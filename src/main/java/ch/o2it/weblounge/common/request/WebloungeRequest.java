@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.common.request;
 
-import javax.servlet.http.HttpServletRequest;
-
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.AuthenticatedUser;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This class is a wrapper to the <code>HttpServletRequest</code> with weblounge
