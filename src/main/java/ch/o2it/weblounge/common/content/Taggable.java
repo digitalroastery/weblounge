@@ -128,8 +128,8 @@ public interface Taggable {
   boolean removeTag(String name);
 
   /**
-   * Removes the tag from the tag set and returns <code>true</code> if it was
-   * removed and the set changed due to the removal.
+   * Removes the tag with the given name and value from the tag set and returns
+   * <code>true</code> if it was removed.
    * 
    * @param name
    *          the tag name
@@ -149,10 +149,8 @@ public interface Taggable {
   /**
    * Returns an array consisting of the current tags.
    * 
-   * @param tag
-   *          the array
    * @return an array of tags
    */
-  Tag[] getTags(Tag[] tag);
+  Tag[] getTags();
 
 }
