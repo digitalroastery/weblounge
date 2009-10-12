@@ -387,8 +387,10 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
 		} else if (action.getConfiguration().getTargetUrl() != null) {
 			target = new WebUrlImpl(request.getSite(), action.getConfiguration().getTargetUrl());
 			targetForced = true;
-		} else {
+		} else if (request.getHistory().size() > 0) {
 			 target = request.getHistory().getLatestMove();
+		} else {
+		  target = request.getSite().getNavigation().getHomeUrl();
 		}
 		
     // We are about to render the action output in the composer of the target
@@ -398,6 +400,7 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
     if (page == null) {
       WebUrl oldTarget = target;
       target = request.getSite().getNavigation().getHomeUrl();
+      page = PageManager.getPage(target, user, SystemPermission.READ, request.getVersion());
       if (targetForced) {
         sitelogger_.warn("Output of action '" + action + "' is configured to go to non existing page " + oldTarget);
       }
