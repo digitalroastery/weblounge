@@ -746,7 +746,21 @@ public class Email implements Serializable {
         // TODO: linebreaks?
         alt.append("Content-Transfer-Encoding: 7bit" + CRLF);
         alt.append(CRLF);
-        alt.append(body);
+        StringBuffer b = new StringBuffer(body.length());
+        boolean wasReturn = false;
+        for (int i=0; i < body.length(); i++) {
+          char c = body.charAt(i);
+          if (c == '\r') {
+            b.append(CRLF);
+            wasReturn = true;
+          } else if (c == '\n' && !wasReturn) {
+            b.append(CRLF);
+          } else {
+            wasReturn = false;
+            b.append(c);
+          }
+        }
+        alt.append(b.toString());
       }
     }
   }
