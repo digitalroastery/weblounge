@@ -20,29 +20,23 @@
 
 package ch.o2it.weblounge.common.security;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-
-import junit.framework.TestCase;
-
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
 import ch.o2it.weblounge.common.impl.security.PageSecurityContext;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.security.WebloungeAdmin;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
-import ch.o2it.weblounge.common.security.Authority;
-import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.security.SystemPermission;
+
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import junit.framework.TestCase;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
 
 /**
  * Testcase for <code>PermissionSecurityContext</code>.
@@ -112,14 +106,12 @@ public class PermissionSecurityContextTest extends TestCase {
 		WebloungeAdmin.init("admin", "weblounge", "admin@weblounge.org");
 		
 		// Create the security context
-		PermissionSecurityContext context = new PageSecurityContext("test");
+		PermissionSecurityContext context = new PageSecurityContext();
 		context.init(path, config);
 
 		// Deny all
-		Set<Authority> authorities = new HashSet<Authority>();
-		authorities.add(translator);
-		authorities.add(editor);
-		context.allow(publish, authorities);
+		context.allow(publish, translator);
+    context.allow(publish, translator);
 		
 		// Test (publish, translator) - expected: success
 		if (!context.check(publish, translator)) {
@@ -165,10 +157,8 @@ public class PermissionSecurityContextTest extends TestCase {
 		context.init(path, config);
 
 		// Deny all
-		Set<Authority> authorities = new HashSet<Authority>();
-		authorities.add(translator);
-		authorities.add(editor);
-		context.deny(write, authorities);
+		context.deny(write, translator);
+    context.deny(write, editor);
 		
 		// Test (write, translator) - expected: failure
 		if (context.check(write, translator)) {
@@ -333,17 +323,12 @@ public class PermissionSecurityContextTest extends TestCase {
 		context.init(path, config);
 
 		// Test one of (editor, publisher) - expected: success
-		Set<Authority> authorities = new HashSet<Authority>();
-		authorities.add(editor);
-		authorities.add(publisher);
+		Authority[] authorities = new Authority[] { editor, publisher };
 		if (!context.checkOne(publish, authorities)) {
 			fail(publisher + " was expected to pass but failed");
 		}
 
 		// Test one of (translator, editor) - expected: failure
-		authorities = new HashSet<Authority>();
-		authorities.add(translator);
-		authorities.add(editor);
 		if (context.checkOne(publish, authorities)) {
 			fail("Neither " + translator + " nor " + editor + " were expected to pass");
 		}
@@ -363,9 +348,7 @@ public class PermissionSecurityContextTest extends TestCase {
 		context.init(path, config);
 
 		// Test one of (editor, publisher) - expected: success
-		Set<Authority> authorities = new HashSet<Authority>();
-		authorities.add(editor);
-		authorities.add(publisher);
+    Authority[] authorities = new Authority[] { editor, publisher };
 		if (!context.checkAll(write, authorities)) {
 			fail("Both " + editor + " and " + publisher + " were expected to pass but failed");
 		}
