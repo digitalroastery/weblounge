@@ -39,10 +39,6 @@ import ch.o2it.weblounge.common.site.SiteNotFoundException;
 /**
  * Wrapper for a request that is passing the weblounge content management
  * system.
- * 
- * @author Tobias Wunden
- * @version 1.0
- * @since Weblounge 2.0
  */
 
 public class WebloungeResponseImpl extends HttpServletResponseWrapper implements WebloungeResponse {
@@ -57,10 +53,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 	private int httpError_ = 200;
 	
 	/** the http error message */
-	private String httpErrorMsg_;
+	private String httpErrorMsg_ = null;
 	
 	/** the servlet request */
-	private WebloungeRequest request_;
+	private WebloungeRequest request_ = null;
 
 	// Logging
 	
@@ -309,6 +305,14 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 	public Iterator<Tag> tags() {
 		return (new ArrayList<Tag>()).iterator();
 	}
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Taggable#getTags()
+   */
+  public Tag[] getTags() {
+    return new Tag[]{};
+  }
 
   /**
    * {@inheritDoc}
