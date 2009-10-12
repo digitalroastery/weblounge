@@ -2,6 +2,8 @@
 ../../../modules/weblounge-assetdirectory-api/trunk	modules/weblounge-assetdirectory-api
 ../../../modules/weblounge-asseteditor/trunk	modules/weblounge-asseteditor
 ../../../modules/weblounge-asseteditor-api/trunk	modules/weblounge-asseteditor-api
+../../../modules/weblounge-cache/trunk	modules/weblounge-cache
+../../../modules/weblounge-cache-api/trunk	modules/weblounge-cache-api
 ../../../modules/weblounge-common/trunk	modules/weblounge-common
 ../../../modules/weblounge-common-api/trunk	modules/weblounge-common-api
 ../../../modules/weblounge-core/trunk	modules/weblounge-core
