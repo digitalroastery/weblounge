@@ -23,12 +23,10 @@ package ch.o2it.weblounge.dispatcher.impl.http;
 /**
  * Describes the required response type to maintain HTTP 1.1 compatibility.
  * 
- * @version	$Revision: 1090 $ $Date: 2009-09-14 19:43:19 +0200 (Mon, 14 Sep 2009) $
- * @author		Daniel Steiner
  * @see ch.ch.o2it.weblounge.common.util.http.Http11ProtocolHandler
  */
-
 public class Http11ResponseType {
+
 	protected int type = Http11ProtocolHandler.RESPONSE_INTERNAL_SERVER_ERROR;
 	protected int from = -1;
 	protected int to = -1;
