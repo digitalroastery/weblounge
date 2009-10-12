@@ -26,9 +26,6 @@ import java.util.Map;
  * The HTMLEncoding encodes any text such that it may be displayed in an HTML
  * browser. This content encoder supports the character set ISO 8859-1 (Latin
  * 1).
- * 
- * @author Tobias Wunden
- * @version Feb 24, 2003
  */
 
 public class HTMLEncoding implements Encoding {
@@ -45,8 +42,7 @@ public class HTMLEncoding implements Encoding {
   /**
    * Creates a new instance of HTMLEncoding.
    */
-  public HTMLEncoding() {
-  }
+  public HTMLEncoding() { }
 
   /**
    * Encodes a text for proper display within an HTML browser.
@@ -56,10 +52,20 @@ public class HTMLEncoding implements Encoding {
    * @return the encoded text
    */
   public String encode(String text) {
-    StringBuffer original = new StringBuffer(text);
+    return encode(new StringBuffer(text));
+  }
+
+  /**
+   * Encodes a text for proper display within an HTML browser.
+   * 
+   * @param text
+   *          the element to be encoded
+   * @return the encoded text
+   */
+  public String encode(StringBuffer text) {
     StringBuffer result = new StringBuffer("");
-    for (int i = 0; i < original.length(); i++) {
-      Character key = new Character(original.charAt(i));
+    for (int i = 0; i < text.length(); i++) {
+      Character key = new Character(text.charAt(i));
       String replacement = encodingDict_.get(key);
       if (replacement != null) {
         for (int j = 0; j < replacement.length(); j++) {
