@@ -38,6 +38,8 @@
         <module>modules/weblounge-assetdirectory</module>
         <module>modules/weblounge-asseteditor-api</module>
         <module>modules/weblounge-asseteditor</module>
+        <module>modules/weblounge-cache-api</module>
+        <module>modules/weblounge-cache</module>
         <module>modules/weblounge-common-api</module>
         <module>modules/weblounge-common</module>
 		<!--
@@ -73,6 +75,8 @@
         <module>modules/weblounge-assetdirectory</module>
         <module>modules/weblounge-asseteditor-api</module>
         <module>modules/weblounge-asseteditor</module>
+        <module>modules/weblounge-cache-api</module>
+        <module>modules/weblounge-cache</module>
         <module>modules/weblounge-common-api</module>
         <module>modules/weblounge-common</module>
 		<!--
