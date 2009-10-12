@@ -57,9 +57,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.jasper-6.0.14</artifactId>
-      <version>4.0-m1</version>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>jasper</artifactId>
+      <version>6.0.16</version>
     </dependency>
 
     <!-- testing -->
