@@ -329,6 +329,7 @@ public class PermissionSecurityContextTest extends TestCase {
 		}
 
 		// Test one of (translator, editor) - expected: failure
+    authorities = new Authority[] { translator, editor };
 		if (context.checkOne(publish, authorities)) {
 			fail("Neither " + translator + " nor " + editor + " were expected to pass");
 		}
