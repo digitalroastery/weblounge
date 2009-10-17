@@ -59,7 +59,7 @@ public class DefaultLayout extends LocalizableObject implements Layout {
 
 	/**
 	 * The default layout allows all elements to be placed anywhere, so this
-	 * method allways returns <code>true</code>.
+	 * method always returns <code>true</code>.
 	 * 
 	 * @param element the pagelet to be placed
 	 * @param composer the composer where the pagelet will be placed

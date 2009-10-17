@@ -21,7 +21,7 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.ServletConfiguration;
 import ch.o2it.weblounge.common.impl.util.ServletMapping;
@@ -81,7 +81,7 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
   String identifier;
 
   /** Module description */
-  LocalizableObject descriptions;
+  LocalizableContent descriptions;
 
   /** True if the site is enabled */
   boolean isEnabled;
@@ -308,7 +308,7 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
     moduleClass = XPathHelper.valueOf(path, config, "class");
     if (moduleClass == null)
       moduleClass = "ch.o2it.weblounge.core.module.ModuleImpl";
-    descriptions = new LocalizableObject();
+    descriptions = new LocalizableContent();
     LanguageSupport.addDescriptions(path, config, null, descriptions, true);
     String enable = XPathHelper.valueOf(path, config, "enable");
     isEnabled = (enable == null || "true".equals(enable.toLowerCase()));

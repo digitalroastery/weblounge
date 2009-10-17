@@ -20,7 +20,7 @@
 package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.Lease;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.pool.LeaseFactory;
 import ch.o2it.weblounge.common.impl.util.pool.Pool;
@@ -50,7 +50,7 @@ import java.util.Map;
  * @since Weblounge 2.0
  */
 
-public class ActionHandlerBundle extends LocalizableObject implements PoolListener, SiteListener {
+public class ActionHandlerBundle extends LocalizableContent implements PoolListener, SiteListener {
 
 	/** ActionHandler identifier */
 	private String identifier_;

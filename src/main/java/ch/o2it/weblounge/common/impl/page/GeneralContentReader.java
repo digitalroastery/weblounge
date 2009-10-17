@@ -446,13 +446,13 @@ public class GeneralContentReader extends DefaultHandler {
       if (characters.length() > 0) {
         try {
           Date d = dateFormat.parse(characters.toString());
-          publishingCtx.setFrom(d);
+          publishingCtx.setPublishFrom(d);
         } catch (Exception e) {
-          publishingCtx.setFrom(new Date());
+          publishingCtx.setPublishFrom(new Date());
           log_.warn("The publishing 'from' date on " + this + " is malformed: '" + characters.toString() + "'");
         }
       } else {
-        publishingCtx.setFrom(new Date());
+        publishingCtx.setPublishFrom(new Date());
       }
     }
 
@@ -464,13 +464,13 @@ public class GeneralContentReader extends DefaultHandler {
       if (characters.length() > 0) {
         try {
           Date d = dateFormat.parse(characters.toString());
-          publishingCtx.setTo(d);
+          publishingCtx.setPublishTo(d);
         } catch (Exception e) {
-          publishingCtx.setTo(new Date(Long.MAX_VALUE));
+          publishingCtx.setPublishTo(new Date(Long.MAX_VALUE));
           log_.warn("The publishing 'to' date on " + this + " is malformed: '" + characters.toString() + "'");
         }
       } else {
-        publishingCtx.setTo(new Date(Long.MAX_VALUE));
+        publishingCtx.setPublishTo(new Date(Long.MAX_VALUE));
       }
     }
 

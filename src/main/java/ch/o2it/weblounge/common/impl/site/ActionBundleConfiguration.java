@@ -21,7 +21,7 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.security.SecuredObject;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.Arguments;
@@ -76,7 +76,7 @@ public final class ActionBundleConfiguration extends SecuredObject implements Lo
 	Map configurations;
 	
 	/** The multilingual descriptions */
-	LocalizableObject description;
+	LocalizableContent description;
 	
 	/** Amount of time until the content is considered to be invalid */
 	long validTime;
@@ -99,7 +99,7 @@ public final class ActionBundleConfiguration extends SecuredObject implements Lo
 		this.recheckTime = RECHECK_TIME_DEFAULT;
 		this.target = null;
 		this.configurations = new HashMap();
-		this.description = new LocalizableObject();
+		this.description = new LocalizableContent();
 	}
 
 	/**
@@ -116,7 +116,7 @@ public final class ActionBundleConfiguration extends SecuredObject implements Lo
 	 * 
 	 * @return the description
 	 */
-	public LocalizableObject getDescription() {
+	public LocalizableContent getDescription() {
 		return description;
 	}
 	
@@ -194,10 +194,10 @@ public final class ActionBundleConfiguration extends SecuredObject implements Lo
 	}
 
 	/**
-	 * @see ch.o2it.weblounge.Localizable.language.Multilingual#setLanguage(ch.o2it.weblounge.api.language.Language)
+	 * @see ch.o2it.weblounge.Localizable.language.Multilingual#switchTo(ch.o2it.weblounge.api.language.Language)
 	 */
 	public void setLanguage(Language language) {
-		description.setLanguage(language);
+		description.switchTo(language);
 	}
 
 	/**

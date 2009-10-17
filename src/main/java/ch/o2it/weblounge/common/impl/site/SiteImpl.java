@@ -921,7 +921,7 @@ public class SiteImpl implements Site {
 	}
 
 	/**
-	 * This method is called when the request has been successfuly delivered to
+	 * This method is called when the request has been successfully delivered to
 	 * the client.
 	 * 
 	 * @param request the servlet request

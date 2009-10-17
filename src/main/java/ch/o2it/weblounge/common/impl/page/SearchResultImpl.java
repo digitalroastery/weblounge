@@ -42,7 +42,7 @@ import java.util.Date;
  * @version 1.0
  */
 
-public class SearchResultImpl extends LocalizableObject<SearchResult> implements SearchResult {
+public class SearchResultImpl extends LocalizableObject implements SearchResult {
 
   /** The title */
   protected String title = null;
@@ -65,7 +65,7 @@ public class SearchResultImpl extends LocalizableObject<SearchResult> implements
   /** Relevance of this search result with respect to the search terms */
   float relevance = 0;
 
-  /** The securitiy context of this search result */
+  /** The security context of this search result */
   protected SecurityContext securityContext = null;
 
   /** The publishing context of this search result */
@@ -272,15 +272,6 @@ public class SearchResultImpl extends LocalizableObject<SearchResult> implements
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Publishable#getPublishingContext()
-   */
-  public PublishingContext getPublishingContext() {
-    return publishingContext;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
    */
   public boolean isPublished() {
@@ -298,6 +289,22 @@ public class SearchResultImpl extends LocalizableObject<SearchResult> implements
     if (publishingContext != null)
       return publishingContext.isPublished(date);
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
+   */
+  public Date getPublishFrom() {
+    return publishingContext.getPublishFrom();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
+   */
+  public Date getPublishTo() {
+    return publishingContext.getPublishTo();
   }
 
 }

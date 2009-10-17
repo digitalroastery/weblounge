@@ -27,7 +27,7 @@ import ch.o2it.weblounge.common.security.SystemPermission;
  * Specialized security context for a pagelet. This implementation adds the proper
  * name and default values.
  */
-public class PageletSecurityContext extends PermissionSecurityContext {
+public class PageletSecurityContextImpl extends PermissionSecurityContext {
 
 	/**
 	 * Creates a new security context for a pagelet with the specified url.
@@ -35,7 +35,7 @@ public class PageletSecurityContext extends PermissionSecurityContext {
 	 * @param module the pagelet module
 	 * @param id the pagelet id
 	 */
-	public PageletSecurityContext(String module, String id) {
+	public PageletSecurityContextImpl(String module, String id) {
 		addDefaultValues();
 	}
 

@@ -19,15 +19,20 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
+import ch.o2it.weblounge.common.WebloungeDateFormat;
+import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
+import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.security.PageSecurityContext;
+import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Layout;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageContentListener;
-import ch.o2it.weblounge.common.page.PageHeader;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.page.Pagelet;
 import ch.o2it.weblounge.common.renderer.Renderer;
@@ -36,9 +41,12 @@ import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
+import ch.o2it.weblounge.common.security.SystemPermission;
 import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -65,20 +73,58 @@ import javax.xml.parsers.ParserConfigurationException;
  * @version 1.0
  * @since Weblounge 2.0
  */
+public class PageImpl extends LocalizableObject implements Page {
 
-public class PageImpl implements Page {
+  /** The logging instance */
+  private final static Logger log_ = LoggerFactory.getLogger(PageImpl.class);
 
-  /** The page header */
-  PageHeaderImpl header;
+  /** The uri */
+  PageURI uri = null;
 
-  /** The user that holds the editing lock for this page */
-  User editor;
+  /** PageHeader type */
+  String type = null;
+
+  /** PageHeader keywords */
+  List<String> keywords_ = null;
+
+  /** Renderer identifier */
+  String renderer = null;
+
+  /** Layout identifier */
+  String layout = null;
+  
+  /** True if this page should show up on the sitemap */
+  boolean inSitemap = false;
+
+  /** The title pagelets */
+  List<Pagelet> headlines = null;
+
+  /** Current page editor (and owner) */
+  User editor = null;
+  
+  /** Modification context */
+  ModificationContext modificationCtx = null;
+  
+  /** The publishing context */
+  PublishingContext publishingCtx = null;
+
+  /** The security context */
+  PermissionSecurityContext securityCtx = null;
+
+  /** The user that last modified the page */
+  User modifyingUser = null;
+
+  /** Date when the page was last modified */
+  Date modifiedSince = null;
+  
+  /** The title */
+  LocalizableContent<String> title = null;
 
   /** The pagelet container */
-  Map<String, List<Pagelet>> composers_;
+  Map<String, List<Pagelet>> composers_ = null;
 
   /** The page content listeners */
-  private List<PageContentListener> listeners;
+  private List<PageContentListener> contentListeners = null;
 
   /**
    * Creates a new page for the given page uri.
@@ -86,28 +132,16 @@ public class PageImpl implements Page {
    * @param uri
    *          the page uri
    */
-  public PageImpl(PageURI uri) {
-    this(new PageHeaderImpl(uri));
-  }
-
-  /**
-   * Creates a new page with default properties and the given page header.
-   * 
-   * @param header
-   *          the page header
-   */
-  PageImpl(PageHeaderImpl header) {
+  PageImpl(PageURI uri) {
+    super(uri.getSite().getDefaultLanguage());
     composers_ = new HashMap<String, List<Pagelet>>();
-    this.header = header;
-  }
-
-  /**
-   * Returns the page header.
-   * 
-   * @return the page header
-   */
-  public PageHeader getHeader() {
-    return header;
+    this.uri = uri;
+    this.publishingCtx = new PublishingContextImpl();
+    this.modificationCtx = new ModificationContextImpl();
+    this.securityCtx = new PageSecurityContext();
+    this.keywords_ = new ArrayList<String>();
+    this.headlines = new ArrayList<Pagelet>();
+    this.title = new LocalizableContent<String>(this);
   }
 
   /**
@@ -116,21 +150,16 @@ public class PageImpl implements Page {
    * @return the site
    */
   public Site getSite() {
-    return header.site;
+    return uri.getSite();
   }
 
   /**
-   * Returns the page version, which is one of
-   * <ul>
-   * <li>{@link #LIVE}</li>
-   * <li>{@link #ORIGINAL}</li>
-   * <li>{@link #WORK}</li>
-   * </ul>
+   * Returns the page version.
    * 
    * @return the page version
    */
   public long getVersion() {
-    return header.version;
+    return uri.getVersion();
   }
 
   /**
@@ -140,16 +169,483 @@ public class PageImpl implements Page {
    * @return the page type
    */
   public String getType() {
-    return header.type;
+    return type;
   }
 
   /**
-   * Returns the keywords that are defined for this page.
+   * Sets the page type: news, feature, ...
+   * 
+   * @param type
+   *          the page type
+   */
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  /**
+   * Adds the keyword to this page.
+   * 
+   * @param keyword
+   *          the keyword to add
+   */
+  void addKeyword(String keyword) {
+    keywords_.add(keyword);
+  }
+
+  /**
+   * Returns the page uri.
+   * 
+   * @return the page uri
+   */
+  public PageURI getURI() {
+    return uri;
+  }
+
+  /**
+   * Returns the publishing context of this page in the current version. The
+   * context tells whether the pagelet may be published on a certain point in
+   * time or not.
+   * 
+   * @return the publishing context
+   */
+  public PublishingContext getPublishingContext() {
+    return publishingCtx;
+  }
+
+  /**
+   * Returns the publishing start date.
+   * 
+   * @return the start date
+   */
+  public Date getPublishFrom() {
+    return publishingCtx.getPublishFrom();
+  }
+
+  /**
+   * Returns the publishing end date.
+   * 
+   * @return the end date
+   */
+  public Date getPublishTo() {
+    return publishingCtx.getPublishTo();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.page.Page#inSitemap()
+   */
+  public boolean inSitemap() {
+    return inSitemap;
+  }
+
+  /**
+   * Returns the headline for the given user regarding the read permission that
+   * have been defined on the title pagelets. If no suitable headline is found,
+   * <code>null</code> is returned.
+   * 
+   * @param moduleId
+   *          the pagelet's module identifier
+   * @param pageletId
+   *          the pagelet identifier
+   * @param user
+   *          the user that wants access to the header
+   * @return the first suitable headline pagelet
+   */
+  public Pagelet getHeadline(String moduleId, String pageletId, User user) {
+    return getHeadline(moduleId, pageletId, user, SystemPermission.READ);
+  }
+
+  /**
+   * Returns the headline for the given user regarding the permissions that have
+   * been defined on the title pagelets. If no suitable hedline is found,
+   * <code>null</code> is returned.
+   * 
+   * @param moduleId
+   *          the pagelet's module identifier
+   * @param pageletId
+   *          the pagelet identifier
+   * @param user
+   *          the user that wants access to the header
+   * @param permission
+   *          the permission requirements
+   * @return the first suitable headline pagelet
+   */
+  public Pagelet getHeadline(String moduleId, String pageletId, User user,
+      Permission permission) {
+    for (int i = 0; i < headlines.size(); i++) {
+      Pagelet headline = headlines.get(i);
+      if (headline.getModule().equals(moduleId) && headline.getIdentifier().equals(pageletId))
+        if (headline.checkOne(permission, user.getRoleClosure()) || headline.check(permission, user))
+          return headline;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the headline pagelets
+   * 
+   * @return the headline pagelets
+   */
+  public Pagelet[] getHeadlines() {
+    Pagelet[] h = new Pagelet[headlines.size()];
+    return headlines.toArray(h);
+  }
+
+  /**
+   * Returns the page title in the active language.
+   * 
+   * @return the page title
+   */
+  public String getTitle() {
+    return title.get();
+  }
+
+  /**
+   * Returns the page title in the specified language or <code>null</code> if
+   * this language version is not available.
+   * 
+   * @param language
+   *          the language identifier
+   * @return the page title
+   */
+  public String getTitle(Language language) {
+    return title.get(language);
+  }
+
+  /**
+   * Returns the page title in the required language. If no title can be found
+   * in that language, then it will be looked up in the default language (unless
+   * <code>force</code> is set to <code>true</code>). If that doesn't produce a
+   * result as well, <code>null</code> is returned.
+   * 
+   * @param language
+   *          the title language
+   * @param force
+   *          <code>true</code> to force the language
+   * @return the content
+   */
+  public String getTitle(Language language, boolean force) {
+    return title.get(language, force);
+  }
+
+  /**
+   * Sets the data when this page has been modified.
+   * 
+   * @param date
+   *          the modification date
+   */
+  void setModifiedSince(Date date) {
+    modifiedSince = date;
+  }
+
+  /**
+   * Returns the modification date of the page.
+   * 
+   * @return the modification date
+   */
+  public Date getModifiedSince() {
+    return modifiedSince;
+  }
+
+  /**
+   * Sets the user that last modified the page.
+   * 
+   * @param user
+   *          the modifying user
+   */
+  void setModifiedBy(User user) {
+    modifyingUser = user;
+  }
+
+  /**
+   * Returns the modification user of the page.
+   * 
+   * @return the modification date
+   */
+  public User getModifiedBy() {
+    return modifyingUser;
+  }
+
+  /**
+   * Returns the layout associated with this page.
+   * 
+   * @return the associated layout
+   */
+  public Layout getLayout() {
+    return uri.getSite().getLayout(layout);
+  }
+
+  /**
+   * Returns the renderer that is used to render this page.
+   * 
+   * @param method
+   *          the rendering method
+   * @return the renderer
+   */
+  public Renderer getRenderer(String method) {
+    return (renderer != null) ? uri.getSite().getRenderer(renderer, method) : null;
+  }
+
+  /**
+   * Sets the renderer that is used to render this page.
+   * 
+   * @param renderer
+   *          the renderer identifier
+   */
+  public void setRenderer(String renderer) {
+    this.renderer = renderer;
+  }
+
+  /**
+   * Returns the keywords that are defined for this page header.
    * 
    * @return the keywords
    */
   public String[] getKeywords() {
-    return header.getKeywords();
+    String kw[] = new String[keywords_.size()];
+    return keywords_.toArray(kw);
+  }
+
+  /**
+   * Sets the keywords that are defined on this page.
+   * 
+   * @param keywords
+   */
+  public void setKeywords(String[] keywords) {
+    keywords_.clear();
+    for (int i = 0; i < keywords.length; i++)
+      keywords_.add(keywords[i]);
+  }
+
+  /**
+   * Returns the security context that is associated with this pagelet. The
+   * context tells whether the pagelet may be accessed in a certain way by a
+   * user or not.
+   * 
+   * @return the pagelet's security context
+   */
+  public SecurityContext getSecurityContext() {
+    return securityCtx;
+  }
+
+  /**
+   * Returns <code>true</code> if the user <code>u</code> is allowed to do
+   * actions that require permission <code>p</code> on this pagelet.
+   * 
+   * @param p
+   *          the required permission
+   * @param a
+   *          the authorization used to access to this pagelet
+   * @return <code>true</code> if the user has the required permission
+   */
+  public boolean check(Permission p, Authority a) {
+    return securityCtx.check(p, a);
+  }
+
+  /**
+   * Returns <code>true</code> if the user <code>u</code> is allowed to act on
+   * the secured object in a way that satisfies the given {@link PermissionSet}
+   * <code>p</code>.
+   * 
+   * @param p
+   *          the required set of permissions
+   * @param a
+   *          the authorization used to access to the secured object
+   * @return <code>true</code> if the user owns the required permissions
+   */
+  public boolean check(PermissionSet p, Authority a) {
+    return securityCtx.check(p, a);
+  }
+
+  /**
+   * Checks whether at least one of the given authorities pass with respect to
+   * the given permission.
+   * 
+   * @param permission
+   *          the permission to obtain
+   * @param authorities
+   *          the objects claiming the permission
+   * @return <code>true</code> if all authorities pass
+   */
+  public boolean checkOne(Permission permission, Authority[] authorities) {
+    return securityCtx.checkOne(permission, authorities);
+  }
+
+  /**
+   * Checks whether all of the given authorities pass with respect to the given
+   * permission.
+   * 
+   * @param permission
+   *          the permission to obtain
+   * @param authorities
+   *          the object claiming the permission
+   * @return <code>true</code> if all authorities pass
+   */
+  public boolean checkAll(Permission permission, Authority[] authorities) {
+    return securityCtx.checkAll(permission, authorities);
+  }
+
+  /**
+   * Returns the pagelets permissions, which are
+   * <ul>
+   * <li>READ</li>
+   * <li>WRITE</li>
+   * <li>TRANSLATE</li>
+   * <li>MANAGE</li>
+   * </ul>
+   * 
+   * @return the permissions that can be set on the pagelet
+   * @see ch.o2it.weblounge.api.security.Secured#permissions()
+   */
+  public Permission[] permissions() {
+    return permissions;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#getOwner()
+   */
+  public User getOwner() {
+    if (securityCtx == null)
+      return null;
+    return securityCtx.getOwner();
+  }
+
+  /**
+   * Adds the security listener to the pagelets security context.
+   * 
+   * @param listener
+   *          the security listener
+   * @see ch.o2it.weblounge.api.security.Secured#addSecurityListener(ch.o2it.weblounge.api.security.SecurityListener)
+   */
+  public void addSecurityListener(SecurityListener listener) {
+    securityCtx.addSecurityListener(listener);
+  }
+
+  /**
+   * Removes the security listener from the pagelets security context.
+   * 
+   * @param listener
+   *          the security listener
+   * @see ch.o2it.weblounge.api.security.Secured#removeSecurityListener(ch.o2it.weblounge.api.security.SecurityListener)
+   */
+  public void removeSecurityListener(SecurityListener listener) {
+    securityCtx.removeSecurityListener(listener);
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  public int hashCode() {
+    return uri.hashCode();
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof Page) {
+      return uri.equals(((Page)obj).getURI());
+    }
+    return false;
+  }
+
+  /**
+   * Returns the string representation of this page header.
+   * 
+   * @return the string representation
+   */
+  public String toString() {
+    return uri.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
+   */
+  public boolean isPublished() {
+    return publishingCtx.isPublished();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
+   */
+  public boolean isPublished(Date date) {
+    return publishingCtx.isPublished(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
+   */
+  public Date getCreationDate() {
+    return modificationCtx.getCreationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
+   */
+  public User getCreator() {
+    return modificationCtx.getCreator();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationContext()
+   */
+  public ModificationContext getModificationContext() {
+    return modificationCtx;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
+   */
+  public Date getModificationDate() {
+    return modificationCtx.getModificationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
+   */
+  public Date getModificationDate(Language language) {
+    return modificationCtx.getModificationDate(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
+   */
+  public User getModifier() {
+    return modificationCtx.getModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier(ch.o2it.weblounge.common.language.Language)
+   */
+  public User getModifier(Language language) {
+    return modificationCtx.getModifier(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
+   */
+  public boolean isModifiedAfter(Date date) {
+    return modificationCtx.isModifiedAfter(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date, ch.o2it.weblounge.common.language.Language)
+   */
+  public boolean isModifiedAfter(Date date, Language language) {
+    return modificationCtx.isModifiedAfter(date, language);
   }
 
   /**
@@ -168,7 +664,7 @@ public class PageImpl implements Page {
    * 
    * @param user
    *          the locking user
-   * @return <code>true</code> if the page was locked successfuly
+   * @return <code>true</code> if the page was locked successfully
    */
   boolean lock(User user) {
     if (editor == null || editor.equals(user)) {
@@ -180,12 +676,12 @@ public class PageImpl implements Page {
 
   /**
    * Removes the editing lock from this page and returns <code>true</code> if
-   * the page was previously unlocke, the user was the one holding the lock or
+   * the page was previously unlocked, the user was the one holding the lock or
    * the user is a publisher.
    * 
    * @param user
    *          the unlocking user
-   * @return <code>true</code> if the page was unlocked successfuly
+   * @return <code>true</code> if the page was unlocked successfully
    */
   boolean unlock(User user) {
     if (editor == null || editor.equals(user) || user.hasRole(SystemRole.PUBLISHER)) {
@@ -211,16 +707,6 @@ public class PageImpl implements Page {
    */
   public boolean isLocked(User user) {
     return isLocked() && user.equals(editor);
-  }
-
-  /**
-   * Adds the keyword to this page.
-   * 
-   * @param keyword
-   *          the keyword to add
-   */
-  public void addKeyword(String keyword) {
-    header.keywords_.add(keyword);
   }
 
   /**
@@ -282,7 +768,7 @@ public class PageImpl implements Page {
    * @return the composer content
    */
   public Pagelet getPagelet(String composer, int index, User u, Permission p) {
-    List pagelets = composers_.get(composer);
+    List<Pagelet> pagelets = composers_.get(composer);
     if (pagelets == null || pagelets.size() - 1 < index) {
       return null;
     }
@@ -321,140 +807,6 @@ public class PageImpl implements Page {
    */
   void movePageletDown(String composer, int position) {
     movePageletUp(composer, position + 1);
-  }
-
-  /**
-   * Returns the page uri.
-   * 
-   * @return the page uri
-   */
-  public PageURI getURI() {
-    return header.getURI();
-  }
-
-  /**
-   * Returns the publishing context of this page in the current version. The
-   * context tells whether the pagelet may be published on a certain point in
-   * time or not.
-   * 
-   * @return the publishing context
-   */
-  public PublishingContext getPublishingContext() {
-    return header.publishingCtx;
-  }
-
-  /**
-   * Returns the publishing start date.
-   * 
-   * @return the start date
-   */
-  public Date getPublishFrom() {
-    return header.publishingCtx.getFrom();
-  }
-
-  /**
-   * Returns the publishing end date.
-   * 
-   * @return the end date
-   */
-  public Date getPublishTo() {
-    return header.publishingCtx.getTo();
-  }
-
-  /**
-   * Returns <code>true</code> if the page may be published. The output of this
-   * method depends on the <code>check</code> method of the
-   * <code>PublishingContext</code>.
-   * 
-   * @return <code>true</code> if the page may be published
-   */
-  public boolean isPublished() {
-    return header.publishingCtx.isPublished();
-  }
-
-  /**
-   * Returns the page title in the active language.
-   * 
-   * @return the page title
-   */
-  public String getTitle() {
-    return header.getTitle();
-  }
-
-  /**
-   * Returns the page title in the specified language or <code>null</code> if
-   * this language version is not available.
-   * 
-   * @param language
-   *          the language identifier
-   * @return the page title
-   */
-  public String getTitle(Language language) {
-    return header.getTitle(language);
-  }
-
-  /**
-   * Returns the page title in the required language. If no title can be found
-   * in that language, then it will be looked up in the default language (unless
-   * <code>force</code> is set to <code>true</code>). If that doesn't produce a
-   * result as well, <code>null</code> is returned.
-   * 
-   * @param language
-   *          the title language
-   * @param force
-   *          <code>true</code> to force the language
-   * @return the content
-   */
-  public String getTitle(Language language, boolean force) {
-    return header.getTitle(language, force);
-  }
-
-  /**
-   * Sets the data when this page has been modified.
-   * 
-   * @param date
-   *          the modification date
-   */
-  void setModifiedSince(Date date) {
-    header.modifiedSince = date;
-  }
-
-  /**
-   * Returns the modification date of the page.
-   * 
-   * @return the modification date
-   */
-  public Date getModifiedSince() {
-    return header.modifiedSince;
-  }
-
-  /**
-   * Sets the user that last modified the page.
-   * 
-   * @param user
-   *          the modifying user
-   */
-  void setModifiedBy(User user) {
-    header.modifyingUser = user;
-  }
-
-  /**
-   * Returns the modification user of the page.
-   * 
-   * @return the modification date
-   */
-  public User getModifiedBy() {
-    return header.modifyingUser;
-  }
-
-  /**
-   * Sets the page's version.
-   * 
-   * @param version
-   *          the version
-   */
-  void setVersion(long version) {
-    header.version = version;
   }
 
   /**
@@ -540,34 +892,14 @@ public class PageImpl implements Page {
    *          the position
    */
   void removePagelet(String composer, int position) {
-    List c = composers_.get(composer);
-    if (c == null) {
+    List<Pagelet> pagelets = composers_.get(composer);
+    if (pagelets == null) {
       return;
     }
-    c.remove(position);
-    for (int i = position; i < c.size(); i++) {
-      ((PageletLocationImpl) ((PageletImpl) c.get(i)).getLocation()).setPosition(i);
+    pagelets.remove(position);
+    for (int i = position; i < pagelets.size(); i++) {
+      ((PageletLocationImpl) ((PageletImpl) pagelets.get(i)).getLocation()).setPosition(i);
     }
-  }
-
-  /**
-   * Returns the layout associated with this page.
-   * 
-   * @return the associated layout
-   */
-  public Layout getLayout() {
-    return header.getLayout();
-  }
-
-  /**
-   * Returns the renderer that is used to render this page.
-   * 
-   * @param method
-   *          the rendering method
-   * @return the renderer
-   */
-  public Renderer getRenderer(String method) {
-    return header.getRenderer(method);
   }
 
   /**
@@ -578,9 +910,9 @@ public class PageImpl implements Page {
    *          the new page content listener
    */
   public void addPageContentListener(PageContentListener listener) {
-    if (listeners == null)
-      listeners = new ArrayList<PageContentListener>();
-    listeners.add(listener);
+    if (contentListeners == null)
+      contentListeners = new ArrayList<PageContentListener>();
+    contentListeners.add(listener);
   }
 
   /**
@@ -590,115 +922,9 @@ public class PageImpl implements Page {
    *          the page content listener
    */
   public void removePageContentListener(PageContentListener listener) {
-    if (listeners == null)
+    if (contentListeners == null)
       return;
-    listeners.remove(listener);
-  }
-
-  /**
-   * Returns the security context that is associated with this pagelet. The
-   * context tells whether the pagelet may be accessed in a certain way by a
-   * user or not.
-   * 
-   * @return the pagelet's security context
-   */
-  public SecurityContext getSecurityContext() {
-    return header.securityCtx;
-  }
-
-  /**
-   * Returns <code>true</code> if the user <code>u</code> is allowed to do
-   * actions that require permission <code>p</code> on this pagelet.
-   * 
-   * @param p
-   *          the required permission
-   * @param a
-   *          the authorization used to access to this pagelet
-   * @return <code>true</code> if the user has the required permission
-   */
-  public boolean check(Permission p, Authority a) {
-    return header.securityCtx.check(p, a);
-  }
-
-  /**
-   * Returns <code>true</code> if the user <code>u</code> is allowed to act on
-   * the secured object in a way that satisfies the given permissionset
-   * <code>p</code>.
-   * 
-   * @param p
-   *          the required set of permissions
-   * @param a
-   *          the authorization used to access to this pagelet
-   * @return <code>true</code> if the user owns the required permissions
-   */
-  public boolean check(PermissionSet p, Authority a) {
-    return header.securityCtx.check(p, a);
-  }
-
-  /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the objects claiming the permission
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkOne(Permission permission, Set authorities) {
-    return header.securityCtx.checkOne(permission, authorities);
-  }
-
-  /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the object claiming the permission
-   * @return <code>true</code> if all authorities pass
-   */
-  public boolean checkAll(Permission permission, Set authorities) {
-    return header.securityCtx.checkAll(permission, authorities);
-  }
-
-  /**
-   * Returns the pages permissions, which are
-   * <ul>
-   * <li>READ</li>
-   * <li>WRITE</li>
-   * <li>TRANSLATE</li>
-   * <li>MANAGE</li>
-   * </ul>
-   * 
-   * @return the permissions that can be set on the pagelet
-   * @see ch.o2it.weblounge.api.security.Secured#permissions()
-   */
-  public Permission[] permissions() {
-    return permissions;
-  }
-
-  /**
-   * Adds the security listener to the pagelets security context.
-   * 
-   * @param listener
-   *          the security listener
-   * @see ch.o2it.weblounge.api.security.Secured#addSecurityListener(ch.o2it.weblounge.api.security.SecurityListener)
-   */
-  public void addSecurityListener(SecurityListener listener) {
-    header.securityCtx.addSecurityListener(listener);
-  }
-
-  /**
-   * Removes the security listener from the pagelets security context.
-   * 
-   * @param listener
-   *          the security listener
-   * @see ch.o2it.weblounge.api.security.Secured#removeSecurityListener(ch.o2it.weblounge.api.security.SecurityListener)
-   */
-  public void removeSecurityListener(SecurityListener listener) {
-    header.securityCtx.removeSecurityListener(listener);
+    contentListeners.remove(listener);
   }
 
   /**
@@ -776,117 +1002,70 @@ public class PageImpl implements Page {
   }
 
   /**
-   * Returns the versions that are available for this page. The strings are
-   * converted longs denoting the time of creation. Additionally, the versions
-   * <code>index</code>, <code>work</code> and <code>original</code> may exist.
-   * 
-   * @return the available versions
-   */
-  public String[] getVersions() {
-    // TODO: Load versions
-    return null;
-  }
-
-  /**
-   * Returns the page's current language.
-   * 
-   * @see ch.o2it.weblounge.Localizable.language.Multilingual#getLanguage()
-   */
-  public Language getLanguage() {
-    return header.getLanguage();
-  }
-
-  /**
-   * Sets the page's language.
-   * 
-   * @see ch.o2it.weblounge.Localizable.language.Multilingual#setLanguage(ch.o2it.weblounge.api.language.Language)
-   */
-  public void setLanguage(Language language) {
-    header.setLanguage(language);
-  }
-
-  /**
-   * Returns <code>true</code> if the page supports <code>language</code>.
-   * 
-   * @see ch.o2it.weblounge.Localizable.language.Multilingual#supportsLanguage(ch.o2it.weblounge.api.language.Language)
-   */
-  public boolean supportsLanguage(Language language) {
-    return header.supportsLanguage(language);
-  }
-
-  /**
-   * Returns the page's string representation.
-   * 
-   * @see ch.o2it.weblounge.Localizable.language.Multilingual#toString(ch.o2it.weblounge.api.language.Language)
-   */
-  public String toString(Language language) {
-    return header.toString(language);
-  }
-
-  /**
-   * Returns the page's string representation or <code>null</code> if
-   * <code>force</code> is set to <code>true</code> and no representation in the
-   * given language could be found.
-   * 
-   * @see ch.o2it.weblounge.Localizable.language.Multilingual#toString(ch.o2it.weblounge.api.language.Language,
-   *      boolean)
-   */
-  public String toString(Language language, boolean force) {
-    return header.toString(language, force);
-  }
-
-  /**
-   * @see ch.o2it.weblounge.Localizable.language.Multilingual#compareTo(ch.o2it.weblounge.Localizable.language.Multilingual,
-   *      ch.o2it.weblounge.api.language.Language)
-   */
-  public int compareTo(Localizable o, Language language) {
-    return header.compareTo(o, language);
-  }
-
-  /**
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
-  public int compareTo(Object o) {
-    return header.compareTo(o);
-  }
-
-  /**
-   * @see java.lang.Object#toString()
-   */
-  public String toString() {
-    return header.dbPath;
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  public int hashCode() {
-    return header.hashCode();
-  }
-
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof PageImpl) {
-      PageImpl p = (PageImpl) obj;
-      return header.equals(p.header);
-    }
-    return false;
-  }
-
-  /**
    * Returns a XML representation of this page header.
    * 
    * @return an XML representation of this page header
    */
-  public Node toExportXml() {
+  public Node toXml() {
     StringBuffer b = new StringBuffer();
 
     b.append("<page>");
 
-    b.append(header.toExportXml());
+    // Add header
+    b.append("<header>");
 
+    b.append("<renderer>");
+    b.append(renderer);
+    b.append("</renderer>\n");
+
+    b.append("<layout>");
+    b.append(layout);
+    b.append("</layout>\n");
+
+    b.append("<type>");
+    b.append(type);
+    b.append("</type>\n");
+
+    b.append(publishingCtx.toXml());
+    b.append(securityCtx.toXml());
+
+    if (keywords_.size() != 0) {
+      b.append("<keywords>\n");
+      for (String k : keywords_) {
+        b.append("<keyword><![CDATA[");
+        b.append(k);
+        b.append("]]></keyword>\n");
+      }
+      b.append("</keywords>\n");
+    } else {
+      b.append("<keywords/>\n");
+    }
+
+    for (Language l : languages) {
+      b.append("<title language=\"");
+      b.append(l.getIdentifier());
+      b.append("\"><![CDATA[");
+      b.append(getTitle(l));
+      b.append("]]></title>\n");
+    }
+
+    b.append("<modified>\n");
+    b.append("<date>");
+    Date d = modifiedSince;
+    if (d == null)
+      d = new Date();
+    b.append(WebloungeDateFormat.formatStatic(d));
+    b.append("</date>\n");
+    b.append("<user>");
+    User u = modifyingUser;
+    if (u == null)
+      u = uri.getSite().getAdministrator();
+    b.append(u.getLogin());
+    b.append("</user>\n");
+    b.append("</modified>\n");
+
+    b.append("</header>");
+    
     // TODO: Append body
 
     b.append("</page>");
@@ -897,11 +1076,11 @@ public class PageImpl implements Page {
       Document doc = docBuilder.parse(is);
       return doc.getFirstChild();
     } catch (SAXException e) {
-      header.site.getLogger().error("Error building dom tree for pagelet", e);
+      log_.error("Error building dom tree for pagelet", e);
     } catch (IOException e) {
-      header.site.getLogger().error("Error reading pagelet xml", e);
+      log_.error("Error reading pagelet xml", e);
     } catch (ParserConfigurationException e) {
-      header.site.getLogger().error("Error parsing pagelet xml", e);
+      log_.error("Error parsing pagelet xml", e);
     }
     return null;
   }

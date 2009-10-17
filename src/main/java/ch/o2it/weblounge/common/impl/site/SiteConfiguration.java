@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.security.WebloungeAdmin;
 import ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule;
 import ch.o2it.weblounge.common.impl.util.Arguments;
@@ -91,7 +91,7 @@ public class SiteConfiguration extends XMLConfigurator implements Customizable {
 	SiteClassLoader classLoader;
 
 	/** Site description */
-	LocalizableObject description;
+	LocalizableContent description;
 
 	/** True if the site is enabled */
 	boolean isEnabled;
@@ -262,7 +262,7 @@ public class SiteConfiguration extends XMLConfigurator implements Customizable {
 		siteClass = XPathHelper.valueOf(path, config, "class");
 		if (siteClass == null)
 			siteClass = "ch.o2it.weblounge.core.site.SiteImpl";
-		description = new LocalizableObject();
+		description = new LocalizableContent();
 		LanguageSupport.addDescriptions(path, config, null, description);
 		isEnabled = "true".equals(XPathHelper.valueOf(path, config, "enable", false).toLowerCase());
 	}

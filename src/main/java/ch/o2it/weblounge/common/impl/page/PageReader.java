@@ -32,6 +32,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import java.io.InputStream;
 import java.util.Date;
 
 /**
@@ -82,33 +83,14 @@ public final class PageReader extends GeneralContentReader {
   private int context_ = CTXT_PAGE;
 
   /**
-   * Creates a new page data reader that will parse the sax data and store it in
+   * Creates a new page data reader that will parse the SAX data and store it in
    * the page object.
    * 
-   * @param page
-   *          the page object
    * @param site
    *          the associated site
    */
-  public PageReader(PageImpl page, Site site) {
+  public PageReader(Site site) {
     super(site);
-    page_ = page;
-    header_ = page.header;
-  }
-
-  /**
-   * Creates a new page data reader that will parse the sax data and store it in
-   * the page header object.
-   * 
-   * @param header
-   *          the page object
-   * @param site
-   *          the associated site
-   */
-  public PageReader(PageHeaderImpl header, Site site) {
-    super(site);
-    page_ = null;
-    header_ = header;
   }
 
   /**
@@ -122,11 +104,8 @@ public final class PageReader extends GeneralContentReader {
    * @param version
    *          the page version
    */
-  public static PageImpl read(XMLResource data, PageURI uri) throws XMLDBException {
+  public PageImpl read(InputStream in, PageURI uri) {
     page_ = new PageImpl(uri);
-    header_ = page_.getHeader();
-    page_.header.site = site;
-    page_.header.version = version;
     page_.header.setDefaultLanguage(site.getDefaultLanguage());
     PageReader reader = new PageReader(this, site);
     reader.read(data);

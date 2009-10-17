@@ -88,7 +88,7 @@ public class PublishingContextImpl implements PublishingContext, Cloneable {
    * @param from
    *          the start date
    */
-  public void setFrom(Date from) {
+  public void setPublishFrom(Date from) {
     from_ = from;
   }
 
@@ -97,7 +97,7 @@ public class PublishingContextImpl implements PublishingContext, Cloneable {
    * 
    * @return the publishing start date
    */
-  public Date getFrom() {
+  public Date getPublishFrom() {
     return from_;
   }
 
@@ -108,7 +108,7 @@ public class PublishingContextImpl implements PublishingContext, Cloneable {
    * @param to
    *          the end date
    */
-  public void setTo(Date to) {
+  public void setPublishTo(Date to) {
     to_ = to;
   }
 
@@ -117,7 +117,7 @@ public class PublishingContextImpl implements PublishingContext, Cloneable {
    * 
    * @return the publishing end date
    */
-  public Date getTo() {
+  public Date getPublishTo() {
     return to_;
   }
 

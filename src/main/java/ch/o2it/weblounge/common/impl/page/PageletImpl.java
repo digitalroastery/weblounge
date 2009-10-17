@@ -20,10 +20,12 @@
 package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.WebloungeDateFormat;
+import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
+import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
-import ch.o2it.weblounge.common.impl.util.classloader.WebloungeClassLoader;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Pagelet;
@@ -39,6 +41,7 @@ import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -52,7 +55,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -82,52 +84,38 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public final class PageletImpl extends LocalizableObject implements Pagelet {
 
-  /** Module containing the error pagelet */
-  public static final String ERROR_MODULE = "special";
-
-  /** Id of the error pagelet */
-  public static final String ERROR_PAGELET = "error";
+  /** Logging facility */
+  protected final static Logger log_ = LoggerFactory.getLogger(Pagelet.class);
 
   /** Module that defined the pagelet */
-  private String moduleId_;
+  private String moduleId_ = null;
 
   /** Pagelet identifier */
-  private String id_;
+  private String id_ = null;
 
   /** The module */
-  private Module module_;
+  private Module module_ = null;
 
   /** The security context */
-  PermissionSecurityContext securityCtx;
+  PermissionSecurityContext securityCtx = null;
 
   /** The publishing context */
-  PublishingContext publishingCtx;
+  PublishingContext publishingCtx = null;
 
-  /** The dates when the conten has been modified */
-  private Map<Language, Date> modificationDates_;
-
-  /** The user that modified the content */
-  private Map<Language, User> modificationUsers_;
+  /** The modification context */
+  ModificationContext modificationCtx = null;
 
   /** The pagelet properties */
-  Map<String, Object> properties;
+  Map<String, Object> properties = null;
 
   /** Pagelet owner */
-  User owner;
-
-  /** The pagelet extension */
-  PageletExtension extension_;
+  User owner = null;
 
   /** The pagelet location */
-  PageletLocation location_;
-
-  // Logging
-
-  /** the class name, used for the loggin facility */
-  protected final static String loggerClass = Pagelet.class.getName();
-
-  /** Logging facility */
-  protected final static Logger log_ = Logger.getLogger(loggerClass);
+  PageletLocation location_ = null;
+  
+  /** The content */
+  LocalizableContent<Map> content_ = null;
 
   /**
    * Creates a new pagelet data holder.
@@ -142,23 +130,21 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     id_ = id;
     module_ = site.getModule(moduleId_);
     if (module_ == null) {
-      module_ = site.getModule(ERROR_MODULE);
-      id_ = ERROR_PAGELET;
       if (module_ == null) {
-        String msg = "Configuration error: Module '" + ERROR_MODULE + "' containing renderer '" + ERROR_PAGELET + "' could not be found!";
+        String msg = "Configuration error: Module '" + module + "' containing renderer '" + id + "' could not be found!";
         log_.error(msg);
-        throw new RuntimeException(msg);
-      } else if (module_.getRenderer(ERROR_PAGELET) == null) {
-        String msg = "Configuration error: Renderer '" + ERROR_PAGELET + "' could not be found in module '" + ERROR_MODULE + "'";
+        throw new IllegalStateException(msg);
+      } else if (module_.getRenderer(id) == null) {
+        String msg = "Configuration error: Renderer '" + id + "' could not be found in module '" + id + "'";
         log_.error(msg);
-        throw new RuntimeException(msg);
+        throw new IllegalStateException(msg);
       }
     }
-    properties = new HashMap(10);
-    securityCtx = new PageletSecurityContext(module, id);
-    publishingCtx = new PublishingContext();
-    modificationDates_ = new HashMap<Language, Date>();
-    modificationUsers_ = new HashMap<Language, User>();
+    properties = new HashMap<String, Object>();
+    securityCtx = new PageletSecurityContextImpl(module, id);
+    publishingCtx = new PublishingContextImpl();
+    modificationCtx = new ModificationContextImpl();
+    content_ = new LocalizableContent<Map>(this);
   }
 
   /**
@@ -198,23 +184,12 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * Sets the date of the last modification of this pagelet.
    * 
    * @param date
-   *          the modfication date
-   * @param l
+   *          the modification date
+   * @param language
    *          the language version
    */
-  public void setModifiedSince(Date date, Language l) {
-    modificationDates_.put(l, date);
-  }
-
-  /**
-   * Returns the date of the last modification of this pagelet.
-   * 
-   * @param l
-   *          the language version
-   * @return the last modification date
-   */
-  public Date getModifiedSince(Language l) {
-    return modificationDates_.get(l);
+  public void setModifiedSince(Date date, Language language) {
+    modificationCtx.setModificationDate(date, language);
   }
 
   /**
@@ -222,22 +197,11 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * 
    * @param editor
    *          the modifying user
-   * @param l
-   *          the language version
+   * @param language
+   *          the language
    */
-  public void setModifiedBy(User editor, Language l) {
-    modificationUsers_.put(l, editor);
-  }
-
-  /**
-   * Returns the user that last modified the pagelet.
-   * 
-   * @param l
-   *          the language version
-   * @return the user that last modified the pagelet
-   */
-  public User getModifiedBy(Language l) {
-    return modificationUsers_.get(l);
+  public void setModifiedBy(User editor, Language language) {
+    modificationCtx.setModifier(editor, language);
   }
 
   /**
@@ -279,7 +243,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * Returns the array of values for the multivalue property <code>key</code>.
    * This method returns <code>null</code> if no value has been stored at all
-   * for the given key, a single element string array if there is excactly one
+   * for the given key, a single element string array if there is exactly one
    * string and an array of strings of all values in all other cases.
    * 
    * @param key
@@ -367,16 +331,12 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns <code>true</code> if this pagelet has not only a renderer but also
-   * an editor.
+   * {@inheritDoc}
    * 
-   * @param method
-   *          the rendering method
-   * @return <code>true</code> if this pagelet has an editor
+   * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
    */
-  public boolean hasEditor(String method) {
-    RendererBundleConfiguration config = module_.getRenderers().getRendererBundleConfiguration(id_);
-    return (config != null) ? config.getEditor() != null : false;
+  public boolean isPublished(Date date) {
+    return publishingCtx.isPublished(date);
   }
 
   /**
@@ -534,8 +494,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     b.append(securityCtx.toXml());
 
     // export content
-    for (Iterator i = languages(); i.hasNext();) {
-      Language l = (Language) i.next();
+    for (Language l : languages) {
       b.append("<content language=\"");
       b.append(l.getIdentifier());
       b.append("\"");
@@ -546,13 +505,13 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
       b.append("<modified>");
       b.append("<date>");
-      Date d = getModifiedSince(l);
+      Date d = modificationCtx.getModificationDate(l);
       if (d == null)
         d = new Date();
       b.append(WebloungeDateFormat.formatStatic(d));
       b.append("</date>");
       b.append("<user>");
-      User u = getModifiedBy(l);
+      User u = modificationCtx.getModifier(l);
       if (u == null)
         u = location_.getSite().getAdministrator();
       b.append(u.getLogin());
@@ -653,12 +612,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *      ch.o2it.weblounge.api.language.Language, boolean)
    * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
    */
-  public Object getContent(String name, Language language, boolean force) {
-    Object value = super.getContent(name, language, force);
+  public String getContent(String name, Language language, boolean force) {
+    Map<String, ?> languageContent = content_.get(language, force);
+    if (languageContent == null)
+      return null;
+    Object value = languageContent.get(name);
     if (value != null && value instanceof ArrayList) {
-      return ((ArrayList) value).get(0);
+      return ((ArrayList<String>) value).get(0);
     }
-    return value;
+    return (String)value;
   }
 
   /**
@@ -674,7 +636,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *      ch.o2it.weblounge.api.language.Language, boolean)
    * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
    */
-  public Object getContent(String name, Language language) {
+  public String getContent(String name, Language language) {
     return getContent(name, language, false);
   }
 
@@ -690,8 +652,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *      ch.o2it.weblounge.api.language.Language, boolean)
    * @see ch.o2it.weblounge.core.language.MultilingualObject#getActiveLanguage()
    */
-  public Object getContent(String name) {
-    return getContent(name, getActiveLanguage(), false);
+  public String getContent(String name) {
+    return getContent(name, getLanguage(), false);
   }
 
   /**
@@ -708,15 +670,18 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *      ch.o2it.weblounge.api.language.Language, boolean)
    * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
    */
-  public Object[] getMultiValueContent(String name, Language language,
+  public String[] getMultiValueContent(String name, Language language,
       boolean force) {
-    Object value = super.getContent(name, language, force);
+    Map languageContent = content_.get(language, force);
+    if (languageContent == null)
+      return null;
+    Object value = languageContent.get(name);
     if (value != null) {
       if (value instanceof ArrayList) {
-        List valueList = (ArrayList) value;
-        return valueList.toArray(new Object[valueList.size()]);
+        List<String> valueList = (ArrayList<String>) value;
+        return valueList.toArray(new String[valueList.size()]);
       } else {
-        return new Object[] { value };
+        return new String[] { (String)value };
       }
     }
     return null;
@@ -734,7 +699,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *      ch.o2it.weblounge.api.language.Language)
    * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
    */
-  public Object[] getMultiValueContent(String name, Language language) {
+  public String[] getMultiValueContent(String name, Language language) {
     return getMultiValueContent(name, language, false);
   }
 
@@ -749,8 +714,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @see ch.o2it.weblounge.api.content.Pagelet#getContent(java.lang.String)
    * @see ch.o2it.weblounge.core.language.MultilingualObject#getActiveLanguage()
    */
-  public Object[] getMultiValueContent(String name) {
-    return getMultiValueContent(name, getActiveLanguage(), false);
+  public String[] getMultiValueContent(String name) {
+    return getMultiValueContent(name, getLanguage(), false);
   }
 
   /**
@@ -763,7 +728,14 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @see #isMultiValueContent(String)
    */
   public void setContent(String name, Object content, Language language) {
-    Object value = super.getContent(name, language, true);
+    Map languageContent = content_.get(language, true);
+    Object value = null;
+    if (languageContent == null) {
+      languageContent = new HashMap<String, Object>(10);
+      content_.put(languageContent, language);
+    } else {
+      value = languageContent.get(name);
+    }
     if (value != null) {
       if (value instanceof ArrayList) {
         ((ArrayList) value).add(content);
@@ -771,10 +743,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
         List valueList = new ArrayList();
         valueList.add(value);
         valueList.add(content);
-        super.setContent(name, valueList, language);
+        languageContent.put(name, valueList);
       }
     } else {
-      super.setContent(name, content, language);
+      languageContent.put(name, content);
     }
   }
 
@@ -805,6 +777,88 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       }
     }
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
+   */
+  public Date getCreationDate() {
+    return modificationCtx.getCreationDate();
+    }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
+   */
+  public User getCreator() {
+    return modificationCtx.getCreator();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationContext()
+   */
+  public ModificationContext getModificationContext() {
+    return modificationCtx;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
+   */
+  public Date getModificationDate() {
+    return modificationCtx.getModificationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
+   */
+  public Date getModificationDate(Language language) {
+    return modificationCtx.getModificationDate(language);
+    }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
+   */
+  public User getModifier() {
+    return modificationCtx.getModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier(ch.o2it.weblounge.common.language.Language)
+   */
+  public User getModifier(Language language) {
+    return modificationCtx.getModifier(language);
+    }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
+   */
+  public boolean isModifiedAfter(Date date) {
+    return modificationCtx.isModifiedAfter(date);
+   }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public boolean isModifiedAfter(Date date, Language language) {
+    return modificationCtx.isModifiedAfter(date, language);
   }
 
 }
