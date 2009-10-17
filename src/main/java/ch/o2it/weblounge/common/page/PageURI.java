@@ -32,61 +32,50 @@ public interface PageURI {
    * Returns the id of the page that this uri is pointing to.
    * 
    * @return the id
-   * @throws MalformedPageURIException
    */
-  long getId() throws MalformedPageURIException;
+  String getId();
 
   /**
    * Returns the path of the page that this uri is pointing to.
    * 
    * @return the path
-   * @throws MalformedPageURIException
    */
-  String getPath() throws MalformedPageURIException;
+  String getPath();
 
   /**
    * Returns the page version.
    * 
    * @return the version
-   * @throws MalformedPageURIException
    */
-  long getVersion() throws MalformedPageURIException;
+  long getVersion();
 
   /**
    * Returns the page uri in the given version.
    * 
    * @return the new page uri
-   * @throws MalformedPageURIException
    */
-  PageURI getVersion(long version) throws MalformedPageURIException;
+  PageURI getVersion(long version);
 
   /**
    * Returns a link to the page that this uri is pointing to.
    * 
    * @return a link
-   * @throws MalformedPageURIException
    */
-  WebUrl getLink() throws MalformedPageURIException;
+  WebUrl getLink();
 
   /**
    * Returns the associated site.
    * 
    * @return the site
    */
-  Site getSite() throws MalformedPageURIException;
+  Site getSite();
 
   /**
-   * Returns <code>true</code> if the page described by this resource exists.
-   * 
-   * @return <code>true</code> if the item or page exists
-   */
-  boolean exists() throws MalformedPageURIException;
-
-  /**
-   * Returns the URI for the parent page.
+   * Returns the URI for the parent page. If the current URI is the site's root
+   * then <code>null</code> is returned.
    * 
    * @return the parent uri
    */
-  PageURI getParentURI() throws MalformedPageURIException;
+  PageURI getParentURI();
 
 }
