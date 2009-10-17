@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.security;
 
+import ch.o2it.weblounge.common.language.Localizable;
+
 /**
  * This interface represents the permission to do something that might be
  * restricted by the security subsystem.
@@ -27,7 +29,7 @@ package ch.o2it.weblounge.common.security;
  * In addition, it defines common permissions to be used throughout the security
  * system.
  */
-public interface Permission {
+public interface Permission extends Localizable {
 
   /**
    * Returns the permission identifier.

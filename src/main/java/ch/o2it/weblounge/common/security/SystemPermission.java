@@ -20,6 +20,12 @@
 
 package ch.o2it.weblounge.common.security;
 
+import ch.o2it.weblounge.common.language.Language;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Special permission for the system context.
  * 
@@ -58,7 +64,13 @@ public class SystemPermission implements Permission {
   public static final Permission PUBLISH = new SystemPermission("publish");
 
   /** Permission identifier */
-  private String identifier_;
+  private String identifier_ = null;
+
+  /** The permission titles */
+  private Map<Language, String> titles_ = null;
+  
+  /** The selected language */
+  private Language selectedLanguage = null;
 
   /**
    * Creates a new system permission. Use the defined constants to access
@@ -69,6 +81,7 @@ public class SystemPermission implements Permission {
    */
   private SystemPermission(String permission) {
     identifier_ = permission;
+    titles_ = new HashMap<Language, String>();
   }
 
   /**
@@ -118,7 +131,7 @@ public class SystemPermission implements Permission {
   }
 
   /**
-   * Returns the string representaton of this permission object, which is equal
+   * Returns the string representation of this permission object, which is equal
    * to the permission identifier.
    * 
    * @return the permission identifier
@@ -126,6 +139,32 @@ public class SystemPermission implements Permission {
    */
   public String toString() {
     return CONTEXT + ":" + identifier_;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.language.Localizable#languages()
+   */
+  public Set<Language> languages() {
+    return titles_.keySet();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.language.Localizable#supportsLanguage(ch.o2it.weblounge.common.language.Language)
+   */
+  public boolean supportsLanguage(Language language) {
+    return titles_.containsKey(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.language.Localizable#switchTo(ch.o2it.weblounge.common.language.Language)
+   */
+  public Language switchTo(Language language) {
+    if (titles_.containsKey(language))
+      selectedLanguage = language;
+    return selectedLanguage;
   }
 
 }
