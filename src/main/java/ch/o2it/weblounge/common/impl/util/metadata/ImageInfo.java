@@ -848,7 +848,7 @@ public class ImageInfo {
   /**
    * Returns the physical width of an image in inches, or <code>-1.0f</code> if
    * width information is not available. Assumes that {@link #check} has been
-   * called successfuly.
+   * called successfully.
    * 
    * @return physical width in inches or <code>-1.0f</code> on failure
    * @see #getPhysicalWidthDpi

@@ -99,8 +99,8 @@ public abstract class CronJob extends PeriodicJob {
   /** The day names */
   private static final String[] DAYS = new String[] { "sun", "mon", "tue", "wed", "thu", "fri", "sat", "sun" };
 
-  /** Constant for "allways" */
-  public static final short ALLWAYS = -1;
+  /** Constant for "always" */
+  public static final short ALWAYS = -1;
 
   /** The job identifier */
   protected String identifier;
@@ -129,7 +129,7 @@ public abstract class CronJob extends PeriodicJob {
   /** True if the job may be suspended */
   protected boolean suspendable = true;
 
-  /** True if the job has ben successfuly configured */
+  /** True if the job has been successfully configured */
   private boolean configured = true;
 
   /** The cached execution time */
@@ -459,7 +459,7 @@ public abstract class CronJob extends PeriodicJob {
   private static boolean matches(Calendar c, int field, short[] reference) {
     if (reference.length == 0)
       return true;
-    if (reference.length == 1 && reference[0] == ALLWAYS)
+    if (reference.length == 1 && reference[0] == ALWAYS)
       return true;
     int offset = (field == Calendar.MONTH) ? 1 : 0;
     for (int i = 0; i < reference.length; i++)
@@ -482,9 +482,9 @@ public abstract class CronJob extends PeriodicJob {
    */
   private static boolean matches(Calendar c, int field, short[] days,
       short[] weekdays) {
-    if (days.length == 0 || (days.length == 1 && days[0] == ALLWAYS))
+    if (days.length == 0 || (days.length == 1 && days[0] == ALWAYS))
       return matches(c, field, weekdays);
-    else if (weekdays.length == 0 || (weekdays.length == 1 && weekdays[0] == ALLWAYS))
+    else if (weekdays.length == 0 || (weekdays.length == 1 && weekdays[0] == ALWAYS))
       return matches(c, field, days);
     else
       return matches(c, field, days) || matches(c, field, weekdays);
@@ -630,25 +630,25 @@ public abstract class CronJob extends PeriodicJob {
     short hour = 0;
     short dayOfMonth = 1;
     short month = 0;
-    short dayOfWeek = ALLWAYS;
+    short dayOfWeek = ALWAYS;
 
     if ("@restart".equals(str)) {
       once = true;
     } else if ("@yearly".equals(str) || "@annually".equals(str)) {
       month = 1;
     } else if ("@monthly".equals(str)) {
-      month = ALLWAYS;
+      month = ALWAYS;
     } else if ("@weekly".equals(str)) {
-      dayOfMonth = ALLWAYS;
-      month = ALLWAYS;
+      dayOfMonth = ALWAYS;
+      month = ALWAYS;
       dayOfWeek = 0;
     } else if ("@daily".equals(str) || "@midnight".equals(str)) {
-      dayOfMonth = ALLWAYS;
-      month = ALLWAYS;
+      dayOfMonth = ALWAYS;
+      month = ALWAYS;
     } else if ("@hourly".equals(str)) {
-      hour = ALLWAYS;
-      dayOfMonth = ALLWAYS;
-      month = ALLWAYS;
+      hour = ALWAYS;
+      dayOfMonth = ALWAYS;
+      month = ALWAYS;
     }
 
     // Set the values
@@ -858,11 +858,11 @@ public abstract class CronJob extends PeriodicJob {
    *           if the configuration data is incomplete or invalid
    */
   public void init() {
-    setMinutes(new short[] { ALLWAYS });
-    setHours(new short[] { ALLWAYS });
-    setDaysOfMonth(new short[] { ALLWAYS });
-    setMonths(new short[] { ALLWAYS });
-    setDaysOfWeek(new short[] { ALLWAYS });
+    setMinutes(new short[] { ALWAYS });
+    setHours(new short[] { ALWAYS });
+    setDaysOfMonth(new short[] { ALWAYS });
+    setMonths(new short[] { ALWAYS });
+    setDaysOfWeek(new short[] { ALWAYS });
     configured = true;
   }
 
@@ -899,35 +899,35 @@ public abstract class CronJob extends PeriodicJob {
       parseMinutes(XPathHelper.valueOf(path, config, "minutes"));
       foundOne = true;
     } else
-      setMinutes(new short[] { ALLWAYS });
+      setMinutes(new short[] { ALWAYS });
 
     // Hours
     if (XPathHelper.select(path, config, "hours") != null) {
       parseHours(XPathHelper.valueOf(path, config, "hours"));
       foundOne = true;
     } else
-      setHours(new short[] { ALLWAYS });
+      setHours(new short[] { ALWAYS });
 
     // Days
     if (XPathHelper.select(path, config, "days") != null) {
       parseDaysOfMonth(XPathHelper.valueOf(path, config, "days"));
       foundOne = true;
     } else
-      setDaysOfMonth(new short[] { ALLWAYS });
+      setDaysOfMonth(new short[] { ALWAYS });
 
     // Months
     if (XPathHelper.select(path, config, "months") != null) {
       parseMonths(XPathHelper.valueOf(path, config, "months"));
       foundOne = true;
     } else
-      setMonths(new short[] { ALLWAYS });
+      setMonths(new short[] { ALWAYS });
 
     // Weekdays
     if (XPathHelper.select(path, config, "weekdays") != null) {
       parseDaysOfWeek(XPathHelper.valueOf(path, config, "weekdays"));
       foundOne = true;
     } else
-      setDaysOfWeek(new short[] { ALLWAYS });
+      setDaysOfWeek(new short[] { ALWAYS });
 
     // Did we find something?
     if (!foundOne)
