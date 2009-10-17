@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.page;
 
-import ch.o2it.weblounge.common.content.Modifiable;
+import ch.o2it.weblounge.common.content.LocalizedModifiable;
 import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
@@ -54,7 +54,7 @@ import org.w3c.dom.Node;
  * 	&lt;/pagelet&gt;
  * </pre>
  */
-public interface Pagelet extends Localizable, Publishable, Modifiable, Securable {
+public interface Pagelet extends Localizable, LocalizedModifiable, Publishable, Securable {
 
   /** Pagelet identifier in request */
   static final String ID = "pagelet";
@@ -139,7 +139,7 @@ public interface Pagelet extends Localizable, Publishable, Modifiable, Securable
    *      ch.o2it.weblounge.common.language.Language, boolean)
    * @see ch.o2it.weblounge.common.language.MultilingualObject#getDefaultLanguage()
    */
-  Object[] getMultiValueContent(String name, Language language, boolean force);
+  String[] getMultiValueContent(String name, Language language, boolean force);
 
   /**
    * Returns the multivalue content in the specified language. If there is no
@@ -153,7 +153,7 @@ public interface Pagelet extends Localizable, Publishable, Modifiable, Securable
    *      ch.o2it.weblounge.common.language.Language)
    * @see ch.o2it.weblounge.common.language.MultilingualObject#getDefaultLanguage()
    */
-  Object[] getMultiValueContent(String name, Language language);
+  String[] getMultiValueContent(String name, Language language);
 
   /**
    * Returns the multivalue content in the specified language. If there is no
@@ -166,7 +166,7 @@ public interface Pagelet extends Localizable, Publishable, Modifiable, Securable
    * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String)
    * @see ch.o2it.weblounge.common.language.MultilingualObject#getActiveLanguage()
    */
-  Object[] getMultiValueContent(String name);
+  String[] getMultiValueContent(String name);
 
   /**
    * Returns the content in the required language. If no content can be found in
@@ -179,7 +179,7 @@ public interface Pagelet extends Localizable, Publishable, Modifiable, Securable
    *          the content language
    * @return the content
    */
-  Object getContent(String name, Language language);
+  String getContent(String name, Language language);
 
   /**
    * Returns the content in the required language. If no content can be found in
@@ -195,7 +195,7 @@ public interface Pagelet extends Localizable, Publishable, Modifiable, Securable
    *          <code>true</code> to force the language
    * @return the content
    */
-  Object getContent(String name, Language language, boolean force);
+  String getContent(String name, Language language, boolean force);
 
   /**
    * Returns the content element with the given identifier or <code>null</code>
@@ -205,17 +205,7 @@ public interface Pagelet extends Localizable, Publishable, Modifiable, Securable
    *          the content identifier
    * @return the content
    */
-  Object getContent(String name);
-
-  /**
-   * Returns <code>true</code> if this pagelet has not only a renderer but also
-   * an editor.
-   * 
-   * @param method
-   *          the rendering method
-   * @return <code>true</code> if this pagelet has an editor
-   */
-  boolean hasEditor(String method);
+  String getContent(String name);
 
   /**
    * Returns the renderer used to render this pagelet.

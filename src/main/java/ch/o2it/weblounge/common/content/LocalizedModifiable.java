@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.security.User;
 
 import java.util.Date;
@@ -28,31 +29,15 @@ import java.util.Date;
  * This interface is used to describe objects that know about a creator, a
  * creation time, a modifier and a modification time.
  */
-public interface Modifiable {
-
-  /**
-   * Returns the time in milliseconds when the object was created.
-   * 
-   * @return the creation time
-   */
-  Date getCreationDate();
-
-  /**
-   * Returns the user that created the object.
-   * 
-   * @param language
-   *          the language
-   * @return the creator
-   */
-  User getCreator();
+public interface LocalizedModifiable extends Modifiable, Localizable {
 
   /**
    * Returns <code>true</code> if this context contains information about a
-   * modification.
+   * modification to the version identified by <code>language</code>.
    * 
-   * @return <code>true</code> is this context was modified
+   * @return <code>true</code> is this context' language version was modified
    */
-  boolean isModified();
+  boolean isModifiedAtAll();
 
   /**
    * Returns <code>true</code> if this context contains information about a
@@ -62,20 +47,22 @@ public interface Modifiable {
    *          the date to compare to
    * @return <code>true</code> is this context was modified
    */
-  boolean isModifiedAfter(Date date);
+  boolean isModifiedAtAllAfter(Date date);
 
   /**
-   * Returns the time in milliseconds when the object was last modified.
+   * Returns the time in milliseconds when the object was last modified,
+   * regardless of the selected language.
    * 
    * @return the modification time
    */
-  Date getModificationDate();
+  Date getLastModificationDate();
 
   /**
-   * Returns the user that last modified the object.
+   * Returns the user that last modified the object, regardless of the selected
+   * language.
    * 
    * @return the modifier
    */
-  User getModifier();
+  User getLatModifier();
 
 }

@@ -20,13 +20,21 @@
 
 package ch.o2it.weblounge.common.language;
 
-import java.util.Iterator;
+import java.util.Set;
 
 /**
  * This interface defines methods for multilingual object. Such an object is
  * capable of representing it's content in various languages.
  */
 public interface Localizable {
+
+  /**
+   * The behavior that is chosen when a decision needs to be made about which
+   * language to take if the requested language version is not available.
+   */
+  public enum LanguageResolution {
+    Original, Default
+  };
 
   /**
    * Returns <code>true</code> if the given language is supported, i. e. if the
@@ -44,41 +52,24 @@ public interface Localizable {
    * 
    * @return the supported languages
    */
-  Iterator<Language> languages();
+  Set<Language> languages();
 
   /**
-   * Returns the object using <code>language</code> as the output language.
+   * Makes <code>language</code> the current language for this object.
+   * <p>
+   * Depending on whether the localizable supports the language, a fall back
+   * might be chosen. This can be determined by comparing the returned language
+   * to <code>returned</code>.
    * 
    * @param language
-   *          the language
-   * @return the object's string representation in the required language
-   */
-  String toString(Language language);
-
-  /**
-   * Returns the object using <code>language</code> as the output language. If
-   * no content can be found in that language, then it will be looked up in the
-   * default language (unless <code>force</code> is set to <code>true</code>). <br>
-   * If this doesn't produce a result as well, <code>null</code> is returned.
-   * 
+   *          the language to switch to
    * @param language
-   *          the language
-   * @param force
-   *          <code>true</code> to force the language
-   * @return the object's string representation in the given language
+   *          the selected language
+   * @throws IllegalArgumentException
+   *           if the language argument is <code>null</code>
+   * @throws IllegalStateException
+   *           if no fall back language can be determined
    */
-  String toString(Language language, boolean force);
-
-  /**
-   * Compares this object to <code>o</code> with respect to the given language
-   * <code>language</code>.
-   * 
-   * @param o
-   *          the object to compare to
-   * @param language
-   *          the language
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
-  int compareTo(Localizable o, Language language);
+  Language switchTo(Language language);
 
 }

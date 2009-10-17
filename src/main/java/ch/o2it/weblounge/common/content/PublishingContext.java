@@ -23,16 +23,10 @@ package ch.o2it.weblounge.common.content;
 import java.util.Date;
 
 /**
- * TODO: Comment PublishingContext
+ * This interface is used for objects that can be published from a given start
+ * date to an end date.
  */
-public interface PublishingContext extends Cloneable {
-
-  /**
-   * Returns the publishing start date.
-   * 
-   * @return the publishing start date
-   */
-  Date getFrom();
+public interface PublishingContext extends Publishable, Cloneable {
 
   /**
    * Sets the publishing start date.
@@ -40,14 +34,7 @@ public interface PublishingContext extends Cloneable {
    * @param from
    *          the start date
    */
-  void setFrom(Date from);
-
-  /**
-   * Returns the publishing end date.
-   * 
-   * @return the publishing end date
-   */
-  Date getTo();
+  void setPublishFrom(Date from);
 
   /**
    * Sets the publishing end date.
@@ -55,21 +42,7 @@ public interface PublishingContext extends Cloneable {
    * @param to
    *          the end date
    */
-  void setTo(Date to);
-
-  /**
-   * Returns <code>true</code> if the object is published right now.
-   * 
-   * @return <code>true</code> if published
-   */
-  boolean isPublished();
-
-  /**
-   * Returns <code>true</code> if the object is published on the given date.
-   * 
-   * @return <code>true</code> if published on the given date
-   */
-  boolean isPublished(Date date);
+  void setPublishTo(Date to);
 
   /**
    * Returns an XML representation of this context.

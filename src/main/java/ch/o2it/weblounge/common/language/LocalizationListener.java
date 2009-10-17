@@ -18,42 +18,19 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content;
-
-import java.util.Date;
+package ch.o2it.weblounge.common.language;
 
 /**
- * This interface is used for objects that can be published from a given start
- * date to an end date.
+ * Listener interface for objects interested in localization events.
  */
-public interface Publishable {
+public interface LocalizationListener {
 
   /**
-   * Returns the publishing start date.
+   * Notification about a language switch to <code>language</code>.
    * 
-   * @return the publishing start date
+   * @param language
+   *          the new language
    */
-  Date getPublishFrom();
-
-  /**
-   * Returns the publishing end date.
-   * 
-   * @return the publishing end date
-   */
-  Date getPublishTo();
-
-  /**
-   * Returns <code>true</code> if the object is published right now.
-   * 
-   * @return <code>true</code> if published
-   */
-  boolean isPublished();
-
-  /**
-   * Returns <code>true</code> if the object is published on the given date.
-   * 
-   * @return <code>true</code> if published on the given date
-   */
-  boolean isPublished(Date date);
+  void switchedTo(Language language);
 
 }

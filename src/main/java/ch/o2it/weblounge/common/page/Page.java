@@ -20,8 +20,9 @@
 
 package ch.o2it.weblounge.common.page;
 
-import ch.o2it.weblounge.common.content.Modifiable;
+import ch.o2it.weblounge.common.content.LocalizedModifiable;
 import ch.o2it.weblounge.common.content.Publishable;
+import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.renderer.Renderer;
@@ -29,18 +30,23 @@ import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
 import ch.o2it.weblounge.common.security.User;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.WebUrl;
+
+import org.w3c.dom.Node;
+
+import java.util.Date;
 
 /**
  * A <code>Page</code> encapsulates all data that is attached with a site url.
  * For performance reasons, this object keeps parts of the page data in memory
  * and maintains indexes to speed up building different language versions.
  */
-public interface Page extends Localizable, Publishable, Modifiable, Securable {
+public interface Page extends Localizable, LocalizedModifiable, Publishable, Securable {
 
   /** Request page identifier */
   String ID = "page";
+
+  /** Page headlines in request */
+  public static final String HEADLINES = "headlines";
 
   /** Live version of a page */
   long LIVE = 0;
@@ -53,33 +59,18 @@ public interface Page extends Localizable, Publishable, Modifiable, Securable {
 
   /** The page's permissions */
   static final Permission[] permissions = new Permission[] {
-    SystemPermission.READ,
-    SystemPermission.WRITE,
-    SystemPermission.TRANSLATE,
-    SystemPermission.PUBLISH,
-    SystemPermission.MANAGE
-  };
-
-  /**
-   * Returns the associated site.
-   * 
-   * @return the site
-   */
-  Site getSite();
+      SystemPermission.READ,
+      SystemPermission.WRITE,
+      SystemPermission.TRANSLATE,
+      SystemPermission.PUBLISH,
+      SystemPermission.MANAGE };
 
   /**
    * Returns the page uri.
    * 
-   * @return the page uri
+   * @return the page url
    */
-  PageURI getURI();
-
-  /**
-   * Returns the page version.
-   * 
-   * @return the page version
-   */
-  long getVersion();
+  public PageURI getURI();
 
   /**
    * Returns the page type, which is used to include this page into news lists
@@ -87,21 +78,7 @@ public interface Page extends Localizable, Publishable, Modifiable, Securable {
    * 
    * @return the page type
    */
-  String getType();
-
-  /**
-   * Returns the page url.
-   * 
-   * @return the page url
-   */
-  WebUrl getUrl();
-
-  /**
-   * Returns the keywords that are defined for this page header.
-   * 
-   * @return the keywords
-   */
-  String[] getKeywords();
+  public String getType();
 
   /**
    * True to include this page in the sitemap.
@@ -109,84 +86,6 @@ public interface Page extends Localizable, Publishable, Modifiable, Securable {
    * @return <code>true</code> to include in sitemap
    */
   boolean inSitemap();
-
-  /**
-   * Returns the page title in the active language.
-   * 
-   * @return the content
-   */
-  String getTitle();
-
-  /**
-   * Returns the page title in the specified language or <code>null</code> if
-   * this language version is not available.
-   * 
-   * @param l
-   *          the language identifier
-   * @return the page title
-   */
-  String getTitle(Language l);
-
-  /**
-   * Returns the page title in the required language. If no title can be found
-   * in that language, then it will be looked up in the default language (unless
-   * <code>force</code> is set to <code>true</code>). If that doesn't produce a
-   * result as well, <code>null</code> is returned.
-   * 
-   * @param language
-   *          the title language
-   * @param force
-   *          <code>true</code> to force the language
-   * @return the content
-   */
-  String getTitle(Language language, boolean force);
-
-  /**
-   * Returns the headline for the given user regarding the read permission that
-   * have been defined on the title pagelets. If no suitable headline is found,
-   * <code>null</code> is returned.
-   * 
-   * @param user
-   *          the user that wants access to the header
-   * @return the first suitable headline pagelet
-   */
-  Pagelet getHeadline(User user);
-
-  /**
-   * Returns the headline for the given user regarding the permissions that have
-   * been defined on the title pagelets. If no suitable headline is found,
-   * <code>null</code> is returned.
-   * 
-   * @param user
-   *          the user that wants access to the header
-   * @param permission
-   *          the permission requirements
-   * @return the first suitable headline pagelet
-   */
-  Pagelet getHeadline(User user, Permission permission);
-
-  /**
-   * Returns the headline pagelets
-   * 
-   * @return the headline pagelets
-   */
-  Pagelet[] getHeadlines();
-
-  /**
-   * Returns the layout associated with this page.
-   * 
-   * @return the associated layout
-   */
-  Layout getLayout();
-
-  /**
-   * Returns the renderer that is used to render this page.
-   * 
-   * @param method
-   *          the rendering method
-   * @return the renderer
-   */
-  Renderer getRenderer(String method);
 
   /**
    * Returns <code>true</code> if the page is locked.
@@ -208,6 +107,104 @@ public interface Page extends Localizable, Publishable, Modifiable, Securable {
    * @return the user holding the editing lock for this page
    */
   User getEditor();
+
+  /**
+   * Returns the publishing context of this page in the current version. The
+   * context tells whether the pagelet may be published on a certain point in
+   * time or not.
+   * 
+   * @return the publishing context
+   */
+  public PublishingContext getPublishingContext();
+
+  /**
+   * Returns the publishing start date.
+   * 
+   * @return the start date
+   */
+  public Date getPublishFrom();
+
+  /**
+   * Returns the publishing end date.
+   * 
+   * @return the end date
+   */
+  public Date getPublishTo();
+
+  /**
+   * Returns the keywords that are defined for this page header.
+   * 
+   * @return the keywords
+   */
+  public String[] getKeywords();
+
+  /**
+   * Returns the page title in the active language.
+   * 
+   * @return the content
+   */
+  String getTitle();
+
+  /**
+   * Returns the page title in the specified language or <code>null</code> if
+   * this language version is not available.
+   * 
+   * @param l
+   *          the language identifier
+   * @return the page title
+   */
+  public String getTitle(Language l);
+
+  /**
+   * Returns the page title in the required language. If no title can be found
+   * in that language, then it will be looked up in the default language (unless
+   * <code>force</code> is set to <code>true</code>). If that doesn't produce a
+   * result as well, <code>null</code> is returned.
+   * 
+   * @param language
+   *          the title language
+   * @param force
+   *          <code>true</code> to force the language
+   * @return the content
+   */
+  String getTitle(Language language, boolean force);
+
+  /**
+   * Returns the headline pagelets
+   * 
+   * @return the headline pagelets
+   */
+  public Pagelet[] getHeadlines();
+
+  /**
+   * Returns the modification date of the page.
+   * 
+   * @return the modification date
+   */
+  public Date getModifiedSince();
+
+  /**
+   * Returns the modification user of the page.
+   * 
+   * @return the modification date
+   */
+  public User getModifiedBy();
+
+  /**
+   * Returns the layout associated with this page.
+   * 
+   * @return the associated layout
+   */
+  public Layout getLayout();
+
+  /**
+   * Returns the renderer that is used to render this page.
+   * 
+   * @param method
+   *          the rendering method
+   * @return the renderer
+   */
+  public Renderer getRenderer(String method);
 
   /**
    * Returns the pagelet for the given composer at position <code>i</code> with
@@ -283,5 +280,12 @@ public interface Page extends Localizable, Publishable, Modifiable, Securable {
    *          the page content listener
    */
   void removePageContentListener(PageContentListener listener);
+
+  /**
+   * Returns an XML representation of this page header.
+   * 
+   * @return an XML representation of this page header
+   */
+  public Node toXml();
 
 }

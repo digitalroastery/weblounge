@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.User;
 
 import java.util.Date;
@@ -28,7 +29,7 @@ import java.util.Date;
  * This interface defines an object that encapsulates access to creation and
  * modification data.
  */
-public interface ModificationContext extends Modifiable, Cloneable {
+public interface LocalizedModificationContext extends LocalizedModifiable, Cloneable {
 
   /**
    * Sets the user that created the object.
@@ -45,6 +46,65 @@ public interface ModificationContext extends Modifiable, Cloneable {
    *          the creation date
    */
   void setCreationDate(Date date);
+
+  /**
+   * Sets creator and creation date.
+   * 
+   * @param user
+   *          the user that created the object
+   * @param date
+   *          the date of creation
+   */
+  void setCreated(User user, Date date);
+
+  /**
+   * Sets the date of the last modification of this object in the current
+   * language.
+   * 
+   * @param date
+   *          the modification date
+   */
+  void setModificationDate(Date date);
+
+  /**
+   * Sets the date of the last modification of this object.
+   * 
+   * @param date
+   *          the modification date
+   * @param language
+   *          the language
+   */
+  void setModificationDate(Date date, Language language);
+
+  /**
+   * Sets the user that last modified the object.
+   * 
+   * @param editor
+   *          the modifying user
+   */
+  void setModifier(User editor);
+
+  /**
+   * Sets the user that last modified the object.
+   * 
+   * @param editor
+   *          the modifying user
+   * @param language
+   *          the affected language version
+   */
+  void setModifier(User editor, Language language);
+
+  /**
+   * Sets creator and creation date.
+   * 
+   * @param user
+   *          the user that created the object
+   * @param date
+   *          the date of creation
+   * @param language
+   *          the language version that was modified
+   */
+  void setModified(User user, Date date, Language language);
 
   /**
    * Returns an XML representation of this context.
