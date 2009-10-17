@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.security.Permission;
 
 /**
@@ -33,13 +33,13 @@ import ch.o2it.weblounge.common.security.Permission;
  * @version 1.0
  */
 
-public class PermissionImpl extends LocalizableObject implements Permission {
+public class PermissionImpl extends LocalizableContent<String> implements Permission {
 
   /** PermissionImpl identifier */
-  private String identifier_;
+  private String identifier_ = null;
 
   /** PermissionImpl identifier */
-  private String context_;
+  private String context_ = null;
 
   /**
    * Creates a new permission from the parameter context::id.

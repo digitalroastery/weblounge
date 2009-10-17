@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.MultilingualTreeSet;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.GroupMember;
@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * Default implementation of a weblounge group.
  */
-public class GroupImpl extends LocalizableObject<Group> implements Group {
+public class GroupImpl extends LocalizableContent<String> implements Group {
 
   /** The group context */
   private String context_ = null;

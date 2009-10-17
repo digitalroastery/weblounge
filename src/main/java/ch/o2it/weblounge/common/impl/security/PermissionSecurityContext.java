@@ -98,7 +98,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * given permission.
    * <p>
    * <b>Note:</b> Calling this method replaces any default authorities on the
-   * given permission, so if you want to keep them, add them here explicitely.
+   * given permission, so if you want to keep them, add them here explicitly.
    * 
    * @param permission
    *          the permission
@@ -146,7 +146,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
   /**
    * Removes <code>authority</code> from the denied authorities regarding the
    * given permission. This method will remove the authority from both the
-   * explicitely allowed and the default authorities.
+   * explicitly allowed and the default authorities.
    * 
    * @param permission
    *          the permission
@@ -296,7 +296,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
   }
 
   /**
-   * Returns the authorities that are explicitely allowed by the context.
+   * Returns the authorities that are explicitly allowed by the context.
    * 
    * @see ch.o2it.weblounge.common.security.SecurityContext#getAllowed(ch.o2it.weblounge.common.security.Permission)
    */
@@ -314,9 +314,9 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
   }
 
   /**
-   * Returns all authorities that are explicitely denied by this security
+   * Returns all authorities that are explicitly denied by this security
    * context. Since this context only defines allowed items, the returned array
-   * will allways be empty.
+   * will always be empty.
    * 
    * @see ch.o2it.weblounge.common.security.SecurityContext#getDenied(ch.o2it.weblounge.common.security.Permission)
    */

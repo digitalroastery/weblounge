@@ -20,7 +20,7 @@
 package ch.o2it.weblounge.common.impl.security;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Role;
@@ -29,7 +29,6 @@ import ch.o2it.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
 
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import javax.xml.xpath.XPath;
@@ -45,7 +44,7 @@ import javax.xml.xpath.XPath;
 public class RoleManager {
 
   /**
-   * Reads a role from the xml configuration node. The node is expected to look
+   * Reads a role from the XML configuration node. The node is expected to look
    * like this:
    * 
    * <pre>
@@ -82,12 +81,10 @@ public class RoleManager {
 
     // Add names
 
-    LocalizableObject<String> descriptions = new LocalizableObject<String>();
+    LocalizableContent<String> descriptions = new LocalizableContent<String>();
     Language defaultLanguage = site.getDefaultLanguage();
     LanguageSupport.addDescriptions(path, node, site.getLanguages(), defaultLanguage, descriptions);
-    Iterator<Language> li = descriptions.languages();
-    while (li.hasNext()) {
-      Language l = li.next();
+    for (Language l : descriptions.languages()) {
       r.put(descriptions.get(l), l);
     }
 

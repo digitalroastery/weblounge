@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.site.Site;
@@ -37,7 +37,7 @@ import java.util.Set;
  * @since Weblounge 2.0
  */
 
-public class RoleImpl extends LocalizableObject<String> implements Role {
+public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /** Role identifier */
   private String identifier_;
