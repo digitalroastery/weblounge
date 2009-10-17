@@ -169,7 +169,7 @@ public class MultipartRequestWrapper extends WebloungeRequestImpl {
 			log_.debug("Internal server error while decoding multipart form data!");
 			state_ = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
-		log_.debug("Decoding finished successfuly");
+		log_.debug("Decoding finished successfully");
 	}
 
 }

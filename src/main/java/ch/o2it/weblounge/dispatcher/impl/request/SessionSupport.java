@@ -145,7 +145,7 @@ public class SessionSupport {
 					log_.debug("Selected language " + languageId + " from user preferences");
 					break;
 				} catch (UnsupportedLanguageException e) { 
-					log_.debug("Unsuccessfuly tried language " + languageId);
+					log_.debug("Unsuccessfully tried language " + languageId);
 				}
 			}
 		}
