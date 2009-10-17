@@ -107,6 +107,24 @@ public interface LocalizedModificationContext extends LocalizedModifiable, Clone
   void setModified(User user, Date date, Language language);
 
   /**
+   * Returns the time in milliseconds when the object was last modified.
+   * 
+   * @param language
+   *          the language
+   * @return the modification time
+   */
+  Date getModificationDate(Language language);
+
+  /**
+   * Returns the user that last modified the object.
+   * 
+   * @param language
+   *          the language
+   * @return the modifier
+   */
+  User getModifier(Language language);
+
+  /**
    * Returns an XML representation of this context.
    * 
    * @return an XML representation of this context
