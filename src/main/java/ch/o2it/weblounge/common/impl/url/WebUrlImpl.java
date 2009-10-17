@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
@@ -31,7 +31,7 @@ import ch.o2it.weblounge.common.url.WebUrl;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A web url represents a url that is used to address locations within the
@@ -42,19 +42,19 @@ import java.util.Iterator;
  * @since Weblounge 1.0
  */
 
-public class WebUrlImpl extends BaseUrl implements WebUrl {
+public class WebUrlImpl extends BaseUrl implements WebUrl, Localizable {
 
   /** The associated site */
-  private Site site_;
-
-  /** The title in the currently active language */
-  private LocalizableObject<String> titles_;
+  private Site site_ = null;
 
   /** The url version */
-  private long version_;
+  private long version_ = -1;
 
   /** The link */
-  private String link_;
+  private String link_ = null;
+
+  /** The title in the currently active language */
+  private LocalizableContent<String> titles_ = null;
 
   /**
    * Constructor for a url. Since this constructor has package access, use
@@ -110,7 +110,7 @@ public class WebUrlImpl extends BaseUrl implements WebUrl {
   public WebUrlImpl(Site site, String path, long version) {
     super(path, '/');
     site_ = site;
-    titles_ = new LocalizableObject<String>();
+    titles_ = new LocalizableContent<String>();
     version_ = version;
   }
 
@@ -150,7 +150,7 @@ public class WebUrlImpl extends BaseUrl implements WebUrl {
   WebUrlImpl(Site site, UrlComponent c, long version) {
     super(c, '/');
     site_ = site;
-    titles_ = new LocalizableObject<String>();
+    titles_ = new LocalizableContent<String>();
     titles_.setDefaultLanguage(site_.getDefaultLanguage());
     version_ = version;
   }
@@ -319,7 +319,7 @@ public class WebUrlImpl extends BaseUrl implements WebUrl {
   /**
    * @see ch.o2it.weblounge.common.language.Localizable#languages()
    */
-  public Iterator<Language> languages() {
+  public Set<Language> languages() {
     return titles_.languages();
   }
 
@@ -337,6 +337,14 @@ public class WebUrlImpl extends BaseUrl implements WebUrl {
   }
 
   /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.language.Localizable#switchTo(ch.o2it.weblounge.common.language.Language)
+   */
+  public Language switchTo(Language language) {
+    return titles_.switchTo(language);
+  }
+
+  /**
    * Returns the url title in the currently active language or the output from
    * the superimplementation (which returns the url path) if no such title
    * exists.
@@ -346,45 +354,6 @@ public class WebUrlImpl extends BaseUrl implements WebUrl {
    */
   public String toString() {
     return titles_.toString();
-  }
-
-  /**
-   * Returns the url title in the requested language or <code>null</code> if the
-   * title didn't exist in that language. Call
-   * {@link #supportsLanguage(Language)} to find out about supported languages.
-   * 
-   * @param language
-   *          the requested language
-   * @return the title
-   * @see ch.o2it.weblounge.common.language.Localizable#toString(ch.o2it.weblounge.common.language.Language)
-   */
-  public String toString(Language language) {
-    return titles_.toString(language);
-  }
-
-  /**
-   * Returns the url title in the requested language or <code>null</code> if the
-   * title didn't exist in that language. Call
-   * {@link #supportsLanguage(Language)} to find out about supported languages.
-   * 
-   * @param language
-   *          the requested language
-   * @param force
-   *          to force the given language
-   * @return the title
-   * @see ch.o2it.weblounge.common.language.Localizable#toString(ch.o2it.weblounge.common.language.Language,
-   *      boolean)
-   */
-  public String toString(Language language, boolean force) {
-    return titles_.toString(language, force);
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public int compareTo(Localizable o, Language language) {
-    return titles_.compareTo(o, language);
   }
 
 }
