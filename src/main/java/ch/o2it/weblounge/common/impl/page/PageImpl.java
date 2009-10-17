@@ -20,9 +20,9 @@
 package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.WebloungeDateFormat;
-import ch.o2it.weblounge.common.content.ModificationContext;
+import ch.o2it.weblounge.common.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
-import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PageSecurityContext;
@@ -65,9 +65,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * A <code>Page</code> encapsulates all data that is attached with a site url.
- * For performance reasons, this object keeps parts of the page data in memory
- * and maintains indexes to speed up building different language versions.
+ * A <code>Page</code> encapsulates all data that is attached with a site URL.
  * 
  * @author Tobias Wunden
  * @version 1.0
@@ -79,7 +77,7 @@ public class PageImpl extends LocalizableObject implements Page {
   private final static Logger log_ = LoggerFactory.getLogger(PageImpl.class);
 
   /** The uri */
-  PageURI uri = null;
+  PageURIImpl uri = null;
 
   /** PageHeader type */
   String type = null;
@@ -92,7 +90,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /** Layout identifier */
   String layout = null;
-  
+
   /** True if this page should show up on the sitemap */
   boolean inSitemap = false;
 
@@ -101,22 +99,16 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /** Current page editor (and owner) */
   User editor = null;
-  
+
   /** Modification context */
-  ModificationContext modificationCtx = null;
-  
+  LocalizedModificationContext modificationCtx = null;
+
   /** The publishing context */
   PublishingContext publishingCtx = null;
 
   /** The security context */
   PermissionSecurityContext securityCtx = null;
 
-  /** The user that last modified the page */
-  User modifyingUser = null;
-
-  /** Date when the page was last modified */
-  Date modifiedSince = null;
-  
   /** The title */
   LocalizableContent<String> title = null;
 
@@ -132,16 +124,16 @@ public class PageImpl extends LocalizableObject implements Page {
    * @param uri
    *          the page uri
    */
-  PageImpl(PageURI uri) {
+  PageImpl(PageURIImpl uri) {
     super(uri.getSite().getDefaultLanguage());
-    composers_ = new HashMap<String, List<Pagelet>>();
     this.uri = uri;
     this.publishingCtx = new PublishingContextImpl();
-    this.modificationCtx = new ModificationContextImpl();
+    this.modificationCtx = new LocalizedModificationContextImpl(this);
     this.securityCtx = new PageSecurityContext();
     this.keywords_ = new ArrayList<String>();
     this.headlines = new ArrayList<Pagelet>();
     this.title = new LocalizableContent<String>(this);
+    this.composers_ = new HashMap<String, List<Pagelet>>();
   }
 
   /**
@@ -232,6 +224,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.page.Page#inSitemap()
    */
   public boolean inSitemap() {
@@ -292,6 +285,18 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
+   * Sets the page title in the specified language.
+   * 
+   * @param title
+   *          the page title
+   * @param language
+   *          the language
+   */
+  public void setTitle(String title, Language language) {
+    this.title.put(title, language);
+  }
+
+  /**
    * Returns the page title in the active language.
    * 
    * @return the page title
@@ -326,44 +331,6 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public String getTitle(Language language, boolean force) {
     return title.get(language, force);
-  }
-
-  /**
-   * Sets the data when this page has been modified.
-   * 
-   * @param date
-   *          the modification date
-   */
-  void setModifiedSince(Date date) {
-    modifiedSince = date;
-  }
-
-  /**
-   * Returns the modification date of the page.
-   * 
-   * @return the modification date
-   */
-  public Date getModifiedSince() {
-    return modifiedSince;
-  }
-
-  /**
-   * Sets the user that last modified the page.
-   * 
-   * @param user
-   *          the modifying user
-   */
-  void setModifiedBy(User user) {
-    modifyingUser = user;
-  }
-
-  /**
-   * Returns the modification user of the page.
-   * 
-   * @return the modification date
-   */
-  public User getModifiedBy() {
-    return modifyingUser;
   }
 
   /**
@@ -546,7 +513,7 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof Page) {
-      return uri.equals(((Page)obj).getURI());
+      return uri.equals(((Page) obj).getURI());
     }
     return false;
   }
@@ -562,6 +529,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
    */
   public boolean isPublished() {
@@ -570,6 +538,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
    */
   public boolean isPublished(Date date) {
@@ -578,6 +547,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
    */
   public Date getCreationDate() {
@@ -586,6 +556,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
    */
   public User getCreator() {
@@ -594,14 +565,54 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getModificationContext()
    */
-  public ModificationContext getModificationContext() {
+  public LocalizedModificationContext getModificationContext() {
     return modificationCtx;
   }
 
   /**
+   * Sets the data when this page has been modified.
+   * 
+   * @param date
+   *          the modification date
+   */
+  void setModifiedSince(Date date) {
+    modificationCtx.setModificationDate(date);
+  }
+
+  /**
+   * Returns the modification date of the page.
+   * 
+   * @return the modification date
+   */
+  public Date getModifiedSince() {
+    return modificationCtx.getModificationDate();
+  }
+
+  /**
+   * Sets the user that last modified the page.
+   * 
+   * @param user
+   *          the modifying user
+   */
+  void setModifiedBy(User user) {
+    modificationCtx.setModifier(user);
+  }
+
+  /**
+   * Returns the modification user of the page.
+   * 
+   * @return the modification date
+   */
+  public User getModifiedBy() {
+    return modificationCtx.getModifier();
+  }
+
+  /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
    */
   public Date getModificationDate() {
@@ -610,14 +621,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
-   */
-  public Date getModificationDate(Language language) {
-    return modificationCtx.getModificationDate(language);
-  }
-
-  /**
-   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
    */
   public User getModifier() {
@@ -626,14 +630,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier(ch.o2it.weblounge.common.language.Language)
-   */
-  public User getModifier(Language language) {
-    return modificationCtx.getModifier(language);
-  }
-
-  /**
-   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
    */
   public boolean isModifiedAfter(Date date) {
@@ -642,10 +639,47 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
-  public boolean isModifiedAfter(Date date, Language language) {
-    return modificationCtx.isModifiedAfter(date, language);
+  public Date getLastModificationDate() {
+    return modificationCtx.getLastModificationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModifier()
+   */
+  public User getLastModifier() {
+    return modificationCtx.getLastModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAll()
+   */
+  public boolean isModifiedAtAll() {
+    return modificationCtx.isModifiedAtAll();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllAfter(java.util.Date)
+   */
+  public boolean isModifiedAtAllAfter(Date date) {
+    return modificationCtx.isModifiedAtAllAfter(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
+   */
+  public boolean isModified() {
+    return modificationCtx.isModified();
   }
 
   /**
@@ -1049,23 +1083,27 @@ public class PageImpl extends LocalizableObject implements Page {
       b.append("]]></title>\n");
     }
 
-    b.append("<modified>\n");
-    b.append("<date>");
-    Date d = modifiedSince;
-    if (d == null)
-      d = new Date();
-    b.append(WebloungeDateFormat.formatStatic(d));
-    b.append("</date>\n");
-    b.append("<user>");
-    User u = modifyingUser;
-    if (u == null)
-      u = uri.getSite().getAdministrator();
-    b.append(u.getLogin());
-    b.append("</user>\n");
-    b.append("</modified>\n");
+    for (Language l : modificationCtx.languages()) {
+      b.append("<modified language=\"");
+      b.append(l.getIdentifier());
+      b.append("\">");
+      b.append("<date>");
+      Date d = modificationCtx.getModificationDate(l);
+      if (d == null)
+        d = new Date();
+      b.append(WebloungeDateFormat.formatStatic(d));
+      b.append("</date>\n");
+      b.append("<user>");
+      User u = modificationCtx.getModifier(l);
+      if (u == null)
+        u = uri.getSite().getAdministrator();
+      b.append(u.getLogin());
+      b.append("</user>\n");
+      b.append("</modified>\n");
+    }
 
     b.append("</header>");
-    
+
     // TODO: Append body
 
     b.append("</page>");

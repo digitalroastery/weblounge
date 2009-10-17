@@ -20,9 +20,9 @@
 package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.WebloungeDateFormat;
-import ch.o2it.weblounge.common.content.ModificationContext;
+import ch.o2it.weblounge.common.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
-import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
@@ -52,7 +52,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +63,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * on the composer that created it, it consists of multiple elements and
  * properties.
  * <p>
- * Such an element ist stored in a page in the following form:
+ * Such an element is stored in a page in the following form:
  * 
  * <pre>
  * 	&lt;pagelet&gt;
@@ -96,6 +95,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /** The module */
   private Module module_ = null;
 
+  /** The pagelet location */
+  PageletLocation location_ = null;
+
   /** The security context */
   PermissionSecurityContext securityCtx = null;
 
@@ -103,19 +105,13 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   PublishingContext publishingCtx = null;
 
   /** The modification context */
-  ModificationContext modificationCtx = null;
+  LocalizedModificationContext modificationCtx = null;
 
   /** The pagelet properties */
-  Map<String, Object> properties = null;
+  Map<String, String[]> properties = null;
 
-  /** Pagelet owner */
-  User owner = null;
-
-  /** The pagelet location */
-  PageletLocation location_ = null;
-  
   /** The content */
-  LocalizableContent<Map> content_ = null;
+  LocalizableContent<Map<String, String[]>> content = null;
 
   /**
    * Creates a new pagelet data holder.
@@ -140,11 +136,11 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
         throw new IllegalStateException(msg);
       }
     }
-    properties = new HashMap<String, Object>();
+    properties = new HashMap<String, String[]>();
     securityCtx = new PageletSecurityContextImpl(module, id);
     publishingCtx = new PublishingContextImpl();
-    modificationCtx = new ModificationContextImpl();
-    content_ = new LocalizableContent<Map>(this);
+    modificationCtx = new LocalizedModificationContextImpl(this);
+    content = new LocalizableContent<Map<String, String[]>>(this);
   }
 
   /**
@@ -207,8 +203,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * Returns the property with name <code>key</code> or the empty string if no
    * such property is found. If there is more than one value for the given key,
-   * e. g. if this is a multivalue property, then this method returns the first
-   * value of the value collection.
+   * e. g. if this is a multiple value property, then this method returns the
+   * first value of the value collection.
    * <p>
    * If no value is found at all, then the empty string is returned.
    * 
@@ -217,49 +213,39 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @return the property value
    */
   public String getProperty(String key) {
-    Object value = properties.get(key);
-    if (value != null) {
-      if (value instanceof String) {
-        return (String) value;
-      } else if (value instanceof ArrayList) {
-        return (String) ((ArrayList) value).get(0);
-      }
-    }
-    return "";
+    String[] values = properties.get(key);
+    if (values != null && values.length > 0)
+      return values[0];
+    return null;
   }
 
   /**
-   * Returns <code>true</code> if this is a multivalue property.
+   * Returns <code>true</code> if this is a multiple value property.
    * 
    * @param key
    *          the key
    * @return <code>true</code> if this key holds more than one value
    */
   public boolean isMultiValueProperty(String key) {
-    Object value = properties.get(key);
-    return (value instanceof ArrayList);
+    String[] values = properties.get(key);
+    return values != null && values.length > 1;
   }
 
   /**
-   * Returns the array of values for the multivalue property <code>key</code>.
-   * This method returns <code>null</code> if no value has been stored at all
-   * for the given key, a single element string array if there is exactly one
-   * string and an array of strings of all values in all other cases.
+   * Returns the array of values for the multiple value property
+   * <code>key</code>. This method returns <code>null</code> if no value has
+   * been stored at all for the given key, a single element string array if
+   * there is exactly one string and an array of strings of all values in all
+   * other cases.
    * 
    * @param key
    *          the value's name
    * @return the value collection
    */
   public String[] getMultiValueProperty(String key) {
-    Object value = properties.get(key);
-    if (value != null) {
-      if (value instanceof String) {
-        return new String[] { (String) value };
-      } else if (value instanceof List) {
-        List<String> valueList = (List<String>) value;
-        return valueList.toArray(new String[valueList.size()]);
-      }
-    }
+    String[] values = properties.get(key);
+    if (values != null)
+      return values;
     return null;
   }
 
@@ -273,19 +259,14 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *          the property value
    */
   public void setProperty(String key, String value) {
-    Object existing = properties.remove(key);
+    String[] existing = properties.remove(key);
+    List<String> values = new ArrayList<String>();
     if (existing != null) {
-      if (existing instanceof List) {
-        ((List) existing).add(value);
-      } else {
-        List values = new ArrayList();
-        values.add(existing);
-        values.add(value);
-        properties.put(key, value);
-      }
-    } else {
-      properties.put(key, value);
+      for (String s : existing)
+        values.add(s);
     }
+    values.add(value);
+    properties.put(key, values.toArray(new String[values.size()]));
   }
 
   /**
@@ -295,7 +276,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *          the owner of this pagelet
    */
   void setOwner(User owner) {
-    this.owner = owner;
+    securityCtx.setOwner(owner);
   }
 
   /**
@@ -304,7 +285,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @return the owner
    */
   public User getOwner() {
-    return owner;
+    return securityCtx.getOwner();
   }
 
   /**
@@ -316,6 +297,24 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public PublishingContext getPublishingContext() {
     return publishingCtx;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
+   */
+  public Date getPublishFrom() {
+    return publishingCtx.getPublishFrom();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
+   */
+  public Date getPublishTo() {
+    return publishingCtx.getPublishTo();
   }
 
   /**
@@ -467,6 +466,125 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
+   */
+  public Date getCreationDate() {
+    return modificationCtx.getCreationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
+   */
+  public User getCreator() {
+    return modificationCtx.getCreator();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationContext()
+   */
+  public LocalizedModificationContext getModificationContext() {
+    return modificationCtx;
+  }
+
+  /**
+   * Sets the data when this page has been modified.
+   * 
+   * @param date
+   *          the modification date
+   */
+  void setModifiedSince(Date date) {
+    modificationCtx.setModificationDate(date);
+  }
+
+  /**
+   * Sets the user that last modified the page.
+   * 
+   * @param user
+   *          the modifying user
+   */
+  void setModifiedBy(User user) {
+    modificationCtx.setModifier(user);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
+   */
+  public Date getModificationDate() {
+    return modificationCtx.getModificationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
+   */
+  public User getModifier() {
+    return modificationCtx.getModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
+   */
+  public boolean isModifiedAfter(Date date) {
+    return modificationCtx.isModifiedAfter(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
+   */
+  public Date getLastModificationDate() {
+    return modificationCtx.getLastModificationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModifier()
+   */
+  public User getLastModifier() {
+    return modificationCtx.getLastModifier();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAll()
+   */
+  public boolean isModifiedAtAll() {
+    return modificationCtx.isModifiedAtAll();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllAfter(java.util.Date)
+   */
+  public boolean isModifiedAtAllAfter(Date date) {
+    return modificationCtx.isModifiedAtAllAfter(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
+   */
+  public boolean isModified() {
+    return modificationCtx.isModified();
+  }
+
+  /**
    * Returns a string representation of this pagelet, consisting of the module
    * identifier and the pagelet id.
    * 
@@ -518,50 +636,36 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       b.append("</user>");
       b.append("</modified>");
 
-      Map content = (HashMap) content_.get(l);
-      if (content == null) {
+      // export content
+      Map<String, String[]> textualContent = content.get(l);
+      if (textualContent.size() == 0) {
+        b.append("<content/>");
+      } else {
+        b.append("<content>");
+        for (Map.Entry<String, String[]> e : textualContent.entrySet()) {
+          for (String value : e.getValue()) {
+            b.append("<text id=\"");
+            b.append(e.getKey());
+            b.append("\"><![CDATA[");
+            b.append(value);
+            b.append("]]></text>");
+          }
+        }
         b.append("</content>");
-        continue;
       }
-      for (Iterator j = content.entrySet().iterator(); j.hasNext();) {
-        Map.Entry e = (Map.Entry) j.next();
-        String[] values = null;
-        if (e.getValue() instanceof List) {
-          List valueList = (List) e.getValue();
-          values = (String[]) valueList.toArray(new String[valueList.size()]);
-        } else {
-          values = new String[] { e.getValue().toString() };
-        }
-        for (int k = 0; k < values.length; k++) {
-          b.append("<text id=\"");
-          b.append(e.getKey());
-          b.append("\"><![CDATA[");
-          b.append(values[k]);
-          b.append("]]></text>");
-        }
-      }
-      b.append("</content>");
     }
+
     // export properties
     if (properties.size() == 0) {
       b.append("<properties/>");
     } else {
       b.append("<properties>");
-      for (Iterator i = properties.entrySet().iterator(); i.hasNext();) {
-        Map.Entry e = (Map.Entry) i.next();
-        String[] properties = null;
-        if (e.getValue() instanceof List) {
-          List<String> propertyList = (List) e.getValue();
-          properties = propertyList.toArray(new String[propertyList.size()]);
-        } else {
-          Object value = e.getValue();
-          properties = (value != null) ? new String[] { value.toString() } : new String[] {};
-        }
-        for (int k = 0; k < properties.length; k++) {
+      for (Map.Entry<String, String[]> e : properties.entrySet()) {
+        for (String value : e.getValue()) {
           b.append("<property id=\"");
           b.append(e.getKey());
           b.append("\"><![CDATA[");
-          b.append(properties[k]);
+          b.append(value);
           b.append("]]></property>");
         }
       }
@@ -594,8 +698,11 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @return <code>true</code> if this is multidimensional content
    */
   public boolean isMultiValueContent(String name) {
-    Object value = getContent(name);
-    return (value instanceof ArrayList);
+    Map<String, String[]> languageContent = content.get();
+    if (languageContent == null)
+      return false;
+    String[] values = languageContent.get(name);
+    return values != null && values.length > 1;
   }
 
   /**
@@ -604,7 +711,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * <code>null</code> if there is no entry in this language. Otherwise, the
    * content is returned in the default language.
    * <p>
-   * If this is multivalue content, then this method returns the first entry
+   * If this is multiple value content, then this method returns the first entry
    * only. Use {@link #getMultiValueContent(String, Language, boolean)} to get
    * all values.
    * 
@@ -613,14 +720,11 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
    */
   public String getContent(String name, Language language, boolean force) {
-    Map<String, ?> languageContent = content_.get(language, force);
+    Map<String, String[]> languageContent = content.get(language, force);
     if (languageContent == null)
       return null;
-    Object value = languageContent.get(name);
-    if (value != null && value instanceof ArrayList) {
-      return ((ArrayList<String>) value).get(0);
-    }
-    return (String)value;
+    String[] values = languageContent.get(name);
+    return (values != null && values.length > 0) ? values[0] : null;
   }
 
   /**
@@ -628,7 +732,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * content in the default language if there is no entry in the specified
    * language.
    * <p>
-   * If this is multivalue content, then this method returns the first entry
+   * If this is multiple value content, then this method returns the first entry
    * only. Use {@link #getMultiValueContent(String, Language)} to get all
    * values.
    * 
@@ -645,7 +749,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * content in the currently active language if there is no entry in the
    * specified language.
    * <p>
-   * If this is multivalue content, then this method returns the first entry
+   * If this is multiple value content, then this method returns the first entry
    * only. Use {@link #getMultiValueContent(String)} to get all values.
    * 
    * @see ch.o2it.weblounge.api.content.Pagelet#getContent(java.lang.String,
@@ -657,10 +761,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns the multivalue content in the specified language. If the language
-   * is forced using the <code>force</code> parameter, then this method will
-   * return <code>null</code> if there is no entry in this language. Otherwise,
-   * the content is returned in the default language.
+   * Returns the multiple value content in the specified language. If the
+   * language is forced using the <code>force</code> parameter, then this method
+   * will return <code>null</code> if there is no entry in this language.
+   * Otherwise, the content is returned in the default language.
    * <p>
    * If this is single value content, then this method returns an array
    * containing only the single value.
@@ -672,24 +776,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public String[] getMultiValueContent(String name, Language language,
       boolean force) {
-    Map languageContent = content_.get(language, force);
+    Map<String, String[]> languageContent = content.get(language, force);
     if (languageContent == null)
       return null;
-    Object value = languageContent.get(name);
-    if (value != null) {
-      if (value instanceof ArrayList) {
-        List<String> valueList = (ArrayList<String>) value;
-        return valueList.toArray(new String[valueList.size()]);
-      } else {
-        return new String[] { (String)value };
-      }
-    }
-    return null;
+    return languageContent.get(name);
   }
 
   /**
-   * Returns the multivalue content in the specified language. If there is no
-   * entry in this language, the content is returned in the default language.
+   * Returns the multiple value content in the specified language. If there is
+   * no entry in this language, the content is returned in the default language.
    * <p>
    * If this is single value content, then this method returns an array
    * containing only the single value.
@@ -704,8 +799,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns the multivalue content in the specified language. If there is no
-   * entry in this language, the content is returned in the active language.
+   * Returns the multiple value content in the specified language. If there is
+   * no entry in this language, the content is returned in the active language.
    * <p>
    * If this is single value content, then this method returns an array
    * containing only the single value.
@@ -721,33 +816,26 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * Sets the pagelet's content in the given language. If the content identified
    * by <code>name</code> has already been assigned, then the content element is
-   * being converted into a multivalue content element.
+   * being converted into a multiple value content element.
    * 
    * @see ch.o2it.weblounge.core.language.MultilingualObject#setContent(java.lang.String,
    *      java.lang.Object, ch.o2it.weblounge.api.language.Language)
    * @see #isMultiValueContent(String)
    */
-  public void setContent(String name, Object content, Language language) {
-    Map languageContent = content_.get(language, true);
-    Object value = null;
+  public void setContent(String name, String value, Language language) {
+    Map<String, String[]> languageContent = content.get(language, true);
     if (languageContent == null) {
-      languageContent = new HashMap<String, Object>(10);
-      content_.put(languageContent, language);
-    } else {
-      value = languageContent.get(name);
+      languageContent = new HashMap<String, String[]>();
+      content.put(languageContent, language);
+    }    
+    List<String> values = new ArrayList<String>();
+    String[] existing = languageContent.remove(name);
+    if (existing != null) {
+      for (String e : existing)
+        values.add(e);
     }
-    if (value != null) {
-      if (value instanceof ArrayList) {
-        ((ArrayList) value).add(content);
-      } else {
-        List valueList = new ArrayList();
-        valueList.add(value);
-        valueList.add(content);
-        languageContent.put(name, valueList);
-      }
-    } else {
-      languageContent.put(name, content);
-    }
+    values.add(value);
+    languageContent.put(name, values.toArray(new String[values.size()]));
   }
 
   /**
@@ -777,88 +865,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       }
     }
     return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
-   */
-  public Date getCreationDate() {
-    return modificationCtx.getCreationDate();
-    }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
-   */
-  public User getCreator() {
-    return modificationCtx.getCreator();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationContext()
-   */
-  public ModificationContext getModificationContext() {
-    return modificationCtx;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
-   */
-  public Date getModificationDate() {
-    return modificationCtx.getModificationDate();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
-   */
-  public Date getModificationDate(Language language) {
-    return modificationCtx.getModificationDate(language);
-    }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
-   */
-  public User getModifier() {
-    return modificationCtx.getModifier();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier(ch.o2it.weblounge.common.language.Language)
-   */
-  public User getModifier(Language language) {
-    return modificationCtx.getModifier(language);
-    }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
-   */
-  public boolean isModifiedAfter(Date date) {
-    return modificationCtx.isModifiedAfter(date);
-   }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public boolean isModifiedAfter(Date date, Language language) {
-    return modificationCtx.isModifiedAfter(date, language);
   }
 
 }
