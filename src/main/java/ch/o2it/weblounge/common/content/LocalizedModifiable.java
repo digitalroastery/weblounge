@@ -63,6 +63,6 @@ public interface LocalizedModifiable extends Modifiable, Localizable {
    * 
    * @return the modifier
    */
-  User getLatModifier();
+  User getLastModifier();
 
 }
