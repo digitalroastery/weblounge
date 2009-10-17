@@ -37,7 +37,7 @@ import java.util.Set;
  * @version 1.0
  */
 
-public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Map<K, V> {
+public class MultilingualHashMap<K, V> extends LocalizableObject implements Map<K, V> {
 
   /** Language dependant content */
   private Map<Language, Map<K, V>> content = null;
@@ -84,7 +84,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#containsKey(java.lang.Object)
    */
   public boolean containsKey(Object key) {
-    Map<K, V> map = get(getActiveLanguage(), false);
+    Map<K, V> map = get(getLanguage(), false);
     return map != null && map.containsKey(key);
   }
 
@@ -105,7 +105,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#containsValue(java.lang.Object)
    */
   public boolean containsValue(Object value) {
-    Map<K, V> map = get(getActiveLanguage(), false);
+    Map<K, V> map = get(getLanguage(), false);
     return map != null && map.containsValue(value);
   }
 
@@ -126,7 +126,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#entrySet()
    */
   public Set<Map.Entry<K, V>> entrySet() {
-    Map<K, V> map = get(getActiveLanguage(), false);
+    Map<K, V> map = get(getLanguage(), false);
     return (map != null) ? map.entrySet() : new HashSet<Map.Entry<K, V>>();
   }
 
@@ -151,7 +151,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#get(java.lang.Object)
    */
   public V get(Object key) {
-    return get(key, getActiveLanguage(), false);
+    return get(key, getLanguage(), false);
   }
 
   /**
@@ -189,7 +189,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
   public boolean isEmpty() {
     if (content.isEmpty())
       return true;
-    Map<K, V> map = get(getActiveLanguage(), false);
+    Map<K, V> map = get(getLanguage(), false);
     return map == null || map.isEmpty();
   }
 
@@ -208,7 +208,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#keySet()
    */
   public Set<K> keySet() {
-    Map<K, V> map = get(getActiveLanguage(), false);
+    Map<K, V> map = get(getLanguage(), false);
     return (map != null) ? map.keySet() : new HashSet<K>();
   }
 
@@ -228,7 +228,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#put(java.lang.Object, java.lang.Object)
    */
   public V put(K key, V value) {
-    return put(key, value, getActiveLanguage());
+    return put(key, value, getLanguage());
   }
 
   /**
@@ -257,7 +257,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#putAll(java.util.Map)
    */
   public void putAll(Map<? extends K, ? extends V> m) {
-    putAll(m, getActiveLanguage());
+    putAll(m, getLanguage());
   }
 
   /**
@@ -284,7 +284,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#remove(java.lang.Object)
    */
   public V remove(Object key) {
-    Map<K, V> map = get(getActiveLanguage(), false);
+    Map<K, V> map = get(getLanguage(), false);
     return (map != null) ? map.remove(key) : null;
   }
 
@@ -334,7 +334,7 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
    * @see java.util.Map#values()
    */
   public Collection<V> values() {
-    Map<K, V> map = get(getActiveLanguage(), false);
+    Map<K, V> map = get(getLanguage(), false);
     return (map != null) ? map.values() : new ArrayList<V>();
   }
 
@@ -364,22 +364,12 @@ public class MultilingualHashMap<K, V> extends AbstractLocalizable implements Ma
     if (map == null && !force) {
       Language defaultLanguage = getDefaultLanguage();
       if (defaultLanguage != null && (language == null || !language.equals(defaultLanguage))) {
-        map = get(getActiveLanguage(), false);
+        map = get(getLanguage(), false);
       } else if (content.size() == 1) {
         map = content.values().iterator().next();
       }
     }
     return map;
-  }
-
-  @Override
-  public String toString(Language language) {
-    return super.toString();
-  }
-
-  @Override
-  public String toString(Language language, boolean force) {
-    return super.toString();
   }
 
 }

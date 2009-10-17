@@ -21,12 +21,12 @@ package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.WebloungeDateFormat;
 import ch.o2it.weblounge.common.content.ModificationContext;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import java.util.Date;
@@ -36,44 +36,35 @@ import javax.xml.xpath.XPath;
 /**
  * TODO: Comment ModificationContextImpl
  */
-public class ModificationContextImpl extends LocalizableObject<ModificationContextImpl> implements ModificationContext {
+public class ModificationContextImpl implements ModificationContext {
 
-  /** The context identifier */
-  private String id_ = null;
-
-  /** Site */
-  protected Site site = null;
+  /** Logging facility */
+  private final static Logger log_ = LoggerFactory.getLogger(ModificationContextImpl.class);
 
   /** Creation date */
-  protected Date created = null;
+  protected Date creationDate = null;
 
   /** Creator */
   protected User creator = null;
 
+  /** Modification date */
+  protected Date modificationDate = null;
+
+  /** Editor */
+  protected User editor = null;
+
   /**
    * Creates a new and empty modification context.
    */
-  public ModificationContextImpl(Site site) {
-    this(site, "<default>");
-  }
-
-  /**
-   * Creates a default publishing context with the given name and initially no
-   * restrictions.
-   * 
-   * @param identifier
-   *          the context identifier
-   */
-  public ModificationContextImpl(Site site, String identifier) {
-    id_ = (identifier != null) ? identifier : "<default>";
-    created = new Date();
+  public ModificationContextImpl() {
+    this.creationDate = new Date();
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.ModificationContext#getCreationDate()
    */
   public Date getCreationDate() {
-    return created;
+    return creationDate;
   }
 
   /**
@@ -87,7 +78,7 @@ public class ModificationContextImpl extends LocalizableObject<ModificationConte
    * @see ch.o2it.weblounge.common.content.ModificationContext#getCreationDate(java.util.Date)
    */
   public void setCreationDate(Date date) {
-    this.created = date;
+    this.creationDate = date;
   }
 
   /**
@@ -101,85 +92,44 @@ public class ModificationContextImpl extends LocalizableObject<ModificationConte
    * @see ch.o2it.weblounge.common.content.ModificationContext#getModificationDate()
    */
   public Date getModificationDate() {
-    return getModificationDate(getLanguage());
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#getModificationDate(ch.o2it.weblounge.common.language.Language)
-   */
-  public Date getModificationDate(Language language) {
-    ModificationContextImpl ctxt = get(language);
-    return (ctxt != null) ? ctxt.getModificationDate() : null;
+    return modificationDate;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.ModificationContext#getModifier()
    */
   public User getModifier() {
-    return getModifier(getLanguage());
+    return editor;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#getModifier(ch.o2it.weblounge.common.language.Language)
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
    */
-  public User getModifier(Language language) {
-    ModificationContextImpl ctxt = get(language);
-    return (ctxt != null) ? ctxt.getModifier() : null;
+  public boolean isModified() {
+    return isModifiedAfter(new Date());
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.ModificationContext#isModified()
    */
-  public boolean isModified() {
-    return isModified(getLanguage());
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#isModified(ch.o2it.weblounge.common.language.Language)
-   */
-  public boolean isModified(Language language) {
-    ModificationContextImpl ctxt = get(language);
-    return (ctxt != null) ? ctxt.isModified() : false;
+  public boolean isModifiedAfter(Date date) {
+    return modificationDate != null && modificationDate.after(date);
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.ModificationContext#setModificationDate(java.util.Date)
    */
   public void setModificationDate(Date date) {
-    setModificationDate(date, getLanguage());
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setModificationDate(java.util.Date,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public void setModificationDate(Date date, Language language) {
-    ModificationContextImpl ctxt = get(language);
-    if (ctxt == null) {
-      ctxt = new ModificationContextImpl(site, id_);
-      put(ctxt, language);
-    }
-    ctxt.setModificationDate(date);
+    this.modificationDate = date;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.security.User)
    */
   public void setModifier(User editor) {
-    setModifier(editor, getLanguage());
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.security.User,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public void setModifier(User editor, Language language) {
-    ModificationContextImpl ctxt = get(language);
-    if (ctxt == null) {
-      ctxt = new ModificationContextImpl(site, id_);
-      put(ctxt, language);
-    }
-    ctxt.setModifier(editor);
+    this.editor = editor;
   }
 
   /**
@@ -188,58 +138,52 @@ public class ModificationContextImpl extends LocalizableObject<ModificationConte
    * @see java.lang.Object#clone()
    */
   public Object clone() {
-    ModificationContextImpl ctxt = new ModificationContextImpl(site, id_);
-    ctxt.created = created;
+    ModificationContextImpl ctxt = new ModificationContextImpl();
+    ctxt.creationDate = creationDate;
     ctxt.creator = creator;
-    for (Language l : content.keySet()) {
-      ctxt.put((ModificationContextImpl) content.get(l).clone(), l);
-    }
+    ctxt.editor = editor;
+    ctxt.modificationDate = modificationDate;
     return ctxt;
   }
 
   /**
-   * Initializes this context from an xml node.
+   * Initializes this context from an XML node.
    * 
    * @param context
    *          the publish context node
+   * @param site
+   *          the associated site
    */
-  public void init(XPath path, Node context) {
+  public void init(XPath path, Node context, Site site) {
+
     // created
     try {
       Node creatorNode = XPathHelper.select(path, context, "//created/user");
       if (creatorNode != null) {
         creator = site.getUsers().getUser(creatorNode.getNodeValue());
       }
-      if (creator == null)
-        creator = site.getAdministrator();
       Node createdNode = XPathHelper.select(path, context, "//created/date");
-      created = (createdNode != null) ? WebloungeDateFormat.parseStatic(createdNode.getNodeValue()) : null;
+      creationDate = (createdNode != null) ? WebloungeDateFormat.parseStatic(createdNode.getNodeValue()) : null;
     } catch (Exception e) {
-      site.getLogger().warn("Error reading history creation data for " + id_);
+      log_.error("Error reading creation data for modification context", e);
     }
-    // modifications
+    
+    // modification
     try {
-      Node languageNode = XPathHelper.select(path, context, "//modified/@language");
-      Language language = site.getLanguage(languageNode.getNodeValue());
-      if (language != null) {
-        Node modifierNode = XPathHelper.select(path, context, "//modified/user");
-        Node modifiedNode = XPathHelper.select(path, context, "//modified/date");
-        if (modifierNode != null && modifiedNode != null) {
-          User modifier = site.getUsers().getUser(modifierNode.getNodeValue());
-          Date modified = (modifiedNode != null) ? WebloungeDateFormat.parseStatic(modifiedNode.getNodeValue()) : null;
-          if (modifier != null) {
-            ModificationContextImpl ctxt = new ModificationContextImpl(site);
-            ctxt.setCreator(creator);
-            ctxt.setCreationDate(created);
-            ctxt.setModifier(modifier);
-            ctxt.setModificationDate(modified);
-            put(ctxt, language);
-          }
+      Node modifierNode = XPathHelper.select(path, context, "//modified/user");
+      Node modifiedNode = XPathHelper.select(path, context, "//modified/date");
+      if (modifierNode != null && modifiedNode != null) {
+        User modifier = site.getUsers().getUser(modifierNode.getNodeValue());
+        Date modified = (modifiedNode != null) ? WebloungeDateFormat.parseStatic(modifiedNode.getNodeValue()) : null;
+        if (modifier != null) {
+          this.editor = modifier;
+          this.modificationDate = modified;
         }
       }
     } catch (Exception e) {
-      site.getLogger().warn("Error reading history creation data for " + id_);
+      log_.error("Error reading modification data", e);
     }
+
   }
 
   /**
@@ -257,37 +201,23 @@ public class ModificationContextImpl extends LocalizableObject<ModificationConte
       b.append(creator.getLogin());
       b.append("</user>");
       b.append("<date>");
-      b.append(WebloungeDateFormat.formatStatic(created));
+      b.append(WebloungeDateFormat.formatStatic(creationDate));
       b.append("</date>");
       b.append("/modified");
     }
 
     // Modification
-    for (Language language : content.keySet()) {
-      ModificationContextImpl ctxt = content.get(language);
-      b.append("<modified language=\"");
-      b.append(language.getIdentifier());
-      b.append("\">");
+    if (editor != null) {
+      b.append("<modified>");
       b.append("<user>");
-      b.append(ctxt.getModifier().getLogin());
+      b.append(editor.getLogin());
       b.append("</user>");
       b.append("<date>");
-      b.append(WebloungeDateFormat.formatStatic(ctxt.getModificationDate()));
+      b.append(WebloungeDateFormat.formatStatic(modificationDate));
       b.append("</date>");
       b.append("/modified");
     }
     return b.toString();
-  }
-
-  /**
-   * Returns the string representation of this context which is equal to the
-   * context identifier.
-   * 
-   * @return the context identifier
-   * @see java.lang.Object#toString()
-   */
-  public String toString() {
-    return id_;
   }
 
 }

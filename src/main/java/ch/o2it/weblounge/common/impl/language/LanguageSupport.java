@@ -111,9 +111,9 @@ public final class LanguageSupport {
    * &#064;throws ConfigurationException if the description in the site default language
    * has not been provided
    */
-  public static LocalizableObject<String> addDescriptions(XPath path,
+  public static LocalizableContent<String> addDescriptions(XPath path,
       Node configuration, Language[] allLanguages, Language defaultLanguage,
-      LocalizableObject<String> o, boolean javascript)
+      LocalizableContent<String> o, boolean javascript)
       throws ConfigurationException {
     Map<Language, String> languages = LanguageSupport.readDescriptions(path, configuration, allLanguages, defaultLanguage);
     for (Map.Entry<Language, String> entry : languages.entrySet()) {
@@ -162,9 +162,9 @@ public final class LanguageSupport {
    * &#064;throws ConfigurationException if the description in the site default language
    * has not been provided
    */
-  public static LocalizableObject<String> addDescriptions(XPath path,
+  public static LocalizableContent<String> addDescriptions(XPath path,
       Node configuration, Language[] allLanguages, Language defaultLanguage, 
-      LocalizableObject<String> o) throws ConfigurationException {
+      LocalizableContent<String> o) throws ConfigurationException {
     return addDescriptions(path, configuration, allLanguages, defaultLanguage, o, false);
   }
 

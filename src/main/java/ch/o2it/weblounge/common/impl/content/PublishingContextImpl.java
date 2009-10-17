@@ -49,35 +49,20 @@ import javax.xml.xpath.XPath;
  */
 public class PublishingContextImpl implements PublishingContext {
 
-  /** Context identifier */
-  private String id_;
-
   /** Publisher */
-  private User publisher_;
+  private User publisher_ = null;
 
   /** Start date */
-  private Date from_;
+  private Date from_ = null;
 
   /** End date */
-  private Date to_;
+  private Date to_ = null;
 
   /**
    * Creates a default publishing context with no restrictions and a context
    * identifier of <tt>&lt;default&gt;</tt>.
    */
   public PublishingContextImpl() {
-    this("<default>");
-  }
-
-  /**
-   * Creates a default publishing context with the given name and initially no
-   * restrictions.
-   * 
-   * @param identifier
-   *          the context identifier
-   */
-  public PublishingContextImpl(String identifier) {
-    id_ = (identifier != null) ? identifier : "<default>";
     publisher_ = null;
     from_ = new Date();
     to_ = null;
@@ -109,14 +94,14 @@ public class PublishingContextImpl implements PublishingContext {
    * @param from
    *          the start date
    */
-  public void setFrom(Date from) {
+  public void setPublishFrom(Date from) {
     from_ = from;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.PublishingContext#getFrom()
+   * @see ch.o2it.weblounge.common.content.PublishingContext#getPublishFrom()
    */
-  public Date getFrom() {
+  public Date getPublishFrom() {
     return from_;
   }
 
@@ -127,14 +112,14 @@ public class PublishingContextImpl implements PublishingContext {
    * @param to
    *          the end date
    */
-  public void setTo(Date to) {
+  public void setPublishTo(Date to) {
     to_ = to;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.PublishingContext#getTo()
+   * @see ch.o2it.weblounge.common.content.PublishingContext#getPublishTo()
    */
-  public Date getTo() {
+  public Date getPublishTo() {
     return to_;
   }
 
@@ -185,25 +170,14 @@ public class PublishingContextImpl implements PublishingContext {
    * @see java.lang.Object#clone()
    */
   public Object clone() {
-    PublishingContextImpl ctxt = new PublishingContextImpl(id_);
+    PublishingContextImpl ctxt = new PublishingContextImpl();
     ctxt.from_ = from_;
     ctxt.to_ = to_;
     return ctxt;
   }
 
   /**
-   * Returns the string representation of this context which is equal to the
-   * context identifier.
-   * 
-   * @return the context identifier
-   * @see java.lang.Object#toString()
-   */
-  public String toString() {
-    return id_;
-  }
-
-  /**
-   * Returns an XML represeantation of this context.
+   * Returns an XML representation of this context.
    * 
    * @return an XML representation of this context
    */

@@ -68,7 +68,7 @@ public class MultilingualTreeList<Type> {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.language.MultilingualList#setLanguage(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.language.MultilingualList#switchTo(ch.o2it.weblounge.common.language.Language)
    */
   public void setLanguage(Language language) {
     this.language = language;

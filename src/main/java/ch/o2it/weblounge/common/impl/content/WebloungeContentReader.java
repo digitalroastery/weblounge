@@ -233,7 +233,7 @@ public class WebloungeContentReader extends DefaultHandler {
    * @return the default publishing context
    */
   protected ModificationContextImpl getDefaultModificationContext() {
-    return new ModificationContextImpl(site);
+    return new ModificationContextImpl();
   }
 
   /**
@@ -260,7 +260,7 @@ public class WebloungeContentReader extends DefaultHandler {
    */
   protected void setCreationDate(Date date) {
     if (modificationCtx == null)
-      modificationCtx = new ModificationContextImpl(site);
+      modificationCtx = new ModificationContextImpl();
     modificationCtx.setCreationDate(date);
   }
 
@@ -272,7 +272,7 @@ public class WebloungeContentReader extends DefaultHandler {
    */
   protected void setCreator(User user) {
     if (modificationCtx == null)
-      modificationCtx = new ModificationContextImpl(site);
+      modificationCtx = new ModificationContextImpl();
     modificationCtx.setCreator(user);
   }
 
@@ -284,7 +284,7 @@ public class WebloungeContentReader extends DefaultHandler {
    */
   protected void setModificationDate(Date date) {
     if (modificationCtx == null)
-      modificationCtx = new ModificationContextImpl(site);
+      modificationCtx = new ModificationContextImpl();
     modificationCtx.setModificationDate(date);
   }
 
@@ -296,7 +296,7 @@ public class WebloungeContentReader extends DefaultHandler {
    */
   protected void setModifier(User user) {
     if (modificationCtx == null)
-      modificationCtx = new ModificationContextImpl(site);
+      modificationCtx = new ModificationContextImpl();
     modificationCtx.setModifier(user);
   }
 
@@ -398,7 +398,7 @@ public class WebloungeContentReader extends DefaultHandler {
     else if ("workflow".equals(local)) {
       contentReaderContext = CTXT_WORKFLOW;
       if (modificationCtx == null) {
-        modificationCtx = new ModificationContextImpl(site);
+        modificationCtx = new ModificationContextImpl();
       }
       return;
     }
@@ -482,13 +482,13 @@ public class WebloungeContentReader extends DefaultHandler {
       if (characters.length() > 0) {
         try {
           Date d = dateFormat.parse(characters.toString());
-          publishingCtx.setFrom(d);
+          publishingCtx.setPublishFrom(d);
         } catch (Exception e) {
-          publishingCtx.setFrom(new Date());
+          publishingCtx.setPublishFrom(new Date());
           log_.warn("The publishing 'from' date on " + this + " is malformed: '" + characters.toString() + "'");
         }
       } else {
-        publishingCtx.setFrom(new Date());
+        publishingCtx.setPublishFrom(new Date());
       }
     }
 
@@ -500,13 +500,13 @@ public class WebloungeContentReader extends DefaultHandler {
       if (characters.length() > 0) {
         try {
           Date d = dateFormat.parse(characters.toString());
-          publishingCtx.setTo(d);
+          publishingCtx.setPublishTo(d);
         } catch (Exception e) {
-          publishingCtx.setTo(new Date(Long.MAX_VALUE));
+          publishingCtx.setPublishTo(new Date(Long.MAX_VALUE));
           log_.warn("The publishing 'to' date on " + this + " is malformed: '" + characters.toString() + "'");
         }
       } else {
-        publishingCtx.setTo(new Date(Long.MAX_VALUE));
+        publishingCtx.setPublishTo(new Date(Long.MAX_VALUE));
       }
     }
 

@@ -19,210 +19,343 @@
 
 package ch.o2it.weblounge.common.impl.language;
 
-import ch.o2it.weblounge.common.impl.util.encoding.Encoding;
-import ch.o2it.weblounge.common.impl.util.encoding.PlainEncoding;
-import ch.o2it.weblounge.common.language.Language;
+import static ch.o2it.weblounge.common.language.Localizable.LanguageResolution.Default;
+import static ch.o2it.weblounge.common.language.Localizable.LanguageResolution.Original;
 
-import java.util.HashMap;
-import java.util.Map;
+import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.Localizable;
+import ch.o2it.weblounge.common.language.LocalizationListener;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * This class represents a general object container, capable of managing this
- * object in various languages. The object itself is identified by either a
- * database id and/or a database key.
- * 
- * TODO Do we need an implementation as complex as this one?
+ * This class represents an abstract implementation of a {@link Localizable}
+ * object.
  */
-public class LocalizableObject<T> extends AbstractLocalizable {
+public abstract class LocalizableObject implements Localizable {
 
-  /** the content in various languages */
-  protected Map<Language, T> content = null;
+  /** list of added languages */
+  protected Set<Language> languages = null;
 
-  /** the encoding used to display the title */
-  private Encoding encoding_ = null;
+  /** the language that has been provided first */
+  protected Language originalLanguage = null;
+
+  /** the default language */
+  protected Language defaultLanguage = null;
+
+  /** the language that is currently set for this object */
+  protected Language currentLanguage = null;
+
+  /** the selector for the default language selection */
+  protected LanguageResolution behavior = Original;
+
+  /** list of objects interested in language switches */
+  protected List<LocalizationListener> localizationListeners = null;
 
   /**
-   * Constructor for class MultilingualObject with a default behaviour of
-   * <code>LANG_ORIGINAL</code>.
+   * Constructor for class AbstractMultilingual with a default behavior of
+   * {@link LanguageBehaviour#Original}.
    */
   public LocalizableObject() {
     this(null);
   }
 
   /**
-   * Constructor for class MultilingualObject with the given language as the
+   * Constructor for class AbstractMultilingual with the given language as the
    * default language.
    * 
-   * @param language
+   * @param defaultLanguage
    *          the default language
    */
-  public LocalizableObject(Language language) {
-    super(language);
-    encoding_ = PlainEncoding.getInstance();
-    content = new HashMap<Language, T>();
+  public LocalizableObject(Language defaultLanguage) {
+    this.defaultLanguage = defaultLanguage;
+    languages = new HashSet<Language>();
+    behavior = (defaultLanguage != null) ? Default : Original;
+    localizationListeners = new ArrayList<LocalizationListener>();
   }
 
   /**
-   * Removes all content from the object while keeping the language settings.
+   * Adds the listener to the list of localization listeners.
+   * 
+   * @param listener
+   *          the listener to add
    */
-  public void clear() {
-    content.clear();
+  public void addLocalizationListener(LocalizationListener listener) {
+    synchronized (localizationListeners) {
+      localizationListeners.add(listener);
+    }
+  }
+
+  /**
+   * Removes the listener from the list of localization listeners.
+   * 
+   * @param listener
+   *          the listener to remove
+   */
+  public void removeLocalizationListener(LocalizationListener listener) {
+    synchronized (localizationListeners) {
+      localizationListeners.remove(listener);
+    }
+  }
+
+  /**
+   * Resets all language settings, including original, default, selected and
+   * active language.
+   */
+  protected void reset() {
+    originalLanguage = null;
+    defaultLanguage = null;
+    currentLanguage = null;
     languages.clear();
   }
 
   /**
-   * Returns <code>true</code> if there is no content at all stored in the
+   * Enables the given language for this object.
+   * 
+   * @param language
+   *          the language to enable
+   */
+  public void enableLanguage(Language language) {
+    if (!languages.contains(language)) {
+      languages.add(language);
+    }
+  }
+
+  /**
+   * Removes the given language from this object.
+   * 
+   * @param language
+   *          the language to be removed
+   */
+  public void remove(Language language) {
+    if (behavior.equals(Original) && language.equals(originalLanguage))
+      throw new IllegalStateException("Cannot disable original language!");
+    else if (behavior.equals(Default) && language.equals(defaultLanguage))
+      throw new IllegalStateException("Cannot disable default language!");
+
+    if (language.equals(currentLanguage))
+      currentLanguage = null;
+    languages.remove(language);
+  }
+
+  /**
+   * Makes <code>language</code> the currently selected language for this
    * object.
    * 
-   * @return <code>true</code> if the object is empty
-   */
-  public boolean isEmpty() {
-    return content.isEmpty();
-  }
-
-  /**
-   * Returns the number of language entries.
-   * 
-   * @return the number of languages
-   */
-  public int size() {
-    return content.size();
-  }
-
-  /**
-   * Sets the encoding that is used to display the object title. By default,
-   * this class uses a <code>HTMLEncoding</code>.
-   * 
-   * @param encoding
-   *          the encoding used to display the object title
-   */
-  public void setEncoding(Encoding encoding) {
-    if (encoding == null) {
-      throw new IllegalArgumentException("Null is not allowed as encoding!");
-    }
-    encoding_ = encoding;
-  }
-
-  /**
-   * Returns the encoding used by this class to display the title element.
-   * 
-   * @return the encoding
-   */
-  public Encoding getEncoding() {
-    return encoding_;
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.impl.language.AbstractLocalizable#remove(ch.o2it.weblounge.common.language.Language)
-   */
-  @Override
-  public void remove(Language language) {
-    super.remove(language);
-    content.remove(language);
-  }
-
-  /**
-   * Sets the content in the given language.
-   * 
-   * @param content
-   *          the content
    * @param language
-   *          the content language
+   *          the language to switch to
+   * @throws IllegalArgumentException
+   *           if the language argument is <code>null</code>
+   * @throws IllegalStateException
+   *           if no fall back language can be determined
    */
-  public void put(T content, Language language) {
-    this.content.put(language, content);
-    super.enableLanguage(language);
+  public Language switchTo(Language language) {
+    return switchTo(language, false);
   }
 
   /**
-   * Returns the content in the active language or <code>null</code> if no
-   * content was found.
-   * 
-   * @return the content
-   */
-  public T get() {
-    return get(getActiveLanguage(), false);
-  }
-
-  /**
-   * Returns the content in the required language. If no content can be found in
-   * that language, then it will be looked up in the default language. If that
-   * doesn't produce a result as well, <code>null</code> is returned.
+   * Makes <code>language</code> the currently selected language for this
+   * object.
    * 
    * @param language
-   *          the content language
-   * @return the content
-   */
-  public T get(Language language) {
-    return get(language, false);
-  }
-
-  /**
-   * Returns the content in the required language. If no content can be found in
-   * that language, then it will be looked up in the default language (unless
-   * <code>force</code> is set to <code>true</code>). If that doesn't produce a
-   * result as well, <code>null</code> is returned.
-   * 
-   * @param language
-   *          the content language
+   *          the language to switch to
    * @param force
-   *          <code>true</code> to force the language
-   * @return the content
+   *          force the language and don't fall back to either original or
+   *          default language
+   * @throws IllegalArgumentException
+   *           if the language argument is <code>null</code>
+   * @throws IllegalStateException
+   *           if <code>force</code> is <code>false</code> and no fall back
+   *           language can be determined
    */
-  public T get(Language language, boolean force) {
-    T c = content.get(language);
-    if (c == null && !force) {
-      Language defaultLanguage = getDefaultLanguage();
-      if (defaultLanguage != null && (language == null || !language.equals(defaultLanguage))) {
-        c = content.get(defaultLanguage);
-      } else if (content.size() == 1) {
-        c = content.values().iterator().next();
+  public Language switchTo(Language language, boolean force) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
+
+    // Remember the current language
+    Language original = currentLanguage;
+
+    // If the language is available, then select it and initialize
+    // the object with this language
+    
+    if (force || supportsLanguage(language)) {
+      currentLanguage = language;
+    }
+
+    // The selected language is not available. It now depends on the
+    // language behavior which language to choose
+
+    else if (behavior.equals(Original)) {
+      currentLanguage = getOriginalLanguage();
+      if (currentLanguage == null)
+        throw new IllegalStateException("Original language must not be null");
+    } else if (behavior.equals(Default)) {
+      currentLanguage = getDefaultLanguage();
+      if (currentLanguage == null)
+        throw new IllegalStateException("Default language must not be null");
+    }
+
+    // Notify interested parties
+    if (original == null || !original.equals(currentLanguage)) {
+      synchronized (localizationListeners) {
+        for (LocalizationListener l : localizationListeners) {
+          l.switchedTo(language);
+        }
       }
     }
-    return c;
+    
+    return currentLanguage;
   }
 
   /**
-   * Returns the component title in the active language. The title is identified
-   * by the name "name".
+   * Returns the language that is currently used to display the object.
    * 
-   * @return the component title.
+   * @return the currently active language
    */
-  public String toString() {
-    return toString(getDefaultLanguage());
+  public Language getLanguage() {
+    return currentLanguage;
   }
 
   /**
-   * Returns the title in the requested language or <code>null</code> if the
-   * title doesn't exist in that language.
+   * Returns a fall back according to the current {@link LanguageResolution}.
+   * 
+   * @return the fall back language
+   */
+  public Language getFallbackLanguage() {
+    if (behavior.equals(Original))
+      return originalLanguage;
+    else
+      return defaultLanguage;
+  }
+
+  /**
+   * Sets the behavior of this localizable object in the case that the object
+   * description is requested in a language that has not been provided.<br>
+   * There are two known behaviors:
+   * <ul>
+   * <li>{@link LanguageResolution#Original}: If the requested language is not
+   * in the list of supported languages, then the language is chosen that was
+   * used to first create this object.</li>
+   * <li>{@link LanguageResolution#Default}: If the requested language is not in
+   * the list of supported languages, then the language is chosen that was set
+   * using {@link #setDefaultLanguage(Language)}.
+   * </ul>
+   * The default for this setting is {@link LanguageResolution#Original}.
+   * 
+   * @param behavior
+   *          the language behavior
+   */
+  public void setLanguageResolution(LanguageResolution behavior) {
+    this.behavior = behavior;
+  }
+
+  /**
+   * Returns the behavior of this multilingual object regarding it's default
+   * language.
+   * 
+   * @return the default language behavior
+   * @see #setLanguageResolution(int)
+   */
+  public LanguageResolution getLanguageResolution() {
+    return behavior;
+  }
+
+  /**
+   * Explicitly sets the default language.
+   * <p>
+   * If the language has not yet been enabled, this method will enable it.
    * 
    * @param language
-   *          the requested language
-   * @return the object title
+   *          the default language
+   * @throws IllegalArgumentException
+   *           if the argument <code>language</code> was null
    */
-  public String toString(Language language) {
-    if (getActiveLanguage() != null) {
-      T c = content.get(getActiveLanguage());
-      return encoding_.encode(c.toString());
+  public void setDefaultLanguage(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Argument language may not be null!");
+
+    defaultLanguage = language;
+    behavior = Default;
+
+    if (behavior.equals(Default) || currentLanguage == null) {
+      currentLanguage = defaultLanguage;
     }
-    return super.toString();
   }
 
   /**
-   * Returns the object using <code>language</code> as the output language. If
-   * no content can be found in that language, then it will be looked up in the
-   * default language (unless <code>force</code> is set to <code>true</code>). <br>
-   * If this doesn't produce a result as well, <code>null</code> is returned.
+   * Returns the default language.
    * 
-   * @param language
-   *          the language
-   * @param force
-   *          <code>true</code> to force the language
-   * @return the object's string representation in the given language
+   * @return the default language for this object
    */
-  public String toString(Language language, boolean force) {
-    String s = toString(language);
-    return (!"".equals(s)) ? s : null;
+  public Language getDefaultLanguage() {
+    return defaultLanguage;
   }
 
+  /**
+   * Returns the original language of this object or <code>null</code>, if no
+   * original language exists.
+   * 
+   * @return the original language
+   */
+  public Language getOriginalLanguage() {
+    return originalLanguage;
+  }
+
+  /**
+   * Sets the original language for this object. The original language is
+   * considered to be the language that was first used to describe the object
+   * (the native language).
+   * <p>
+   * If the language has not yet been enabled, this method will enable it.
+   * 
+   * @param language
+   *          the original language for this object
+   * @throws IllegalArgumentException
+   *           if the argument <code>language</code> was null
+   */
+  public void setOriginalLanguage(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Argument language may not be null!");
+
+    enableLanguage(language);
+    originalLanguage = language;
+
+    if (behavior.equals(Original) || currentLanguage == null) {
+      currentLanguage = originalLanguage;
+    }
+  }
+
+  /**
+   * Returns the number of supported languages.
+   * 
+   * @return the number of supported languages
+   */
+  public int getLanguageCount() {
+    return languages.size();
+  }
+
+  /**
+   * Returns <code>true</code> if the given language is supported, i. e. if the
+   * language has been added using <code>addLanguage()</code>.
+   * 
+   * @param language
+   *          the language to be supported
+   * @return <code>true</code> if the language is supported
+   */
+  public boolean supportsLanguage(Language language) {
+    return languages.contains(language) || language.equals(originalLanguage) || language.equals(defaultLanguage);
+  }
+
+  /**
+   * Returns the languages currently supported by this object.
+   * 
+   * @return a supported language iteration.
+   */
+  public Set<Language> languages() {
+    return languages;
+  }
+  
 }

@@ -71,7 +71,7 @@ public class MultilingualTreeSet<Type> implements Set<Type> {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.language.MultilingualSet#setLanguage(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.language.MultilingualSet#switchTo(ch.o2it.weblounge.common.language.Language)
    */
   public void setLanguage(Language language) {
     this.language = language;
