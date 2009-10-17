@@ -49,7 +49,7 @@ public interface Securable {
   /**
    * Returns <code>true</code> if the authorization <code>authorization</code>
    * is sufficient to act on the secured object in a way that requires the given
-   * permissionset <code>p</code>.
+   * {@link PermissionSet} <code>p</code>.
    * 
    * @param permissions
    *          the required set of permissions

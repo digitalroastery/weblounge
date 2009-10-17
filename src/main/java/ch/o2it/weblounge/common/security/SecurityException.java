@@ -72,7 +72,7 @@ public class SecurityException extends java.lang.SecurityException {
   }
 
   /**
-   * Returns the object that was unsuccessfuly accessed by the user.
+   * Returns the object that was unsuccessfully accessed by the user.
    * 
    * @return the secured object
    */
