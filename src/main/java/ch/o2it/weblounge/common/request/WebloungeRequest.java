@@ -57,6 +57,13 @@ public interface WebloungeRequest extends HttpServletRequest {
   WebUrl getUrl();
 
   /**
+   * Returns the originally requested url.
+   * 
+   * @return the requested url
+   */
+  WebUrl getRequestedUrl();
+
+  /**
    * Returns the current user.
    * 
    * @return the user

@@ -20,11 +20,12 @@
 
 package ch.o2it.weblounge.common.request;
 
+import ch.o2it.weblounge.common.content.Tag;
+import ch.o2it.weblounge.common.content.Taggable;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
-
-import ch.o2it.weblounge.common.content.Taggable;
 
 /**
  * Wrapper for a request that is being processed by the weblounge content
@@ -50,6 +51,115 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable {
   /** Error while processing the request */
   int STATE_PROCESSING_FAILED = -2;
 
+  /**
+   * Starts a cacheable response. By calling this method, a new response wrapper
+   * is generated which will write the response output to the cache as well as
+   * to the client.
+   * <p>
+   * If the method returns <code>true</code>, then the response part was found
+   * in the cache and has been directly written to the response from the cache.
+   * If it returns <code>false</code>, the data was not found but will be put
+   * into the cache when {@link #endResponse(WebloungeResponse)} is called.
+   * 
+   * @param uniqueTags
+   *          the tags identifying this response
+   * @param request
+   *          the request
+   * @param response
+   *          the response
+   * @param validTime
+   *          the valid time in milliseconds
+   * @param recheckTime
+   *          the recheck time in milliseconds
+   * @return the <code>CacheHandle</code> of the response or <code>null</code>
+   *         if the response was found in the cache
+   */
+  CacheHandle startResponse(Iterable<Tag> uniqueTags, WebloungeRequest request,
+      WebloungeResponse response, long validTime, long recheckTime);
+
+  /**
+   * Starts a cacheable response. By calling this method, a new response wrapper
+   * is generated which will write the response output to the cache as well as
+   * to the client.
+   * <p>
+   * If the method returns <code>true</code>, then the response part was found
+   * in the cache and has been directly written to the response from the cache.
+   * If it returns <code>false</code>, the data was not found but will be put
+   * into the cache when {@link #endResponse(WebloungeResponse)} is called.
+   * 
+   * @param request
+   *          the request
+   * @param response
+   *          the response
+   * @return boolean <code>true</code> if the response was found in the cache
+   */
+  boolean startResponse(CacheHandle handle, WebloungeRequest request);
+
+  /**
+   * Tell the cache service that writing the response to the client is now
+   * finished and that the cache buffer containing the response may be written to
+   * the cache.
+   * 
+   * @param response
+   *          the servlet response
+   */
+  boolean endResponse();
+
+  /**
+   * Starts caching a sub portion of the current response, identified by a set
+   * of cache tags.
+   * <p>
+   * Dividing the cached response into parts has the advantage, that, if for
+   * example on part of a page becomes invalid, the other parts remain in the
+   * cache and only the invalidated part and the page in whole have to be
+   * rebuilt.
+   * <p>
+   * If the method returns <code>true</code>, then the response part was found
+   * in the cache and has been directly written to the response from the cache.
+   * If it returns <code>false</code>, the data was not found but will be put
+   * into the cache.
+   * 
+   * @param uniqueTags
+   *          the tag set identifying the response part
+   * @param validTime
+   *          the valid time in milliseconds
+   * @param recheckTime
+   *          the recheck time in milliseconds
+   * @return the <code>CacheHandle</code> of the response part or
+   *         <code>null</code> if the response part was found in the cache
+   */
+  CacheHandle startResponsePart(Iterable<Tag> uniqueTags, long validTime, long recheckTime);
+
+  /**
+   * Starts caching a sub portion of the current response, identified by
+   * <code>handle</code>. Dividing the cached response into parts has the
+   * advantage, that, if for example on part of a page becomes invalid, the
+   * other parts remain in the cache and only the invalidated part and the page
+   * in whole have to be rebuilt.
+   * <p>
+   * If the method returns <code>true</code>, then the response part was found
+   * in the cache and has been directly written to the response from the cache.
+   * If it returns <code>false</code>, the data was not found but will be put
+   * into the cache.
+   * 
+   * @param handle
+   *          the response part identifier
+   * @return boolean <code>true</code> if the response part was found in the
+   *         cache
+   */
+  boolean startResponsePart(CacheHandle handle);
+
+  /**
+   * Tells the cache manager that the data identified by <code>handle</code> is
+   * complete and may be written to the cache.
+   * 
+   * @param handle
+   *          the response part identifier. <br>
+   *          NOTE: This MUST be the same instance that was used to start the
+   *          corresponding response part!
+   */
+  void endResponsePart(CacheHandle handle);
+  
   /**
    * Tells the cache to not cache this response. This method should be called in
    * case of a rendering error.
