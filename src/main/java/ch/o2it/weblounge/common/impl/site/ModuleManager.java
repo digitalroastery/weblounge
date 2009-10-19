@@ -50,9 +50,6 @@ public final class ModuleManager {
 	/** Name of the modules directory */
 	public final static String MODULE_DIR = "module";
 	
-	/** The shared module watcher */
-	private static SharedModuleLoader sharedLoader_ = null;
-
 	/** Watches the loaded modules for changes */
 	private ModuleLoader loader_ = null;
 
@@ -68,16 +65,6 @@ public final class ModuleManager {
 	/** Logging facility */
 	final static Logger log_ = LoggerFactory.getLogger(ModuleManager.class.getName());
 
-	/**
-	 * The static initializer makes sure that the static modules are
-	 * loaded first and only once.
-	 */
-	static {
-		log_.info("Loading shared modules");
-		sharedLoader_ = new SharedModuleLoader(new ModuleManager(null));
-		sharedLoader_.init();
-	}
-	
 	/**
 	 * Since this module only provides static methods, the constructor
 	 * is private.
@@ -110,18 +97,6 @@ public final class ModuleManager {
 	 */
 	public void destroy() {
 		// Nothing to do
-	}
-	
-	/**
-	 * Registers the shared module configuration.
-	 * 
-	 * @param config the shared module configuration
-	 */
-	static void registerSharedConfiguration(ModuleConfigurationImpl config) {
-		synchronized (sharedLoader_) {
-			sharedConfigurations_.put(config.identifier, config);
-			sharedLoader_.notifyAll();
-		}
 	}
 	
 	/**

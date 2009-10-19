@@ -1,32 +1,26 @@
 /*
- *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
- *  http://weblounge.o2it.ch
+ * ActionHandlerSupport.java	Mar 24, 2004
  *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
+ * Copyright 2004 by O2 IT Engineering
+ * Zurich, Switzerland (CH)
+ * All rights reserved.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program; if not, write to the Free Software Foundation
- *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * This software is confidential and proprietary information ("Confidential
+ * Information").  You shall not disclose such Confidential Information
+ * and shall use it only in accordance with the terms of the license
+ * agreement you entered into.
  */
 
-package ch.o2it.weblounge.common.impl.site;
+package ch.o2it.weblounge.site.impl;
 
-import ch.o2it.weblounge.common.impl.util.I18n;
 import ch.o2it.weblounge.common.page.Pagelet;
 import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.ActionConfiguration;
-import ch.o2it.weblounge.common.site.ActionException;
+import ch.o2it.weblounge.site.ActionConfiguration;
+import ch.o2it.weblounge.site.ActionHandlerException;
+
+import com.sun.org.apache.xml.internal.security.utils.I18n;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -77,13 +71,13 @@ public abstract class ActionHandlerSupport extends AbstractActionHandler {
 	 * it the request and response for first analysis as well as the desired output method.
 	 * <p>
 	 * It is not recommended that subclasses use this method to write anything to the
-	 * response. The call serves the single purpose acquire resources and set up for
+	 * response. The call serves the single purpose acquire ressources and set up for
 	 * the call to <code>startPage</code>.
 	 * 
 	 * @param request the weblounge request
 	 * @param response the weblounge response
 	 * @param method the output method
-	 * @see ch.o2it.weblounge.Action.module.ActionHandler#configure(WebloungeRequest, WebloungeResponse, String)
+	 * @see ch.o2it.weblounge.api.module.ActionHandler#configure(WebloungeRequest, WebloungeResponse, String)
 	 */
 	public void configure(WebloungeRequest request, WebloungeResponse response, String method) {
 		super.configure(request, response, method);
@@ -99,11 +93,11 @@ public abstract class ActionHandlerSupport extends AbstractActionHandler {
 	 * @return either <code>EVAL_PAGE</code> or <code>SKIP_PAGE</code>
 	 *                depending on whether the action wants to render the page on its
 	 *                own or have the template do the rendering.
-	 * @see ch.o2it.weblounge.Action.module.ActionHandler#startPage(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse)
+	 * @see ch.o2it.weblounge.api.module.ActionHandler#startPage(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse)
 	 */
 	public int startPage(
 			WebloungeRequest request,
-			WebloungeResponse response) throws ActionException {
+			WebloungeResponse response) throws ActionHandlerException {
 		return EVAL_PAGE;
 	}
 
@@ -132,7 +126,7 @@ public abstract class ActionHandlerSupport extends AbstractActionHandler {
 	 */
 	public int startIncludes(
 			WebloungeRequest request,
-			WebloungeResponse response) throws ActionException {
+			WebloungeResponse response) throws ActionHandlerException {
 		return EVAL_INCLUDES;
 	}
 
@@ -145,11 +139,11 @@ public abstract class ActionHandlerSupport extends AbstractActionHandler {
 	 * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
 	 *                depending on whether the action wants to render the composer on its
 	 *                own or have the template do the rendering.
-	 * @see ch.o2it.weblounge.Action.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
+	 * @see ch.o2it.weblounge.api.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
 	 */
 	public int startStage(
 			WebloungeRequest request,
-			WebloungeResponse response) throws ActionException {
+			WebloungeResponse response) throws ActionHandlerException {
 		return EVAL_COMPOSER;
 	}
 
@@ -163,12 +157,12 @@ public abstract class ActionHandlerSupport extends AbstractActionHandler {
 	 * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
 	 *                depending on whether the action wants to render the composer on its
 	 *                own or have the template do the rendering.
-	 * @see ch.o2it.weblounge.Action.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
+	 * @see ch.o2it.weblounge.api.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
 	 */
 	public int startComposer(
 			WebloungeRequest request,
 			WebloungeResponse response,
-			String composer) throws ActionException {
+			String composer) throws ActionHandlerException {
 		return EVAL_COMPOSER;
 	}
 
@@ -183,13 +177,13 @@ public abstract class ActionHandlerSupport extends AbstractActionHandler {
 	 * @return either <code>EVAL_PAGELET</code> or <code>SKIP_PAGELET</code>
 	 *                depending on whether the action wants to render the pagelet on its
 	 *                own or have the template do the rendering.
-	 * @see ch.o2it.weblounge.Action.module.ActionHandler#startPagelet(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String, int)
+	 * @see ch.o2it.weblounge.api.module.ActionHandler#startPagelet(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String, int)
 	 */
 	public int startPagelet(
 			WebloungeRequest request,
 			WebloungeResponse response,
 			String composer,
-			int position) throws ActionException {
+			int position) throws ActionHandlerException {
 		return EVAL_PAGELET;
 	}
 
@@ -201,7 +195,7 @@ public abstract class ActionHandlerSupport extends AbstractActionHandler {
 	 * NOTE: subclasses MUST always call super.init(ActionConfiguration) 
 	 * 
 	 * @param configuration the action handler configuration
-	 * @see ch.o2it.weblounge.Action.module.ActionHandler#init(ch.o2it.weblounge.api.module.ActionConfiguration)
+	 * @see ch.o2it.weblounge.api.module.ActionHandler#init(ch.o2it.weblounge.api.module.ActionConfiguration)
 	 */
 	public void init(ActionConfiguration configuration) {
 		super.config = configuration;
@@ -212,7 +206,7 @@ public abstract class ActionHandlerSupport extends AbstractActionHandler {
 	 * needed. Use this method to release any resources that have been acquired to process
 	 * the request.
 	 * 
-	 * @see ch.o2it.weblounge.Action.module.ActionHandler#cleanup()
+	 * @see ch.o2it.weblounge.api.module.ActionHandler#cleanup()
 	 */
 	public void cleanup() {
 		infoMessages = null;

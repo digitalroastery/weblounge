@@ -81,7 +81,7 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
   String identifier;
 
   /** Module description */
-  LocalizableContent descriptions;
+  LocalizableContent<String> descriptions;
 
   /** True if the site is enabled */
   boolean isEnabled;
@@ -94,9 +94,6 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
 
   /** The action handlers */
   Map<String, Action> actions;
-
-  /** The services */
-  Map<String, Service> services;
 
   /** Module jobs */
   Map<String, Job> jobs;
@@ -135,7 +132,6 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
     actions = new HashMap<String, Action>();
     imagestyles = new HashMap<String, ImageStyle>();
     renderers = new HashMap<String, Renderer>();
-    services = new HashMap<String, Service>();
     jobs = new HashMap<String, Job>();
     classLoader = Thread.currentThread().getContextClassLoader();
   }
@@ -524,35 +520,6 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
         log_.debug("Error when reading action bundle '" + id + "'!", e);
       }
     }
-  }
-
-  /**
-   * Configures the service settings, such as the preprocessor.
-   * 
-   * @param config
-   *          the services node
-   * @param path
-   *          the XPath object used to parse the configuration
-   */
-  private void readServices(XPath path, Node config) {
-    if (config == null) {
-      log_.debug("No service definitions found for module '" + identifier + "'");
-      return;
-    }
-    log_.debug("Configuring services");
-    NodeList serviceNodes = XPathHelper.selectList(path, config, "service");
-    for (int i = 0; i < serviceNodes.getLength(); i++) {
-      Node serviceNode = serviceNodes.item(i);
-      ServiceConfigurationImpl serviceConfig = null;
-      try {
-        serviceConfig = new ServiceConfigurationImpl();
-        serviceConfig.init(path, serviceNode);
-        services.put(serviceConfig.getIdentifier(), serviceConfig);
-      } catch (ConfigurationException e) {
-        log_.error("Error configuring service '" + serviceConfig.getIdentifier() + "' of module '" + identifier + "': " + e.getMessage(), e);
-      }
-    }
-    log_.debug("Services configured");
   }
 
   /**

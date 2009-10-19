@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.impl.Lease;
+import ch.o2it.weblounge.common.Lease;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.pool.LeaseFactory;

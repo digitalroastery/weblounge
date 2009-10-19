@@ -22,6 +22,9 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.WebloungeDateFormat;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.site.ActionException;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Date;
@@ -33,7 +36,7 @@ import java.util.List;
  * @author Tobias Wunden
  * @version 1.0
  */
-public abstract class AbstractAjaxActionHandler extends ActionHandlerSupport {
+public abstract class AbstractAjaxAction extends ActionSupport {
 
 	/**
 	 * Method that is called when the handler can start sending the response.
@@ -78,7 +81,7 @@ public abstract class AbstractAjaxActionHandler extends ActionHandlerSupport {
 	 */
 	public final int startPage(
 			WebloungeRequest request,
-			WebloungeResponse response) throws ActionHandlerException {
+			WebloungeResponse response) throws ActionException {
 		return SKIP_PAGE;
 	}
 
@@ -107,7 +110,7 @@ public abstract class AbstractAjaxActionHandler extends ActionHandlerSupport {
 	 */
 	public final int startIncludes(
 			WebloungeRequest request,
-			WebloungeResponse response) throws ActionHandlerException {
+			WebloungeResponse response) throws ActionException {
 		return SKIP_INCLUDES;
 	}
 
@@ -124,7 +127,7 @@ public abstract class AbstractAjaxActionHandler extends ActionHandlerSupport {
 	 */
 	public final int startStage(
 			WebloungeRequest request,
-			WebloungeResponse response) throws ActionHandlerException {
+			WebloungeResponse response) throws ActionException {
 		return SKIP_COMPOSER;
 	}
 
@@ -143,7 +146,7 @@ public abstract class AbstractAjaxActionHandler extends ActionHandlerSupport {
 	public final int startComposer(
 			WebloungeRequest request,
 			WebloungeResponse response,
-			String composer) throws ActionHandlerException {
+			String composer) throws ActionException {
 		return SKIP_COMPOSER;
 	}
 
@@ -164,7 +167,7 @@ public abstract class AbstractAjaxActionHandler extends ActionHandlerSupport {
 			WebloungeRequest request,
 			WebloungeResponse response,
 			String composer,
-			int position) throws ActionHandlerException {
+			int position) throws ActionException {
 		return SKIP_PAGELET;
 	}
 
@@ -312,13 +315,13 @@ public abstract class AbstractAjaxActionHandler extends ActionHandlerSupport {
 	 * @param json the json object
 	 * @throws IOException if writing to the response failed
 	 */
-	protected void sendJSONReponse(WebloungeRequest request, WebloungeResponse response, JSONObject json) throws IOException {
+	protected void sendJSONresponse(WebloungeRequest request, WebloungeResponse response, JSONObject json) throws IOException {
 		response.setContentType("text/json");
 		response.getOutputStream().print(json.toString());
 	}
 
 	/**
-	 * Small wrapper for Ajax response parts.
+	 * Small wrapper for AJAX response parts.
 	 * 
 	 * @author Tobias Wunden
 	 * @version 1.0

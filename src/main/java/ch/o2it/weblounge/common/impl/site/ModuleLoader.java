@@ -104,13 +104,9 @@ class ModuleLoader extends DirectoryWatchdog {
 	protected void fileAppeared(File moduleDir) {
 		File configFile = new File(moduleDir, Module.CONFIG_FILE);
 		if (configFile.exists() && configFile.canRead()) {
-			boolean shared = this instanceof SharedModuleLoader;
 			ModuleConfigurationImpl config = new ModuleConfigurationImpl(configFile, site_, shared);
 			config.configure();
-			if (config.shared)
-				ModuleManager.registerSharedConfiguration(config);
-			else
-				manager_.configureModule(config);
+			manager_.configureModule(config);
 			I18n.addDictionaries(new File(configFile.getParentFile(), PathSupport.concat("conf", "i18n")));
 		} else {
 			String filename = moduleDir.getAbsolutePath();

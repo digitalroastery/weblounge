@@ -19,8 +19,8 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.api.request.WebloungeRequest;
-import ch.o2it.weblounge.api.request.WebloungeResponse;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.common.request.WebloungeResponse;
 
 /**
  * This support implementation provides special methods for encoding <code>JSON</code>
@@ -29,7 +29,7 @@ import ch.o2it.weblounge.api.request.WebloungeResponse;
  * @author Tobias Wunden
  * @version 1.0
  */
-public abstract class AbstractJSONActionHandler extends AbstractAjaxActionHandler {
+public abstract class AbstractJSONAction extends AbstractAjaxAction {
 
 	/**
 	 * Returns a JSON response to the server. This class keeps track of all the
@@ -42,7 +42,7 @@ public abstract class AbstractJSONActionHandler extends AbstractAjaxActionHandle
 	public abstract void startJSONResponse(WebloungeRequest request, WebloungeResponse response);
 	
 	/**
-	 * @see ch.o2it.weblounge.common.impl.site.core.module.action.AbstractAjaxActionHandler#startAjaxResponse(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse)
+	 * @see ch.o2it.weblounge.site.impl.AbstractAjaxAction.module.action.AbstractAjaxActionHandler#startAjaxResponse(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse)
 	 */
 	public final void startAjaxResponse(WebloungeRequest request, WebloungeResponse response) {
 		response.setHeader("Content-Type", "text/json; charset=utf-8");

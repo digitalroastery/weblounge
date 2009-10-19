@@ -80,9 +80,6 @@ public class ModuleImpl implements Module, PageListener, UserListener {
   /** The action registry */
   protected ActionRegistry actions;
 
-  /** The service registry */
-  protected ServiceRegistry services;
-
   /** The job registry */
   protected JobRegistry jobs;
 
@@ -473,39 +470,6 @@ public class ModuleImpl implements Module, PageListener, UserListener {
   }
 
   /**
-   * Returns the module service identified by <code>service</code> or
-   * <code>null</code> if no such service is available.
-   * 
-   * @param service
-   *          the service identifier
-   * @return the service
-   */
-  public ModuleService getService(String service) {
-    return getService(service, false);
-  }
-
-  /**
-   * Returns the module service identified by <code>service</code> or
-   * <code>null</code> if no such service is available. If <code>enabled</code>
-   * is set to <code>true</code>, the service is only returned if it is enabled
-   * 
-   * @param service
-   *          the service identifier
-   * @param enabled
-   *          if set to <code>true</code>, service is only returned if enabled
-   * @return the service
-   */
-  public ModuleService getService(String service, boolean enabled) {
-    ModuleService s = (ModuleServiceImpl) services.get(service);
-    if (s != null && !enabled)
-      return s;
-    else if (s != null)
-      if (s.isEnabled())
-        return s;
-    return null;
-  }
-
-  /**
    * Returns the action handler identified by <code>action</code> or
    * <code>null</code> if no such action is available.
    * 
@@ -644,41 +608,6 @@ public class ModuleImpl implements Module, PageListener, UserListener {
     while (ai.hasNext()) {
       ActionHandlerBundle a = (ActionHandlerBundle) ai.next();
       a.setModule(this);
-    }
-  }
-
-  /**
-   * Configures the module services, considering any service defintions from the
-   * base module, if given.
-   * 
-   * @param config
-   *          the module configuration
-   */
-  private void configureServices(ModuleConfiguration moduleconfig) {
-
-    // Check base services
-    if (baseModule != null) {
-      ServiceRegistry baseservices = baseModule.getServices();
-      Iterator si = baseservices.values().iterator();
-      while (si.hasNext()) {
-        Service s = (Service) si.next();
-        services.put(s.getIdentifier(), s);
-      }
-    }
-
-    // Create services
-    Iterator ci = moduleconfig.getServices().values().iterator();
-    while (ci.hasNext()) {
-      ServiceConfiguration config = (ServiceConfiguration) ci.next();
-      Service s = ServiceManager.loadAndConfigure(config, classLoader);
-      services.put(config.getIdentifier(), s);
-    }
-
-    // Assign module
-    Iterator si = services.values().iterator();
-    while (si.hasNext()) {
-      ModuleService s = (ModuleService) si.next();
-      s.setModule(this);
     }
   }
 
