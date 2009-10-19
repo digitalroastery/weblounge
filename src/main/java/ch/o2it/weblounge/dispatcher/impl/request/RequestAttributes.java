@@ -25,8 +25,8 @@ import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
  * The <code>RequestAttributes</code> are placed in the current servlet request,
- * so information about url, user, site etc. are only evaluated once and can thereafter
- * be gathered from this object.
+ * so information about url, user, site etc. are only evaluated once and can
+ * thereafter be gathered from this object.
  * 
  * @author Tobias Wunden
  * @version Apr 17, 2003
@@ -34,77 +34,102 @@ import ch.o2it.weblounge.common.url.WebUrl;
 
 public class RequestAttributes {
 
-	/** Constant identifying the request attributes object within the request */
-	public final static String ID = "weblounge-request";
-	
-	/** the current site */
-	private Site site_;
-	
-	/** The current url */
-	private WebUrl url_;
-	
-	/** The current version */
-	private long version_ = -1;
-	
-	/**
-	 * Creates a new request information object.
-	 */
-	RequestAttributes() { }
-	
-	/**
-	 * Sets the site.
-	 * 
-	 * @param site the site
-	 */
-	void setSite(Site site) {
-		site_ = site;
-	}
-	
-	/**
-	 * Returns the site that has been called using the request that
-	 * is currently being processed.
-	 * 
-	 * @return the requested site
-	 */
-	public Site getSite() {
-		return site_;	
-	}
-	
-	/**
-	 * Sets the url of this request.
-	 * 
-	 * @param url the url
-	 */
-	void setUrl(WebUrl url) {
-		url_ = url;
-	}
+  /** Constant identifying the request attributes object within the request */
+  public final static String ID = "weblounge-request";
 
-	/**
-	 * Returns the url that has been called by the current request.
-	 * 
-	 * @return the current url
-	 */
-	public WebUrl getUrl() {
-		return url_;
-	}
-	
-	/**
-	 * Sets the request version.
-	 * 
-	 * @param version the version
-	 */
-	public void setVersion(long version) {
-		version_ = version;
-	}
-	
-	/**
-	 * Returns the version or <code>-1</code> if no version has been
-	 * set so far.
-	 * 
-	 * @return the version
-	 */
-	public long getVersion() {
-		return version_;
-	}
-	
+  /** the current site */
+  private Site site_;
+
+  /** The current url */
+  private WebUrl url_;
+
+  /** The original url (before a call to setTargetUrl()) */
+  private WebUrl requestUrl_ = null;
+
+  /** The current version */
+  private long version_ = -1;
+
+  /**
+   * Creates a new request information object.
+   */
+  RequestAttributes() {
+  }
+
+  /**
+   * Sets the site.
+   * 
+   * @param site
+   *          the site
+   */
+  void setSite(Site site) {
+    site_ = site;
+  }
+
+  /**
+   * Returns the site that has been called using the request that is currently
+   * being processed.
+   * 
+   * @return the requested site
+   */
+  public Site getSite() {
+    return site_;
+  }
+
+  /**
+   * Sets the url of this request.
+   * 
+   * @param url
+   *          the url
+   */
+  void setUrl(WebUrl url) {
+    url_ = url;
+  }
+
+  /**
+   * Returns the url that has been called by the current request.
+   * 
+   * @return the current url
+   */
+  public WebUrl getUrl() {
+    return url_;
+  }
+
+  /**
+   * Sets the request's initial url.
+   * 
+   * @param url
+   *          the url
+   */
+  void setRequestedUrl(WebUrl url) {
+    requestUrl_ = url;
+  }
+
+  /**
+   * Returns the request's initial url.
+   * 
+   * @return the requested url
+   */
+  public WebUrl getRequestedUrl() {
+    return requestUrl_;
+  }
+
+  /**
+   * Sets the request version.
+   * 
+   * @param version
+   *          the version
+   */
+  public void setVersion(long version) {
+    version_ = version;
+  }
+
+  /**
+   * Returns the version or <code>-1</code> if no version has been set so far.
+   * 
+   * @return the version
+   */
+  public long getVersion() {
+    return version_;
+  }
+
 }
