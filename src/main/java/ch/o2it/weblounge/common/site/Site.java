@@ -21,9 +21,10 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.LanguageManager;
 import ch.o2it.weblounge.common.page.Layout;
+import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageManager;
+import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.repository.RepositoryManager;
 import ch.o2it.weblounge.common.request.RequestHandler;
@@ -34,6 +35,7 @@ import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.GroupRegistry;
 import ch.o2it.weblounge.common.security.RoleRegistry;
 import ch.o2it.weblounge.common.security.SecurityManager;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.security.UserManager;
 
 import java.io.File;
@@ -435,5 +437,16 @@ public interface Site extends ModuleListener, RequestListener {
    *          the response to deliver
    */
   void dispatch(WebloungeRequest request, WebloungeResponse response);
+
+  /**
+   * Returns the page identified by the <code>uri</code>.
+   * 
+   * @param uri
+   *          the page uri
+   * @param user
+   *          the user requesting the page
+   * @return the page or <code>null</code> if the page doesn't exist
+   */
+  Page getPage(PageURI uri, User user);
 
 }
