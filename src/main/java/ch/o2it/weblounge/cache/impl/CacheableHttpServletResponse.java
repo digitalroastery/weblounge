@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.cache.impl;
 
-import ch.o2it.weblounge.cache.CacheHandle;
 import ch.o2it.weblounge.cache.impl.filter.FilterWriter;
+import ch.o2it.weblounge.common.request.CacheHandle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -201,7 +201,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
 	/**
 	 * Returns <code>true</code> if the response has been invalidated.
 	 * 
-	 * @return <code>true</code> if the reponse has been invalidated
+	 * @return <code>true</code> if the response has been invalidated
 	 */
 	public boolean isInvalidated() {
 		return tx.invalidated;

@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.cache.impl.handle;
 
-import ch.o2it.weblounge.cache.CacheHandle;
-import ch.o2it.weblounge.cache.impl.CacheTag;
 import ch.o2it.weblounge.common.content.Tag;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
+import ch.o2it.weblounge.common.request.CacheHandle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -123,7 +123,7 @@ public abstract class CacheHandleImpl implements CacheHandle {
    *      java.lang.Object)
    */
   public boolean addTag(String key, Object value) {
-    return tags.add(new CacheTag(key, value));
+    return tags.add(new CacheTagImpl(key, value));
   }
 
   /**

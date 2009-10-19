@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.cache.impl;
 
-import ch.o2it.weblounge.cache.CacheHandle;
 import ch.o2it.weblounge.cache.StreamFilter;
 import ch.o2it.weblounge.cache.impl.filter.FilterChain;
 import ch.o2it.weblounge.cache.impl.index.CacheIndexMapMap;
 import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.impl.util.PluginLoader;
+import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.dispatcher.impl.http.Http11ProtocolHandler;
 import ch.o2it.weblounge.dispatcher.impl.http.Http11ResponseType;
 

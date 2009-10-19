@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.cache.impl;
 
-import ch.o2it.weblounge.cache.CacheHandle;
 import ch.o2it.weblounge.cache.StreamFilter;
+import ch.o2it.weblounge.common.request.CacheHandle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

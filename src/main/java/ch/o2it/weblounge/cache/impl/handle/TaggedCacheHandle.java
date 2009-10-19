@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.cache.impl.handle;
 
-import ch.o2it.weblounge.cache.CacheHandle;
-import ch.o2it.weblounge.cache.impl.CacheTag;
 import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.content.Taggable;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
+import ch.o2it.weblounge.common.request.CacheHandle;
 
 import java.util.Comparator;
 import java.util.Set;
@@ -70,7 +70,7 @@ public class TaggedCacheHandle extends CacheHandleImpl {
         throw new IllegalArgumentException("No keyless unique tags allowed");
       if (t.getValue() == null)
         throw new IllegalArgumentException("No valueless unique tags allowed");
-      if (t.getValue() == CacheTag.ANY)
+      if (t.getValue() == CacheTagImpl.ANY)
         throw new IllegalArgumentException("No wildcard tags allowed as primary tag");
       if (!s.add(t))
         throw new IllegalArgumentException("No duplicate unique tags allowed");

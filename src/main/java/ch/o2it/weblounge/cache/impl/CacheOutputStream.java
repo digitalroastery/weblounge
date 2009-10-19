@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.cache.impl;
 
-import ch.o2it.weblounge.cache.CacheHandle;
 import ch.o2it.weblounge.common.impl.util.datatype.Stack;
+import ch.o2it.weblounge.common.request.CacheHandle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
