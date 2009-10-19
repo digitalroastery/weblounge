@@ -1,74 +1,91 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>ch.o2it</groupId>
-  <artifactId>weblounge-common</artifactId>
-  <name>Weblounge Common</name>
-  <parent>
-    <groupId>ch.o2it</groupId>
-    <artifactId>weblounge-base</artifactId>
-    <version>3.0-SNAPSHOT</version>
-  </parent>
-  <packaging>bundle</packaging>
-  <dependencies>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ch.o2it</groupId>
+	<artifactId>weblounge-common</artifactId>
+	<name>Weblounge Common</name>
+	<parent>
+		<groupId>ch.o2it</groupId>
+		<artifactId>weblounge-base</artifactId>
+		<version>3.0-SNAPSHOT</version>
+	</parent>
+	<packaging>bundle</packaging>
+	<dependencies>
 
-    <!-- weblounge -->
-	
-    <dependency>
-      <groupId>ch.o2it</groupId>
-      <artifactId>weblounge-common-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
-    </dependency>
+		<!-- weblounge -->
 
-    <!-- thirdparty -->
+		<dependency>
+			<groupId>ch.o2it</groupId>
+			<artifactId>weblounge-common-api</artifactId>
+			<version>3.0-SNAPSHOT</version>
+		</dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
+		<!-- thirdparty -->
 
-    <!-- testing -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
-    </dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
 
-  </dependencies>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>jasper</artifactId>
+		</dependency>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
-            <Export-Package>
-            	ch.o2it.weblounge.common.impl.config,
-            	ch.o2it.weblounge.common.impl.content,
-            	ch.o2it.weblounge.common.impl.language,
-            	ch.o2it.weblounge.common.impl.page,
-            	ch.o2it.weblounge.common.impl.security,
-            	ch.o2it.weblounge.common.impl.security.jaas,
-            	ch.o2it.weblounge.common.impl.url,
-            	ch.o2it.weblounge.common.impl.util,
-            	ch.o2it.weblounge.common.impl.util.*,
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+
+		<!-- testing -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
+						<Export-Package>
+							ch.o2it.weblounge.common.impl.config,
+							ch.o2it.weblounge.common.impl.content,
+							ch.o2it.weblounge.common.impl.language,
+							ch.o2it.weblounge.common.impl.page,
+							ch.o2it.weblounge.common.impl.security,
+							ch.o2it.weblounge.common.impl.security.jaas,
+							ch.o2it.weblounge.common.impl.url,
+							ch.o2it.weblounge.common.impl.util,
+							ch.o2it.weblounge.common.impl.util.*,
             </Export-Package>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
