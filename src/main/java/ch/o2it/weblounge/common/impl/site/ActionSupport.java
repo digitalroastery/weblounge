@@ -21,15 +21,8 @@
 package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.util.ConfigurationUtils;
-import ch.o2it.weblounge.common.page.Pagelet;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.ActionConfiguration;
-import ch.o2it.weblounge.common.site.ActionException;
 
 import com.sun.org.apache.xml.internal.security.utils.I18n;
-
-import org.apache.jasper.JasperException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -296,12 +289,19 @@ public abstract class ActionSupport extends AbstractAction {
 	 */
 	protected String getParameterWithDecoding(WebloungeRequest request, String parameter, String decoding) {
 		String p = request.getParameter(parameter);
-		if (p != null) {
-			p = p.trim();
-			try {
-				p = URLDecoder.decode(p, decoding);
-			} catch (UnsupportedEncodingException e) { }
-		}
+    if (p != null) {
+      p = p.trim();
+      if ("application/x-www-form-urlencoded".equalsIgnoreCase(request.getContentType())) {
+        try {
+          p = URLDecoder.decode(p, decoding);
+        } catch (UnsupportedEncodingException e) { 
+          // The specified encoding is unknown
+          request.getSite().getLogger().error("Unknown encoding: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) { 
+          // Tried decoding a string with a % inside, so obviously the parameter was decoded already
+        }
+      }
+    }
 		return (p != null && !"".equals(p)) ? p : null;
 	}
 
