@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.cache;
 
 import ch.o2it.weblounge.common.content.Tag;
+import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
@@ -44,7 +45,7 @@ public interface CacheService {
    * into the cache when {@link #endResponse(WebloungeResponse)} is called.
    * 
    * @param uniqueTags
-   *          the tags identifying this reponse
+   *          the tags identifying this response
    * @param request
    *          the request
    * @param response
@@ -80,7 +81,7 @@ public interface CacheService {
 
   /**
    * Tell the cache service that writing the response to the client is now
-   * finished and that the cache buffer containing the reponse may be written to
+   * finished and that the cache buffer containing the response may be written to
    * the cache.
    * 
    * @param response
@@ -117,7 +118,7 @@ public interface CacheService {
    * into the cache.
    * 
    * @param uniqueTags
-   *          the tag set identifying the reponse part
+   *          the tag set identifying the response part
    * @param response
    *          the servlet response
    * @param validTime
