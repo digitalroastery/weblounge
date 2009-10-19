@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.util.pool;
 
-import ch.o2it.weblounge.common.impl.Lease;
+import ch.o2it.weblounge.common.Lease;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 
 import org.slf4j.Logger;

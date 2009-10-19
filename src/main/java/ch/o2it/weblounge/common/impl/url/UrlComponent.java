@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import ch.o2it.weblounge.common.impl.Lease;
+import ch.o2it.weblounge.common.Lease;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.pool.LeaseFactory;
 import ch.o2it.weblounge.common.impl.util.pool.Pool;
@@ -315,13 +315,13 @@ public class UrlComponent implements Lease {
   // }
 
   /**
-   * @see ch.o2it.weblounge.common.impl.Lease#leased()
+   * @see ch.o2it.weblounge.common.Lease#leased()
    */
   public void leased() {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.impl.Lease#returned()
+   * @see ch.o2it.weblounge.common.Lease#returned()
    */
   public void returned() {
     path_ = null;
@@ -331,14 +331,14 @@ public class UrlComponent implements Lease {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.impl.Lease#dispose()
+   * @see ch.o2it.weblounge.common.Lease#dispose()
    */
   public boolean dispose() {
     return false;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.impl.Lease#retired()
+   * @see ch.o2it.weblounge.common.Lease#retired()
    */
   public void retired() {
   }
@@ -358,7 +358,7 @@ public class UrlComponent implements Lease {
     }
 
     /**
-     * @see ch.o2it.weblounge.common.impl.util.pool.LeaseFactory#disposeLease(ch.o2it.weblounge.common.impl.Lease)
+     * @see ch.o2it.weblounge.common.impl.util.pool.LeaseFactory#disposeLease(ch.o2it.weblounge.common.Lease)
      */
     public void disposeLease(UrlComponent lease) {
       lease = null;

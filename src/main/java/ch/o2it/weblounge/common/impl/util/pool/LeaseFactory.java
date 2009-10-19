@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.util.pool;
 
-import ch.o2it.weblounge.common.impl.Lease;
+import ch.o2it.weblounge.common.Lease;
 
 /**
  * This factory is used by the pool to request new leases. It also serves the

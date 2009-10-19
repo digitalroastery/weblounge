@@ -19,8 +19,8 @@
 
 package ch.o2it.weblounge.common.impl.util.cron;
 
+import ch.o2it.weblounge.common.Lease;
 import ch.o2it.weblounge.common.WebloungeDateFormat;
-import ch.o2it.weblounge.common.impl.Lease;
 import ch.o2it.weblounge.common.impl.util.datatype.PriorityQueue;
 import ch.o2it.weblounge.common.impl.util.pool.LeaseFactory;
 import ch.o2it.weblounge.common.impl.util.pool.Pool;
@@ -560,27 +560,27 @@ public class Daemon implements Runnable {
     }
 
     /**
-     * @see ch.o2it.weblounge.common.impl.Lease#leased()
+     * @see ch.o2it.weblounge.common.Lease#leased()
      */
     public void leased() {
     }
 
     /**
-     * @see ch.o2it.weblounge.common.impl.Lease#returned()
+     * @see ch.o2it.weblounge.common.Lease#returned()
      */
     public void returned() {
       job = null;
     }
 
     /**
-     * @see ch.o2it.weblounge.common.impl.Lease#dispose()
+     * @see ch.o2it.weblounge.common.Lease#dispose()
      */
     public boolean dispose() {
       return false;
     }
 
     /**
-     * @see ch.o2it.weblounge.common.impl.Lease#retired()
+     * @see ch.o2it.weblounge.common.Lease#retired()
      */
     public void retired() {
       poolMember = false;
@@ -612,7 +612,7 @@ public class Daemon implements Runnable {
     }
 
     /**
-     * @see ch.o2it.weblounge.common.impl.util.pool.LeaseFactory#disposeLease(ch.o2it.weblounge.common.impl.Lease)
+     * @see ch.o2it.weblounge.common.impl.util.pool.LeaseFactory#disposeLease(ch.o2it.weblounge.common.Lease)
      */
     public void disposeLease(WorkerThread lease) {
       lease = null;
