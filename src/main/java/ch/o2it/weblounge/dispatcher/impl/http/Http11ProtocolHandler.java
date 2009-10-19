@@ -97,7 +97,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
 	public static final int RESPONSE_METHOD_NOT_ALLOWED = 6;
 
 	/** unknown response, just in case... */
-	public static final int REPONSE_UNKNOWN = 7;
+	public static final int RESPONSE_UNKNOWN = 7;
 
 	/** statistics constant for the number of analyzed requests */
 	public static final int STATS_ANALYZED = 0;
@@ -551,7 +551,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
 	 */
 	protected static void incResponseStats(int type, long stats[]) {
 		if (type < 0 || type >= stats.length)
-			++stats[REPONSE_UNKNOWN];
+			++stats[RESPONSE_UNKNOWN];
 		++stats[type];
 	}
 
