@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.page.MalformedPageURIException;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -50,7 +51,18 @@ public class PageURIImpl implements PageURI {
   PageURIImpl(Site site) {
     this.site = site;
   }
-  
+
+  /**
+   * Creates a new {@link PageURI} from the given request, which is used to
+   * determine <code>site</code>, <code>path</code> and <code>version</code>.
+   * 
+   * @param request
+   *          the request
+   */
+  public PageURIImpl(WebloungeRequest request) {
+    this(request.getSite(), request.getUrl().getPath(), request.getVersion());
+  }
+
   /**
    * Creates a new {@link PageURI} pointing to the live version of the page
    * identified by <code>site</code> and <code>path</code>.
