@@ -52,7 +52,7 @@ public class HTMLEncoding implements Encoding {
    * @return the encoded text
    */
   public String encode(String text) {
-    return encode(new StringBuffer(text));
+    return encode(new StringBuffer(text)).toString();
   }
 
   /**
@@ -62,7 +62,7 @@ public class HTMLEncoding implements Encoding {
    *          the element to be encoded
    * @return the encoded text
    */
-  public String encode(StringBuffer text) {
+  public StringBuffer encode(StringBuffer text) {
     StringBuffer result = new StringBuffer("");
     for (int i = 0; i < text.length(); i++) {
       Character key = new Character(text.charAt(i));
@@ -75,7 +75,7 @@ public class HTMLEncoding implements Encoding {
         result.append(key);
       }
     }
-    return result.toString();
+    return result;
   }
 
   /**
