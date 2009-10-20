@@ -40,26 +40,20 @@ import java.util.Map;
 import javax.xml.xpath.XPath;
 
 /**
- * <code>LanguageSupport</code> is a helper class the faciliates the handling of
- * languages in numerous ways.
+ * <code>LanguageSupport</code> is a helper class the facilitates the handling
+ * of languages in numerous ways.
  * 
  * @author Tobias Wunden
  * @version 2.0
  * @since Weblounge 1.0
  */
-
 public final class LanguageSupport {
+
+  /** Logging facility */
+  private final static Logger log_ = LoggerFactory.getLogger(LanguageSupport.class);
 
   /** Globally available languages */
   private final static LanguageManagerImpl systemLanguages = new LanguageManagerImpl();
-
-  // Logging
-
-  /** the class name, used for the loggin facility */
-  private final static String className = LanguageSupport.class.getName();
-
-  /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(className);
 
   /**
    * Returns the language object identified by the language identifier.
@@ -163,7 +157,7 @@ public final class LanguageSupport {
    * has not been provided
    */
   public static LocalizableContent<String> addDescriptions(XPath path,
-      Node configuration, Language[] allLanguages, Language defaultLanguage, 
+      Node configuration, Language[] allLanguages, Language defaultLanguage,
       LocalizableContent<String> o) throws ConfigurationException {
     return addDescriptions(path, configuration, allLanguages, defaultLanguage, o, false);
   }
@@ -346,7 +340,8 @@ public final class LanguageSupport {
    * provided
    */
   private static Map<Language, String> readDescriptions(XPath path,
-      Node xmlNode, Language[] languages, Language defaultLanguage) throws ConfigurationException {
+      Node xmlNode, Language[] languages, Language defaultLanguage)
+      throws ConfigurationException {
     if (languages.length == 0)
       return new HashMap<Language, String>();
 
