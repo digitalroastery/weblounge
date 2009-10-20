@@ -21,16 +21,21 @@
 package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.util.ConfigurationUtils;
+import ch.o2it.weblounge.common.impl.util.I18n;
+import ch.o2it.weblounge.common.page.Pagelet;
+import ch.o2it.weblounge.common.renderer.Renderer;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.site.ActionConfiguration;
+import ch.o2it.weblounge.common.site.ActionException;
 
-import com.sun.org.apache.xml.internal.security.utils.I18n;
+import org.apache.jasper.JasperException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.Renderer;
 
 /**
  * This class provides a default implementation for an <code>ActionHandler</code>.
