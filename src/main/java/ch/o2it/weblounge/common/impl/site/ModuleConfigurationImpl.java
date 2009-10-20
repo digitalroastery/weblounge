@@ -23,8 +23,6 @@ import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.Arguments;
-import ch.o2it.weblounge.common.impl.util.ServletConfiguration;
-import ch.o2it.weblounge.common.impl.util.ServletMapping;
 import ch.o2it.weblounge.common.impl.util.classloader.SiteClassLoader;
 import ch.o2it.weblounge.common.impl.util.classloader.WebloungeClassLoader;
 import ch.o2it.weblounge.common.impl.util.config.XMLConfigurator;
@@ -32,13 +30,10 @@ import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.renderer.Renderer;
-import ch.o2it.weblounge.common.service.Service;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Job;
-import ch.o2it.weblounge.common.site.ModuleConfiguration;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.site.WizardHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,7 +158,6 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
       readRenderers(path, XPathHelper.select(path, config, "/module/renderers"));
       readActions(path, XPathHelper.select(path, config, "/module/actions"));
       readImagestyles(path, XPathHelper.select(path, config, "/module/imagestyles"));
-      readServices(path, XPathHelper.select(path, config, "/module/services"));
       readJobs(path, XPathHelper.select(path, config, "/module/jobs"));
       super.init(path, XPathHelper.select(path, config, "/module"));
     } catch (ConfigurationException e) {
@@ -256,15 +250,6 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
   }
 
   /**
-   * Returns the module services.
-   * 
-   * @return the module services
-   */
-  public Map<String, Service> getServices() {
-    return services;
-  }
-
-  /**
    * Returns the module jobs.
    * 
    * @return the module jobs
@@ -294,18 +279,13 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
       throws ConfigurationException {
     identifier = XPathHelper.valueOf(path, config, "@id");
     baseModule = XPathHelper.valueOf(path, config, "@extends");
-    if (!shared) {
-      SiteClassLoader classLoader = ((SiteImpl) site).getClassLoader();
-      classLoader.addModule(getModuleFolderName());
-    } else {
-      WebloungeClassLoader classLoader = WebloungeClassLoader.getInstance();
-      classLoader.addExtendedClassPath(getFile().getParentFile().getAbsolutePath());
-    }
+    WebloungeClassLoader classLoader = WebloungeClassLoader.getInstance();
+    classLoader.addExtendedClassPath(getFile().getParentFile().getAbsolutePath());
     moduleClass = XPathHelper.valueOf(path, config, "class");
     if (moduleClass == null)
       moduleClass = "ch.o2it.weblounge.core.module.ModuleImpl";
-    descriptions = new LocalizableContent();
-    LanguageSupport.addDescriptions(path, config, null, descriptions, true);
+    descriptions = new LocalizableContent<String>();
+    LanguageSupport.addDescriptions(path, config, site.getLanguages(), site.getDefaultLanguage(), descriptions, true);
     String enable = XPathHelper.valueOf(path, config, "enable");
     isEnabled = (enable == null || "true".equals(enable.toLowerCase()));
   }
@@ -480,7 +460,7 @@ public final class ModuleConfigurationImpl extends XMLConfigurator implements Mo
         id = XPathHelper.valueOf(path, node, "@id");
         log_.debug("Reading action bundle '" + id + "'");
         ActionBundleConfiguration bundleConfig = new ActionBundleConfiguration(id, this);
-        LanguageSupport.addDescriptions(path, node, null, bundleConfig.getDescription());
+        LanguageSupport.addDescriptions(path, node, site.getLanguages(), site.getDefaultLanguage(), bundleConfig.getDescription());
         bundleConfig.read(path, node);
 
         // Read handler definitions
