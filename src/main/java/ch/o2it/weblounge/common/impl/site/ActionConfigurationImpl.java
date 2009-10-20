@@ -53,6 +53,9 @@ import javax.xml.xpath.XPath;
 
 public final class ActionConfigurationImpl extends ConfigurationBase implements ActionConfiguration {
 
+  /** Logging facility */
+  private final static Logger log_ = LoggerFactory.getLogger(ActionConfigurationImpl.class);
+
 	/** the default valid time is 60 minutes */
 	public static final long DEFAULT_VALID_TIME = 60L * 60L * 1000L;
 
@@ -60,46 +63,43 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 	public static final long DEFAULT_RECHECK_TIME = 60L * 1000L;
 
 	/** Renderer identifier */
-	String identifier;
+	String identifier = null;
 	
 	/** The action's site */
-	Site site;
+	Site site = null;
 	
 	/** The action's module */
-	Module module;
+	Module module = null;
 
 	/** The concrete action url */
-	String mountpoint;
+	String mountpoint = null;
 	
 	/** Mounpoint extension */
-	String extension;
+	String extension = null;
 	
 	/** Loadfactor */
-	int loadfactor;
+	int loadfactor = null;
 	
 	/** The concrete action class */
-	String className;
+	String className = null;
 	
 	/** The supported action methods */
-	List<String> methods;
+	List<String> methods = null;
 
 	/** The default target url */
-	String target;
+	String target = null;
 	
 	/** Amount of time until the content is considered to be invalid */
-	long validTime;
+	long validTime = -1;
 
 	/** Amount of time where the content is considered to be valid */
-	long recheckTime;
+	long recheckTime = -1;
 	
 	/** The links that have been defined for this action */
-	List<Include> links;
+	List<Include> includes = null;
 	
 	/** The scripts that have been defined for this action */
-	List<ScriptInclude> scripts;
-
-	/** Logging facility */
-	private final static Logger log_ = LoggerFactory.getLogger(ActionConfigurationImpl.class.getName());
+	List<ScriptInclude> scripts = null;
 	
 	/**
 	 * Creates a new action configuration.
@@ -114,7 +114,7 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 		recheckTime = config.recheckTime;
 		validTime = config.validTime;
 		methods = new ArrayList<String>();
-		links = new ArrayList<Include>();
+		includes = new ArrayList<Include>();
 		scripts = new ArrayList<ScriptInclude>();
 	}
 
@@ -241,7 +241,7 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 	 * @return the links
 	 */
 	public Include[] getLinks() {
-		return links.toArray(new Include[links.size()]);
+		return includes.toArray(new Include[includes.size()]);
 	}
 	
 	/**
@@ -269,10 +269,12 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 	 */
 	public void setModule(Module module) {
 		this.module = module;
-		for (Include l : links)
-			l.setModule(module);
-		for (ScriptInclude s : scripts)
-			s.setModule(module);
+		for (Include include : includes)
+		  if (include instanceof IncludeImpl)
+		    ((IncludeImpl)include).setModule(module);
+		for (ScriptInclude script : scripts)
+		  if (script instanceof ScriptIncludeImpl)
+		    ((ScriptIncludeImpl)script).setModule(module);
 	}
 
 	/**
@@ -339,7 +341,7 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 		if (links != null) {
 			for (int i=0; i < links.getLength(); i++) {
 				Node link = links.item(i);
-				this.links.add(new IncludeImpl(link, path));
+				this.includes.add(new IncludeImpl(link, path));
 			}
 		}
 	}
