@@ -20,17 +20,6 @@
 
 package ch.o2it.weblounge.dispatcher.impl.request;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.Env;
@@ -42,7 +31,15 @@ import ch.o2it.weblounge.common.security.AuthenticatedUser;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteNotFoundException;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.core.dispatcher.RequestAttributes;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Facade to the <code>HttpRequest</code> object with easy-to-use access to user
@@ -57,9 +54,6 @@ public final class RequestSupport {
 
   /** The request identifier */
   private static long id = 0;
-
-  /** Redirections */
-  private static List<String> redirects = new ArrayList<String>();
 
   /** The url prefix where the webapp is mapped */
   private static String urlPrefix = null;
