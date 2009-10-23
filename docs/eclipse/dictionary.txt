@@ -1,0 +1,12 @@
+a=bpagelet
+pagelets
+weblounge
+multilingual
+localizable
+uri
+sitemap
+franklin
+pagelet
+url
+mountpoint
+recheck
