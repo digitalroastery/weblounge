@@ -223,7 +223,7 @@ public final class LanguageSupport {
    * @param s
    *          the filename
    * @param languages
-   *          the language registry used to build the variants
+   *          the languages used to build the variants
    */
   public static String[] getLanguageVariants(String s, LanguageManager languages) {
     String[] result = new String[languages.getLanguageCount() + 1];
@@ -269,7 +269,7 @@ public final class LanguageSupport {
    * @param s
    *          the language filename
    * @param languages
-   *          the language registry
+   *          the languages
    * @return the original filenme
    */
   public static String getInternationalVersion(String s,
@@ -296,8 +296,8 @@ public final class LanguageSupport {
    * @param s
    *          the filename
    * @param languages
-   *          the language registry
-   * @return the language objetct or <code>null</code>
+   *          the languages
+   * @return the language object or <code>null</code>
    */
   public static Language extractLanguage(String s, LanguageManager languages) {
     int languagePosition = s.lastIndexOf("_");
