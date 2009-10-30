@@ -19,13 +19,13 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.security.AbstractSecurityContext;
 import ch.o2it.weblounge.common.impl.security.AuthorityImpl;
 import ch.o2it.weblounge.common.impl.security.PermissionImpl;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
+import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
@@ -110,7 +110,7 @@ public class WebloungeContentReader extends DefaultHandler {
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String className = WebloungeContentReader.class.getName();
 
   /** Logging facility */
