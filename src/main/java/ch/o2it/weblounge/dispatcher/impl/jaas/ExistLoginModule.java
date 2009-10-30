@@ -39,7 +39,7 @@ public class ExistLoginModule extends AbstractLoginModule {
 
 	// Logging
 
-	/** the class name, used for the loggin facility */
+	/** the class name, used for the logging facility */
 	private final static String className = ExistLoginModule.class.getName();
 
 	/** Logging facility */
