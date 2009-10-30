@@ -40,7 +40,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.easymock</groupId>
+			<groupId>easymock</groupId>
 			<artifactId>easymock</artifactId>
 		</dependency>
 
