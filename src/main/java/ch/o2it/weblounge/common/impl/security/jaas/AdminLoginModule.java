@@ -42,7 +42,7 @@ public class AdminLoginModule extends AbstractLoginModule {
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String className = AdminLoginModule.class.getName();
 
   /** Logging facility */

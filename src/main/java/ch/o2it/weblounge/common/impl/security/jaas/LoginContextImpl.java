@@ -86,7 +86,7 @@ public final class LoginContextImpl implements LoginContext {
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String loggerClass = LoginContextImpl.class.getName();
 
   /** Logging facility */
