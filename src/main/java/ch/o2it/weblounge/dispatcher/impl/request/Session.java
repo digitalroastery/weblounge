@@ -40,7 +40,7 @@ public class Session {
 
 	// Logging
 	
-	/** the class name, used for the loggin facility */
+	/** the class name, used for the logging facility */
 	private final static String className = Session.class.getName();
 	
 	/** Logging facility */

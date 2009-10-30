@@ -21,6 +21,8 @@
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.ConfigurationException;
+import ch.o2it.weblounge.common.http.Http11Constants;
+import ch.o2it.weblounge.common.impl.http.Http11Utils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
@@ -36,8 +38,6 @@ import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteLogger;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.dispatcher.impl.http.Http11Constants;
-import ch.o2it.weblounge.dispatcher.impl.http.Http11Utils;
 import ch.o2it.weblounge.dispatcher.impl.request.MultipartRequestWrapper;
 import ch.o2it.weblounge.dispatcher.impl.request.RequestSupport;
 import ch.o2it.weblounge.dispatcher.impl.request.WebloungeDispatcher;
@@ -73,7 +73,7 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
 	
 	// Logging
 	
-	/** the class name, used for the loggin facility */
+	/** the class name, used for the logging facility */
 	private final static String className = ActionRequestHandler.class.getName();
 	
 	/** Logging facility */

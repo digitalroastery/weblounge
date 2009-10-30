@@ -23,6 +23,8 @@ package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.http.Http11Constants;
+import ch.o2it.weblounge.common.impl.http.Http11Utils;
 import ch.o2it.weblounge.common.impl.util.DispatchUtil;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageManager;
@@ -37,8 +39,6 @@ import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.dispatcher.impl.http.Http11Constants;
-import ch.o2it.weblounge.dispatcher.impl.http.Http11Utils;
 import ch.o2it.weblounge.dispatcher.impl.request.RequestSupport;
 import ch.o2it.weblounge.dispatcher.impl.request.WebloungeDispatcher;
 

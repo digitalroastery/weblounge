@@ -19,11 +19,11 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.impl.http.WebloungeRequestImpl;
+import ch.o2it.weblounge.common.impl.http.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.dispatcher.impl.request.WebloungeRequestImpl;
-import ch.o2it.weblounge.dispatcher.impl.request.WebloungeResponseImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
