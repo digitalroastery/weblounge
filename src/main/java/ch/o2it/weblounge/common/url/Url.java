@@ -74,22 +74,4 @@ public interface Url {
    */
   boolean isExtension(Url url);
 
-  /**
-   * Returns <code>true</code> if the url is pointing to a file rather than to a
-   * directory node.
-   * 
-   * @return <code>true</code> if this url points to a file
-   * @see #isDirectory()
-   */
-  boolean isFile();
-
-  /**
-   * Returns <code>true</code> if the url is pointing to a directory rather than
-   * to a file node.
-   * 
-   * @return <code>true</code> if this url points to a directory
-   * @see #isFile()
-   */
-  boolean isDirectory();
-
 }
