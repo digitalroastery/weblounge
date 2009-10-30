@@ -72,7 +72,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>opensymphony</groupId>
+			<groupId>quartz</groupId>
 			<artifactId>quartz</artifactId>
 		</dependency>
 
