@@ -19,8 +19,6 @@
 
 package ch.o2it.weblounge.common.impl.util.datatype;
 
-import ch.o2it.weblounge.common.impl.util.OperationNotSupportedException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -419,12 +417,12 @@ public final class LRUCache<K, V> {
 
     /**
      * This method is not allowed for this iterator and will therefore throw a
-     * <code>OperationNotSupportedException</code>
+     * <code>{@link UnsupportedOperationException}</code>
      * 
      * @see java.util.Iterator#remove()
      */
     public void remove() {
-      throw new OperationNotSupportedException();
+      throw new UnsupportedOperationException();
     }
 
     /**
