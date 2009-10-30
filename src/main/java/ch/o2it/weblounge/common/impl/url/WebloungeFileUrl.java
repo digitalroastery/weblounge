@@ -38,7 +38,7 @@ import java.io.File;
  * @since Weblounge 1.0
  */
 
-public class WebloungeFileUrl extends BaseUrl {
+public class WebloungeFileUrl extends UrlImpl {
 
   /** The preferred language */
   private Language language_;
@@ -51,7 +51,7 @@ public class WebloungeFileUrl extends BaseUrl {
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String className = WebloungeFileUrl.class.getName();
 
   /** Logging facility */

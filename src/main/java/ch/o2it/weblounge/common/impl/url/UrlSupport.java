@@ -153,24 +153,6 @@ public class UrlSupport {
   }
 
   /**
-   * Returns the path that is formed by the url with <code>tail</code> as its
-   * tail component. The path is derived by traversing the component chain.
-   * 
-   * @param tail
-   *          the tail component
-   * @return the url path
-   */
-  public static String getPath(UrlComponent tail) {
-    String path = "";
-    UrlComponent c = tail;
-    while (c != null) {
-      path = "/" + c.getPath() + path;
-      c = c.getPrevious();
-    }
-    return path;
-  }
-
-  /**
    * Returns the link created from the given partition and path. This link will
    * include the weblounge mountpoint.
    * 

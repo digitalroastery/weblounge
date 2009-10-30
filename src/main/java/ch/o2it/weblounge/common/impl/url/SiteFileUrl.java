@@ -37,7 +37,7 @@ import java.io.File;
  * @since Weblounge 1.0
  */
 
-public class SiteFileUrl extends BaseUrl {
+public class SiteFileUrl extends UrlImpl {
 
   /** The associated site */
   private Site site_;
@@ -50,7 +50,7 @@ public class SiteFileUrl extends BaseUrl {
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String className = SiteFileUrl.class.getName();
 
   /** Logging facility */

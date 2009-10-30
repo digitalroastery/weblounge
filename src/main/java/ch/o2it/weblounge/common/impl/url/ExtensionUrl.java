@@ -19,7 +19,6 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.Url;
 
 /**
@@ -31,7 +30,7 @@ import ch.o2it.weblounge.common.url.Url;
  * @version 2.0
  * @since Weblounge 1.0
  */
-public class ExtensionUrl extends BaseUrl {
+public class ExtensionUrl extends UrlImpl {
 
   /** Indicates that the url is not extended */
   public final static int EXTENSION_NONE = 0;
@@ -68,21 +67,6 @@ public class ExtensionUrl extends BaseUrl {
    */
   ExtensionUrl(String path) {
     super(path, '/');
-    extension_ = EXTENSION_NONE;
-  }
-
-  /**
-   * Constructor for a url based on the tail component. Since this constructor
-   * has package access, use <code>getUrl(<i>type</i>)</code> from the site
-   * navigation to obtain a reference to a concrete url instance.
-   * 
-   * @param site
-   *          the associated site
-   * @param c
-   *          the url tail component
-   */
-  ExtensionUrl(Site site, UrlComponent c) {
-    super(c, '/');
     extension_ = EXTENSION_NONE;
   }
 

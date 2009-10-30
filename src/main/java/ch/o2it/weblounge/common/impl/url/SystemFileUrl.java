@@ -34,7 +34,7 @@ import java.io.File;
  * @since Weblounge 1.0
  */
 
-public class SystemFileUrl extends BaseUrl {
+public class SystemFileUrl extends UrlImpl {
 
   /**
    * Creates a new weblounge specific url object. The url should be passed

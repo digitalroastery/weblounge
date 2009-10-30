@@ -21,82 +21,38 @@ package ch.o2it.weblounge.common.impl.url;
 
 import ch.o2it.weblounge.common.url.Url;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * The class <code>BaseUrl</code> implements common url behaviour with just the
- * <code>encode</code> method missing.
- * 
- * @author Tobias Wunden
- * @version 2.0
- * @since Weblounge 1.0
+ * This class implements common url behavior.
  */
+public class UrlImpl implements Url {
 
-public abstract class BaseUrl implements Url {
-
-  /** The url that is represented by this site object */
-  private String path_;
+  /** The url that is represented */
+  private String path_ = null;
 
   /** The url flavor */
-  private String flavor_;
+  private String flavor_ = null;
 
-  /** The separator character */
-  protected char separator;
+  /** The path separator character */
+  protected char separator = 0;
 
-  /** The path separator */
-  private String separator_;
-
-  /** The tail url component */
-  private UrlComponent tail_;
-
-  // Logging
-
-  /** the class name, used for the loggin facility */
-  private final static String className = BaseUrl.class.getName();
-
-  /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(className);
+  /** The path separator as a string */
+  private String separator_ = null;
 
   /**
-   * Creates a new url from a given path. Since this constructor has package
-   * access, use <code>getUrl(<i>type</i>)</code> from the site navigation to
-   * obtain a reference to a certain url.
+   * Creates a new url from a given path.
    * 
    * @param path
    *          the url path
    * @param separator
    *          the path separator
    */
-  BaseUrl(String path, char separator) {
-    this(separator);
-    initFromString(path);
-  }
-
-  /**
-   * Creates a new url given its tail component.
-   * 
-   * @param tail
-   *          the url tail component
-   * @param separator
-   *          the path separator
-   */
-  BaseUrl(UrlComponent tail, char separator) {
-    this(separator);
-    initFromTail(tail);
-  }
-
-  /**
-   * This private constructor serves to properly initialize any url, whether it
-   * has been created from a string or a tail component.
-   */
-  private BaseUrl(char separator) {
+  public UrlImpl(String path, char separator) {
+    if (path == null)
+      throw new IllegalArgumentException("Url path cannot be null");
     this.separator = separator;
     separator_ = Character.toString(separator);
-    path_ = null;
+    path_ = trim(path);
+    flavor_ = extractFlavor(path);
   }
 
   /**
@@ -108,12 +64,6 @@ public abstract class BaseUrl implements Url {
     return separator;
   }
 
-  /*
-   * ------------------------------------------------------------- I M P L E M E
-   * N T A T I O N O F Url
-   * -------------------------------------------------------------
-   */
-
   /**
    * Returns url path, e. g.<code>/news/articles/</code>.
    * 
@@ -121,7 +71,6 @@ public abstract class BaseUrl implements Url {
    * @see ch.o2it.weblounge.common.url.Url#getPath()
    */
   public String getPath() {
-    path_ = (path_ == null) ? buildPathFromTail(tail_) : path_;
     return path_;
   }
 
@@ -149,7 +98,7 @@ public abstract class BaseUrl implements Url {
    * Returns the hash code for this url which equals the hash code taken from
    * the url path.
    * <p>
-   * <b>Note:</b> This hash code is not site dependant. Overwrite this method if
+   * <b>Note:</b> This hash code is not site dependent. Overwrite this method if
    * you want to be able to distinguish between two urls with the same paths but
    * from different sites.
    * 
@@ -157,7 +106,6 @@ public abstract class BaseUrl implements Url {
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
-    path_ = (path_ == null) ? buildPathFromTail(tail_) : path_;
     return path_.hashCode();
   }
 
@@ -177,9 +125,8 @@ public abstract class BaseUrl implements Url {
    * @see java.lang.Object#equals(Object)
    */
   public boolean equals(Object obj) {
-    path_ = (path_ == null) ? buildPathFromTail(tail_) : path_;
-    if (obj != null && obj instanceof BaseUrl) {
-      BaseUrl url = (BaseUrl) obj;
+    if (obj != null && obj instanceof UrlImpl) {
+      UrlImpl url = (UrlImpl) obj;
       return path_.equals(url.path_);
     }
     return false;
@@ -192,11 +139,11 @@ public abstract class BaseUrl implements Url {
    * @param path
    *          the path to append
    */
-  public void append(String path) {
+  public String append(String path) {
     if (path == null)
       throw new IllegalArgumentException("Cannot append null string!");
-    path_ = (path_ == null) ? buildPathFromTail(tail_) : path_;
     path_ = concat(path_, trim(path));
+    return path_;
   }
 
   /**
@@ -207,7 +154,8 @@ public abstract class BaseUrl implements Url {
    * @return <code>true</code> if the path is contained in this url
    */
   public boolean contains(String path) {
-    path_ = (path_ == null) ? buildPathFromTail(tail_) : path_;
+    if (path == null)
+      throw new IllegalArgumentException("Cannot contain null string!");
     return path_.indexOf(path) > -1;
   }
 
@@ -225,7 +173,8 @@ public abstract class BaseUrl implements Url {
    * @return <code>true</code> if this url is a prefix
    */
   public boolean isPrefix(Url url) {
-    path_ = (path_ == null) ? buildPathFromTail(tail_) : path_;
+    if (url == null)
+      throw new IllegalArgumentException("Cannot be prepended by null!");
     return url.getPath().indexOf(path_) == 0;
   }
 
@@ -243,30 +192,7 @@ public abstract class BaseUrl implements Url {
    * @return <code>true</code> if this url is a prefix
    */
   public boolean isExtension(Url url) {
-    path_ = (path_ == null) ? buildPathFromTail(tail_) : path_;
     return path_.indexOf(url.getPath()) == 0;
-  }
-
-  /**
-   * Returns <code>true</code> if the url is pointing to a file rather than to a
-   * directory node.
-   * 
-   * @return <code>true</code> if this url points to a file
-   * @see #isDirectory()
-   */
-  public boolean isFile() {
-    return (tail_.getPath().indexOf('.') >= 0);
-  }
-
-  /**
-   * Returns <code>true</code> if the url is pointing to a directory rather than
-   * to a file node.
-   * 
-   * @return <code>true</code> if this url points to a directory
-   * @see #isFile()
-   */
-  public boolean isDirectory() {
-    return !isFile();
   }
 
   /**
@@ -277,7 +203,6 @@ public abstract class BaseUrl implements Url {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    path_ = (path_ == null) ? buildPathFromTail(tail_) : path_;
     return path_;
   }
 
@@ -325,100 +250,21 @@ public abstract class BaseUrl implements Url {
   }
 
   /**
-   * Initializes this url given its tail.
-   */
-  private void initFromTail(UrlComponent tail) {
-    tail_ = tail;
-    path_ = "";
-    UrlComponent c = UrlComponent.getLease(tail.getPath(), tail.getPrevious());
-    List<UrlComponent> components = new ArrayList<UrlComponent>();
-    while (c != null) {
-      path_ = separator_ + c.getPath() + path_;
-      components.add(0, UrlComponent.getLease(c.getPath(), c.getPrevious()));
-      c = c.getPrevious();
-    }
-    tail_.setUrl(this);
-    log_.debug("Url [tail=" + tail_ + "] initialized");
-  }
-
-  /**
-   * Initializes the url from the given String by taking it apart into its
-   * components.
-   */
-  private void initFromString(String path) {
-    path_ = trim(path);
-
-    // Check for leading separator
-    if (!path_.startsWith(separator_)) {
-      path_ = separator_ + path_;
-    }
-
-    // Check if the url was the home url "/"
-
-    if (path_.equals(separator_)) {
-      UrlComponent c = UrlComponent.getLease(separator_, null);
-      tail_ = c;
-    } else {
-      UrlTokenizer tok = new UrlTokenizer(path_, separator_);
-      UrlComponent previous = null;
-      UrlComponent c = null;
-      while (tok.hasMoreElements()) {
-        if (c == null) {
-          c = UrlComponent.getLease(tok.nextElement().toString(), previous);
-        } else {
-          c.setPath(tok.nextElement().toString());
-          c.setPrevious(previous);
-        }
-        previous = c;
-      }
-      tail_ = c;
-    }
-
-    tail_.setUrl(this);
-  }
-
-  /**
-   * Returns the path that is formed by the url with <code>tail</code> as its
-   * tail component. The path is derived by traversing the component chain.
+   * Returns the flavor or <code>null</code> if there is no flavor.
    * 
-   * @param tail
-   *          the tail component
-   * @return the url path
+   * @param path
+   *          the url path
+   * @return the flavor
    */
-  protected String buildPathFromTail(UrlComponent tail) {
-    String path = "";
-    UrlComponent c = tail;
-    while (c != null) {
-      path = separator_ + c.getPath() + path;
-      c = c.getPrevious();
-    }
-    return path;
-  }
-
-  /**
-   * Returns a url dump.
-   * 
-   * @return a url dump
-   */
-  public String dump() {
-    StringBuffer result = new StringBuffer();
-    UrlTokenizer components = new UrlTokenizer(this);
-    while (components.hasMoreElements()) {
-      if (result.length() > 0)
-        result.append("->");
-      result.append(components.nextElement().toString());
-    }
-    return result.toString();
-  }
-
-  /**
-   * This method is called if this object is about to be collected by the
-   * garbage collector.
-   * 
-   * @see java.lang.Object#finalize()
-   */
-  protected void finalize() {
-    UrlComponent.returnLease(tail_);
+  protected String extractFlavor(String path) {
+    if (path == null)
+      return null;
+    if (separator <= 0)
+      return null;
+    int dotSeparator = path.lastIndexOf('.');
+    if (dotSeparator > path.lastIndexOf(separator))
+      return path.substring(dotSeparator + 1);
+    return null;
   }
 
 }

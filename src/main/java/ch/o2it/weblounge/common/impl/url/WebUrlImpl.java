@@ -42,7 +42,7 @@ import java.util.Set;
  * @since Weblounge 1.0
  */
 
-public class WebUrlImpl extends BaseUrl implements WebUrl, Localizable {
+public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
 
   /** The associated site */
   private Site site_ = null;
@@ -111,47 +111,6 @@ public class WebUrlImpl extends BaseUrl implements WebUrl, Localizable {
     super(path, '/');
     site_ = site;
     titles_ = new LocalizableContent<String>();
-    version_ = version;
-  }
-
-  /**
-   * Constructor for a url based on the tail component. Since this constructor
-   * has package access, use <code>getUrl(<i>type</i>)</code> from the site
-   * navigation to obtain a reference to a concrete url instance.
-   * <p>
-   * This object supports multilingual titles. The default title language is set
-   * to the site default language, and the version of this url is
-   * <code>LIVE</code>.
-   * 
-   * @param site
-   *          the associated site
-   * @param c
-   *          the url tail component
-   */
-  WebUrlImpl(Site site, UrlComponent c) {
-    this(site, c, Page.LIVE);
-  }
-
-  /**
-   * Constructor for a url based on the tail component. Since this constructor
-   * has package access, use <code>getUrl(<i>type</i>)</code> from the site
-   * navigation to obtain a reference to a concrete url instance.
-   * <p>
-   * This object supports multilingual titles. The default title language is set
-   * to the site default language.
-   * 
-   * @param site
-   *          the associated site
-   * @param c
-   *          the url tail component
-   * @param version
-   *          the required version
-   */
-  WebUrlImpl(Site site, UrlComponent c, long version) {
-    super(c, '/');
-    site_ = site;
-    titles_ = new LocalizableContent<String>();
-    titles_.setDefaultLanguage(site_.getDefaultLanguage());
     version_ = version;
   }
 
