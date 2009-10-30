@@ -54,7 +54,7 @@ public class XMLUtilities {
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String className = XMLUtilities.class.getName();
 
   /** Logging facility */
