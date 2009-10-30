@@ -158,7 +158,7 @@ public class PageURITest {
    */
   @Test
   public void testGetVersionLong() {
-    assertEquals(7, simpleURI.switchVersion(7).getVersion());
+    assertEquals(7, simpleURI.getVersion(7).getVersion());
   }
 
   /**
