@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.request;
 
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.security.AuthenticatedUser;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -68,7 +68,7 @@ public interface WebloungeRequest extends HttpServletRequest {
    * 
    * @return the user
    */
-  AuthenticatedUser getUser();
+  User getUser();
 
   /**
    * Returns the user's history.
