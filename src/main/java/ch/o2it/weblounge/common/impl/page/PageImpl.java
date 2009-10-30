@@ -19,7 +19,6 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
-import ch.o2it.weblounge.common.WebloungeDateFormat;
 import ch.o2it.weblounge.common.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
@@ -28,6 +27,7 @@ import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PageSecurityContext;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
+import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Layout;

@@ -19,9 +19,9 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
-import ch.o2it.weblounge.common.WebloungeDateFormat;
 import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.util.Arguments;
+import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 
 import org.w3c.dom.Node;
