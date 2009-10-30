@@ -72,7 +72,7 @@ public class RestrictionSecurityContext extends AbstractSecurityContext {
   /** The permissions */
   private Permission[] permissions_;
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String className = RestrictionSecurityContext.class.getName();
 
   /** Logging facility */

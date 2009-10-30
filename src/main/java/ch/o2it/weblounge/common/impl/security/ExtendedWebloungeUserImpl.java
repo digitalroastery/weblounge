@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.WebloungeDateFormat;
+import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.security.ExtendedWebloungeUser;
 import ch.o2it.weblounge.common.security.LoginContext;
 import ch.o2it.weblounge.common.site.Site;

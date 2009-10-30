@@ -40,7 +40,7 @@ public class RoleRegistryImpl extends HashMap<String, Role> implements RoleRegis
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String className = RoleRegistryImpl.class.getName();
 
   /** Logging facility */

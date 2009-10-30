@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.WebloungeDateFormat;
+import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public final class ExtendedWebloungeUserReader extends WebloungeUserReader {
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String className = ExtendedWebloungeUserReader.class.getName();
 
   /** Logging facility */

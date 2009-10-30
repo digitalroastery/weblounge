@@ -93,7 +93,7 @@ public final class UserManagerImpl implements UserManager {
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String loggerClass = UserManagerImpl.class.getName();
 
   /** Logging facility */

@@ -19,8 +19,8 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.MD5;
+import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.LoginContext;
@@ -68,7 +68,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
 
   // Logging
 
-  /** the class name, used for the loggin facility */
+  /** the class name, used for the logging facility */
   private final static String loggerClass = WebloungeUserImpl.class.getName();
 
   /** Logging facility */
