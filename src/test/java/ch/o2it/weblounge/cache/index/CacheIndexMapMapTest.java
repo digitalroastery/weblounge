@@ -20,11 +20,11 @@
 
 package ch.o2it.weblounge.cache.index;
 
-import ch.o2it.weblounge.cache.CacheHandle;
+import ch.o2it.weblounge.cache.impl.CacheTagImpl;
 import ch.o2it.weblounge.cache.impl.handle.TaggedCacheHandle;
 import ch.o2it.weblounge.cache.impl.index.CacheIndexMapMap;
 import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
+import ch.o2it.weblounge.common.request.CacheHandle;
 
 import org.junit.Test;
 

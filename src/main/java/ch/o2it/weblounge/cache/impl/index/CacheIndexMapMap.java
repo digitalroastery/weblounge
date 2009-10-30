@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.cache.impl.index;
 
+import ch.o2it.weblounge.cache.impl.CacheTagImpl;
 import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 import ch.o2it.weblounge.common.impl.util.datatype.IdentityHashSet;
 import ch.o2it.weblounge.common.request.CacheHandle;
 

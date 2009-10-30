@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.cache.impl;
 
-import ch.o2it.weblounge.common.impl.request.CacheTagSetImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Module;
