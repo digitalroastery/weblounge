@@ -22,9 +22,9 @@ package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.http.Http11ProtocolHandler;
-import ch.o2it.weblounge.common.impl.http.Http11ResponseType;
-import ch.o2it.weblounge.common.impl.http.Http11Utils;
+import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
+import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
+import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestHandlerConfiguration;

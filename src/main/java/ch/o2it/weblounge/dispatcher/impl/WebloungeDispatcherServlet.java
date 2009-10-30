@@ -19,10 +19,8 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.common.impl.http.WebloungeRequestImpl;
-import ch.o2it.weblounge.common.impl.http.WebloungeResponseImpl;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
+import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
@@ -82,8 +80,10 @@ public class WebloungeDispatcherServlet extends HttpServlet {
       throws ServletException, IOException {
     Site site = getSiteByRequest(request);
     if (site != null) {
-      WebloungeRequest webloungeRequest = new WebloungeRequestImpl(request);
-      WebloungeResponse webloungeResponse = new WebloungeResponseImpl(response);
+      // TODO: Add object pooling for request and response
+      WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(request);
+      WebloungeResponseImpl webloungeResponse = new WebloungeResponseImpl(response);
+      webloungeRequest.init(site);
       site.dispatch(webloungeRequest, webloungeResponse);
     } else {
       super.doGet(request, response);

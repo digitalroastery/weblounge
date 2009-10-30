@@ -22,7 +22,7 @@ package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.http.Http11Constants;
-import ch.o2it.weblounge.common.impl.http.Http11Utils;
+import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;

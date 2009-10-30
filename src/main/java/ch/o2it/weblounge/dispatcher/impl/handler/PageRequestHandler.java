@@ -24,7 +24,7 @@ package ch.o2it.weblounge.dispatcher.impl.handler;
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.http.Http11Constants;
-import ch.o2it.weblounge.common.impl.http.Http11Utils;
+import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.util.DispatchUtil;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageManager;
