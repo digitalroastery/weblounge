@@ -21,7 +21,6 @@ package ch.o2it.weblounge.common.impl.url;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.Env;
-import ch.o2it.weblounge.common.impl.util.PathSupport;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.slf4j.Logger;

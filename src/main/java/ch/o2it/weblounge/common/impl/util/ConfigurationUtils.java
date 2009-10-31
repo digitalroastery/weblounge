@@ -34,7 +34,7 @@ public class ConfigurationUtils {
 
   /**
    * Returns the single option values as a <code>String[]</code> array. The
-   * values are expected to be separated by either coma, semicolon or space
+   * values are expected to be separated by either comma, semicolon or space
    * characters.
    * 
    * @param optionValue

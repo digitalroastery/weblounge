@@ -19,6 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.util;
 
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 
 import org.slf4j.Logger;

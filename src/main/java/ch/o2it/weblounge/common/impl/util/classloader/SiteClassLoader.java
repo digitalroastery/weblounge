@@ -19,8 +19,8 @@
 
 package ch.o2it.weblounge.common.impl.util.classloader;
 
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.util.Env;
-import ch.o2it.weblounge.common.impl.util.PathSupport;
 
 import java.io.File;
 
