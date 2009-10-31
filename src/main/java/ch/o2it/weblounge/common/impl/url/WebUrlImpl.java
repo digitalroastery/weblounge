@@ -36,12 +36,7 @@ import java.util.Set;
 /**
  * A web url represents a url that is used to address locations within the
  * webapp, such as html pages or module actions.
- * 
- * @author Tobias Wunden
- * @version 2.0
- * @since Weblounge 1.0
  */
-
 public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
 
   /** The associated site */
@@ -71,7 +66,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the url path
    */
   public WebUrlImpl(Site site, String path) {
-    this(site, path, Page.LIVE);
+    this(site, path, Page.LIVE, null);
   }
 
   /**
@@ -89,7 +84,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the url
    */
   public WebUrlImpl(Site site, Url url) {
-    this(site, url.getPath(), Page.LIVE);
+    this(site, url.getPath(), Page.LIVE, null);
   }
 
   /**
@@ -108,7 +103,28 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the required version
    */
   public WebUrlImpl(Site site, String path, long version) {
-    super(path, '/');
+    this(site, path, version, null);
+  }
+
+  /**
+   * Constructor for a url. Since this constructor has package access, use
+   * <code>getUrl(<i>type</i>)</code> from the site navigation to obtain a
+   * reference to a concrete url instance.
+   * <p>
+   * This object supports multilingual titles. The default title language is set
+   * to the site default language.
+   * 
+   * @param site
+   *          the associated site
+   * @param path
+   *          the url path
+   * @param version
+   *          the required version
+   * @param flavor
+   *          the url flavor, e. g. <code>html</code>
+   */
+  public WebUrlImpl(Site site, String path, long version, String flavor) {
+    super(path, flavor, '/');
     site_ = site;
     titles_ = new LocalizableContent<String>();
     version_ = version;
@@ -148,7 +164,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    */
   public String getLink() {
     if (link_ == null) {
-      link_ = UrlSupport.concat(new String[] { Env.getURI(), Env.getServletPath(), getPath() });
+      link_ = UrlSupport.concat(new String[] {
+          Env.getURI(),
+          Env.getServletPath(),
+          getPath() });
       try {
         link_ = URLEncoder.encode(link_, "UTF-8");
       } catch (UnsupportedEncodingException e) {
@@ -297,6 +316,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.language.Localizable#switchTo(ch.o2it.weblounge.common.language.Language)
    */
   public Language switchTo(Language language) {

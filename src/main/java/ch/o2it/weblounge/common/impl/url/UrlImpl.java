@@ -26,6 +26,9 @@ import ch.o2it.weblounge.common.url.Url;
  */
 public class UrlImpl implements Url {
 
+  /** HTML flavor definition */
+  private static final String FLAVOR_HTML = "html";
+
   /** The url that is represented */
   private String path_ = null;
 
@@ -47,12 +50,26 @@ public class UrlImpl implements Url {
    *          the path separator
    */
   public UrlImpl(String path, char separator) {
+    this(path, FLAVOR_HTML, separator);
+  }
+
+  /**
+   * Creates a new url from a given path.
+   * 
+   * @param path
+   *          the url path
+   * @param flavor
+   *          the url flavor
+   * @param separator
+   *          the path separator
+   */
+  public UrlImpl(String path, String flavor, char separator) {
     if (path == null)
       throw new IllegalArgumentException("Url path cannot be null");
     this.separator = separator;
     separator_ = Character.toString(separator);
     path_ = trim(path);
-    flavor_ = extractFlavor(path);
+    flavor_ = (flavor != null) ? flavor : extractFlavor(path);
   }
 
   /**

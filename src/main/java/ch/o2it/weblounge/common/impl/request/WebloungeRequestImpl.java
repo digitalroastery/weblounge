@@ -19,9 +19,13 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
+import ch.o2it.weblounge.common.impl.page.PageImpl;
 import ch.o2it.weblounge.common.impl.security.Guest;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
+import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.request.History;
+import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
@@ -29,6 +33,12 @@ import ch.o2it.weblounge.common.url.WebUrl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -53,6 +63,15 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   /** The attribute name used to store the {@link Site} in the session */
   public static final String SESSION_SITE = "weblounge-site";
 
+  /** The attribute name used to store the last {@link URL} in the session */
+  public static final String SESSION_PREVIOUS_URL = "weblounge-lasturl";
+
+  /** The language extraction regular expression */
+  private static Pattern languageExtractor_ = Pattern.compile("_([a-zA-Z]+)\\.[\\w\\- ]+$");
+
+  /** Regular expression used to take urls apart */
+  private static Pattern urlAnalyzer_ = Pattern.compile("^(.*)(work|original|index)(_[a-zA-Z0-9]+)?\\.([a-zA-Z0-9]+)$");
+
   /** The request counter */
   private static long requestCounter_ = 0L;
 
@@ -74,6 +93,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   /** Url that was originally requested */
   protected WebUrl requestedUrl = null;
 
+  /** Url that was requested before this requested */
+  protected WebUrl previousUrl = null;
+
   /**
    * Creates a new wrapper for <code>request</code>.
    * 
@@ -87,8 +109,10 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   /**
    * Initializes reloading of cached request information.
    */
-  public void revalidate() {
+  public void validate() {
     user = null;
+    url = null;
+    language = null;
   }
 
   /**
@@ -98,10 +122,51 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @return the requested language
    */
   public Language getLanguage() {
+    // Has the language been cached?
+    if (language != null) {
+      return language;
+    }
+
     if (site == null)
       throw new IllegalStateException("Site has not been set");
 
-    return SessionSupport.getLanguage((HttpServletRequest) getRequest());
+    // Extract the language from the session (a.k.a an earlier request). Then
+    // make sure the language was put there for the current site.
+    language = (Language) getSession(true).getAttribute(SESSION_LANGUAGE);
+
+    // If no language has been found in the session, it's the visitor's first
+    // access to this site. First thing we do is take a look at the url, where
+    // language information might be encoded, e. g. index_en.xml
+    if (language == null) {
+      Matcher m = languageExtractor_.matcher(getRequestURI());
+      if (m.find()) {
+        language = site.getLanguage(m.group(1));
+        log_.trace("Selected language " + language + " from request uri");
+      }
+    }
+
+    // If the url didn't contain language information, or referenced a language
+    // that the site doesn't support, let's go for the user's browser
+    // preferences
+    if (language == null) {
+      Enumeration<?> localeEnum = getLocales();
+      while (localeEnum.hasMoreElements()) {
+        String languageId = ((Locale) localeEnum.nextElement()).getLanguage();
+        if ((language = site.getLanguage(languageId)) != null) {
+          log_.trace("Selected language " + languageId + " from browser preferences");
+          break;
+        }
+      }
+    }
+
+    // Still no valid language? Let's go with the site default.
+    if (language == null) {
+      language = getSite().getDefaultLanguage();
+      log_.trace("Selected default site language " + language);
+    }
+
+    getSession().setAttribute(SESSION_LANGUAGE, language);
+    return language;
   }
 
   /**
@@ -122,15 +187,36 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @return the requested url
    */
   public WebUrl getUrl() {
-    if (site == null)
-      throw new IllegalStateException("Site has not been set");
-
-    // Has the url been cached?
     if (url != null) {
       return url;
     }
 
-    return RequestSupport.getUrl((HttpServletRequest) getRequest());
+    if (site == null)
+      throw new IllegalStateException("Site has not been set");
+
+    String urlPrefix = null;
+    String installPath = Env.getURI();
+    String servletPath = Env.getServletPath();
+    urlPrefix = UrlSupport.trim(UrlSupport.concat(installPath, servletPath));
+
+    String uri = getRequestURI();
+    String urlPath = uri.substring(urlPrefix.length() - 1);
+    String urlFlavor = "html";
+    long version = Page.LIVE;
+    log_.trace("url prefix=" + urlPrefix + "; request uri=" + uri + "; url=" + urlPath);
+
+    // Version selection
+    Matcher m = urlAnalyzer_.matcher(urlPath);
+    if (m.matches()) {
+      urlPath = m.group(1);
+      version = PageImpl.getVersion(m.group(2));
+      urlFlavor = m.group(3);
+    }
+
+    this.url = new WebUrlImpl(site, urlPath, version, urlFlavor);
+    this.requestedUrl = url;
+    getSession(true).setAttribute(SESSION_PREVIOUS_URL, url);
+    return url;
   }
 
   /**
@@ -139,15 +225,34 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @return the requested url
    */
   public WebUrl getRequestedUrl() {
+    if (requestedUrl != null) {
+      return requestedUrl;
+    }
+
     if (site == null)
       throw new IllegalStateException("Site has not been set");
 
-    // Has the requested url been cached?
-    if (requestedUrl != null) {
-      return requestedUrl;
-    }    
+    // If the requested url has not been stored so far, it will anyway be equal
+    // to what getUrl() returns
+    return getUrl();
+  }
+
+  /**
+   * Returns the user's history.
+   * 
+   * @return the history
+   */
+  public WebUrl getPreviousUrl() {
+    if (previousUrl != null)
+      return previousUrl;
+
+    if (site == null)
+      throw new IllegalStateException("Site has not been set");
     
-    return RequestSupport.getRequestedUrl((HttpServletRequest) getRequest());
+    // Seems that no on has shown interest in the previous url so far. Let's see
+    // if we can extract it from the session
+    previousUrl = (WebUrl) getSession(true).getAttribute(SESSION_PREVIOUS_URL);    
+    return previousUrl;
   }
 
   /**
@@ -156,13 +261,12 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @return the user
    */
   public User getUser() {
-    if (site == null)
-      throw new IllegalStateException("Site has not been set");
-
-    // Has the user been cached?
     if (user != null) {
       return user;
     }
+
+    if (site == null)
+      throw new IllegalStateException("Site has not been set");
 
     // Extract the user from the session (a.k.a an earlier request). Then make
     // sure the user was put there for the current site.
@@ -172,23 +276,11 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // visitor's first access to this site. Therefore, he/she is automatically
     // being logged in as guest.
     if (user == null) {
-      log_.info("New guest at " + getLocalName());
+      log_.debug("New guest at " + getLocalName());
       user = new Guest(getSite());
     }
 
     return user;
-  }
-
-  /**
-   * Returns the user's history.
-   * 
-   * @return the history
-   */
-  public History getHistory() {
-    if (site == null)
-      throw new IllegalStateException("Site has not been set");
-
-    return SessionSupport.getHistory((HttpServletRequest) getRequest());
   }
 
   /**
@@ -202,11 +294,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @return the requested version
    */
   public long getVersion() {
-    if (site == null)
-      throw new IllegalStateException("Site has not been set");
-
-    long version = RequestSupport.getVersion((HttpServletRequest) getRequest());
-    return (version < 0) ? getUrl().getVersion() : version;
+    return getUrl().getVersion();
   }
 
   /**
@@ -218,8 +306,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (site == null)
       throw new IllegalStateException("Site has not been set");
 
-    // TODO: Make method selection dynamic
-    return "html";
+    return getUrl().getFlavor();
   }
 
   /**
@@ -238,29 +325,55 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (requestCounter_ == Long.MAX_VALUE)
       requestCounter_ = 0L;
     else
-      requestCounter_ ++;
+      requestCounter_++;
 
     // Handle changes to the users session that might be required should he/she
     // be surfing on another site
     HttpSession session = getSession(true);
-    Site oldSite = (Site)session.getAttribute(SESSION_SITE);
+    Site oldSite = (Site) session.getAttribute(SESSION_SITE);
     if (!site.equals(oldSite)) {
-      session.removeAttribute(SESSION_USER);
-      session.removeAttribute(SESSION_LANGUAGE);
-      session.setAttribute(SESSION_SITE, site);
+      clearSession();
     }
   }
 
   /**
    * Method to reset this request object, forcing it to release any cached
    * information.
+   * <p/>
+   * Note that you should only set <code>clearSession</code> to <code>true</code>
+   * if you want to get rid of cached information to force a change in the way
+   * the current user is treated, e. g. if he/she has been logged out.
+   * <p/>
+   * The following things are stored in the session
+   * <ul>
+   *  <li>The current site</li>
+   *  <li>The user</li>
+   *  <li>The selected language</li>
+   *  <li>The previously visited url (on this site)</li>
+   * </ul>
+   * 
+   * @param clearSession <code>true</code> to remove cached information as well
    */
-  public void reset() {
+  public void reset(boolean clearSession) {
     site = null;
     user = null;
     language = null;
     url = null;
     requestedUrl = null;
+    if (clearSession) {
+      clearSession();
+    }
+  }
+  
+  /**
+   * Utility method used to clear the attributes stored by the url in the user's
+   * session.
+   */
+  private void clearSession() {
+    HttpSession session = getSession(true);
+    session.removeAttribute(SESSION_USER);
+    session.removeAttribute(SESSION_LANGUAGE);
+    session.setAttribute(SESSION_SITE, site);
   }
 
   /**
