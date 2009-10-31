@@ -20,7 +20,10 @@
 
 package ch.o2it.weblounge.common.page;
 
+import static org.junit.Assert.assertTrue;
+
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -51,7 +54,7 @@ public class PageURITest {
   protected PageURI versionedURI = null;
 
   /** The uri instance under test */
-  protected PageURI identifyableURI = null;
+  protected PageURI identifyableVersionedURI = null;
 
   /** The parent uri instance under test */
   protected PageURI simpleParentURI = null;
@@ -88,7 +91,7 @@ public class PageURITest {
   public void setUp() throws Exception {
     simpleURI = new PageURIImpl(site, defaultPath);
     versionedURI = new PageURIImpl(site, defaultPath, defaultRandomVersion);
-    identifyableURI = new PageURIImpl(site, defaultPath, defaultRandomVersion, defaultId);
+    identifyableVersionedURI = new PageURIImpl(site, defaultPath, defaultRandomVersion, defaultId);
     simpleParentURI = new PageURIImpl(site, defaultParentPath);
     versionedParentURI = new PageURIImpl(site, defaultParentPath, defaultRandomVersion);
     identifyableParentURI = new PageURIImpl(site, defaultParentPath, defaultRandomVersion, defaultId);
@@ -101,7 +104,7 @@ public class PageURITest {
   public void testGetId() {
     assertNull(simpleURI.getId());
     assertNull(versionedURI.getId());
-    assertEquals(defaultId, identifyableURI.getId());
+    assertEquals(defaultId, identifyableVersionedURI.getId());
   }
 
   /**
@@ -120,9 +123,9 @@ public class PageURITest {
    */
   @Test
   public void testGetParentURI() {
-    assertEquals(simpleParentURI, simpleURI.getParentURI());
-    assertEquals(versionedParentURI, versionedURI.getParentURI());
-    assertEquals(identifyableParentURI, identifyableURI.getParentURI());
+    assertTrue(simpleParentURI.equals(simpleURI.getParentURI()));
+    assertTrue(versionedParentURI.equals(versionedURI.getParentURI()));
+    assertTrue(identifyableParentURI.equals(identifyableVersionedURI.getParentURI()));
   }
 
   /**
@@ -130,7 +133,7 @@ public class PageURITest {
    */
   @Test
   public void testGetPath() {
-    assertEquals(defaultPath, simpleURI.getPath());
+    assertEquals(PathSupport.trim(defaultPath), simpleURI.getPath());
   }
 
   /**
@@ -140,7 +143,7 @@ public class PageURITest {
   public void testGetSite() {
     assertEquals(site, simpleURI.getSite());
     assertEquals(site, versionedURI.getSite());
-    assertEquals(site, identifyableURI.getSite());
+    assertEquals(site, identifyableVersionedURI.getSite());
   }
 
   /**
@@ -150,7 +153,7 @@ public class PageURITest {
   public void testGetVersion() {
     assertEquals(Page.LIVE, simpleURI.getVersion());
     assertEquals(defaultRandomVersion, versionedURI.getVersion());
-    assertEquals(defaultRandomVersion, identifyableURI.getVersion());
+    assertEquals(defaultRandomVersion, identifyableVersionedURI.getVersion());
   }
 
   /**
@@ -166,11 +169,11 @@ public class PageURITest {
    */
   @Test
   public void testEquals() {
-    assertEquals(simpleURI, simpleURI);
-    assertEquals(versionedURI, versionedURI);
-    assertEquals(identifyableURI, identifyableURI);
+    assertTrue(simpleURI.equals(simpleURI));
+    assertTrue(versionedURI.equals(versionedURI));
+    assertTrue(identifyableVersionedURI.equals(identifyableVersionedURI));
     assertFalse(simpleURI.equals(versionedURI));
-    assertFalse(versionedURI.equals(identifyableURI));
+    assertTrue(versionedURI.equals(identifyableVersionedURI));
   }
 
 }

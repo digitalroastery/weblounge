@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.page.MalformedPageURIException;
 import ch.o2it.weblounge.common.page.Page;
@@ -117,7 +118,7 @@ public class PageURIImpl implements PageURI {
       throw new MalformedPageURIException("Path can't be relative: " + path);
     this.site = site;
     this.id = id;
-    this.path = path;
+    this.path = UrlSupport.trim(path);
     this.version = version;
   }
 
@@ -153,8 +154,8 @@ public class PageURIImpl implements PageURI {
     String p = path;
     if (p.endsWith("/"))
       p = path.substring(0, path.length() - 1);
-    int lastSeparator = path.lastIndexOf('/');
-    p = path.substring(0, lastSeparator);
+    int lastSeparator = p.lastIndexOf('/');
+    p = (lastSeparator > 0) ? path.substring(0, lastSeparator) : "/";
     return new PageURIImpl(site, p, version, id);
   }
 
@@ -192,6 +193,34 @@ public class PageURIImpl implements PageURI {
    */
   public PageURI getVersion(long version) throws MalformedPageURIException {
     return new PageURIImpl(site, path, version);
+  }
+  
+  /**
+   * {@inheritDoc}
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return path.hashCode();
+  }
+  
+  /**
+   * {@inheritDoc}
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof PageURI) {
+      PageURI uri = (PageURI)obj;
+      if (!site.equals(uri.getSite()))
+        return false;
+      if (!path.equals(uri.getPath()))
+        return false;
+      if (version != uri.getVersion())
+        return false;
+      return true;
+    }
+    return false;
   }
 
 }
