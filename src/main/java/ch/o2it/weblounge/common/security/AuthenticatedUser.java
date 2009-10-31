@@ -48,7 +48,7 @@ public interface AuthenticatedUser extends User, Principal {
    * 
    * @return the password
    */
-  String getPassword();
+  byte[] getPassword();
 
   /**
    * Returns the password type, which is either {@link #PASSWORD_TYPE_PLAIN} or
