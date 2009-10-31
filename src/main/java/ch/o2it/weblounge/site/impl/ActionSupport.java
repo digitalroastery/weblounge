@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.site.impl;
 
-import ch.o2it.weblounge.common.impl.util.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.I18n;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.page.Pagelet;
 import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
