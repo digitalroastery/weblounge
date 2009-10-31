@@ -22,7 +22,6 @@ package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
-import ch.o2it.weblounge.common.impl.util.DispatchUtil;
 import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
