@@ -24,7 +24,7 @@ import ch.o2it.weblounge.cache.StreamFilter;
 import ch.o2it.weblounge.cache.impl.filter.FilterChain;
 import ch.o2it.weblounge.cache.impl.index.CacheIndexMapMap;
 import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.util.PluginLoader;
+import ch.o2it.weblounge.common.impl.util.classloader.PluginLoader;
 import ch.o2it.weblounge.common.request.CacheHandle;
 
 import org.slf4j.Logger;
