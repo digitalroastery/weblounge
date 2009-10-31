@@ -10,3 +10,4 @@ pagelet
 url
 mountpoint
 recheck
+cron
