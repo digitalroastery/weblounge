@@ -20,8 +20,8 @@
 package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.ConfigurationException;
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
-import ch.o2it.weblounge.common.impl.util.PathSupport;
 import ch.o2it.weblounge.common.impl.util.ServletConfiguration;
 import ch.o2it.weblounge.common.impl.util.ServletMapping;
 import ch.o2it.weblounge.common.language.Language;

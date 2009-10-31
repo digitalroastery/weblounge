@@ -19,8 +19,8 @@
 
 package ch.o2it.weblounge.site.impl;
 
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.util.I18n;
-import ch.o2it.weblounge.common.impl.util.PathSupport;
 import ch.o2it.weblounge.common.impl.util.config.DirectoryWatchdog;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;

@@ -20,7 +20,6 @@
 package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.dispatcher.Dispatcher;
-import ch.o2it.weblounge.common.impl.util.DispatchUtil;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -28,6 +27,7 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.UrlNotFoundException;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.dispatcher.impl.DispatchUtil;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
