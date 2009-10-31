@@ -5,7 +5,7 @@
   <artifactId>weblounge-base</artifactId>
   <packaging>pom</packaging>
   <version>3.0-SNAPSHOT</version>
-  <name>weblounge</name>
+  <name>Weblounge</name>
   <description>Weblounge is a multilingual web content management system</description>
   <url>http://www.o2it.ch/weblounge</url>
   <inceptionYear>2009</inceptionYear>
