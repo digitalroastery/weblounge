@@ -64,18 +64,18 @@ public interface WebloungeRequest extends HttpServletRequest {
   WebUrl getRequestedUrl();
 
   /**
+   * Returns the url that was called before this request.
+   * 
+   * @return the previous url
+   */
+  WebUrl getPreviousUrl();
+
+  /**
    * Returns the current user.
    * 
    * @return the user
    */
   User getUser();
-
-  /**
-   * Returns the user's history.
-   * 
-   * @return the history
-   */
-  History getHistory();
 
   /**
    * Returns the requested version, which is one of
