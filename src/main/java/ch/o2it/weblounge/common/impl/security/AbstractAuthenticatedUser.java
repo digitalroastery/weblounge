@@ -19,10 +19,11 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.util.MD5;
 import ch.o2it.weblounge.common.security.AuthenticatedUser;
 import ch.o2it.weblounge.common.security.LoginContext;
 import ch.o2it.weblounge.common.site.Site;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +39,7 @@ public abstract class AbstractAuthenticatedUser extends AbstractUser implements 
   protected LoginContext loginContext = null;
 
   /** the password */
-  protected String password = null;
+  protected byte[] password = null;
 
   /** the password type, either plain or md5 */
   protected int passwordType = PASSWORD_TYPE_PLAIN;
@@ -123,7 +124,7 @@ public abstract class AbstractAuthenticatedUser extends AbstractUser implements 
    * @param type
    *          the password type
    */
-  public void setPassword(String password, int type) {
+  public void setPassword(byte[] password, int type) {
     passwordType = type;
     this.password = password;
   }
@@ -134,8 +135,8 @@ public abstract class AbstractAuthenticatedUser extends AbstractUser implements 
    * @param password
    *          the password
    */
-  public void setPassword(String password) {
-    setPassword(MD5.md(password), PASSWORD_TYPE_MD5);
+  public void setPassword(byte[] password) {
+    setPassword(DigestUtils.md5(password), PASSWORD_TYPE_MD5);
   }
 
   /**
@@ -143,7 +144,7 @@ public abstract class AbstractAuthenticatedUser extends AbstractUser implements 
    * 
    * @return the password
    */
-  public String getPassword() {
+  public byte[] getPassword() {
     return password;
   }
 
@@ -165,7 +166,7 @@ public abstract class AbstractAuthenticatedUser extends AbstractUser implements 
     case PASSWORD_TYPE_PLAIN:
       return this.password.equals(password);
     case PASSWORD_TYPE_MD5:
-      return this.password.equals(MD5.md(password));
+      return this.password.equals(DigestUtils.md5(password));
     }
     return false;
   }

@@ -38,7 +38,7 @@ public class SiteAdminImpl extends AuthenticatedUserImpl implements SiteAdmin {
    * Creates a new SiteAdminImpl user with the <code>administrator</code> role
    * assigned.
    */
-  public SiteAdminImpl(String login, String password, String email) {
+  public SiteAdminImpl(String login, byte[] password, String email) {
     super(login);
     this.password = password;
     this.email = email;
@@ -108,15 +108,6 @@ public class SiteAdminImpl extends AuthenticatedUserImpl implements SiteAdmin {
    */
   public void setPassword(String password) throws IllegalStateException {
     throw new IllegalStateException("The administrator password must not be changed!");
-  }
-
-  /**
-   * Returns the login name of the weblounge system administrator user.
-   * 
-   * @return the admin user's login
-   */
-  public String getPassword() {
-    return password != null ? password : "";
   }
 
   /**

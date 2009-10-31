@@ -211,7 +211,7 @@ public class WebloungeUserReader extends DefaultHandler {
 
     // password
     else if (local.equals("password")) {
-      user.setPassword(nodeContent.toString(), user.passwordType);
+      user.setPassword(nodeContent.toString().getBytes(), user.passwordType);
     }
 
     // last login date

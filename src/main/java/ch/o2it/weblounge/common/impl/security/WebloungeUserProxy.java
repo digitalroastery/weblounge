@@ -98,7 +98,7 @@ public class WebloungeUserProxy extends UserProxy implements WebloungeUser {
   /**
    * @see ch.o2it.weblounge.common.security.AuthenticatedUser#getPassword()
    */
-  public String getPassword() {
+  public byte[] getPassword() {
     if (!initialized && login != null)
       init();
     return ((WebloungeUser) stub).getPassword();

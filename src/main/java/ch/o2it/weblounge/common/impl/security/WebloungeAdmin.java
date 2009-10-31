@@ -48,7 +48,7 @@ public final class WebloungeAdmin extends AuthenticatedUserImpl {
    * @param email
    *          the email address
    */
-  public static void init(String login, String password, String email) {
+  public static void init(String login, byte[] password, String email) {
     instance = new WebloungeAdmin(login);
     instance.password = password;
     instance.email = email;
@@ -99,15 +99,6 @@ public final class WebloungeAdmin extends AuthenticatedUserImpl {
    */
   public void setPassword(String password) throws IllegalStateException {
     throw new IllegalStateException("The administrator password must be changed!");
-  }
-
-  /**
-   * Returns the login name of the weblounge system administrator user.
-   * 
-   * @return the admin user's login
-   */
-  public String getPassword() {
-    return password != null ? password : "";
   }
 
   /**

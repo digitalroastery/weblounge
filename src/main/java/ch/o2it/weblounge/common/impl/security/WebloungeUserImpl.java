@@ -19,7 +19,6 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.util.MD5;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.security.Group;
@@ -28,6 +27,7 @@ import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.WebloungeUser;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -227,7 +227,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     // Password
     b.append("<password type=\"md5\">");
     if (passwordType == PASSWORD_TYPE_PLAIN) {
-      password = MD5.md(password);
+      password = DigestUtils.md5(password);
       passwordType = PASSWORD_TYPE_MD5;
     }
     b.append(password);
