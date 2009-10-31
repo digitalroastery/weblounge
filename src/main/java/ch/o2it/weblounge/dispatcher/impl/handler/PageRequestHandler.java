@@ -39,8 +39,8 @@ import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.dispatcher.impl.WebloungeDispatcher;
 import ch.o2it.weblounge.dispatcher.impl.request.RequestSupport;
-import ch.o2it.weblounge.dispatcher.impl.request.WebloungeDispatcher;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
@@ -157,7 +157,7 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
 				// Check if the page is already part of the cache
 				cacheHdl = cache.startResponse(cacheTags, request, response, validTime, recheckTime);
 				if (cacheHdl == null) {
-					request.getHistory().addEntry(url);
+					request.getPreviousUrl().addEntry(url);
 					return true;
 				}
 
@@ -240,9 +240,9 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
 						renderer.configure(method, null);
 						renderer.render(request, response);
 						if (action == null) {
-							request.getHistory().addEntry(url);
+							request.getPreviousUrl().addEntry(url);
 							if (cache != null) {
-								request.getHistory().addEntry(url);
+								request.getPreviousUrl().addEntry(url);
 							} else if (METHOD_HEAD.equals(requestMethod)) {
 						        Http11Utils.endHeadResponse(response);
 							}

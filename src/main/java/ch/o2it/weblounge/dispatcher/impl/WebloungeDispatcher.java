@@ -18,8 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl.request;
+package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.impl.util.DispatchUtil;
 import ch.o2it.weblounge.common.request.RequestHandler;
@@ -143,10 +144,6 @@ public final class WebloungeDispatcher {
         return;
       }
 
-      // Register the current thread
-
-      RequestSupport.register(request);
-
       // Ask the registered request handler if they are willing to handle
       // the request. Otherwise, the site dispatcher will be called.
 
@@ -221,7 +218,6 @@ public final class WebloungeDispatcher {
       }
     } finally {
       log_.debug("Request " + request + " processed");
-      RequestSupport.deregister();
     }
   }
 

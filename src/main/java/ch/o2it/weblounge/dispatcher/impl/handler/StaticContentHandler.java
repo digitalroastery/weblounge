@@ -30,7 +30,7 @@ import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestHandlerConfiguration;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.dispatcher.impl.request.WebloungeDispatcher;
+import ch.o2it.weblounge.dispatcher.impl.WebloungeDispatcher;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;

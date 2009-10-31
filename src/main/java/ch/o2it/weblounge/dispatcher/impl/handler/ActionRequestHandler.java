@@ -38,9 +38,9 @@ import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteLogger;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.dispatcher.impl.WebloungeDispatcher;
 import ch.o2it.weblounge.dispatcher.impl.request.MultipartRequestWrapper;
 import ch.o2it.weblounge.dispatcher.impl.request.RequestSupport;
-import ch.o2it.weblounge.dispatcher.impl.request.WebloungeDispatcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -382,13 +382,13 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
 				target = new WebUrlImpl(site, decocedTargetUrl);
 			} catch (UnsupportedEncodingException e) {
 				log_.warn("Error while decoding target url " + targetUrl + ": " + e.getMessage());
-				target = request.getHistory().getLatestMove();
+				target = request.getPreviousUrl().getLatestMove();
 			}
 		} else if (action.getConfiguration().getTargetUrl() != null) {
 			target = new WebUrlImpl(request.getSite(), action.getConfiguration().getTargetUrl());
 			targetForced = true;
-		} else if (request.getHistory().size() > 0) {
-			 target = request.getHistory().getLatestMove();
+		} else if (request.getPreviousUrl().size() > 0) {
+			 target = request.getPreviousUrl().getLatestMove();
 		} else {
 		  target = request.getSite().getNavigation().getHomeUrl();
 		}

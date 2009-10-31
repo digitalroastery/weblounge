@@ -20,13 +20,13 @@
 
 package ch.o2it.weblounge.dispatcher.impl.jaas;
 
+import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.security.jaas.AbstractLoginModule;
 import ch.o2it.weblounge.common.impl.security.jaas.HttpAuthCallback;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.security.WebloungeUser;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.dispatcher.impl.request.SessionSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +98,7 @@ public class WebloungeLoginModule extends AbstractLoginModule {
 		// Remove user from session
 		if (callbackHandler != null && callbackHandler instanceof HttpAuthCallback) {
 			WebloungeRequest request = ((HttpAuthCallback)callbackHandler).getRequest();
-			SessionSupport.getAttributes(request).setUser(null);
+			request.getSession(true).removeAttribute(WebloungeRequestImpl.SESSION_USER);
 		}		
 		return true;
 	}
