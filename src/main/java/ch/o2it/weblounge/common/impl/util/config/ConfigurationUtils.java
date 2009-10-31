@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.util;
+package ch.o2it.weblounge.common.impl.util.config;
 
 import java.util.ArrayList;
 import java.util.List;
