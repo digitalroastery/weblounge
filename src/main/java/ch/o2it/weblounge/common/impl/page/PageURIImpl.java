@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.page.MalformedPageURIException;
 import ch.o2it.weblounge.common.page.Page;
@@ -32,7 +32,7 @@ import ch.o2it.weblounge.common.url.WebUrl;
 /**
  * Implementation of the {@link PageURI} interface.
  */
-public class PageURIImpl implements PageURI {
+public class PageURIImpl extends UrlImpl implements PageURI {
 
   /** The page identifier */
   String id = null;
@@ -50,7 +50,7 @@ public class PageURIImpl implements PageURI {
   private transient WebUrlImpl link_ = null;
 
   PageURIImpl(Site site) {
-    this.site = site;
+    this(site, "/", Page.LIVE);
   }
 
   /**
@@ -110,6 +110,7 @@ public class PageURIImpl implements PageURI {
    */
   public PageURIImpl(Site site, String path, long version, String id)
       throws MalformedPageURIException {
+    super(path, '/');
     if (path == null)
       throw new IllegalArgumentException("Argument 'path' must not be null");
     if (site == null)
@@ -118,7 +119,6 @@ public class PageURIImpl implements PageURI {
       throw new MalformedPageURIException("Path can't be relative: " + path);
     this.site = site;
     this.id = id;
-    this.path = UrlSupport.trim(path);
     this.version = version;
   }
 
@@ -149,14 +149,10 @@ public class PageURIImpl implements PageURI {
    * @see ch.o2it.weblounge.common.page.PageURI#getParentURI()
    */
   public PageURI getParentURI() throws MalformedPageURIException {
-    if ("/".equals(path))
+    String parentPath = getParentPath();
+    if (parentPath == null) 
       return null;
-    String p = path;
-    if (p.endsWith("/"))
-      p = path.substring(0, path.length() - 1);
-    int lastSeparator = p.lastIndexOf('/');
-    p = (lastSeparator > 0) ? path.substring(0, lastSeparator) : "/";
-    return new PageURIImpl(site, p, version, id);
+    return new PageURIImpl(site, parentPath, version, id);
   }
 
   /**
