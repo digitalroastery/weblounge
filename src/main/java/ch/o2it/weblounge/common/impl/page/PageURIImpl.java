@@ -1,33 +1,30 @@
 /*
- *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
- *  http://weblounge.o2it.ch
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program; if not, write to the Free Software Foundation
- *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * Weblounge: Web Content Management System Copyright (c) 2009 The Weblounge
+ * Team http://weblounge.o2it.ch
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option) any
+ * later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.impl.url.UrlImpl;
-import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.page.MalformedPageURIException;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
  * Implementation of the {@link PageURI} interface.
@@ -40,15 +37,15 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   /** The associated site */
   Site site = null;
 
-  /** The path */
-  String path = null;
-
   /** The page */
   long version = Page.LIVE;
 
-  /** The link */
-  private transient WebUrlImpl link_ = null;
-
+  /**
+   * Constructor for a URI pointing to the live version of the root document.
+   * 
+   * @param site
+   *          the associated site
+   */
   PageURIImpl(Site site) {
     this(site, "/", Page.LIVE);
   }
@@ -134,23 +131,11 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.page.PageURI#getLink()
-   */
-  public WebUrl getLink() throws MalformedPageURIException {
-    if (link_ == null) {
-      link_ = new WebUrlImpl(site, path);
-    }
-    return link_;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.page.PageURI#getParentURI()
    */
   public PageURI getParentURI() throws MalformedPageURIException {
     String parentPath = getParentPath();
-    if (parentPath == null) 
+    if (parentPath == null)
       return null;
     return new PageURIImpl(site, parentPath, version, id);
   }
@@ -190,24 +175,26 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   public PageURI getVersion(long version) throws MalformedPageURIException {
     return new PageURIImpl(site, path, version);
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
     return path.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof PageURI) {
-      PageURI uri = (PageURI)obj;
+      PageURI uri = (PageURI) obj;
       if (!site.equals(uri.getSite()))
         return false;
       if (!path.equals(uri.getPath()))

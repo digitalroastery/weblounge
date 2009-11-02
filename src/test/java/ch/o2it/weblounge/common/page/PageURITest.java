@@ -20,24 +20,21 @@
 
 package ch.o2it.weblounge.common.page;
 
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
-import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.WebUrl;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 
 /**
  * Test case for the {@link #PageURIImpl}.
@@ -105,17 +102,6 @@ public class PageURITest {
     assertNull(simpleURI.getId());
     assertNull(versionedURI.getId());
     assertEquals(defaultId, identifyableVersionedURI.getId());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getLink()}.
-   */
-  @Test
-  public void testGetLink() {
-    WebUrl link = new WebUrlImpl(site, defaultPath);
-    WebUrl versionedLink = new WebUrlImpl(site, defaultPath, defaultRandomVersion);
-    assertEquals(link, simpleURI.getLink());
-    assertEquals(versionedLink, versionedURI.getLink());
   }
 
   /**
