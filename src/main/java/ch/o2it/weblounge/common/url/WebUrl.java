@@ -20,15 +20,16 @@
 
 package ch.o2it.weblounge.common.url;
 
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.site.Site;
 
 /**
  * A web url represents a url that is used to address locations within the
  * webapp, such as html pages or module actions.
  */
-public interface WebUrl extends Url, Localizable {
+public interface WebUrl extends Url {
+
+  /** Default flavors */
+  public enum Flavor { html, xml, json };
 
   /**
    * Returns the parent site.
@@ -41,7 +42,7 @@ public interface WebUrl extends Url, Localizable {
    * Returns the encoded url to be used when calling the url through the web
    * application. <br>
    * What this method does in detail is prepending the mount point of the
-   * webapplication and the servlet path obtained via <code>Env.getURI()</code>
+   * web application and the servlet path obtained via <code>Env.getURI()</code>
    * and <code>getServletPath()</code> to the url.
    * 
    * @return the encoded url
@@ -52,7 +53,7 @@ public interface WebUrl extends Url, Localizable {
    * Returns the encoded url to be used when calling the url through the web
    * application. <br>
    * What this method does in detail is prepending the mount point of the
-   * webapplication and the servlet path obtained via <code>Env.getURI()</code>
+   * web application and the servlet path obtained via <code>Env.getURI()</code>
    * and <code>getServletPath()</code> to the url.
    * <p>
    * The parameter version is used to create links to special versions of a
@@ -82,31 +83,10 @@ public interface WebUrl extends Url, Localizable {
 
   /**
    * Returns the url flavor. For example, in case of "index.xml" the flavor will
-   * be <code>xml</code>.
+   * be <code>XML</code>.
    * 
    * @return the url flavor
    */
   String getFlavor();
-
-  /**
-   * Returns the url title in the currently active language or <code>null</code>
-   * if no such title exists.
-   * 
-   * @return the url title in the currently active language
-   * @see ch.o2it.weblounge.common.language.Localizable#toString()
-   */
-  String getTitle();
-
-  /**
-   * Returns the url title in the requested language or <code>null</code> if the
-   * title didn't exist in that language. Call
-   * {@link #supportsLanguage(Language)} to find out about supported languages.
-   * 
-   * @param language
-   *          the requested language
-   * @return the title
-   * @see ch.o2it.weblounge.common.language.Localizable#toString(ch.o2it.weblounge.common.language.Language)
-   */
-  String getTitle(Language language);
 
 }
