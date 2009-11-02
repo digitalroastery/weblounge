@@ -85,7 +85,7 @@ public class SystemFileUrl extends UrlImpl {
 
   /**
    * Returns the url encoded and ready to be sent as a request to the
-   * application server, relative to the webapplication mountpoint.
+   * application server, relative to the web application mountpoint.
    * <p>
    * For example, if your weblounge instance can be reached at
    * <code>http://localhost/weblounge/cms</code> this method will return for a
