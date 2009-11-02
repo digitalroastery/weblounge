@@ -77,6 +77,17 @@ public class UrlImpl implements Url {
   }
 
   /**
+   * Creates a url pointing to root with the given separator.
+   * 
+   * @param separator
+   *          the path separator character
+   */
+  protected UrlImpl(char separator) {
+    this.separatorChar = separator;
+    this.path = "/";
+  }
+
+  /**
    * Returns the url separator character, like '/' in web urls.
    * 
    * @return the separator character
@@ -217,7 +228,8 @@ public class UrlImpl implements Url {
    * 
    * @return the concatenated url of the two arguments
    */
-  protected static String concat(String prefix, String suffix, char separatorChar) {
+  protected static String concat(String prefix, String suffix,
+      char separatorChar) {
     if (prefix == null)
       throw new IllegalArgumentException("Argument prefix is null");
     if (suffix == null)
