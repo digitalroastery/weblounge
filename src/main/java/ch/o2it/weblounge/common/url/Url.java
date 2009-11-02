@@ -33,7 +33,7 @@ public interface Url {
    * 
    * @return the separator character
    */
-  char getSeparator();
+  char getPathSeparator();
 
   /**
    * Returns the webapp-relativ path for this url, e. g.
@@ -61,7 +61,7 @@ public interface Url {
    *          the url
    * @return <code>true</code> if this url is a prefix
    */
-  boolean isPrefix(Url url);
+  boolean isPrefixOf(Url url);
 
   /**
    * Returns <code>true</code> if this url is an extension of <code>url</code>
@@ -72,6 +72,6 @@ public interface Url {
    *          the url
    * @return <code>true</code> if this url is a prefix
    */
-  boolean isExtension(Url url);
+  boolean isExtensionOf(Url url);
 
 }

@@ -69,14 +69,6 @@ public interface WebUrl extends Url, Localizable {
   String getLink(String version);
 
   /**
-   * Extends this url by the given path and returns it as a new
-   * <code>WebUrl</code>
-   * 
-   * @return an extended WebUrl
-   */
-  WebUrl extend(String path);
-
-  /**
    * Returns the version of this url. Possible versions are:
    * <ul>
    * <li>{@link ch.o2it.weblounge.common.page.Page#LIVE}</li>
