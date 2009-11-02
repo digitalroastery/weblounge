@@ -156,9 +156,9 @@ public class Env {
   }
 
   /**
-   * Returns the path that was used to install the whole webapplication.
+   * Returns the path that was used to install the whole web application.
    * 
-   * @return the path to the webapplication
+   * @return the path to the web application
    */
   public static String getURI() {
     return properties.getProperty("system.uri");
