@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.page;
 
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.Url;
-import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
  * This interface is used to locate and point to pages within a site.
@@ -56,13 +55,6 @@ public interface PageURI extends Url {
    * @return the new page uri
    */
   PageURI getVersion(long version);
-
-  /**
-   * Returns a link to the page that this uri is pointing to.
-   * 
-   * @return a link
-   */
-  WebUrl getLink();
 
   /**
    * Returns the associated site.
