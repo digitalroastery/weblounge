@@ -295,7 +295,7 @@ public interface Site extends ModuleListener, RequestListener {
   String getPhysicalPath(String path);
 
   /**
-   * Returns the virtual path on the server relative to the webapplication.
+   * Returns the virtual path on the server relative to the web application.
    * Using this path e. g. for a renderer <code>renderer/myjsp.jsp</code> will
    * produce </code>/sites/mysite/renderer/myjsp.jsp</code>.
    * 

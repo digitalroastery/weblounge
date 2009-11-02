@@ -218,7 +218,7 @@ public interface Module extends Customizable {
   String getPhysicalPath(String path);
 
   /**
-   * Returns the virtual path on the server relative to the webapplication.
+   * Returns the virtual path on the server relative to the web application.
    * Using this path e. g. for a renderer <code>jsp/myjsp.jsp</code> will
    * produce </code>/sites/mysite/modules/mymodule/jsp/myjsp.jsp</code>.
    * 

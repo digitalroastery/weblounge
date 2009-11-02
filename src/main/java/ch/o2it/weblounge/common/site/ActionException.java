@@ -33,7 +33,7 @@ public class ActionException extends RuntimeException {
   /** Action name, e. g. <code>XSLAction</code> */
   private Action handler_ = null;
 
-  /** Rendering method, e. g. <code>html</code>" */
+  /** Rendering method, e. g. <code>HTML</code>" */
   private String method_ = null;
 
   /** The exception that lead to this one */
@@ -46,7 +46,7 @@ public class ActionException extends RuntimeException {
    * @param handler
    *          the handler, e. g. <code>XLSElementAction</code>
    * @param method
-   *          the output method, e. g. <code>html</code>
+   *          the output method, e. g. <code>HTML</code>
    */
   public ActionException(Action handler, String method) {
     handler_ = handler;
@@ -60,7 +60,7 @@ public class ActionException extends RuntimeException {
    * @param handler
    *          the handler, e. g. <code>XLSElementAction</code>
    * @param method
-   *          the output method, e. g. <code>html</code>
+   *          the output method, e. g. <code>HTML</code>
    * @param t
    *          the exception caught when executing the renderer
    */
@@ -80,7 +80,7 @@ public class ActionException extends RuntimeException {
   }
 
   /**
-   * Returns the output method, e. g. <code>html</code>.
+   * Returns the output method, e. g. <code>HTML</code>.
    * 
    * @return the output method
    */

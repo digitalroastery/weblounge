@@ -33,7 +33,7 @@ public class RenderException extends RuntimeException {
   /** Renderer name, e. g. <code>XSLRenderer</code> */
   private Renderer renderer_ = null;
 
-  /** Rendering method, e. g. <code>html</code>" */
+  /** Rendering method, e. g. <code>HTML</code>" */
   private String method_ = null;
 
   /**
@@ -43,7 +43,7 @@ public class RenderException extends RuntimeException {
    * @param renderer
    *          the renderer, e. g. <code>XLSElementRenderer</code>
    * @param method
-   *          the rendering output method, e. g. <code>html</code>
+   *          the rendering output method, e. g. <code>HTML</code>
    */
   public RenderException(Renderer renderer, String method) {
     renderer_ = renderer;
@@ -57,7 +57,7 @@ public class RenderException extends RuntimeException {
    * @param renderer
    *          the renderer, e. g. <code>XLSElementRenderer</code>
    * @param method
-   *          the rendering output method, e. g. <code>html</code>
+   *          the rendering output method, e. g. <code>HTML</code>
    * @param t
    *          the exception caught when executing the renderer
    */
@@ -77,7 +77,7 @@ public class RenderException extends RuntimeException {
   }
 
   /**
-   * Returns the rendering method, e. g. <code>html</code>.
+   * Returns the rendering method, e. g. <code>HTML</code>.
    * 
    * @return the rendering output method
    */
