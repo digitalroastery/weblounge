@@ -19,43 +19,47 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.impl.util.Arguments;
+import static ch.o2it.weblounge.common.url.WebUrl.Flavor.html;
+import static ch.o2it.weblounge.common.url.WebUrl.Flavor.xml;
+import static ch.o2it.weblounge.common.url.WebUrl.Flavor.json;
+
 import ch.o2it.weblounge.common.impl.util.Env;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.Url;
 import ch.o2it.weblounge.common.url.WebUrl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * A web url represents a url that is used to address locations within the
- * webapp, such as html pages or module actions.
+ * A web url represents a url that is used to address locations within the web
+ * application, such as HTML pages or module actions.
  */
-public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
+public class WebUrlImpl extends UrlImpl implements WebUrl {
 
-  /** HTML flavor definition */
-  private static final String FLAVOR_HTML = "html";
+  /** The logging facility */
+  private static Logger log_ = LoggerFactory.getLogger(WebUrlImpl.class);
+  
+  /** Regular expression used to take urls apart */
+  private final static Pattern inspector = Pattern.compile("^(.*)/(work|original|index|[0-9]*)(_[a-zA-Z0-9]+)?\\.([a-zA-Z0-9]+)$");
 
   /** The associated site */
-  private Site site_ = null;
+  protected Site site = null;
 
   /** The url version */
-  private long version_ = -1;
+  protected long version = -1;
 
   /** The link */
-  private String link_ = null;
+  private transient String link_ = null;
 
   /** The url flavor */
-  private String flavor_ = null;
-  
-  /** The title in the currently active language */
-  private LocalizableContent<String> titles_ = null;
+  protected String flavor = null;
 
   /**
    * Constructor for a url. Since this constructor has package access, use
@@ -72,7 +76,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the url path
    */
   public WebUrlImpl(Site site, String path) {
-    this(site, path, Page.LIVE, FLAVOR_HTML);
+    this(site, path, Page.LIVE, html.toString());
   }
 
   /**
@@ -90,9 +94,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the url
    */
   public WebUrlImpl(Site site, Url url) {
-    this(site, url.getPath(), Page.LIVE, FLAVOR_HTML);
+    this(site, url.getPath(), Page.LIVE, html.toString());
   }
-  
+
   /**
    * Constructor for a url. Since this constructor has package access, use
    * <code>getUrl(<i>type</i>)</code> from the site navigation to obtain a
@@ -108,7 +112,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the url
    */
   public WebUrlImpl(Site site, Url url, String path) {
-    this(site, concat(url.getPath(), path, '/'), Page.LIVE, FLAVOR_HTML);
+    this(site, concat(url.getPath(), path, '/'), Page.LIVE, html.toString());
   }
 
   /**
@@ -127,7 +131,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the required version
    */
   public WebUrlImpl(Site site, String path, long version) {
-    this(site, path, version, FLAVOR_HTML);
+    this(site, path, version, html.toString());
   }
 
   /**
@@ -145,14 +149,18 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    * @param version
    *          the required version
    * @param flavor
-   *          the url flavor, e. g. <code>html</code>
+   *          the url flavor, e. g. <code>HTML</code>
    */
   public WebUrlImpl(Site site, String path, long version, String flavor) {
-    super(path, '/');
-    site_ = site;
-    titles_ = new LocalizableContent<String>();
-    version_ = version;
-    flavor_ = flavor;
+    super('/');
+    this.site = site;
+    this.path = inspect(path, '/');
+    if (this.version < 0)
+      this.version = version;
+    if (this.flavor == null)
+      this.flavor = flavor;
+    if (this.flavor == null)
+      throw new IllegalStateException("Flavor information missing from url");
   }
 
   /**
@@ -161,15 +169,15 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    * @return the site
    */
   public Site getSite() {
-    return site_;
+    return site;
   }
 
   /**
    * Returns the encoded url to be used when calling the url through the web
    * application. <br>
-   * What this method does in detail is prepending the mount point of the
-   * webapplication and the servlet path obtained via <code>Env.getURI()</code>
-   * and <code>getServletPath()</code> to the url.
+   * What this method does in detail is prepending the mount point of the web
+   * application and the servlet path obtained via <code>Env.getURI()</code> and
+   * <code>getServletPath()</code> to the url.
    * <p>
    * The generated link is free from version information. It just points to the
    * correct database collection.
@@ -178,13 +186,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    */
   public String getLink() {
     if (link_ == null) {
-      link_ = UrlSupport.concat(new String[] {
-          Env.getURI(),
-          Env.getServletPath(),
-          getPath() });
       try {
-        link_ = URLEncoder.encode(link_, "UTF-8");
+        link_ = URLEncoder.encode(getLink(flavor, version), "UTF-8");
       } catch (UnsupportedEncodingException e) {
+        log_.error("Unexpected error while urlencoding link " + link_, e);
       }
       link_ = link_.replaceAll("%2F", "/");
     }
@@ -194,9 +199,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
   /**
    * Returns the encoded url to be used when calling the url through the web
    * application. <br>
-   * What this method does in detail is prepending the mount point of the
-   * webapplication and the servlet path obtained via <code>Env.getURI()</code>
-   * and <code>getServletPath()</code> to the url.
+   * What this method does in detail is prepending the mount point of the web
+   * application and the servlet path obtained via <code>Env.getURI()</code> and
+   * <code>getServletPath()</code> to the url.
    * <p>
    * The parameter version is used to create includes to special versions of a
    * given page. Possible values are:
@@ -210,19 +215,80 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the requested version
    * @return the encoded url
    */
-  public String getLink(String version) {
-    String selector = null;
-    if (version != null && version.equals("work")) {
-      selector = "work.xml";
-      version_ = Page.WORK;
-    } else if (version != null && version.equals("original")) {
-      selector = "original.xml";
-      version_ = Page.ORIGINAL;
+  public String getLink(long version) {
+    return getLink(flavor, version);
+  }
+
+  /**
+   * Returns the encoded url to be used when calling the url through the web
+   * application. <br>
+   * What this method does in detail is prepending the mount point of the web
+   * application and the servlet path obtained via <code>Env.getURI()</code> and
+   * <code>getServletPath()</code> to the url.
+   * <p>
+   * The parameter version is used to create includes to special versions of a
+   * given page. Possible values are:
+   * <ul>
+   * <li>live</li>
+   * <li>work</li>
+   * <li>original</li>
+   * </ul>
+   * 
+   * @param version
+   *          the requested version
+   * @return the encoded url
+   */
+  public String getLink(String flavor) {
+    return getLink(flavor, version);
+  }
+
+  /**
+   * Returns the encoded url to be used when calling the url through the web
+   * application.<br>
+   * What this method does in detail is prepending the mount point of the web
+   * application and the servlet path obtained via <code>Env.getURI()</code> and
+   * <code>getServletPath()</code> to the url.
+   * <p>
+   * The parameter version is used to create includes to special versions of a
+   * given page. Possible values are:
+   * <ul>
+   * <li>live</li>
+   * <li>work</li>
+   * <li>original</li>
+   * </ul>
+   * 
+   * @param version
+   *          the requested version
+   * @return the encoded url
+   */
+  public String getLink(String flavor, long version) {
+    StringBuffer selector = new StringBuffer();
+    if (version == Page.WORK) {
+      selector.append("work");
+    } else if (version == Page.ORIGINAL) {
+      selector.append("original");
+    } else if (version == Page.LIVE) {
+      selector.append("index");
     } else {
-      selector = "index.xml";
-      version_ = Page.LIVE;
+      selector.append(Long.toString(version));
     }
-    return UrlSupport.concat(new String[] { getLink(), selector });
+    selector.append(".").append(flavor);
+    return UrlSupport.concat(new String[] {
+        Env.getMountpoint(),
+        Env.getServletPath(),
+        path, 
+        selector.toString()
+    });
+  }
+
+  /**
+   * Returns the url flavor. For example, in case of "index.xml" the flavor will
+   * be <code>XML</code>.
+   * 
+   * @return the url flavor
+   */
+  public String getFlavor() {
+    return flavor;
   }
 
   /**
@@ -236,79 +302,17 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    * @return the url version
    */
   public long getVersion() {
-    return version_;
+    return version;
   }
 
   /**
-   * Returns the url flavor. For example, in case of "index.xml" the flavor will
-   * be <code>xml</code>.
-   * 
-   * @return the url flavor
-   */
-  public String getFlavor() {
-    return flavor_;
-  }
-
-  /**
-   * Sets the url flavor.
-   * 
-   * @param flavor
-   *          the flavor
-   */
-  public void setFlavor(String flavor) {
-    flavor_ = flavor;
-  }
-
-  /**
-   * Sets the corresponding language version of the url title if that language
-   * is supported by the associated site.
-   * 
-   * @param title
-   *          the url title
-   * @param language
-   *          the language
-   */
-  public void setTitle(String title, Language language) {
-    if (site_.supportsLanguage(language)) {
-      titles_.put(title, language);
-    }
-  }
-
-  /**
-   * Returns the url title in the currently active language or <code>null</code>
-   * if no such title exists.
-   * 
-   * @return the url title in the currently active language
-   * @see ch.o2it.weblounge.common.language.Localizable#toString()
-   */
-  public String getTitle() {
-    return titles_.get();
-  }
-
-  /**
-   * Returns the url title in the requested language or <code>null</code> if the
-   * title didn't exist in that language. Call
-   * {@link #supportsLanguage(Language)} to find out about supported languages.
-   * 
-   * @param language
-   *          the requested language
-   * @return the title
-   * @see ch.o2it.weblounge.common.language.Localizable#toString(ch.o2it.weblounge.common.language.Language)
-   */
-  public String getTitle(Language language) {
-    Arguments.checkNull(language, "language");
-    return titles_.get(language);
-  }
-
-  /**
-   * Returns the hash code for this url. The method includes the
-   * super implementation and adds sensitivity for the site and the url
-   * extension.
+   * Returns the hash code for this url. The method includes the super
+   * implementation and adds sensitivity for the site and the url extension.
    * 
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
-    return super.hashCode() | site_.hashCode();
+    return super.hashCode() | site.hashCode();
   }
 
   /**
@@ -319,9 +323,13 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object object) {
-    if (object instanceof WebUrlImpl) {
-      WebUrlImpl url = (WebUrlImpl) object;
-      return (super.equals(object) && site_.equals(url.site_));
+    if (object instanceof WebUrl) {
+      WebUrl url = (WebUrl) object;
+      return 
+        (super.equals(object) &&
+        version == url.getVersion() && 
+        flavor.equals(url.getFlavor()) && 
+        site.equals(url.getSite()));
     } else if (object instanceof Url) {
       return super.equals(object);
     }
@@ -329,62 +337,58 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.language.Localizable#languages()
-   */
-  public Set<Language> languages() {
-    return titles_.languages();
-  }
-
-  /**
-   * Returns <code>true</code> if the url title has been provided in the given
-   * language.
-   * 
-   * @param language
-   *          the language
-   * @return <code>true</code> if a title has been provided in that language
-   * @see ch.o2it.weblounge.common.language.Localizable#supportsLanguage(ch.o2it.weblounge.common.language.Language)
-   */
-  public boolean supportsLanguage(Language language) {
-    return titles_.supportsLanguage(language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.language.Localizable#switchTo(ch.o2it.weblounge.common.language.Language)
-   */
-  public Language switchTo(Language language) {
-    return titles_.switchTo(language);
-  }
-
-  /**
-   * Returns the flavor or <code>null</code> if there is no flavor.
+   * Strips version and flavor from this url.
    * 
    * @param path
-   *          the url path
-   * @return the flavor
+   *          the full path
+   * @param separator
+   *          path separator character
+   * @return the directory path
    */
-  protected String extractFlavor(String path) {
-    if (path == null)
-      return null;
-    if (separatorChar <= 0)
-      return null;
-    int dotSeparator = path.lastIndexOf('.');
-    if (dotSeparator > path.lastIndexOf(separatorChar))
-      return path.substring(dotSeparator + 1);
-    return null;
-  }
+  protected String inspect(String path, char separator) {
+    Matcher m = inspector.matcher(path);
+    if (m.matches()) {
+      String v = m.group(2);
+      if ("".equals(v) || "index".equals(v)) {
+        this.version = Page.LIVE;
+      } else if ("work".equals(v)) {
+        this.version = Page.WORK;
+      } else if ("original".equals(v)) {
+        this.version = Page.ORIGINAL;
+      } else {
+        try {
+          this.version = Long.parseLong(v);
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Unable to extract version from url " + path);
+        }
+      }
+      String f = m.group(4);
+      this.flavor = "".equals(f) ? html.toString() : f;
+      return trim(m.group(1));
+    }
 
+    // Make sure we've not been fooled
+    if (path.indexOf('.') > 0)
+      throw new IllegalArgumentException("Path is malformed: " + path);
+    
+    // Test for well-known flavors in the last path element
+    path = path.toLowerCase();
+    if (path.endsWith(html.toString()))
+      this.flavor = html.toString();
+    else if (path.endsWith(xml.toString()))
+      this.flavor = xml.toString();
+    else if (path.endsWith(json.toString()))
+      this.flavor = json.toString();
+    return trim(path);
+  }
+  
   /**
-   * Returns the url title in the currently active language or the output from
-   * the super implementation (which returns the url path) if no such title
-   * exists.
-   * 
-   * @return the url title in the currently active language
-   * @see ch.o2it.weblounge.common.language.Localizable#toString()
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.impl.url.UrlImpl#toString()
    */
+  @Override
   public String toString() {
-    return titles_.toString();
+    return getLink();
   }
 
 }
