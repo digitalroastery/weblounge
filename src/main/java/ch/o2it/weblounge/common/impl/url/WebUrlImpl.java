@@ -39,6 +39,9 @@ import java.util.Set;
  */
 public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
 
+  /** HTML flavor definition */
+  private static final String FLAVOR_HTML = "html";
+
   /** The associated site */
   private Site site_ = null;
 
@@ -48,6 +51,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
   /** The link */
   private String link_ = null;
 
+  /** The url flavor */
+  private String flavor_ = null;
+  
   /** The title in the currently active language */
   private LocalizableContent<String> titles_ = null;
 
@@ -66,7 +72,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the url path
    */
   public WebUrlImpl(Site site, String path) {
-    this(site, path, Page.LIVE, null);
+    this(site, path, Page.LIVE, FLAVOR_HTML);
   }
 
   /**
@@ -84,7 +90,25 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the url
    */
   public WebUrlImpl(Site site, Url url) {
-    this(site, url.getPath(), Page.LIVE, null);
+    this(site, url.getPath(), Page.LIVE, FLAVOR_HTML);
+  }
+  
+  /**
+   * Constructor for a url. Since this constructor has package access, use
+   * <code>getUrl(<i>type</i>)</code> from the site navigation to obtain a
+   * reference to a concrete url instance.
+   * <p>
+   * This object supports multilingual titles. The default title language is set
+   * to the site default language and the version of this url is
+   * <code>LIVE</code>.
+   * 
+   * @param site
+   *          the associated site
+   * @param url
+   *          the url
+   */
+  public WebUrlImpl(Site site, Url url, String path) {
+    this(site, concat(url.getPath(), path, '/'), Page.LIVE, FLAVOR_HTML);
   }
 
   /**
@@ -103,7 +127,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the required version
    */
   public WebUrlImpl(Site site, String path, long version) {
-    this(site, path, version, null);
+    this(site, path, version, FLAVOR_HTML);
   }
 
   /**
@@ -124,21 +148,11 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
    *          the url flavor, e. g. <code>html</code>
    */
   public WebUrlImpl(Site site, String path, long version, String flavor) {
-    super(path, flavor, '/');
+    super(path, '/');
     site_ = site;
     titles_ = new LocalizableContent<String>();
     version_ = version;
-  }
-
-  /**
-   * Extends the current url by <code>path</code>.
-   * 
-   * @see ch.o2it.weblounge.common.url.WebUrl#extend(java.lang.String)
-   */
-  public WebUrl extend(String path) {
-    WebUrlImpl url = new WebUrlImpl(getSite(), this);
-    url.append(path);
-    return url;
+    flavor_ = flavor;
   }
 
   /**
@@ -226,6 +240,26 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
   }
 
   /**
+   * Returns the url flavor. For example, in case of "index.xml" the flavor will
+   * be <code>xml</code>.
+   * 
+   * @return the url flavor
+   */
+  public String getFlavor() {
+    return flavor_;
+  }
+
+  /**
+   * Sets the url flavor.
+   * 
+   * @param flavor
+   *          the flavor
+   */
+  public void setFlavor(String flavor) {
+    flavor_ = flavor;
+  }
+
+  /**
    * Sets the corresponding language version of the url title if that language
    * is supported by the associated site.
    * 
@@ -268,7 +302,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
 
   /**
    * Returns the hash code for this url. The method includes the
-   * superimplementation and adds sensitivity for the site and the url
+   * super implementation and adds sensitivity for the site and the url
    * extension.
    * 
    * @see java.lang.Object#hashCode()
@@ -324,8 +358,26 @@ public class WebUrlImpl extends UrlImpl implements WebUrl, Localizable {
   }
 
   /**
+   * Returns the flavor or <code>null</code> if there is no flavor.
+   * 
+   * @param path
+   *          the url path
+   * @return the flavor
+   */
+  protected String extractFlavor(String path) {
+    if (path == null)
+      return null;
+    if (separatorChar <= 0)
+      return null;
+    int dotSeparator = path.lastIndexOf('.');
+    if (dotSeparator > path.lastIndexOf(separatorChar))
+      return path.substring(dotSeparator + 1);
+    return null;
+  }
+
+  /**
    * Returns the url title in the currently active language or the output from
-   * the superimplementation (which returns the url path) if no such title
+   * the super implementation (which returns the url path) if no such title
    * exists.
    * 
    * @return the url title in the currently active language

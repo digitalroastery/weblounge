@@ -22,24 +22,42 @@ package ch.o2it.weblounge.common.impl.url;
 import ch.o2it.weblounge.common.url.Url;
 
 /**
- * This class implements common url behavior.
+ * This class implements common url and path behavior.
  */
 public class UrlImpl implements Url {
 
-  /** HTML flavor definition */
-  private static final String FLAVOR_HTML = "html";
+  /** Default path separator */
+  private static final char URL_PATH_SEPARATOR = '/';
 
   /** The url that is represented */
-  private String path_ = null;
-
-  /** The url flavor */
-  private String flavor_ = null;
+  protected String path = null;
 
   /** The path separator character */
-  protected char separator = 0;
+  protected char separatorChar = 0;
 
-  /** The path separator as a string */
-  private String separator_ = null;
+  /**
+   * Creates a new url from a given path and using the default path separator
+   * <code>"/"</code>.
+   * 
+   * @param path
+   *          the url path
+   */
+  public UrlImpl(String path) {
+    this(path, URL_PATH_SEPARATOR);
+  }
+
+  /**
+   * Creates a new url from a given path and using the default path separator
+   * <code>"/"</code>.
+   * 
+   * @param url
+   *          the parent url
+   * @param path
+   *          the url path
+   */
+  public UrlImpl(Url url, String path) {
+    this(concat(url.getPath(), path, url.getPathSeparator()), url.getPathSeparator());
+  }
 
   /**
    * Creates a new url from a given path.
@@ -50,26 +68,12 @@ public class UrlImpl implements Url {
    *          the path separator
    */
   public UrlImpl(String path, char separator) {
-    this(path, FLAVOR_HTML, separator);
-  }
-
-  /**
-   * Creates a new url from a given path.
-   * 
-   * @param path
-   *          the url path
-   * @param flavor
-   *          the url flavor
-   * @param separator
-   *          the path separator
-   */
-  public UrlImpl(String path, String flavor, char separator) {
     if (path == null)
       throw new IllegalArgumentException("Url path cannot be null");
-    this.separator = separator;
-    separator_ = Character.toString(separator);
-    path_ = trim(path);
-    flavor_ = (flavor != null) ? flavor : extractFlavor(path);
+    if (path.length() == 0 || path.charAt(0) != separator)
+      throw new IllegalArgumentException("Url path must be absolute");
+    this.separatorChar = separator;
+    this.path = trim(path);
   }
 
   /**
@@ -77,8 +81,8 @@ public class UrlImpl implements Url {
    * 
    * @return the separator character
    */
-  public char getSeparator() {
-    return separator;
+  public char getPathSeparator() {
+    return separatorChar;
   }
 
   /**
@@ -88,27 +92,24 @@ public class UrlImpl implements Url {
    * @see ch.o2it.weblounge.common.url.Url#getPath()
    */
   public String getPath() {
-    return path_;
+    return path;
   }
 
   /**
-   * Returns the url flavor. For example, in case of "index.xml" the flavor will
-   * be <code>xml</code>.
+   * Returns the parent path or <code>null</code> if the current path has now
+   * parent, i. e. the current path represents the root.
    * 
-   * @return the url flavor
+   * @return the parent path
    */
-  public String getFlavor() {
-    return flavor_;
-  }
-
-  /**
-   * Sets the url flavor.
-   * 
-   * @param flavor
-   *          the flavor
-   */
-  public void setFlavor(String flavor) {
-    flavor_ = flavor;
+  protected String getParentPath() {
+    String separator = Character.toString(separatorChar);
+    if (path.equals(separator))
+      return null;
+    String p = path;
+    if (p.endsWith(separator))
+      p = path.substring(0, path.length() - 1);
+    int lastSeparator = p.lastIndexOf(separatorChar);
+    return (lastSeparator > 0) ? path.substring(0, lastSeparator) : separator;
   }
 
   /**
@@ -123,7 +124,7 @@ public class UrlImpl implements Url {
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
-    return path_.hashCode();
+    return path.hashCode();
   }
 
   /**
@@ -144,23 +145,9 @@ public class UrlImpl implements Url {
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof UrlImpl) {
       UrlImpl url = (UrlImpl) obj;
-      return path_.equals(url.path_);
+      return path.equals(url.path);
     }
     return false;
-  }
-
-  /**
-   * Appends <code>url</code> to the existing url path with respect to leading
-   * and trailing slashes.
-   * 
-   * @param path
-   *          the path to append
-   */
-  public String append(String path) {
-    if (path == null)
-      throw new IllegalArgumentException("Cannot append null string!");
-    path_ = concat(path_, trim(path));
-    return path_;
   }
 
   /**
@@ -173,7 +160,9 @@ public class UrlImpl implements Url {
   public boolean contains(String path) {
     if (path == null)
       throw new IllegalArgumentException("Cannot contain null string!");
-    return path_.indexOf(path) > -1;
+    String trimmedPathelement = trim(path);
+    int found = this.path.indexOf(trimmedPathelement);
+    return found != -1;
   }
 
   /**
@@ -189,10 +178,10 @@ public class UrlImpl implements Url {
    *          the url
    * @return <code>true</code> if this url is a prefix
    */
-  public boolean isPrefix(Url url) {
+  public boolean isPrefixOf(Url url) {
     if (url == null)
       throw new IllegalArgumentException("Cannot be prepended by null!");
-    return url.getPath().indexOf(path_) == 0;
+    return url.getPath().indexOf(path) == 0;
   }
 
   /**
@@ -208,8 +197,8 @@ public class UrlImpl implements Url {
    *          the url
    * @return <code>true</code> if this url is a prefix
    */
-  public boolean isExtension(Url url) {
-    return path_.indexOf(url.getPath()) == 0;
+  public boolean isExtensionOf(Url url) {
+    return path.indexOf(url.getPath()) == 0;
   }
 
   /**
@@ -220,7 +209,7 @@ public class UrlImpl implements Url {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return path_;
+    return path;
   }
 
   /**
@@ -228,15 +217,16 @@ public class UrlImpl implements Url {
    * 
    * @return the concatenated url of the two arguments
    */
-  protected String concat(String prefix, String suffix) {
+  protected static String concat(String prefix, String suffix, char separatorChar) {
     if (prefix == null)
-      throw new IllegalArgumentException("Argument prefix is null, suffix is " + suffix);
+      throw new IllegalArgumentException("Argument prefix is null");
     if (suffix == null)
       throw new IllegalArgumentException("Argument suffix is null");
 
-    if (!prefix.endsWith(separator_) && !suffix.startsWith(separator_))
-      prefix += separator_;
-    if (prefix.endsWith(separator_) && suffix.startsWith(separator_))
+    String separator = Character.toString(separatorChar);
+    if (!prefix.endsWith(separator) && !suffix.startsWith(separator))
+      prefix += separator;
+    if (prefix.endsWith(separator) && suffix.startsWith(separator))
       suffix = suffix.substring(1);
 
     prefix += suffix;
@@ -256,32 +246,17 @@ public class UrlImpl implements Url {
     if (url == null)
       throw new IllegalArgumentException("Argument url is null");
     url.trim();
-    if (url.endsWith(separator_) || (url.length() == 1))
+    String separator = Character.toString(separatorChar);
+    url = url.replaceAll(separator + separator, separator);
+    if (!url.startsWith(separator))
+      url = separator + url;
+    if (url.endsWith(separator) || (url.length() == 1))
       return url;
-
-    int index = url.lastIndexOf(separator_);
+    int index = url.lastIndexOf(separator);
     index = url.indexOf(".", index);
     if (index < 0)
-      url += separator_;
+      url += separator;
     return url;
-  }
-
-  /**
-   * Returns the flavor or <code>null</code> if there is no flavor.
-   * 
-   * @param path
-   *          the url path
-   * @return the flavor
-   */
-  protected String extractFlavor(String path) {
-    if (path == null)
-      return null;
-    if (separator <= 0)
-      return null;
-    int dotSeparator = path.lastIndexOf('.');
-    if (dotSeparator > path.lastIndexOf(separator))
-      return path.substring(dotSeparator + 1);
-    return null;
   }
 
 }

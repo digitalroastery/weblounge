@@ -89,7 +89,7 @@ public class ExtensionUrl extends UrlImpl {
    * @return the encoded url
    */
   public String encode() {
-    String encUrl = concat(getPath(), getExtension());
+    String encUrl = concat(getPath(), getExtension(), separatorChar);
     return encUrl;
   }
 
