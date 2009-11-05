@@ -25,8 +25,8 @@ import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.security.jaas.AbstractLoginModule;
 import ch.o2it.weblounge.common.impl.security.jaas.HttpAuthCallback;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.security.WebloungeUser;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

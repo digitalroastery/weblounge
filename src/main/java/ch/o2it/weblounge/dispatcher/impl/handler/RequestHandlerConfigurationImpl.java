@@ -98,11 +98,11 @@ public class RequestHandlerConfigurationImpl extends ConfigurationBase implement
 	 */
 	private void readEnv(XPath path, Node config) throws TransformerException {
 		env = new HashMap();
-		NodeList nodes = XPathHelper.selectList(path, config, "properties/env");
+		NodeList nodes = XPathHelper.selectList(config, "properties/env", path);
 		for (int i=0; i < nodes.getLength(); i++) {
 			Node property = nodes.item(i);
-			String name = XPathHelper.valueOf(path, property, "name/text()");
-			String value =  XPathHelper.valueOf(path, property, "value/text()");
+			String name = XPathHelper.valueOf(property, "name/text()", path);
+			String value =  XPathHelper.valueOf(property, "value/text()", path);
 			if (env.get(name) != null) {
 				Object o = env.get(name);
 				if (o instanceof List) {
@@ -131,14 +131,14 @@ public class RequestHandlerConfigurationImpl extends ConfigurationBase implement
 	 * @throws ConfigurationException
 	 */
 	private void readMainSettings(XPath path, Node config) throws DOMException, TransformerException, ConfigurationException {
-		identifier = XPathHelper.valueOf(path, config, "@id");
+		identifier = XPathHelper.valueOf(config, "@id", path);
 		if (identifier == null || identifier.equals(""))
 			throw new ConfigurationException("handler identifier must be specified");
-		name = XPathHelper.valueOf(path, config, "name/text()");
+		name = XPathHelper.valueOf(config, "name/text()", path);
 		if (name == null || name.equals(""))
 			throw new ConfigurationException("handler name must be specified");
-		description = XPathHelper.valueOf(path, config, "description/text()");
-		className = XPathHelper.valueOf(path, config, "class/text()");
+		description = XPathHelper.valueOf(config, "description/text()", path);
+		className = XPathHelper.valueOf(config, "class/text()", path);
 		if (className == null || className.equals(""))
 			throw new ConfigurationException("handler class must be specified");
 	}
