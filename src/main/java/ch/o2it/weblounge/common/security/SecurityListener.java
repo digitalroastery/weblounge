@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.security;
 
+import ch.o2it.weblounge.common.user.User;
+
 /**
  * Listener interface for those who are interested in changes of object owners
  * and permissions.

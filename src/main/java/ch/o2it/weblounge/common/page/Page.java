@@ -20,16 +20,16 @@
 
 package ch.o2it.weblounge.common.page;
 
+import ch.o2it.weblounge.common.content.Creatable;
 import ch.o2it.weblounge.common.content.LocalizedModifiable;
 import ch.o2it.weblounge.common.content.Publishable;
-import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 import org.w3c.dom.Node;
 
@@ -40,7 +40,7 @@ import java.util.Date;
  * For performance reasons, this object keeps parts of the page data in memory
  * and maintains indexes to speed up building different language versions.
  */
-public interface Page extends Localizable, LocalizedModifiable, Publishable, Securable {
+public interface Page extends Localizable, Creatable, LocalizedModifiable, Publishable, Securable {
 
   /** Request page identifier */
   String ID = "page";
@@ -107,15 +107,6 @@ public interface Page extends Localizable, LocalizedModifiable, Publishable, Sec
    * @return the user holding the editing lock for this page
    */
   User getEditor();
-
-  /**
-   * Returns the publishing context of this page in the current version. The
-   * context tells whether the pagelet may be published on a certain point in
-   * time or not.
-   * 
-   * @return the publishing context
-   */
-  public PublishingContext getPublishingContext();
 
   /**
    * Returns the publishing start date.
@@ -205,41 +196,6 @@ public interface Page extends Localizable, LocalizedModifiable, Publishable, Sec
    * @return the renderer
    */
   public Renderer getRenderer(String method);
-
-  /**
-   * Returns the pagelet for the given composer at position <code>i</code> with
-   * respect to the rights of the requesting user. This method looks up the
-   * default version, which is <code>live</code>.
-   * 
-   * @param composer
-   *          the composer identifier
-   * @param index
-   *          the index within the composer
-   * @param u
-   *          the user
-   * @param p
-   *          the permission to ask for
-   * @return the composer content
-   */
-  Pagelet getPagelet(String composer, int index, User u, Permission p);
-
-  /**
-   * Returns the composers for the given version.
-   * 
-   * @param version
-   *          the page version
-   * @return the composers
-   */
-  String[] getComposers(long version);
-
-  /**
-   * Returns the pagelets for the given version.
-   * 
-   * @param version
-   *          the page version
-   * @return the pagelets
-   */
-  Pagelet[] getPagelets(long version);
 
   /**
    * Returns the pagelets that are contained in the specified composer.

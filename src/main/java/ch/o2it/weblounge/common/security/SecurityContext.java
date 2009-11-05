@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.security;
 
+import ch.o2it.weblounge.common.user.User;
+
 
 /**
  * This class models the security constraints that apply to an arbitrary object

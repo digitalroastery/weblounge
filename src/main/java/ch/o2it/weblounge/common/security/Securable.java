@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.security;
 
+import ch.o2it.weblounge.common.user.User;
+
 
 /**
  * The <code>Secured</code> interface defines the required methods for a secured

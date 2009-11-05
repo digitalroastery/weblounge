@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.repository;
 
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 /**
  * Interface for listeners that are interested in changes within the repository.

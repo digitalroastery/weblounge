@@ -18,48 +18,39 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content;
-
-import ch.o2it.weblounge.common.user.User;
-
-import java.util.Date;
+package ch.o2it.weblounge.common.user;
 
 /**
- * This interface is used to describe objects that know about a creator, a
- * creation time, a modifier and a modification time.
+ * Defines a user with login, realm and name.
  */
-public interface Modifiable {
+public interface User {
 
   /**
-   * Returns <code>true</code> if this context contains information about a
-   * modification.
+   * Returns the name of this user.
    * 
-   * @return <code>true</code> is this context was modified
+   * @returns the user name
    */
-  boolean isModified();
+  String getName();
 
   /**
-   * Returns <code>true</code> if this context was modified after the given
-   * date.
+   * Returns the login name of this user.
    * 
-   * @param date
-   *          the date to compare to
-   * @return <code>true</code> is this context was modified after the given date
+   * @return the login
    */
-  boolean isModifiedAfter(Date date);
+  String getLogin();
 
   /**
-   * Returns the time in milliseconds when the object was last modified.
+   * Returns the realm where this user can be looked up.
    * 
-   * @return the modification time
+   * @return the realm
    */
-  Date getModificationDate();
+  String getRealm();
 
   /**
-   * Returns the user that last modified the object.
+   * Returns the <code>XML</code> representation of this user.
    * 
-   * @return the modifier
+   * @return the xml representation
    */
-  User getModifier();
+  String toXml();
 
 }

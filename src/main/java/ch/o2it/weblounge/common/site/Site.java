@@ -32,11 +32,12 @@ import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
-import ch.o2it.weblounge.common.security.GroupRegistry;
-import ch.o2it.weblounge.common.security.RoleRegistry;
+import ch.o2it.weblounge.common.security.Group;
+import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.SecurityManager;
-import ch.o2it.weblounge.common.security.User;
-import ch.o2it.weblounge.common.security.UserManager;
+import ch.o2it.weblounge.common.security.UserListener;
+import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import java.io.File;
 
@@ -257,33 +258,30 @@ public interface Site extends ModuleListener, RequestListener {
   ImageStyle getImageStyle(String id);
 
   /**
-   * Returns the <code>UserRegistry</code> of this site where all users are
-   * stored. The user registry may also be used to verify that a user has
-   * certain roles.
+   * Adds the listener to the list of user listeners.
    * 
-   * TODO: Rename
-   * 
-   * @return the site users
+   * @param listener
+   *          the user listener to add
    */
-  UserManager getUsers();
+  void addUserListener(UserListener listener);
 
   /**
-   * Returns the <code>GroupRegistry</code> of this site where all groups are
-   * stored.
+   * Removes the listener from the list of user listeners.
    * 
-   * TODO: Rename
-   * 
-   * @return the site groups
+   * @param listener
+   *          the listener to remove
    */
-  GroupRegistry getGroups();
+  void removeUserListener(UserListener listener);
 
   /**
-   * Returns the <code>RoleRegistry</code> of this site where all roles are
-   * stored.
+   * Returns the user with the given login name or <code>null</code> if no such
+   * user exists.
    * 
-   * @return the site roles
+   * @param login
+   *          the user's login name
+   * @return the user
    */
-  RoleRegistry getRoles();
+  WebloungeUser getUser(String login);
 
   /**
    * Returns the real path on the server for a given virtual path.
@@ -449,4 +447,28 @@ public interface Site extends ModuleListener, RequestListener {
    */
   Page getPage(PageURI uri, User user);
 
+  /**
+   * Returns the role with the given identifier, defined in the specified
+   * context or <code>null</code> if no such role was found.
+   * 
+   * @param role
+   *          the role identifier
+   * @param context
+   *          the role domain
+   * @return the role
+   */
+  Role getRole(String role, String context);
+
+  /**
+   * Returns the group with the given identifier, defined in the specified
+   * context or <code>null</code> if no such group was found.
+   * 
+   * @param group
+   *          the group identifier
+   * @param context
+   *          the group domain
+   * @return the role
+   */
+  Group getGroup(String group, String context);
+  
 }

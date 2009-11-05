@@ -23,7 +23,7 @@ package ch.o2it.weblounge.common.page;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.SecurityException;
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 import java.io.IOException;
 import java.util.Iterator;

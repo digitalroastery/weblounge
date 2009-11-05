@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.page;
 
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 /**
  * This interface defines the methods and fields for a listener that is

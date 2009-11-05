@@ -22,9 +22,9 @@ package ch.o2it.weblounge.common.repository;
 
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.SecurityException;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.common.user.User;
 
 import java.io.IOException;
 import java.util.Iterator;

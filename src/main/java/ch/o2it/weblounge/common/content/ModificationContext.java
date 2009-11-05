@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.content;
 
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 import java.util.Date;
 
@@ -31,20 +31,20 @@ import java.util.Date;
 public interface ModificationContext extends Modifiable, Cloneable {
 
   /**
-   * Sets the user that created the object.
+   * Sets the user that changed the object.
    * 
    * @param user
-   *          the creator
+   *          the editor
    */
-  void setCreator(User user);
+  void setModifier(User user);
 
   /**
-   * Sets the creation date of this object.
+   * Sets the modification date of this object.
    * 
    * @param date
-   *          the creation date
+   *          the modification date
    */
-  void setCreationDate(Date date);
+  void setModificationDate(Date date);
 
   /**
    * Returns an XML representation of this context.

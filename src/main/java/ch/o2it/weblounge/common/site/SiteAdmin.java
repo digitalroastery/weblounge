@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.site;
 
-import ch.o2it.weblounge.common.security.AuthenticatedUser;
+import ch.o2it.weblounge.common.user.AuthenticatedUser;
 
 /**
  * This interface represents the administrator user for a single site.

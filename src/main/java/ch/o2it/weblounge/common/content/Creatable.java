@@ -25,41 +25,34 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * This interface is used to describe objects that know about a creator, a
- * creation time, a modifier and a modification time.
+ * This interface is used to describe objects that know about a creator and a
+ * creation time.
  */
-public interface Modifiable {
+public interface Creatable {
 
   /**
-   * Returns <code>true</code> if this context contains information about a
-   * modification.
+   * Returns the time in milliseconds when the object was created.
    * 
-   * @return <code>true</code> is this context was modified
+   * @return the creation time
    */
-  boolean isModified();
+  Date getCreationDate();
 
   /**
-   * Returns <code>true</code> if this context was modified after the given
-   * date.
+   * Returns the user that created the object.
+   * 
+   * @param language
+   *          the language
+   * @return the creator
+   */
+  User getCreator();
+
+  /**
+   * Returns <code>true</code> if this context was created after the given date.
    * 
    * @param date
    *          the date to compare to
-   * @return <code>true</code> is this context was modified after the given date
+   * @return <code>true</code> is this context was created after the given date
    */
-  boolean isModifiedAfter(Date date);
-
-  /**
-   * Returns the time in milliseconds when the object was last modified.
-   * 
-   * @return the modification time
-   */
-  Date getModificationDate();
-
-  /**
-   * Returns the user that last modified the object.
-   * 
-   * @return the modifier
-   */
-  User getModifier();
+  boolean isCreatedAfter(Date date);
 
 }

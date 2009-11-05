@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.common.user.User;
 
 /**
  * This interface describes the callbacks that have to be provided by an

@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.security;
 
+import ch.o2it.weblounge.common.user.User;
+
 /**
  * This exception is thrown if a secured object is being accessed with
  * insufficient rights.

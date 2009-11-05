@@ -18,30 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
-
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.user.User;
+package ch.o2it.weblounge.common.security;
 
 /**
- * This interface defines the methods for listeners that are interested in page
- * access.
+ * Digest type definitions used to indicate how passwords and other data have
+ * been hashed up.
  */
-public interface PageAccessListener {
+public enum DigestType {
 
-  /**
-   * Notifies the listener about an access to the page identified by
-   * <code>uri</code>.
-   * 
-   * @param uri
-   *          the accessed uri
-   * @param user
-   *          the accessing user
-   * @param language
-   *          the requested language
-   * @param version
-   *          the requested version
-   */
-  void access(PageURI uri, User user, Language language, String version);
-
+  md5, plain
+  
 }

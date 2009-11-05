@@ -18,45 +18,45 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.security;
+package ch.o2it.weblounge.common.content;
+
+import ch.o2it.weblounge.common.user.User;
 
 import java.util.Date;
 
-import org.w3c.dom.Node;
-
 /**
- * TODO: Comment WebloungeUser
+ * TODO: Comment CreationContext
  */
-public interface WebloungeUser extends AuthenticatedUser {
+public interface CreationContext {
 
   /**
-   * Returns <code>true</code> if the user is enabled, <code>false</code>
-   * otherwise.
-   * 
-   * @return <code>true</code> for enabled users
+   * @see ch.o2it.weblounge.common.content.CreationContext#getCreationDate()
    */
-  boolean isEnabled();
+  Date getCreationDate();
 
   /**
-   * Returns the data where the user logged in for the last time.
-   * 
-   * @return the last login
+   * @see ch.o2it.weblounge.common.content.CreationContext#getCreator()
    */
-  Date getLastLogin();
+  User getCreator();
 
   /**
-   * Returns the last login source. The source can be either an ip address or a
-   * host name.
-   * 
-   * @return the source of the last login
+   * @see ch.o2it.weblounge.common.content.CreationContext#getCreationDate(java.util.Date)
    */
-  String getLastLoginSource();
+  void setCreationDate(Date date);
 
   /**
-   * Returns an xml representation of this user.
-   * 
-   * @return the user as an xml document fragment
+   * @see ch.o2it.weblounge.common.content.CreationContext#setCreator(ch.o2it.weblounge.common.user.User)
    */
-  Node toXml();
+  void setCreator(User user);
+
+  /**
+   * @see ch.o2it.weblounge.common.content.CreationContext#isCreatedAfter(java.util.Date)
+   */
+  boolean isCreatedAfter(Date date);
+
+  /**
+   * @see ch.o2it.weblounge.common.content.CreationContext#toXml()
+   */
+  String toXml();
 
 }

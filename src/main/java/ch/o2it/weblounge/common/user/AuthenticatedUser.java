@@ -18,7 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.security;
+package ch.o2it.weblounge.common.user;
+
+import ch.o2it.weblounge.common.security.Authority;
+import ch.o2it.weblounge.common.security.DigestType;
+import ch.o2it.weblounge.common.security.GroupMember;
+import ch.o2it.weblounge.common.security.LoginContext;
+import ch.o2it.weblounge.common.security.RoleOwner;
 
 import java.security.Principal;
 import java.util.Set;
@@ -26,13 +32,7 @@ import java.util.Set;
 /**
  * Interface defining the fields and methods for an authenticated user.
  */
-public interface AuthenticatedUser extends User, Principal {
-
-  /** Identifies a plain password */
-  int PASSWORD_TYPE_PLAIN = 0;
-
-  /** Identifies a hashed password */
-  int PASSWORD_TYPE_MD5 = 5;
+public interface AuthenticatedUser extends User, GroupMember, RoleOwner, Authority, Principal {
 
   /**
    * Sets the login context which is later used to perform a clean logout
@@ -51,12 +51,12 @@ public interface AuthenticatedUser extends User, Principal {
   byte[] getPassword();
 
   /**
-   * Returns the password type, which is either {@link #PASSWORD_TYPE_PLAIN} or
-   * {@link #PASSWORD_TYPE_MD5}.
+   * Returns the password type, which is either {@link DigestType#plain} or
+   * {@link DigestType#md5}.
    * 
-   * @return the password type
+   * @return the digest function used to hash the password
    */
-  int getPasswordType();
+  DigestType getPasswordDigestType();
 
   /**
    * Checks the password for equality.
