@@ -21,9 +21,9 @@
 package ch.o2it.weblounge.cache.impl;
 
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.common.user.User;
 
 import java.util.Map;
 
