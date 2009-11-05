@@ -44,7 +44,6 @@ import ch.o2it.weblounge.common.security.AuthorizationProvider;
 import ch.o2it.weblounge.common.security.GroupRegistry;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.RoleRegistry;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.service.ServiceDependencyException;
 import ch.o2it.weblounge.common.service.ServiceException;
@@ -57,6 +56,7 @@ import ch.o2it.weblounge.common.site.SiteListener;
 import ch.o2it.weblounge.common.site.SiteLogger;
 import ch.o2it.weblounge.common.url.UrlRegistry;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.site.SiteService;
 
 import com.sun.corba.se.impl.activation.RepositoryImpl;
@@ -989,7 +989,7 @@ public class SiteImpl implements Site {
 	 * 
 	 * @param url the page's location
 	 * @param user the creating user
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageCreated(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageCreated(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageCreated(WebUrl url, User user) {
 		firePageCreated(url, user);
@@ -1001,8 +1001,8 @@ public class SiteImpl implements Site {
 	 * 
 	 * @param url the page's former location
 	 * @param user the removing user
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageRemoved(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.security.User)
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageRemoved(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageRemoved(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageRemoved(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageRemoved(WebUrl url, User user) {
 		firePageRemoved(url, user);
@@ -1015,7 +1015,7 @@ public class SiteImpl implements Site {
 	 * @param from the page's former location
 	 * @param to the page's new location
 	 * @param user the user moving the page
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageMoved(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageMoved(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageMoved(WebUrl from, WebUrl to, User user) {
 		firePageMoved(from, to, user);
@@ -1027,7 +1027,7 @@ public class SiteImpl implements Site {
 	 * 
 	 * @param url the page's location
 	 * @param user the user publishing the page
-	 * @see ch.o2it.weblounge.api.content.PageListener#pagePublished(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pagePublished(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pagePublished(WebUrl url, User user) {
 		firePagePublished(url, user);
@@ -1039,7 +1039,7 @@ public class SiteImpl implements Site {
 	 * 
 	 * @param url the page's location
 	 * @param user the user unpublishing the page
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageUnpublished(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageUnpublished(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageUnpublished(WebUrl url, User user) {
 		firePageUnlocked(url, user);
@@ -1051,7 +1051,7 @@ public class SiteImpl implements Site {
 	 * 
 	 * @param url the page's location
 	 * @param user the user locking the page
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageLocked(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageLocked(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageLocked(WebUrl url, User user) {
 		firePageLocked(url, user);
@@ -1063,7 +1063,7 @@ public class SiteImpl implements Site {
 	 * 
 	 * @param url the page's location
 	 * @param user the user releasing the page lock
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageUnlocked(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageUnlocked(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageUnlocked(WebUrl url, User user) {
 		firePageUnlocked(url, user);
@@ -1076,7 +1076,7 @@ public class SiteImpl implements Site {
 	 * @param newRenderer the new renderer
 	 * @param oldRenderer the former renderer
 	 * @param user the editing user
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageRendererChanged(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.renderer.Renderer, ch.o2it.weblounge.api.renderer.Renderer, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageRendererChanged(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.api.renderer.Renderer, ch.o2it.weblounge.api.renderer.Renderer, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageRendererChanged(WebUrl url, Renderer newRenderer, Renderer oldRenderer, User user) {
 		firePageRendererChanged(url, newRenderer, oldRenderer, user);
@@ -1089,7 +1089,7 @@ public class SiteImpl implements Site {
 	 * @param newLayout the new layout
 	 * @param oldLayout the former layout
 	 * @param user the editing user
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageLayoutChanged(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.core.content.Layout, ch.o2it.weblounge.core.content.Layout, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageLayoutChanged(ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.core.content.Layout, ch.o2it.weblounge.core.content.Layout, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageLayoutChanged(WebUrl url, Layout newLayout, Layout oldLayout, User user) {
 		firePageLayoutChanged(url, newLayout, oldLayout, user);
@@ -1102,7 +1102,7 @@ public class SiteImpl implements Site {
 	 * @param newType the new page type
 	 * @param oldType the former page type
 	 * @param user the editing user
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageTypeChanged(ch.o2it.weblounge.api.url.WebUrl, java.lang.String, java.lang.String, ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageTypeChanged(ch.o2it.weblounge.api.url.WebUrl, java.lang.String, java.lang.String, ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageTypeChanged(WebUrl url, String newType, String oldType, User user) {
 		firePageTypeChanged(url, newType, oldType, user);
@@ -1115,7 +1115,7 @@ public class SiteImpl implements Site {
 	 * @param newKeywords the new keywords
 	 * @param oldKeywords the old keywords
 	 * @param user the editing user
-	 * @see ch.o2it.weblounge.api.content.PageListener#pageKeywordsChanged(ch.o2it.weblounge.api.url.WebUrl, java.lang.String[], java.lang.String[], ch.o2it.weblounge.api.security.User)
+	 * @see ch.o2it.weblounge.api.content.PageListener#pageKeywordsChanged(ch.o2it.weblounge.api.url.WebUrl, java.lang.String[], java.lang.String[], ch.o2it.weblounge.common.user.api.security.User)
 	 */
 	public void pageKeywordsChanged(WebUrl url, String[] newKeywords, String[] oldKeywords, User user) {
 		firePageKeywordsChanged(url, newKeywords, oldKeywords, user);

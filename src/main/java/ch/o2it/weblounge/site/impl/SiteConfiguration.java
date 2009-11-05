@@ -23,8 +23,8 @@ import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.impl.security.WebloungeAdmin;
 import ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule;
+import ch.o2it.weblounge.common.impl.user.WebloungeAdmin;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.ServletConfiguration;
 import ch.o2it.weblounge.common.impl.util.ServletMapping;
@@ -183,21 +183,21 @@ public class SiteConfiguration implements Customizable {
 		Arguments.checkNull(config, "config");
 		XPath path = XMLUtilities.getXPath();
 		try {
-			readMainSettings(path, XPathHelper.select(path, config, "/site"));
-			readOptions(path, XPathHelper.select(path, config, "/site"));
-			readAdmin(path, XPathHelper.select(path, config, "/site/admin"));
-			readUrls(path, XPathHelper.select(path, config, "/site/urls"));
-			readAuthenticationModules(path, XPathHelper.select(path, config, "/site/authentication"));
-			readMountpoints(path, XPathHelper.select(path, config, "/site/urls"));
-			readLanguages(path, XPathHelper.select(path, config, "/site/languages"));
-			readPerformanceSettings(path, XPathHelper.select(path, config, "/site/performance"));
-			readLayouts(path, XPathHelper.select(path, config, "/site/layouts"));
-			readRenderers(path, XPathHelper.select(path, config, "/site/renderers"));
-			readImagestyles(path, XPathHelper.select(path, config, "/site/imagestyles"));
-			readJobs(path, XPathHelper.select(path, config, "/site/jobs"));
-			readServices(path, XPathHelper.select(path, config, "/site/services"));
-			readHandlers(path, XPathHelper.select(path, config, "/site/handlers"));
-			readServlets(path, XPathHelper.select(path, config, "/site"));
+			readMainSettings(path, XPathHelper.select(config, "/site", path));
+			readOptions(path, XPathHelper.select(config, "/site", path));
+			readAdmin(path, XPathHelper.select(config, "/site/admin", path));
+			readUrls(path, XPathHelper.select(config, "/site/urls", path));
+			readAuthenticationModules(path, XPathHelper.select(config, "/site/authentication", path));
+			readMountpoints(path, XPathHelper.select(config, "/site/urls", path));
+			readLanguages(path, XPathHelper.select(config, "/site/languages", path));
+			readPerformanceSettings(path, XPathHelper.select(config, "/site/performance", path));
+			readLayouts(path, XPathHelper.select(config, "/site/layouts", path));
+			readRenderers(path, XPathHelper.select(config, "/site/renderers", path));
+			readImagestyles(path, XPathHelper.select(config, "/site/imagestyles", path));
+			readJobs(path, XPathHelper.select(config, "/site/jobs", path));
+			readServices(path, XPathHelper.select(config, "/site/services", path));
+			readHandlers(path, XPathHelper.select(config, "/site/handlers", path));
+			readServlets(path, XPathHelper.select(config, "/site", path));
 			setName("Site '" + identifier + "' configuration watchdog");
 		} catch (ConfigurationException e) {
 			throw e;
@@ -257,14 +257,14 @@ public class SiteConfiguration implements Customizable {
 	 * @param path the XPath object used to parse the configuration
 	 */
 	private void readMainSettings(XPath path, Node config) throws ConfigurationException {
-		identifier = XPathHelper.valueOf(path, config, "@id");
-		isDefault = "true".equals(XPathHelper.valueOf(path, config, "@default"));
-		siteClass = XPathHelper.valueOf(path, config, "class");
+		identifier = XPathHelper.valueOf(config, "@id", path);
+		isDefault = "true".equals(XPathHelper.valueOf(config, "@default", path));
+		siteClass = XPathHelper.valueOf(config, "class", path);
 		if (siteClass == null)
 			siteClass = "ch.o2it.weblounge.core.site.SiteImpl";
 		description = new LocalizableContent();
 		LanguageSupport.addDescriptions(path, config, null, description);
-		isEnabled = "true".equals(XPathHelper.valueOf(path, config, "enable", false).toLowerCase());
+		isEnabled = "true".equals(XPathHelper.valueOf(config, "enable", false, path).toLowerCase());
 	}
 
 	/**
@@ -275,14 +275,14 @@ public class SiteConfiguration implements Customizable {
 	 */
 	private void readAdmin(XPath path, Node config) {
 		if (config != null) {
-			String login = XPathHelper.valueOf(path, config, "login");
+			String login = XPathHelper.valueOf(config, "login", path);
 			if (login.equals(WebloungeAdmin.getInstance().getLogin())) {
 				throw new ConfigurationException("Site administrator login '" + login + "' is not allowed. Login is taken by system administrator");
 			}
-			String password = XPathHelper.valueOf(path, config, "password");
-			String email = XPathHelper.valueOf(path, config, "email");
-			String firstname = XPathHelper.valueOf(path, config, "firstname");
-			String lastname = XPathHelper.valueOf(path, config, "lastname");
+			String password = XPathHelper.valueOf(config, "password", path);
+			String email = XPathHelper.valueOf(config, "email", path);
+			String firstname = XPathHelper.valueOf(config, "firstname", path);
+			String lastname = XPathHelper.valueOf(config, "lastname", path);
 			
 			if (login == null || password == null) {
 				throw new ConfigurationException("Site administrator definition missing!");
@@ -303,7 +303,7 @@ public class SiteConfiguration implements Customizable {
 	 * @param path the XPath object used to parse the configuration
 	 */
 	private void readUrls(XPath path, Node config) {
-		NodeList urlNodes = XPathHelper.selectList(path, config, "url");
+		NodeList urlNodes = XPathHelper.selectList(config, "url", path);
 		for (int i=0; i < urlNodes.getLength(); i++) {
 			Node node = urlNodes.item(i);
 			String url = node.getFirstChild().getNodeValue();
@@ -323,7 +323,7 @@ public class SiteConfiguration implements Customizable {
 			log_.debug("No authentication modules found");
 			return;
 		}
-		NodeList moduleNodes = XPathHelper.selectList(path, config, "module");
+		NodeList moduleNodes = XPathHelper.selectList(config, "module", path);
 		for (int i=0; i < moduleNodes.getLength(); i++) {
 			Node node = moduleNodes.item(i);
 			try {
@@ -350,7 +350,7 @@ public class SiteConfiguration implements Customizable {
 			log_.debug("No mountpoint definitions found");
 			return;
 		}
-		NodeList mountpointNodes = XPathHelper.selectList(path, config, "mount");
+		NodeList mountpointNodes = XPathHelper.selectList(config, "mount", path);
 		for (int i=0; i < mountpointNodes.getLength(); i++) {
 			Node node = mountpointNodes.item(i);
 			String url = node.getAttributes().getNamedItem("url").getNodeValue();
@@ -373,8 +373,8 @@ public class SiteConfiguration implements Customizable {
 			throw new ConfigurationException("A site must at least have one language!");
 		}
 
-		String allLanguages = XPathHelper.valueOf(path, config, "all");
-		String defaultLanguage = XPathHelper.valueOf(path, config, "default");
+		String allLanguages = XPathHelper.valueOf(config, "all", path);
+		String defaultLanguage = XPathHelper.valueOf(config, "default", path);
 		LanguageRegistry systemLanguages = (LanguageRegistry)SystemRegistries.get(LanguageRegistry.ID);
 
 		// Default language
@@ -414,7 +414,7 @@ public class SiteConfiguration implements Customizable {
 		}
 
 		// Load factor
-		String factor = XPathHelper.valueOf(path, config, "loadfactor");
+		String factor = XPathHelper.valueOf(config, "loadfactor", path);
 		try {
 			loadfactor = Integer.parseInt(factor);
 			if (loadfactor < 1) {
@@ -429,7 +429,7 @@ public class SiteConfiguration implements Customizable {
 		}
 
 		// History size
-		String size = XPathHelper.valueOf(path, config, "history");
+		String size = XPathHelper.valueOf(config, "history", path);
 		if (size != null) {
 			try {
 				historysize = Integer.parseInt(size);
@@ -448,7 +448,7 @@ public class SiteConfiguration implements Customizable {
 		}
 		
 		// Page cache
-		usePageCache = !"false".equalsIgnoreCase(XPathHelper.valueOf(path, config, "pagecache", false));
+		usePageCache = !"false".equalsIgnoreCase(XPathHelper.valueOf(config, "pagecache", false, path));
 	}
 	
 	/**
@@ -476,13 +476,13 @@ public class SiteConfiguration implements Customizable {
 			return;
 		}
 		RendererBundle defaultRenderer = null;
-		NodeList rendererNodes = XPathHelper.selectList(path, config, "renderer");
+		NodeList rendererNodes = XPathHelper.selectList(config, "renderer", path);
 		for (int i=0; i < rendererNodes.getLength(); i++) {
 			Node node = rendererNodes.item(i);
 			String id = null;
 			RendererBundle bundle = null;
 			try {
-				id = XPathHelper.valueOf(path, node, "@id");
+				id = XPathHelper.valueOf(node, "@id", path);
 				log_.debug("Reading renderer bundle '" + id + "'");
 				RendererBundleConfiguration bundleConfig = new RendererBundleConfiguration(id, getFile());
 				bundleConfig.read(path, node);
@@ -498,7 +498,7 @@ public class SiteConfiguration implements Customizable {
 				}
 				
 				// Read jsp renderer definitions
-				NodeList jspRenderers = XPathHelper.selectList(path, node, "jsp");
+				NodeList jspRenderers = XPathHelper.selectList(node, "jsp", path);
 				for (int j=0; j < jspRenderers.getLength(); j++) {
 					Node jspNode = jspRenderers.item(j);
 					TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
@@ -507,7 +507,7 @@ public class SiteConfiguration implements Customizable {
 				}
 	
 				// Read xsl renderer definitions
-				NodeList xslRenderers = XPathHelper.selectList(path, node, "xsl");
+				NodeList xslRenderers = XPathHelper.selectList(node, "xsl", path);
 				for (int j=0; j < xslRenderers.getLength(); j++) {
 					Node xslNode = xslRenderers.item(j);
 					TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
@@ -516,7 +516,7 @@ public class SiteConfiguration implements Customizable {
 				}
 	
 				// Read custom renderer definitions
-				NodeList customRenderers = XPathHelper.selectList(path, node, "custom");
+				NodeList customRenderers = XPathHelper.selectList(node, "custom", path);
 				for (int j=0; j < customRenderers.getLength(); j++) {
 					Node customNode = customRenderers.item(j);
 					TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
@@ -556,17 +556,17 @@ public class SiteConfiguration implements Customizable {
 			return;
 		}
 		log_.debug("Configuring jobs");
-		NodeList jobNodes = XPathHelper.selectList(path, config, "job");
+		NodeList jobNodes = XPathHelper.selectList(config, "job", path);
 		for (int i=0; i < jobNodes.getLength(); i++) {
 			Node jobNode = jobNodes.item(i);
 			SiteJob job = null;
 			
 			// See if job is enabled
-			String enabled = XPathHelper.valueOf(path, jobNode, "@enabled");
+			String enabled = XPathHelper.valueOf(jobNode, "@enabled", path);
 			if (enabled != null && !"true".equals(enabled))
 				continue;
 
-			String className = XPathHelper.valueOf(path, jobNode, "class");
+			String className = XPathHelper.valueOf(jobNode, "class", path);
 			try {
 				job = (SiteJob) classLoader.loadClass(className).newInstance();
 				job.init(path, jobNode);
@@ -602,7 +602,7 @@ public class SiteConfiguration implements Customizable {
 			return;
 		}
 		log_.debug("Configuring services");
-		NodeList servicesNodes = XPathHelper.selectList(path, config, "service");
+		NodeList servicesNodes = XPathHelper.selectList(config, "service", path);
 		for (int i=0; i < servicesNodes.getLength(); i++) {
 			Node serviceNode = servicesNodes.item(i);
 			ServiceConfigurationImpl serviceConfig = null;
@@ -631,16 +631,16 @@ public class SiteConfiguration implements Customizable {
 			return;
 		}
 		log_.debug("Configuring imagestyles");
-		NodeList styleNodes = XPathHelper.selectList(path, config, "imagestyle");
+		NodeList styleNodes = XPathHelper.selectList(config, "imagestyle", path);
 		for (int i=0; i < styleNodes.getLength(); i++) {
 			Node styleNode = styleNodes.item(i);
-			String id = XPathHelper.valueOf(path, styleNode, "@id");
-			String composeableAttribute = XPathHelper.valueOf(path, styleNode, "@composeable");
+			String id = XPathHelper.valueOf(styleNode, "@id", path);
+			String composeableAttribute = XPathHelper.valueOf(styleNode, "@composeable", path);
 			boolean composeable = composeableAttribute == null || "true".equalsIgnoreCase(composeableAttribute);
 			try {
-				String mode = XPathHelper.valueOf(path, styleNode, "scalingmode");
-				String width =  XPathHelper.valueOf(path, styleNode, "width");
-				String height =  XPathHelper.valueOf(path, styleNode, "height");
+				String mode = XPathHelper.valueOf(styleNode, "scalingmode", path);
+				String width =  XPathHelper.valueOf(styleNode, "width", path);
+				String height =  XPathHelper.valueOf(styleNode, "height", path);
 				int m = ImageStyle.SCALE_NONE;
 				int h = -1;
 				int w = -1;
@@ -687,7 +687,7 @@ public class SiteConfiguration implements Customizable {
 			log_.debug("No request handler definitions found");
 			return;
 		}
-		NodeList handlerNodes = XPathHelper.selectList(path, node, "handler");
+		NodeList handlerNodes = XPathHelper.selectList(node, "handler", path);
 		for (int i=0; i < handlerNodes.getLength(); i++) {
 			Node handlerNode = handlerNodes.item(i);
 			RequestHandlerConfigurationImpl config = null;
@@ -721,7 +721,7 @@ public class SiteConfiguration implements Customizable {
 		servletHandler = new ServletRequestHandler();
 		handlers.put(ServletRequestHandler.ID, servletHandler);
 
-		NodeList servletNodes = XPathHelper.selectList(path, node, "servlets/servlet");
+		NodeList servletNodes = XPathHelper.selectList(node, "servlets/servlet", path);
 		for (int i=0; i < servletNodes.getLength(); i++) {
 			Node servlet = servletNodes.item(i);
 			try {
@@ -730,7 +730,7 @@ public class SiteConfiguration implements Customizable {
 				log_.error("Error reading servlet configuration in module '" + this + "'");
 			}
 		}
-		NodeList mappingNodes= XPathHelper.selectList(path, node, "servlet-mappings/servlet-mapping");
+		NodeList mappingNodes= XPathHelper.selectList(node, "servlet-mappings/servlet-mapping", path);
 		for (int i=0; i < mappingNodes.getLength(); i++) {
 			Node mapping = mappingNodes.item(i);
 			try {

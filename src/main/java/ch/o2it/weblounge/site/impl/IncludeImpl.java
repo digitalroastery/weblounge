@@ -130,13 +130,13 @@ public class IncludeImpl implements Include {
    *          the xpath engine
    */
   public IncludeImpl(Node node, XPath xpath) {
-    addAttribute("media", XPathHelper.valueOf(xpath, node, "@media", "all"));
-    addAttribute("rel", XPathHelper.valueOf(xpath, node, "@rel", "stylesheet"));
-    addAttribute("rev", XPathHelper.valueOf(xpath, node, "@rev"));
-    addAttribute("type", XPathHelper.valueOf(xpath, node, "@type", "text/css"));
-    addAttribute("title", XPathHelper.valueOf(xpath, node, "@title"));
-    addAttribute("charset", XPathHelper.valueOf(xpath, node, "@charset"));
-    href = XPathHelper.valueOf(xpath, node, "text()");
+    addAttribute("media", XPathHelper.valueOf(node, "@media", "all", xpath));
+    addAttribute("rel", XPathHelper.valueOf(node, "@rel", "stylesheet", xpath));
+    addAttribute("rev", XPathHelper.valueOf(node, "@rev", xpath));
+    addAttribute("type", XPathHelper.valueOf(node, "@type", "text/css", xpath));
+    addAttribute("title", XPathHelper.valueOf(node, "@title", xpath));
+    addAttribute("charset", XPathHelper.valueOf(node, "@charset", xpath));
+    href = XPathHelper.valueOf(node, "text()", xpath);
     if (href == null)
       throw new ConfigurationException("source path of link definition is mandatory!");
   }

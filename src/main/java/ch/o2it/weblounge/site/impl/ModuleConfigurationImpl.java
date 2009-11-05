@@ -155,14 +155,14 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
       throw new IllegalArgumentException("Configuration node is null");
     try {
       XPath path = XMLUtilities.getXPath();
-      readMainSettings(path, XPathHelper.select(path, config, "/module"));
-      readOptions(path, XPathHelper.select(path, config, "/module/options"));
-      readPerformanceSettings(path, XPathHelper.select(path, config, "/module/performance"));
-      readRenderers(path, XPathHelper.select(path, config, "/module/renderers"));
-      readActions(path, XPathHelper.select(path, config, "/module/actions"));
-      readImagestyles(path, XPathHelper.select(path, config, "/module/imagestyles"));
-      readJobs(path, XPathHelper.select(path, config, "/module/jobs"));
-      super.init(path, XPathHelper.select(path, config, "/module"));
+      readMainSettings(path, XPathHelper.select(config, "/module", path));
+      readOptions(path, XPathHelper.select(config, "/module/options", path));
+      readPerformanceSettings(path, XPathHelper.select(config, "/module/performance", path));
+      readRenderers(path, XPathHelper.select(config, "/module/renderers", path));
+      readActions(path, XPathHelper.select(config, "/module/actions", path));
+      readImagestyles(path, XPathHelper.select(config, "/module/imagestyles", path));
+      readJobs(path, XPathHelper.select(config, "/module/jobs", path));
+      super.init(path, XPathHelper.select(config, "/module", path));
     } catch (ConfigurationException e) {
       throw e;
     } catch (Exception e) {
@@ -269,15 +269,15 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
    */
   private void readMainSettings(XPath path, Node config)
       throws ConfigurationException {
-    identifier = XPathHelper.valueOf(path, config, "@id");
+    identifier = XPathHelper.valueOf(config, "@id", path);
     WebloungeClassLoader classLoader = WebloungeClassLoader.getInstance();
     classLoader.addExtendedClassPath(file.getParentFile().getAbsolutePath());
-    moduleClass = XPathHelper.valueOf(path, config, "class");
+    moduleClass = XPathHelper.valueOf(config, "class", path);
     if (moduleClass == null)
       moduleClass = "ch.o2it.weblounge.core.module.ModuleImpl";
     descriptions = new LocalizableContent<String>();
     LanguageSupport.addDescriptions(path, config, descriptions, true);
-    String enable = XPathHelper.valueOf(path, config, "enable");
+    String enable = XPathHelper.valueOf(config, "enable", path);
     isEnabled = (enable == null || "true".equals(enable.toLowerCase()));
   }
 
@@ -296,7 +296,7 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
       log_.debug("No performance settings found for module '" + identifier + "'");
       return;
     }
-    String factor = XPathHelper.valueOf(path, config, "loadfactor");
+    String factor = XPathHelper.valueOf(config, "loadfactor", path);
     if (factor != null) {
       try {
         loadfactor = Integer.parseInt(factor);
@@ -325,19 +325,19 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
       log_.debug("No renderer definitions found for module '" + identifier + "'");
       return;
     }
-    NodeList bundleNodes = XPathHelper.selectList(path, config, "renderer");
+    NodeList bundleNodes = XPathHelper.selectList(config, "renderer", path);
     for (int i = 0; i < bundleNodes.getLength(); i++) {
       Node node = bundleNodes.item(i);
       String id = null;
       try {
-        id = XPathHelper.valueOf(path, node, "@id");
+        id = XPathHelper.valueOf(node, "@id", path);
         log_.debug("Reading renderer bundle '" + id + "'");
         RendererBundleConfiguration bundleConfig = new RendererBundleConfiguration(id, getFile());
         bundleConfig.read(path, node);
         LanguageSupport.addDescriptions(path, node, null, bundleConfig.getDescriptions());
 
         // Read jsp renderer definitions
-        NodeList jspRenderers = XPathHelper.selectList(path, node, "jsp");
+        NodeList jspRenderers = XPathHelper.selectList(node, "jsp", path);
         for (int j = 0; j < jspRenderers.getLength(); j++) {
           Node jspNode = jspRenderers.item(j);
           RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
@@ -346,7 +346,7 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
         }
 
         // Read xsl renderer definitions
-        NodeList xslRenderers = XPathHelper.selectList(path, node, "xsl");
+        NodeList xslRenderers = XPathHelper.selectList(node, "xsl", path);
         for (int j = 0; j < xslRenderers.getLength(); j++) {
           Node xslNode = xslRenderers.item(j);
           RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
@@ -355,7 +355,7 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
         }
 
         // Read custom renderer definitions
-        NodeList customRenderers = XPathHelper.selectList(path, node, "custom");
+        NodeList customRenderers = XPathHelper.selectList(node, "custom", path);
         for (int j = 0; j < customRenderers.getLength(); j++) {
           Node customNode = customRenderers.item(j);
           RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
@@ -388,16 +388,16 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
       return;
     }
     log_.debug("Configuring imagestyles");
-    NodeList styleNodes = XPathHelper.selectList(path, config, "imagestyle");
+    NodeList styleNodes = XPathHelper.selectList(config, "imagestyle", path);
     for (int j = 0; j < styleNodes.getLength(); j++) {
       Node styleNode = styleNodes.item(j);
-      String id = XPathHelper.valueOf(path, styleNode, "@id");
-      String composeableAttribute = XPathHelper.valueOf(path, styleNode, "@composeable");
+      String id = XPathHelper.valueOf(styleNode, "@id", path);
+      String composeableAttribute = XPathHelper.valueOf(styleNode, "@composeable", path);
       boolean composeable = composeableAttribute == null || "true".equalsIgnoreCase(composeableAttribute);
       try {
-        String mode = XPathHelper.valueOf(path, styleNode, "scalingmode");
-        String width = XPathHelper.valueOf(path, styleNode, "width");
-        String height = XPathHelper.valueOf(path, styleNode, "height");
+        String mode = XPathHelper.valueOf(styleNode, "scalingmode", path);
+        String width = XPathHelper.valueOf(styleNode, "width", path);
+        String height = XPathHelper.valueOf(styleNode, "height", path);
         int m = ImageStyle.SCALE_NONE;
         int h = -1;
         int w = -1;
@@ -443,19 +443,19 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
       log_.debug("No action definitions found for module '" + identifier + "'");
       return;
     }
-    NodeList actionNodes = XPathHelper.selectList(path, config, "action");
+    NodeList actionNodes = XPathHelper.selectList(config, "action", path);
     for (int i = 0; i < actionNodes.getLength(); i++) {
       Node node = actionNodes.item(i);
       String id = null;
       try {
-        id = XPathHelper.valueOf(path, node, "@id");
+        id = XPathHelper.valueOf(node, "@id", path);
         log_.debug("Reading action bundle '" + id + "'");
         ActionBundleConfiguration bundleConfig = new ActionBundleConfiguration(id, this);
         LanguageSupport.addDescriptions(path, node, site.getLanguages(), site.getDefaultLanguage(), bundleConfig.getDescription());
         bundleConfig.read(path, node);
 
         // Read handler definitions
-        NodeList handlerNodes = XPathHelper.selectList(path, node, "handler");
+        NodeList handlerNodes = XPathHelper.selectList(node, "handler", path);
         for (int j = 0; j < handlerNodes.getLength(); j++) {
           Node handlerNode = handlerNodes.item(j);
           ActionConfigurationImpl actionConfig = new ActionConfigurationImpl(bundleConfig);
@@ -508,17 +508,17 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
     }
     log_.debug("Configuring cron jobs");
 
-    NodeList jobNodes = XPathHelper.selectList(path, config, "job");
+    NodeList jobNodes = XPathHelper.selectList(config, "job", path);
     for (int i = 0; i < jobNodes.getLength(); i++) {
       Node jobNode = jobNodes.item(i);
       ModuleJob job = null;
 
       // See if job is enabled
-      String enabled = XPathHelper.valueOf(path, jobNode, "@enabled");
+      String enabled = XPathHelper.valueOf(jobNode, "@enabled", path);
       if (enabled != null && !"true".equals(enabled))
         continue;
 
-      String className = XPathHelper.valueOf(path, jobNode, "class");
+      String className = XPathHelper.valueOf(jobNode, "class", path);
       try {
         job = (ModuleJob) classLoader.loadClass(className).newInstance();
         job.init(path, jobNode);

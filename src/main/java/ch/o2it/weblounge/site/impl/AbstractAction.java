@@ -31,7 +31,6 @@ import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTagSet;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionConfiguration;
 import ch.o2it.weblounge.common.site.ActionException;
@@ -39,6 +38,7 @@ import ch.o2it.weblounge.common.site.Include;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ScriptInclude;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;

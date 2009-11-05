@@ -317,7 +317,7 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 	 * @param path the XPath object used to parse the configuration
 	 */
 	private void readHandler(XPath path, Node config) throws TransformerException, ConfigurationException {
-		String methods = XPathHelper.valueOf(path, config, "methods/text()");
+		String methods = XPathHelper.valueOf(config, "methods/text()", path);
 		if (methods == null || methods.length() == 0) {
 			String msg = "Error when reading action configuration: No methods defined!";
 			log_.error(msg);
@@ -327,7 +327,7 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 		while (tok.hasMoreTokens()) {
 			this.methods.add(tok.nextToken());
 		}
-		className = XPathHelper.valueOf(path, config, "class/text()");
+		className = XPathHelper.valueOf(config, "class/text()", path);
 	}
 
 	/**
@@ -337,7 +337,7 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 	 * @param path the XPath object used to parse the configuration
 	 */
 	private void readLinks(XPath path, Node config) throws ConfigurationException {
-		NodeList links = XPathHelper.selectList(path, config, "link");
+		NodeList links = XPathHelper.selectList(config, "link", path);
 		if (links != null) {
 			for (int i=0; i < links.getLength(); i++) {
 				Node link = links.item(i);
@@ -353,7 +353,7 @@ public final class ActionConfigurationImpl extends ConfigurationBase implements 
 	 * @param path the XPath object used to parse the configuration
 	 */
 	private void readScripts(XPath path, Node config) throws ConfigurationException {
-		NodeList scripts = XPathHelper.selectList(path, config, "script");
+		NodeList scripts = XPathHelper.selectList(config, "script", path);
 		if (scripts != null) {
 			for (int i=0; i < scripts.getLength(); i++) {
 				Node script = scripts.item(i);

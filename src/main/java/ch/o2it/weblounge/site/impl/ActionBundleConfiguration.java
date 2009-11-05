@@ -285,23 +285,23 @@ public final class ActionBundleConfiguration extends SecuredObject implements Lo
 	 * @param path the XPath object used to parse the configuration
 	 */
 	private void readMainSettings(XPath path, Node config) throws DOMException, TransformerException, ConfigurationException {
-		mountpoint = XPathHelper.valueOf(path, config, "mountpoint/text()");
+		mountpoint = XPathHelper.valueOf(config, "mountpoint/text()", path);
 		if (mountpoint != null) {
 			mountpoint = UrlSupport.concat("/", mountpoint);
 			extension = UrlSupport.getExtension(mountpoint);
 			mountpoint = UrlSupport.stripExtension(mountpoint);
 		}
 		
-		target = XPathHelper.valueOf(path, config, "target/text()");
+		target = XPathHelper.valueOf(config, "target/text()", path);
 		
 		try {
-			validTime = Long.parseLong(XPathHelper.valueOf(path, config, "valid/text()"));
+			validTime = Long.parseLong(XPathHelper.valueOf(config, "valid/text()", path));
 		} catch (NumberFormatException e) {
 			validTime = VALID_TIME_DEFAULT;
 		}
 		
 		try {
-			recheckTime = Long.parseLong(XPathHelper.valueOf(path, config, "recheck/text()"));
+			recheckTime = Long.parseLong(XPathHelper.valueOf(config, "recheck/text()", path));
 		} catch (NumberFormatException e) {
 			recheckTime = RECHECK_TIME_DEFAULT;
 		}

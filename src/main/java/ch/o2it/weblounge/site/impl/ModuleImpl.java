@@ -30,7 +30,6 @@ import ch.o2it.weblounge.common.page.PageListener;
 import ch.o2it.weblounge.common.page.SearchResult;
 import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.repository.Collection;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ImageStyle;
@@ -39,6 +38,7 @@ import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleConfiguration;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

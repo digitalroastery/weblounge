@@ -117,11 +117,11 @@ public class ScriptIncludeImpl implements ScriptInclude {
    *          the xpath engine
    */
   public ScriptIncludeImpl(Node node, XPath xpath) {
-    addAttribute("defer", XPathHelper.valueOf(xpath, node, "@defer"));
-    addAttribute("language", XPathHelper.valueOf(xpath, node, "@language"));
-    addAttribute("type", XPathHelper.valueOf(xpath, node, "@type", "text/css"));
-    addAttribute("charset", XPathHelper.valueOf(xpath, node, "@charset"));
-    href = XPathHelper.valueOf(xpath, node, "text()");
+    addAttribute("defer", XPathHelper.valueOf(node, "@defer", xpath));
+    addAttribute("language", XPathHelper.valueOf(node, "@language", xpath));
+    addAttribute("type", XPathHelper.valueOf(node, "@type", "text/css", xpath));
+    addAttribute("charset", XPathHelper.valueOf(node, "@charset", xpath));
+    href = XPathHelper.valueOf(node, "text()", xpath);
     if (href == null)
       throw new ConfigurationException("Source path of script definition is mandatory!");
   }
