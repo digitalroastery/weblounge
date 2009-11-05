@@ -48,45 +48,42 @@ public class XPathHelper {
 
   /**
    * Returns the query result or <code>null</code>.
-   * 
-   * @param path
-   *          the xpath engine
    * @param node
    *          the context node
    * @param xpath
    *          the xpath expression
+   * @param processor
+   *          the xpath engine
+   * 
    * @return the selected string or <code>null</code> if the query didn't yield
    *         a result
    */
-  public static String valueOf(XPath path, Node node, String xpath) {
-    return valueOf(path, node, xpath, true);
+  public static String valueOf(Node node, String xpath, XPath processor) {
+    return valueOf(node, xpath, true, processor);
   }
 
   /**
    * Returns the query result or <code>null</code>.
-   * 
-   * @param path
-   *          the xpath engine
    * @param node
    *          the context node
    * @param xpath
    *          the xpath expression
    * @param defaultValue
    *          the default value
+   * @param processor
+   *          the xpath engine
+   * 
    * @return the selected string or <code>defaultValue</code> if the query
    *         didn't yield a result
    */
-  public static String valueOf(XPath path, Node node, String xpath,
-      String defaultValue) {
-    String value = valueOf(path, node, xpath, true);
+  public static String valueOf(Node node, String xpath, String defaultValue,
+      XPath processor) {
+    String value = valueOf(node, xpath, true, processor);
     return (value != null) ? value : defaultValue;
   }
 
   /**
    * Returns the query result.
-   * 
-   * @param path
-   *          the xpath engine
    * @param node
    *          the context node
    * @param xpath
@@ -94,16 +91,19 @@ public class XPathHelper {
    * @param nullable
    *          if <code>null</code> should be returned or the empty string in
    *          case of no search result
+   * @param processor
+   *          the xpath engine
+   * 
    * @return the selected string or <code>null</code> / "" if the query didn't
    *         yield a result
    */
-  public static String valueOf(XPath path, Node node, String xpath,
-      boolean nullable) {
-    if (node == null || path == null) {
+  public static String valueOf(Node node, String xpath, boolean nullable,
+      XPath processor) {
+    if (node == null || processor == null) {
       return nullable ? null : "";
     }
     try {
-      String value = path.evaluate(xpath, node);
+      String value = processor.evaluate(xpath, node);
       return nullable && value.length() == 0 ? null : value;
     } catch (XPathExpressionException e) {
       log_.warn("Error when selecting '" + xpath + "' from " + node, e);
@@ -116,12 +116,12 @@ public class XPathHelper {
    * 
    * @return the selected string
    */
-  public static Node select(XPath path, Node node, String xpath) {
-    if (node == null || path == null) {
+  public static Node select(Node node, String xpath, XPath processor) {
+    if (node == null || processor == null) {
       return null;
     }
     try {
-      return (Node) path.evaluate(xpath, node, XPathConstants.NODE);
+      return (Node) processor.evaluate(xpath, node, XPathConstants.NODE);
     } catch (XPathExpressionException e) {
       log_.warn("Error when selecting '" + xpath + "' from " + node, e);
       return null;
@@ -133,12 +133,12 @@ public class XPathHelper {
    * 
    * @return the selected node list
    */
-  public static NodeList selectList(XPath path, Node node, String xpath) {
-    if (node == null || path == null) {
+  public static NodeList selectList(Node node, String xpath, XPath processor) {
+    if (node == null || processor == null) {
       return null;
     }
     try {
-      return (NodeList) path.evaluate(xpath, node, XPathConstants.NODESET);
+      return (NodeList) processor.evaluate(xpath, node, XPathConstants.NODESET);
     } catch (XPathExpressionException e) {
       log_.warn("Error when selecting '" + xpath + "' from " + node, e);
       return null;

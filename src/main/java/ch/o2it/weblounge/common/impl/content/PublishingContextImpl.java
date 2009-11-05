@@ -23,8 +23,8 @@ import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 import org.w3c.dom.Node;
 
@@ -148,17 +148,17 @@ public class PublishingContextImpl implements PublishingContext {
    */
   public void init(XPath path, Node context, Site site) {
     try {
-      Node publisher = XPathHelper.select(path, context, "//publish/user");
-      publisher_ = (publisher != null) ? site.getUsers().getUser(publisher.getNodeValue()) : null;
+      Node publisher = XPathHelper.select(context, "//publish/user", path);
+      publisher_ = (publisher != null) ? site.getUser(publisher.getNodeValue()) : null;
     } catch (Exception e) {
     }
     try {
-      Node from = XPathHelper.select(path, context, "//publish/from");
+      Node from = XPathHelper.select(context, "//publish/from", path);
       from_ = (from != null) ? WebloungeDateFormat.parseStatic(from.getNodeValue()) : null;
     } catch (Exception e) {
     }
     try {
-      Node to = XPathHelper.select(path, context, "//publish/to");
+      Node to = XPathHelper.select(context, "//publish/to", path);
       to_ = (to != null) ? WebloungeDateFormat.parseStatic(to.getNodeValue()) : null;
     } catch (Exception e) {
     }

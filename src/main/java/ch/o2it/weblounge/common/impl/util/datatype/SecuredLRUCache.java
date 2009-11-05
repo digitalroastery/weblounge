@@ -21,7 +21,7 @@ package ch.o2it.weblounge.common.impl.util.datatype;
 
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.AuthenticatedUser;
 
 /**
  * LRU cache for secured objects.
@@ -29,16 +29,16 @@ import ch.o2it.weblounge.common.security.User;
  * @author Tobias Wunden
  * 
  */
-public class SecuredLRUCache {
+public class SecuredLRUCache<K, V extends Securable> {
 
   /** The cache */
-  private LRUCache cache_ = null;
+  private LRUCache<K,V> cache_ = null;
 
   /**
    * Creates a new secured cache.
    */
   public SecuredLRUCache() {
-    cache_ = new LRUCache();
+    cache_ = new LRUCache<K,V>();
   }
 
   /**
@@ -48,7 +48,7 @@ public class SecuredLRUCache {
    *          the maximum capacity
    */
   public SecuredLRUCache(int size) {
-    cache_ = new LRUCache(size);
+    cache_ = new LRUCache<K, V>(size);
   }
 
   /**
@@ -63,8 +63,10 @@ public class SecuredLRUCache {
    *          the user that wants access
    * @return the secured object
    */
-  public Securable get(Object key, Permission permission, User user) {
-    Securable item = (Securable) cache_.get(key);
+  public V get(K key, Permission permission, AuthenticatedUser user) {
+    V item = cache_.get(key);
+    if (item == null)
+      return null;
     return item.check(permission, user) ? item : null;
   }
 
@@ -76,7 +78,7 @@ public class SecuredLRUCache {
    * @param item
    *          the item to be cached
    */
-  public void put(Object key, Securable item) {
+  public void put(K key, V item) {
     cache_.put(key, item);
   }
 
@@ -86,8 +88,8 @@ public class SecuredLRUCache {
    * @param key
    *          the key
    */
-  public Securable remove(Object key) {
-    return (Securable) cache_.remove(key);
+  public V remove(K key) {
+    return cache_.remove(key);
   }
 
 }

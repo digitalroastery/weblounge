@@ -17,12 +17,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.security;
+package ch.o2it.weblounge.common.impl.user;
 
+import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.Authority;
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
-public final class WebloungeAdmin extends AuthenticatedUserImpl {
+public final class WebloungeAdmin extends AdminUserImpl {
 
   /** Teh singleton instance */
   private static WebloungeAdmin instance = null;
@@ -36,6 +37,7 @@ public final class WebloungeAdmin extends AuthenticatedUserImpl {
    */
   private WebloungeAdmin(String login) {
     super(login);
+    assignRole(SystemRole.SYSTEMADMIN);
   }
 
   /**
@@ -99,22 +101,6 @@ public final class WebloungeAdmin extends AuthenticatedUserImpl {
    */
   public void setPassword(String password) throws IllegalStateException {
     throw new IllegalStateException("The administrator password must be changed!");
-  }
-
-  /**
-   * Sets the email address for the weblounge system administator user. It will
-   * be set by the system configurator and is read from
-   * <code>/WEB-INF/conf/weblounge.xml</code>.
-   * 
-   * <b>Note:</b> You are only allowed to set the email address once! Any
-   * subsequent attempts to set it will result in an
-   * <code>IllegalStateException</code>.
-   * 
-   * @param email
-   *          the email address
-   */
-  public void setEmail(String email) throws IllegalStateException {
-    throw new IllegalStateException("The administrator email address must not be changed!");
   }
 
   /**

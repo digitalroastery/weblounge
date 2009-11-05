@@ -31,8 +31,8 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.SystemPermission;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +67,9 @@ public class WebloungeContentReader extends DefaultHandler {
 
   /** The publishing context */
   protected PublishingContextImpl publishingCtx;
+
+  /** The creation context */
+  protected CreationContextImpl creationCtx;
 
   /** The modification context */
   protected ModificationContextImpl modificationCtx;
@@ -145,6 +148,11 @@ public class WebloungeContentReader extends DefaultHandler {
     // Apply default permissions if none have been set
     if (securityCtx == null) {
       securityCtx = getDefaultSecurityContext();
+    }
+
+    // Apply default creation if none have been set
+    if (creationCtx == null) {
+      creationCtx = getDefaultCreationContext();
     }
 
     // Apply default modification if none have been set
@@ -232,6 +240,19 @@ public class WebloungeContentReader extends DefaultHandler {
    * 
    * @return the default publishing context
    */
+  protected CreationContextImpl getDefaultCreationContext() {
+    return new CreationContextImpl();
+  }
+
+  /**
+   * Returns the default publishing context, which is applied if no specific
+   * publishing context information could be read.
+   * <p>
+   * Subclasses should overwrite this method to apply their specialized default
+   * publishing constraints.
+   * 
+   * @return the default publishing context
+   */
   protected ModificationContextImpl getDefaultModificationContext() {
     return new ModificationContextImpl();
   }
@@ -259,9 +280,9 @@ public class WebloungeContentReader extends DefaultHandler {
    *          the creation date
    */
   protected void setCreationDate(Date date) {
-    if (modificationCtx == null)
-      modificationCtx = new ModificationContextImpl();
-    modificationCtx.setCreationDate(date);
+    if (creationCtx == null)
+      creationCtx = new CreationContextImpl();
+    creationCtx.setCreationDate(date);
   }
 
   /**
@@ -271,9 +292,9 @@ public class WebloungeContentReader extends DefaultHandler {
    *          the creator
    */
   protected void setCreator(User user) {
-    if (modificationCtx == null)
-      modificationCtx = new ModificationContextImpl();
-    modificationCtx.setCreator(user);
+    if (creationCtx == null)
+      creationCtx = new CreationContextImpl();
+    creationCtx.setCreator(user);
   }
 
   /**
@@ -451,7 +472,7 @@ public class WebloungeContentReader extends DefaultHandler {
     /** security owner */
     if (contentReaderContext == CTXT_SECURITY && "owner".equals(local)) {
       String login = characters.toString();
-      owner = site.getUsers().getUser(login);
+      owner = site.getUser(login);
     }
 
     /** security permission */
@@ -522,7 +543,7 @@ public class WebloungeContentReader extends DefaultHandler {
     /** creating user */
     else if (contentReaderContext == CTXT_CREATION && "user".equals(local)) {
       String login = characters.toString();
-      User user = site.getUsers().getUser(login);
+      User user = site.getUser(login);
       setCreator(user);
     }
 
@@ -541,7 +562,7 @@ public class WebloungeContentReader extends DefaultHandler {
     /** modifying user */
     else if (contentReaderContext == CTXT_MODIFICATION && "user".equals(local)) {
       String login = characters.toString();
-      User user = site.getUsers().getUser(login);
+      User user = site.getUser(login);
       setModifier(user);
     }
 

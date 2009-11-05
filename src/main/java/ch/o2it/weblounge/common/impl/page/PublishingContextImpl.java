@@ -144,12 +144,12 @@ public class PublishingContextImpl implements PublishingContext, Cloneable {
    */
   public void init(XPath path, Node context) {
     try {
-      Node from = XPathHelper.select(path, context, "//publish/from");
+      Node from = XPathHelper.select(context, "//publish/from", path);
       from_ = (from != null) ? WebloungeDateFormat.parseStatic(from.getNodeValue()) : null;
     } catch (Exception e) {
     }
     try {
-      Node to = XPathHelper.select(path, context, "//publish/to");
+      Node to = XPathHelper.select(context, "//publish/to", path);
       to_ = (to != null) ? WebloungeDateFormat.parseStatic(to.getNodeValue()) : null;
     } catch (Exception e) {
     }

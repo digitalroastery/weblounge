@@ -339,22 +339,22 @@ public class RestrictionImpl implements Restriction {
 
     try {
       // Permission
-      String permission = XPathHelper.valueOf(path, node, "@id");
+      String permission = XPathHelper.valueOf(node, "@id", path);
       permission_ = new PermissionImpl(permission);
 
       // Evaluation order
-      String evaluation = XPathHelper.valueOf(path, node, "@evaluation");
+      String evaluation = XPathHelper.valueOf(node, "@evaluation", path);
       if (evaluation == null || evaluation.trim().startsWith("allow"))
         evaluateAllowDeny();
       else
         evaluateDenyAllow();
 
       // Read rules
-      NodeList rules = XPathHelper.selectList(path, node, "allow | deny");
+      NodeList rules = XPathHelper.selectList(node, "allow | deny", path);
       for (int i = 0; i < rules.getLength(); i++) {
         Node rule = rules.item(i);
-        String type = XPathHelper.valueOf(path, rule, "@type");
-        String id = XPathHelper.valueOf(path, rule, "text()");
+        String type = XPathHelper.valueOf(rule, "@type", path);
+        String id = XPathHelper.valueOf(rule, "text()", path);
 
         // Check for multiple authorities
         StringTokenizer tok = new StringTokenizer(id, " ,;");

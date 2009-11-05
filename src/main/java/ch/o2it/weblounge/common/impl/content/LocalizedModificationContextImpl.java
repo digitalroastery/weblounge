@@ -26,8 +26,8 @@ import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.LocalizationListener;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +106,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setCreator(ch.o2it.weblounge.common.security.User)
+   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setCreator(ch.o2it.weblounge.common.user.User)
    */
   public void setCreator(User user) {
     this.creator = user;
@@ -186,7 +186,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.security.User)
+   * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.user.User)
    */
   public void setModifier(User editor) {
     setModified(editor, null, getLanguage());
@@ -202,7 +202,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModifier(ch.o2it.weblounge.common.security.User, ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModifier(ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.language.Language)
    */
   public void setModifier(User modifier, Language language) {
     setModified(modifier, null, language);
@@ -210,7 +210,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModified(ch.o2it.weblounge.common.security.User, java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
     Modification modification = modifications.get();
@@ -228,7 +228,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setCreated(ch.o2it.weblounge.common.security.User, java.util.Date)
+   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setCreated(ch.o2it.weblounge.common.user.User, java.util.Date)
    */
   public void setCreated(User user, Date date) {
     this.creator = user;
@@ -331,27 +331,27 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   public void init(XPath path, Node context, Site site) {
     // created
     try {
-      Node creatorNode = XPathHelper.select(path, context, "//created/user");
+      Node creatorNode = XPathHelper.select(context, "//created/user", path);
       if (creatorNode != null) {
-        creator = site.getUsers().getUser(creatorNode.getNodeValue());
+        creator = site.getUser(creatorNode.getNodeValue());
       }
       if (creator == null)
         creator = site.getAdministrator();
-      Node createdNode = XPathHelper.select(path, context, "//created/date");
+      Node createdNode = XPathHelper.select(context, "//created/date", path);
       creationDate = (createdNode != null) ? WebloungeDateFormat.parseStatic(createdNode.getNodeValue()) : null;
     } catch (Exception e) {
       log_.warn("Error reading creation data", e);
     }
     // modifications
     try {
-      Node languageNode = XPathHelper.select(path, context, "//modified/@language");
+      Node languageNode = XPathHelper.select(context, "//modified/@language", path);
       Language language = site.getLanguage(languageNode.getNodeValue());
       if (language != null) {
-        Node modifierNode = XPathHelper.select(path, context, "//modified/user");
-        Node modifiedNode = XPathHelper.select(path, context, "//modified/date");
+        Node modifierNode = XPathHelper.select(context, "//modified/user", path);
+        Node modifiedNode = XPathHelper.select(context, "//modified/date", path);
         if (modifierNode != null && modifiedNode != null) {
-          User modifier = site.getUsers().getUser(modifierNode.getNodeValue());
-          Date modified = (modifiedNode != null) ? WebloungeDateFormat.parseStatic(modifiedNode.getNodeValue()) : null;
+          User modifier = site.getUser(modifierNode.getNodeValue());
+          Date modified = WebloungeDateFormat.parseStatic(modifiedNode.getNodeValue());
           if (modifier != null) {
             modifications.put(new Modification(modifier, modified), language);
           }

@@ -53,4 +53,46 @@ public class ConfigurationUtils {
     return (String[]) values.toArray(new String[values.size()]);
   }
 
+  /**
+   * Returns <code>true</code> if the lowercased and trimmed value is not
+   * <code>null</code> and corresponds to any of:
+   * <ul>
+   * <li>true</li>
+   * <li>on</li>
+   * <li>yes</li>
+   * </ul>
+   * 
+   * @param value
+   *          the value to test
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>true</code>
+   */
+  public static boolean isTrue(String value) {
+    if (value == null)
+      return false;
+    value = value.trim().toLowerCase();
+    return "true".equals(value) || "on".equals(value) || "yes".equals(value);
+  }
+
+  /**
+   * Returns <code>true</code> if the lowercased and trimmed value is not
+   * <code>null<code> and corresponds to any of:
+   * <ul>
+   * <li>true</li>
+   * <li>on</li>
+   * <li>yes</li>
+   * </ul>
+   * 
+   * @param value
+   *          the value to test
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>true</code>
+   */
+  public static boolean isFalse(String value) {
+    if (value == null)
+      return false;
+    value = value.trim().toLowerCase();
+    return "false".equals(value) || "off".equals(value) || "no".equals(value);
+  }
+
 }

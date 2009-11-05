@@ -19,8 +19,11 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
+import ch.o2it.weblounge.common.content.CreationContext;
 import ch.o2it.weblounge.common.content.LocalizedModificationContext;
+import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
+import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
@@ -36,9 +39,9 @@ import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +107,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /** The publishing context */
   PublishingContext publishingCtx = null;
 
+  /** The creation context */
+  CreationContext creationCtx = null;
+
   /** The modification context */
   LocalizedModificationContext modificationCtx = null;
 
@@ -139,6 +145,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     properties = new HashMap<String, String[]>();
     securityCtx = new PageletSecurityContextImpl(module, id);
     publishingCtx = new PublishingContextImpl();
+    creationCtx = new CreationContextImpl();
     modificationCtx = new LocalizedModificationContextImpl(this);
     content = new LocalizableContent<Map<String, String[]>>(this);
   }
@@ -466,12 +473,21 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
+   * Returns the pagelet's {@link CreationContext}.
+   * 
+   * @return the creation context
+   */
+  public CreationContext getCreationContext() {
+    return creationCtx;
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
    */
   public Date getCreationDate() {
-    return modificationCtx.getCreationDate();
+    return creationCtx.getCreationDate();
   }
 
   /**
@@ -480,13 +496,22 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
    */
   public User getCreator() {
-    return modificationCtx.getCreator();
+    return creationCtx.getCreator();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationContext()
+   * @see ch.o2it.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
+   */
+  public boolean isCreatedAfter(Date date) {
+    return creationCtx.isCreatedAfter(date);
+  }
+
+  /**
+   * Returns the pagelet's {@link ModificationContext}.
+   * 
+   * @return the modification context
    */
   public LocalizedModificationContext getModificationContext() {
     return modificationCtx;
@@ -827,7 +852,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     if (languageContent == null) {
       languageContent = new HashMap<String, String[]>();
       content.put(languageContent, language);
-    }    
+    }
     List<String> values = new ArrayList<String>();
     String[] existing = languageContent.remove(name);
     if (existing != null) {

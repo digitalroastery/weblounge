@@ -350,11 +350,11 @@ public final class LanguageSupport {
 
     try {
       boolean found = false;
-      NodeList nodes = XPathHelper.selectList(path, xmlNode, "name");
+      NodeList nodes = XPathHelper.selectList(xmlNode, "name", path);
       for (int i = 0; i < nodes.getLength(); i++) {
         Node name = nodes.item(i);
-        String description = XPathHelper.valueOf(path, name, "text()");
-        String lAttrib = XPathHelper.valueOf(path, name, "@language");
+        String description = XPathHelper.valueOf(name, "text()", path);
+        String lAttrib = XPathHelper.valueOf(name, "@language", path);
         Language language = null;
         for (Language l : languages) {
           if (l.getIdentifier().equals(lAttrib)) {

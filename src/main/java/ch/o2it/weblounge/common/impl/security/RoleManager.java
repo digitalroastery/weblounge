@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.security.RoleRegistry;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
@@ -61,18 +60,17 @@ public class RoleManager {
    * @return the role
    */
   public static Role read(XPath path, Node node, Site site) {
-    String id = XPathHelper.valueOf(path, node, "@id");
+    String id = XPathHelper.valueOf(node, "@id", path);
     RoleImpl r = new RoleImpl(id, site);
 
     // Read extensions
 
-    String extension = XPathHelper.valueOf(path, node, "@extends");
+    String extension = XPathHelper.valueOf(node, "@extends", path);
     if (extension != null) {
-      RoleRegistry roles = site.getRoles();
       StringTokenizer tok = new StringTokenizer(extension, " ,;");
       while (tok.hasMoreTokens()) {
         String ancestor = tok.nextToken();
-        Role ancestorRole = roles.getRole(ancestor);
+        Role ancestorRole = site.getRole(ancestor, null);
         if (ancestorRole != null) {
           r.extend(ancestorRole);
         }

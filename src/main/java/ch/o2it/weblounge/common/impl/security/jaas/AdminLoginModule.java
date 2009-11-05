@@ -19,9 +19,9 @@
 
 package ch.o2it.weblounge.common.impl.security.jaas;
 
-import ch.o2it.weblounge.common.impl.security.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.impl.security.WebloungeAdmin;
+import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
+import ch.o2it.weblounge.common.impl.user.WebloungeAdmin;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteAdmin;
 

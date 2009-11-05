@@ -201,7 +201,7 @@ public class XMLDocument {
    * @return the first resulting node or <code>null</code>
    */
   public Node getNode(String xpath) {
-    return XPathHelper.select(engine, document, xpath);
+    return XPathHelper.select(document, xpath, engine);
   }
 
   /**
@@ -213,7 +213,7 @@ public class XMLDocument {
    * @return the resulting nodelist or <code>null</code>
    */
   public NodeList getNodes(String xpath) {
-    return XPathHelper.selectList(engine, document, xpath);
+    return XPathHelper.selectList(document, xpath, engine);
   }
 
   /**
@@ -224,7 +224,7 @@ public class XMLDocument {
    * @return the number of elements removed
    */
   public int removeNode(String xpath) {
-    return removeNode(XPathHelper.select(engine, document, xpath));
+    return removeNode(XPathHelper.select(document, xpath, engine));
   }
 
   /**
@@ -260,7 +260,7 @@ public class XMLDocument {
    * @return the number of elements removed
    */
   public int removeNodes(String xpath) {
-    return removeNodes(XPathHelper.selectList(engine, document, xpath));
+    return removeNodes(XPathHelper.selectList(document, xpath, engine));
   }
 
   /**

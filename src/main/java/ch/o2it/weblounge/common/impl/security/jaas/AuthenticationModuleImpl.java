@@ -141,8 +141,8 @@ public final class AuthenticationModuleImpl extends ConfigurationBase implements
    *          the XPath object used to parse the configuration
    */
   public void init(XPath path, Node config) throws ConfigurationException {
-    setClass(XPathHelper.valueOf(path, config, "@class"));
-    setRelevance(XPathHelper.valueOf(path, config, "@relevance"));
+    setClass(XPathHelper.valueOf(config, "@class", path));
+    setRelevance(XPathHelper.valueOf(config, "@relevance", path));
     super.init(path, config);
   }
 

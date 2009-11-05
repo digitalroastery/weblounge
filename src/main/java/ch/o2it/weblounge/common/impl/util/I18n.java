@@ -211,11 +211,11 @@ public class I18n {
       // Read and store the messages
 
       XPath path = XMLUtilities.getXPath();
-      NodeList nodes = XPathHelper.selectList(path, doc, "/i18n/message");
+      NodeList nodes = XPathHelper.selectList(doc, "/i18n/message", path);
       for (int j = 0; j < nodes.getLength(); j++) {
         Node messageNode = nodes.item(j);
-        String key = XPathHelper.valueOf(path, messageNode, "@name");
-        String value = XPathHelper.valueOf(path, messageNode, "value/text()");
+        String key = XPathHelper.valueOf(messageNode, "@name", path);
+        String value = XPathHelper.valueOf(messageNode, "value/text()", path);
         if (warn && p.containsKey(key)) {
           log_.warn("I18n key '" + key + "' redefined in " + f);
         }

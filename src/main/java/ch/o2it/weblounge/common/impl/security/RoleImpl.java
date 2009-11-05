@@ -209,7 +209,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
       String roleId = authority.getAuthorityId();
       Role r = null;
       if (site_ != null) {
-        r = site_.getRoles().getRole(roleId);
+        r = site_.getRole(roleId, null);
       } else {
         r = SystemRole.getRole(roleId);
       }

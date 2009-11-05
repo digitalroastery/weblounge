@@ -20,72 +20,58 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.ModificationContext;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.security.User;
-import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.xml.xpath.XPath;
 
 /**
- * TODO: Comment ModificationContextImpl
+ * Default implementation of the {@link ModificationContext}.
  */
 public class ModificationContextImpl implements ModificationContext {
-
-  /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(ModificationContextImpl.class);
-
-  /** Creation date */
-  protected Date creationDate = null;
-
-  /** Creator */
-  protected User creator = null;
 
   /** Modification date */
   protected Date modificationDate = null;
 
   /** Editor */
-  protected User editor = null;
+  protected User modifier = null;
 
   /**
-   * Creates a new and empty modification context.
+   * Creates a modification context with today's date.
    */
   public ModificationContextImpl() {
-    this.creationDate = new Date();
+    this.modificationDate = new Date();
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#getCreationDate()
+   * Creates a modification context reflecting modification at the given date.
+   * 
+   * @param date
+   *          the modification date
    */
-  public Date getCreationDate() {
-    return creationDate;
+  public ModificationContextImpl(Date date) {
+    this.modificationDate = date;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#getCreator()
+   * Creates a modification context reflecting modification at the given date,
+   * made by the referenced user.
+   * 
+   * @param date
+   *          the modification date
+   * @param editor
+   *          the modifying user
    */
-  public User getCreator() {
-    return creator;
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#getCreationDate(java.util.Date)
-   */
-  public void setCreationDate(Date date) {
-    this.creationDate = date;
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setCreator(ch.o2it.weblounge.common.security.User)
-   */
-  public void setCreator(User user) {
-    this.creator = user;
+  public ModificationContextImpl(Date date, User editor) {
+    this.modificationDate = date;
+    this.modifier = editor;
   }
 
   /**
@@ -99,7 +85,7 @@ public class ModificationContextImpl implements ModificationContext {
    * @see ch.o2it.weblounge.common.content.ModificationContext#getModifier()
    */
   public User getModifier() {
-    return editor;
+    return modifier;
   }
 
   /**
@@ -126,10 +112,10 @@ public class ModificationContextImpl implements ModificationContext {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.security.User)
+   * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.user.User)
    */
-  public void setModifier(User editor) {
-    this.editor = editor;
+  public void setModifier(User modifier) {
+    this.modifier = modifier;
   }
 
   /**
@@ -139,9 +125,7 @@ public class ModificationContextImpl implements ModificationContext {
    */
   public Object clone() {
     ModificationContextImpl ctxt = new ModificationContextImpl();
-    ctxt.creationDate = creationDate;
-    ctxt.creator = creator;
-    ctxt.editor = editor;
+    ctxt.modifier = modifier;
     ctxt.modificationDate = modificationDate;
     return ctxt;
   }
@@ -151,39 +135,24 @@ public class ModificationContextImpl implements ModificationContext {
    * 
    * @param context
    *          the publish context node
-   * @param site
-   *          the associated site
    */
-  public void init(XPath path, Node context, Site site) {
+  public static ModificationContextImpl fromXml(XPath xpath, Node context) {
+    Node contextRoot = XPathHelper.select(context, "//modified", xpath);
+    if (contextRoot == null)
+      return null;
 
-    // created
-    try {
-      Node creatorNode = XPathHelper.select(path, context, "//created/user");
-      if (creatorNode != null) {
-        creator = site.getUsers().getUser(creatorNode.getNodeValue());
+    ModificationContextImpl c = new ModificationContextImpl();
+    Node creator = XPathHelper.select(contextRoot, "/user", xpath);
+    if (creator != null)
+      c.setModifier(UserImpl.fromXml(creator, xpath));
+    String date = XPathHelper.valueOf(contextRoot, "/date", xpath);
+    if (date != null)
+      try {
+        c.setModificationDate(WebloungeDateFormat.parseStatic(date));
+      } catch (ParseException e) {
+        throw new IllegalArgumentException("The modification date " + date + " cannot be parsed", e);
       }
-      Node createdNode = XPathHelper.select(path, context, "//created/date");
-      creationDate = (createdNode != null) ? WebloungeDateFormat.parseStatic(createdNode.getNodeValue()) : null;
-    } catch (Exception e) {
-      log_.error("Error reading creation data for modification context", e);
-    }
-    
-    // modification
-    try {
-      Node modifierNode = XPathHelper.select(path, context, "//modified/user");
-      Node modifiedNode = XPathHelper.select(path, context, "//modified/date");
-      if (modifierNode != null && modifiedNode != null) {
-        User modifier = site.getUsers().getUser(modifierNode.getNodeValue());
-        Date modified = (modifiedNode != null) ? WebloungeDateFormat.parseStatic(modifiedNode.getNodeValue()) : null;
-        if (modifier != null) {
-          this.editor = modifier;
-          this.modificationDate = modified;
-        }
-      }
-    } catch (Exception e) {
-      log_.error("Error reading modification data", e);
-    }
-
+    return c;
   }
 
   /**
@@ -191,32 +160,18 @@ public class ModificationContextImpl implements ModificationContext {
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();
-
-    // Creation
-    if (creator == null)
-      b.append("<created/>");
-    else {
-      b.append("<created>");
+    b.append("<modified>");
+    if (modifier != null) {
       b.append("<user>");
-      b.append(creator.getLogin());
+      b.append(modifier.getLogin());
       b.append("</user>");
-      b.append("<date>");
-      b.append(WebloungeDateFormat.formatStatic(creationDate));
-      b.append("</date>");
-      b.append("/modified");
     }
-
-    // Modification
-    if (editor != null) {
-      b.append("<modified>");
-      b.append("<user>");
-      b.append(editor.getLogin());
-      b.append("</user>");
+    if (modificationDate != null) {
       b.append("<date>");
       b.append(WebloungeDateFormat.formatStatic(modificationDate));
       b.append("</date>");
-      b.append("/modified");
     }
+    b.append("/modified");
     return b.toString();
   }
 

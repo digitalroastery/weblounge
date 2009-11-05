@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.Restriction;
 import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -310,10 +310,10 @@ public class RestrictionSecurityContext extends AbstractSecurityContext {
     securityCtxt_.clear();
     permissions_ = null;
 
-    NodeList restrictions = XPathHelper.selectList(path, context, "restriction");
+    NodeList restrictions = XPathHelper.selectList(context, "restriction", path);
     for (int i = 0; i < restrictions.getLength(); i++) {
       Node restrictionNode = restrictions.item(i);
-      Permission p = new PermissionImpl(XPathHelper.valueOf(path, restrictionNode, "@id"));
+      Permission p = new PermissionImpl(XPathHelper.valueOf(restrictionNode, "@id", path));
       Restriction restriction = new RestrictionImpl(path, restrictionNode);
       securityCtxt_.put(p, restriction);
     }

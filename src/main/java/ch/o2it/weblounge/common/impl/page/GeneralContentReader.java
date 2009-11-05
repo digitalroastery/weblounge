@@ -30,8 +30,8 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.SystemPermission;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -397,7 +397,7 @@ public class GeneralContentReader extends DefaultHandler {
     /** security owner */
     if (contentReaderContext == CTXT_SECURITY && "owner".equals(local)) {
       String login = characters.toString();
-      owner = site.getUsers().getUser(login);
+      owner = site.getUser(login);
     }
 
     /** security permission */
@@ -486,7 +486,7 @@ public class GeneralContentReader extends DefaultHandler {
     /** modifying user */
     else if (contentReaderContext == CTXT_MODIFICATION && "user".equals(local)) {
       String login = characters.toString();
-      User user = site.getUsers().getUser(login);
+      User user = site.getUser(login);
       setModifiedBy(user);
     }
 

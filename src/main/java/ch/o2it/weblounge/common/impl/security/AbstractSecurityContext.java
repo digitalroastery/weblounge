@@ -25,8 +25,8 @@ import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.url.Url;
+import ch.o2it.weblounge.common.user.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;

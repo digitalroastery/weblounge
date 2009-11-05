@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.common.impl.security.jaas;
 
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.AuthenticatedUser;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public abstract class AbstractLoginModule implements LoginModule {
   protected char[] password;
 
   /** The user */
-  protected User user;
+  protected AuthenticatedUser user;
 
   /** The shared state information */
   protected Map sharedState;

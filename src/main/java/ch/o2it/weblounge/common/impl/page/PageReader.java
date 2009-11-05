@@ -22,8 +22,8 @@ package ch.o2it.weblounge.common.impl.page;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.PageManager;
 import ch.o2it.weblounge.common.page.PageletLocation;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -292,7 +292,7 @@ public final class PageReader extends GeneralContentReader {
     // Pagelock
     else if (state_ == STATE_PAGELOCK && "pagelock".equals(local)) {
       String login = characters.toString();
-      User editor = site.getUsers().getUser(login);
+      User editor = site.getUser(login);
       if (page_ != null)
         page_.editor = editor;
     }

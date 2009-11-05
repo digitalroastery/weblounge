@@ -17,32 +17,33 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.security;
+package ch.o2it.weblounge.common.impl.user;
 
 import ch.o2it.weblounge.common.impl.language.MultilingualTreeSet;
+import ch.o2it.weblounge.common.impl.security.RoleImpl;
 import ch.o2it.weblounge.common.security.Authority;
+import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.security.Group;
+import ch.o2it.weblounge.common.security.LoginContext;
 import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.AuthenticatedUser;
+import ch.o2it.weblounge.common.user.User;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class represents some part of the implementation of a weblounge user by
- * providing support for password checks, roles and group memberships.
- * 
- * @author Tobias Wunden
- * @version 1.0
+ * This class represents the authentication part of the implementation of a
+ * weblounge user by providing support for the login context, the credentials
+ * and the logout operation.
  */
-public abstract class AbstractUser implements User {
+public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser {
 
   /** The associated site */
   protected Site site = null;
-
-  /** The username */
-  protected String login = null;
 
   /** The groups where this user is a member */
   protected Set<Group> groups = null;
@@ -50,41 +51,257 @@ public abstract class AbstractUser implements User {
   /** The groups where this user is a member */
   protected Set<Role> roles = null;
 
-  /** The cached initials */
-  private String initials_ = null;
+  /** The login context */
+  protected LoginContext loginContext = null;
+
+  /** the password */
+  protected byte[] password = null;
+
+  /** Password digest type, either plain or md5 */
+  protected DigestType passwordDigestType = DigestType.plain;
+
+  /** the public credential set */
+  protected Set<Object> publicCredentials = null;
+
+  /** the private credential set */
+  protected Set<Object> privateCredentials = null;
 
   /**
-   * Creates a new abstract user;
+   * Creates a new abstract authenticated user.
    * 
    * @param login
    *          the username
+   * @param context
+   *          the login context
    * @param site
-   *          the associated site
+   *          the site
    */
-  public AbstractUser(String login, Site site) {
-    this.login = login;
+  public AuthenticatedUserImpl(String login, LoginContext context, Site site) {
+    super(login);
     this.site = site;
+    loginContext = context;
   }
 
   /**
-   * Creates a new abstract user for the specified site. Other properties such
-   * as login, name etc. have to be filled in later.
-   * 
-   * @param site
-   *          the associated site
-   */
-  protected AbstractUser(Site site) {
-    this(null, site);
-  }
-
-  /**
-   * Creates a new abstract user without references to a specific site.
+   * Creates a new abstract authenticated user. The login context has to be set
+   * using {@link #setLoginContext(LoginContext)}.
    * 
    * @param login
    *          the username
+   * @param site
+   *          the site
    */
-  public AbstractUser(String login) {
-    this(login, null);
+  public AuthenticatedUserImpl(String login, Site site) {
+    this(login, null, site);
+  }
+
+  /**
+   * Creates a new abstract authenticated user whithout any reference to a site.
+   * The login context has to be set using
+   * {@link #setLoginContext(LoginContext)}.
+   * 
+   * @param login
+   *          the login
+   */
+  public AuthenticatedUserImpl(String login) {
+    this(login, null, null);
+  }
+
+  /**
+   * Sets the login context which is later used to perform a clean logout
+   * operation.
+   * 
+   * @param context
+   *          the login context
+   */
+  public void setLoginContext(LoginContext context) {
+    loginContext = context;
+  }
+
+  /**
+   * Returns the user's login context. This method returns <code>null</code> if
+   * the user is not authenticated.
+   * 
+   * @return the login context
+   */
+  public LoginContext getLoginContext() {
+    return loginContext;
+  }
+
+  /**
+   * Sets the user's password. The argument <code>type</code> specifies the
+   * password encoding, which is one of
+   * <ul>
+   * <li>{@link AuthenticatedUserImpl#PASSWORD_TYPE_PLAIN}</li>
+   * <li>{@link AuthenticatedUserImpl#PASSWORD_TYPE_MD5}</li>
+   * </ul>
+   * 
+   * @param password
+   *          the password
+   * @param type
+   *          the password type
+   */
+  public void setPassword(byte[] password, DigestType type) {
+    passwordDigestType = type;
+    this.password = password;
+  }
+
+  /**
+   * Sets the user's password. The password will be md5 encoded.
+   * 
+   * @param password
+   *          the password
+   */
+  public void setPassword(byte[] password) {
+    setPassword(DigestUtils.md5(password), DigestType.md5);
+  }
+
+  /**
+   * Returns the password that was used to login.
+   * 
+   * @return the password
+   */
+  public byte[] getPassword() {
+    return password;
+  }
+
+  /**
+   * Checks <code>password</code> for equality with the users's password.
+   * <p>
+   * <b>Note:</b> This method returns <code>true</code> if <code>password</code>
+   * is <code>null</code>.
+   * 
+   * @param password
+   *          the password to check
+   * @return <code>true</code> if the password matches
+   */
+  public boolean checkPassword(String password) {
+    if (password == null) {
+      return true;
+    }
+    switch (passwordDigestType) {
+    case plain:
+      return this.password.equals(password);
+    case md5:
+      return this.password.equals(DigestUtils.md5(password));
+    }
+    return false;
+  }
+
+  /**
+   * Returns the password type, which is either {@link DigestType#plain} or
+   * {@link DigestType#md5}. The default is <code>plain</code>
+   * .
+   * 
+   * @return the password type
+   */
+  public DigestType getPasswordDigestType() {
+    return passwordDigestType;
+  }
+
+  /**
+   * Returns <code>true</code> if the user is authenticated. This is the case if
+   * the user possesses a valid login context.
+   * 
+   * @see ch.o2it.weblounge.common.user.AuthenticatedUser#isAuthenticated()
+   */
+  public boolean isAuthenticated() {
+    return loginContext != null;
+  }
+
+  /**
+   * This method is called by the authentication service when the user is logged
+   * out of the site.
+   */
+  public void logout() {
+    if (loginContext != null) {
+      loginContext.logout();
+      loginContext = null;
+    }
+  }
+
+  /**
+   * Adds the private credential to this user. A public credential would be for
+   * example the public key of an rsa keypair.
+   * 
+   * @param credential
+   *          the public credential
+   */
+  public void addPublicCredential(Object credential) {
+    if (publicCredentials == null) {
+      publicCredentials = new HashSet<Object>();
+    }
+    publicCredentials.add(credential);
+  }
+
+  /**
+   * Returns the set of all public credentials of this user.
+   * 
+   * @return the public credentials
+   */
+  public Set<Object> getPublicCredentials() {
+    if (publicCredentials != null) {
+      return publicCredentials;
+    } else {
+      return new HashSet<Object>();
+    }
+  }
+
+  /**
+   * Returns the user's set of all public credentials of the given type.
+   * 
+   * @return the public credentials
+   */
+  public Set<Object> getPublicCredentials(Class<?> type) {
+    Set<Object> set = new HashSet<Object>();
+    if (publicCredentials != null) {
+      for (Object c : publicCredentials) {
+        set.add(c);
+      }
+    }
+    return set;
+  }
+
+  /**
+   * Adds the private credential to this user. A private credential would be for
+   * example the private key of an rsa keypair.
+   * 
+   * @param credential
+   *          the private credential
+   */
+  public void addPrivateCredential(Object credential) {
+    if (privateCredentials == null) {
+      privateCredentials = new HashSet<Object>();
+    }
+    privateCredentials.add(credential);
+  }
+
+  /**
+   * Returns the set of all private credentials of this user.
+   * 
+   * @return the private credentials
+   */
+  public Set<Object> getPrivateCredentials() {
+    if (privateCredentials != null) {
+      return privateCredentials;
+    } else {
+      return new HashSet<Object>();
+    }
+  }
+
+  /**
+   * Returns the user's set of all private credentials of the given type.
+   * 
+   * @return the private credentials
+   */
+  public Set<Object> getPrivateCredentials(Class<?> type) {
+    Set<Object> set = new HashSet<Object>();
+    if (privateCredentials != null) {
+      for (Object c : privateCredentials) {
+        set.add(c);
+      }
+    }
+    return set;
   }
 
   /**
@@ -113,85 +330,6 @@ public abstract class AbstractUser implements User {
    */
   public Site getSite() {
     return site;
-  }
-
-  /**
-   * Returns the name of this user. If possible, the value returned consists of
-   * type <first name><last name>.
-   * 
-   * @returns the full user name
-   */
-  public String getName() {
-    String name = "";
-    if (getFirstName() != null && !getFirstName().trim().equals("")) {
-      if (getLastName() != null && !getLastName().trim().equals("")) {
-        name = getFirstName() + " " + getLastName();
-      } else {
-        name = getFirstName();
-      }
-    } else if (getLastName() != null && !getLastName().trim().equals("")) {
-      name = getLastName();
-    } else {
-      name = getLogin();
-    }
-    return name;
-  }
-
-  /**
-   * Returns the name of this user. If possible, the value returned consists of
-   * type <tt>&lt;first name&gt; &lt;last name&gt;</tt> or
-   * <tt>&lt;last name&gt;, &lt;first name&gt;</tt>, depending on the value of
-   * <code>reversed</code>.
-   * 
-   * @param reversed
-   *          <code>true</code> to return <tt>Lastname, Firstname</tt>
-   * @returns the full user name
-   */
-  public String getName(boolean reversed) {
-    if (!reversed) {
-      return getName();
-    }
-    String name = "";
-    if (getLastName() != null && !getLastName().trim().equals("")) {
-      if (getFirstName() != null && !getFirstName().trim().equals("")) {
-        name = getLastName() + ", " + getFirstName();
-      } else {
-        name = getLastName();
-      }
-    } else if (getFirstName() != null && !getFirstName().trim().equals("")) {
-      name = getFirstName();
-    } else {
-      name = getLogin();
-    }
-    return name;
-  }
-
-  /**
-   * Returns the short version of the persons name, which are constructed from
-   * the first and the last name of the user.
-   * 
-   * @return the persons initials
-   */
-  public String getInitials() {
-    if (initials_ != null) {
-      return initials_;
-    }
-    String firstName = getFirstName();
-    String lastName = getLastName();
-    if (firstName != null && lastName != null) {
-      initials_ = firstName.substring(0, 1) + lastName.substring(0, 1);
-    }
-    return initials_;
-  }
-
-  /**
-   * Sets the person's initials.
-   * 
-   * @param initials
-   *          the person's initials
-   */
-  public void setInitials(String initials) {
-    initials_ = initials;
   }
 
   /**
@@ -405,7 +543,7 @@ public abstract class AbstractUser implements User {
     if (authority != null && authority instanceof User) {
       return equals((Object) authority);
     } else if (authority != null && site != null && authority.getAuthorityType().equals(User.class.getName())) {
-      User u = site.getUsers().getUser(authority.getAuthorityId());
+      User u = site.getUser(authority.getAuthorityId());
       return getLogin().equals(u.getLogin());
     }
     return false;

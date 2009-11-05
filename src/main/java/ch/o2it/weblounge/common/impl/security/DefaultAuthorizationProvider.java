@@ -22,8 +22,8 @@ package ch.o2it.weblounge.common.impl.security;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.AuthorizationProvider;
 import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 /**
  * The system authorization provider is used to create objects from the system
@@ -49,11 +49,7 @@ import ch.o2it.weblounge.common.site.Site;
  * <p>
  * This special provider implementation can handle user, role and composer
  * authorizations.
- * 
- * @author Tobias Wunden
- * @version 1.0
  */
-
 public class DefaultAuthorizationProvider implements AuthorizationProvider {
 
   /** The site */
@@ -83,9 +79,9 @@ public class DefaultAuthorizationProvider implements AuthorizationProvider {
     assert type != null;
     assert id != null;
     if (type.equals(TYPE_ROLE)) {
-      site_.getRoles().getRole(RoleImpl.extractContext(id), RoleImpl.extractIdentifier(id));
+      site_.getRole(RoleImpl.extractContext(id), RoleImpl.extractIdentifier(id));
     } else if (type.equals(TYPE_USER)) {
-      return site_.getUsers().getUser(id);
+      return site_.getUser(id);
     }
     return null;
   }

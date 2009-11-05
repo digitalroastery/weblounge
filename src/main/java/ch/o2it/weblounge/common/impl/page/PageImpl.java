@@ -19,7 +19,9 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
+import ch.o2it.weblounge.common.content.CreationContext;
 import ch.o2it.weblounge.common.content.LocalizedModificationContext;
+import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
@@ -42,8 +44,9 @@ import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
 import ch.o2it.weblounge.common.security.SystemPermission;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.AuthenticatedUser;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,17 +62,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * A <code>Page</code> encapsulates all data that is attached with a site URL.
- * 
- * @author Tobias Wunden
- * @version 1.0
- * @since Weblounge 2.0
  */
 public class PageImpl extends LocalizableObject implements Page {
 
@@ -99,6 +97,9 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /** Current page editor (and owner) */
   User editor = null;
+
+  /** Creation context */
+  CreationContext creationCtx = null;
 
   /** Modification context */
   LocalizedModificationContext modificationCtx = null;
@@ -244,13 +245,13 @@ public class PageImpl extends LocalizableObject implements Page {
    *          the user that wants access to the header
    * @return the first suitable headline pagelet
    */
-  public Pagelet getHeadline(String moduleId, String pageletId, User user) {
+  public Pagelet getHeadline(String moduleId, String pageletId, AuthenticatedUser user) {
     return getHeadline(moduleId, pageletId, user, SystemPermission.READ);
   }
 
   /**
    * Returns the headline for the given user regarding the permissions that have
-   * been defined on the title pagelets. If no suitable hedline is found,
+   * been defined on the title pagelets. If no suitable headline is found,
    * <code>null</code> is returned.
    * 
    * @param moduleId
@@ -263,7 +264,7 @@ public class PageImpl extends LocalizableObject implements Page {
    *          the permission requirements
    * @return the first suitable headline pagelet
    */
-  public Pagelet getHeadline(String moduleId, String pageletId, User user,
+  public Pagelet getHeadline(String moduleId, String pageletId, AuthenticatedUser user,
       Permission permission) {
     for (int i = 0; i < headlines.size(); i++) {
       Pagelet headline = headlines.get(i);
@@ -546,12 +547,21 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
+   * Returns the page's {@link CreationContext}.
+   * 
+   * @return the creation context
+   */
+  public CreationContext getCreationContext() {
+    return creationCtx;
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
    */
   public Date getCreationDate() {
-    return modificationCtx.getCreationDate();
+    return creationCtx.getCreationDate();
   }
 
   /**
@@ -560,13 +570,21 @@ public class PageImpl extends LocalizableObject implements Page {
    * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
    */
   public User getCreator() {
-    return modificationCtx.getCreator();
+    return creationCtx.getCreator();
   }
 
   /**
    * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
+   */
+  public boolean isCreatedAfter(Date date) {
+    return creationCtx.isCreatedAfter(date);
+  }
+
+  /**
+   * Returns the page's {@link ModificationContext}.
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationContext()
+   * @return the modification context
    */
   public LocalizedModificationContext getModificationContext() {
     return modificationCtx;
@@ -700,7 +718,7 @@ public class PageImpl extends LocalizableObject implements Page {
    *          the locking user
    * @return <code>true</code> if the page was locked successfully
    */
-  boolean lock(User user) {
+  boolean lock(AuthenticatedUser user) {
     if (editor == null || editor.equals(user)) {
       editor = user;
       return true;
@@ -717,7 +735,7 @@ public class PageImpl extends LocalizableObject implements Page {
    *          the unlocking user
    * @return <code>true</code> if the page was unlocked successfully
    */
-  boolean unlock(User user) {
+  boolean unlock(AuthenticatedUser user) {
     if (editor == null || editor.equals(user) || user.hasRole(SystemRole.PUBLISHER)) {
       editor = null;
       return true;
@@ -787,33 +805,6 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * Returns the pagelet for the given composer at position <code>i</code> with
-   * respect to the rights of the requesting user. This method looks up the
-   * default version, which is <code>live</code>.
-   * 
-   * @param composer
-   *          the composer identifier
-   * @param index
-   *          the index within the composer
-   * @param u
-   *          the user
-   * @param p
-   *          the permission to ask for
-   * @return the composer content
-   */
-  public Pagelet getPagelet(String composer, int index, User u, Permission p) {
-    List<Pagelet> pagelets = composers_.get(composer);
-    if (pagelets == null || pagelets.size() - 1 < index) {
-      return null;
-    }
-    Pagelet pagelet = (Pagelet) pagelets.get(index);
-    if (!pagelet.checkOne(p, u.getRoleClosure()) && !pagelet.check(p, u)) {
-      return null;
-    }
-    return pagelet;
-  }
-
-  /**
    * Moves the pagelet up by one step.
    * 
    * @param composer
@@ -841,33 +832,6 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   void movePageletDown(String composer, int position) {
     movePageletUp(composer, position + 1);
-  }
-
-  /**
-   * Returns the composers for the given version.
-   * 
-   * @param version
-   *          the page version
-   * @return the composers
-   */
-  public String[] getComposers(long version) {
-    Set<String> ids = composers_.keySet();
-    return ids.toArray(new String[ids.size()]);
-  }
-
-  /**
-   * Returns the pagelets for the given version.
-   * 
-   * @param version
-   *          the page version
-   * @return the pagelets
-   */
-  public Pagelet[] getPagelets(long version) {
-    List<Pagelet> allpagelets = new ArrayList<Pagelet>();
-    for (List<Pagelet> pagelets : composers_.values()) {
-      allpagelets.addAll(pagelets);
-    }
-    return allpagelets.toArray(new Pagelet[allpagelets.size()]);
   }
 
   /**

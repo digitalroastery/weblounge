@@ -20,16 +20,16 @@
 package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.impl.page.PageImpl;
-import ch.o2it.weblounge.common.impl.security.Guest;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
+import ch.o2it.weblounge.common.impl.user.GuestImpl;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -277,7 +277,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // being logged in as guest.
     if (user == null) {
       log_.debug("New guest at " + getLocalName());
-      user = new Guest(getSite());
+      user = new GuestImpl(getSite());
     }
 
     return user;

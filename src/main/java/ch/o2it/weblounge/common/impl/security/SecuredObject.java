@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 import java.util.ArrayList;
 import java.util.List;

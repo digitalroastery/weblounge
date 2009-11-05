@@ -172,11 +172,11 @@ public class ConfigurationBase implements Customizable {
   protected void readOptions(XPath path, Node config) {
     if (path == null || config == null)
       return;
-    NodeList nodes = XPathHelper.selectList(path, config, "options/option");
+    NodeList nodes = XPathHelper.selectList(config, "options/option", path);
     for (int i = 0; i < nodes.getLength(); i++) {
       Node option = nodes.item(i);
-      String name = XPathHelper.valueOf(path, option, "name");
-      String value = XPathHelper.valueOf(path, option, "value");
+      String name = XPathHelper.valueOf(option, "name", path);
+      String value = XPathHelper.valueOf(option, "value", path);
       List<String> values = options.get(name);
       if (values != null) {
         values.add(value);

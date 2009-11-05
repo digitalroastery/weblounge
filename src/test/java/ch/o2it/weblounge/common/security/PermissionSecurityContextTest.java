@@ -23,7 +23,7 @@ package ch.o2it.weblounge.common.security;
 import ch.o2it.weblounge.common.impl.security.PageSecurityContext;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.impl.security.WebloungeAdmin;
+import ch.o2it.weblounge.common.impl.user.WebloungeAdmin;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 
 import org.w3c.dom.Node;

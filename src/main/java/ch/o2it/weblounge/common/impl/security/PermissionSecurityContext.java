@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -393,20 +393,20 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
     permissions_ = null;
 
     // Read permissions
-    NodeList permissions = XPathHelper.selectList(path, context, "//security/permission");
+    NodeList permissions = XPathHelper.selectList(context, "//security/permission", path);
     for (int i = 0; i < permissions.getLength(); i++) {
       Node p = permissions.item(i);
-      String id = XPathHelper.valueOf(path, p, "@id");
+      String id = XPathHelper.valueOf(p, "@id", path);
       Permission permission = new PermissionImpl(id);
 
       // Authority name
-      String require = XPathHelper.valueOf(path, p, "text()");
+      String require = XPathHelper.valueOf(p, "text()", path);
       if (require == null) {
         continue;
       }
 
       // Authority type
-      String type = XPathHelper.valueOf(path, p, "@type");
+      String type = XPathHelper.valueOf(p, "@type", path);
 
       // Check for multiple authorities
       StringTokenizer tok = new StringTokenizer(require, " ,;");

@@ -32,9 +32,15 @@ public class Keywords extends HashSet<String> {
   private static final long serialVersionUID = 6293776479106369637L;
 
   /**
-   * Returns an xml representation of the keywords.
+   * Returns an <code>XML</code> representation of the set of keywords, 
+   * looking something like:
+   * <pre>
+   * &lt;keywords&gt;
+   *  &lt;keyword&gt;&lt;![CDATA[[important[[&gt;&lt;/keyword&gt;
+   * &lt;/keywords&gt;
+   * </pre>
    * 
-   * @return the xml representation
+   * @return the <code>XML</code> representation
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();

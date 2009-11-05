@@ -29,7 +29,7 @@ import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.security.User;
+import ch.o2it.weblounge.common.user.User;
 
 import java.util.Date;
 
@@ -188,7 +188,7 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
 
   /**
    * @see ch.o2it.weblounge.api.security.Secured#check(ch.o2it.weblounge.api.security.Permission,
-   *      ch.o2it.weblounge.api.security.User)
+   *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public boolean check(Permission p, Authority a) {
     return check(p, a);
