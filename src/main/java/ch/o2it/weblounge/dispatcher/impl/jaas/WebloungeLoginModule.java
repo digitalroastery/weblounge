@@ -24,12 +24,14 @@ import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.security.jaas.AbstractLoginModule;
 import ch.o2it.weblounge.common.impl.security.jaas.HttpAuthCallback;
+import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 
 import java.util.Arrays;
 
@@ -46,7 +48,7 @@ import javax.security.auth.login.LoginException;
 public class WebloungeLoginModule extends AbstractLoginModule {
 	
 	/** The weblounge login module namespace */
-	public final static String WEBLOUNGE_NS = "weblounge";
+	public final static String WEBLOUNGE_REALM = "weblounge";
 
 	// Logging
 
@@ -63,7 +65,7 @@ public class WebloungeLoginModule extends AbstractLoginModule {
 		Site site = null;
 		if (callbackHandler instanceof HttpAuthCallback) {
 			site = ((HttpAuthCallback)callbackHandler).getRequest().getSite();
-			user = site.getUsers().loadUser(username);
+			user = site.getUser(username);
 			if (user != null) {
 				if (!((WebloungeUser)user).isEnabled()) {
 					throw new FailedLoginException("Login disabled");
@@ -77,7 +79,7 @@ public class WebloungeLoginModule extends AbstractLoginModule {
 			}
 			return false;
 		}
-		log_.warn("Weblounge login module received unknown callback handler!");
+		log_.error("Login module was presented with an unknown callback handler!");
 		return false;
 	}
 
@@ -130,7 +132,7 @@ public class WebloungeLoginModule extends AbstractLoginModule {
 		}
 		return super.commit();
 	}
-
+	
 	/**
 	 * Returns a string identifier for this login context. The identifier is used to store and identify
 	 *  user profile data in the weblounge database.
