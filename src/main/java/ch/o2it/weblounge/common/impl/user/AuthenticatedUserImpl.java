@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.impl.security.RoleImpl;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.security.Group;
-import ch.o2it.weblounge.common.security.LoginContext;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.AuthenticatedUser;
@@ -34,6 +33,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 /**
  * This class represents the authentication part of the implementation of a
@@ -71,15 +73,14 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * 
    * @param login
    *          the username
-   * @param context
-   *          the login context
+   * @param realm
+   *          the login domain
    * @param site
    *          the site
    */
-  public AuthenticatedUserImpl(String login, LoginContext context, Site site) {
-    super(login);
+  public AuthenticatedUserImpl(String login, String realm, Site site) {
+    super(login, realm);
     this.site = site;
-    loginContext = context;
   }
 
   /**
@@ -132,14 +133,14 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * Sets the user's password. The argument <code>type</code> specifies the
    * password encoding, which is one of
    * <ul>
-   * <li>{@link AuthenticatedUserImpl#PASSWORD_TYPE_PLAIN}</li>
-   * <li>{@link AuthenticatedUserImpl#PASSWORD_TYPE_MD5}</li>
+   * <li>{@link DigestType#plain}</li>
+   * <li>{@link DigestType#md5}</li>
    * </ul>
    * 
    * @param password
    *          the password
    * @param type
-   *          the password type
+   *          the digest type used to hash the password
    */
   public void setPassword(byte[] password, DigestType type) {
     passwordDigestType = type;
@@ -180,18 +181,17 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
       return true;
     }
     switch (passwordDigestType) {
-    case plain:
-      return this.password.equals(password);
-    case md5:
-      return this.password.equals(DigestUtils.md5(password));
+      case plain:
+        return this.password.equals(password);
+      case md5:
+        return this.password.equals(DigestUtils.md5(password));
     }
     return false;
   }
 
   /**
    * Returns the password type, which is either {@link DigestType#plain} or
-   * {@link DigestType#md5}. The default is <code>plain</code>
-   * .
+   * {@link DigestType#md5}. The default is <code>plain</code> .
    * 
    * @return the password type
    */
@@ -212,8 +212,11 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
   /**
    * This method is called by the authentication service when the user is logged
    * out of the site.
+   * 
+   * @throws LoginException
+   *           if logout fails for some reason
    */
-  public void logout() {
+  public void logout() throws LoginException {
     if (loginContext != null) {
       loginContext.logout();
       loginContext = null;

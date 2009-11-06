@@ -44,10 +44,10 @@ import javax.security.auth.spi.LoginModule;
 public abstract class AbstractLoginModule implements LoginModule {
 
   /** Initial state */
-  protected Subject subject;
+  protected Subject subject = null;
 
   /** The callback handler */
-  protected CallbackHandler callbackHandler;
+  protected CallbackHandler callbackHandler = null;
 
   /** Authentication status */
   protected boolean succeeded = false;
@@ -56,19 +56,19 @@ public abstract class AbstractLoginModule implements LoginModule {
   protected boolean commitSucceeded = false;
 
   /** Login */
-  protected String username;
+  protected String username = null;
 
   /** Password */
-  protected char[] password;
+  protected char[] password = null;
 
   /** The user */
-  protected AuthenticatedUser user;
+  protected AuthenticatedUser user = null;
 
   /** The shared state information */
-  protected Map sharedState;
+  protected Map sharedState = null;
 
   /** The options map */
-  protected Map options;
+  protected Map options = null;
 
   /**
    * Returns a namespace for this login context. The namespace is used to store

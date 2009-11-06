@@ -34,19 +34,11 @@ import javax.security.auth.login.LoginException;
 /**
  * Implementation of the Weblounge login module, which will login the admin
  * user.
- * 
- * @author Tobias Wunden
- * @version 1.0
  */
 public class AdminLoginModule extends AbstractLoginModule {
 
-  // Logging
-
-  /** the class name, used for the logging facility */
-  private final static String className = AdminLoginModule.class.getName();
-
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(className);
+  private final static Logger log_ = LoggerFactory.getLogger(AdminLoginModule.class);
 
   /**
    * @see ch.o2it.weblounge.core.security.jaas.AbstractLoginModule#checkUserAndPassword()

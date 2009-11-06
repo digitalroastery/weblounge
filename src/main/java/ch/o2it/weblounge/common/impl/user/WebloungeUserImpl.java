@@ -26,7 +26,6 @@ import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.security.Group;
-import ch.o2it.weblounge.common.security.LoginContext;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.WebloungeUser;
@@ -46,6 +45,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Default implementation of a weblounge user.
@@ -97,13 +97,13 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * 
    * @param login
    *          the username
-   * @param context
-   *          the login context
+   * @param realm
+   *          the login domain
    * @param site
    *          the site where the user logged in
    */
-  WebloungeUserImpl(String login, LoginContext context, Site site) {
-    super(login, context, site);
+  WebloungeUserImpl(String login, String realm, Site site) {
+    super(login, realm, site);
   }
 
   /**
@@ -343,17 +343,45 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * Initializes this user object by reading all information from the
    * <code>XML</code> configuration node.
    * 
+   * @param userNode
+   *          the <code>XML</code> node containing the user configuration
+   * @param realm
+   *          the login realm
+   * @param site
+   *          the associated site
    * @throws ParserConfigurationException
    * @throws SAXException
    */
-  public static WebloungeUserImpl fromXml(Node userNode, XPath xpath,
-      LoginContext context, Site site) throws IllegalStateException {
+  public static WebloungeUserImpl fromXml(Node userNode, String realm, Site site)
+      throws IllegalStateException {
+    XPath xpath_ = XPathFactory.newInstance().newXPath();
+    return fromXml(userNode, realm, site, xpath_);
+  }
+
+  /**
+   * Initializes this user object by reading all information from the
+   * <code>XML</code> configuration node.
+   * 
+   * @param userNode
+   *          the <code>XML</code> node containing the user configuration
+   * @param realm
+   *          the login realm
+   * @param site
+   *          the associated site
+   * @param xpath
+   *          the {@link XPath} processor
+   * @throws ParserConfigurationException
+   * @throws SAXException
+   */
+  public static WebloungeUserImpl fromXml(Node userNode, String realm,
+      Site site, XPath xpath) throws IllegalStateException {
+
     Node rootNode = XPathHelper.select(userNode, "//user", xpath);
     if (rootNode == null)
       return null;
 
     String login = XPathHelper.valueOf(rootNode, "@id", xpath);
-    WebloungeUserImpl user = new WebloungeUserImpl(login, context, site);
+    WebloungeUserImpl user = new WebloungeUserImpl(login, realm, site);
 
     user.enabled = ConfigurationUtils.isTrue(XPathHelper.valueOf(rootNode, "@enabled", xpath));
     user.firstName = XPathHelper.valueOf(rootNode, "/firstname", xpath);
@@ -366,6 +394,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       user.language = (l != null) ? l : site.getDefaultLanguage();
     }
 
+    // Password
     String password = XPathHelper.valueOf(rootNode, "/password", xpath);
     if (password != null) {
       String digestType = null;
@@ -378,6 +407,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       }
     }
 
+    // Challenge / Response
     user.challenge = XPathHelper.valueOf(rootNode, "/challenge", xpath);
     String response = XPathHelper.valueOf(rootNode, "/response", xpath);
     if (response != null) {
@@ -394,7 +424,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     // Roles
     NodeList roles = XPathHelper.selectList(rootNode, "/role", xpath);
     if (roles != null) {
-      for (int i=0; i < roles.getLength(); i++) {
+      for (int i = 0; i < roles.getLength(); i++) {
         String roleContext = XPathHelper.valueOf(roles.item(i), "@context", xpath);
         String roleId = XPathHelper.valueOf(roles.item(i), "text()", xpath);
         Role r = site.getRole(roleId, roleContext);
@@ -402,11 +432,11 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
           user.roles.add(r);
       }
     }
-    
+
     // Groups
     NodeList groups = XPathHelper.selectList(rootNode, "/group", xpath);
     if (roles != null) {
-      for (int i=0; i < groups.getLength(); i++) {
+      for (int i = 0; i < groups.getLength(); i++) {
         String groupContext = XPathHelper.valueOf(roles.item(i), "@context", xpath);
         String groupId = XPathHelper.valueOf(roles.item(i), "text()", xpath);
         Group g = site.getGroup(groupId, groupContext);
@@ -416,7 +446,8 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
         }
       }
     }
-    
+
+    // Last login
     String lastLogin = XPathHelper.valueOf(rootNode, "/lastlog/date", xpath);
     try {
       user.lastLogin = WebloungeDateFormat.parseStatic(lastLogin);
@@ -426,9 +457,10 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       log_.error("Unable to parse last login date: " + lastLogin, e);
     }
 
+    // Properties
     NodeList properties = XPathHelper.selectList(rootNode, "/properties/property", xpath);
     if (properties != null) {
-      for (int i=0; i < properties.getLength(); i++) {
+      for (int i = 0; i < properties.getLength(); i++) {
         String key = XPathHelper.valueOf(properties.item(i), "name", xpath);
         String value = XPathHelper.valueOf(properties.item(i), "value", xpath);
         // TODO: Check for serialized objects or xml nodes
@@ -441,9 +473,9 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   }
 
   /**
-   * Returns an xml representation of this user.
+   * Returns an <code>XML</code> representation of this user.
    * 
-   * @return the user as an xml document fragment
+   * @return the user as an <code>XML</code> document fragment
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();

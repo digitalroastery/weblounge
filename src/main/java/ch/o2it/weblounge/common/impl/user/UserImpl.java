@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.user.User;
 import org.w3c.dom.Node;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Default implementation for a weblounge user that is not logged in. This class
@@ -139,48 +140,69 @@ public class UserImpl implements User {
    * 
    * <p>
    * The input is expected as:
-   * 
    * <pre>
-   * &lt;user realm=&quot;realm&quot; id=&quot;login&quot; &gt;Jon Doe&lt;/user&gt;
+   * &lt;user id=&quot;login&quot; realm=&quot;realm&quot;&gt;Jon Doe&lt;/user&gt;
    * </pre>
    * 
    * @param xml
-   *          the xml node
+   *          the XML node
+   * @return the user or <code>null</code> if
+   */
+  public static UserImpl fromXml(Node xml) {
+    XPath xpathProcessor = XPathFactory.newInstance().newXPath();
+    return fromXml(xml, xpathProcessor);
+  }
+
+  /**
+   * This method will create a user from the given <code>XML</code> node or
+   * <code>null</code> if no user information is contained in the node.
+   * 
+   * <p>
+   * The input is expected as:
+   * 
+   * <pre>
+   * &lt;user id=&quot;login&quot; realm=&quot;realm&quot;&gt;Jon Doe&lt;/user&gt;
+   * </pre>
+   * 
+   * @param xml
+   *          the XML node
    * @param xpath
    *          the xpath object
    * @return the user or <code>null</code> if
    */
   public static UserImpl fromXml(Node xml, XPath xpath) {
-    Node userNode = XPathHelper.select(xml, "/user", xpath);
+    Node userNode = XPathHelper.select(xml, "//user", xpath);
     if (userNode == null)
       return null;
 
-    String login = XPathHelper.valueOf(userNode, "@id", xpath);
+    String login = XPathHelper.valueOf(userNode, "//user/@id", xpath);
     if (login == null)
       throw new IllegalStateException("Found user node without id");
-    String realm = XPathHelper.valueOf(userNode, "@realm", xpath);
-    String name = XPathHelper.valueOf(userNode, "./text()", xpath);
+    String realm = XPathHelper.valueOf(userNode, "//user/@realm", xpath);
+    String name = XPathHelper.valueOf(userNode, "//user/text()", xpath);
     UserImpl user = new UserImpl(login, realm, name);
     return user;
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
     return login.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof User) {
-      User u = (User)obj;
+      User u = (User) obj;
       if (realm != null && !realm.equals(u.getRealm()))
         return false;
       if (u.getRealm() != null && realm == null)
@@ -198,19 +220,26 @@ public class UserImpl implements User {
   public String toXml() {
     StringBuffer buf = new StringBuffer();
     buf.append("<user");
+
+    // id
+    buf.append(" id=\"");
+    buf.append(login);
+    buf.append("\"");
+
+    // realm
     if (realm != null) {
       buf.append(" realm=\"");
       buf.append(realm);
       buf.append("\"");
     }
-    buf.append(" id=\"");
-    buf.append(login);
-    buf.append("\"");
+
+    buf.append(">");
+
+    // name
     if (name != null) {
-      buf.append("><![CDATA[");
       buf.append(name);
-      buf.append("]]>");
     }
+
     buf.append("</user>");
     return buf.toString();
   }

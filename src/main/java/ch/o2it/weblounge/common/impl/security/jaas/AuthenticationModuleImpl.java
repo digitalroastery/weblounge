@@ -42,7 +42,7 @@ public final class AuthenticationModuleImpl extends ConfigurationBase implements
   private String className_ = null;
 
   /** The module's relevance */
-  private String relevance_ = null;
+  private Relevance relevance_ = null;
 
   /**
    * Creates a new authentication module and throws variuos exceptions while
@@ -79,23 +79,27 @@ public final class AuthenticationModuleImpl extends ConfigurationBase implements
    * @param className_
    *          the class name
    */
+  @SuppressWarnings("unchecked")
   private void setClass(String className) {
     if (className == null) {
       throw new ConfigurationException("Login module does not specify implementation!");
     }
     try {
-      Class c = Class.forName(className);
+      Class<LoginModule> c = (Class<LoginModule>)Class.forName(className);
       Object o = c.newInstance();
       if (!(o instanceof LoginModule)) {
         String msg = "Class " + className + " does not implement the interface javax.security.auth.spi.LoginModule!";
         throw new ConfigurationException(msg);
       }
       this.className_ = className;
+    } catch (ClassCastException e) {
+      String msg = "Configured class " + className + " is not of type LoginModule";
+      throw new ConfigurationException(msg, e);
     } catch (InstantiationException e) {
-      String msg = "Unable to instantiate login module.implementation " + className;
+      String msg = "Unable to instantiate login module " + className;
       throw new ConfigurationException(msg, e);
     } catch (IllegalAccessException e) {
-      String msg = "Access violation while instantiating login module.implementation " + className;
+      String msg = "Access violation while instantiating login module " + className;
       throw new ConfigurationException(msg, e);
     } catch (NoClassDefFoundError e) {
       String msg = "Class '" + e.getMessage() + "' which is required by login module class '" + className + "' was not found";
@@ -118,17 +122,18 @@ public final class AuthenticationModuleImpl extends ConfigurationBase implements
       throw new ConfigurationException(msg);
     }
     relevance = relevance.toLowerCase();
-    if (!relevance.equals(LoginContextImpl.RELVANCE_REQUIRED) && !relevance.equals(LoginContextImpl.RELVANCE_REQUISITE) && !relevance.equals(LoginContextImpl.RELVANCE_SUFFICIENT) && !relevance.equals(LoginContextImpl.RELVANCE_OPTIONAL)) {
+    try {
+      relevance_ = Relevance.valueOf(relevance);
+    } catch (IllegalArgumentException e) {
       String msg = "Unknown relevance value for login module " + className_ + ": " + relevance;
       throw new ConfigurationException(msg);
     }
-    this.relevance_ = relevance;
   }
 
   /**
    * @see ch.o2it.weblounge.common.security.AuthenticationModule#getRelevance()
    */
-  public String getRelevance() {
+  public Relevance getRelevance() {
     return relevance_;
   }
 
