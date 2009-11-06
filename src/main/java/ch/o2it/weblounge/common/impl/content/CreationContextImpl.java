@@ -31,6 +31,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Default implementation of the creation context.
@@ -115,16 +116,33 @@ public class CreationContextImpl implements CreationContext {
    * @throws IllegalStateException
    *           if the date found in this context cannot be parsed
    */
-  public static CreationContext fromXml(XPath xpath, Node context) throws IllegalStateException {
-    Node contextRoot = XPathHelper.select(context, "//created", xpath);
+  public static CreationContext fromXml(Node context)
+      throws IllegalStateException {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(context, xpath);
+  }
+
+  /**
+   * Initializes this context from an XML node.
+   * 
+   * @param context
+   *          the creation context node
+   * @param xpathProcessor
+   *          xpath processor to use
+   * @throws IllegalStateException
+   *           if the date found in this context cannot be parsed
+   */
+  public static CreationContext fromXml(Node context, XPath xpathProcessor)
+      throws IllegalStateException {
+    Node contextRoot = XPathHelper.select(context, "//created", xpathProcessor);
     if (contextRoot == null)
       return null;
 
     CreationContextImpl c = new CreationContextImpl();
-    Node creator = XPathHelper.select(contextRoot, "/user", xpath);
+    Node creator = XPathHelper.select(contextRoot, "//created/user", xpathProcessor);
     if (creator != null)
-      c.setCreator(UserImpl.fromXml(creator, xpath));
-    String date = XPathHelper.valueOf(contextRoot, "/date", xpath);
+      c.setCreator(UserImpl.fromXml(creator, xpathProcessor));
+    String date = XPathHelper.valueOf(contextRoot, "//created/date", xpathProcessor);
     if (date != null)
       try {
         c.setCreationDate(WebloungeDateFormat.parseStatic(date));
@@ -143,9 +161,7 @@ public class CreationContextImpl implements CreationContext {
     StringBuffer b = new StringBuffer();
     b.append("<created>");
     if (creator != null) {
-      b.append("<user>");
       b.append(creator.toXml());
-      b.append("</user>");
     }
     if (creationDate != null) {
       b.append("<date>");
