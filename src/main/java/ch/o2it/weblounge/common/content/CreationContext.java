@@ -27,7 +27,7 @@ import java.util.Date;
 /**
  * TODO: Comment CreationContext
  */
-public interface CreationContext {
+public interface CreationContext extends Cloneable {
 
   /**
    * @see ch.o2it.weblounge.common.content.CreationContext#getCreationDate()
@@ -53,6 +53,13 @@ public interface CreationContext {
    * @see ch.o2it.weblounge.common.content.CreationContext#isCreatedAfter(java.util.Date)
    */
   boolean isCreatedAfter(Date date);
+
+  /**
+   * Creates a clone of this <code>CreationContext</code>.
+   * 
+   * @return the cloned creation context
+   */
+  Object clone();
 
   /**
    * @see ch.o2it.weblounge.common.content.CreationContext#toXml()

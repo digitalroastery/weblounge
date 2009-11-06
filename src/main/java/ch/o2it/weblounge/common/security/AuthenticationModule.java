@@ -24,9 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: Comment AuthenticationModule
+ * An authentication module defines an authentication facility that can be
+ * activated and deactivated by configuration means.
  */
 public interface AuthenticationModule {
+  
+  /** The relevance values for authentication modules */
+  public enum Relevance { required, requisite, sufficient, optional };
 
   /**
    * Returns the name of the module's implementing class.
@@ -54,6 +58,6 @@ public interface AuthenticationModule {
    * 
    * @return the module's relevance_
    */
-  String getRelevance();
+  Relevance getRelevance();
 
 }

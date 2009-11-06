@@ -23,11 +23,13 @@ package ch.o2it.weblounge.common.user;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.security.GroupMember;
-import ch.o2it.weblounge.common.security.LoginContext;
 import ch.o2it.weblounge.common.security.RoleOwner;
 
 import java.security.Principal;
 import java.util.Set;
+
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 /**
  * Interface defining the fields and methods for an authenticated user.
@@ -132,7 +134,9 @@ public interface AuthenticatedUser extends User, GroupMember, RoleOwner, Authori
   /**
    * This method is called by the authentication service when the user is logged
    * out of the site.
+   * @throws LoginException
+   *           if logout fails for some reason
    */
-  void logout();
+  void logout() throws LoginException;
 
 }
