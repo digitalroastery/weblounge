@@ -21,9 +21,9 @@ package ch.o2it.weblounge.common.impl.security.jaas;
 
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
-import ch.o2it.weblounge.common.impl.user.WebloungeAdmin;
+import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.site.SiteAdmin;
+import ch.o2it.weblounge.common.user.SiteAdmin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class AdminLoginModule extends AbstractLoginModule {
     if (callbackHandler instanceof HttpAuthCallback) {
       site = ((HttpAuthCallback) callbackHandler).getRequest().getSite();
       SiteAdmin siteadmin = site.getAdministrator();
-      WebloungeAdmin sysadmin = WebloungeAdmin.getInstance();
+      WebloungeAdminImpl sysadmin = WebloungeAdminImpl.getInstance();
 
       // Test for site admin
       if (siteadmin.getLogin().equals(username) && !sysadmin.getLogin().equals(username)) {
@@ -114,7 +114,7 @@ public class AdminLoginModule extends AbstractLoginModule {
     } else {
       if (user instanceof SiteAdminImpl) {
         subject.getPublicCredentials().add(SystemRole.SITEADMIN);
-      } else if (user instanceof WebloungeAdmin) {
+      } else if (user instanceof WebloungeAdminImpl) {
         subject.getPublicCredentials().add(SystemRole.SYSTEMADMIN);
       }
     }

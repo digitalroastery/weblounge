@@ -68,12 +68,14 @@ public class MultilingualComparator<Type> implements Comparator<Type> {
       return 1;
     } else if (b == null) {
       return -1;
-    } else if (a instanceof LocalizableContent<?> && b instanceof LocalizableContent<?>) {
-      return ((LocalizableContent<?>)a).get(l).toString().toLowerCase().compareTo(((LocalizableContent<?>) b).get(l).toString().toLowerCase());
     } else if (a instanceof Localizable && b instanceof Localizable) {
       ((Localizable)a).switchTo(l);
       ((Localizable)b).switchTo(l);
       return ((Localizable)a).toString().toLowerCase().compareTo(((Localizable) b).toString().toLowerCase());
+    } else if (a instanceof LocalizableContent<?> && b instanceof LocalizableContent<?>) {
+      LocalizableContent la = (LocalizableContent<?>)a;
+      LocalizableContent lb = (LocalizableContent<?>)b;
+      return la.get(l).toString().toLowerCase().compareTo(lb.get(l).toString().toLowerCase());
     } else {
       return a.toString().toLowerCase().compareTo(b.toString().toLowerCase());
     }

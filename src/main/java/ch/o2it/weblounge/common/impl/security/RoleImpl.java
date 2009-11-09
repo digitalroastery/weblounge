@@ -69,13 +69,12 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * Creates a role in the given context with the specified role identifier.
-   * 
-   * @param context
-   *          the role context
    * @param identifier
    *          the role identifier
+   * @param context
+   *          the role context
    */
-  public RoleImpl(String context, String identifier) {
+  public RoleImpl(String identifier, String context) {
     context_ = context;
     identifier_ = identifier;
     ancestors_ = new HashSet<Role>();
@@ -92,7 +91,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the associated site
    */
   public RoleImpl(String context, String identifier, Site site) {
-    this(context, identifier);
+    this(identifier, context);
     site_ = site;
   }
 

@@ -25,7 +25,6 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.AuthenticatedUser;
 import ch.o2it.weblounge.common.user.User;
 
@@ -43,9 +42,6 @@ import javax.security.auth.login.LoginException;
  * and the logout operation.
  */
 public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser {
-
-  /** The associated site */
-  protected Site site = null;
 
   /** The groups where this user is a member */
   protected Set<Group> groups = null;
@@ -75,25 +71,9 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    *          the username
    * @param realm
    *          the login domain
-   * @param site
-   *          the site
    */
-  public AuthenticatedUserImpl(String login, String realm, Site site) {
+  public AuthenticatedUserImpl(String login, String realm) {
     super(login, realm);
-    this.site = site;
-  }
-
-  /**
-   * Creates a new abstract authenticated user. The login context has to be set
-   * using {@link #setLoginContext(LoginContext)}.
-   * 
-   * @param login
-   *          the username
-   * @param site
-   *          the site
-   */
-  public AuthenticatedUserImpl(String login, Site site) {
-    this(login, null, site);
   }
 
   /**
@@ -105,7 +85,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    *          the login
    */
   public AuthenticatedUserImpl(String login) {
-    this(login, null, null);
+    this(login, null);
   }
 
   /**
@@ -154,6 +134,10 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    *          the password
    */
   public void setPassword(byte[] password) {
+    if (password == null) {
+      this.password = null;
+      return;
+    }
     setPassword(DigestUtils.md5(password), DigestType.md5);
   }
 
@@ -327,15 +311,6 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
   }
 
   /**
-   * Returns the associated site.
-   * 
-   * @return the site
-   */
-  public Site getSite() {
-    return site;
-  }
-
-  /**
    * Registers a membership with <code>group</code>.
    * 
    * @param group
@@ -474,7 +449,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    *      java.lang.String)
    */
   public boolean hasRole(String context, String id) {
-    return hasRole(new RoleImpl(context, id));
+    return hasRole(new RoleImpl(id, context));
   }
 
   /**
@@ -537,17 +512,21 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
   }
 
   /**
-   * Returns <code>true</code> if <code>authority</code> represents the same
-   * user.
+   * {@inheritDoc}
+   * 
+   * TODO: Same implementation than equals(Object). What is the idea behind
+   * this?
    * 
    * @see ch.o2it.weblounge.common.security.Authority#equals(ch.o2it.weblounge.common.security.Authority)
    */
   public boolean equals(Authority authority) {
-    if (authority != null && authority instanceof User) {
-      return equals((Object) authority);
-    } else if (authority != null && site != null && authority.getAuthorityType().equals(User.class.getName())) {
-      User u = site.getUser(authority.getAuthorityId());
-      return getLogin().equals(u.getLogin());
+    if (authority instanceof AuthenticatedUser) {
+      AuthenticatedUser u = (AuthenticatedUser) authority;
+      if (!login.equals(u.getLogin()))
+        return false;
+      if (!realm.equals(u.getRealm()))
+        return false;
+      return true;
     }
     return false;
   }
@@ -572,8 +551,13 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object obj) {
-    if (login != null && obj != null && obj instanceof User) {
-      return (login.equals(((User) obj).getLogin()));
+    if (obj instanceof User) {
+      User u = (User)obj;
+      if (!login.equals(u.getLogin()))
+        return false;
+      if (!realm.equals(u.getRealm()))
+        return false;
+      return true;
     }
     return false;
   }

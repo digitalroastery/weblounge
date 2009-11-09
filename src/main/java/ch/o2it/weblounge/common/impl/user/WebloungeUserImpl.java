@@ -19,6 +19,8 @@
 
 package ch.o2it.weblounge.common.impl.user;
 
+import ch.o2it.weblounge.common.impl.security.GroupImpl;
+import ch.o2it.weblounge.common.impl.security.RoleImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -30,7 +32,6 @@ import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -54,6 +55,9 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
 
   /** Logging facility */
   private static final Logger log_ = LoggerFactory.getLogger(WebloungeUserImpl.class);
+
+  /** The associated site */
+  protected Site site = null;
 
   /** Enabled flag */
   protected boolean enabled = true;
@@ -91,6 +95,12 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /** Source of the last login */
   protected String lastLoginSource = null;
 
+  /** Cached version of automatically generated initials */
+  private String cachedInitials = null;
+
+  /** Cached version of automatically generated name */
+  private String cachedName = null;
+
   /**
    * Creates a user with the given login and initializes it from the weblounge
    * database.
@@ -102,12 +112,14 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * @param site
    *          the site where the user logged in
    */
-  WebloungeUserImpl(String login, String realm, Site site) {
-    super(login, realm, site);
+  public WebloungeUserImpl(String login, String realm, Site site) {
+    super(login, realm);
+    this.site = site;
   }
 
   /**
-   * Reads the user <code>login</code> from the weblounge database.
+   * Creates a user with login <code>login</code> and the default realm
+   * {@link #DefaultRealm}.
    * 
    * @param login
    *          the username
@@ -115,7 +127,16 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    *          the site where the user logged in
    */
   public WebloungeUserImpl(String login, Site site) {
-    this(login, null, site);
+    this(login, DefaultRealm, site);
+  }
+
+  /**
+   * Returns the associated site.
+   * 
+   * @return the site
+   */
+  public Site getSite() {
+    return site;
   }
 
   /**
@@ -154,6 +175,8 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    */
   public void setFirstName(String firstname) {
     this.firstName = firstname;
+    cachedInitials = null;
+    cachedName = null;
   }
 
   /**
@@ -173,6 +196,8 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    */
   public void setLastName(String lastname) {
     this.lastName = lastname;
+    cachedInitials = null;
+    cachedName = null;
   }
 
   /**
@@ -191,19 +216,30 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * @returns the full user name
    */
   public String getName() {
-    String name = "";
-    if (getFirstName() != null && !getFirstName().trim().equals("")) {
-      if (getLastName() != null && !getLastName().trim().equals("")) {
-        name = getFirstName() + " " + getLastName();
-      } else {
-        name = getFirstName();
-      }
-    } else if (getLastName() != null && !getLastName().trim().equals("")) {
-      name = getLastName();
-    } else {
-      name = getLogin();
+    if (name != null)
+      return name;
+    if (cachedName != null)
+      return cachedName;
+
+    String first = getFirstName();
+    String last = getLastName();
+    if ((first == null || first.equals("")) && (last == null || last.equals("")))
+      return null;
+
+    // Create the name
+    StringBuffer name = new StringBuffer();
+    if (first != null && !first.equals("")) {
+      name.append(first);
     }
-    return name;
+    if (last != null && !last.trim().equals("")) {
+      if (name.length() > 0)
+        name.append(" ");
+      name.append(last);
+    }
+
+    // Cache for further reference
+    cachedName = name.toString();
+    return cachedName;
   }
 
   /**
@@ -251,15 +287,20 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * @return the persons initials
    */
   public String getInitials() {
-    if (initials != null) {
+    if (initials != null)
       return initials;
+    if (cachedInitials != null)
+      return cachedInitials;
+    StringBuffer initials = new StringBuffer();
+    String first = getFirstName();
+    String last = getLastName();
+    if (first != null && !first.equals("") && last != null && !last.equals("")) {
+      initials.append(first.substring(0, 1));
+      initials.append(last.subSequence(0, 1));
+      cachedInitials = initials.toString().toLowerCase();
+      return cachedInitials;
     }
-    String firstName = getFirstName();
-    String lastName = getLastName();
-    if (firstName != null && lastName != null) {
-      initials = firstName.substring(0, 1) + lastName.substring(0, 1);
-    }
-    return initials;
+    return null;
   }
 
   /**
@@ -277,9 +318,12 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * 
    * @param date
    *          the login date
+   * @param src
+   *          the login source
    */
-  public void setLastLogin(Date date) {
+  public void setLastLogin(Date date, String src) {
     lastLogin = date;
+    lastLoginSource = src;
   }
 
   /**
@@ -289,16 +333,6 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    */
   public Date getLastLogin() {
     return lastLogin;
-  }
-
-  /**
-   * Sets the last login source.
-   * 
-   * @param src
-   *          the login source
-   */
-  public void setLastLoginSource(String src) {
-    lastLoginSource = src;
   }
 
   /**
@@ -345,17 +379,15 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * 
    * @param userNode
    *          the <code>XML</code> node containing the user configuration
-   * @param realm
-   *          the login realm
    * @param site
    *          the associated site
    * @throws ParserConfigurationException
    * @throws SAXException
    */
-  public static WebloungeUserImpl fromXml(Node userNode, String realm, Site site)
+  public static WebloungeUserImpl fromXml(Node userNode, Site site)
       throws IllegalStateException {
     XPath xpath_ = XPathFactory.newInstance().newXPath();
-    return fromXml(userNode, realm, site, xpath_);
+    return fromXml(userNode, site, xpath_);
   }
 
   /**
@@ -364,8 +396,6 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * 
    * @param userNode
    *          the <code>XML</code> node containing the user configuration
-   * @param realm
-   *          the login realm
    * @param site
    *          the associated site
    * @param xpath
@@ -373,33 +403,36 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * @throws ParserConfigurationException
    * @throws SAXException
    */
-  public static WebloungeUserImpl fromXml(Node userNode, String realm,
-      Site site, XPath xpath) throws IllegalStateException {
+  public static WebloungeUserImpl fromXml(Node userNode, Site site, XPath xpath)
+      throws IllegalStateException {
 
     Node rootNode = XPathHelper.select(userNode, "//user", xpath);
     if (rootNode == null)
       return null;
 
     String login = XPathHelper.valueOf(rootNode, "@id", xpath);
-    WebloungeUserImpl user = new WebloungeUserImpl(login, realm, site);
+    WebloungeUserImpl user = new WebloungeUserImpl(login, site);
 
+    String realm = XPathHelper.valueOf(rootNode, "@realm", xpath);
+    if (realm != null)
+      user.realm = realm;
     user.enabled = ConfigurationUtils.isTrue(XPathHelper.valueOf(rootNode, "@enabled", xpath));
-    user.firstName = XPathHelper.valueOf(rootNode, "/firstname", xpath);
-    user.lastName = XPathHelper.valueOf(rootNode, "/lastname", xpath);
-    user.initials = XPathHelper.valueOf(rootNode, "/initials", xpath);
-    user.email = XPathHelper.valueOf(rootNode, "/email", xpath);
-    String language = XPathHelper.valueOf(rootNode, "/language", xpath);
+    user.firstName = XPathHelper.valueOf(rootNode, "//profile/firstname", xpath);
+    user.lastName = XPathHelper.valueOf(rootNode, "//profile/lastname", xpath);
+    user.initials = XPathHelper.valueOf(rootNode, "//profile/initials", xpath);
+    user.email = XPathHelper.valueOf(rootNode, "//profile/email", xpath);
+    String language = XPathHelper.valueOf(rootNode, "//profile/language", xpath);
     if (language != null) {
       Language l = site.getLanguage(language);
       user.language = (l != null) ? l : site.getDefaultLanguage();
     }
 
     // Password
-    String password = XPathHelper.valueOf(rootNode, "/password", xpath);
+    String password = XPathHelper.valueOf(rootNode, "//password", xpath);
     if (password != null) {
       String digestType = null;
       try {
-        digestType = XPathHelper.valueOf(rootNode, "/password/@type", xpath);
+        digestType = XPathHelper.valueOf(rootNode, "//password/@type", xpath);
         user.passwordDigestType = DigestType.valueOf(digestType);
         user.password = password.getBytes();
       } catch (Exception e) {
@@ -408,12 +441,12 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     }
 
     // Challenge / Response
-    user.challenge = XPathHelper.valueOf(rootNode, "/challenge", xpath);
-    String response = XPathHelper.valueOf(rootNode, "/response", xpath);
+    user.challenge = XPathHelper.valueOf(rootNode, "//security/challenge", xpath);
+    String response = XPathHelper.valueOf(rootNode, "//security/response", xpath);
     if (response != null) {
       String digestType = null;
       try {
-        digestType = XPathHelper.valueOf(rootNode, "/response/@type", xpath);
+        digestType = XPathHelper.valueOf(rootNode, "//security/response/@type", xpath);
         user.responseDigestType = DigestType.valueOf(digestType);
         user.response = response.getBytes();
       } catch (Exception e) {
@@ -421,44 +454,48 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       }
     }
 
-    // Roles
-    NodeList roles = XPathHelper.selectList(rootNode, "/role", xpath);
-    if (roles != null) {
-      for (int i = 0; i < roles.getLength(); i++) {
-        String roleContext = XPathHelper.valueOf(roles.item(i), "@context", xpath);
-        String roleId = XPathHelper.valueOf(roles.item(i), "text()", xpath);
-        Role r = site.getRole(roleId, roleContext);
-        if (r != null)
-          user.roles.add(r);
-      }
-    }
-
-    // Groups
-    NodeList groups = XPathHelper.selectList(rootNode, "/group", xpath);
-    if (roles != null) {
-      for (int i = 0; i < groups.getLength(); i++) {
-        String groupContext = XPathHelper.valueOf(roles.item(i), "@context", xpath);
-        String groupId = XPathHelper.valueOf(roles.item(i), "text()", xpath);
-        Group g = site.getGroup(groupId, groupContext);
-        if (g != null) {
-          user.groups.add(g);
-          g.addMember(user);
-        }
-      }
-    }
-
     // Last login
-    String lastLogin = XPathHelper.valueOf(rootNode, "/lastlog/date", xpath);
+    String lastLogin = XPathHelper.valueOf(rootNode, "//security/lastlogin/date", xpath);
     try {
       user.lastLogin = WebloungeDateFormat.parseStatic(lastLogin);
-      user.lastLoginSource = XPathHelper.valueOf(rootNode, "/lastlog/ip", xpath);
+      user.lastLoginSource = XPathHelper.valueOf(rootNode, "//security/lastlogin/ip", xpath);
     } catch (ParseException e) {
       // It's not important. Let's log and then forget about it
       log_.error("Unable to parse last login date: " + lastLogin, e);
     }
 
+    // Roles
+    NodeList roles = XPathHelper.selectList(rootNode, "//security/roles/role", xpath);
+    if (roles != null) {
+      for (int i = 0; i < roles.getLength(); i++) {
+        Node roleNode = roles.item(i);
+        String roleContext = XPathHelper.valueOf(roleNode, "@context", xpath);
+        String roleId = XPathHelper.valueOf(roleNode, "text()", xpath);
+        Role r = site.getRole(roleId, roleContext);
+        if (r != null)
+          user.assignRole(r);
+        else
+          user.assignRole(new RoleImpl(roleId, roleContext));
+      }
+    }
+
+    // Groups
+    NodeList groups = XPathHelper.selectList(rootNode, "//security/groups/group", xpath);
+    if (groups != null) {
+      for (int i = 0; i < groups.getLength(); i++) {
+        Node groupNode = groups.item(i);
+        String groupContext = XPathHelper.valueOf(groupNode, "@context", xpath);
+        String groupId = XPathHelper.valueOf(groupNode, "text()", xpath);
+        Group g = site.getGroup(groupId, groupContext);
+        if (g != null)
+          user.addMembership(g);
+        else
+          user.addMembership(new GroupImpl(groupId, groupContext));
+      }
+    }
+
     // Properties
-    NodeList properties = XPathHelper.selectList(rootNode, "/properties/property", xpath);
+    NodeList properties = XPathHelper.selectList(rootNode, "//property", xpath);
     if (properties != null) {
       for (int i = 0; i < properties.getLength(); i++) {
         String key = XPathHelper.valueOf(properties.item(i), "name", xpath);
@@ -481,22 +518,21 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     StringBuffer b = new StringBuffer();
 
     // Add root node
-    b.append("<user id=\"" + login + "\" enabled=\"" + enabled + "\">");
-
-    // Password
-    b.append("<password type=\"");
-    b.append(passwordDigestType.toString());
-    b.append("\">");
-    switch (passwordDigestType) {
-      case plain:
-        b.append(password);
-        break;
-      case md5:
-        b.append(DigestUtils.md5(password));
-        break;
+    b.append("<user id=\"" + login + "\"");
+    if (realm != null) {
+      b.append(" realm=\"");
+      b.append(realm);
+      b.append("\"");
     }
-    b.append("</password>");
+    b.append(" enabled=\"" + enabled + "\"");
+    b.append(">");
 
+    //
+    // Profile
+    //
+    
+    b.append("<profile>");
+    
     // First name
     if (firstName != null) {
       b.append("<firstname>");
@@ -509,6 +545,13 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       b.append("<lastname>");
       b.append(lastName);
       b.append("</lastname>");
+    }
+
+    // Name, if first name and last name were not given
+    if (name != null && firstName == null && lastName == null) {
+      b.append("<name>");
+      b.append(name);
+      b.append("</name>");
     }
 
     // Initials
@@ -532,34 +575,31 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       b.append("</language>");
     }
 
-    // Groups
-    if (groups != null && groups.size() > 0) {
-      b.append("<groups>");
-      for (Iterator<Group> gi = groups.iterator(); gi.hasNext();) {
-        Group g = gi.next();
-        b.append("<group id=\"");
-        b.append(g.getIdentifier());
-        b.append("\" context=\"");
-        b.append(g.getContext());
-        b.append("\"/>");
-      }
-      b.append("</groups>");
-    }
+    b.append("</profile>");
 
-    // Roles
-    if (roles != null && roles.size() > 0) {
-      b.append("<roles>");
-      for (Iterator<Role> ri = roles.iterator(); ri.hasNext();) {
-        Role r = ri.next();
-        if (!r.equals(SystemRole.GUEST)) {
-          b.append("<role id=\"");
-          b.append(r.getIdentifier());
-          b.append("\" context=\"");
-          b.append(r.getContext());
-          b.append("\"/>");
-        }
-      }
-      b.append("</roles>");
+    //
+    // Security
+    //
+    
+    b.append("<security>");
+    
+    // Password
+    b.append("<password type=\"");
+    b.append(passwordDigestType.toString());
+    b.append("\">");
+    b.append(new String(password));
+    b.append("</password>");
+
+    // challenge - response
+    if (challenge != null && response != null) {
+      b.append("<challenge>");
+      b.append(challenge);
+      b.append("</challenge>");
+      b.append("<response type=\"");
+      b.append(responseDigestType.toString());
+      b.append("\">");
+      b.append(new String(response));
+      b.append("</response>");
     }
 
     // Last login
@@ -574,24 +614,37 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       b.append("</lastlogin>");
     }
 
-    // challenge - response
-    if (challenge != null && response != null) {
-      b.append("<challenge>");
-      b.append(challenge);
-      b.append("</challenge>");
-      b.append("<response type=\"");
-      b.append(responseDigestType.toString());
-      b.append("\">");
-      switch (responseDigestType) {
-        case plain:
-          b.append(response);
-          break;
-        case md5:
-          b.append(DigestUtils.md5(response));
-          break;
+    // Groups
+    if (groups != null && groups.size() > 0) {
+      b.append("<groups>");
+      for (Iterator<Group> gi = groups.iterator(); gi.hasNext();) {
+        Group g = gi.next();
+        b.append("<group context=\"");
+        b.append(g.getContext());
+        b.append("\">");
+        b.append(g.getIdentifier());
+        b.append("</group>");
       }
-      b.append("</response>");
+      b.append("</groups>");
     }
+
+    // Roles
+    if (roles != null && roles.size() > 0) {
+      b.append("<roles>");
+      for (Iterator<Role> ri = roles.iterator(); ri.hasNext();) {
+        Role r = ri.next();
+        if (!r.equals(SystemRole.GUEST)) {
+          b.append("<role context=\"");
+          b.append(r.getContext());
+          b.append("\">");
+          b.append(r.getIdentifier());
+          b.append("</role>");
+        }
+      }
+      b.append("</roles>");
+    }
+
+    b.append("</security>");
 
     // properties
     if (properties != null && properties.size() > 0) {

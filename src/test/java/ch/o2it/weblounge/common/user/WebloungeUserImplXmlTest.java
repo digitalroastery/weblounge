@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,13 +39,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Tests loading and serializing of {@link UserImpl} objects from and to
- * <code>XML</code>.
+ * TODO: Comment WebloungeUserImplTest
  */
-public class UserImplXmlTest extends UserImplTest {
+public class WebloungeUserImplXmlTest extends WebloungeUserImplTest {
 
   /** File path and name */
-  String testFile = "/user.xml";
+  String testFile = "/webloungeuser.xml";
 
   /**
    * @throws java.lang.Exception
@@ -57,12 +56,12 @@ public class UserImplXmlTest extends UserImplTest {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    user = UserImpl.fromXml(doc.getFirstChild());
+    setUpPrerequisites();
+    user = WebloungeUserImpl.fromXml(doc.getFirstChild(), mockSite);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#toXml()}
-   * .
+   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#toXml()}.
    */
   @Test
   public void testToXml() {

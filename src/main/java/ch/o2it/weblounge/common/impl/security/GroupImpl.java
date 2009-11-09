@@ -50,13 +50,12 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
 
   /**
    * Creates a new group with the given context and identifier.
-   * 
-   * @param context
-   *          the group context
    * @param id
    *          the group identifier
+   * @param context
+   *          the group context
    */
-  public GroupImpl(String context, String id) {
+  public GroupImpl(String id, String context) {
     context_ = context;
     id_ = id;
   }
@@ -276,7 +275,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    *      java.lang.String)
    */
   public boolean hasRole(String context, String id) {
-    return hasRole(new RoleImpl(context, id));
+    return hasRole(new RoleImpl(id, context));
   }
 
   /**

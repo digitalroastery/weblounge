@@ -69,7 +69,7 @@ public class SystemRole extends RoleImpl {
    *          the role name
    */
   private SystemRole(String role) {
-    super(CONTEXT, role);
+    super(role, CONTEXT);
   }
 
   /**

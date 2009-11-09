@@ -22,46 +22,26 @@ package ch.o2it.weblounge.common.impl.user;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.site.SiteAdmin;
+import ch.o2it.weblounge.common.user.SiteAdmin;
 
 /**
  * This class represents the administrator user for a single site.
  */
-public class SiteAdminImpl extends AdminUserImpl implements SiteAdmin {
-
+public class SiteAdminImpl extends WebloungeUserImpl implements SiteAdmin {
+  
   /**
    * Creates a new SiteAdminImpl user with the <code>administrator</code> role
    * assigned.
-   */
-  public SiteAdminImpl(String login, byte[] password, String email) {
-    super(login);
-    // TODO: Pass to superconstructor
-    this.password = password;
-    this.email = email;
-    assignRole(SystemRole.SITEADMIN);
-  }
-
-  /**
-   * Initializes this user.
    * 
+   * @param login
+   *          the login name
    * @param site
    *          the associated site
    */
-  public void init(Site site) {
-    this.site = site;
-  }
-
-  /**
-   * Returns the full user name.
-   * 
-   * @return the name
-   * @see ch.o2it.weblounge.common.impl.user.core.security.WebloungeUserImpl#getName()
-   */
-  public String getName() {
-    if (firstName == null && lastName == null) {
-      return getSite().getIdentifier() + " Site Administrator";
-    }
-    return super.getName();
+  public SiteAdminImpl(String login, Site site) {
+    super(login, SystemRealm, site);
+    assignRole(SystemRole.SITEADMIN);
+    setName("Site Administrator (" + site.getIdentifier() + ")");
   }
 
   /**
@@ -77,4 +57,13 @@ public class SiteAdminImpl extends AdminUserImpl implements SiteAdmin {
     return false;
   }
 
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.impl.user.UserImpl#setRealm(java.lang.String)
+   */
+  @Override
+  public void setRealm(String realm) {
+    throw new UnsupportedOperationException("The admin user realm cannot be changed");
+  }
+  
 }

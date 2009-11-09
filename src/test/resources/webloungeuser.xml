@@ -1,0 +1,30 @@
+<user id="john" realm="testland" enabled="true">
+	<profile>
+		<firstname>John</firstname>
+		<lastname>Doe</lastname>
+		<initials>jd</initials>
+		<email>john.doe@testland.org</email>
+		<language>en</language>
+	</profile>
+	<security>
+		<password type="md5">3417989822736ddf1867f860ccf4120c</password>
+		<challenge>What's my last name</challenge>
+		<response type="plain">Doe</response>
+		<lastlogin>
+			<date>2009/03/17 02:22:05 GMT</date>
+			<ip>192.168.0.1</ip>
+		</lastlogin>
+		<groups>
+			<group context="system">publisher</group>
+		</groups>
+		<roles>
+			<role context="myapp">apprentice</role>
+		</roles>
+	</security>
+	<properties>
+		<property>
+			<name>ch.o2it.weblounge.lastpage</name>
+			<value>/test</value>
+		</property>
+	</properties>
+</user>

@@ -189,13 +189,15 @@ public abstract class LocalizableObject implements Localizable {
     // language behavior which language to choose
 
     else if (behavior.equals(Original)) {
-      currentLanguage = getOriginalLanguage();
-      if (currentLanguage == null)
-        throw new IllegalStateException("Original language must not be null");
+      if (getOriginalLanguage() != null)
+        currentLanguage = getOriginalLanguage();
+//      else
+//        throw new IllegalStateException("Original language must not be null");
     } else if (behavior.equals(Default)) {
-      currentLanguage = getDefaultLanguage();
-      if (currentLanguage == null)
-        throw new IllegalStateException("Default language must not be null");
+      if (getDefaultLanguage() != null)
+        currentLanguage = getDefaultLanguage();
+//      else
+//        throw new IllegalStateException("Default language must not be null");
     }
 
     // Notify interested parties
