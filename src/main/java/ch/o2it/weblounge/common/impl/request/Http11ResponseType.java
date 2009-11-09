@@ -27,70 +27,66 @@ package ch.o2it.weblounge.common.impl.request;
  */
 public class Http11ResponseType {
 
-	protected int type = Http11ProtocolHandler.RESPONSE_INTERNAL_SERVER_ERROR;
-	protected int from = -1;
-	protected int to = -1;
-	protected long size = -1;
-	protected long modified = -1L;
-	protected long expires = -1L;
-	protected String err = null;
-	protected long time = System.currentTimeMillis();
-	protected boolean headers = false;
-	protected boolean headerOnly = false;
+  protected int type = Http11ProtocolHandler.RESPONSE_INTERNAL_SERVER_ERROR;
+  protected int from = -1;
+  protected int to = -1;
+  protected long size = -1;
+  protected long modified = -1L;
+  protected long expires = -1L;
+  protected String err = null;
+  protected long time = System.currentTimeMillis();
+  protected boolean headers = false;
+  protected boolean headerOnly = false;
 
-	public Http11ResponseType(int type, long modified) {
-		this(type, modified, -1L, null);
-	}
+  public Http11ResponseType(int type, long modified) {
+    this(type, modified, -1L, null);
+  }
 
-	public Http11ResponseType(int type, long modified, long expires) {
-		this(type, modified, expires, null);
-	}
+  public Http11ResponseType(int type, long modified, long expires) {
+    this(type, modified, expires, null);
+  }
 
-	public Http11ResponseType(
-		int type,
-		long modified,
-		long expires,
-		String err) {
-		this.type = type;
-		this.modified = modified;
-		this.expires = expires;
-		this.err = err;
-	}
+  public Http11ResponseType(int type, long modified, long expires, String err) {
+    this.type = type;
+    this.modified = modified;
+    this.expires = expires;
+    this.err = err;
+  }
 
-	public int getFrom() {
-		return from;
-	}
+  public int getFrom() {
+    return from;
+  }
 
-	public int getTo() {
-		return to;
-	}
+  public int getTo() {
+    return to;
+  }
 
-	public int getType() {
-		return type;
-	}
+  public int getType() {
+    return type;
+  }
 
-	public long getExpires() {
-		return expires;
-	}
+  public long getExpires() {
+    return expires;
+  }
 
-	public long getModified() {
-		return modified;
-	}
+  public long getModified() {
+    return modified;
+  }
 
-	public long getTime() {
-		return time;
-	}
+  public long getTime() {
+    return time;
+  }
 
-	public String getErr() {
-		return err;
-	}
+  public String getErr() {
+    return err;
+  }
 
-	public long getSize() {
-		return size;
-	}
-	
-	public boolean isHeaderOnly() {
-		return headerOnly;
-	}
+  public long getSize() {
+    return size;
+  }
+
+  public boolean isHeaderOnly() {
+    return headerOnly;
+  }
 
 }

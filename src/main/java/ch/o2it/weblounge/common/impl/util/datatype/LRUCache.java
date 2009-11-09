@@ -1,20 +1,21 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2007 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.common.impl.util.datatype;
@@ -30,12 +31,7 @@ import java.util.Map;
 
 /**
  * The <code>LRUCache</code> keeps the most recently used items for fast access.
- * 
- * @author Tobias Wunden
- * @version 1.0
- * @since Weblounge 2.0
  */
-
 public final class LRUCache<K, V> {
 
   /** The serial version id */
@@ -198,7 +194,7 @@ public final class LRUCache<K, V> {
    * 
    * @return an iteration of items
    */
-  public Iterator pages() {
+  public Iterator<CacheHandle<V>> pages() {
     return head;
   }
 
@@ -333,7 +329,7 @@ public final class LRUCache<K, V> {
   String dump() {
     String dump = "\n\tCachesize: " + cacheSize + "\n";
     dump += "\tMaximum Cachesize: " + maxCacheSize_ + "\n";
-    CacheHandle handle = head;
+    CacheHandle<V> handle = head;
     int i = 2;
     while (handle != null) {
       if (handle == head)
@@ -352,12 +348,8 @@ public final class LRUCache<K, V> {
    * Inner class used to build a double linked chain of cached items. The chain
    * start is identified by <code>getPrevious() == null</code>, the last element
    * has a next element of <code>null</code>.
-   * 
-   * @author Tobias Wunden
-   * @version 1.0
-   * @since Weblounge 2.0
    */
-  private class CacheHandle<H> implements Iterator {
+  private class CacheHandle<H> implements Iterator<CacheHandle<H>> {
 
     /** References used to maintain the chain */
     CacheHandle<H> prev, next;
@@ -435,9 +427,10 @@ public final class LRUCache<K, V> {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
       if (o != null && o instanceof CacheHandle) {
-        CacheHandle pch = (CacheHandle) o;
+        CacheHandle<H> pch = (CacheHandle<H>) o;
         return item.equals(pch.item);
       }
       return false;

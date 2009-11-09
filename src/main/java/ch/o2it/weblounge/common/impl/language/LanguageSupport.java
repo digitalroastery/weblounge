@@ -1,20 +1,21 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2007 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.common.impl.language;
@@ -42,10 +43,6 @@ import javax.xml.xpath.XPath;
 /**
  * <code>LanguageSupport</code> is a helper class the facilitates the handling
  * of languages in numerous ways.
- * 
- * @author Tobias Wunden
- * @version 2.0
- * @since Weblounge 1.0
  */
 public final class LanguageSupport {
 
@@ -53,7 +50,24 @@ public final class LanguageSupport {
   private final static Logger log_ = LoggerFactory.getLogger(LanguageSupport.class);
 
   /** Globally available languages */
-  private final static LanguageManagerImpl systemLanguages = new LanguageManagerImpl();
+  private final static Map<String, Language> systemLanguages = new HashMap<String, Language>();
+
+  /**
+   * Returns the language object that represents the given locale.
+   * 
+   * @param locale
+   *          the locale
+   * @return the language
+   * @throws UnsupportedLanguageException
+   *           if there is no language for the given locale
+   */
+  public static Language getLanguage(Locale locale)
+      throws UnsupportedLanguageException {
+    Language language = systemLanguages.get(locale.getLanguage());
+    if (language == null)
+      systemLanguages.put(locale.getLanguage(), new LanguageImpl(locale));
+    return language;
+  }
 
   /**
    * Returns the language object identified by the language identifier.
@@ -62,16 +76,17 @@ public final class LanguageSupport {
    *          the language identifier
    * @return the language
    * @throws UnsupportedLanguageException
+   *           if there is no language for the given locale
    */
   public static Language getLanguage(String languageCode)
       throws UnsupportedLanguageException {
-    Language language = systemLanguages.getLanguage(languageCode);
+    Language language = systemLanguages.get(languageCode);
     if (language != null)
       return language;
     for (Locale locale : Locale.getAvailableLocales()) {
       if (locale.getLanguage().equals(languageCode)) {
         language = new LanguageImpl(locale);
-        systemLanguages.addLanguage(language);
+        systemLanguages.put(languageCode, language);
       }
     }
     return language;

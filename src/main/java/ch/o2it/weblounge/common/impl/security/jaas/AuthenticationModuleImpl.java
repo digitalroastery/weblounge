@@ -1,20 +1,21 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2007 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.common.impl.security.jaas;
@@ -32,9 +33,6 @@ import javax.xml.xpath.XPath;
 /**
  * This class is used to wrap information on JAAS login modules read from the
  * site configuration file.
- * 
- * @author Tobias Wunden
- * @version 1.0
  */
 public final class AuthenticationModuleImpl extends ConfigurationBase implements AuthenticationModule {
 
@@ -45,7 +43,7 @@ public final class AuthenticationModuleImpl extends ConfigurationBase implements
   private Relevance relevance_ = null;
 
   /**
-   * Creates a new authentication module and throws variuos exceptions while
+   * Creates a new authentication module and throws various exceptions while
    * trying to read in the module configuration.
    */
   public AuthenticationModuleImpl(XPath path, Node config)

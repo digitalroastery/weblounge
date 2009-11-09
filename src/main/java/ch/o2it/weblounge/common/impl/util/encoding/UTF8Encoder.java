@@ -1,20 +1,21 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2007 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.common.impl.util.encoding;
@@ -36,7 +37,6 @@ import java.io.UTFDataFormatException;
  * the UTF-8 transform format.
  * </p>
  */
-
 public class UTF8Encoder {
 
   private UTF8Encoder() {
@@ -57,7 +57,7 @@ public class UTF8Encoder {
   }
 
   /**
-   * Encodes the character array to an utf-8 byte sequence.
+   * Encodes the character array to an UTF-8 byte sequence.
    * 
    * @param chars
    *          the character array
@@ -180,7 +180,7 @@ public class UTF8Encoder {
     }
 
     // Shortcut small strings to avoid the penalty of creating a byte array
-    // to write blockwise.
+    // to write block-wise.
     int slen = s.length();
     if (slen < 15) {
       for (int i = 0; i < slen; i++) {
@@ -206,8 +206,8 @@ public class UTF8Encoder {
       throw new IllegalArgumentException("Cannot convert null string to UTF-8");
     }
 
-    // Shorcut small strings to avoid the penalty of creating a byte array
-    // to write blockwise.
+    // Shortcut small strings to avoid the penalty of creating a byte array
+    // to write block-wise.
     int slen = s.length();
     if (slen < 15) {
       int len = getEncodedLength(s);

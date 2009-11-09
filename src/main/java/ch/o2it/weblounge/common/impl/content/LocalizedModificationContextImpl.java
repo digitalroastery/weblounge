@@ -1,20 +1,21 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2007 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.common.impl.content;
@@ -39,19 +40,13 @@ import java.util.HashSet;
 import javax.xml.xpath.XPath;
 
 /**
- * Default implementation of the modification context.
+ * Default implementation of the localized modification context.
  */
 public class LocalizedModificationContextImpl extends LocalizableObject implements LocalizedModificationContext, LocalizationListener {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(LocalizedModificationContextImpl.class);
 
-  /** Creation date */
-  protected Date creationDate = null;
-
-  /** Creator */
-  protected User creator = null;
-  
   /** The last modifier */
   protected transient User lastModifier = null;
   
@@ -66,7 +61,6 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    * <code>now</code>.
    */
   public LocalizedModificationContextImpl() {
-    this.creationDate = new Date();
     this.modifications = new LocalizableContent<Modification>(this);
   }
 
@@ -75,41 +69,8 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    * <code>now</code>.
    */
   public LocalizedModificationContextImpl(LocalizableObject localized) {
-    this.creationDate = new Date();
     this.modifications = new LocalizableContent<Modification>(this);
     localized.addLocalizationListener(this);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
-   */
-  public Date getCreationDate() {
-    return creationDate;
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
-   */
-  public User getCreator() {
-    return creator;
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setCreationDate(java.util.Date)
-   */
-  public void setCreationDate(Date date) {
-    this.creationDate = date;
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setCreator(ch.o2it.weblounge.common.user.User)
-   */
-  public void setCreator(User user) {
-    this.creator = user;
   }
 
   /**
@@ -248,15 +209,6 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setCreated(ch.o2it.weblounge.common.user.User, java.util.Date)
-   */
-  public void setCreated(User user, Date date) {
-    this.creator = user;
-    this.creationDate = date;
-  }
-
-  /**
-   * {@inheritDoc}
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
   public Date getLastModificationDate() {
@@ -264,7 +216,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
       return lastModification;
 
     // First time calculation
-    Date date = creationDate;
+    Date date = null;
     for (Modification m : modifications.values()) {
       if (date == null || m.getDate().after(date))
         date = m.getDate();
@@ -285,7 +237,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
       return lastModifier;
     
     // First time calculation
-    Date date = creationDate;
+    Date date = null;
     User user = null;
     for (Modification m : modifications.values()) {
       if (date == null || m.getDate().after(date)) {
@@ -306,7 +258,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAll()
    */
   public boolean isModifiedAtAll() {
-    return creationDate.before(getLastModificationDate());
+    return new Date().after(getLastModificationDate());
   }
 
   /**
@@ -322,6 +274,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    * 
    * @see java.lang.Object#clone()
    */
+  @SuppressWarnings("unchecked")
   public LocalizedModificationContextImpl clone() {
     LocalizedModificationContextImpl ctxt = new LocalizedModificationContextImpl();
     
@@ -331,10 +284,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
     ctxt.originalLanguage = originalLanguage;
     ctxt.languages = new HashSet<Language>();
     ctxt.languages.addAll(languages);
-
-    ctxt.creationDate = creationDate;
-    ctxt.creator = creator;
-    ctxt.modifications = modifications.clone();
+    ctxt.modifications = (LocalizableContent<Modification>)modifications.clone();
     ctxt.addLocalizationListener(modifications);
     
     return ctxt;
@@ -349,20 +299,6 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    *          the associated site
    */
   public void init(XPath path, Node context, Site site) {
-    // created
-    try {
-      Node creatorNode = XPathHelper.select(context, "//created/user", path);
-      if (creatorNode != null) {
-        creator = site.getUser(creatorNode.getNodeValue());
-      }
-      if (creator == null)
-        creator = site.getAdministrator();
-      Node createdNode = XPathHelper.select(context, "//created/date", path);
-      creationDate = (createdNode != null) ? WebloungeDateFormat.parseStatic(createdNode.getNodeValue()) : null;
-    } catch (Exception e) {
-      log_.warn("Error reading creation data", e);
-    }
-    // modifications
     try {
       Node languageNode = XPathHelper.select(context, "//modified/@language", path);
       Language language = site.getLanguage(languageNode.getNodeValue());
@@ -387,34 +323,16 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();
-
-    // Creation
-    if (creator == null)
-      b.append("<created/>");
-    else {
-      b.append("<created>");
-      b.append("<user>");
-      b.append(creator.getLogin());
-      b.append("</user>");
-      b.append("<date>");
-      b.append(WebloungeDateFormat.formatStatic(creationDate));
-      b.append("</date>");
-      b.append("/modified");
-    }
-
-    // Modifications
     for (Language language : modifications.languages()) {
       Modification modification = modifications.get(language);
       b.append("<modified language=\"");
       b.append(language.getIdentifier());
       b.append("\">");
-      b.append("<user>");
-      b.append(modification.getUser().getLogin());
-      b.append("</user>");
+      b.append(modification.getUser().toXml());
       b.append("<date>");
       b.append(WebloungeDateFormat.formatStatic(modification.getDate()));
       b.append("</date>");
-      b.append("/modified");
+      b.append("</modified>");
     }
     return b.toString();
   }
