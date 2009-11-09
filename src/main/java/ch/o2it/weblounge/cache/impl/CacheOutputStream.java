@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.cache.impl;
 
-import ch.o2it.weblounge.common.impl.util.datatype.Stack;
 import ch.o2it.weblounge.common.request.CacheHandle;
 
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import javax.servlet.ServletOutputStream;
 
@@ -100,7 +100,7 @@ class CacheOutputStream extends ServletOutputStream {
   }
 
   /**
-   * Signals the begin of a new cache entry.
+   * Signals the start of a new cache entry.
    * 
    * @param hnd
    *          the handle that identifies the cache entry
@@ -115,7 +115,7 @@ class CacheOutputStream extends ServletOutputStream {
     ActiveElement a = new ActiveElement(hnd, hit, pos);
 
     /* update the element hierarchy */
-    ActiveElement parent = hierarchy.top();
+    ActiveElement parent = hierarchy.peek();
     if (parent != null) {
       a.parent = parent.hnd;
       parent.children.add(hnd);
