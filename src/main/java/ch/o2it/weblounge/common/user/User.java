@@ -23,7 +23,7 @@ package ch.o2it.weblounge.common.user;
 /**
  * Defines a user with login, realm and name.
  */
-public interface User {
+public interface User extends Cloneable {
 
   /** Default realm for weblounge users */
   String DefaultRealm = "weblounge";
@@ -51,6 +51,13 @@ public interface User {
    * @return the realm
    */
   String getRealm();
+
+  /**
+   * Creates a clone of this user.
+   * 
+   * @return the cloned user
+   */
+  Object clone();
 
   /**
    * Returns the <code>XML</code> representation of this user.

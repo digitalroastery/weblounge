@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.user.User;
+
 import java.util.Date;
 
 /**
@@ -28,6 +30,13 @@ import java.util.Date;
  */
 public interface Publishable {
 
+  /**
+   * Returns the user that published the resource.
+   * 
+   * @return the publisher
+   */
+  User getPublisher();
+  
   /**
    * Returns the publishing start date.
    * 

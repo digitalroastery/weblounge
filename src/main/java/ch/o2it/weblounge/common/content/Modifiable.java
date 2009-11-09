@@ -49,6 +49,17 @@ public interface Modifiable {
   boolean isModifiedAfter(Date date);
 
   /**
+   * Returns <code>true</code> if this context was modified before the given
+   * date.
+   * 
+   * @param date
+   *          the date to compare to
+   * @return <code>true</code> is this context was modified before the given
+   *         date
+   */
+  boolean isModifiedBefore(Date date);
+
+  /**
    * Returns the time in milliseconds when the object was last modified.
    * 
    * @return the modification time

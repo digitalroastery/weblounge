@@ -40,14 +40,24 @@ public interface LocalizedModifiable extends Modifiable, Localizable {
   boolean isModifiedAtAll();
 
   /**
-   * Returns <code>true</code> if this context contains information about a
-   * modification.
+   * Returns <code>true</code> if this context was modified in any language
+   * after the given date.
    * 
    * @param date
    *          the date to compare to
    * @return <code>true</code> is this context was modified
    */
   boolean isModifiedAtAllAfter(Date date);
+
+  /**
+   * Returns <code>true</code> if this context was modified in any language
+   * before the given date.
+   * 
+   * @param date
+   *          the date to compare to
+   * @return <code>true</code> is this context was modified
+   */
+  boolean isModifiedAtAllBefore(Date date);
 
   /**
    * Returns the time in milliseconds when the object was last modified,
