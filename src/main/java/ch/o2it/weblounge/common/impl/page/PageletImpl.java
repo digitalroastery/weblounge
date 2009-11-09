@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
@@ -143,10 +144,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       }
     }
     properties = new HashMap<String, String[]>();
-    securityCtx = new PageletSecurityContextImpl(module, id);
-    publishingCtx = new PublishingContextImpl();
     creationCtx = new CreationContextImpl();
     modificationCtx = new LocalizedModificationContextImpl(this);
+    publishingCtx = new PublishingContextImpl();
+    securityCtx = new PageletSecurityContextImpl(module, id);
     content = new LocalizableContent<Map<String, String[]>>(this);
   }
 
@@ -304,6 +305,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public PublishingContext getPublishingContext() {
     return publishingCtx;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
+   */
+  public User getPublisher() {
+    return publishingCtx.getPublisher();
   }
 
   /**
@@ -567,6 +577,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedBefore(java.util.Date)
+   */
+  public boolean isModifiedBefore(Date date) {
+    return modificationCtx.isModifiedBefore(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
   public Date getLastModificationDate() {
@@ -598,6 +617,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public boolean isModifiedAtAllAfter(Date date) {
     return modificationCtx.isModifiedAtAllAfter(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllBefore(java.util.Date)
+   */
+  public boolean isModifiedAtAllBefore(Date date) {
+    return modificationCtx.isModifiedAtAllBefore(date);
   }
 
   /**

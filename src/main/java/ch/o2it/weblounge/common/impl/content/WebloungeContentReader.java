@@ -212,7 +212,7 @@ public class WebloungeContentReader extends DefaultHandler {
    * @return the default publishing context
    */
   protected PublishingContextImpl getDefaultPublishingContext() {
-    return new PublishingContextImpl();
+    return new PublishingContextImpl(site.getAdministrator());
   }
 
   /**
@@ -254,7 +254,7 @@ public class WebloungeContentReader extends DefaultHandler {
    * @return the default publishing context
    */
   protected ModificationContextImpl getDefaultModificationContext() {
-    return new ModificationContextImpl();
+    return new ModificationContextImpl(site.getAdministrator());
   }
 
   /**
@@ -305,7 +305,7 @@ public class WebloungeContentReader extends DefaultHandler {
    */
   protected void setModificationDate(Date date) {
     if (modificationCtx == null)
-      modificationCtx = new ModificationContextImpl();
+      modificationCtx = new ModificationContextImpl(site.getAdministrator());
     modificationCtx.setModificationDate(date);
   }
 
@@ -317,8 +317,9 @@ public class WebloungeContentReader extends DefaultHandler {
    */
   protected void setModifier(User user) {
     if (modificationCtx == null)
-      modificationCtx = new ModificationContextImpl();
-    modificationCtx.setModifier(user);
+      modificationCtx = new ModificationContextImpl(user);
+    else
+      modificationCtx.setModifier(user);
   }
 
   /**
@@ -419,7 +420,7 @@ public class WebloungeContentReader extends DefaultHandler {
     else if ("workflow".equals(local)) {
       contentReaderContext = CTXT_WORKFLOW;
       if (modificationCtx == null) {
-        modificationCtx = new ModificationContextImpl();
+        modificationCtx = new ModificationContextImpl(site.getAdministrator());
       }
       return;
     }
@@ -498,7 +499,7 @@ public class WebloungeContentReader extends DefaultHandler {
     /** publishing from */
     else if (contentReaderContext == CTXT_PUBLISH && "from".equals(local)) {
       if (publishingCtx == null) {
-        publishingCtx = new PublishingContextImpl();
+        publishingCtx = new PublishingContextImpl(site.getAdministrator());
       }
       if (characters.length() > 0) {
         try {
@@ -516,7 +517,7 @@ public class WebloungeContentReader extends DefaultHandler {
     /** publishing to */
     else if (contentReaderContext == CTXT_PUBLISH && "to".equals(local)) {
       if (publishingCtx == null) {
-        publishingCtx = new PublishingContextImpl();
+        publishingCtx = new PublishingContextImpl(site.getAdministrator());
       }
       if (characters.length() > 0) {
         try {

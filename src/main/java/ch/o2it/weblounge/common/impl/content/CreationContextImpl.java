@@ -103,8 +103,10 @@ public class CreationContextImpl implements CreationContext {
    */
   public Object clone() {
     CreationContextImpl ctxt = new CreationContextImpl();
-    ctxt.creationDate = creationDate;
-    ctxt.creator = creator;
+    if (creator != null)
+      ctxt.creator = (User)creator.clone();
+    if (creationDate != null)
+    ctxt.creationDate = (Date)creationDate.clone();
     return ctxt;
   }
 
@@ -117,7 +119,7 @@ public class CreationContextImpl implements CreationContext {
    *           if the date found in this context cannot be parsed
    */
   public static CreationContext fromXml(Node context)
-      throws IllegalStateException {
+      throws IllegalArgumentException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(context, xpath);
   }
@@ -129,27 +131,32 @@ public class CreationContextImpl implements CreationContext {
    *          the creation context node
    * @param xpathProcessor
    *          xpath processor to use
-   * @throws IllegalStateException
+   * @throws IllegalArgumentException
    *           if the date found in this context cannot be parsed
    */
   public static CreationContext fromXml(Node context, XPath xpathProcessor)
-      throws IllegalStateException {
+      throws IllegalArgumentException {
+
     Node contextRoot = XPathHelper.select(context, "//created", xpathProcessor);
     if (contextRoot == null)
       return null;
 
-    CreationContextImpl c = new CreationContextImpl();
+    CreationContextImpl ctx = new CreationContextImpl();
+    
+    // Creator
     Node creator = XPathHelper.select(contextRoot, "//created/user", xpathProcessor);
     if (creator != null)
-      c.setCreator(UserImpl.fromXml(creator, xpathProcessor));
+      ctx.setCreator(UserImpl.fromXml(creator, xpathProcessor));
+    
+    // Creation date
     String date = XPathHelper.valueOf(contextRoot, "//created/date", xpathProcessor);
     if (date != null)
       try {
-        c.setCreationDate(WebloungeDateFormat.parseStatic(date));
+        ctx.setCreationDate(WebloungeDateFormat.parseStatic(date));
       } catch (ParseException e) {
-        throw new IllegalArgumentException("The creation date " + date + " cannot be parsed", e);
+        throw new IllegalArgumentException("The creation date '" + date + "' cannot be parsed", e);
       }
-    return c;
+    return ctx;
   }
 
   /**

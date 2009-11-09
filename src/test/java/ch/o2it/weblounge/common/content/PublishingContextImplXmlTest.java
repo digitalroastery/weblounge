@@ -18,12 +18,12 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.user;
+package ch.o2it.weblounge.common.content;
 
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
+import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,12 +35,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Tests loading a {@link WebloungeUserImpl} from a piece of <code>XML</code>.
+ * Test case for the part of the implementation of {@link PublishingContextImpl}
+ * that deals with <code>XML</code> serialization and deserialization.
  */
-public class WebloungeUserImplXmlTest extends WebloungeUserImplTest {
+public class PublishingContextImplXmlTest extends PublishingContextImplTest {
 
-  /** File path and name */
-  protected String testFile = "/webloungeuser.xml";
+  /** Test file */
+  protected String testFile = "/publishingcontext.xml";
 
   /**
    * @throws java.lang.Exception
@@ -52,17 +53,17 @@ public class WebloungeUserImplXmlTest extends WebloungeUserImplTest {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    setUpPrerequisites();
-    user = WebloungeUserImpl.fromXml(doc.getFirstChild(), mockSite);
+    ctx = PublishingContextImpl.fromXml(doc.getFirstChild());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#toXml()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContextImpl#fromXml(org.w3c.dom.Node)}
+   * .
    */
   @Test
-  public void testToXml() {
-    String testXml = TestUtils.loadXmlFromFile(testFile);
-    assertEquals(testXml, user.toXml());
+  public void testFromXmlNode() {
+    assertEquals(TestUtils.loadXmlFromFile(testFile), ctx.toXml());
   }
 
 }

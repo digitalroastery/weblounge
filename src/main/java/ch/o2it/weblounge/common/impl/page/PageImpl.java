@@ -23,7 +23,9 @@ import ch.o2it.weblounge.common.content.CreationContext;
 import ch.o2it.weblounge.common.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
+import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PageSecurityContext;
@@ -128,8 +130,9 @@ public class PageImpl extends LocalizableObject implements Page {
   PageImpl(PageURIImpl uri) {
     super(uri.getSite().getDefaultLanguage());
     this.uri = uri;
-    this.publishingCtx = new PublishingContextImpl();
+    this.creationCtx = new CreationContextImpl();
     this.modificationCtx = new LocalizedModificationContextImpl(this);
+    this.publishingCtx = new PublishingContextImpl();
     this.securityCtx = new PageSecurityContext();
     this.keywords_ = new ArrayList<String>();
     this.headlines = new ArrayList<Pagelet>();
@@ -206,6 +209,15 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
+   */
+  public User getPublisher() {
+    return publishingCtx.getPublisher();
+  }
+
+  /**
    * Returns the publishing start date.
    * 
    * @return the start date
@@ -245,7 +257,8 @@ public class PageImpl extends LocalizableObject implements Page {
    *          the user that wants access to the header
    * @return the first suitable headline pagelet
    */
-  public Pagelet getHeadline(String moduleId, String pageletId, AuthenticatedUser user) {
+  public Pagelet getHeadline(String moduleId, String pageletId,
+      AuthenticatedUser user) {
     return getHeadline(moduleId, pageletId, user, SystemPermission.READ);
   }
 
@@ -264,8 +277,8 @@ public class PageImpl extends LocalizableObject implements Page {
    *          the permission requirements
    * @return the first suitable headline pagelet
    */
-  public Pagelet getHeadline(String moduleId, String pageletId, AuthenticatedUser user,
-      Permission permission) {
+  public Pagelet getHeadline(String moduleId, String pageletId,
+      AuthenticatedUser user, Permission permission) {
     for (int i = 0; i < headlines.size(); i++) {
       Pagelet headline = headlines.get(i);
       if (headline.getModule().equals(moduleId) && headline.getIdentifier().equals(pageletId))
@@ -575,6 +588,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
    */
   public boolean isCreatedAfter(Date date) {
@@ -658,6 +672,15 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedBefore(java.util.Date)
+   */
+  public boolean isModifiedBefore(Date date) {
+    return modificationCtx.isModifiedBefore(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
   public Date getLastModificationDate() {
@@ -689,6 +712,15 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public boolean isModifiedAtAllAfter(Date date) {
     return modificationCtx.isModifiedAtAllAfter(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllBefore(java.util.Date)
+   */
+  public boolean isModifiedAtAllBefore(Date date) {
+    return modificationCtx.isModifiedAtAllBefore(date);
   }
 
   /**

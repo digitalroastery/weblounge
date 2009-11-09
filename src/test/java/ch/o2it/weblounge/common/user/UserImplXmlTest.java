@@ -22,17 +22,13 @@ package ch.o2it.weblounge.common.user;
 
 import static org.junit.Assert.assertEquals;
 
-import static org.junit.Assert.fail;
-
+import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -45,7 +41,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class UserImplXmlTest extends UserImplTest {
 
   /** File path and name */
-  String testFile = "/user.xml";
+  protected String testFile = "/user.xml";
 
   /**
    * @throws java.lang.Exception
@@ -66,17 +62,8 @@ public class UserImplXmlTest extends UserImplTest {
    */
   @Test
   public void testToXml() {
-    File templateFile = new File(this.getClass().getResource(testFile).getPath());
-    String template = null;
-    try {
-      byte[] buffer = new byte[(int) templateFile.length()];
-      FileInputStream f = new FileInputStream(templateFile);
-      f.read(buffer);
-      template = new String(buffer).replaceAll("(>\\s*)+", ">").replaceAll("(\\s*<)+", "<");
-    } catch (IOException e) {
-      fail("Error reading test resource " + templateFile.getPath());
-    }
-    assertEquals(template, user.toXml());
+    String testXml = TestUtils.loadXmlFromFile(testFile);
+    assertEquals(testXml, user.toXml());
   }
 
 }

@@ -196,7 +196,9 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.PermissionSet,
+   *      ch.o2it.weblounge.common.security.Authority)
    */
   public boolean check(PermissionSet p, Authority a) {
     return securityContext.check(p, a);
@@ -204,7 +206,9 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.security.Securable#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#checkOne(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority[])
    */
   public boolean checkOne(Permission permission, Authority[] authorities) {
     if (securityContext == null)
@@ -214,7 +218,9 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.security.Securable#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#checkAll(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority[])
    */
   public boolean checkAll(Permission permission, Authority[] authorities) {
     if (securityContext == null)
@@ -224,6 +230,7 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.security.Securable#permissions()
    */
   public Permission[] permissions() {
@@ -275,9 +282,9 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
    */
   public boolean isPublished() {
-    if (publishingContext != null)
-      return publishingContext.isPublished();
-    return false;
+    if (publishingContext == null)
+      return false;
+    return publishingContext.isPublished();
   }
 
   /**
@@ -286,24 +293,41 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
    */
   public boolean isPublished(Date date) {
-    if (publishingContext != null)
-      return publishingContext.isPublished(date);
-    return false;
+    if (publishingContext == null)
+      return false;
+    return publishingContext.isPublished(date);
   }
 
   /**
    * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
+   */
+  public User getPublisher() {
+    if (publishingContext == null)
+      return null;
+    return publishingContext.getPublisher();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
    */
   public Date getPublishFrom() {
+    if (publishingContext == null)
+      return null;
     return publishingContext.getPublishFrom();
   }
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
    */
   public Date getPublishTo() {
+    if (publishingContext == null)
+      return null;
     return publishingContext.getPublishTo();
   }
 

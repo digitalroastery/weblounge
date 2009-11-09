@@ -31,6 +31,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Default implementation of the {@link ModificationContext}.
@@ -47,17 +48,18 @@ public class ModificationContextImpl implements ModificationContext {
    * Creates a modification context with today's date.
    */
   public ModificationContextImpl() {
-    this.modificationDate = new Date();
+    this(new Date(), null);
   }
 
   /**
-   * Creates a modification context reflecting modification at the given date.
+   * Creates a modification context with the given modifier, with the
+   * modification time reflecting the current date.
    * 
-   * @param date
-   *          the modification date
+   * @param modifier
+   *          the modifying user
    */
-  public ModificationContextImpl(Date date) {
-    this.modificationDate = date;
+  public ModificationContextImpl(User modifier) {
+    this(new Date(), modifier);
   }
 
   /**
@@ -66,12 +68,12 @@ public class ModificationContextImpl implements ModificationContext {
    * 
    * @param date
    *          the modification date
-   * @param editor
+   * @param modifier
    *          the modifying user
    */
-  public ModificationContextImpl(Date date, User editor) {
+  public ModificationContextImpl(Date date, User modifier) {
     this.modificationDate = date;
-    this.modifier = editor;
+    this.modifier = modifier;
   }
 
   /**
@@ -94,14 +96,21 @@ public class ModificationContextImpl implements ModificationContext {
    * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
    */
   public boolean isModified() {
-    return isModifiedAfter(new Date());
+    return isModifiedBefore(new Date());
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#isModified()
+   * @see ch.o2it.weblounge.common.content.ModificationContext#isModifiedAfter(java.util.Date)
    */
   public boolean isModifiedAfter(Date date) {
     return modificationDate != null && modificationDate.after(date);
+  }
+
+  /**
+   * @see ch.o2it.weblounge.common.content.ModificationContext#isModifiedBefore(java.util.Date)
+   */
+  public boolean isModifiedBefore(Date date) {
+    return modificationDate != null && modificationDate.before(date);
   }
 
   /**
@@ -125,53 +134,81 @@ public class ModificationContextImpl implements ModificationContext {
    */
   public Object clone() {
     ModificationContextImpl ctxt = new ModificationContextImpl();
-    ctxt.modifier = modifier;
-    ctxt.modificationDate = modificationDate;
+    if (modifier != null)
+      ctxt.modifier = (User)modifier.clone();
+    if (modificationDate != null)
+      ctxt.modificationDate = (Date)modificationDate.clone();
     return ctxt;
   }
 
   /**
-   * Initializes this context from an XML node.
+   * Initializes this context from an <code>XML</code> node.
    * 
    * @param context
    *          the publish context node
+   * @throws IllegalArgumentException
+   *           if the modification date found in this context cannot be parsed
    */
-  public static ModificationContextImpl fromXml(XPath xpath, Node context) {
+  public static ModificationContextImpl fromXml(Node context) {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(context, xpath);
+  }
+
+  /**
+   * Initializes this context from an <code>XML</code> node.
+   * 
+   * @param context
+   *          the publish context node
+   * @param xpath
+   *          the xpath processor
+   * @throws IllegalArgumentException
+   *           if the modification date found in this context cannot be parsed
+   */
+  public static ModificationContextImpl fromXml(Node context, XPath xpath)
+      throws IllegalArgumentException {
+
     Node contextRoot = XPathHelper.select(context, "//modified", xpath);
     if (contextRoot == null)
       return null;
 
-    ModificationContextImpl c = new ModificationContextImpl();
-    Node creator = XPathHelper.select(contextRoot, "/user", xpath);
-    if (creator != null)
-      c.setModifier(UserImpl.fromXml(creator, xpath));
-    String date = XPathHelper.valueOf(contextRoot, "/date", xpath);
-    if (date != null)
-      try {
-        c.setModificationDate(WebloungeDateFormat.parseStatic(date));
-      } catch (ParseException e) {
-        throw new IllegalArgumentException("The modification date " + date + " cannot be parsed", e);
-      }
-    return c;
+    // Modifying user
+    ModificationContextImpl ctx = new ModificationContextImpl();
+    Node creator = XPathHelper.select(contextRoot, "/modified/user", xpath);
+    if (creator == null)
+      throw new IllegalStateException("Modifier cannot be null");
+    ctx.setModifier(UserImpl.fromXml(creator, xpath));
+
+    // Modification date
+    String date = XPathHelper.valueOf(contextRoot, "/modified/date", xpath);
+    if (date == null)
+      throw new IllegalStateException("Date cannot be null");
+    try {
+      ctx.setModificationDate(WebloungeDateFormat.parseStatic(date));
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("The modification date '" + date + "' cannot be parsed", e);
+    }
+
+    return ctx;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.ModificationContext#toXml()
    */
   public String toXml() {
+    if (modifier == null || modificationDate == null)
+      return "";
+
     StringBuffer b = new StringBuffer();
     b.append("<modified>");
     if (modifier != null) {
-      b.append("<user>");
-      b.append(modifier.getLogin());
-      b.append("</user>");
+      b.append(modifier.toXml());
     }
     if (modificationDate != null) {
       b.append("<date>");
       b.append(WebloungeDateFormat.formatStatic(modificationDate));
       b.append("</date>");
     }
-    b.append("/modified");
+    b.append("</modified>");
     return b.toString();
   }
 

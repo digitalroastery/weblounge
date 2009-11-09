@@ -183,6 +183,16 @@ public class UserImpl implements User {
     UserImpl user = new UserImpl(login, realm, name);
     return user;
   }
+  
+  /**
+   * {@inheritDoc}
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public Object clone() {
+    UserImpl user = new UserImpl(login, realm, name);
+    return user;
+  }
 
   /**
    * {@inheritDoc}

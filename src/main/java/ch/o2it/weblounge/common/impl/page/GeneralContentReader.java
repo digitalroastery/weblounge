@@ -20,6 +20,7 @@
 package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.content.PublishingContext;
+import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
 import ch.o2it.weblounge.common.impl.security.AbstractSecurityContext;
 import ch.o2it.weblounge.common.impl.security.AuthorityImpl;
 import ch.o2it.weblounge.common.impl.security.PermissionImpl;

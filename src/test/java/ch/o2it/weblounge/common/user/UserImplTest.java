@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * TODO: Comment UserImplTest
+ * Tests the implementation of {@link UserImpl}.
  */
 public class UserImplTest {
   
@@ -50,7 +50,6 @@ public class UserImplTest {
    * @throws java.lang.Exception
    */
   @Before
-  @SuppressWarnings("unused")
   public void setUp() throws Exception {
     user = new UserImpl(login, realm, name);
   }

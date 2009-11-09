@@ -18,12 +18,12 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.user;
+package ch.o2it.weblounge.common.content;
 
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
+import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,15 +35,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Tests loading a {@link WebloungeUserImpl} from a piece of <code>XML</code>.
+ * Test case for the part of the implementation of {@link ModificationContextImpl}
+ * that deals with <code>XML</code> serialization and deserialization.
  */
-public class WebloungeUserImplXmlTest extends WebloungeUserImplTest {
+public class ModificationContextImplXmlTest extends ModificationContextImplTest {
 
   /** File path and name */
-  protected String testFile = "/webloungeuser.xml";
+  protected String testFile = "/modificationcontext.xml";
 
   /**
-   * @throws java.lang.Exception
+   * Test setup.
    */
   @Before
   @Override
@@ -52,17 +53,17 @@ public class WebloungeUserImplXmlTest extends WebloungeUserImplTest {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    setUpPrerequisites();
-    user = WebloungeUserImpl.fromXml(doc.getFirstChild(), mockSite);
+    ctx = ModificationContextImpl.fromXml(doc.getFirstChild());
+    setupSpecialModificationContexts();
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#toXml()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ModificationContextImpl#toXml()}.
    */
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromFile(testFile);
-    assertEquals(testXml, user.toXml());
+    assertEquals(testXml, ctx.toXml());
   }
 
 }

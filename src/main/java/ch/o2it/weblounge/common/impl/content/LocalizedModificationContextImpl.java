@@ -39,7 +39,7 @@ import java.util.HashSet;
 import javax.xml.xpath.XPath;
 
 /**
- * Default implementation fo the modification context.
+ * Default implementation of the modification context.
  */
 public class LocalizedModificationContextImpl extends LocalizableObject implements LocalizedModificationContext, LocalizationListener {
 
@@ -170,6 +170,26 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllAfter(java.util.Date)
    */
   public boolean isModifiedAtAllAfter(Date date) {
+    for (Modification modification : modifications.values()) {
+      if (modification.getDate().after(date))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * @see ch.o2it.weblounge.common.content.ModificationContext#isModifiedBefore(java.util.Date)
+   */
+  public boolean isModifiedBefore(Date date) {
+    Modification modification = modifications.get();
+    return modification != null && modification.getDate().before(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllBefore(java.util.Date)
+   */
+  public boolean isModifiedAtAllBefore(Date date) {
     for (Modification modification : modifications.values()) {
       if (modification.getDate().after(date))
         return true;

@@ -20,17 +20,19 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.PublishingContext;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import org.w3c.dom.Node;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * This class models the publishing constraints that apply to an arbitrary
@@ -50,22 +52,49 @@ import javax.xml.xpath.XPath;
 public class PublishingContextImpl implements PublishingContext {
 
   /** Publisher */
-  private User publisher_ = null;
+  protected User publisher = null;
 
   /** Start date */
-  private Date from_ = null;
+  protected Date startDate = null;
 
   /** End date */
-  private Date to_ = null;
+  protected Date endDate = null;
 
   /**
    * Creates a default publishing context with no restrictions and a context
    * identifier of <tt>&lt;default&gt;</tt>.
    */
   public PublishingContextImpl() {
-    publisher_ = null;
-    from_ = new Date();
-    to_ = null;
+    startDate = new Date();
+  }
+
+  /**
+   * Creates a default publishing context with no restrictions and a context
+   * identifier of <tt>&lt;default&gt;</tt>.
+   * 
+   * @param publisher
+   *          the user publishing the content
+   */
+  public PublishingContextImpl(User publisher) {
+    this.publisher = publisher;
+    startDate = new Date();
+  }
+
+  /**
+   * Creates a default publishing context with no restrictions and a context
+   * identifier of <tt>&lt;default&gt;</tt>.
+   * 
+   * @param publisher
+   *          the user publishing the content
+   * @param startDate
+   *          publication start date
+   * @param endDate
+   *          publication end date
+   */
+  public PublishingContextImpl(User publisher, Date startDate, Date endDate) {
+    this.publisher = publisher;
+    this.startDate = startDate;
+    this.endDate = endDate;
   }
 
   /**
@@ -75,7 +104,7 @@ public class PublishingContextImpl implements PublishingContext {
    *          the publisher
    */
   public void setPublisher(User user) {
-    publisher_ = user;
+    publisher = user;
   }
 
   /**
@@ -84,7 +113,7 @@ public class PublishingContextImpl implements PublishingContext {
    * @return the publisher
    */
   public User getPublisher() {
-    return publisher_;
+    return publisher;
   }
 
   /**
@@ -95,14 +124,14 @@ public class PublishingContextImpl implements PublishingContext {
    *          the start date
    */
   public void setPublishFrom(Date from) {
-    from_ = from;
+    this.startDate = from;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.PublishingContext#getPublishFrom()
    */
   public Date getPublishFrom() {
-    return from_;
+    return startDate;
   }
 
   /**
@@ -113,14 +142,14 @@ public class PublishingContextImpl implements PublishingContext {
    *          the end date
    */
   public void setPublishTo(Date to) {
-    to_ = to;
+    this.endDate = to;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.PublishingContext#getPublishTo()
    */
   public Date getPublishTo() {
-    return to_;
+    return endDate;
   }
 
   /**
@@ -135,33 +164,74 @@ public class PublishingContextImpl implements PublishingContext {
    */
   public boolean isPublished(Date date) {
     Arguments.checkNull(date, "date");
-    boolean checkFrom = from_ == null || from_.before(date);
-    boolean checkTo = to_ == null || to_.after(date);
+    boolean checkFrom = startDate == null || startDate.before(date);
+    boolean checkTo = endDate == null || endDate.after(date);
     return (checkFrom && checkTo);
   }
 
   /**
-   * Initializes this context from an xml node.
+   * Creates a publishing context from an <code>XML</code> node.
    * 
    * @param context
    *          the publish context node
+   * @throws IllegalArgumentException
+   *           if either the publishing start date or the publishing end date
+   *           found in this context cannot be parsed
    */
-  public void init(XPath path, Node context, Site site) {
+  public static PublishingContextImpl fromXml(Node context)
+      throws IllegalArgumentException {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(context, xpath);
+  }
+
+  /**
+   * Creates a publishing context from an <code>XML</code> node.
+   * 
+   * @param context
+   *          the publish context node
+   * @param xpathProcessor
+   *          the xpath processor
+   * @throws IllegalArgumentException
+   *           if either the publishing start date or the publishing end date
+   *           found in this context cannot be parsed
+   */
+  public static PublishingContextImpl fromXml(Node context, XPath xpathProcessor)
+      throws IllegalArgumentException {
+
+    // Look up the root node
+    Node contextRoot = XPathHelper.select(context, "//published", xpathProcessor);
+    if (contextRoot == null)
+      return null;
+
+    PublishingContextImpl ctx = new PublishingContextImpl();
+
+    // Publisher
+    Node publisher = XPathHelper.select(contextRoot, "//published/user", xpathProcessor);
+    if (publisher == null)
+      throw new IllegalStateException("Publisher cannot be null");
+    ctx.setPublisher(UserImpl.fromXml(publisher, xpathProcessor));
+
+    // Start date
+    String startDate = XPathHelper.valueOf(contextRoot, "//published/from", xpathProcessor);
+    if (startDate == null)
+      throw new IllegalStateException("Publishing start date cannot be null");
     try {
-      Node publisher = XPathHelper.select(context, "//publish/user", path);
-      publisher_ = (publisher != null) ? site.getUser(publisher.getNodeValue()) : null;
-    } catch (Exception e) {
+      ctx.setPublishFrom(WebloungeDateFormat.parseStatic(startDate));
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("The publishing start date '" + startDate + "' cannot be parsed", e);
     }
-    try {
-      Node from = XPathHelper.select(context, "//publish/from", path);
-      from_ = (from != null) ? WebloungeDateFormat.parseStatic(from.getNodeValue()) : null;
-    } catch (Exception e) {
+
+    // End date
+    String endDate = XPathHelper.valueOf(contextRoot, "//published/to", xpathProcessor);
+    if (endDate != null) {
+      try {
+        ctx.setPublishTo(WebloungeDateFormat.parseStatic(endDate));
+      } catch (ParseException e) {
+        throw new IllegalArgumentException("The publishing end date '" + endDate + "' cannot be parsed", e);
+      }
     }
-    try {
-      Node to = XPathHelper.select(context, "//publish/to", path);
-      to_ = (to != null) ? WebloungeDateFormat.parseStatic(to.getNodeValue()) : null;
-    } catch (Exception e) {
-    }
+
+    return ctx;
   }
 
   /**
@@ -171,8 +241,12 @@ public class PublishingContextImpl implements PublishingContext {
    */
   public Object clone() {
     PublishingContextImpl ctxt = new PublishingContextImpl();
-    ctxt.from_ = from_;
-    ctxt.to_ = to_;
+    if (publisher != null)
+      ctxt.publisher = (User) publisher.clone();
+    if (startDate != null)
+      ctxt.startDate = (Date) startDate.clone();
+    if (endDate != null)
+      ctxt.endDate = (Date) endDate.clone();
     return ctxt;
   }
 
@@ -182,25 +256,23 @@ public class PublishingContextImpl implements PublishingContext {
    * @return an XML representation of this context
    */
   public String toXml() {
+    if (publisher == null || startDate == null)
+      return "";
+
     StringBuffer b = new StringBuffer();
     b.append("<published>");
-    if (publisher_ != null) {
-      b.append("<user>");
-      b.append(publisher_.getLogin());
-      b.append("</user>");
-    }
-    if (from_ == null) {
-      b.append("<from/>");
-    } else {
-      b.append("<from>");
-      b.append(WebloungeDateFormat.formatStatic(from_));
-      b.append("</from>");
-    }
-    if (to_ != null) {
+    b.append(publisher.toXml());
+    
+    b.append("<from>");
+    b.append(WebloungeDateFormat.formatStatic(startDate));
+    b.append("</from>");
+
+    if (endDate != null) {
       b.append("<to>");
-      b.append(WebloungeDateFormat.formatStatic(to_));
+      b.append(WebloungeDateFormat.formatStatic(endDate));
       b.append("</to>");
     }
+
     b.append("</published>");
     return b.toString();
   }

@@ -32,10 +32,11 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
- * Test cases for {@link CreationContextImplTest}.
+ * Test cases for {@link CreationContextImpl}.
  */
 public class CreationContextImplTest {
 
+  /** Test context */
   protected CreationContext ctx = null;
 
   /** Creation date */
@@ -48,7 +49,6 @@ public class CreationContextImplTest {
    * Test setup.
    */
   @Before
-  @SuppressWarnings("unused")
   public void setUp() throws Exception {
     ctx = new CreationContextImpl();
     ctx.setCreationDate(creationDate);
