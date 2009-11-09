@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule;
-import ch.o2it.weblounge.common.impl.user.WebloungeAdmin;
+import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.ServletConfiguration;
 import ch.o2it.weblounge.common.impl.util.ServletMapping;
@@ -38,7 +38,7 @@ import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.service.Service;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.ImageStyleRegistry;
-import ch.o2it.weblounge.common.site.SiteAdmin;
+import ch.o2it.weblounge.common.user.SiteAdmin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -276,7 +276,7 @@ public class SiteConfiguration implements Customizable {
 	private void readAdmin(XPath path, Node config) {
 		if (config != null) {
 			String login = XPathHelper.valueOf(config, "login", path);
-			if (login.equals(WebloungeAdmin.getInstance().getLogin())) {
+			if (login.equals(WebloungeAdminImpl.getInstance().getLogin())) {
 				throw new ConfigurationException("Site administrator login '" + login + "' is not allowed. Login is taken by system administrator");
 			}
 			String password = XPathHelper.valueOf(config, "password", path);
