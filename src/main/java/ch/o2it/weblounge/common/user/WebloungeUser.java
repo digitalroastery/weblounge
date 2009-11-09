@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.user;
 
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
 
@@ -32,11 +33,42 @@ import java.util.Date;
 public interface WebloungeUser extends AuthenticatedUser {
 
   /**
+   * Sets the person's email.
+   * 
+   * @param email
+   *          the email address
+   */
+  void setEmail(String email);
+
+  /**
+   * Returns the associated site.
+   * 
+   * @return the site
+   */
+  Site getSite();
+
+  /**
+   * Sets this person's first name.
+   * 
+   * @param firstname
+   *          the first name
+   */
+  void setFirstName(String firstname);
+
+  /**
    * Returns the first name of this person.
    * 
    * @return the person's first name
    */
   String getFirstName();
+
+  /**
+   * Sets this person's last name.
+   * 
+   * @param lastname
+   *          the last name
+   */
+  void setLastName(String lastname);
 
   /**
    * Returns the last name of this person.
@@ -53,6 +85,14 @@ public interface WebloungeUser extends AuthenticatedUser {
   String getEmail();
 
   /**
+   * Sets the person's preferred language.
+   * 
+   * @param language
+   *          the preferred language
+   */
+  void setLanguage(Language language);
+
+  /**
    * Returns the preferred language of this person.
    * 
    * @return the person's preferred language
@@ -60,11 +100,27 @@ public interface WebloungeUser extends AuthenticatedUser {
   Language getLanguage();
 
   /**
+   * Sets the person's initials.
+   * 
+   * @param initials
+   *          the person's initials
+   */
+  void setInitials(String initials);
+
+  /**
    * Returns the short version of the persons name.
    * 
    * @return the persons initials
    */
   String getInitials();
+
+  /**
+   * Sets the enabled flag. Set it to <code>true</code> to enable the login.
+   * 
+   * @param enabled
+   *          <code>true</code> to enable this login
+   */
+  void setEnabled(boolean enabled);
 
   /**
    * Returns <code>true</code> if the user is enabled, <code>false</code>
@@ -114,6 +170,16 @@ public interface WebloungeUser extends AuthenticatedUser {
    * @return the property value
    */
   Object removeProperty(String name);
+
+  /**
+   * Sets the last login date.
+   * 
+   * @param date
+   *          the login date
+   * @param src
+   *          the login source
+   */
+  void setLastLogin(Date date, String src);
 
   /**
    * Returns the data where the user logged in for the last time.

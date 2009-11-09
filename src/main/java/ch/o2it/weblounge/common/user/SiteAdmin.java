@@ -21,42 +21,11 @@
 package ch.o2it.weblounge.common.user;
 
 /**
- * Defines a user with login, realm and name.
+ * This interface represents the administrator user for a single site.
  */
-public interface User {
+public interface SiteAdmin extends WebloungeUser {
 
-  /** Default realm for weblounge users */
-  String DefaultRealm = "weblounge";
-
-  /** Default realm for system users */
-  String SystemRealm = "system";
-
-  /**
-   * Returns the name of this user.
-   * 
-   * @returns the user name
-   */
-  String getName();
-
-  /**
-   * Returns the login name of this user.
-   * 
-   * @return the login
-   */
-  String getLogin();
-
-  /**
-   * Returns the realm where this user can be looked up.
-   * 
-   * @return the realm
-   */
-  String getRealm();
-
-  /**
-   * Returns the <code>XML</code> representation of this user.
-   * 
-   * @return the xml representation
-   */
-  String toXml();
+  // This is a marker interface, since the site administrator is
+  // a special authenticated user.
 
 }

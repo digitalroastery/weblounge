@@ -36,6 +36,7 @@ import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.SecurityManager;
 import ch.o2it.weblounge.common.security.UserListener;
+import ch.o2it.weblounge.common.user.SiteAdmin;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 

@@ -18,16 +18,15 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.site;
-
-import ch.o2it.weblounge.common.user.AuthenticatedUser;
+package ch.o2it.weblounge.common.user;
 
 /**
- * This interface represents the administrator user for a single site.
+ * This interface represents the administrator user for a weblounge
+ * installation.
  */
-public interface SiteAdmin extends AuthenticatedUser {
+public interface WebloungeAdmin extends WebloungeUser {
 
-  // This is a marker interface, since the site admin is
-  // a special authenticated user.
+  // This is a marker interface, since the weblounge administrator is
+  // a special user.
 
 }
