@@ -24,6 +24,8 @@ import ch.o2it.weblounge.cache.StreamFilter;
 import ch.o2it.weblounge.cache.impl.filter.FilterChain;
 import ch.o2it.weblounge.cache.impl.index.CacheIndexMapMap;
 import ch.o2it.weblounge.common.content.Tag;
+import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
+import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
 import ch.o2it.weblounge.common.impl.util.classloader.PluginLoader;
 import ch.o2it.weblounge.common.request.CacheHandle;
 
@@ -49,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 public class CacheManager {
 
   /** the default character encoding */
+  /* TODO: Is this hardcoding correct? */
   public static final String DEFAULT_ENCODING = "ISO-8859-1";
 
   /** The default cache size maximum */
