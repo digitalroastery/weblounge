@@ -25,12 +25,7 @@ import ch.o2it.weblounge.common.language.Localizable;
 /**
  * A <code>Layout</code> enforces the placement of certain elements
  * on the page.
- * 
- * @author Tobias Wunden
- * @version 1.0
- * @since Weblounge 2.0
  */
-
 public interface Layout extends Localizable {
 
 	/**

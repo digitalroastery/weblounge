@@ -28,77 +28,75 @@ import java.util.Collection;
 
 /**
  * This interface defines the fields and methods for a module configuration. The
- * default implementation is;@link ch.o2it.weblounge.core.module.ModuleConfigurationImpl}.
- * 
- * @author Tobias Wunden
- * @version 1.0
- * @since Weblounge 2.0
+ * default implementation is
+ * {@link ch.o2it.weblounge.core.module.ModuleConfigurationImpl}.
  */
 public interface ModuleConfiguration extends Customizable {
 
-	/**
-	 * Returns the module identifier, e. g. <tt>forum</tt>.
-	 * 
-	 * @return the module identifier
-	 */
-	String getIdentifier();
+  /**
+   * Returns the module identifier, e. g. <tt>forum</tt>.
+   * 
+   * @return the module identifier
+   */
+  String getIdentifier();
 
-	/**
-	 * Returns the module description, e. g. <tt>Forum</tt>.
-	 * 
-	 * @param l the language used to return the description
-	 * @return the module description
-	 */
-	String getDescription(Language l);
+  /**
+   * Returns the module description, e. g. <tt>Forum</tt>.
+   * 
+   * @param l
+   *          the language used to return the description
+   * @return the module description
+   */
+  String getDescription(Language l);
 
-	/**
-	 * Returns <code>true</code> if the module is configured to be enabled.
-	 * 
-	 * @return <code>true</code> if the module is enabled
-	 */
-	boolean isEnabled();
-	
-	/**
-	 * Returns the module's document base.
-	 * 
-	 * @return the module's document base
-	 */
-	String getPath();
-	
-	/**
-	 * Returns the module load factor. The factor denotes the load that is expected
-	 * to be put on the module.
-	 * 
-	 * @return the module load factor
-	 */
-	int getLoadFactor();
+  /**
+   * Returns <code>true</code> if the module is configured to be enabled.
+   * 
+   * @return <code>true</code> if the module is enabled
+   */
+  boolean isEnabled();
 
-	/**
-	 * Returns the renderers that are defined for the module.
-	 * 
-	 * @return the module renderer
-	 */
-	Collection<Renderer> getRenderers();
+  /**
+   * Returns the module's document base.
+   * 
+   * @return the module's document base
+   */
+  String getPath();
 
-	/**
-	 * Returns the action registry containing all registered actions.
-	 * 
-	 * @return the actions
-	 */
-	Collection<Action> getActions();
+  /**
+   * Returns the module load factor. The factor denotes the load that is
+   * expected to be put on the module.
+   * 
+   * @return the module load factor
+   */
+  int getLoadFactor();
 
-	/**
-	 * Returns the image style registry containing all registered styles.
-	 * 
-	 * @return the image styles
-	 */
-	Collection<ImageStyle> getImageStyles();
+  /**
+   * Returns the renderers that are defined for the module.
+   * 
+   * @return the module renderer
+   */
+  Collection<Renderer> getRenderers();
 
-	/**
-	 * Returns the module jobs.
-	 * 
-	 * @return the module jobs
-	 */
-	Collection<Job> getJobs();
+  /**
+   * Returns the action registry containing all registered actions.
+   * 
+   * @return the actions
+   */
+  Collection<Action> getActions();
+
+  /**
+   * Returns the image style registry containing all registered styles.
+   * 
+   * @return the image styles
+   */
+  Collection<ImageStyle> getImageStyles();
+
+  /**
+   * Returns the module jobs.
+   * 
+   * @return the module jobs
+   */
+  Collection<Job> getJobs();
 
 }

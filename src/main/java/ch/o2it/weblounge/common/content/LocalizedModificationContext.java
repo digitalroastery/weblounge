@@ -32,32 +32,6 @@ import java.util.Date;
 public interface LocalizedModificationContext extends LocalizedModifiable, Cloneable {
 
   /**
-   * Sets the user that created the object.
-   * 
-   * @param user
-   *          the creator
-   */
-  void setCreator(User user);
-
-  /**
-   * Sets the creation date of this object.
-   * 
-   * @param date
-   *          the creation date
-   */
-  void setCreationDate(Date date);
-
-  /**
-   * Sets creator and creation date.
-   * 
-   * @param user
-   *          the user that created the object
-   * @param date
-   *          the date of creation
-   */
-  void setCreated(User user, Date date);
-
-  /**
    * Sets the date of the last modification of this object in the current
    * language.
    * 

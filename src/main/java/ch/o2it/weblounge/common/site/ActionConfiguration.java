@@ -26,12 +26,7 @@ import ch.o2it.weblounge.common.Customizable;
  * The action configuration stores configuration information about an action handler
  * instance. The configuration data is beeing read from the <code>&lt;action&gt;</code>
  * section of the <code>module.xml</code>.
- * 
- * @author Tobias Wunden
- * @version 1.0
- * @since Weblounge 2.0
  */
-
 public interface ActionConfiguration extends Customizable {
 
 	/** the default valid time is 60 minutes */

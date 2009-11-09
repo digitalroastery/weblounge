@@ -22,9 +22,6 @@ package ch.o2it.weblounge.common.http;
 
 /**
  * Http11Constants
- * 
- * @version $Revision: 1090 $ $Date: 2009-09-14 19:43:19 +0200 (Mon, 14 Sep 2009) $
- * @author Daniel Steiner
  */
 public interface Http11Constants {
 	
