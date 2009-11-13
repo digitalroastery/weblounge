@@ -26,7 +26,6 @@ import ch.o2it.weblounge.cache.impl.index.CacheIndexMapMap;
 import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
-import ch.o2it.weblounge.common.impl.util.classloader.PluginLoader;
 import ch.o2it.weblounge.common.request.CacheHandle;
 
 import org.slf4j.Logger;
@@ -671,24 +670,16 @@ public class CacheManager {
    * Sets the output filters.
    * 
    * @param filter
-   *          a coma separated list of filter names
+   *          a comma separated list of filter names
    */
   @SuppressWarnings("unchecked")
   static void setFilters(String filter) {
     if (filter == null)
       return;
-    if (allFilters == null) {
+    
+    if (allFilters == null)
       allFilters = new HashMap<String, Class<? extends StreamFilter>>();
-      Class<? extends StreamFilter> all[] = PluginLoader.findPlugins("ch.o2it.weblounge.service.cache.filter", null, new String[] { "ch.o2it.weblounge.api.request.StreamFilter" }, CacheManager.class.getClassLoader());
-      for (int i = 0; i < all.length; i++) {
-        String name = all[i].getName();
-        int j = -1;
-        if ((j = name.lastIndexOf('.')) >= 0)
-          name = name.substring(j + 1);
-        log.debug("found filter: " + name);
-        allFilters.put(name, all[i]);
-      }
-    }
+
     StringTokenizer st = new StringTokenizer(filter, ",");
     List<Class<? extends StreamFilter>> l = new ArrayList<Class<? extends StreamFilter>>();
     while (st.hasMoreTokens()) {
@@ -762,7 +753,7 @@ public class CacheManager {
    * 
    * @param hnd
    *          the cache handle to identify a cache hierarchy
-   * @return a string respresentation of the cache hierarchy
+   * @return a string representation of the cache hierarchy
    */
   public static String dumpHierarchy(CacheHandle hnd) {
     synchronized (cache) {
