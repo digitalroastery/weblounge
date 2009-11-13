@@ -25,8 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This interface describes objects containing a list of options that further
- * customize the configuration.
+ * This interface describes objects containing a list of options. The intention
+ * of it is to give configurable options inside weblounge a consistent way of
+ * exposing these options.
  */
 public interface Customizable {
 
