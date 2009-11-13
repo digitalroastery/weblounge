@@ -1,20 +1,21 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2009 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.site.impl;
@@ -24,7 +25,6 @@ import ch.o2it.weblounge.common.impl.security.DefaultAuthorizationProvider;
 import ch.o2it.weblounge.common.impl.security.SecurityManagerImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
-import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.impl.util.classloader.SiteClassLoader;
 import ch.o2it.weblounge.common.language.Language;
@@ -56,7 +56,6 @@ import com.sun.corba.se.spi.activation.Repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 
 import quicktime.Errors;
 
@@ -67,25 +66,18 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.spi.ServiceRegistry;
-import javax.security.auth.Subject;
-import javax.security.auth.spi.LoginModule;
 
 /**
  * The <code>Site</code> object represents one of multiple sites managed by the
  * weblounge system.
- * 
- * @author Tobias Wunden
- * @version 2.0
- * @since WebLounge 1.0
  */
-
 public class SiteImpl implements Site {
 
   /** Site identifier */
   private String id_;
 
   /** Site xml configuration file */
-  private SiteConfiguration config_ = null;
+  private SiteConfigurationImpl config_ = null;
 
   /** The site request dispatcher */
   private SiteDispatcher dispatcher_;
@@ -711,7 +703,7 @@ public class SiteImpl implements Site {
    * @return the renderer registry
    */
   public RendererRegistry getRenderers() {
-    return config_.renderers;
+    return config_.templates;
   }
 
   /**
@@ -720,7 +712,7 @@ public class SiteImpl implements Site {
    * @return the site default template
    */
   public String getDefaultTemplate() {
-    return config_.renderers.getDefault("html").getIdentifier();
+    return config_.templates.getDefault("html").getIdentifier();
   }
 
   /**
@@ -1247,7 +1239,7 @@ public class SiteImpl implements Site {
    * @param config
    *          the site configuration
    */
-  void configure(SiteConfiguration config) throws ConfigurationException {
+  void configure(SiteConfigurationImpl config) throws ConfigurationException {
     config_ = config;
     virtualPath_ = UrlSupport.trim("/sites/" + config.identifier);
     dispatcher_ = new SiteDispatcher(this, config_.isEnabled);
@@ -1308,8 +1300,8 @@ public class SiteImpl implements Site {
 
     // Renderers
 
-    SiteRegistries.add(RendererRegistry.ID, this, config_.renderers);
-    Iterator renderers = config_.renderers.values().iterator();
+    SiteRegistries.add(RendererRegistry.ID, this, config_.templates);
+    Iterator renderers = config_.templates.values().iterator();
     while (renderers.hasNext()) {
       ((RendererBundle) renderers.next()).setSite(this);
     }

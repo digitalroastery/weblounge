@@ -1,44 +1,37 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2009 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
-import ch.o2it.weblounge.common.impl.util.ServletConfiguration;
-import ch.o2it.weblounge.common.impl.util.ServletMapping;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.Layout;
-import ch.o2it.weblounge.common.page.PageListener;
 import ch.o2it.weblounge.common.page.SearchResult;
 import ch.o2it.weblounge.common.renderer.Renderer;
-import ch.o2it.weblounge.common.repository.Collection;
-import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Job;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleConfiguration;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.site.impl.handler.ActionRequestHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,12 +48,7 @@ import javax.imageio.spi.ServiceRegistry;
  * This is the default implementation for a module, which is instantiated for a
  * module descriptor if no custom module class is specified in the
  * <code>&lt;class&gt;</code> tag.
- * 
- * @author Tobias Wunden
- * @version 1.0
- * @since Weblounge 2.0
  */
-
 public class ModuleImpl implements Module {
 
   /** Logging facility */
@@ -343,8 +331,8 @@ public class ModuleImpl implements Module {
   }
 
   /**
-   * Returns this module's renderers which keeps track of the defined
-   * renderer bundles.
+   * Returns this module's renderers which keeps track of the defined renderer
+   * bundles.
    * 
    * @return the renderers
    */
@@ -386,8 +374,7 @@ public class ModuleImpl implements Module {
   }
 
   /**
-   * Returns this module's services which keeps track of the defined
-   * services.
+   * Returns this module's services which keeps track of the defined services.
    * 
    * @return the services
    */
@@ -532,7 +519,7 @@ public class ModuleImpl implements Module {
   private void configureJobs(ModuleConfiguration moduleconfig) {
     for (Job job : moduleconfig.getJobs()) {
       if (job instanceof ModuleJob)
-        ((ModuleJob)job).setModule(this);
+        ((ModuleJob) job).setModule(this);
       jobs.put(job.getIdentifier(), job);
     }
   }
@@ -563,7 +550,7 @@ public class ModuleImpl implements Module {
       log_.debug("Found option " + o + ": " + config.getOption(o));
     }
 
-   s handlerRegistry = SiteRegistries.get(RequestHandlerRegistry.ID, site);
+    s handlerRegistry = SiteRegistries.get(RequestHandlerRegistry.ID, site);
 
     // Renderers
 
@@ -634,7 +621,7 @@ public class ModuleImpl implements Module {
     // Servlets
 
     ServletRequestHandler servletHandler = null;
-   s handlers = SiteRegistries.get(RequestHandlerRegistry.ID, site);
+    s handlers = SiteRegistries.get(RequestHandlerRegistry.ID, site);
     servletHandler = (ServletRequestHandler) handlers.get(ServletRequestHandler.ID);
     if (servletHandler != null) {
       for (Iterator servlets = ((ModuleConfigurationImpl) config).servlets.iterator(); servlets.hasNext();) {

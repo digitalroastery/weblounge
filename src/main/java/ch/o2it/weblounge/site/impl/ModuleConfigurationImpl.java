@@ -1,20 +1,21 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2009 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.site.impl;
@@ -22,8 +23,6 @@ package ch.o2it.weblounge.site.impl;
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.impl.util.Arguments;
-import ch.o2it.weblounge.common.impl.util.classloader.SiteClassLoader;
 import ch.o2it.weblounge.common.impl.util.classloader.WebloungeClassLoader;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationBase;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
@@ -34,7 +33,6 @@ import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Job;
 import ch.o2it.weblounge.common.site.ModuleConfiguration;
-import ch.o2it.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,12 +64,7 @@ import javax.xml.xpath.XPath;
  * 		.
  * 	&lt;/module&gt;
  * </pre>
- * 
- * @author Tobias Wunden
- * @version 1.0
- * @since Weblounge 2.0
  */
-
 public final class ModuleConfigurationImpl extends ConfigurationBase implements ModuleConfiguration {
 
   /** Module identifier */
@@ -193,7 +186,8 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
 
   /**
    * Returns <code>true</code> if <code>o</code> is a <code>ModuleConfiguration
-	 * </code> and matches this configuration in every aspect.
+	 * </code> and matches this
+   * configuration in every aspect.
    * 
    * @return <code>true</code> if o is equal to this configuration
    */

@@ -1,26 +1,27 @@
 /*
- * Weblounge: Web Content Management System Copyright (c) 2009 The Weblounge
- * Team http://weblounge.o2it.ch
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option) any
- * later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2009 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 package ch.o2it.weblounge.site.impl;
 
-import ch.o2it.weblounge.cache.impl.CacheTagSetImpl;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.request.CacheTagSetImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
@@ -60,10 +61,6 @@ import java.util.List;
  * Be aware of the fact that action handlers are pooled, so make sure to
  * implement the <code>cleanup</code> method to clear any state information from
  * this handler instance.
- * 
- * @author Tobias Wunden <tobias.wunden@o2it.ch>
- * @version 1.0
- * @since Weblounge 2.0
  */
 public abstract class AbstractAction implements Action {
 
@@ -306,13 +303,13 @@ public abstract class AbstractAction implements Action {
       Page page = site.getPage(new PageURIImpl(request), request.getUser());
       renderer = page.getRenderer(request.getOutputMethod());
     }
-    
+
     // Let's check the renderer configuration
     if (renderer != null && renderer.getConfiguration() instanceof PageRendererConfiguation) {
       return composer.equalsIgnoreCase(((PageRendererConfiguation) renderer.getConfiguration()).getStage());
     }
 
-    // No template found, let's return the default stage 
+    // No template found, let's return the default stage
     return composer.equalsIgnoreCase(PageRendererConfiguation.DEFAULT_STAGE);
   }
 
@@ -350,23 +347,23 @@ public abstract class AbstractAction implements Action {
     this.request = request;
     this.response = response;
     this.method = method;
-        
+
     // Check if we have a file upload request
     if (ServletFileUpload.isMultipartContent(request)) {
-    
+
       // Create a factory for disk-based file items
       DiskFileItemFactory factory = new DiskFileItemFactory();
       // TODO: Configure factory
-      //factory.setSizeThreshold(yourMaxMemorySize);
-      //factory.setRepository(yourTempDirectory);
-  
+      // factory.setSizeThreshold(yourMaxMemorySize);
+      // factory.setRepository(yourTempDirectory);
+
       // Create a new file upload handler
       ServletFileUpload upload = new ServletFileUpload(factory);
-  
+
       // Set overall request size constraint
       // TODO: Configure uploader
-      //upload.setSizeMax(yourMaxRequestSize);
-  
+      // upload.setSizeMax(yourMaxRequestSize);
+
       // Parse the request
       try {
         files = upload.parseRequest(request);
@@ -374,7 +371,7 @@ public abstract class AbstractAction implements Action {
         log_.error("Error parsing uploads:" + e.getMessage(), e);
       }
     }
-    
+
   }
 
   /**
@@ -460,9 +457,7 @@ public abstract class AbstractAction implements Action {
       Module m = renderer.getModule();
       if (m != null)
         m.returnRenderer(renderer);
-      if (rendererCacheHdl != null) {
-        response.endResponsePart(rendererCacheHdl);
-      }
+      response.endResponsePart(rendererCacheHdl);
     }
     includes++;
   }
