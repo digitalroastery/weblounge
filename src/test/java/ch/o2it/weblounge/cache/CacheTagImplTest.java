@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.cache.impl.CacheTagImpl;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 import ch.o2it.weblounge.common.request.CacheTag;
 
 import org.junit.Before;
@@ -57,7 +57,7 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.CacheTagImpl#hashCode()}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#hashCode()}.
    */
   @Test
   public void testHashCode() {
@@ -66,7 +66,7 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.CacheTagImpl#CacheTagImpl(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#CacheTagImpl(java.lang.String)}
    * .
    */
   @Test
@@ -84,7 +84,7 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.CacheTagImpl#CacheTagImpl(java.lang.String, java.lang.Object)}
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#CacheTagImpl(java.lang.String, java.lang.Object)}
    * .
    */
   @Test
@@ -110,7 +110,7 @@ public class CacheTagImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.cache.impl.CacheTagImpl#getName()}
+   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#getName()}
    * .
    */
   @Test
@@ -120,7 +120,7 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.CacheTagImpl#getValue()}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#getValue()}.
    */
   @Test
   public void testGetValue() {
@@ -129,7 +129,7 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.CacheTagImpl#equals(java.lang.Object)}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
@@ -154,7 +154,7 @@ public class CacheTagImplTest {
   
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.CacheTagImpl#equals(java.lang.Object)}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testSetMatchAny() {

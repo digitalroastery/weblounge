@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.cache.impl.handle;
 
-import ch.o2it.weblounge.cache.impl.CacheTagImpl;
 import ch.o2it.weblounge.common.content.Tag;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 import ch.o2it.weblounge.common.request.CacheHandle;
 
 import java.util.ArrayList;
