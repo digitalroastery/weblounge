@@ -6,8 +6,8 @@
 ../../../modules/weblounge-cache-api/trunk	modules/weblounge-cache-api
 ../../../modules/weblounge-common/trunk	modules/weblounge-common
 ../../../modules/weblounge-common-api/trunk	modules/weblounge-common-api
-../../../modules/weblounge-core/trunk	modules/weblounge-core
-../../../modules/weblounge-core-api/trunk	modules/weblounge-core-api
+../../../modules/weblounge-contentrepository/trunk	modules/weblounge-contentrepository
+../../../modules/weblounge-contentrepository-api/trunk	modules/weblounge-contentrepository-api
 ../../../modules/weblounge-dispatcher/trunk	modules/weblounge-dispatcher
 ../../../modules/weblounge-dispatcher-api/trunk	modules/weblounge-dispatcher-api
 ../../../modules/weblounge-pagedirectory/trunk	modules/weblounge-pagedirectory
