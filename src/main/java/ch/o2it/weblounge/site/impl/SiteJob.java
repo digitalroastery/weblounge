@@ -22,10 +22,12 @@ package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.site.Site;
 
+import org.quartz.Job;
+
 /**
  * Contains a cron job that has been defined by the associated site.
  */
-public abstract class SiteJob extends CronJob {
+public abstract class SiteJob implements Job {
 
   /** The site */
   protected Site site = null;

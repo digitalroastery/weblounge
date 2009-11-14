@@ -103,13 +103,12 @@
 				<configuration>
 					<instructions>
 						<Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
-						<Bundle-Activator>ch.o2it.weblounge.site.impl.SiteServiceImpl</Bundle-Activator>
 						<Export-Package>
 							ch.o2it.weblounge.site.impl
-            </Export-Package>
+            			</Export-Package>
 						<Service-Component>
 							OSGI-INF/site-service.xml
-            </Service-Component>
+            			</Service-Component>
 					</instructions>
 				</configuration>
 			</plugin>
