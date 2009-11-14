@@ -1,0 +1,177 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.o2it</groupId>
+  <artifactId>weblounge-contentrepository</artifactId>
+  <packaging>bundle</packaging>
+  <name>Weblounge Content Repository</name>
+  <parent>
+    <groupId>ch.o2it</groupId>
+    <artifactId>weblounge-base</artifactId>
+    <version>3.0-SNAPSHOT</version>
+  </parent>
+  <dependencies>
+	
+    <!-- weblounge -->
+	
+    <dependency>
+      <groupId>ch.o2it</groupId>
+      <artifactId>weblounge-contentrepository-api</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
+
+    <!-- osgi support -->
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi_R4_core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi_R4_compendium</artifactId>
+    </dependency>
+
+    <!-- thirdparty -->
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+        <!-- Runtime Dependencies -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.jcr</groupId>
+      <artifactId>jcr</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-api</artifactId>
+      <version>1.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-core</artifactId>
+      <version>1.4.3</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-text-extractors</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-spi-commons</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-spi</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.5.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.5.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>concurrent</groupId>
+      <artifactId>concurrent</artifactId>
+      <version>1.3.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>3.0.1-FINAL</version>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.8.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.textmining</groupId>
+      <artifactId>tm-extractors</artifactId>
+      <version>0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+      <version>0.7.1</version>
+    </dependency>
+    <dependency>
+      <groupId>nekohtml</groupId>
+      <artifactId>nekohtml</artifactId>
+      <version>0.9.4</version>
+    </dependency>
+
+    <!-- testing -->
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
+            <Bundle-Activator>ch.o2it.weblounge.contentrepository.impl.JCRActivator</Bundle-Activator>
+            <Embed-Dependency>
+              jackrabbit-core,jackrabbit-spi-commons,jackrabbit-spi,
+              jackrabbit-text-extractors,lucene-core,concurrent,poi, postgresql, derby,
+              xercesImpl,tm-extractors,pdfbox,nekohtml, mysql-connector-java, derby
+            </Embed-Dependency>
+            <Import-Package> !org.apache.jackrabbit.test.*, !org.apache.lucene.demo.*,
+              !org.apache.log4j.spi.*, !org.apache.tools.ant.*, !org.apache.xml.resolver.*, !sun.*,
+              !org.apache.xpath.*, !org.apache.xml.utils.*, !org.apache.xalan.*,
+              !org.apache.derby.impl.drda, !org.jboss.resource.adapter.jdbc.*,
+              !com.mchange.v2.c3p0.*, !javax.xml.transform.stax, *
+            </Import-Package>
+            <Export-Package>
+              ch.o2it.weblounge.content.impl
+            </Export-Package>
+            <Service-Component>
+              OSGI-INF/contentrepository-service.xml
+            </Service-Component>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

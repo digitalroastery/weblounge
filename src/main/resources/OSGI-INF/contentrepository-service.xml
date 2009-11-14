@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="weblounge-contentrepository" immediate="true" start="start" stop="stop">
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.JCRepositoryServiceImpl" />
+  <property name="service.description" value="Weblounge Content Repository Service" />
+  <service>
+    <provide interface="ch.o2it.weblounge.contentrepository.PageRepository" />
+    <provide interface="ch.o2it.weblounge.contentrepository.ResourceRepository" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+</component>
