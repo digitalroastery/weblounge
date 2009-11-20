@@ -134,7 +134,7 @@ public class SystemRole extends RoleImpl {
    * 
    * @return all system roles
    */
-  public static Iterator roles() {
+  public static Iterator<Role> roles() {
     if (roles_ == null) {
       roles_ = new HashSet<Role>();
       roles_.add(SystemRole.GUEST);
