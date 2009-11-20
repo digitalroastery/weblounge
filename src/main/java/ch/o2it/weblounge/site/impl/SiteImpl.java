@@ -271,10 +271,10 @@ public class SiteImpl implements Site {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.api.util.Customizable#getOptions()
+   * @see ch.o2it.weblounge.common.api.util.Customizable#options()
    */
   public Map getOptions() {
-    return config_.getOptions();
+    return config_.options();
   }
 
   /**

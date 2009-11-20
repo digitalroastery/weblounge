@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.classloader.WebloungeClassLoader;
-import ch.o2it.weblounge.common.impl.util.config.ConfigurationBase;
+import ch.o2it.weblounge.common.impl.util.config.Options;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -65,7 +65,7 @@ import javax.xml.xpath.XPath;
  * 	&lt;/module&gt;
  * </pre>
  */
-public final class ModuleConfigurationImpl extends ConfigurationBase implements ModuleConfiguration {
+public final class ModuleConfigurationImpl extends Options implements ModuleConfiguration {
 
   /** Module identifier */
   String identifier = null;
@@ -155,7 +155,7 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
       readActions(path, XPathHelper.select(config, "/module/actions", path));
       readImagestyles(path, XPathHelper.select(config, "/module/imagestyles", path));
       readJobs(path, XPathHelper.select(config, "/module/jobs", path));
-      super.init(path, XPathHelper.select(config, "/module", path));
+      super.load(path, XPathHelper.select(config, "/module", path));
     } catch (ConfigurationException e) {
       throw e;
     } catch (Exception e) {
@@ -335,7 +335,7 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
         for (int j = 0; j < jspRenderers.getLength(); j++) {
           Node jspNode = jspRenderers.item(j);
           RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
-          rendererConfig.init(path, jspNode);
+          rendererConfig.load(path, jspNode);
           bundleConfig.define(JSPRenderer.class, rendererConfig);
         }
 
@@ -344,7 +344,7 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
         for (int j = 0; j < xslRenderers.getLength(); j++) {
           Node xslNode = xslRenderers.item(j);
           RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
-          rendererConfig.init(path, xslNode);
+          rendererConfig.load(path, xslNode);
           bundleConfig.define(XSLRenderer.class, rendererConfig);
         }
 
@@ -353,7 +353,7 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
         for (int j = 0; j < customRenderers.getLength(); j++) {
           Node customNode = customRenderers.item(j);
           RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
-          rendererConfig.init(path, customNode);
+          rendererConfig.load(path, customNode);
           try {
             Class<?> clazz = classLoader.loadClass(rendererConfig.getClassName());
             bundleConfig.define(clazz, rendererConfig);
@@ -515,7 +515,7 @@ public final class ModuleConfigurationImpl extends ConfigurationBase implements 
       String className = XPathHelper.valueOf(jobNode, "class", path);
       try {
         job = (ModuleJob) classLoader.loadClass(className).newInstance();
-        job.init(path, jobNode);
+        job.load(path, jobNode);
         jobs.put(job.getIdentifier(), job);
       } catch (ConfigurationException e) {
         log_.debug("Error configuring service!", e.getCause());

@@ -25,8 +25,11 @@ import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule;
+import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.impl.util.config.Options;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -101,6 +104,9 @@ public class SiteConfigurationImpl implements Customizable {
   /** JAAS authentication modules */
   List<AuthenticationModule> authenticationModules = null;
 
+  /** The default language */
+  Language defaultLanguage = null;
+
   /** Site languages */
   List<Language> languages = null;
 
@@ -115,6 +121,9 @@ public class SiteConfigurationImpl implements Customizable {
 
   /** Site cron jobs */
   List<SiteJob> jobs = null;
+
+  /** Site options */
+  Options options = null;
 
   /** Site load factor */
   int loadfactor = DEFAULT_LOADFACTOR;
@@ -159,11 +168,9 @@ public class SiteConfigurationImpl implements Customizable {
     XPath path = XMLUtilities.getXPath();
     try {
       readMainSettings(path, XPathHelper.select(config, "/site", path));
-      readOptions(path, XPathHelper.select(config, "/site", path));
       readAdmin(path, XPathHelper.select(config, "/site/admin", path));
       readUrls(path, XPathHelper.select(config, "/site/urls", path));
       readAuthenticationModules(path, XPathHelper.select(config, "/site/authentication", path));
-      readMountpoints(path, XPathHelper.select(config, "/site/urls", path));
       readLanguages(path, XPathHelper.select(config, "/site/languages", path));
       readPerformanceSettings(path, XPathHelper.select(config, "/site/performance", path));
       readLayouts(path, XPathHelper.select(config, "/site/layouts", path));
@@ -171,6 +178,7 @@ public class SiteConfigurationImpl implements Customizable {
       readImagestyles(path, XPathHelper.select(config, "/site/imagestyles", path));
       readJobs(path, XPathHelper.select(config, "/site/jobs", path));
       readHandlers(path, XPathHelper.select(config, "/site/handlers", path));
+      options = Options.load(path, XPathHelper.select(config, "/site", path));
     } catch (ConfigurationException e) {
       throw e;
     } catch (Exception e) {
@@ -284,7 +292,7 @@ public class SiteConfigurationImpl implements Customizable {
     for (int i = 0; i < urlNodes.getLength(); i++) {
       Node node = urlNodes.item(i);
       String url = node.getFirstChild().getNodeValue();
-      urls.add(url);
+      urls.add(new URL(url));
       log_.debug("Found site url " + url);
     }
   }
@@ -306,7 +314,7 @@ public class SiteConfigurationImpl implements Customizable {
     for (int i = 0; i < moduleNodes.getLength(); i++) {
       Node node = moduleNodes.item(i);
       try {
-        AuthenticationModule module = new AuthenticationModule(path, node, classLoader);
+        AuthenticationModule module = new AuthenticationModuleImpl(path, node);
         authenticationModules.add(module);
         log_.debug("Login module " + module.getClass() + " registered");
       } catch (Exception e) {
@@ -315,7 +323,7 @@ public class SiteConfigurationImpl implements Customizable {
       }
     }
     // By default, add authentication for superuser login
-    authenticationModules.add(new AuthenticationModule(AdminLoginModule.class.getName(), "sufficient", classLoader));
+    authenticationModules.add(new AuthenticationModuleImpl(AdminLoginModule.class.getName(), "sufficient"));
   }
 
   /**
@@ -333,32 +341,31 @@ public class SiteConfigurationImpl implements Customizable {
       throw new ConfigurationException("A site must at least have one language!");
     }
 
+    // Site languages
     String allLanguages = XPathHelper.valueOf(config, "all", path);
-    String defaultLanguage = XPathHelper.valueOf(config, "default", path);
-    LanguageRegistry systemLanguages = (LanguageRegistry) SystemRegistries.get(LanguageRegistry.ID);
+    String[] languageIds = ConfigurationUtils.getMultiOptionValues(allLanguages);
+    for (String lId : languageIds) {
+      Language l = LanguageSupport.getLanguage(lId);
+      if (l != null)
+        languages.add(l);
+      else
+        throw new ConfigurationException(lId + " is not a valid language identifier");
+    }
 
     // Default language
-
-    Language l = systemLanguages.getLanguage(defaultLanguage);
-    if (l != null) {
-      languages = new LanguageRegistry(l);
-    } else {
-      throw new ConfigurationException("The default language " + defaultLanguage + " is not a system language");
-    }
-
-    // Site languages
-
-    StringTokenizer tok = new StringTokenizer(allLanguages);
-    while (tok.hasMoreTokens()) {
-      String id = tok.nextToken();
-      l = systemLanguages.getLanguage(id);
+    String defaultLanguageId = XPathHelper.valueOf(config, "default", path);
+    if (defaultLanguageId == null)
+      throw new ConfigurationException("No default language has been specified");
+      
+    if (defaultLanguageId != null) {
+      Language l = LanguageSupport.getLanguage(defaultLanguageId);
       if (l != null) {
-        languages.put(id, l);
-        log_.debug("Added language " + l);
+        defaultLanguage = l;
       } else {
-        throw new ConfigurationException("Language " + id + " is not a system language");
+        throw new ConfigurationException("The default language " + defaultLanguage + " is not a system language");
       }
     }
+
   }
 
   /**
@@ -471,7 +478,7 @@ public class SiteConfigurationImpl implements Customizable {
         for (int j = 0; j < jspRenderers.getLength(); j++) {
           Node jspNode = jspRenderers.item(j);
           TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
-          rendererConfig.init(path, jspNode);
+          rendererConfig.load(path, jspNode);
           bundle.define(JSPRenderer.class, rendererConfig);
         }
 
@@ -480,7 +487,7 @@ public class SiteConfigurationImpl implements Customizable {
         for (int j = 0; j < xslRenderers.getLength(); j++) {
           Node xslNode = xslRenderers.item(j);
           TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
-          rendererConfig.init(path, xslNode);
+          rendererConfig.load(path, xslNode);
           bundle.define(XSLRenderer.class, rendererConfig);
         }
 
@@ -489,7 +496,7 @@ public class SiteConfigurationImpl implements Customizable {
         for (int j = 0; j < customRenderers.getLength(); j++) {
           Node customNode = customRenderers.item(j);
           TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
-          rendererConfig.init(path, customNode);
+          rendererConfig.load(path, customNode);
           try {
             Class clazz = classLoader.loadClass(rendererConfig.getClassName());
             bundle.define(clazz, rendererConfig);
@@ -539,11 +546,12 @@ public class SiteConfigurationImpl implements Customizable {
 
       String className = XPathHelper.valueOf(jobNode, "class", path);
       try {
-        job = (SiteJob) classLoader.loadClass(className).newInstance();
-        job.init(path, jobNode);
+        Class<?> jobClass = Class.forName(className);
+        job = (SiteJob)jobClass.newInstance();
+        job.load(path, jobNode);
         jobs.add(job);
       } catch (ConfigurationException e) {
-        log_.debug("Error configuring service!", e.getReason());
+        log_.debug("Error configuring service!", e.getCause());
         log_.error("Error configuring cronjob '" + job.getName() + "' of site '" + identifier + "': " + e.getMessage());
       } catch (InstantiationException e) {
         log_.error("Error instantiating cronjob '" + className + "' of site '" + identifier + "': " + e.getMessage());
@@ -620,6 +628,37 @@ public class SiteConfigurationImpl implements Customizable {
   }
 
   /**
+   * Configures the request handlers.
+   * 
+   * @param node
+   *          the handlers node
+   * @param path
+   *          the XPath object used to parse the configuration
+   */
+  private void readHandlers(XPath path, Node node) {
+    log_.debug("Configuring request handlers");
+    if (node == null) {
+      log_.debug("No request handler definitions found");
+      return;
+    }
+    NodeList handlerNodes = XPathHelper.selectList(path, node, "handler");
+    for (int i = 0; i < handlerNodes.getLength(); i++) {
+      Node handlerNode = handlerNodes.item(i);
+      RequestHandlerConfigurationImpl config = null;
+      try {
+        config = new RequestHandlerConfigurationImpl();
+        config.load(path, handlerNode);
+        RequestHandler h = RequestHandlerManager.loadAndConfigure(config, classLoader);
+        handlers.put(config.getIdentifier(), h);
+      } catch (ConfigurationException e) {
+        log_.debug("Error configuring handler!", e.getReason());
+        log_.error("Error configuring handler '" + config.getIdentifier() + "': " + e.getMessage());
+      }
+    }
+    log_.debug("Request handlers configured");
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.Customizable#getOption(java.lang.String)
@@ -653,9 +692,9 @@ public class SiteConfigurationImpl implements Customizable {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.Customizable#getOptions()
+   * @see ch.o2it.weblounge.common.Customizable#options()
    */
-  public Map<String, List<String>> getOptions() {
+  public Map<String, List<String>> options() {
     // TODO Auto-generated method stub
     return null;
   }

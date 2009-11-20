@@ -324,10 +324,10 @@ public class ModuleImpl implements Module {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.api.util.Customizable#getOptions()
+   * @see ch.o2it.weblounge.common.api.util.Customizable#options()
    */
-  public Map getOptions() {
-    return config.getOptions();
+  public Map options() {
+    return config.options();
   }
 
   /**
