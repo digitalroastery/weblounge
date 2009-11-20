@@ -285,7 +285,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
     incResponseStats(type.type, bodyStats);
 
     /* get the temporary buffer for this thread */
-    byte tmp[] = (byte[]) buffer.get();
+    byte tmp[] = buffer.get();
     if (tmp == null) {
       tmp = new byte[BUFFER_SIZE];
       buffer.set(tmp);
