@@ -20,14 +20,13 @@
 
 package ch.o2it.weblounge.common.security;
 
-import java.util.List;
-import java.util.Map;
+import ch.o2it.weblounge.common.Customizable;
 
 /**
  * An authentication module defines an authentication facility that can be
  * activated and deactivated by configuration means.
  */
-public interface AuthenticationModule {
+public interface AuthenticationModule extends Customizable {
   
   /** The relevance values for authentication modules */
   public enum Relevance { required, requisite, sufficient, optional };
@@ -38,13 +37,6 @@ public interface AuthenticationModule {
    * @return the module class name
    */
   String getModuleClass();
-
-  /**
-   * Returns configuration options for this login module.
-   * 
-   * @return the configuration options
-   */
-  Map<String, List<String>> getOptions();
 
   /**
    * Returns the module's relevance. Please see the JAAS documentation on the
