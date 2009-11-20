@@ -246,7 +246,7 @@ public final class LanguageSupport {
     Iterator<Language> li = languages.languages();
     int i = 1;
     while (li.hasNext()) {
-      Language language = (Language) li.next();
+      Language language = li.next();
       result[i] = getLanguageVariant(s, language);
       i++;
     }
