@@ -22,7 +22,7 @@ package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.util.Arguments;
-import ch.o2it.weblounge.common.impl.util.config.ConfigurationBase;
+import ch.o2it.weblounge.common.impl.util.config.Options;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.request.RequestHandlerConfiguration;
 
@@ -47,200 +47,252 @@ import javax.xml.xpath.XPath;
  * @version $Revision: 1.9 $ $Date: 2005/11/29 23:28:40 $
  * @author Daniel Steiner
  */
-public class RequestHandlerConfigurationImpl extends ConfigurationBase implements RequestHandlerConfiguration {
+public class RequestHandlerConfigurationImpl implements RequestHandlerConfiguration {
 
-	/** Service identifier */
-	String identifier;
-	
-	/** Service name */
-	String name;
-	
-	/** Service description */
-	String description;
+  /** Service identifier */
+  String identifier = null;
 
-	/** Service description */
-	String className;
+  /** Service name */
+  String name = null;
 
-	/** Java system properties  */
-	Map env;
-	
-	/** the logger */
-	Logger log = LoggerFactory.getLogger(RequestHandlerConfigurationImpl.class);
+  /** Service description */
+  String description = null;
 
-	/**
-	 * Reads the handler configuration from the given xml configuration node.
-	 * 
-	 * @param config the configuration node
-	 * @param path the XPath object used to parse the configuration
-	 * @throws ConfigurationException if there are errors in the configuration
-	 */
-	public void init(XPath path, Node config) throws ConfigurationException {
-		Arguments.checkNull(config, "config");
-		try {
-			readMainSettings(path, config);
-			readEnv(path, config);
-			super.init(path, config);
-		} catch (ConfigurationException e) {
-			throw e;
-		} catch (Exception e) {
-			log.error("Error when reading request handler configuration!", e);
-			throw new ConfigurationException("Error when reading request handler configuration!", e);
-		}
-	}
+  /** Service description */
+  String className = null;
 
-	/**
-	 * Reads the handler properties from the handler configuration. These properties will
-	 * be set using <code>System.setProperty()</code> at handler configuration time.
-	 * 
-	 * @param config handler configuration node
-	 * @param path the XPath object used to parse the configuration
-	 * @throws TransformerException on XPathAPI errors
-	 */
-	private void readEnv(XPath path, Node config) throws TransformerException {
-		env = new HashMap();
-		NodeList nodes = XPathHelper.selectList(config, "properties/env", path);
-		for (int i=0; i < nodes.getLength(); i++) {
-			Node property = nodes.item(i);
-			String name = XPathHelper.valueOf(property, "name/text()", path);
-			String value =  XPathHelper.valueOf(property, "value/text()", path);
-			if (env.get(name) != null) {
-				Object o = env.get(name);
-				if (o instanceof List) {
-					((List)o).add(value);
-				} else {
-					List values = new ArrayList();
-					values.add(o);
-					values.add(value);
-					env.remove(name);
-					env.put(name, values);
-				}
-			} else {
-				env.put(name, value);
-			}
-			log.debug("Java property '" + name + "' has been set to '" + value + "'");
-		}
-	}
+  /** Handler configuration */
+  Options configuration = null;
 
-	/**
-	 * Reads the main handler settings like identifier, name and description
-	 * from the handler configuration.
-	 * 
-	 * @param config handler configuration node
-	 * @throws DOMException
-	 * @throws TransformerException
-	 * @throws ConfigurationException
-	 */
-	private void readMainSettings(XPath path, Node config) throws DOMException, TransformerException, ConfigurationException {
-		identifier = XPathHelper.valueOf(config, "@id", path);
-		if (identifier == null || identifier.equals(""))
-			throw new ConfigurationException("handler identifier must be specified");
-		name = XPathHelper.valueOf(config, "name/text()", path);
-		if (name == null || name.equals(""))
-			throw new ConfigurationException("handler name must be specified");
-		description = XPathHelper.valueOf(config, "description/text()", path);
-		className = XPathHelper.valueOf(config, "class/text()", path);
-		if (className == null || className.equals(""))
-			throw new ConfigurationException("handler class must be specified");
-	}
+  /** Java system properties */
+  Map env = null;
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getIdentifier()
-	 */
-	public String getIdentifier() {
-		return identifier;
-	}
+  /** the logger */
+  Logger log = LoggerFactory.getLogger(RequestHandlerConfigurationImpl.class);
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getName()
-	 */
-	public String getName() {
-		return name;
-	}
+  /**
+   * Reads the handler configuration from the given xml configuration node.
+   * 
+   * @param config
+   *          the configuration node
+   * @param path
+   *          the XPath object used to parse the configuration
+   * @throws ConfigurationException
+   *           if there are errors in the configuration
+   */
+  public void init(XPath path, Node config) throws ConfigurationException {
+    Arguments.checkNull(config, "config");
+    try {
+      readMainSettings(path, config);
+      readEnv(path, config);
+      configuration = Options.load(path, config);
+    } catch (ConfigurationException e) {
+      throw e;
+    } catch (Exception e) {
+      log.error("Error when reading request handler configuration!", e);
+      throw new ConfigurationException("Error when reading request handler configuration!", e);
+    }
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getDescription()
-	 */
-	public String getDescription() {
-		return description;
-	}
+  /**
+   * Reads the handler properties from the handler configuration. These
+   * properties will be set using <code>System.setProperty()</code> at handler
+   * configuration time.
+   * 
+   * @param config
+   *          handler configuration node
+   * @param path
+   *          the XPath object used to parse the configuration
+   * @throws TransformerException
+   *           on XPathAPI errors
+   */
+  private void readEnv(XPath path, Node config) throws TransformerException {
+    env = new HashMap();
+    NodeList nodes = XPathHelper.selectList(config, "properties/env", path);
+    for (int i = 0; i < nodes.getLength(); i++) {
+      Node property = nodes.item(i);
+      String name = XPathHelper.valueOf(property, "name/text()", path);
+      String value = XPathHelper.valueOf(property, "value/text()", path);
+      if (env.get(name) != null) {
+        Object o = env.get(name);
+        if (o instanceof List) {
+          ((List) o).add(value);
+        } else {
+          List values = new ArrayList();
+          values.add(o);
+          values.add(value);
+          env.remove(name);
+          env.put(name, values);
+        }
+      } else {
+        env.put(name, value);
+      }
+      log.debug("Java property '" + name + "' has been set to '" + value + "'");
+    }
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#properties()
-	 */
-	public Iterator properties() {
-		return env.keySet().iterator();
-	}
+  /**
+   * Reads the main handler settings like identifier, name and description from
+   * the handler configuration.
+   * 
+   * @param config
+   *          handler configuration node
+   * @throws DOMException
+   * @throws TransformerException
+   * @throws ConfigurationException
+   */
+  private void readMainSettings(XPath path, Node config) throws DOMException,
+      TransformerException, ConfigurationException {
+    identifier = XPathHelper.valueOf(config, "@id", path);
+    if (identifier == null || identifier.equals(""))
+      throw new ConfigurationException("handler identifier must be specified");
+    name = XPathHelper.valueOf(config, "name/text()", path);
+    if (name == null || name.equals(""))
+      throw new ConfigurationException("handler name must be specified");
+    description = XPathHelper.valueOf(config, "description/text()", path);
+    className = XPathHelper.valueOf(config, "class/text()", path);
+    if (className == null || className.equals(""))
+      throw new ConfigurationException("handler class must be specified");
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#hasProperty(java.lang.String)
-	 */
-	public boolean hasProperty(String name) {
-		return env.containsKey(name);
-	}
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getIdentifier()
+   */
+  public String getIdentifier() {
+    return identifier;
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperty(java.lang.String)
-	 */
-	public String getProperty(String name) {
-		Object property = env.get(name);
-		if (property instanceof ArrayList) {
-			return (String)((ArrayList) property).get(0);
-		} else {
-			return (String) property;
-		}
-	}
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getName()
+   */
+  public String getName() {
+    return name;
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperty(java.lang.String, java.lang.String)
-	 */
-	public String getProperty(String name, String defaultValue) {
-		String value = getProperty(name);
-		return (value != null) ? value : defaultValue;
-	}
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getDescription()
+   */
+  public String getDescription() {
+    return description;
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperties(java.lang.String)
-	 */
-	public String[] getProperties(String name) {
-		Object property = env.get(name);
-		if (property instanceof ArrayList) {
-			return (String[]) ((ArrayList) property).toArray(new String[] {});
-		} else if (property instanceof String){
-			return new String[] { (String )property };
-		}
-		return null;
-	}
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#properties()
+   */
+  public Iterator properties() {
+    return env.keySet().iterator();
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getClassName()
-	 */
-	public String getClassName() {
-		return className;
-	}
-	
-	
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object obj) {
-		if (obj instanceof RequestHandlerConfigurationImpl) {
-			RequestHandlerConfigurationImpl s = (RequestHandlerConfigurationImpl) obj;
-			return
-				identifier.equals(s.identifier) &&
-				name.equals(s.name) &&
-				description.equals(s.description) &&
-				className.equals(s.className) &&
-				options.entrySet().containsAll(s.options.entrySet()) &&
-				s.options.entrySet().containsAll(options.entrySet());			
-		}
-		return false;
-	}
-	
-	
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return identifier;
-	}
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#hasProperty(java.lang.String)
+   */
+  public boolean hasProperty(String name) {
+    return env.containsKey(name);
+  }
+
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperty(java.lang.String)
+   */
+  public String getProperty(String name) {
+    Object property = env.get(name);
+    if (property instanceof ArrayList) {
+      return (String) ((ArrayList) property).get(0);
+    } else {
+      return (String) property;
+    }
+  }
+
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperty(java.lang.String,
+   *      java.lang.String)
+   */
+  public String getProperty(String name, String defaultValue) {
+    String value = getProperty(name);
+    return (value != null) ? value : defaultValue;
+  }
+
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperties(java.lang.String)
+   */
+  public String[] getProperties(String name) {
+    Object property = env.get(name);
+    if (property instanceof ArrayList) {
+      return (String[]) ((ArrayList) property).toArray(new String[] {});
+    } else if (property instanceof String) {
+      return new String[] { (String) property };
+    }
+    return null;
+  }
+
+  /**
+   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getClassName()
+   */
+  public String getClassName() {
+    return className;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOption(java.lang.String)
+   */
+  public String getOption(String name) {
+    return configuration.getOption(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOption(java.lang.String,
+   *      java.lang.String)
+   */
+  public String getOption(String name, String defaultValue) {
+    return configuration.getOption(name, defaultValue);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptions(java.lang.String)
+   */
+  public String[] getOptions(String name) {
+    return configuration.getOptions(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#hasOption(java.lang.String)
+   */
+  public boolean hasOption(String name) {
+    return configuration.hasOption(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#options()
+   */
+  public Map<String, List<String>> options() {
+    return configuration.options();
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(Object obj) {
+    if (obj instanceof RequestHandlerConfigurationImpl) {
+      RequestHandlerConfigurationImpl s = (RequestHandlerConfigurationImpl) obj;
+      return identifier.equals(s.identifier) && name.equals(s.name) && description.equals(s.description) && className.equals(s.className) && configuration.options().entrySet().containsAll(s.configuration.options().entrySet()) && s.configuration.options().entrySet().containsAll(configuration.options().entrySet());
+    }
+    return false;
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+    return identifier;
+  }
+
 }
