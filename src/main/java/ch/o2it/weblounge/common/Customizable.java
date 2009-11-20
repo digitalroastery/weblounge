@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,16 +29,6 @@ import java.util.Map;
  * exposing these options.
  */
 public interface Customizable {
-
-  /**
-   * Returns an iteration of all available option names.
-   * 
-   * @return the available option names
-   * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
-   */
-  Iterator<String> options();
 
   /**
    * Returns <code>true</code> if the the option with name <code>name</code> has
@@ -104,6 +93,6 @@ public interface Customizable {
    * 
    * @return the options
    */
-  Map<String, List<String>> getOptions();
+  Map<String, List<String>> options();
 
 }
