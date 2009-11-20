@@ -237,10 +237,7 @@ public class XMLDocument {
     Node parent = node.getParentNode();
     if (parent == null)
       return 0;
-    Node removed = null;
-    if (parent != null) {
-      removed = parent.removeChild(node);
-    }
+    Node removed = parent.removeChild(node);
     int count = 0;
     if (removed != null) {
       isDirty = true;
