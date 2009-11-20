@@ -20,16 +20,20 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.language.MultilingualTreeSet;
 import ch.o2it.weblounge.common.security.Role;
 
+import java.util.TreeSet;
+
 /**
- * A <code>Roleset</code> contains an aribtrary number of roles.
+ * A <code>Roleset</code> contains an arbitrary number of roles.
  */
-public class RoleSet extends MultilingualTreeSet<Role> {
+public class RoleSet extends TreeSet<Role> {
+
+  /** Serial version UID */
+  private static final long serialVersionUID = -7096162030865806017L;
 
   /**
-   * Creates an empty roleset that may be used to group an aribtrary set of
+   * Creates an empty role set that may be used to group an arbitrary set of
    * roles for the specified user.
    */
   public RoleSet(Role role) {
