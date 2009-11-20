@@ -28,10 +28,10 @@ import java.util.Comparator;
 /**
  * Comparator specifically designed for <code>Multilingual</code> objects.
  */
-public class MultilingualComparator<Type> implements Comparator<Type> {
+public class MultilingualComparator<Type extends Localizable> implements Comparator<Type> {
 
   /** The language used to compare */
-  private Language l;
+  private Language l = null;
 
   /**
    * Creates a new comparator for the given language.
@@ -66,16 +66,10 @@ public class MultilingualComparator<Type> implements Comparator<Type> {
       return 1;
     } else if (b == null) {
       return -1;
-    } else if (a instanceof Localizable && b instanceof Localizable) {
+    } else {
       ((Localizable)a).switchTo(l);
       ((Localizable)b).switchTo(l);
       return ((Localizable)a).toString().toLowerCase().compareTo(((Localizable) b).toString().toLowerCase());
-    } else if (a instanceof LocalizableContent<?> && b instanceof LocalizableContent<?>) {
-      LocalizableContent la = (LocalizableContent<?>)a;
-      LocalizableContent lb = (LocalizableContent<?>)b;
-      return la.get(l).toString().toLowerCase().compareTo(lb.get(l).toString().toLowerCase());
-    } else {
-      return a.toString().toLowerCase().compareTo(b.toString().toLowerCase());
     }
   }
 
