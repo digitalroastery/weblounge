@@ -47,6 +47,9 @@ public class CreationContextImplTest {
 
   /**
    * Test setup.
+   * 
+   * @throws Exception
+   *           if setup fails
    */
   @Before
   public void setUp() throws Exception {
