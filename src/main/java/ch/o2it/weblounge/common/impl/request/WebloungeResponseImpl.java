@@ -49,13 +49,13 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 	/** Flag for invalidated responses that should not be cached */
 	private boolean invalidated = false;
 	
-	/** the http error code */
+	/** HTTP error code */
 	private int httpError_ = 200;
 	
-	/** the http error message */
+	/** HTTP error message */
 	private String httpErrorMsg_ = null;
 	
-	/** the servlet request */
+	/** Associated HTTP request object */
 	private WebloungeRequest request_ = null;
 
 	// Logging
@@ -140,12 +140,16 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 			
 			case STATE_SITE_INITIALIZING:
 				notifySite = true;
+        state_ = STATE_PRECONDITION_FAILED;
+				break;
 			case STATE_SYSTEM_INITIALIZING:
 				state_ = STATE_PRECONDITION_FAILED;
 				break;
 
 			case STATE_SITE_PROCESSING:
 				notifySite = true;
+        state_ = STATE_PROCESSING_FAILED;
+				break;
 			case STATE_SYSTEM_PROCESSING:
 				state_ = STATE_PROCESSING_FAILED;
 				break;
@@ -262,13 +266,6 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 	 */
 	public boolean containsTag(String name, String value) {
 		return false;
-	}
-
-	/**
-	 * @see ch.o2it.weblounge.common.content.Taggable#getTags(ch.o2it.weblounge.common.content.Tag[])
-	 */
-	public Tag[] getTags(Tag[] tag) {
-		return new Tag[] {};
 	}
 
 	/**
