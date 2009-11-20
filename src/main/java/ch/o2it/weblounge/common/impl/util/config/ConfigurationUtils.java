@@ -42,12 +42,12 @@ public class ConfigurationUtils {
     if (optionValue == null) {
       return new String[] {};
     }
-    List values = new ArrayList();
+    List<String> values = new ArrayList<String>();
     StringTokenizer tok = new StringTokenizer(optionValue, " ,;");
     while (tok.hasMoreTokens()) {
       values.add(tok.nextToken());
     }
-    return (String[]) values.toArray(new String[values.size()]);
+    return values.toArray(new String[values.size()]);
   }
 
   /**

@@ -29,14 +29,14 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.xpath.XPath;
 
 /**
- * This class may be used as a basis for configuration objects containing a
+ * This class may be used as a utility to hold configuration data of the
+ * following kind:
  * 
  * <pre>
  * 	&lt;options&gt;
@@ -47,22 +47,10 @@ import javax.xml.xpath.XPath;
  *  &lt;/options&gt;
  * </pre>
  */
-public class ConfigurationBase implements Customizable {
+public class Options implements Customizable {
 
-  /** Job options */
+  /** Options */
   protected Map<String, List<String>> options = new HashMap<String, List<String>>();
-
-  /**
-   * Returns an iteration of all available option names.
-   * 
-   * @return the available option names
-   * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
-   */
-  public Iterator<String> options() {
-    return options.keySet().iterator();
-  }
 
   /**
    * Returns <code>true</code> if the the option with name <code>name</code> has
@@ -83,8 +71,8 @@ public class ConfigurationBase implements Customizable {
    * Returns the option value for option <code>name</code> if it has been
    * configured, <code>null</code> otherwise.
    * <p>
-   * If the option is a multivalue option (that is, if the option has been
-   * configured multiple times), this method returns the first value onyl. Use
+   * If the option is a multi value option (that is, if the option has been
+   * configured multiple times), this method returns the first value only. Use
    * {@link #getOptions(java.lang.String)} to get all option values.
    * 
    * @param name
@@ -144,7 +132,7 @@ public class ConfigurationBase implements Customizable {
    * 
    * @return the options
    */
-  public Map<String, List<String>> getOptions() {
+  public Map<String, List<String>> options() {
     return options;
   }
 
@@ -158,35 +146,30 @@ public class ConfigurationBase implements Customizable {
    * @throws ConfigurationException
    *           if the configuration data is incomplete or invalid
    */
-  public void init(XPath path, Node config) throws ConfigurationException {
-    readOptions(path, config);
-  }
+  public static Options load(XPath path, Node config)
+      throws ConfigurationException {
+    Options configurationBase = new Options();
 
-  /**
-   * Reads the options from the configuration.
-   * 
-   * @param config
-   *          configuration node
-   * @param path
-   *          the XPath object used to parse the configuration
-   */
-  protected void readOptions(XPath path, Node config) {
+    // No options available?
     if (path == null || config == null)
-      return;
+      return null;
+
+    // Read the options
     NodeList nodes = XPathHelper.selectList(config, "options/option", path);
     for (int i = 0; i < nodes.getLength(); i++) {
       Node option = nodes.item(i);
       String name = XPathHelper.valueOf(option, "name", path);
       String value = XPathHelper.valueOf(option, "value", path);
-      List<String> values = options.get(name);
+      List<String> values = configurationBase.options.get(name);
       if (values != null) {
         values.add(value);
       } else {
         values = new ArrayList<String>();
         values.add(value);
-        options.put(name, values);
+        configurationBase.options.put(name, values);
       }
     }
+    return configurationBase;
   }
 
 }
