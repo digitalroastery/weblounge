@@ -63,10 +63,10 @@ public abstract class AbstractLoginModule implements LoginModule {
   protected AuthenticatedUser user = null;
 
   /** The shared state information */
-  protected Map sharedState = null;
+  protected Map<?,?> sharedState = null;
 
   /** The options map */
-  protected Map options = null;
+  protected Map<?,?> options = null;
 
   /**
    * Returns a namespace for this login context. The namespace is used to store
@@ -94,6 +94,7 @@ public abstract class AbstractLoginModule implements LoginModule {
    *          options specified in the login <code>Configuration</code> for this
    *          particular <code>LoginModule</code>.
    */
+  @SuppressWarnings("unchecked")
   public void initialize(Subject subject, CallbackHandler callbackHandler,
       Map sharedState, Map options) {
     this.subject = subject;
@@ -101,9 +102,9 @@ public abstract class AbstractLoginModule implements LoginModule {
     this.sharedState = sharedState;
     this.options = options;
     if (this.sharedState == null)
-      this.sharedState = new HashMap();
+      this.sharedState = new HashMap<Object, Object>();
     if (this.options == null) {
-      this.options = new HashMap();
+      this.options = new HashMap<Object, Object>();
     }
   }
 
