@@ -235,7 +235,7 @@ public class Http11Utils implements Http11Constants {
    * Ouput stream that discards all output and only counts the number of bytes
    * that have been written.
    */
-  private static class NullOutputStream extends ServletOutputStream {
+  static class NullOutputStream extends ServletOutputStream {
 
     /** the number of bytes that have been written to this stream */
     private int bytesWritten = 0;
