@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.user;
 
-import ch.o2it.weblounge.common.impl.language.MultilingualTreeSet;
 import ch.o2it.weblounge.common.impl.security.RoleImpl;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.DigestType;
@@ -33,6 +32,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -319,7 +319,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    */
   public void addMembership(Group group) {
     if (groups == null) {
-      groups = new MultilingualTreeSet<Group>();
+      groups = new TreeSet<Group>();
     }
     if (!groups.contains(group)) {
       synchronized (groups) {
@@ -348,7 +348,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * @see ch.o2it.weblounge.common.security.GroupMember#getGroupClosure()
    */
   public Group[] getGroupClosure() {
-    Set<Group> result = new MultilingualTreeSet<Group>();
+    Set<Group> result = new TreeSet<Group>();
     if (groups != null) {
       result.addAll(groups);
       for (Group g : groups) {
@@ -392,7 +392,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    */
   public void assignRole(Role role) {
     if (roles == null) {
-      roles = new MultilingualTreeSet<Role>();
+      roles = new TreeSet<Role>();
     }
     if (!roles.contains(role)) {
       synchronized (roles) {
@@ -421,7 +421,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * @return the roles that this user owns
    */
   public Role[] getRoleClosure() {
-    Set<Role> roles = new MultilingualTreeSet<Role>();
+    Set<Role> roles = new TreeSet<Role>();
     if (this.roles != null)
       roles.addAll(this.roles);
     if (this.groups != null) {
@@ -439,7 +439,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * @return the user's primary roles
    */
   public Role[] getRoles() {
-    Set<Role> roles = new MultilingualTreeSet<Role>();
+    Set<Role> roles = new TreeSet<Role>();
     if (this.roles != null)
       roles.addAll(this.roles);
     return roles.toArray(new Role[roles.size()]);
