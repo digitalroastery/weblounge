@@ -23,12 +23,11 @@ package ch.o2it.weblounge.common.impl.util.datatype;
 import java.util.AbstractSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  * A set implementation backed by an <code>IdentityHashMap</code>. 
  */
-public final class IdentityHashSet<E> extends AbstractSet<E> implements Set<E> {
+public final class IdentityHashSet<E> extends AbstractSet<E> {
 	
 	/** the values in the backing map */
 	private static final Object VALUE = new Object();
