@@ -24,9 +24,7 @@ import ch.o2it.weblounge.common.security.AuthorizationProvider;
 import ch.o2it.weblounge.common.security.SecurityManager;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This class implements the security manager for a single site.
@@ -64,12 +62,11 @@ public class SecurityManagerImpl implements SecurityManager {
    */
   public void removeProvider(AuthorizationProvider provider) {
     Object key = null;
-    Set entries = provider_.entrySet();
-    Iterator i = entries.iterator();
-    while (i.hasNext()) {
-      Map.Entry entry = (Map.Entry) i.next();
-      if (entry.getValue().equals(provider))
+    for (Map.Entry<String, AuthorizationProvider> entry : provider_.entrySet()) {
+      if (entry.getValue().equals(provider)) {
         key = entry.getKey();
+        break;
+      }
     }
     provider_.remove(key);
   }

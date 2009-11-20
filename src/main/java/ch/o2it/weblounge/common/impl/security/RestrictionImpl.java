@@ -30,7 +30,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -216,17 +215,13 @@ public class RestrictionImpl implements Restriction {
   public String[] getTypes() {
     Set<String> types = new HashSet<String>();
     if (allowRules_ != null) {
-      Iterator rules = allowRules_.iterator();
-      while (rules.hasNext()) {
-        Authority r = (Authority) rules.next();
+      for (Authority r : allowRules_) {
         String type = r.getAuthorityType();
         types.add(type);
       }
     }
     if (denyRules_ != null) {
-      Iterator rules = allowRules_.iterator();
-      while (rules.hasNext()) {
-        Authority r = (Authority) rules.next();
+      for (Authority r : denyRules_) {
         String type = r.getAuthorityType();
         types.add(type);
       }
@@ -242,9 +237,7 @@ public class RestrictionImpl implements Restriction {
   public Authority[] getAllowed(String type) {
     Set<Authority> allowed = new HashSet<Authority>();
     if (allowRules_ != null) {
-      Iterator rules = allowRules_.iterator();
-      while (rules.hasNext()) {
-        Authority a = (Authority) rules.next();
+      for (Authority a : allowRules_) {
         if (a.getAuthorityType().equals(type)) {
           allowed.add(a);
         }
@@ -273,9 +266,7 @@ public class RestrictionImpl implements Restriction {
   public Authority[] getDenied(String type) {
     Set<Authority> denied = new HashSet<Authority>();
     if (denyRules_ != null) {
-      Iterator rules = denyRules_.iterator();
-      while (rules.hasNext()) {
-        Authority a = (Authority) rules.next();
+      for (Authority a : denyRules_) {
         if (a.getAuthorityType().equals(type)) {
           denied.add(a);
         }

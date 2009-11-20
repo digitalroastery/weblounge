@@ -35,7 +35,6 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -174,18 +173,17 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * @param context
    *          the authorities context
    */
-  private void deny(Permission permission, Authority authority, Map context) {
-    HashSet authorities = (HashSet) context.get(permission);
+  private void deny(Permission permission, Authority authority,
+      Map<Permission, Set<Authority>> context) {
+    Set<Authority> authorities = context.get(permission);
 
     // If the authorities have been found, iterate over them to find a matching
     // authority. We have to do this instead of directly calling
     // authorities.remove(authority)
-    // because the hashmap may contain AuthorityImpl instances which will equal
+    // because the context may contain AuthorityImpl instances which will equal
     // a matching role (after casting them to an authority) but not v. v.
     if (authorities != null) {
-      Iterator i = authorities.iterator();
-      while (i.hasNext()) {
-        Authority a = (Authority) i.next();
+      for (Authority a : authorities) {
         if (a.equals(authority)) {
           authorities.remove(a);
           return;
@@ -218,10 +216,11 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * @param context
    *          the context
    */
-  private void denyAll(Permission permission, Map context) {
-    HashSet a = (HashSet) context.get(permission);
-    if (a != null) {
-      a.clear();
+  private void denyAll(Permission permission,
+      Map<Permission, Set<Authority>> context) {
+    Set<Authority> authorities = context.get(permission);
+    if (authorities != null) {
+      authorities.clear();
     }
   }
 
@@ -263,16 +262,14 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    *          the context
    * @return <code>true</code> if the item may obtain the permission
    */
-  private boolean check(Permission permission, Authority authority, Map context) {
-    HashSet authorities = (HashSet) context.get(permission);
+  private boolean check(Permission permission, Authority authority,
+      Map<Permission, Set<Authority>> context) {
+    Set<Authority> authorities = context.get(permission);
     if (authorities != null) {
-      Iterator i = authorities.iterator();
-      while (i.hasNext()) {
-        Authority a = (Authority) i.next();
+      for (Authority a : authorities) {
         if (authority.equals(a))
           return true;
       }
-      return false;
     }
     return false;
   }
@@ -437,13 +434,9 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
     }
 
     // Permissions
-    Iterator constraints = context_.keySet().iterator();
-    while (constraints.hasNext()) {
-      Permission p = (Permission) constraints.next();
+    for (Permission p : context_.keySet()) {
       Map<String, Set<Authority>> authorities = groupByType(context_.get(p));
-      Iterator types = authorities.keySet().iterator();
-      while (types.hasNext()) {
-        String type = (String) types.next();
+      for (String type : authorities.keySet()) {
         b.append("<permission id=\"");
         b.append(p.getContext() + ":" + p.getIdentifier());
         b.append("\" type=\"");
