@@ -20,6 +20,10 @@
 
 package ch.o2it.weblounge.common.util.datatype;
 
+import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.assertNotNull;
+
 import ch.o2it.weblounge.common.impl.util.datatype.IdentityHashSet;
 
 import org.junit.After;
@@ -66,25 +70,25 @@ public class IdentityHashSetTest {
 	 */
 	@Test
 	public final void testSize() {
-		assert(s.size() == 0);
+		assertTrue(s.size() == 0);
 		s.add(o[0]);
-		assert(s.size() == 1);
+		assertTrue(s.size() == 1);
 		s.add(o[1]);
-		assert(s.size() == 2);
+		assertTrue(s.size() == 2);
 		s.add(o[2]);
-		assert(s.size() == 3);
+		assertTrue(s.size() == 3);
 		s.add(o[2]);
-		assert(s.size() == 3);
+		assertTrue(s.size() == 3);
 		s.add(o[3]);
-		assert(s.size() == 4);
+		assertTrue(s.size() == 4);
 		s.remove(o[2]);
-		assert(s.size() == 3);
+		assertTrue(s.size() == 3);
 		s.remove(o[2]);
-		assert(s.size() == 3);
+		assertTrue(s.size() == 3);
 		s.remove("Test1");
-		assert(s.size() == 3);
+		assertTrue(s.size() == 3);
 		s.clear();
-		assert(s.size() == 0);
+		assertTrue(s.size() == 0);
 	}
 
 	/**
@@ -92,18 +96,18 @@ public class IdentityHashSetTest {
 	 */
 	@Test
 	public final void testIsEmpty() {
-		assert(s.isEmpty());
+		assertTrue(s.isEmpty());
 		s.add(o[0]);
-		assert(!s.isEmpty());
+		assertTrue(!s.isEmpty());
 		s.remove("Test1");
-		assert(!s.isEmpty());
+		assertTrue(!s.isEmpty());
 		s.remove(o[0]);
-		assert(s.isEmpty());
+		assertTrue(s.isEmpty());
 		s.add(o[0]);
 		s.add(o[1]);
-		assert(!s.isEmpty());
+		assertTrue(!s.isEmpty());
 		s.clear();
-		assert(s.isEmpty());
+		assertTrue(s.isEmpty());
 	}
 
 	/**
@@ -111,13 +115,13 @@ public class IdentityHashSetTest {
 	 */
 	@Test
 	public final void testClear() {
-		assert(s.isEmpty());
+		assertTrue(s.isEmpty());
 		s.clear();
-		assert(s.isEmpty());
+		assertTrue(s.isEmpty());
 		s.add(o[0]);
-		assert(!s.isEmpty());
+		assertTrue(!s.isEmpty());
 		s.clear();
-		assert(s.isEmpty());
+		assertTrue(s.isEmpty());
 	}
 
 	/**
@@ -126,13 +130,13 @@ public class IdentityHashSetTest {
 	@Test
 	public final void testIdentityHashSet() {
 		Set<String> l =  new IdentityHashSet<String>();
-		assert(l != null);
-		assert(l instanceof IdentityHashSet);
-		assert(l.size() == 0);
-		assert(l.isEmpty());
-		assert(!s.remove("Test"));
-		assert(!s.contains("Test"));
-		assert(s.add("Test"));
+		assertNotNull(l);
+		assertTrue(l instanceof IdentityHashSet<?>);
+		assertTrue(l.size() == 0);
+		assertTrue(l.isEmpty());
+		assertTrue(!s.remove("Test"));
+		assertTrue(!s.contains("Test"));
+		assertTrue(s.add("Test"));
 	}
 
 	/**
@@ -140,14 +144,14 @@ public class IdentityHashSetTest {
 	 */
 	@Test
 	public final void testAddE() {
-		assert(s.add(o[0]));
-		assert(s.add(o[1]));
-		assert(!s.add(o[0]));
-		assert(!s.add(o[1]));
-		assert(s.add(o[2]));
+		assertTrue(s.add(o[0]));
+		assertTrue(s.add(o[1]));
+		assertTrue(!s.add(o[0]));
+		assertTrue(!s.add(o[1]));
+		assertTrue(s.add(o[2]));
 		s.clear();
-		assert(s.add(o[0]));
-		assert(s.add(o[1]));
+		assertTrue(s.add(o[0]));
+		assertTrue(s.add(o[1]));
 	}
 
 	/**
@@ -155,16 +159,16 @@ public class IdentityHashSetTest {
 	 */
 	@Test
 	public final void testContainsObject() {
-		assert(!s.contains(o[0]));
+		assertTrue(!s.contains(o[0]));
 		s.add(o[0]);
-		assert(s.contains(o[0]));
-		assert(!s.contains(o[1]));
+		assertTrue(s.contains(o[0]));
+		assertTrue(!s.contains(o[1]));
 		s.add(o[1]);
-		assert(s.contains(o[1]));
+		assertTrue(s.contains(o[1]));
 		s.remove(o[0]);
-		assert(!s.contains(o[0]));
+		assertTrue(!s.contains(o[0]));
 		s.remove(o[1]);
-		assert(!s.contains(o[1]));
+		assertTrue(!s.contains(o[1]));
 	}
 
 	/**
@@ -173,15 +177,13 @@ public class IdentityHashSetTest {
 	@Test
 	public final void testIterator() {
 		Iterator<Object> i = s.iterator();
-		assert(i != null);
-		assert(!i.hasNext());
+		assertTrue(i != null && !i.hasNext());
 		for (int j = 0; j < o.length; j++)
 			s.add(o[j]);
 		i = s.iterator();
-		assert(i != null);
+		assertTrue(i != null);
 		for (int j = 0; j < o.length; j++) {
-			assert(i.hasNext());
-			assert(i.next() != null);
+			assertTrue(i != null && i.next() != null && i.hasNext());
 		}
 	}
 
@@ -190,17 +192,17 @@ public class IdentityHashSetTest {
 	 */
 	@Test
 	public final void testRemoveObject() {
-		assert(!s.remove(o[0]));
-		assert(!s.remove(o[1]));
+		assertTrue(!s.remove(o[0]));
+		assertTrue(!s.remove(o[1]));
 		s.add(o[0]);
 		s.add(o[1]);
-		assert(s.remove(o[0]));
-		assert(s.remove(o[1]));
+		assertTrue(s.remove(o[0]));
+		assertTrue(s.remove(o[1]));
 		s.add(o[0]);
 		s.add(o[1]);
 		s.clear();
-		assert(!s.remove(o[0]));
-		assert(!s.remove(o[1]));		
+		assertTrue(!s.remove(o[0]));
+		assertTrue(!s.remove(o[1]));		
 	}
 
 }
