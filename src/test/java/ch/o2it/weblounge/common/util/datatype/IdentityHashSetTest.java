@@ -183,7 +183,7 @@ public class IdentityHashSetTest {
 		i = s.iterator();
 		assertTrue(i != null);
 		for (int j = 0; j < o.length; j++) {
-			assertTrue(i != null && i.next() != null && i.hasNext());
+			assertTrue(i != null && i.hasNext() && i.next() != null);
 		}
 	}
 
