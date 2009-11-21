@@ -85,8 +85,14 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
+            <Embed-Dependency>
+              jtidy
+            </Embed-Dependency>
             <Export-Package>
-              ch.o2it.weblounge.cache.impl
+              ch.o2it.weblounge.cache.impl,
+              ch.o2it.weblounge.cache.impl.filter,
+              ch.o2it.weblounge.cache.impl.handle,
+              ch.o2it.weblounge.cache.impl.index
             </Export-Package>
             <Service-Component>
               OSGI-INF/cache-service.xml
