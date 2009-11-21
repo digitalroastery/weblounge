@@ -106,7 +106,7 @@ public final class CacheTagImpl implements Tag, CacheTag {
    */
   @Override
   public int hashCode() {
-    return key.hashCode() + value.hashCode();
+    return key.hashCode();
   }
 
   /**
