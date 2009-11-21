@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common;
 
+import org.junit.Ignore;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.io.IOException;
 /**
  * Utility class containing a few helper methods.
  */
+@Ignore
 public class TestUtils {
 
   /**
