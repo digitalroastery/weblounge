@@ -20,7 +20,7 @@
           <instructions>
             <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
             <Export-Package>
-              ch.o2it.weblounge.content
+              ch.o2it.weblounge.contentrepository
             </Export-Package>
           </instructions>
         </configuration>
