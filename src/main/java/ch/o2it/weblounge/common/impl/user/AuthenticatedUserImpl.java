@@ -32,7 +32,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -78,7 +77,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
   }
 
   /**
-   * Creates a new abstract authenticated user whithout any reference to a site.
+   * Creates a new abstract authenticated user without any reference to a site.
    * The login context has to be set using
    * {@link #setLoginContext(LoginContext)}.
    * 
@@ -319,7 +318,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    */
   public void addMembership(Group group) {
     if (groups == null) {
-      groups = new TreeSet<Group>();
+      groups = new HashSet<Group>();
     }
     if (!groups.contains(group)) {
       synchronized (groups) {
@@ -348,7 +347,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * @see ch.o2it.weblounge.common.security.GroupMember#getGroupClosure()
    */
   public Group[] getGroupClosure() {
-    Set<Group> result = new TreeSet<Group>();
+    Set<Group> result = new HashSet<Group>();
     if (groups != null) {
       result.addAll(groups);
       for (Group g : groups) {
@@ -392,7 +391,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    */
   public void assignRole(Role role) {
     if (roles == null) {
-      roles = new TreeSet<Role>();
+      roles = new HashSet<Role>();
     }
     if (!roles.contains(role)) {
       synchronized (roles) {
@@ -421,7 +420,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * @return the roles that this user owns
    */
   public Role[] getRoleClosure() {
-    Set<Role> roles = new TreeSet<Role>();
+    Set<Role> roles = new HashSet<Role>();
     if (this.roles != null)
       roles.addAll(this.roles);
     if (this.groups != null) {
@@ -439,7 +438,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * @return the user's primary roles
    */
   public Role[] getRoles() {
-    Set<Role> roles = new TreeSet<Role>();
+    Set<Role> roles = new HashSet<Role>();
     if (this.roles != null)
       roles.addAll(this.roles);
     return roles.toArray(new Role[roles.size()]);
