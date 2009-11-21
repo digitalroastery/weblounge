@@ -20,12 +20,10 @@
 
 package ch.o2it.weblounge.cache;
 
-import static org.junit.Assert.assertFalse;
-
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 import ch.o2it.weblounge.common.request.CacheTag;
@@ -73,7 +71,7 @@ public class CacheTagImplTest {
   public void testCacheTagImplString() {
     CacheTag t = new CacheTagImpl(tagName);
     assertEquals(tagName, t.getName());
-    assertNull(t.getValue());
+    assertEquals(CacheTagImpl.ANY, t.getValue());
     try {
       new CacheTagImpl(null);
       fail("Managed to initialize tag without name");
@@ -94,7 +92,7 @@ public class CacheTagImplTest {
     // Test null value
     t = new CacheTagImpl(tagName, null);
     assertEquals("test", t.getName());
-    assertNull(t.getValue());
+    assertEquals(CacheTagImpl.ANY, t.getValue());
     
     // Test non-null value
     t = new CacheTagImpl(tagName, tagValue);
