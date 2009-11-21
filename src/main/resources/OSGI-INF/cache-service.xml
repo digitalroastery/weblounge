@@ -5,4 +5,4 @@
   <service>
     <provide interface="ch.o2it.weblounge.cache.CacheService" />
   </service>
-</component>
+</scr:component>
