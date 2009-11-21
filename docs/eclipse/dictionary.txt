@@ -12,4 +12,7 @@ urls
 mountpoint
 recheck
 cron
-servlet
+servletcredential
+username
+credentials
+deactivated
