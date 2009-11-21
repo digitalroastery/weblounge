@@ -62,7 +62,7 @@ public interface User extends Cloneable {
   /**
    * Returns the <code>XML</code> representation of this user.
    * 
-   * @return the xml representation
+   * @return the <code>XML</code> representation
    */
   String toXml();
 
