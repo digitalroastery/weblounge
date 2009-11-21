@@ -3,7 +3,7 @@
 ##
 
 FELIX="/Applications/Weblounge"
-M2_REPO="/Users/wunden/.m2/repository"
+M2_REPO="/Users/johndoe/.m2/repository"
 DEBUG_PORT="8000"
 DEBUG_SUSPEND="n"
 
