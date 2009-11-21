@@ -19,6 +19,11 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
 
+	<dependency>
+		<groupId>quartz</groupId>
+		<artifactId>quartz</artifactId>
+	</dependency>
+
   </dependencies>
   <build>
     <plugins>
@@ -30,22 +35,18 @@
           <instructions>
             <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
             <Export-Package>
-            	ch.o2it.weblounge.common.dispatcher,
-            	ch.o2it.weblounge.common.job,
+                ch.o2it.weblounge.common,
+            	ch.o2it.weblounge.common.content,
+            	ch.o2it.weblounge.common.http,
             	ch.o2it.weblounge.common.language,
-            	ch.o2it.weblounge.common.modification,
-            	ch.o2it.weblounge.common.module,
             	ch.o2it.weblounge.common.page,
-            	ch.o2it.weblounge.common.publication,
             	ch.o2it.weblounge.common.renderer,
             	ch.o2it.weblounge.common.repository,
             	ch.o2it.weblounge.common.request,
             	ch.o2it.weblounge.common.security,
-            	ch.o2it.weblounge.common.service,
             	ch.o2it.weblounge.common.site,
-            	ch.o2it.weblounge.common.tag,
             	ch.o2it.weblounge.common.url,
-            	ch.o2it.weblounge.common.util
+            	ch.o2it.weblounge.common.user
             </Export-Package>
           </instructions>
         </configuration>
