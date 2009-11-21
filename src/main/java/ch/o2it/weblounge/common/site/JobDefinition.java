@@ -20,11 +20,10 @@
 
 package ch.o2it.weblounge.common.site;
 
-import org.quartz.JobDetail;
-import org.quartz.Trigger;
-
 /**
  * Definition for jobs within weblounge.
+ * 
+ * TODO: The interface currently relies on quartz, which is bad
  */
 public interface JobDefinition {
 
@@ -34,13 +33,13 @@ public interface JobDefinition {
    * 
    * @return the job
    */
-  JobDetail getJob();
+  // JobDetail getJob();
   
   /**
    * Returns the trigger that determines when the job should be executed.
    * 
    * @return the trigger
    */
-  Trigger getTrigger();
+  // Trigger getTrigger();
   
 }

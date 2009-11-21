@@ -19,11 +19,6 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
 
-	<dependency>
-		<groupId>quartz</groupId>
-		<artifactId>quartz</artifactId>
-	</dependency>
-
   </dependencies>
   <build>
     <plugins>
