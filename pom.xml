@@ -96,6 +96,9 @@
             <Service-Component>
               OSGI-INF/dispatcher-service.xml
             </Service-Component>
+            <Embed-Dependency>
+              jasper
+            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>
