@@ -1,99 +1,99 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>ch.o2it</groupId>
-	<artifactId>weblounge-cache</artifactId>
-	<packaging>bundle</packaging>
-	<name>Weblounge Cache</name>
-	<parent>
-		<groupId>ch.o2it</groupId>
-		<artifactId>weblounge-base</artifactId>
-		<version>3.0-SNAPSHOT</version>
-	</parent>
-	<dependencies>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.o2it</groupId>
+  <artifactId>weblounge-cache</artifactId>
+  <packaging>bundle</packaging>
+  <name>Weblounge Cache</name>
+  <parent>
+    <groupId>ch.o2it</groupId>
+    <artifactId>weblounge-base</artifactId>
+    <version>3.0-SNAPSHOT</version>
+  </parent>
+  <dependencies>
 
-		<!-- weblounge -->
+    <!-- weblounge -->
 
-		<dependency>
-			<groupId>ch.o2it</groupId>
-			<artifactId>weblounge-cache-api</artifactId>
-			<version>3.0-SNAPSHOT</version>
-		</dependency>
+    <dependency>
+      <groupId>ch.o2it</groupId>
+      <artifactId>weblounge-cache-api</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
 
-		<dependency>
-			<groupId>ch.o2it</groupId>
-			<artifactId>weblounge-common-api</artifactId>
-			<version>3.0-SNAPSHOT</version>
-		</dependency>
+    <dependency>
+      <groupId>ch.o2it</groupId>
+      <artifactId>weblounge-common-api</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
 
-		<dependency>
-			<groupId>ch.o2it</groupId>
-			<artifactId>weblounge-common</artifactId>
-			<version>3.0-SNAPSHOT</version>
-		</dependency>
+    <dependency>
+      <groupId>ch.o2it</groupId>
+      <artifactId>weblounge-common</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
 
-		<!-- osgi support -->
+    <!-- osgi support -->
 
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>osgi_R4_core</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi_R4_core</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>osgi_R4_compendium</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi_R4_compendium</artifactId>
+    </dependency>
 
-		<!-- thirdparty -->
+    <!-- thirdparty -->
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>jtidy</groupId>
-			<artifactId>jtidy</artifactId>
-			<version>4aug2000r7-dev</version>
-		</dependency>
-		
-		<!-- testing -->
+    <dependency>
+      <groupId>jtidy</groupId>
+      <artifactId>jtidy</artifactId>
+      <version>4aug2000r7-dev</version>
+    </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
+    <!-- testing -->
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<scope>test</scope>
-		</dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
 
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
-						<Export-Package>
-							ch.o2it.weblounge.cache.impl
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
+            <Export-Package>
+              ch.o2it.weblounge.cache.impl
             </Export-Package>
-						<Service-Component>
-							OSGI-INF/cache-service.xml
+            <Service-Component>
+              OSGI-INF/cache-service.xml
             </Service-Component>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
