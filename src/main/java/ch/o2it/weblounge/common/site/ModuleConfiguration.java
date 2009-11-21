@@ -97,6 +97,6 @@ public interface ModuleConfiguration extends Customizable {
    * 
    * @return the module jobs
    */
-  Collection<Job> getJobs();
+  Collection<JobDefinition> getJobs();
 
 }

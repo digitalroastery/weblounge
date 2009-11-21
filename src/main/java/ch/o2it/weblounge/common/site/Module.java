@@ -131,7 +131,7 @@ public interface Module extends Customizable {
    * 
    * @return the job registry
    */
-  Job[] getJobs();
+  JobDefinition[] getJobs();
 
   /**
    * Returns this module's renderer registry which keeps track of the defined
