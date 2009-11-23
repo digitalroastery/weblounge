@@ -61,6 +61,48 @@
       <artifactId>jasper</artifactId>
     </dependency>
 
+    <!-- supports jasper -->
+    <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>catalina</artifactId>
+        <version>6.0.20</version>
+    </dependency>
+
+    <!-- supports catalina (see above) -->
+    <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>annotations-api</artifactId>
+        <version>6.0.20</version>
+    </dependency>
+
+    <!-- supports jasper -->
+    <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>el-api</artifactId>
+        <version>6.0.20</version>
+    </dependency>
+    
+    <!-- supports jasper -->
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>jasper-el</artifactId>
+      <version>6.0.20</version>
+    </dependency>
+    
+    <!-- supports jasper -->
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>jasper-jdt</artifactId>
+      <version>6.0.20</version>
+    </dependency>
+
+    <!-- supports japser -->
+    <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>jsp-api</artifactId>
+        <version>6.0.20</version>
+    </dependency>
+
     <!-- testing -->
     
     <dependency>
@@ -89,16 +131,33 @@
             <Export-Package>
             	ch.o2it.weblounge.dispatcher.impl,
             	ch.o2it.weblounge.dispatcher.impl.handler,
-            	ch.o2it.weblounge.dispatcher.impl.http,
-            	ch.o2it.weblounge.dispatcher.impl.jaas,
-            	ch.o2it.weblounge.dispatcher.impl.request
+            	ch.o2it.weblounge.dispatcher.impl.jaas
             </Export-Package>
             <Service-Component>
               OSGI-INF/dispatcher-service.xml
             </Service-Component>
             <Embed-Dependency>
-              jasper
+              jasper,
+              catalina,
+              annotations-api,
+              el-api,
+              jasper-el,
+              jasper-jdt,
+              jsp-api
             </Embed-Dependency>
+            <!-- 
+              If pax-logging is installed, there is no need to include juli logger
+            -->
+            <Import-Package>
+              !org.apache.juli.*,
+              !org.apache.coyote,
+              !org.apache.tomcat.jni,
+              !org.apache.tomcat.util.*,
+              !org.apache.tools.ant.*,
+              !org.eclipse.*,
+              *
+            </Import-Package>
+            -->
           </instructions>
         </configuration>
       </plugin>
