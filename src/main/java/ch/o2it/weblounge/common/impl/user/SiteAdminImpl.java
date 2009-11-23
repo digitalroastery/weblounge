@@ -22,13 +22,15 @@ package ch.o2it.weblounge.common.impl.user;
 
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.Authority;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.SiteAdmin;
 
 /**
  * This class represents the administrator user for a single site.
  */
-public class SiteAdminImpl extends WebloungeUserImpl implements SiteAdmin {
+public final class SiteAdminImpl extends WebloungeUserImpl implements SiteAdmin {
+  
+  /** The site identifier */
+  protected String site = null;
   
   /**
    * Creates a new SiteAdminImpl user with the <code>administrator</code> role
@@ -37,12 +39,13 @@ public class SiteAdminImpl extends WebloungeUserImpl implements SiteAdmin {
    * @param login
    *          the login name
    * @param site
-   *          the associated site
+   *          identifier of the associated site
    */
-  public SiteAdminImpl(String login, Site site) {
-    super(login, SystemRealm, site);
+  public SiteAdminImpl(String login, String site) {
+    super(login, SystemRealm);
+    this.site = site;
     assignRole(SystemRole.SITEADMIN);
-    setName("Site Administrator (" + site.getIdentifier() + ")");
+    setName("Site Administrator (" + site + ")");
   }
 
   /**
@@ -53,7 +56,7 @@ public class SiteAdminImpl extends WebloungeUserImpl implements SiteAdmin {
    */
   public boolean equals(Authority authority) {
     if (authority != null && authority instanceof SiteAdminImpl) {
-      return ((SiteAdminImpl) authority).getSite() == getSite();
+      return site.equals(((SiteAdminImpl) authority).site);
     }
     return false;
   }

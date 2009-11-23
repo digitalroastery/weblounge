@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeAdmin;
 
 /**
- * TODO: Comment WebloungeAdminImpl
+ * This class implements the system administrator for weblounge.
  */
 public final class WebloungeAdminImpl extends WebloungeUserImpl implements WebloungeAdmin {
 
@@ -45,7 +45,7 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl implements Weblo
    * according to your needs.
    */
   public WebloungeAdminImpl(String login) {
-    super(login, User.SystemRealm, null);
+    super(login, User.SystemRealm);
     assignRole(SystemRole.SYSTEMADMIN);
     setName("Weblounge Administrator");
     if (instance != null)

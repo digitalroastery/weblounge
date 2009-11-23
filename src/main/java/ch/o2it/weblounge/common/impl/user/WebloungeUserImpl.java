@@ -57,9 +57,6 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /** Logging facility */
   private static final Logger log_ = LoggerFactory.getLogger(WebloungeUserImpl.class);
 
-  /** The associated site */
-  protected Site site = null;
-
   /** Enabled flag */
   protected boolean enabled = true;
 
@@ -110,12 +107,9 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    *          the username
    * @param realm
    *          the login domain
-   * @param site
-   *          the site where the user logged in
    */
-  public WebloungeUserImpl(String login, String realm, Site site) {
+  public WebloungeUserImpl(String login, String realm) {
     super(login, realm);
-    this.site = site;
   }
 
   /**
@@ -124,20 +118,9 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    * 
    * @param login
    *          the username
-   * @param site
-   *          the site where the user logged in
    */
-  public WebloungeUserImpl(String login, Site site) {
-    this(login, DefaultRealm, site);
-  }
-
-  /**
-   * Returns the associated site.
-   * 
-   * @return the site
-   */
-  public Site getSite() {
-    return site;
+  public WebloungeUserImpl(String login) {
+    this(login, DefaultRealm);
   }
 
   /**
@@ -412,7 +395,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       return null;
 
     String login = XPathHelper.valueOf(rootNode, "@id", xpath);
-    WebloungeUserImpl user = new WebloungeUserImpl(login, site);
+    WebloungeUserImpl user = new WebloungeUserImpl(login);
 
     String realm = XPathHelper.valueOf(rootNode, "@realm", xpath);
     if (realm != null)

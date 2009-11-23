@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.common.impl.user;
 
 import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.Guest;
 
 /**
@@ -34,8 +33,8 @@ public class GuestImpl extends WebloungeUserImpl implements Guest {
   /**
    * Creates a new guest user for the given site.
    */
-  public GuestImpl(Site site) {
-    super("guest", site);
+  public GuestImpl() {
+    super("guest");
     setName("Guest");
     assignRole(SystemRole.GUEST);
   }
