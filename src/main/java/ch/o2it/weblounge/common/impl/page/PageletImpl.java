@@ -35,14 +35,11 @@ import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Pagelet;
 import ch.o2it.weblounge.common.page.PageletLocation;
-import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
@@ -97,9 +94,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /** Pagelet identifier */
   private String id_ = null;
 
-  /** The module */
-  private Module module_ = null;
-
   /** The pagelet location */
   PageletLocation location_ = null;
 
@@ -129,21 +123,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @param id
    *          the pagelet identifier
    */
-  public PageletImpl(Site site, String module, String id) {
+  public PageletImpl(String module, String id) {
     moduleId_ = module;
     id_ = id;
-    module_ = site.getModule(moduleId_);
-    if (module_ == null) {
-      if (module_ == null) {
-        String msg = "Configuration error: Module '" + module + "' containing renderer '" + id + "' could not be found!";
-        log_.error(msg);
-        throw new IllegalStateException(msg);
-      } else if (module_.getRenderer(id) == null) {
-        String msg = "Configuration error: Renderer '" + id + "' could not be found in module '" + id + "'";
-        log_.error(msg);
-        throw new IllegalStateException(msg);
-      }
-    }
     properties = new HashMap<String, String[]>();
     creationCtx = new CreationContextImpl();
     modificationCtx = new LocalizedModificationContextImpl(this);
@@ -163,7 +145,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *          the pagelet identifier
    */
   public PageletImpl(PageletLocation location, String module, String id) {
-    this(location.getSite(), module, id);
+    this(module, id);
     location_ = location;
   }
 
@@ -357,14 +339,12 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns the renderer used to render this pagelet.
+   * Returns the identifier of the renderer used to render this pagelet.
    * 
-   * @param method
-   *          the rendering method
    * @return the pagelet's renderer
    */
-  public Renderer getRenderer(String method) {
-    return module_.getRenderer(id_, method);
+  public String getRenderer() {
+    return id_;
   }
 
   /**

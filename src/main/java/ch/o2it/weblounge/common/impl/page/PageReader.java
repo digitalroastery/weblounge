@@ -64,24 +64,20 @@ public final class PageReader extends GeneralContentReader {
 
   /** The parser states */
   private static final int STATE_UNKNOWN = -1;
-  private static final int STATE_RENDERER = 1;
-  private static final int STATE_LAYOUT = 2;
   private static final int STATE_CONTENT = 9;
   private static final int STATE_TEXT = 10;
   private static final int STATE_PROPERTY = 11;
   private static final int STATE_TITLE = 12;
-  private static final int STATE_PAGELOCK = 15;
 
-  /** Parser context */
-  private static final int CTXT_PAGE = 0;
-  private static final int CTXT_COMPOSER = 1;
-  private static final int CTXT_PAGELET = 2;
+  private enum ParserContext {
+    Lost, Page, Head, Body, Composer, Pagelet
+  };
 
   /** The initial parser state */
   private int state_ = STATE_UNKNOWN;
 
   /** The parser context */
-  private int context_ = CTXT_PAGE;
+  private ParserContext context_ = ParserContext.Lost;
 
   /**
    * Creates a new page data reader that will parse the SAX data and store it in
@@ -137,20 +133,32 @@ public final class PageReader extends GeneralContentReader {
     super.startElement(uri, local, raw, attrs);
 
     // read the page url
-    if ("page".equals(local)) {
-      context_ = CTXT_PAGE;
+    if ("page".equals(raw)) {
+      context_ = ParserContext.Page;
       state_ = STATE_UNKNOWN;
       page_.uri.id = attrs.getValue("id");
     }
 
+    // in the header
+    else if ("head".equals(raw)) {
+      context_ = ParserContext.Head;
+      state_ = STATE_UNKNOWN;
+    }
+
+    // in the body
+    else if ("body".equals(raw)) {
+      context_ = ParserContext.Body;
+      state_ = STATE_UNKNOWN;
+    }
+
     // pagelet or headline
-    else if ("pagelet".equals(local)) {
-      context_ = CTXT_PAGELET;
+    else if ("pagelet".equals(raw)) {
+      context_ = ParserContext.Pagelet;
       state_ = STATE_UNKNOWN;
       String module = attrs.getValue("module");
       String id = attrs.getValue("id");
       if (isHeadline_) {
-        pagelet_ = new PageletImpl(site, module, id);
+        pagelet_ = new PageletImpl(module, id);
       } else {
         PageletLocation location = new PageletLocationImpl(page_.getURI(), composer_, position_);
         pagelet_ = new PageletImpl(location, module, id);
@@ -159,19 +167,19 @@ public final class PageReader extends GeneralContentReader {
     }
 
     // headline
-    else if ("headline".equals(local)) {
+    else if ("headline".equals(raw)) {
       isHeadline_ = true;
     }
 
     // composer
-    else if ("composer".equals(local)) {
-      context_ = CTXT_COMPOSER;
+    else if ("composer".equals(raw)) {
+      context_ = ParserContext.Composer;
       composer_ = attrs.getValue("id");
       position_ = 0;
     }
 
     // content
-    else if ("content".equals(local)) {
+    else if ("content".equals(raw)) {
       state_ = STATE_CONTENT;
       String language = attrs.getValue("language");
       Language l = site.getLanguage(language);
@@ -186,19 +194,19 @@ public final class PageReader extends GeneralContentReader {
     }
 
     // element
-    else if ("text".equals(local)) {
+    else if ("text".equals(raw)) {
       state_ = STATE_TEXT;
       clipboard.put("text.id", attrs.getValue("id"));
     }
 
     // property
-    else if ("property".equals(local)) {
+    else if ("property".equals(raw)) {
       state_ = STATE_PROPERTY;
       clipboard.put("property.id", attrs.getValue("id"));
     }
 
     // title
-    else if ("title".equals(local)) {
+    else if ("title".equals(raw)) {
       state_ = STATE_TITLE;
       String language = attrs.getValue("language");
       Language l = site.getLanguage(language);
@@ -213,24 +221,6 @@ public final class PageReader extends GeneralContentReader {
       }
     }
 
-    // page renderer
-    else if ("renderer".equals(local)) {
-      state_ = STATE_RENDERER;
-      return;
-    }
-
-    // page layout
-    else if ("layout".equals(local)) {
-      state_ = STATE_LAYOUT;
-      return;
-    }
-
-    // pagelock
-    else if ("pagelock".equals(local)) {
-      state_ = STATE_PAGELOCK;
-      return;
-    }
-
   }
 
   /**
@@ -241,23 +231,23 @@ public final class PageReader extends GeneralContentReader {
       throws SAXException {
 
     // Pagelet
-    if ("pagelet".equals(local)) {
+    if ("pagelet".equals(raw)) {
       if (isHeadline_)
         page_.headlines.add(pagelet_);
       else
         page_.appendPagelet(pagelet_, composer_);
       pagelet_ = null;
-      context_ = isHeadline_ ? CTXT_PAGE : CTXT_COMPOSER;
+      context_ = isHeadline_ ? ParserContext.Page : ParserContext.Composer;
     }
 
     // Headline
-    if ("headline".equals(local)) {
-      context_ = CTXT_PAGE;
+    if ("headline".equals(raw)) {
+      context_ = ParserContext.Page;
       isHeadline_ = false;
     }
 
     // Security
-    else if (contentReaderContext == CTXT_SECURITY && "security".equals(local)) {
+    else if (contentReaderContext == CTXT_SECURITY && "security".equals(raw)) {
       if (pagelet_ != null) {
         pagelet_.securityCtx = getSecurityContext();
       } else {
@@ -266,7 +256,7 @@ public final class PageReader extends GeneralContentReader {
     }
 
     // Publishing
-    else if (contentReaderContext == CTXT_PUBLISH && "publish".equals(local)) {
+    else if (contentReaderContext == CTXT_PUBLISH && "publish".equals(raw)) {
       if (pagelet_ != null) {
         pagelet_.publishingCtx = getPublishingContext();
       } else {
@@ -274,24 +264,29 @@ public final class PageReader extends GeneralContentReader {
       }
     }
 
-    // Renderer
-    else if (state_ == STATE_RENDERER && "renderer".equals(local)) {
-      page_.renderer = characters.toString();
+    // Template
+    else if (context_.equals(ParserContext.Head) && "template".equals(raw)) {
+      page_.template = characters.toString();
     }
 
     // Layout
-    else if (state_ == STATE_LAYOUT && "layout".equals(local)) {
+    else if (context_.equals(ParserContext.Head) && "layout".equals(raw)) {
       page_.layout = characters.toString();
     }
 
+    // Type
+    else if (context_.equals(ParserContext.Head) && "type".equals(raw)) {
+      page_.type = characters.toString();
+    }
+
     // Title
-    else if (state_ == STATE_TITLE && "title".equals(local)) {
+    else if (state_ == STATE_TITLE && "title".equals(raw)) {
       Language l = (Language) clipboard.get("language");
       page_.setTitle(characters.toString(), l);
     }
 
     // Pagelock
-    else if (state_ == STATE_PAGELOCK && "pagelock".equals(local)) {
+    else if (context_.equals(ParserContext.Head) && "pagelock".equals(raw)) {
       String login = characters.toString();
       User editor = site.getUser(login);
       if (page_ != null)
@@ -299,17 +294,29 @@ public final class PageReader extends GeneralContentReader {
     }
 
     // Text
-    else if (state_ == STATE_TEXT && "text".equals(local)) {
+    else if (state_ == STATE_TEXT && "text".equals(raw)) {
       String id = (String) clipboard.get("text.id");
       Language l = (Language) clipboard.get("language");
       pagelet_.setContent(id, characters.toString(), l);
     }
 
     // Property
-    else if (state_ == STATE_PROPERTY && "property".equals(local)) {
+    else if (state_ == STATE_PROPERTY && "property".equals(raw)) {
       String id = (String) clipboard.get("property.id");
       pagelet_.setProperty(id, characters.toString());
     }
+    
+    else if (context_.equals(ParserContext.Head) && "head".equals(raw))
+      context_ = ParserContext.Page;
+
+    else if (context_.equals(ParserContext.Head) && "body".equals(raw))
+      context_ = ParserContext.Page;
+
+    else if (context_.equals(ParserContext.Head) && "composer".equals(raw))
+      context_ = ParserContext.Body;
+    
+    else if (context_.equals(ParserContext.Head) && "pagelet".equals(raw))
+      context_ = ParserContext.Composer;
 
     super.endElement(uri, local, raw);
   }
@@ -336,12 +343,14 @@ public final class PageReader extends GeneralContentReader {
   protected void setModificationDate(Date date) {
     Language l = (Language) clipboard.get("language");
     switch (context_) {
-    case CTXT_PAGE:
-      page_.setModifiedSince(date);
-      break;
-    case CTXT_PAGELET:
-      pagelet_.setModifiedSince(date, l);
-      break;
+      case Page:
+        page_.setModifiedSince(date);
+        break;
+      case Pagelet:
+        pagelet_.setModifiedSince(date, l);
+        break;
+      default:
+        break;
     }
     super.setModificationDate(date);
   }
@@ -356,12 +365,14 @@ public final class PageReader extends GeneralContentReader {
   protected void setModifiedBy(User user) {
     Language l = (Language) clipboard.get("language");
     switch (context_) {
-    case CTXT_PAGE:
-      page_.setModifiedBy(user);
-      break;
-    case CTXT_PAGELET:
-      pagelet_.setModifiedBy(user, l);
-      break;
+      case Page:
+        page_.setModifiedBy(user);
+        break;
+      case Pagelet:
+        pagelet_.setModifiedBy(user, l);
+        break;
+      default:
+        break;
     }
     super.setModifiedBy(user);
   }
@@ -375,12 +386,14 @@ public final class PageReader extends GeneralContentReader {
    */
   protected void setOwner(User user) {
     switch (context_) {
-    case CTXT_PAGE:
-      page_.securityCtx.setOwner(user);
-      break;
-    case CTXT_PAGELET:
-      pagelet_.securityCtx.setOwner(user);
-      break;
+      case Page:
+        page_.securityCtx.setOwner(user);
+        break;
+      case Pagelet:
+        pagelet_.securityCtx.setOwner(user);
+        break;
+      default:
+        break;
     }
     super.setModifiedBy(user);
   }

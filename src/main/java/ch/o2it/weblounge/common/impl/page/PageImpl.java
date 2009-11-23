@@ -35,12 +35,10 @@ import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.Layout;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageContentListener;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.page.Pagelet;
-import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
@@ -87,7 +85,7 @@ public class PageImpl extends LocalizableObject implements Page {
   List<String> keywords_ = null;
 
   /** Renderer identifier */
-  String renderer = null;
+  String template = null;
 
   /** Layout identifier */
   String layout = null;
@@ -353,29 +351,38 @@ public class PageImpl extends LocalizableObject implements Page {
    * 
    * @return the associated layout
    */
-  public Layout getLayout() {
-    return uri.getSite().getLayout(layout);
+  public String getLayout() {
+    return layout;
   }
 
   /**
-   * Returns the renderer that is used to render this page.
+   * Sets the layout that is used to determine default content and initial
+   * layout.
    * 
-   * @param method
-   *          the rendering method
+   * @param layout
+   *          the layout identifier
+   */
+  public void setLayout(String layout) {
+    this.layout = layout;
+  }
+
+  /**
+   * Returns the template that is used to render this page.
+   * 
    * @return the renderer
    */
-  public Renderer getRenderer(String method) {
-    return (renderer != null) ? uri.getSite().getRenderer(renderer, method) : null;
+  public String getTemplate() {
+    return template;
   }
 
   /**
    * Sets the renderer that is used to render this page.
    * 
-   * @param renderer
-   *          the renderer identifier
+   * @param template
+   *          the template identifier
    */
-  public void setRenderer(String renderer) {
-    this.renderer = renderer;
+  public void setTemplate(String template) {
+    this.template = template;
   }
 
   /**
@@ -903,7 +910,7 @@ public class PageImpl extends LocalizableObject implements Page {
       int i = 0;
       while (i < l.size()) {
         Pagelet p = l.get(i);
-        if (!p.getModule().equals(module) || !p.getRenderer("html").getIdentifier().equals(id)) {
+        if (!p.getModule().equals(module) || !p.getIdentifier().equals(id)) {
           l.remove(i);
         } else {
           i++;
@@ -1046,7 +1053,7 @@ public class PageImpl extends LocalizableObject implements Page {
     b.append("<header>");
 
     b.append("<renderer>");
-    b.append(renderer);
+    b.append(template);
     b.append("</renderer>\n");
 
     b.append("<layout>");
