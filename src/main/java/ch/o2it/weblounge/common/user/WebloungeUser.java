@@ -21,14 +21,14 @@
 package ch.o2it.weblounge.common.user;
 
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
 
 import java.util.Date;
 
 /**
- * TODO: Comment WebloungeUser
+ * This class represents a user that has been authenticated and identified by
+ * weblounge.
  */
 public interface WebloungeUser extends AuthenticatedUser {
 
@@ -39,13 +39,6 @@ public interface WebloungeUser extends AuthenticatedUser {
    *          the email address
    */
   void setEmail(String email);
-
-  /**
-   * Returns the associated site.
-   * 
-   * @return the site
-   */
-  Site getSite();
 
   /**
    * Sets this person's first name.
