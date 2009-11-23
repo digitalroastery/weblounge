@@ -100,7 +100,7 @@ public class WebloungeUserImplTest {
   @Before
   public void setUp() throws Exception {
     setUpPrerequisites();
-    user = new WebloungeUserImpl(login, realm, mockSite);
+    user = new WebloungeUserImpl(login, realm);
     setUpUser();
   }
 
@@ -170,7 +170,7 @@ public class WebloungeUserImplTest {
   @Test
   public void testGetRealm() {
     assertEquals(realm, user.getRealm());
-    User u = new WebloungeUserImpl(login, mockSite);
+    User u = new WebloungeUserImpl(login);
     assertEquals(User.DefaultRealm, u.getRealm());
   }
 
@@ -180,7 +180,7 @@ public class WebloungeUserImplTest {
    */
   @Test
   public void testDefaultRealm() {
-    User u = new WebloungeUserImpl(login, mockSite);
+    User u = new WebloungeUserImpl(login);
     assertEquals(User.DefaultRealm, u.getRealm());
   }
 
