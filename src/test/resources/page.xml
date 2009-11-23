@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<page id="/service/test" version="live">
+    <head>
+        <template>default</template>
+        <layout>default</layout>
+        <type>default</type>
+        <publish>
+            <from>2006/05/05 16:58:21 GMT</from>
+            <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+            <security>
+               <owner>
+                  <user realm="weblounge">tobias.wunden</user>
+               </owner>
+               <restrict>
+                  <permission realm="weblounge">translate</permission>
+                  <role realm="weblounge">translator</role>
+               </restrict>
+               <restrict>
+                  <permission realm="weblounge">manage</permission>
+                  <role realm="weblounge">editor</role>
+               </restrict>
+               <restrict>
+                  <permission realm="weblounge">write</permission>
+                  <role realm="weblounge">editor</role>
+               </restrict>
+               <restrict>
+                  <permission realm="weblounge">publish</permission>
+                  <role realm="weblounge">publisher</role>
+               </restrict>
+               <restrict>
+                  <permission realm="weblounge">read</permission>
+                  <role realm="weblounge">guest</role>
+               </restrict>
+            </security>
+        </security>
+        <keywords>
+            <keyword>su</keyword>
+            <keyword>wo</keyword>
+        </keywords>
+        <title language="de">Service</title>
+        <title language="it">Servizio</title>
+        <title language="fr">Services</title>
+        <modified>
+            <date>2007/05/02 21:07:00 GMT</date>
+            <user>thorsten.brigmann</user>
+        </modified>
+    </head>
+   <body>
+      <composer id="main">
+         <pagelet module="text" id="title">
+            <publish>
+                <from>2006/05/05 16:58:21 GMT</from>
+                <to>292278994/08/17 07:12:55 GMT</to>
+            </publish>
+            <security>
+               <owner>
+                  <user realm="weblounge">tobias.wunden</user>
+               </owner>
+               <restrict>
+                  <permission realm="weblounge">translate</permission>
+                  <role realm="weblounge">translator</role>
+               </restrict>
+               <restrict>
+                  <permission realm="weblounge">manage</permission>
+                  <role realm="weblounge">editor</role>
+               </restrict>
+               <restrict>
+                  <permission realm="weblounge">write</permission>
+                  <role realm="weblounge">editor</role>
+               </restrict>
+               <restrict>
+                  <permission realm="weblounge">publish</permission>
+                  <role realm="weblounge">publisher</role>
+               </restrict>
+               <restrict>
+                  <permission realm="weblounge">read</permission>
+                  <role realm="weblounge">guest</role>
+               </restrict>
+            </security>
+            <workflow/>
+            <content>
+               <localized langage="de">
+                  <text id="title">
+                        Service auf swissunihockey.ch
+                    </text>
+                  <text id="keyword">Service</text>
+               </localized>
+               <localized langage="fr">
+                  <text id="title">
+                        Services sur swissunihockey.ch
+                    </text>
+                  <text id="keyword">Services</text>
+                  <text id="lead">
+                        Les nouveaux et les anciens services sont sous
+                        cette rubrique.
+                    </text>
+               </localized>
+            </content>
+            <properties>
+               <property id="author">false</property>
+               <property id="date">false</property>
+            </properties>
+         </pagelet>
+      </composer>
+   </body>
+</page>
