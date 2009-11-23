@@ -2,10 +2,15 @@
 # Configure these variables to match your environment
 ##
 
+# Felix home
 FELIX="/Applications/Weblounge"
-M2_REPO="/Users/johndoe/.m2/repository"
+
+# Felix debug options
 DEBUG_PORT="8000"
 DEBUG_SUSPEND="n"
+
+# Maven home
+M2_REPO="/Users/johndoe/.m2/repository"
 
 ##
 # Only change the line below if you want to customize the server
@@ -14,6 +19,7 @@ DEBUG_SUSPEND="n"
 MAVEN_OPTS="-DM2_REPO=$M2_REPO"
 FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX/load"
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf"
+PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN"
 
 # Clear the felix cache directory
 FELIX_CACHE="$FELIX/felix-cache"
@@ -24,4 +30,4 @@ DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,
 
 # Finally start felix
 cd $FELIX
-java $DEBUG_OPTS $MAVEN_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE
+java $DEBUG_OPTS $MAVEN_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE
