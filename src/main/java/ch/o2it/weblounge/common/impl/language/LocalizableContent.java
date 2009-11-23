@@ -73,8 +73,10 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    */
   public LocalizableContent(LocalizableObject localizable) {
     this(localizable.getDefaultLanguage());
-    this.setOriginalLanguage(localizable.getOriginalLanguage());
-    this.setDefaultLanguage(localizable.getDefaultLanguage());
+    if (localizable.getOriginalLanguage() != null)
+      this.setOriginalLanguage(localizable.getOriginalLanguage());
+    if (localizable.getDefaultLanguage() != null)
+      this.setDefaultLanguage(localizable.getDefaultLanguage());
     this.setLanguageResolution(localizable.getLanguageResolution());
     localizable.addLocalizationListener(this);
   }
