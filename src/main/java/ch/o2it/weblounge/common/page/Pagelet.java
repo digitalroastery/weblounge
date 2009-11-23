@@ -25,7 +25,6 @@ import ch.o2it.weblounge.common.content.LocalizedModifiable;
 import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -209,13 +208,11 @@ public interface Pagelet extends Localizable, Creatable, LocalizedModifiable, Pu
   String getContent(String name);
 
   /**
-   * Returns the renderer used to render this pagelet.
+   * Returns the identifier of the renderer used to render this pagelet.
    * 
-   * @param method
-   *          the rendering method
    * @return the pagelet's renderer
    */
-  Renderer getRenderer(String method);
+  String getRenderer();
 
   /**
    * Returns the pagelet location, containing information about url, composer

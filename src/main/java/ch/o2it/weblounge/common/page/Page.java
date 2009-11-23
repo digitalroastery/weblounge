@@ -25,7 +25,6 @@ import ch.o2it.weblounge.common.content.LocalizedModifiable;
 import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -182,20 +181,18 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
   public User getModifiedBy();
 
   /**
-   * Returns the layout associated with this page.
+   * Returns the identifier of the layout associated with this page.
    * 
    * @return the associated layout
    */
-  public Layout getLayout();
+  public String getLayout();
 
   /**
-   * Returns the renderer that is used to render this page.
+   * Returns the identifier of the template that is used to render this page.
    * 
-   * @param method
-   *          the rendering method
-   * @return the renderer
+   * @return the template
    */
-  public Renderer getRenderer(String method);
+  public String getTemplate();
 
   /**
    * Returns the pagelets that are contained in the specified composer.
