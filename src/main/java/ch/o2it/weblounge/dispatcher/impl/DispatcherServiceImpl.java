@@ -55,7 +55,7 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
    */
   @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
-    log_.info("Dispatcher service properties have been updated");
+    log_.debug("Updating dispatcher service properties");
   }
 
   /**
@@ -74,7 +74,7 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
     httpTracker = new HttpServiceTracker(context, dispatcher);
     httpTracker.open();    
 
-    log_.info("Weblounge dispatcher activated");
+    log_.debug("Weblounge dispatcher activated");
   }
 
   /**
@@ -92,7 +92,7 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
     siteTracker.close();
     siteTracker = null;
 
-    log_.info("Weblounge dispatcher deactivated");
+    log_.debug("Weblounge dispatcher deactivated");
   }
 
 }
