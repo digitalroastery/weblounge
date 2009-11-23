@@ -57,10 +57,10 @@ import javax.jcr.SimpleCredentials;
  * {@link PageRepository} and {@link ResourceRepository}, backed by the
  * <code>Jackrabbit content repository</code> implementation.
  */
-public class JCRepositoryService implements PageRepository, ResourceRepository, ManagedService {
+public class ContentRepositoryService implements PageRepository, ResourceRepository, ManagedService {
 
   /** Logging instance */
-  private static final Logger log_ = LoggerFactory.getLogger(JCRepositoryService.class);
+  private static final Logger log_ = LoggerFactory.getLogger(ContentRepositoryService.class);
 
   /** Weblounge node prefix */
   public static final String PREFIX = "wl:";
@@ -68,7 +68,7 @@ public class JCRepositoryService implements PageRepository, ResourceRepository, 
   /** Jackrabbit jcr repository instance */
   private Repository jcrRepository = null;
 
-  public JCRepositoryService() {
+  public ContentRepositoryService() {
   }
 
   /**
