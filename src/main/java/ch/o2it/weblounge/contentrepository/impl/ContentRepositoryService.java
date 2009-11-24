@@ -20,23 +20,23 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.contentrepository.PageRepository;
 import ch.o2it.weblounge.contentrepository.ResourceRepository;
 
-import org.apache.jackrabbit.api.JackrabbitNodeTypeManager;
 import org.apache.jackrabbit.api.JackrabbitRepository;
 import org.apache.jackrabbit.core.RepositoryImpl;
 import org.apache.jackrabbit.core.config.RepositoryConfig;
+import org.apache.jackrabbit.value.DateValue;
+import org.apache.jackrabbit.value.StringValue;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -44,31 +44,88 @@ import java.util.Map;
 
 import javax.jcr.LoginException;
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
-import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.Workspace;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
+import javax.jcr.version.VersionHistory;
 
 /**
  * This class represents the default implementation of the
  * {@link PageRepository} and {@link ResourceRepository}, backed by the
  * <code>Jackrabbit content repository</code> implementation.
  */
-public class ContentRepositoryService implements PageRepository, ResourceRepository, ManagedService {
+public class ContentRepositoryService implements PageRepository, ResourceRepository, ManagedService, BundleActivator {
 
   /** Logging instance */
   private static final Logger log_ = LoggerFactory.getLogger(ContentRepositoryService.class);
 
+  /** Path to the jcr repository */
+  private final static String jcrConfigPath = "/jackrabbit/repository.xml";
+
+  /** Name of the jcr home configuration parameter */
+  public static final String OPT_JCR_HOME = "weblounge.jcr.home";
+
+  /** Name of the jcr database driver configuration parameter */
+  public static final String OPT_JCR_DB_DRIVER = "weblounge.jcr.db.driver";
+
+  /** Name of the jcr database url configuration parameter */
+  public static final String OPT_JCR_DB_URL = "weblounge.jcr.db.url";
+
+  /** Name of the jcr database user configuration parameter */
+  public static final String OPT_JCR_DB_USER = "weblounge.jcr.db.user";
+
+  /** Name of the jcr database password configuration parameter */
+  public static final String OPT_JCR_DB_PASSWORD = "weblounge.jcr.db.password";
+
   /** Weblounge node prefix */
   public static final String PREFIX = "wl:";
 
-  /** Jackrabbit jcr repository instance */
-  private Repository jcrRepository = null;
+  /** Path to the jcr home directory */
+  private String jcrHome = null;
 
+  /** Path to the jcr home directory */
+  private String jcrDbDriver = null;
+
+  /** Url to the jcr persistence database */
+  private String jcrDbUrl = null;
+
+  /** Username for the jcr persistence database */
+  private String jcrDbUsername = null;
+
+  /** Password for the jcr persistence database */
+  private String jcrDbPassword = null;
+
+  /** Jackrabbit jcr repository instance */
+  private JackrabbitRepository jcr = null;
+
+  /**
+   * Creates a new content repository service instance.
+   */
   public ContentRepositoryService() {
+    initToDefaults();
+  }
+
+  /**
+   * Initializes the jackrabbit jcr settings to their default values.
+   */
+  protected void initToDefaults() {
+    jcrHome = PathSupport.concat(new String[] {
+        System.getProperty("java.io.tmpdir"),
+        "weblounge",
+        "jackrabbit"
+    });
+    jcrDbDriver = "org.apache.derby.jdbc.EmbeddedDriver";
+    jcrDbUrl = "jdbc:derby:${wsp.home}/db;create=true";
+    jcrDbUsername = null;
+    jcrDbPassword = null;
   }
 
   /**
@@ -76,85 +133,102 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
    */
   @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
-    log_.info("Java content repository service properties have been updated");
-  }
 
-  /**
-   * Sets up the jackrabbit content repository.
-   * 
-   * @param context
-   *          the bundle context
-   * @throws Exception
-   *           if starting the bundle fails
-   */
-  public void start(ComponentContext context) throws Exception {
-    // Open the configuration template from within this bundle
-    InputStream configTemplate = context.getBundleContext().getBundle().getEntry("/cluster-repository-template.xml").openStream();
-
-    // Get the configuration settings from the framework or system properties
-    String nodeId = context.getBundleContext().getProperty("weblounge.jcr.nodeId");
-    String repoHome = context.getBundleContext().getProperty("weblounge.jcr.repoPath");
-    String dbUrl = context.getBundleContext().getProperty("weblounge.jcr.db.url");
-    String dbDriver = context.getBundleContext().getProperty("weblounge.jcr.db.driver");
-    String dbUser = context.getBundleContext().getProperty("weblounge.jcr.db.user");
-    String dbPass = context.getBundleContext().getProperty("weblounge.jcr.db.password");
-    String pm = context.getBundleContext().getProperty("weblounge.jcr.persistence.manager");
-    String dataStorePath = context.getBundleContext().getProperty("weblounge.jcr.datastore.path");
-
-    // This is just a hack... better to use an xml parser
-    BufferedReader br = new BufferedReader(new InputStreamReader(configTemplate));
-    StringBuilder sb = new StringBuilder();
-    String line = null;
-    while ((line = br.readLine()) != null) {
-      sb.append(line);
+    // jcrHome
+    if (properties.get(OPT_JCR_HOME) != null) {
+      jcrHome = properties.get(OPT_JCR_HOME).toString();
+      log_.info("Jackrabbit home is now " + jcrHome);
     }
-    br.close();
-    configTemplate.close();
-    String templateString = sb.toString();
-    String configString = templateString.replaceAll("PERSISTENCE_MGR", pm).replaceAll("NODE_ID", nodeId).replaceAll("DB_DRIVER", dbDriver).replaceAll("DB_USER", dbUser).replaceAll("DB_PASS", dbPass).replaceAll("DB_URL", dbUrl).replaceAll("DATA_STORE_PATH", dataStorePath);
 
-    InputStream config = new ByteArrayInputStream(configString.getBytes("UTF8"));
+    // jcrDbDriver
+    if (properties.get(OPT_JCR_DB_DRIVER) != null) {
+      jcrDbDriver = properties.get(OPT_JCR_DB_DRIVER).toString();
+      log_.info("Driver for jackrabbit persistence database is now " + jcrDbDriver);
+    }
 
-    log_.info(configString);
+    // jcrDbUrl
+    if (properties.get(OPT_JCR_DB_URL) != null) {
+      jcrDbUrl = properties.get(OPT_JCR_DB_URL).toString();
+      log_.info("Url to jackrabbit persistence database is now " + jcrDbUrl);
+    }
 
-    // Build the repository
-    RepositoryConfig rc = RepositoryConfig.create(config, repoHome);
+    // jcrDbUsername
+    if (properties.get(OPT_JCR_DB_USER) != null) {
+      jcrDbUsername = properties.get(OPT_JCR_DB_USER).toString();
+      log_.info("Username for jackrabbit persistence database is now " + jcrDbUsername);
+    }
 
-    log_.info("Creating a new JCR instance with cluster id=" + rc.getClusterConfig().getId());
-
-    jcrRepository = RepositoryImpl.create(rc);
-
-    // TODO Remove jackrabbit-specific dependencies
-    Session session = getSession();
-    try {
-      JackrabbitNodeTypeManager manager = (JackrabbitNodeTypeManager)
-        session.getWorkspace().getNodeTypeManager();
-      manager.registerNodeTypes(this.getClass().getResourceAsStream("/nodeTypes.cnd"),
-          JackrabbitNodeTypeManager.TEXT_X_JCR_CND);
-    } catch (Exception e) {
-      e.printStackTrace();
-      log_.error(e.getLocalizedMessage());
+    // jcrDbPassword
+    if (properties.get(OPT_JCR_DB_PASSWORD) != null) {
+      jcrDbPassword = properties.get(OPT_JCR_DB_PASSWORD).toString();
+      log_.info("Password for jackrabbit persistence database is now " + jcrDbPassword);
     }
 
   }
 
   /**
-   * Stops the previously set up jackrabbit content repository.
+   * {@inheritDoc}
    * 
-   * @param context
-   *          the bundle context
-   * @throws Exception
-   *           if shutdown fails
+   * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
-  public void stop(ComponentContext context) throws Exception {
-    if (jcrRepository != null) {
-      ((JackrabbitRepository) jcrRepository).shutdown();
+  public void start(BundleContext context) throws Exception {
+    InputStream is = context.getBundle().getEntry(jcrConfigPath).openStream();
+    RepositoryConfig jcrConfig = RepositoryConfig.create(is, jcrHome);
+    jcr = RepositoryImpl.create(jcrConfig);
+
+    // Test
+    Session session = jcr.login(new SimpleCredentials("userid", "".toCharArray()), null);
+
+    // Obtain the root node
+    Node rn = session.getRootNode();
+
+    // Create and add a new blog node. The node's type will be "blog".
+    Node blogNode = rn.addNode("blog");
+    blogNode.addMixin("mix:versionable");
+    blogNode.setProperty("blogtitle", new StringValue("Chasing Jackrabbit article"));
+    blogNode.setProperty("blogauthor", new StringValue("Joe Blogger"));
+    blogNode.setProperty("blogdate", new DateValue(Calendar.getInstance()));
+    blogNode.setProperty("blogtext", new StringValue("JCR is an interesting API to lo learn."));
+    session.save();
+
+    log_.info("Blog node has been saved to jcr");
+
+    // See if the node can be retrieved
+    Workspace ws = session.getWorkspace();
+    QueryManager qm = ws.getQueryManager();
+
+    // Specify a query using the XPATH query language
+    Query q = qm.createQuery("//blog[@blogauthor = 'Joe Blogger']", Query.XPATH);
+    QueryResult res = q.execute();
+    NodeIterator it = res.getNodes();
+    while (it.hasNext()) {
+      Node n = it.nextNode();
+      Property prop = n.getProperty("blogtitle");
+      log_.info("Found blog entry with title: " + prop.getString());
+      
+      VersionHistory history = n.getVersionHistory();
+      if (history.getAllVersions().hasNext()) {
+        log_.info("Blog entry is versioned");
+      }
+    }    
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+   */
+  public void stop(BundleContext context) throws Exception {
+    if (jcr != null) {
+      jcr.shutdown();
     }
   }
 
   /**
    * {@inheritDoc}
-   * @see org.opencastproject.repository.api.OpencastRepository#getObject(java.lang.Class, java.lang.String)
+   * 
+   * @see org.opencastproject.repository.api.OpencastRepository#getObject(java.lang.Class,
+   *      java.lang.String)
    */
   @SuppressWarnings("unchecked")
   public <T> T getObject(Class<T> type, String path) {
@@ -166,7 +240,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     } else {
       Node node = null;
       try {
-        node = (Node)session.getItem(path + "/jcr:content");
+        node = (Node) session.getItem(path + "/jcr:content");
         return (T) node.getProperty("jcr:data").getStream();
       } catch (PathNotFoundException e) {
         throw new RuntimeException(e);
@@ -180,7 +254,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     Session session = null;
     try {
       // TODO Use authentication service to log in to the repo
-      session = jcrRepository.login(new SimpleCredentials("foo", "bar".toCharArray()));
+      session = jcr.login(new SimpleCredentials("foo", "bar".toCharArray()));
     } catch (LoginException e) {
       e.printStackTrace();
     } catch (RepositoryException e) {
@@ -191,15 +265,17 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
 
   /**
    * {@inheritDoc}
+   * 
    * @see org.opencastproject.repository.api.OpencastRepository#getSupportedTypes()
    */
   public Class<?>[] getSupportedTypes() {
     // TODO: Support MediaBundle
-    return new Class<?>[] {InputStream.class};
+    return new Class<?>[] { InputStream.class };
   }
 
   /**
    * {@inheritDoc}
+   * 
    * @see org.opencastproject.repository.api.OpencastRepository#hasObject(java.lang.String)
    */
   public boolean hasObject(String path) {
@@ -218,21 +294,23 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
   protected void assertSupported(Class<?> type) {
     Class<?>[] supportedTypes = getSupportedTypes();
     boolean objectClassSupported = false;
-    for (int i=0; i<supportedTypes.length; i++) {
+    for (int i = 0; i < supportedTypes.length; i++) {
       Class<?> currentClass = supportedTypes[i];
       if (currentClass.isAssignableFrom(type)) {
         objectClassSupported = true;
         break;
       }
     }
-    if( ! objectClassSupported) {
+    if (!objectClassSupported) {
       throw new IllegalArgumentException("Class " + type + " is not a supported object type");
     }
   }
 
   /**
    * {@inheritDoc}
-   * @see org.opencastproject.repository.api.OpencastRepository#putObject(java.lang.Object, java.lang.String)
+   * 
+   * @see org.opencastproject.repository.api.OpencastRepository#putObject(java.lang.Object,
+   *      java.lang.String)
    */
   public String putObject(Object object, String path) {
     assertSupported(object.getClass());
@@ -243,7 +321,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     try {
       Node fileNode = null;
       if (session.itemExists(path)) {
-        fileNode = (Node)session.getItem(path);
+        fileNode = (Node) session.getItem(path);
       } else {
         fileNode = buildPath(session, path);
       }
@@ -252,7 +330,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
       try {
         resNode = (Node) fileNode.getNode("jcr:content");
         log_.debug("resource node exists: " + resNode.getPath());
-      } catch(PathNotFoundException e) {
+      } catch (PathNotFoundException e) {
         resNode = fileNode.addNode("jcr:content", "nt:resource");
         log_.debug("resource node created: " + resNode.getPath());
         resNode.addMixin("mix:referenceable");
@@ -270,6 +348,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
 
   /**
    * Build each "nt:unstructured" node as needed
+   * 
    * @param root
    * @param path
    * @return The leaf nt:unstructured node
@@ -279,14 +358,14 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     StringBuilder partialPath = new StringBuilder();
     Node currentNode = session.getRootNode();
     String[] sa = path.split("/");
-    for(int i=0; i<sa.length; i++) {
+    for (int i = 0; i < sa.length; i++) {
       String pathElement = sa[i];
       if (pathElement == null || "".equals(pathElement))
         continue;
       partialPath.append("/");
       partialPath.append(pathElement);
       log_.debug("checking for node " + pathElement + " at path " + partialPath);
-      if(session.itemExists(partialPath.toString())) {
+      if (session.itemExists(partialPath.toString())) {
         currentNode = currentNode.getNode(pathElement);
       } else {
         log_.debug("Adding node " + pathElement);
@@ -296,9 +375,10 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     }
     return currentNode;
   }
+
   protected InputStream convertToStream(Object object) {
     // TODO Handle Media Bundles and anything else this should support
-    return (InputStream)object;
+    return (InputStream) object;
   }
 
   public Map<String, String> getMetadata(String path) {
@@ -309,21 +389,22 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     try {
       Node node = null;
       if (session.itemExists(path)) {
-        node = (Node)session.getItem(path);
+        node = (Node) session.getItem(path);
         Map<String, String> map = new HashMap<String, String>();
         PropertyIterator iter = node.getProperties();
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
           Property prop = iter.nextProperty();
-          if( ! prop.getName().startsWith(PREFIX)) continue;
+          if (!prop.getName().startsWith(PREFIX))
+            continue;
           map.put(prop.getName().substring(PREFIX.length()), prop.getString());
         }
         return map;
       } else {
         throw new RuntimeException("no object exists at path " + path);
       }
-    } catch(PathNotFoundException e) {
+    } catch (PathNotFoundException e) {
       throw new RuntimeException(e);
-    } catch(RepositoryException e) {
+    } catch (RepositoryException e) {
       throw new RuntimeException(e);
     }
   }
@@ -336,15 +417,15 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     try {
       Node node = null;
       if (session.itemExists(path)) {
-        node = (Node)session.getItem(path);
+        node = (Node) session.getItem(path);
         node.setProperty(PREFIX + key, value);
         session.save();
       } else {
         throw new RuntimeException("no object exists at path " + path);
       }
-    } catch(PathNotFoundException e) {
+    } catch (PathNotFoundException e) {
       throw new RuntimeException(e);
-    } catch(RepositoryException e) {
+    } catch (RepositoryException e) {
       throw new RuntimeException(e);
     }
   }
