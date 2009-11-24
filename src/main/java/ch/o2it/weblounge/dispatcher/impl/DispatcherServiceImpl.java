@@ -32,21 +32,21 @@ import java.util.Dictionary;
 
 /**
  * The dispatcher coordinates dispatching of requests in weblounge. It first
- * registers with the http service if available and then starts the tracking
- * of sites, so the weblounge dispatcher servlet knows where to dispatch
- * requests to.
+ * registers with the http service if available and then starts the tracking of
+ * sites, so the weblounge dispatcher servlet knows where to dispatch requests
+ * to.
  * <p>
- * This means that by deactivating this service, no dispatching will be done
- * in weblounge and all sites will effectively be offline.
+ * This means that by deactivating this service, no dispatching will be done in
+ * weblounge and all sites will effectively be offline.
  */
 public class DispatcherServiceImpl implements DispatcherService, BundleActivator, ManagedService {
 
   /** Logging instance */
   private static final Logger log_ = LoggerFactory.getLogger(DispatcherServiceImpl.class);
-  
+
   /** Tracker for the http service */
   private HttpServiceTracker httpTracker = null;
-  
+
   /** Tracker for weblounge sites */
   private SiteTracker siteTracker = null;
 
@@ -60,11 +60,12 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
 
   /**
    * {@inheritDoc}
+   * 
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   public void start(BundleContext context) throws Exception {
     log_.debug("Weblounge dispatcher activating");
-    
+
     // Start site service tracking
     siteTracker = new SiteTracker(context);
     siteTracker.open();
@@ -72,13 +73,14 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
     // Create an http tracker and make sure it forwards to our servlet
     WebloungeDispatcherServlet dispatcher = new WebloungeDispatcherServlet(siteTracker);
     httpTracker = new HttpServiceTracker(context, dispatcher);
-    httpTracker.open();    
+    httpTracker.open();
 
     log_.debug("Weblounge dispatcher activated");
   }
 
   /**
    * {@inheritDoc}
+   * 
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   public void stop(BundleContext context) throws Exception {
