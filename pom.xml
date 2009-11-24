@@ -20,6 +20,12 @@
       <version>3.0-SNAPSHOT</version>
     </dependency>
 
+    <dependency>
+      <groupId>ch.o2it.weblounge</groupId>
+      <artifactId>weblounge-common</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
+
     <!-- osgi support -->
 
     <dependency>
@@ -81,6 +87,12 @@
         <version>1.6.0</version>
     </dependency>
 
+    <dependency>
+        <groupId>org.apache.jackrabbit</groupId>
+        <artifactId>jackrabbit-text-extractors</artifactId>
+        <version>1.6.0</version>
+    </dependency>
+
     <!-- end apache jackrabbit -->
 
     <!-- apache jackrabbit support -->
@@ -115,16 +127,44 @@
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
-      <version>10.3.1.4</version>
+      <version>10.4.2.0</version>
+    </dependency>
+    
+    <!-- supports derby (see above) -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.7.1</version>
+    </dependency>
+
+    <!-- supports xalan (see above) -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>serializer</artifactId>
+      <version>2.7.1</version>
+    </dependency>
+
+    <!-- supports derby (see above) -->    
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.9.1</version>
+    </dependency>
+
+    <!-- supports xercexImpl (see above) -->    
+    <dependency>
+        <groupId>xml-resolver</groupId>
+        <artifactId>xml-resolver</artifactId>
+        <version>1.2</version>
     </dependency>
     
     <!-- supports jackrabbit-core -->
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
-      <version>2.9.0</version>
+      <version>2.4.1</version>
     </dependency>
-
+ 
     <!-- supports jackrabbit-core -->
     <dependency>
         <groupId>concurrent</groupId>
@@ -138,6 +178,60 @@
         <artifactId>json</artifactId>
         <version>20090211</version>
     </dependency>
+
+    <!-- supports jackrabbit-text-extractors -->
+    <!--
+    <dependency>
+      <groupId>net.sourceforge.nekohtml</groupId>
+      <artifactId>nekohtml</artifactId>
+      <version>1.9.7</version>
+    </dependency>
+    -->
+    
+    <!--  supports jackrabbit-text-extractors -->
+    <!--
+    <dependency>
+      <groupId>pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+      <version>0.7.3</version>
+    </dependency>
+    -->
+
+    <!--  supports pdfbox (see above) -->
+    <!--
+    <dependency>
+      <groupId>bouncycastle</groupId>
+      <artifactId>bcmail-jdk14</artifactId>
+      <version>139</version>
+    </dependency>
+    -->
+
+    <!--  supports pdfbox (see above) -->
+    <!--
+    <dependency>
+      <groupId>bouncycastle</groupId>
+      <artifactId>bcprov-jdk14</artifactId>
+      <version>140</version>
+    </dependency>
+    -->
+
+    <!-- supports pdfbox (see above) -->
+    <!--
+    <dependency>
+      <groupId>org.fontbox</groupId>
+      <artifactId>fontbox</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+    -->
+
+    <!-- supports pdfbox (see above) -->
+    <!--
+    <dependency>
+      <groupId>org.jempbox</groupId>
+      <artifactId>jempbox</artifactId>
+      <version>0.2.0</version>
+    </dependency>
+    -->
 
     <!-- testing -->
 
@@ -162,6 +256,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
+            <Bundle-Activator>ch.o2it.weblounge.contentrepository.impl.ContentRepositoryService</Bundle-Activator>
             <Embed-Dependency>
               jcr,
               jta,
@@ -170,20 +265,43 @@
               jackrabbit-jcr-commons,
               jackrabbit-spi,
               jackrabbit-spi-commons,
+              jackrabbit-text-extractors,
+              lucene-core,
+              derby,
               commons-collections,
               commons-io,
               concurrent,
-              lucene-core,
+              xalan,
+              serializer,
+              xercesImpl,
               json
             </Embed-Dependency>
+            <!--  Embed for additional indexing support            
+              nekohtml
+              pdfbox,
+              bcmail-jdk14,
+              bcprov-jdk14,
+              fontbox,
+              jempbox
+            -->
             <Export-Package>
               ch.o2it.weblounge.contentrepository.impl
             </Export-Package>
             <Import-Package>
+              org.apache.xml.resolver.*;resolution:=optional,
+              sun.io.*;resolution:=optional,
               !org.apache.jackrabbit.test,
-              !org.apache.jackrabbit.extractor,
+              !org.apache.derby.impl.drda,
+              !org.cyberneko.html.*,
+              !org.apache.poi.*,
+              !org.pdfbox.*,
               *
             </Import-Package>
+            <!-- Import for additional indexing support
+              !junit.*,
+              !org.apache.tools.ant.*,
+              !org.apache.lucene.demo,
+            -->
             <Service-Component>
               OSGI-INF/contentrepository-service.xml
             </Service-Component>
