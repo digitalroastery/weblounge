@@ -10,12 +10,12 @@ REM # Make sure the following two path entries do *not* contain spaces
 REM # Felix home
 SET FELIX_HOME=C:\Libraries\felix-framework-2.0.0
 
+REM # Maven home
+SET M2_REPO=C:\Users\johndoe\.m2\repository
+
 REM # Felix debug options
 SET DEBUG_PORT=8000
 SET DEBUG_SUSPEND=n
-
-REM # Maven home
-SET M2_REPO=C:\Users\johndoe\.m2\repository
 
 REM ##
 REM # Only change the lines below if you know what you are doing

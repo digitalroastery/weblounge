@@ -5,12 +5,12 @@
 # Felix home
 FELIX="/Applications/Weblounge"
 
+# Maven home
+M2_REPO="/Users/johndoe/.m2/repository"
+
 # Felix debug options
 DEBUG_PORT="8000"
 DEBUG_SUSPEND="n"
-
-# Maven home
-M2_REPO="/Users/johndoe/.m2/repository"
 
 ##
 # Only change the line below if you want to customize the server
