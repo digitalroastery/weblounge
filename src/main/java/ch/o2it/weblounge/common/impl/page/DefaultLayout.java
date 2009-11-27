@@ -20,7 +20,10 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Layout;
 import ch.o2it.weblounge.common.page.Pagelet;
 
@@ -37,21 +40,26 @@ public class DefaultLayout extends LocalizableObject implements Layout {
 	/** Default layout identifier */
 	protected String identifier = "default";
 	
-	/**
-	 * Returns the layout identifier. In case of this default layout implementation,
-	 * this method always returns <tt>default</tt>.
-	 * 
-	 * @return the layout identifier
-	 * @see ch.o2it.weblounge.core.content.Layout#getIdentifier()
-	 */
-	public String getIdentifier() {
-		return identifier;
-	}
+  /** The layout name */
+  LocalizableContent<String> name = null;
 	
 	/**
 	 * Creates a new default layout.
 	 */
-	public DefaultLayout() {}
+	public DefaultLayout() {
+	  name = new LocalizableContent<String>();
+	}
+
+	 /**
+   * Returns the layout identifier. In case of this default layout implementation,
+   * this method always returns <tt>default</tt>.
+   * 
+   * @return the layout identifier
+   * @see ch.o2it.weblounge.core.content.Layout#getIdentifier()
+   */
+  public String getIdentifier() {
+    return identifier;
+  }
 
 	/**
 	 * The default layout allows all elements to be placed anywhere, so this
@@ -67,4 +75,14 @@ public class DefaultLayout extends LocalizableObject implements Layout {
 		return true;
 	}
 	
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public int compareTo(Localizable o, Language l) {
+    return name.compareTo(o, l);
+  }
+
 }

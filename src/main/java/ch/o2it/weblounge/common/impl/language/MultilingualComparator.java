@@ -48,9 +48,22 @@ public class MultilingualComparator<Type extends Localizable> implements Compara
    * 
    * @param language
    *          the language
+   * @throws IllegalArgumentException
+   *           if <code>language</code> is null
    */
   public void setLanguage(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
     l = language;
+  }
+
+  /**
+   * Returns the current language.
+   * 
+   * @return the language
+   */
+  public Language getLanguage() {
+    return l;
   }
 
   /**
@@ -67,9 +80,7 @@ public class MultilingualComparator<Type extends Localizable> implements Compara
     } else if (b == null) {
       return -1;
     } else {
-      ((Localizable)a).switchTo(l);
-      ((Localizable)b).switchTo(l);
-      return ((Localizable)a).toString().toLowerCase().compareTo(((Localizable) b).toString().toLowerCase());
+      return a.compareTo(b, l);
     }
   }
 

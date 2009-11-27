@@ -118,7 +118,7 @@ public class LocalizableObjectTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#getFallbackLanguage()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#resolveLanguage()}.
    */
   @Test
   public void testGetFallbackLanguage() {

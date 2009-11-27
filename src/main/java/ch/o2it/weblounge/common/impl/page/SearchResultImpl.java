@@ -22,6 +22,8 @@ package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.page.SearchResult;
 import ch.o2it.weblounge.common.renderer.Renderer;
@@ -326,6 +328,25 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
     if (publishingContext == null)
       return null;
     return publishingContext.getPublishTo();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)
+   */
+  public int compareTo(Localizable o, Language l) {
+    if (o instanceof SearchResult) {
+      SearchResult r = (SearchResult)o;
+      if (relevance > r.getRelevance())
+        return 1;
+      else if (relevance < r.getRelevance())
+        return -1;
+      else {
+        // TODO: Return newest entry?
+        return 0;
+      }
+    }
+    return 0;
   }
 
 }

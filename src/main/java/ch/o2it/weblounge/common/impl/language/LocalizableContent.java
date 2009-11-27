@@ -23,6 +23,7 @@ package ch.o2it.weblounge.common.impl.language;
 import ch.o2it.weblounge.common.impl.util.encoding.Encoding;
 import ch.o2it.weblounge.common.impl.util.encoding.PlainEncoding;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.LocalizationListener;
 
 import java.util.Collection;
@@ -158,6 +159,8 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    *          the content language
    */
   public void put(T content, Language language) {
+    if (this.content.size() == 0)
+      this.originalLanguage = language;
     this.content.put(language, content);
     super.enableLanguage(language);
   }
@@ -244,13 +247,24 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
   }
 
   /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable)
+   */
+  public int compareTo(Localizable o, Language l) {
+    if (o instanceof LocalizableContent<?>) {
+      return toString(l).compareTo(((LocalizableContent<?>)o).toString(l));
+    }
+    return toString(l).compareTo(o.toString());
+  }
+
+  /**
    * Returns the component title in the active language. The title is identified
    * by the name "name".
    * 
    * @return the component title.
    */
   public String toString() {
-    return toString(getDefaultLanguage());
+    return toString(resolveLanguage());
   }
 
   /**
@@ -280,9 +294,9 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
   public String toString(Language language, boolean force) {
     T c = content.get(language);
 
-    // Not found? Try the fall back
+    // Not found? Try the fall back language
     if (c == null && !force)
-      c = content.get(getFallbackLanguage());
+      c = content.get(resolveLanguage());
 
     return (c != null) ? encoding_.encode(c.toString()) : null;
   }

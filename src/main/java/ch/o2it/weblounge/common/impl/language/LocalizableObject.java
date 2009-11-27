@@ -227,11 +227,13 @@ public abstract class LocalizableObject implements Localizable {
    * 
    * @return the fall back language
    */
-  public Language getFallbackLanguage() {
-    if (behavior.equals(Original))
+  public Language resolveLanguage() {
+    if (behavior.equals(Original) && originalLanguage != null)
       return originalLanguage;
-    else
+    else if (behavior.equals(Default) && defaultLanguage != null)
       return defaultLanguage;
+    else
+      throw new IllegalStateException("Language resolution failed");
   }
 
   /**
@@ -360,5 +362,5 @@ public abstract class LocalizableObject implements Localizable {
   public Set<Language> languages() {
     return languages;
   }
-  
+
 }

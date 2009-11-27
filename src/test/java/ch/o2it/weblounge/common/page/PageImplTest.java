@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.page;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.language.English;
@@ -112,7 +114,7 @@ public class PageImplTest {
    */
   @Test
   public void testSetType() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -120,7 +122,7 @@ public class PageImplTest {
    */
   @Test
   public void testAddKeyword() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -128,7 +130,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetURI() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -136,7 +138,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetPublishingContext() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -144,7 +146,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetPublisher() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -152,7 +154,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetPublishFrom() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -160,7 +162,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetPublishTo() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -168,7 +170,7 @@ public class PageImplTest {
    */
   @Test
   public void testInSitemap() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -176,7 +178,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetHeadlineStringStringAuthenticatedUser() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -184,7 +186,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetHeadlineStringStringAuthenticatedUserPermission() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -192,7 +194,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetHeadlines() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -200,7 +202,7 @@ public class PageImplTest {
    */
   @Test
   public void testSetTitle() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -208,7 +210,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetTitle() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -216,7 +218,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetTitleLanguage() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -224,7 +226,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetTitleLanguageBoolean() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -257,7 +259,7 @@ public class PageImplTest {
    */
   @Test
   public void testSetTemplate() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -265,7 +267,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetKeywords() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -273,7 +275,7 @@ public class PageImplTest {
    */
   @Test
   public void testSetKeywords() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -281,7 +283,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetSecurityContext() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -289,7 +291,7 @@ public class PageImplTest {
    */
   @Test
   public void testCheckPermissionAuthority() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -297,7 +299,7 @@ public class PageImplTest {
    */
   @Test
   public void testCheckPermissionSetAuthority() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -305,7 +307,7 @@ public class PageImplTest {
    */
   @Test
   public void testCheckOne() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -313,7 +315,7 @@ public class PageImplTest {
    */
   @Test
   public void testCheckAll() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -321,7 +323,7 @@ public class PageImplTest {
    */
   @Test
   public void testPermissions() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -329,7 +331,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetOwner() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -337,7 +339,7 @@ public class PageImplTest {
    */
   @Test
   public void testAddSecurityListener() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -345,7 +347,7 @@ public class PageImplTest {
    */
   @Test
   public void testRemoveSecurityListener() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -353,7 +355,7 @@ public class PageImplTest {
    */
   @Test
   public void testEqualsObject() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -361,7 +363,7 @@ public class PageImplTest {
    */
   @Test
   public void testToString() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -369,7 +371,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsPublished() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -377,7 +379,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsPublishedDate() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -385,7 +387,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetCreationContext() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -393,7 +395,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetCreationDate() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -401,7 +403,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetCreator() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -409,7 +411,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsCreatedAfter() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -417,7 +419,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetModificationContext() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -425,7 +427,7 @@ public class PageImplTest {
    */
   @Test
   public void testSetModifiedSince() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -433,7 +435,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetModifiedSince() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -441,7 +443,7 @@ public class PageImplTest {
    */
   @Test
   public void testSetModifiedBy() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -449,7 +451,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetModifiedBy() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -457,7 +459,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetModificationDate() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -465,7 +467,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetModifier() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -473,7 +475,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsModifiedAfter() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -481,7 +483,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsModifiedBefore() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -489,7 +491,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetLastModificationDate() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -497,7 +499,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetLastModifier() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -505,7 +507,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsModifiedAtAll() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -513,7 +515,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsModifiedAtAllAfter() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -521,7 +523,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsModifiedAtAllBefore() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -529,7 +531,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsModified() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -537,7 +539,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetEditor() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -545,7 +547,7 @@ public class PageImplTest {
    */
   @Test
   public void testLock() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -553,7 +555,7 @@ public class PageImplTest {
    */
   @Test
   public void testUnlock() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -561,7 +563,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsLocked() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -569,7 +571,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsLockedUser() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -577,7 +579,7 @@ public class PageImplTest {
    */
   @Test
   public void testAppendPagelet() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -585,7 +587,7 @@ public class PageImplTest {
    */
   @Test
   public void testAddPagelet() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -593,7 +595,7 @@ public class PageImplTest {
    */
   @Test
   public void testMovePageletUp() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -601,7 +603,7 @@ public class PageImplTest {
    */
   @Test
   public void testMovePageletDown() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -609,7 +611,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetPageletsString() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -617,7 +619,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetPageletsStringStringString() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -625,7 +627,7 @@ public class PageImplTest {
    */
   @Test
   public void testRemovePagelet() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -633,7 +635,7 @@ public class PageImplTest {
    */
   @Test
   public void testAddPageContentListener() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -641,7 +643,7 @@ public class PageImplTest {
    */
   @Test
   public void testRemovePageContentListener() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -649,7 +651,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetDocument() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -657,7 +659,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetVersionLong() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -665,7 +667,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetVersionString() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
   /**
@@ -673,7 +675,7 @@ public class PageImplTest {
    */
   @Test
   public void testToXml() {
-    System.err.println("Not yet implemented"); // TODO
+    fail("Not yet implemented"); // TODO
   }
 
 }

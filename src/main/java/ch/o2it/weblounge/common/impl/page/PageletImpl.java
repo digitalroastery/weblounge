@@ -33,6 +33,7 @@ import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Pagelet;
 import ch.o2it.weblounge.common.page.PageletLocation;
 import ch.o2it.weblounge.common.security.Authority;
@@ -114,6 +115,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /** The content */
   LocalizableContent<Map<String, String[]>> content = null;
+
+  /** The pagelet name */
+  LocalizableContent<String> name = null;
 
   /**
    * Creates a new pagelet data holder.
@@ -899,6 +903,14 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       }
     }
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)
+   */
+  public int compareTo(Localizable o, Language l) {
+    return name.compareTo(o, l);
   }
 
 }

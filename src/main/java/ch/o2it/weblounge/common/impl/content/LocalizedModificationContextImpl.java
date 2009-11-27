@@ -21,11 +21,13 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.LocalizedModificationContext;
+import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.LocalizationListener;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
@@ -49,7 +51,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /** The last modifier */
   protected transient User lastModifier = null;
-  
+
   /** The last modification date */
   protected transient Date lastModification = null;
 
@@ -75,15 +77,17 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
    */
   public Date getModificationDate() {
     Modification modification = modifications.get();
     return (modification != null) ? modification.getDate() : null;
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#getModificationDate(ch.o2it.weblounge.common.language.Language)
    */
   public Date getModificationDate(Language language) {
@@ -93,6 +97,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
    */
   public User getModifier() {
@@ -102,15 +107,17 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#getModifier(ch.o2it.weblounge.common.language.Language)
    */
   public User getModifier(Language language) {
     Modification modification = modifications.get(language);
     return (modification != null) ? modification.getUser() : null;
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
    */
   public boolean isModified() {
@@ -119,6 +126,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
    */
   public boolean isModifiedAfter(Date date) {
@@ -128,6 +136,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllAfter(java.util.Date)
    */
   public boolean isModifiedAtAllAfter(Date date) {
@@ -148,6 +157,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllBefore(java.util.Date)
    */
   public boolean isModifiedAtAllBefore(Date date) {
@@ -160,6 +170,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModificationDate(java.util.Date)
    */
   public void setModificationDate(Date date) {
@@ -175,7 +186,9 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModificationDate(java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModificationDate(java.util.Date,
+   *      ch.o2it.weblounge.common.language.Language)
    */
   public void setModificationDate(Date date, Language language) {
     setModified(null, date, language);
@@ -183,7 +196,9 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModifier(ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModifier(ch.o2it.weblounge.common.user.User,
+   *      ch.o2it.weblounge.common.language.Language)
    */
   public void setModifier(User modifier, Language language) {
     setModified(modifier, null, language);
@@ -191,7 +206,9 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModified(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
     Modification modification = modifications.get();
@@ -201,7 +218,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
     }
     modification.setUser(user);
     modification.setDate(date);
-    
+
     // These might no longer be valid
     lastModifier = null;
     lastModification = null;
@@ -209,6 +226,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
   public Date getLastModificationDate() {
@@ -221,7 +239,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
       if (date == null || m.getDate().after(date))
         date = m.getDate();
     }
-   
+
     // Store for later reference
     lastModification = date;
 
@@ -230,12 +248,13 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModifier()
    */
   public User getLastModifier() {
     if (lastModifier != null)
       return lastModifier;
-    
+
     // First time calculation
     Date date = null;
     User user = null;
@@ -245,16 +264,17 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
         user = m.getUser();
       }
     }
-    
+
     // Store for later reference
     lastModification = date;
     lastModifier = user;
-    
+
     return user;
   }
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAll()
    */
   public boolean isModifiedAtAll() {
@@ -263,6 +283,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.language.LocalizationListener#switchedTo(ch.o2it.weblounge.common.language.Language)
    */
   public void switchedTo(Language language) {
@@ -277,16 +298,16 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   @SuppressWarnings("unchecked")
   public LocalizedModificationContextImpl clone() {
     LocalizedModificationContextImpl ctxt = new LocalizedModificationContextImpl();
-    
+
     ctxt.behavior = behavior;
     ctxt.currentLanguage = currentLanguage;
     ctxt.defaultLanguage = defaultLanguage;
     ctxt.originalLanguage = originalLanguage;
     ctxt.languages = new HashSet<Language>();
     ctxt.languages.addAll(languages);
-    ctxt.modifications = (LocalizableContent<Modification>)modifications.clone();
+    ctxt.modifications = (LocalizableContent<Modification>) modifications.clone();
     ctxt.addLocalizationListener(modifications);
-    
+
     return ctxt;
   }
 
@@ -351,10 +372,12 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
     /**
      * Creates a new and empty modification.
      */
-    Modification() { }
+    Modification() {
+    }
 
     /**
-     * Creates a new modification including the user and the date of modification.
+     * Creates a new modification including the user and the date of
+     * modification.
      * 
      * @param modifier
      *          the modifier
@@ -404,6 +427,21 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
       return modificationDate;
     }
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public int compareTo(Localizable o, Language l) {
+    if (o instanceof LocalizedModificationContextImpl) {
+      return getLastModificationDate().compareTo(getLastModificationDate());
+    } else if (o instanceof ModificationContext) {
+      return getModificationDate().compareTo(((ModificationContext) o).getModificationDate());
+    }
+    return 0;
   }
 
 }

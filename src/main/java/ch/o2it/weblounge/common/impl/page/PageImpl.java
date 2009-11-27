@@ -35,6 +35,7 @@ import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageContentListener;
 import ch.o2it.weblounge.common.page.PageURI;
@@ -1037,6 +1038,14 @@ public class PageImpl extends LocalizableObject implements Page {
         return -1;
       }
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)
+   */
+  public int compareTo(Localizable o, Language l) {
+    return title.compareTo(o, l);
   }
 
   /**
