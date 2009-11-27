@@ -20,29 +20,88 @@
 
 package ch.o2it.weblounge.common.language;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import static org.junit.Assert.fail;
+
+import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.impl.language.MultilingualComparator;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
 /**
- * TODO: Comment MultilingualComparatorTest
+ * This test suite tests the implementation of {@link MultilingualComparator}.
  */
 public class MultilingualComparatorTest {
+  
+  /** The comparator to test */
+  protected MultilingualComparator<Localizable> englishComparator = null;
 
+  /** The comparator to test */
+  protected MultilingualComparator<Localizable> germanComparator = null;
+
+  /** The comparator to test */
+  protected MultilingualComparator<Localizable> frenchComparator = null;
+
+  /** The list of localizable objects */
+  protected List<Localizable> localizables = null;
+  
+  /** The localizable that will be first when sorted in English */
+  protected LocalizableContent<String> englishFirst = null;
+
+  /** The localizable that will be first when sorted in German */
+  protected LocalizableContent<String> germanFirst = null;
+
+  /** The English language */
+  protected final Language english = new LanguageImpl(new Locale("en"));
+
+  /** The German language */
+  protected final Language german = new LanguageImpl(new Locale("de"));
+
+  /** The French language */
+  protected final Language french = new LanguageImpl(new Locale("fr"));
+
+  /** The language */
+  protected Language language = null;
+  
   /**
+   * Prepares a collection of localizable objects.
+   * 
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
+    englishComparator = new MultilingualComparator<Localizable>(english);
+    germanComparator = new MultilingualComparator<Localizable>(german);
+    frenchComparator = new MultilingualComparator<Localizable>(french);
+
+    localizables = new ArrayList<Localizable>();
+    
+    englishFirst = new LocalizableContent<String>();
+    englishFirst.put("art", english);
+    englishFirst.put("kunst", german);
+    localizables.add(englishFirst);
+
+    germanFirst = new LocalizableContent<String>();
+    germanFirst.put("deutsch", english);
+    germanFirst.put("german", german);
+    localizables.add(germanFirst);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.MultilingualComparator#MultilingualComparator(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.language.MultilingualComparator#getLanguage()}.
    */
   @Test
-  public void testMultilingualComparator() {
-    fail("Not yet implemented"); // TODO
+  public void testGetLanguage() {
+    assertEquals(english, englishComparator.getLanguage());
+    assertEquals(german, germanComparator.getLanguage());
   }
 
   /**
@@ -50,7 +109,14 @@ public class MultilingualComparatorTest {
    */
   @Test
   public void testSetLanguage() {
-    fail("Not yet implemented"); // TODO
+    englishComparator.setLanguage(french);
+    assertEquals(french, englishComparator.getLanguage());
+    try {
+      englishComparator.setLanguage(null);
+      fail("Setting the language to null should not be allowed");
+    } catch (IllegalArgumentException e) {
+      // This is expected
+    }
   }
 
   /**
@@ -58,7 +124,15 @@ public class MultilingualComparatorTest {
    */
   @Test
   public void testCompare() {
-    fail("Not yet implemented"); // TODO
+    Collections.sort(localizables, englishComparator);
+    assertEquals(englishFirst, localizables.get(0));
+    Collections.sort(localizables, germanComparator);
+    assertEquals(germanFirst, localizables.get(0));
+    try {
+      Collections.sort(localizables, frenchComparator);
+    } catch (Exception e) {
+      fail("Sorting with an unknown language failed");
+    }
   }
 
 }
