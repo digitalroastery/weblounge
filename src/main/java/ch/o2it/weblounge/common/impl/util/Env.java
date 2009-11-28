@@ -109,7 +109,8 @@ public class Env {
    * @see #set(java.lang.String, java.lang.String)
    */
   public static String get(String name, String defaultValue) {
-    Arguments.checkNull(name, "name");
+    if (name == null)
+      throw new IllegalArgumentException("Name cannot be null");
     String value = properties.getProperty(name);
     return (value != null) ? value : defaultValue;
   }

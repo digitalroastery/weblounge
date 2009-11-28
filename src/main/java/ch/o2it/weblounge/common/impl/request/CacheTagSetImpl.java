@@ -71,7 +71,7 @@ public final class CacheTagSetImpl implements CacheTagSet {
    */
 	public boolean prevent(String key) {
 		if (key == null)
-			throw new IllegalArgumentException("Argument 'key' must not be null!");
+			throw new IllegalArgumentException("Key must not be null!");
 		return add(new CacheTagImpl(key, CacheTagImpl.ANY));
 	}
 
@@ -81,7 +81,7 @@ public final class CacheTagSetImpl implements CacheTagSet {
    */
 	public boolean preventAll(Collection<String> keys) {
 		if (keys == null)
-			throw new IllegalArgumentException("Argument 'keys' must not be null!");
+			throw new IllegalArgumentException("Keys must not be null!");
 		boolean changed = false;
 		for (String key : keys) {
 			changed |= add(new CacheTagImpl(key, CacheTagImpl.ANY));

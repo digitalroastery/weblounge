@@ -232,9 +232,9 @@ public class UrlImpl implements Url {
   protected static String concat(String prefix, String suffix,
       char separatorChar) {
     if (prefix == null)
-      throw new IllegalArgumentException("Argument prefix is null");
+      throw new IllegalArgumentException("Prefix cannot be null");
     if (suffix == null)
-      throw new IllegalArgumentException("Argument suffix is null");
+      throw new IllegalArgumentException("Suffix cannot be null");
 
     String separator = Character.toString(separatorChar);
     if (!prefix.endsWith(separator) && !suffix.startsWith(separator))
@@ -257,7 +257,7 @@ public class UrlImpl implements Url {
    */
   protected String trim(String url) {
     if (url == null)
-      throw new IllegalArgumentException("Argument url is null");
+      throw new IllegalArgumentException("Url cannot be null");
     url.trim();
     String separator = Character.toString(separatorChar);
     url = url.replaceAll(separator + separator, separator);

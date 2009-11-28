@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.util.xml;
 
-import ch.o2it.weblounge.common.impl.util.Arguments;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -285,8 +283,10 @@ public class XMLDocument {
    *          the parent node
    */
   public Node addNode(Node node, Node parent) {
-    Arguments.checkNull(node, "node");
-    Arguments.checkNull(parent, "parent");
+    if (node == null)
+      throw new IllegalArgumentException("Node cannot be null");
+    if (parent == null)
+      throw new IllegalArgumentException("parent cannot be null");
     isDirty = true;
     return parent.appendChild(node);
   }

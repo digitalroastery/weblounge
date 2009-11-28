@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
-import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.user.User;
@@ -164,7 +163,8 @@ public class PublishingContextImpl implements PublishingContext {
    * @see ch.o2it.weblounge.common.content.PublishingContext#isPublished(java.util.Date)
    */
   public boolean isPublished(Date date) {
-    Arguments.checkNull(date, "date");
+    if (date == null)
+      throw new IllegalArgumentException("Date cannot be null");
     boolean checkFrom = startDate == null || startDate.before(date);
     boolean checkTo = endDate == null || endDate.after(date);
     return (checkFrom && checkTo);

@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
@@ -106,8 +105,10 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    *          the item that is allowed to obtain the permission
    */
   public void allow(Permission permission, Authority authority) {
-    Arguments.checkNull(permission, "permission");
-    Arguments.checkNull(authority, "authority");
+    if (permission == null)
+      throw new IllegalArgumentException("Permission cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
     log_.debug("Security context '" + this + "' requires '" + authority + "' for permission '" + permission + "'");
 
     Set<Authority> a = context_.get(permission);
@@ -131,8 +132,10 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    *          the item that is allowed to obtain the permission
    */
   public void allowDefault(Permission permission, Authority authority) {
-    Arguments.checkNull(permission, "permission");
-    Arguments.checkNull(authority, "authority");
+    if (permission == null)
+      throw new IllegalArgumentException("Permission cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
     log_.debug("Security context '" + this + "' requires '" + authority + "' for permission '" + permission + "'");
     Set<Authority> a = defaultContext_.get(permission);
     if (a == null) {
@@ -154,8 +157,10 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    *          the authorization to deny
    */
   public void deny(Permission permission, Authority authority) {
-    Arguments.checkNull(permission, "permission");
-    Arguments.checkNull(authority, "authority");
+    if (permission == null)
+      throw new IllegalArgumentException("Permission cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
     log_.debug("Security context '" + this + "' requires '" + authority + "' for permission '" + permission + "'");
 
     deny(permission, authority, context_);
@@ -243,8 +248,10 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * @return <code>true</code> if the item may obtain the permission
    */
   public boolean check(Permission permission, Authority authority) {
-    Arguments.checkNull(permission, "permission");
-    Arguments.checkNull(authority, "authority");
+    if (permission == null)
+      throw new IllegalArgumentException("Permission cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
     log_.debug("Request to check permission '" + permission + "' for authority '" + authority + "' at " + this);
 
     return check(permission, authority, defaultContext_) || check(permission, authority, context_);
@@ -281,16 +288,18 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * 
    * @param permissions
    *          the required set of permissions
-   * @param authorization
+   * @param authority
    *          the object claiming the permissions
    * @return <code>true</code> if the object may obtain the permissions
    */
-  public boolean check(PermissionSet permissions, Authority authorization) {
-    Arguments.checkNull(permissions, "permissions");
-    Arguments.checkNull(authorization, "authorization");
-    log_.debug("Request to check permissionset for authorization '" + authorization + "' at " + this);
+  public boolean check(PermissionSet permissions, Authority authority) {
+    if (permissions == null)
+      throw new IllegalArgumentException("Permissions cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
+    log_.debug("Request to check permissionset for authorization '" + authority + "' at " + this);
 
-    return checkOneOf(permissions, authorization) && checkAllOf(permissions, authorization);
+    return checkOneOf(permissions, authority) && checkAllOf(permissions, authority);
   }
 
   /**

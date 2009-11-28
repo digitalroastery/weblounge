@@ -41,9 +41,9 @@ public class PathSupport {
    */
   public static String concat(String prefix, String suffix) {
     if (prefix == null)
-      throw new IllegalArgumentException("Argument prefix is null");
+      throw new IllegalArgumentException("Prefix cannot be null");
     if (suffix == null)
-      throw new IllegalArgumentException("Argument suffix is null");
+      throw new IllegalArgumentException("Suffix cannot be null");
 
     prefix = adjustSeparator(prefix);
     suffix = adjustSeparator(suffix);
@@ -69,7 +69,7 @@ public class PathSupport {
    */
   public static String concat(String[] parts) {
     if (parts == null)
-      throw new IllegalArgumentException("Argument parts is null");
+      throw new IllegalArgumentException("Parts cannot be null");
     if (parts.length == 0)
       throw new IllegalArgumentException("Array parts is empty");
     String path = removeDoubleSeparator(adjustSeparator(parts[0]));
@@ -90,7 +90,7 @@ public class PathSupport {
    */
   public static String trim(String path) {
     if (path == null)
-      throw new IllegalArgumentException("Argument path is null");
+      throw new IllegalArgumentException("Path cannot be null");
     path.trim();
     path = removeDoubleSeparator(adjustSeparator(path));
     if (path.endsWith(File.separator) || (path.length() == 1))
@@ -113,7 +113,7 @@ public class PathSupport {
    */
   public static String getFileExtension(String path) {
     if (path == null) {
-      throw new IllegalArgumentException("Argument path is null");
+      throw new IllegalArgumentException("Path cannot be null");
     }
     int index = path.lastIndexOf('.');
     if (index > 0 && index < path.length()) {

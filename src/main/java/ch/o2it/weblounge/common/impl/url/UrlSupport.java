@@ -80,9 +80,9 @@ public class UrlSupport {
    */
   public static String concat(String prefix, String suffix, boolean close) {
     if (prefix == null)
-      throw new IllegalArgumentException("Argument prefix is null");
+      throw new IllegalArgumentException("Prefix cannot be null");
     if (suffix == null)
-      throw new IllegalArgumentException("Argument suffix is null");
+      throw new IllegalArgumentException("Suffix cannot be null");
 
     prefix = checkSeparator(prefix);
     suffix = checkSeparator(suffix);
@@ -112,7 +112,7 @@ public class UrlSupport {
    */
   public static String concat(String[] parts) {
     if (parts == null)
-      throw new IllegalArgumentException("Argument parts is null");
+      throw new IllegalArgumentException("Parts cannot be null");
     if (parts.length == 0)
       throw new IllegalArgumentException("Array parts is empty");
     String path = parts[0];
@@ -133,7 +133,7 @@ public class UrlSupport {
    */
   public static String trim(String url) {
     if (url == null)
-      throw new IllegalArgumentException("Argument url is null");
+      throw new IllegalArgumentException("Url cannot be null");
 
     url = checkSeparator(url);
     url.trim();

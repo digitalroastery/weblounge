@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
@@ -106,8 +105,10 @@ public class RestrictionSecurityContext extends AbstractSecurityContext {
    *          the item that is allowed to obtain the permission
    */
   public void allow(Permission permission, Authority authority) {
-    Arguments.checkNull(permission, "permission");
-    Arguments.checkNull(authority, "authorization");
+    if (permission == null)
+      throw new IllegalArgumentException("Permission cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
     log_.debug("Security context '" + this + "' requires '" + authority + "' for permission '" + permission + "'");
     Restriction r = securityCtxt_.get(permission);
     if (r == null) {
@@ -182,22 +183,24 @@ public class RestrictionSecurityContext extends AbstractSecurityContext {
    * 
    * @param permission
    *          the permission to obtain
-   * @param authorization
+   * @param authority
    *          the object claiming the permission
    * @return <code>true</code> if the item may obtain the permission
    */
-  public boolean check(Permission permission, Authority authorization) {
-    Arguments.checkNull(permission, "permission");
-    Arguments.checkNull(authorization, "authorization");
-    log_.debug("Request to check permission '" + permission + "' for authorization '" + authorization + "' at " + this);
+  public boolean check(Permission permission, Authority authority) {
+    if (permission == null)
+      throw new IllegalArgumentException("Permission cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
+    log_.debug("Request to check permission '" + permission + "' for authorization '" + authority + "' at " + this);
 
     Restriction authorizationSet = securityCtxt_.get(permission);
     if (authorizationSet != null) {
-      boolean check = authorizationSet.check(authorization);
-      log_.debug("Check for ('" + authorization + "', '" + permission + "') " + ((check) ? "succeeded" : "failed") + " for context " + this);
+      boolean check = authorizationSet.check(authority);
+      log_.debug("Check for ('" + authority + "', '" + permission + "') " + ((check) ? "succeeded" : "failed") + " for context " + this);
       return check;
     }
-    log_.warn(authorization + " asked for permission '" + permission + "' which is not defined in security context " + this);
+    log_.warn(authority + " asked for permission '" + permission + "' which is not defined in security context " + this);
     return false;
   }
 
@@ -208,15 +211,17 @@ public class RestrictionSecurityContext extends AbstractSecurityContext {
    * 
    * @param permissions
    *          the required set of permissions
-   * @param authorization
+   * @param authority
    *          the object claiming the permissions
    * @return <code>true</code> if the object may obtain the permissions
    */
-  public boolean check(PermissionSet permissions, Authority authorization) {
-    Arguments.checkNull(permissions, "permissions");
-    Arguments.checkNull(authorization, "authorization");
-    log_.debug("Request to check permissionset for authorization '" + authorization + "' at " + this);
-    return checkOneOf(permissions, authorization) && checkAllOf(permissions, authorization);
+  public boolean check(PermissionSet permissions, Authority authority) {
+    if (permissions == null)
+      throw new IllegalArgumentException("Permissions cannot be null");
+    if (authority == null)
+      throw new IllegalArgumentException("Authority cannot be null");
+    log_.debug("Request to check permissionset for authorization '" + authority + "' at " + this);
+    return checkOneOf(permissions, authority) && checkAllOf(permissions, authority);
   }
 
   /**

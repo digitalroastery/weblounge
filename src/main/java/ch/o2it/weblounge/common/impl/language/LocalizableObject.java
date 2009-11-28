@@ -280,7 +280,7 @@ public abstract class LocalizableObject implements Localizable {
    */
   public void setDefaultLanguage(Language language) {
     if (language == null)
-      throw new IllegalArgumentException("Argument language may not be null!");
+      throw new IllegalArgumentException("Language may not be null!");
 
     defaultLanguage = language;
     behavior = Default;
@@ -323,7 +323,7 @@ public abstract class LocalizableObject implements Localizable {
    */
   public void setOriginalLanguage(Language language) {
     if (language == null)
-      throw new IllegalArgumentException("Argument language may not be null!");
+      throw new IllegalArgumentException("Language may not be null!");
 
     enableLanguage(language);
     originalLanguage = language;
