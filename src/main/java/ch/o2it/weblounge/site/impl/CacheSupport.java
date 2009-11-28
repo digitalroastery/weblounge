@@ -316,9 +316,9 @@ public class CacheSupport {
       return;
 
     if (module == null)
-      throw new IllegalArgumentException("Argument 'module' must not be null");
+      throw new IllegalArgumentException("Module must not be null");
     if (action == null)
-      throw new IllegalArgumentException("Argument 'action' must not be null");
+      throw new IllegalArgumentException("Action must not be null");
 
     // Create tag set
     CacheTagSetImpl tags = new CacheTagSetImpl();
@@ -376,9 +376,9 @@ public class CacheSupport {
       return;
 
     if (module == null)
-      throw new IllegalArgumentException("Argument 'module' must not be null");
+      throw new IllegalArgumentException("Module must not be null");
     if (renderer == null)
-      throw new IllegalArgumentException("Argument 'action' must not be null");
+      throw new IllegalArgumentException("Action must not be null");
 
     // Create tag set
     CacheTagSetImpl tags = new CacheTagSetImpl();
