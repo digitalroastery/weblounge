@@ -34,175 +34,186 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * IdentityHashSetTest 
+ * IdentityHashSetTest
  */
 public class IdentityHashSetTest {
 
-	/** the map under test */
-	private Set<Object> s;
-	
-	/** some helpers */
-	Object o[] = new Object[5];
-	
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		s = new IdentityHashSet<Object>();
-		o = new Object[5];
-		for (int i = 0; i < o.length; i++)
-			o[i] = new String("Test1");
-	}
+  /** the map under test */
+  private Set<Object> s;
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-		s = null;
-		o = null;
-	}
+  /** some helpers */
+  Object o[] = new Object[5];
 
+  /**
+   * @throws java.lang.Exception
+   */
+  @Before
+  public void setUp() throws Exception {
+    s = new IdentityHashSet<Object>();
+    o = new Object[5];
+    for (int i = 0; i < o.length; i++)
+      o[i] = new String("Test1");
+  }
 
-	/**
-	 * Test method for {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#size()}.
-	 */
-	@Test
-	public final void testSize() {
-		assertTrue(s.size() == 0);
-		s.add(o[0]);
-		assertTrue(s.size() == 1);
-		s.add(o[1]);
-		assertTrue(s.size() == 2);
-		s.add(o[2]);
-		assertTrue(s.size() == 3);
-		s.add(o[2]);
-		assertTrue(s.size() == 3);
-		s.add(o[3]);
-		assertTrue(s.size() == 4);
-		s.remove(o[2]);
-		assertTrue(s.size() == 3);
-		s.remove(o[2]);
-		assertTrue(s.size() == 3);
-		s.remove("Test1");
-		assertTrue(s.size() == 3);
-		s.clear();
-		assertTrue(s.size() == 0);
-	}
+  /**
+   * @throws java.lang.Exception
+   */
+  @After
+  public void tearDown() throws Exception {
+    s = null;
+    o = null;
+  }
 
-	/**
-	 * Test method for {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#isEmpty()}.
-	 */
-	@Test
-	public final void testIsEmpty() {
-		assertTrue(s.isEmpty());
-		s.add(o[0]);
-		assertTrue(!s.isEmpty());
-		s.remove("Test1");
-		assertTrue(!s.isEmpty());
-		s.remove(o[0]);
-		assertTrue(s.isEmpty());
-		s.add(o[0]);
-		s.add(o[1]);
-		assertTrue(!s.isEmpty());
-		s.clear();
-		assertTrue(s.isEmpty());
-	}
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#size()}.
+   */
+  @Test
+  public final void testSize() {
+    assertTrue(s.size() == 0);
+    s.add(o[0]);
+    assertTrue(s.size() == 1);
+    s.add(o[1]);
+    assertTrue(s.size() == 2);
+    s.add(o[2]);
+    assertTrue(s.size() == 3);
+    s.add(o[2]);
+    assertTrue(s.size() == 3);
+    s.add(o[3]);
+    assertTrue(s.size() == 4);
+    s.remove(o[2]);
+    assertTrue(s.size() == 3);
+    s.remove(o[2]);
+    assertTrue(s.size() == 3);
+    s.remove("Test1");
+    assertTrue(s.size() == 3);
+    s.clear();
+    assertTrue(s.size() == 0);
+  }
 
-	/**
-	 * Test method for {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#clear()}.
-	 */
-	@Test
-	public final void testClear() {
-		assertTrue(s.isEmpty());
-		s.clear();
-		assertTrue(s.isEmpty());
-		s.add(o[0]);
-		assertTrue(!s.isEmpty());
-		s.clear();
-		assertTrue(s.isEmpty());
-	}
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#isEmpty()}.
+   */
+  @Test
+  public final void testIsEmpty() {
+    assertTrue(s.isEmpty());
+    s.add(o[0]);
+    assertTrue(!s.isEmpty());
+    s.remove("Test1");
+    assertTrue(!s.isEmpty());
+    s.remove(o[0]);
+    assertTrue(s.isEmpty());
+    s.add(o[0]);
+    s.add(o[1]);
+    assertTrue(!s.isEmpty());
+    s.clear();
+    assertTrue(s.isEmpty());
+  }
 
-	/**
-	 * Test method for {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#IdentityHashSet()}.
-	 */
-	@Test
-	public final void testIdentityHashSet() {
-		Set<String> l =  new IdentityHashSet<String>();
-		assertNotNull(l);
-		assertTrue(l instanceof IdentityHashSet<?>);
-		assertTrue(l.size() == 0);
-		assertTrue(l.isEmpty());
-		assertTrue(!s.remove("Test"));
-		assertTrue(!s.contains("Test"));
-		assertTrue(s.add("Test"));
-	}
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#clear()}.
+   */
+  @Test
+  public final void testClear() {
+    assertTrue(s.isEmpty());
+    s.clear();
+    assertTrue(s.isEmpty());
+    s.add(o[0]);
+    assertTrue(!s.isEmpty());
+    s.clear();
+    assertTrue(s.isEmpty());
+  }
 
-	/**
-	 * Test method for {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#add(java.lang.Object)}.
-	 */
-	@Test
-	public final void testAddE() {
-		assertTrue(s.add(o[0]));
-		assertTrue(s.add(o[1]));
-		assertTrue(!s.add(o[0]));
-		assertTrue(!s.add(o[1]));
-		assertTrue(s.add(o[2]));
-		s.clear();
-		assertTrue(s.add(o[0]));
-		assertTrue(s.add(o[1]));
-	}
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#IdentityHashSet()}
+   * .
+   */
+  @Test
+  public final void testIdentityHashSet() {
+    Set<String> l = new IdentityHashSet<String>();
+    assertNotNull(l);
+    assertTrue(l instanceof IdentityHashSet<?>);
+    assertTrue(l.size() == 0);
+    assertTrue(l.isEmpty());
+    assertTrue(!s.remove("Test"));
+    assertTrue(!s.contains("Test"));
+    assertTrue(s.add("Test"));
+  }
 
-	/**
-	 * Test method for {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#contains(java.lang.Object)}.
-	 */
-	@Test
-	public final void testContainsObject() {
-		assertTrue(!s.contains(o[0]));
-		s.add(o[0]);
-		assertTrue(s.contains(o[0]));
-		assertTrue(!s.contains(o[1]));
-		s.add(o[1]);
-		assertTrue(s.contains(o[1]));
-		s.remove(o[0]);
-		assertTrue(!s.contains(o[0]));
-		s.remove(o[1]);
-		assertTrue(!s.contains(o[1]));
-	}
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#add(java.lang.Object)}
+   * .
+   */
+  @Test
+  public final void testAddE() {
+    assertTrue(s.add(o[0]));
+    assertTrue(s.add(o[1]));
+    assertTrue(!s.add(o[0]));
+    assertTrue(!s.add(o[1]));
+    assertTrue(s.add(o[2]));
+    s.clear();
+    assertTrue(s.add(o[0]));
+    assertTrue(s.add(o[1]));
+  }
 
-	/**
-	 * Test method for {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#iterator()}.
-	 */
-	@Test
-	public final void testIterator() {
-		Iterator<Object> i = s.iterator();
-		assertTrue(i != null && !i.hasNext());
-		for (int j = 0; j < o.length; j++)
-			s.add(o[j]);
-		i = s.iterator();
-		assertTrue(i != null);
-		for (int j = 0; j < o.length; j++) {
-			assertTrue(i != null && i.hasNext() && i.next() != null);
-		}
-	}
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#contains(java.lang.Object)}
+   * .
+   */
+  @Test
+  public final void testContainsObject() {
+    assertTrue(!s.contains(o[0]));
+    s.add(o[0]);
+    assertTrue(s.contains(o[0]));
+    assertTrue(!s.contains(o[1]));
+    s.add(o[1]);
+    assertTrue(s.contains(o[1]));
+    s.remove(o[0]);
+    assertTrue(!s.contains(o[0]));
+    s.remove(o[1]);
+    assertTrue(!s.contains(o[1]));
+  }
 
-	/**
-	 * Test method for {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#remove(java.lang.Object)}.
-	 */
-	@Test
-	public final void testRemoveObject() {
-		assertTrue(!s.remove(o[0]));
-		assertTrue(!s.remove(o[1]));
-		s.add(o[0]);
-		s.add(o[1]);
-		assertTrue(s.remove(o[0]));
-		assertTrue(s.remove(o[1]));
-		s.add(o[0]);
-		s.add(o[1]);
-		s.clear();
-		assertTrue(!s.remove(o[0]));
-		assertTrue(!s.remove(o[1]));		
-	}
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#iterator()}.
+   */
+  @Test
+  public final void testIterator() {
+    Iterator<Object> i = s.iterator();
+    assertTrue(i != null && !i.hasNext());
+    for (int j = 0; j < o.length; j++)
+      s.add(o[j]);
+    i = s.iterator();
+    assertTrue(i != null);
+    for (int j = 0; j < o.length; j++) {
+      assertTrue(i != null && i.hasNext() && i.next() != null);
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#remove(java.lang.Object)}
+   * .
+   */
+  @Test
+  public final void testRemoveObject() {
+    assertTrue(!s.remove(o[0]));
+    assertTrue(!s.remove(o[1]));
+    s.add(o[0]);
+    s.add(o[1]);
+    assertTrue(s.remove(o[0]));
+    assertTrue(s.remove(o[1]));
+    s.add(o[0]);
+    s.add(o[1]);
+    s.clear();
+    assertTrue(!s.remove(o[0]));
+    assertTrue(!s.remove(o[1]));
+  }
 
 }
