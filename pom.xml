@@ -255,7 +255,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
             <Bundle-Activator>ch.o2it.weblounge.contentrepository.impl.ContentRepositoryService</Bundle-Activator>
             <Embed-Dependency>
               jcr,
