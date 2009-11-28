@@ -102,7 +102,6 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
 						<Export-Package>
 							ch.o2it.weblounge.site.impl
             			</Export-Package>
