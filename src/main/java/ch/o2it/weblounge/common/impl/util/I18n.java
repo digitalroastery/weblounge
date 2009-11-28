@@ -21,12 +21,12 @@
 package ch.o2it.weblounge.common.impl.util;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.util.encoding.HTMLEncoding;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -122,7 +122,7 @@ public class I18n {
    * @return the result
    */
   public static String toHTML(String key, Language language, Site site) {
-    return HTMLEncoding.toHTML(get(key, language, site));
+    return StringEscapeUtils.escapeHtml(get(key, language, site));
   }
 
   /**
@@ -143,7 +143,7 @@ public class I18n {
     if (msg == null)
       return null;
     MessageFormat mf = new MessageFormat(escape(msg));
-    return HTMLEncoding.toHTML(mf.format(variables));
+    return StringEscapeUtils.escapeHtml(mf.format(variables));
   }
 
   /**
@@ -165,7 +165,7 @@ public class I18n {
   /**
    * Adds the the dictionary found in <code>file</code> to the current i18n
    * definitions. If <code>warn</code> is <code>false</code> then warnings about
-   * existing keys are supressed.
+   * existing keys are suppressed.
    * 
    * @param f
    *          the i18n dictionary

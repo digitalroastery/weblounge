@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.language;
 
-import ch.o2it.weblounge.common.impl.util.encoding.Encoding;
-import ch.o2it.weblounge.common.impl.util.encoding.PlainEncoding;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.LocalizationListener;
@@ -40,15 +38,11 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
   /** the content in various languages */
   protected Map<Language, T> content = null;
 
-  /** the encoding used to display the title */
-  private Encoding encoding_ = null;
-
   /**
    * Constructor for a localizable object with a default behavior of
    * {@link LanguageResolution#Original}.
    */
   public LocalizableContent() {
-    encoding_ = PlainEncoding.getInstance();
     content = new HashMap<Language, T>();
   }
 
@@ -61,7 +55,6 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    */
   public LocalizableContent(Language language) {
     super(language);
-    encoding_ = PlainEncoding.getInstance();
     content = new HashMap<Language, T>();
   }
 
@@ -115,30 +108,7 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    * @return the values
    */
   public Collection<T> values() {
-    return  content.values();
-  }
-
-  /**
-   * Sets the encoding that is used to display the object title. By default,
-   * this class uses a <code>HTMLEncoding</code>.
-   * 
-   * @param encoding
-   *          the encoding used to display the object title
-   */
-  public void setEncoding(Encoding encoding) {
-    if (encoding == null) {
-      throw new IllegalArgumentException("Null is not allowed as encoding!");
-    }
-    encoding_ = encoding;
-  }
-
-  /**
-   * Returns the encoding used by this class to display the title element.
-   * 
-   * @return the encoding
-   */
-  public Encoding getEncoding() {
-    return encoding_;
+    return content.values();
   }
 
   /**
@@ -232,7 +202,6 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
     c.behavior = behavior;
     c.currentLanguage = currentLanguage;
     c.defaultLanguage = defaultLanguage;
-    c.encoding_ = encoding_;
     c.originalLanguage = originalLanguage;
 
     // languages
@@ -248,11 +217,12 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable)
    */
   public int compareTo(Localizable o, Language l) {
     if (o instanceof LocalizableContent<?>) {
-      return toString(l).compareTo(((LocalizableContent<?>)o).toString(l));
+      return toString(l).compareTo(((LocalizableContent<?>) o).toString(l));
     }
     return toString(l).compareTo(o.toString());
   }
@@ -298,7 +268,7 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
     if (c == null && !force)
       c = content.get(resolveLanguage());
 
-    return (c != null) ? encoding_.encode(c.toString()) : null;
+    return (c != null) ? c.toString() : null;
   }
 
 }
