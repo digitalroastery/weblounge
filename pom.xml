@@ -126,7 +126,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
             <Bundle-Activator>ch.o2it.weblounge.dispatcher.impl.DispatcherServiceImpl</Bundle-Activator>
             <Export-Package>
             	ch.o2it.weblounge.dispatcher.impl,
