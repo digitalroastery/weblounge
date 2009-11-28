@@ -198,7 +198,7 @@ public abstract class CacheHandleImpl implements CacheHandle {
    */
   public boolean containsTag(String name, String value) {
     if (name == null)
-      throw new IllegalArgumentException("Argument 'name' cannot be null");
+      throw new IllegalArgumentException("Name cannot be null");
     for (Tag t : tags) {
       if (t.getName().equals(name) && (value == null || t.getValue().equals(value)))
         return true;
