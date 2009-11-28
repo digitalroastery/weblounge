@@ -84,7 +84,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${pom.name}</Bundle-SymbolicName>
             <Embed-Dependency>
               jtidy
             </Embed-Dependency>
