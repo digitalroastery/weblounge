@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.config.Options;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.request.RequestHandlerConfiguration;
@@ -81,7 +80,8 @@ public class RequestHandlerConfigurationImpl implements RequestHandlerConfigurat
    *           if there are errors in the configuration
    */
   public void init(XPath path, Node config) throws ConfigurationException {
-    Arguments.checkNull(config, "config");
+    if (config == null)
+      throw new IllegalArgumentException("Configuration node cannot be null");
     try {
       readMainSettings(path, config);
       readEnv(path, config);
