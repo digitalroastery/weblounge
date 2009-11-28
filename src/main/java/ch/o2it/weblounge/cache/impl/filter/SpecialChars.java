@@ -21,36 +21,36 @@
 package ch.o2it.weblounge.cache.impl.filter;
 
 import ch.o2it.weblounge.cache.StreamFilter;
-import ch.o2it.weblounge.common.impl.util.encoding.HTMLEncoding;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 /**
- * This {@link StreamFilter} removes unencoded special characters from the
- * output stream and replaces them with their proper HTML representation.
+ * This {@link StreamFilter} removes special characters from the output stream
+ * and replaces them with their proper HTML representation.
  */
 public class SpecialChars implements StreamFilter {
 
-	/** The HTML encoder */
-	private static HTMLEncoding encoding = new HTMLEncoding();
-	
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#filter(java.lang.StringBuffer, java.lang.String)
-	 */
-	public StringBuffer filter(StringBuffer buffer, String contentType) {
-		if ("text/html".equals(contentType))
-			return encoding.encode(buffer);
-		return buffer;
-	}
+  /**
+   * @see ch.o2it.weblounge.api.request.StreamFilter#filter(java.lang.StringBuffer,
+   *      java.lang.String)
+   */
+  public StringBuffer filter(StringBuffer buffer, String contentType) {
+    if ("text/html".equals(contentType))
+      return new StringBuffer(StringEscapeUtils.escapeHtml(buffer.toString()));
+    return buffer;
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#flush()
-	 */
-	public StringBuffer flush() {
-		return null;
-	}
+  /**
+   * @see ch.o2it.weblounge.api.request.StreamFilter#flush()
+   */
+  public StringBuffer flush() {
+    return null;
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#close()
-	 */
-	public void close() {}
+  /**
+   * @see ch.o2it.weblounge.api.request.StreamFilter#close()
+   */
+  public void close() {
+  }
 
 }
