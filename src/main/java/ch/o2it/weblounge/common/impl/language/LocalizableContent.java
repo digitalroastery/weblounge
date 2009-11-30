@@ -132,7 +132,7 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
     if (this.content.size() == 0)
       this.originalLanguage = language;
     this.content.put(language, content);
-    super.enableLanguage(language);
+    enableLanguage(language);
   }
 
   /**
@@ -173,12 +173,16 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
   public T get(Language language, boolean force) {
     T c = content.get(language);
     if (c == null && !force) {
-      Language defaultLanguage = getDefaultLanguage();
-      if (defaultLanguage != null && (language == null || !language.equals(defaultLanguage))) {
-        c = content.get(defaultLanguage);
-      } else if (content.size() == 1) {
-        c = content.values().iterator().next();
+      Language l = null;
+      switch (behavior) {
+        case Default:
+          l = getDefaultLanguage();
+          break;
+        case Original:
+          l = getOriginalLanguage();
+          break;
       }
+      c = content.get(l);
     }
     return c;
   }

@@ -122,6 +122,10 @@ public abstract class LocalizableObject implements Localizable {
   public void enableLanguage(Language language) {
     if (!languages.contains(language)) {
       languages.add(language);
+      if (languages.size() == 1) {
+        originalLanguage = language;
+        currentLanguage = language;
+      }
     }
   }
 
@@ -179,27 +183,31 @@ public abstract class LocalizableObject implements Localizable {
     // Remember the current language
     Language original = currentLanguage;
 
-    // If the language is available, then select it and initialize
-    // the object with this language
-    
-    if (force || supportsLanguage(language)) {
+    // If the language is available, then simply select it
+    if (supportsLanguage(language)) {
       currentLanguage = language;
     }
 
-    // The selected language is not available. It now depends on the
-    // language behavior which language to choose
+    // If the language is forced but not available, then throw an exception
+    else if (force) {
+      throw new IllegalStateException(this + " is not localized to " + language.getLocale().getDisplayLanguage());
+    }
 
+    // The selected language is not available. Use the original language instead
     else if (behavior.equals(Original)) {
       if (getOriginalLanguage() != null)
         currentLanguage = getOriginalLanguage();
-//      else
-//        throw new IllegalStateException("Original language must not be null");
-    } else if (behavior.equals(Default)) {
+    }
+
+    // The selected language is not available. Use the default language instead
+    else if (behavior.equals(Default)) {
       if (getDefaultLanguage() != null)
         currentLanguage = getDefaultLanguage();
-//      else
-//        throw new IllegalStateException("Default language must not be null");
     }
+
+    // Check the resolution process outcome
+    if (currentLanguage == null && languages.size() > 0)
+      throw new IllegalStateException("Language resolution failed for " + this);
 
     // Notify interested parties
     if (original == null || !original.equals(currentLanguage)) {
@@ -209,7 +217,7 @@ public abstract class LocalizableObject implements Localizable {
         }
       }
     }
-    
+
     return currentLanguage;
   }
 
@@ -223,11 +231,12 @@ public abstract class LocalizableObject implements Localizable {
   }
 
   /**
-   * Returns a fall back according to the current {@link LanguageResolution}.
+   * Returns a fall back language according to the current
+   * {@link LanguageResolution}.
    * 
    * @return the fall back language
    */
-  public Language resolveLanguage() {
+  protected Language resolveLanguage() {
     if (behavior.equals(Original) && originalLanguage != null)
       return originalLanguage;
     else if (behavior.equals(Default) && defaultLanguage != null)
@@ -252,8 +261,15 @@ public abstract class LocalizableObject implements Localizable {
    * 
    * @param behavior
    *          the language behavior
+   * @throws IllegalStateException
+   *           if a default language has not been specified but
+   *           {@link LanguageResolution#Default} has been chosen for language
+   *           resolution
    */
-  public void setLanguageResolution(LanguageResolution behavior) {
+  public void setLanguageResolution(LanguageResolution behavior)
+      throws IllegalStateException {
+    if (Default.equals(behavior) && defaultLanguage == null)
+      throw new IllegalStateException("Must specify default language first");
     this.behavior = behavior;
   }
 
@@ -283,11 +299,6 @@ public abstract class LocalizableObject implements Localizable {
       throw new IllegalArgumentException("Language may not be null!");
 
     defaultLanguage = language;
-    behavior = Default;
-
-    if (behavior.equals(Default) || currentLanguage == null) {
-      currentLanguage = defaultLanguage;
-    }
   }
 
   /**
@@ -325,21 +336,7 @@ public abstract class LocalizableObject implements Localizable {
     if (language == null)
       throw new IllegalArgumentException("Language may not be null!");
 
-    enableLanguage(language);
     originalLanguage = language;
-
-    if (behavior.equals(Original) || currentLanguage == null) {
-      currentLanguage = originalLanguage;
-    }
-  }
-
-  /**
-   * Returns the number of supported languages.
-   * 
-   * @return the number of supported languages
-   */
-  public int getLanguageCount() {
-    return languages.size();
   }
 
   /**
@@ -351,7 +348,7 @@ public abstract class LocalizableObject implements Localizable {
    * @return <code>true</code> if the language is supported
    */
   public boolean supportsLanguage(Language language) {
-    return languages.contains(language) || language.equals(originalLanguage) || language.equals(defaultLanguage);
+    return languages.contains(language);
   }
 
   /**
