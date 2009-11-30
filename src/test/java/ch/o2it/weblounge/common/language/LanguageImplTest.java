@@ -20,15 +20,30 @@
 
 package ch.o2it.weblounge.common.language;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Locale;
+
 /**
- * TODO: Comment LanguageImplTest
+ * Test cases for {@link LanguageImpl}.
  */
 public class LanguageImplTest {
+
+  /** English locale */
+  Locale englishLocale = new Locale("en");
+  
+  /** English */
+  Language english = new LanguageImpl(englishLocale);
+
+  /** French */
+  Language french = new LanguageImpl(new Locale("fr"));
 
   /**
    * @throws java.lang.Exception
@@ -42,7 +57,7 @@ public class LanguageImplTest {
    */
   @Test
   public void testHashCode() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(englishLocale.hashCode(), english.hashCode());
   }
 
   /**
@@ -50,7 +65,7 @@ public class LanguageImplTest {
    */
   @Test
   public void testGetLocale() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(new Locale("en"), english.getLocale());
   }
 
   /**
@@ -58,7 +73,7 @@ public class LanguageImplTest {
    */
   @Test
   public void testGetDescription() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(englishLocale.getDisplayLanguage(), english.getDescription());
   }
 
   /**
@@ -66,7 +81,7 @@ public class LanguageImplTest {
    */
   @Test
   public void testGetDescriptionLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(englishLocale.getDisplayLanguage(french.getLocale()), english.getDescription(french));
   }
 
   /**
@@ -74,7 +89,7 @@ public class LanguageImplTest {
    */
   @Test
   public void testGetIdentifier() {
-    fail("Not yet implemented"); // TODO
+    assertEquals("en", english.getIdentifier());
   }
 
   /**
@@ -82,7 +97,9 @@ public class LanguageImplTest {
    */
   @Test
   public void testEqualsObject() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(english.equals(english));
+    assertTrue(english.equals(new LanguageImpl(new Locale("en"))));
+    assertFalse(french.equals(english));
   }
 
   /**
@@ -90,7 +107,7 @@ public class LanguageImplTest {
    */
   @Test
   public void testToString() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(english.getIdentifier(), english.toString());
   }
 
 }

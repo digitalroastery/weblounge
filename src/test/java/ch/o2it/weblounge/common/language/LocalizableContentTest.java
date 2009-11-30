@@ -20,45 +20,29 @@
 
 package ch.o2it.weblounge.common.language;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import org.junit.Before;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+
 import org.junit.Test;
 
 /**
- * TODO: Comment LocalizableContentTest
+ * Test case for the {@link LocalizableContent} implementation.
  */
-public class LocalizableContentTest {
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @Before
-  public void setUp() throws Exception {
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#remove(ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testRemove() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#LocalizableContent(ch.o2it.weblounge.common.impl.language.LocalizableObject)}.
-   */
-  @Test
-  public void testLocalizableContentLocalizableObject() {
-    fail("Not yet implemented"); // TODO
-  }
+public class LocalizableContentTest extends LocalizableObjectImplTest {
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#clear()}.
    */
   @Test
   public void testClear() {
-    fail("Not yet implemented"); // TODO
+    content.clear();
+    assertEquals(0, content.size());
+    assertFalse(content.supportsLanguage(english));
+    assertFalse(content.supportsLanguage(french));
   }
 
   /**
@@ -66,7 +50,9 @@ public class LocalizableContentTest {
    */
   @Test
   public void testIsEmpty() {
-    fail("Not yet implemented"); // TODO
+    assertFalse(content.isEmpty());
+    content.clear();
+    assertTrue(content.isEmpty());
   }
 
   /**
@@ -74,7 +60,7 @@ public class LocalizableContentTest {
    */
   @Test
   public void testSize() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(2, content.size());
   }
 
   /**
@@ -82,23 +68,8 @@ public class LocalizableContentTest {
    */
   @Test
   public void testValues() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#setEncoding(ch.o2it.weblounge.common.impl.util.encoding.Encoding)}.
-   */
-  @Test
-  public void testSetEncoding() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#getEncoding()}.
-   */
-  @Test
-  public void testGetEncoding() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(2, content.values().size());
+    assertTrue(content.values().contains(englishLocale.getDisplayLanguage()));
   }
 
   /**
@@ -106,7 +77,11 @@ public class LocalizableContentTest {
    */
   @Test
   public void testPut() {
-    fail("Not yet implemented"); // TODO
+    content.put(englishLocale.getDisplayLanguage(), english);
+    assertEquals(2, content.size());
+    content.put(italianLocale.getDisplayLanguage(), italian);
+    assertEquals(3, content.size());
+    assertTrue(content.supportsLanguage(italian));
   }
 
   /**
@@ -114,7 +89,9 @@ public class LocalizableContentTest {
    */
   @Test
   public void testGet() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(englishLocale.getDisplayLanguage(), content.get());
+    assertEquals(englishLocale.getDisplayLanguage(), content.get(italian));
+    assertTrue(content.get(italian, true) == null);
   }
 
   /**
@@ -122,7 +99,8 @@ public class LocalizableContentTest {
    */
   @Test
   public void testGetLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(english, content.getLanguage());
+    assertEquals(englishLocale.getDisplayLanguage(), content.get(italian));
   }
 
   /**
@@ -130,15 +108,8 @@ public class LocalizableContentTest {
    */
   @Test
   public void testGetLanguageBoolean() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#switchedTo(ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testSwitchedTo() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(englishLocale.getDisplayLanguage(), content.get(italian, false));
+    assertTrue(content.get(italian, true) == null);
   }
 
   /**
