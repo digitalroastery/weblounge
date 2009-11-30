@@ -65,10 +65,10 @@ public class LanguageImpl implements Language {
   /**
    * Returns the name of this language in its own language, e.g
    * <ul>
-   * <li><code>en</code> for english</li>
-   * <li><code>de</code> for german</li>
-   * <li><code>fr</code> for french</li>
-   * <li><code>it</code> for italian</li>
+   * <li><code>English</code> for english</li>
+   * <li><code>Deutsch</code> for german</li>
+   * <li><code>Français</code> for french</li>
+   * <li><code>Italiano</code> for italian</li>
    * </ul>
    * 
    * @return the language name in its own language
@@ -78,12 +78,13 @@ public class LanguageImpl implements Language {
   }
 
   /**
-   * Returns the name of this language in the specified language, e.g
+   * Returns the name of this language in the specified language, e.g given that
+   * <code>language</code> were <code>English</code>, the output would be
    * <ul>
-   * <li><code>en</code> for english</li>
-   * <li><code>de</code> for german</li>
-   * <li><code>fr</code> for french</li>
-   * <li><code>it</code> for italian</li>
+   * <li><code>English</code> for english</li>
+   * <li><code>German</code> for german</li>
+   * <li><code>French</code> for french</li>
+   * <li><code>Italian</code> for italian</li>
    * </ul>
    * 
    * @param language
