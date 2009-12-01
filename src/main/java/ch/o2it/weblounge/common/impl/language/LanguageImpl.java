@@ -122,10 +122,10 @@ public class LanguageImpl implements Language {
   }
 
   /**
-   * Returns the hashcode for the language which equals the database key,
+   * Returns the hash code for the language which equals the database key,
    * truncated to an <code>int</code>
    * 
-   * @return the language hashcode
+   * @return the language hash code
    */
   public int hashCode() {
     return locale.hashCode();
@@ -137,7 +137,7 @@ public class LanguageImpl implements Language {
    * @return a string representation of this language
    */
   public String toString() {
-    return locale.toString();
+    return locale.getDisplayLanguage();
   }
 
 }
