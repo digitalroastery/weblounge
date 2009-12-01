@@ -78,7 +78,7 @@ public class RoleManager {
 
     LocalizableContent<String> descriptions = new LocalizableContent<String>();
     Language defaultLanguage = site.getDefaultLanguage();
-    LanguageSupport.addDescriptions(path, node, site.getLanguages(), defaultLanguage, descriptions);
+    LanguageSupport.addDescriptions(node, "name", defaultLanguage, descriptions, false);
     for (Language l : descriptions.languages()) {
       r.put(descriptions.get(l), l);
     }
