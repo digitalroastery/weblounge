@@ -20,29 +20,56 @@
 
 package ch.o2it.weblounge.common.language;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.language.Localizable.LanguageResolution;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Locale;
+
 /**
- * TODO: Comment LocalizableObjectTest
+ *  LocalizableObjectImplTest
  */
 public class LocalizableObjectTest {
+
+  /** The localizable content */
+  protected LocalizableContent<String> content = null;
+
+  /** English locale */
+  protected Locale englishLocale = new Locale("en");
+
+  /** French locale */
+  protected Locale frenchLocale = new Locale("fr");
+
+  /** Italian locale */
+  protected Locale italianLocale = new Locale("it");
+
+  /** English */
+  protected Language english = new LanguageImpl(englishLocale);
+
+  /** French */
+  protected Language french = new LanguageImpl(frenchLocale);
+
+  /** Italian */
+  protected Language italian = new LanguageImpl(italianLocale);
 
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#LocalizableObject()}.
-   */
-  @Test
-  public void testLocalizableObject() {
-    fail("Not yet implemented"); // TODO
+    content = new LocalizableContent<String>();
+    content.put(englishLocale.getDisplayLanguage(englishLocale), english);
+    content.put(englishLocale.getDisplayLanguage(frenchLocale), french);
   }
 
   /**
@@ -50,31 +77,9 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testLocalizableObjectLanguage() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#addLocalizationListener(ch.o2it.weblounge.common.language.LocalizationListener)}.
-   */
-  @Test
-  public void testAddLocalizationListener() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#removeLocalizationListener(ch.o2it.weblounge.common.language.LocalizationListener)}.
-   */
-  @Test
-  public void testRemoveLocalizationListener() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#reset()}.
-   */
-  @Test
-  public void testReset() {
-    fail("Not yet implemented"); // TODO
+    LocalizableObject lc = new LocalizableContent<String>(french);
+    assertEquals(french, lc.getDefaultLanguage());
+    assertEquals(LanguageResolution.Default, lc.getLanguageResolution());
   }
 
   /**
@@ -82,7 +87,8 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testEnableLanguage() {
-    fail("Not yet implemented"); // TODO
+    content.enableLanguage(italian);
+    assertTrue(content.supportsLanguage(italian));
   }
 
   /**
@@ -90,7 +96,24 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testRemove() {
-    fail("Not yet implemented"); // TODO
+    content.remove(french);
+    assertFalse(content.supportsLanguage(french));
+    assertEquals(1, content.size());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#switchedTo(ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testSwitchedTo() {
+    final StringBuffer newLanguage = new StringBuffer();
+    content.addLocalizationListener(new LocalizationListener() {
+      public void switchedTo(Language language) {
+        newLanguage.append(language.getIdentifier());
+      }
+    });
+    content.switchTo(french);
+    assertEquals(french.getIdentifier(), newLanguage.toString());
   }
 
   /**
@@ -98,7 +121,10 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testSwitchToLanguage() {
-    fail("Not yet implemented"); // TODO
+    content.switchTo(french);
+    assertEquals(french, content.getLanguage());
+    content.switchTo(italian);
+    assertEquals(content.getOriginalLanguage(), content.getLanguage());
   }
 
   /**
@@ -106,7 +132,12 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testSwitchToLanguageBoolean() {
-    fail("Not yet implemented"); // TODO
+    try {
+      content.switchTo(italian, true);
+      fail("Language switch to unresolvable language did not fail");
+    } catch (IllegalStateException e) {
+      // Expected, everything's fine
+    }
   }
 
   /**
@@ -114,15 +145,7 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testGetLanguage() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#resolveLanguage()}.
-   */
-  @Test
-  public void testGetFallbackLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(english, content.getLanguage());
   }
 
   /**
@@ -130,7 +153,10 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testSetLanguageResolution() {
-    fail("Not yet implemented"); // TODO
+    content.setDefaultLanguage(french);
+    content.setLanguageResolution(LanguageResolution.Default);
+    assertEquals(LanguageResolution.Default, content.getLanguageResolution());
+    assertEquals(french, content.switchTo(italian));
   }
 
   /**
@@ -138,7 +164,7 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testGetLanguageResolution() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(LanguageResolution.Original, content.getLanguageResolution());
   }
 
   /**
@@ -146,7 +172,16 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testSetDefaultLanguage() {
-    fail("Not yet implemented"); // TODO
+    content.setDefaultLanguage(null);
+    content.setDefaultLanguage(french);
+    assertEquals(french, content.getDefaultLanguage());
+    try {
+      content.setLanguageResolution(LanguageResolution.Default);
+      content.setDefaultLanguage(null);
+      fail("Setting the default language to null should be prohited in this case");
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
   }
 
   /**
@@ -154,7 +189,7 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testGetDefaultLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(content.getDefaultLanguage() == null);
   }
 
   /**
@@ -162,7 +197,9 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testGetOriginalLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(english, content.getOriginalLanguage());
+    LocalizableObject lc = new LocalizableContent<String>(french);
+    assertTrue(lc.getOriginalLanguage() == null);
   }
 
   /**
@@ -170,15 +207,9 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testSetOriginalLanguage() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#getLanguageCount()}.
-   */
-  @Test
-  public void testGetLanguageCount() {
-    fail("Not yet implemented"); // TODO
+    content.setOriginalLanguage(french);
+    assertEquals(french, content.getOriginalLanguage());
+    assertEquals(english, content.getLanguage());
   }
 
   /**
@@ -186,7 +217,13 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testSupportsLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(content.supportsLanguage(english));
+    assertFalse(content.supportsLanguage(italian));
+    LocalizableObject lc = new LocalizableContent<String>();
+    lc.setOriginalLanguage(english);
+    lc.setDefaultLanguage(french);
+    assertFalse(lc.supportsLanguage(english));
+    assertFalse(lc.supportsLanguage(french));
   }
 
   /**
@@ -194,7 +231,9 @@ public class LocalizableObjectTest {
    */
   @Test
   public void testLanguages() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(2, content.languages().size());
+    assertTrue(content.languages().contains(english));
+    assertFalse(content.languages().contains(italian));
   }
 
 }

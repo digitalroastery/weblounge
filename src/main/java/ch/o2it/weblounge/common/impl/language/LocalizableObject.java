@@ -295,8 +295,8 @@ public abstract class LocalizableObject implements Localizable {
    *           if the argument <code>language</code> was null
    */
   public void setDefaultLanguage(Language language) {
-    if (language == null)
-      throw new IllegalArgumentException("Language may not be null!");
+    if (language == null && behavior.equals(Default))
+      throw new IllegalArgumentException("Default language may not be null while language resolution is set to default");
 
     defaultLanguage = language;
   }
