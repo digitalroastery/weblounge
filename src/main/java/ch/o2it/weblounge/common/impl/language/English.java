@@ -26,18 +26,18 @@ import java.util.Locale;
 
 /**
  * This is a special instance of <code>Language</code>, representing then
- * english language.
+ * English language.
  */
 public class English extends LanguageImpl {
 
   /** The language identifier */
   public final static String ID = "en";
 
-  /** The singleton instance of english */
+  /** The singleton instance of English */
   private static Language language_ = null;
 
   /**
-   * Creates an instance of the english language.
+   * Creates an instance of the English language.
    */
   private English() {
     super(Locale.ENGLISH);
