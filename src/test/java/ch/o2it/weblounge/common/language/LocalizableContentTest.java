@@ -23,16 +23,16 @@ package ch.o2it.weblounge.common.language;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.language.Localizable.LanguageResolution;
 
 import org.junit.Test;
 
 /**
  * Test case for the {@link LocalizableContent} implementation.
  */
-public class LocalizableContentTest extends LocalizableObjectImplTest {
+public class LocalizableContentTest extends LocalizableObjectTest {
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#clear()}.
@@ -115,9 +115,20 @@ public class LocalizableContentTest extends LocalizableObjectImplTest {
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableContent#clone()}.
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void testClone() {
-    fail("Not yet implemented"); // TODO
+    content.setDefaultLanguage(italian);
+    content.setLanguageResolution(LanguageResolution.Default);
+    LocalizableContent<String> americanEnglish = (LocalizableContent<String>)content.clone();
+    assertEquals(content.size(), americanEnglish.size());
+    assertEquals(content.getLanguage(), americanEnglish.getLanguage());
+    assertEquals(content.getOriginalLanguage(), americanEnglish.getOriginalLanguage());
+    assertEquals(content.getLanguageResolution(), americanEnglish.getLanguageResolution());
+    assertEquals(content.get(), americanEnglish.get());
+    assertEquals(content.get(english), americanEnglish.get(english));
+    assertEquals(content.get(french), americanEnglish.get(french));
+    assertEquals(content.get(italian), americanEnglish.get(italian));
   }
 
   /**
@@ -125,7 +136,7 @@ public class LocalizableContentTest extends LocalizableObjectImplTest {
    */
   @Test
   public void testToString() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(englishLocale.getDisplayLanguage(englishLocale), content.toString());
   }
 
   /**
@@ -133,7 +144,7 @@ public class LocalizableContentTest extends LocalizableObjectImplTest {
    */
   @Test
   public void testToStringLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(englishLocale.getDisplayLanguage(frenchLocale), content.toString(french));
   }
 
   /**
@@ -141,7 +152,7 @@ public class LocalizableContentTest extends LocalizableObjectImplTest {
    */
   @Test
   public void testToStringLanguageBoolean() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(content.toString(italian, true) == null);
   }
 
 }
