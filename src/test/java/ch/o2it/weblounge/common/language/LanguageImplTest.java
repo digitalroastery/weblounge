@@ -107,7 +107,7 @@ public class LanguageImplTest {
    */
   @Test
   public void testToString() {
-    assertEquals(english.getIdentifier(), english.toString());
+    assertEquals(englishLocale.getDisplayLanguage(), english.toString());
   }
 
 }
