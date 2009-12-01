@@ -20,9 +20,8 @@
 
 package ch.o2it.weblounge.common.page;
 
-import static org.junit.Assert.fail;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.language.English;
 import ch.o2it.weblounge.common.impl.page.PageImpl;
