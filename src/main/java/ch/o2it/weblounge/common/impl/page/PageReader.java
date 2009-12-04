@@ -340,41 +340,19 @@ public final class PageReader extends GeneralContentReader {
    * ch.o2it.weblounge.core.content.GeneralContentReader#setModificationDate
    * (java.util.Date)
    */
-  protected void setModificationDate(Date date) {
-    Language l = (Language) clipboard.get("language");
+  protected void setModified(User user, Date date, Language language) {
     switch (context_) {
       case Page:
-        page_.setModifiedSince(date);
+        page_.setModified(user, date, language);
         break;
       case Pagelet:
-        pagelet_.setModifiedSince(date, l);
-        break;
-      default:
-        break;
-    }
-    super.setModificationDate(date);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * ch.o2it.weblounge.core.content.GeneralContentReader#setModifiedBy(ch.o2it
-   * .weblounge.api.staff.User)
-   */
-  protected void setModifiedBy(User user) {
-    Language l = (Language) clipboard.get("language");
-    switch (context_) {
-      case Page:
-        page_.setModifiedBy(user);
-        break;
-      case Pagelet:
-        pagelet_.setModifiedBy(user, l);
+        pagelet_.setModified(user, date, language);
         break;
       default:
         break;
     }
     super.setModifiedBy(user);
+    super.setModificationDate(date);
   }
 
   /*

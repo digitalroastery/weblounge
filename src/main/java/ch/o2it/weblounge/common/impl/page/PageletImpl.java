@@ -132,9 +132,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     id_ = id;
     properties = new HashMap<String, String[]>();
     creationCtx = new CreationContextImpl();
-    modificationCtx = new LocalizedModificationContextImpl(this);
+    modificationCtx = new LocalizedModificationContextImpl();
     publishingCtx = new PublishingContextImpl();
-    securityCtx = new PageletSecurityContextImpl(module, id);
+    securityCtx = new DefaultPageletSecurityContext(module, id);
     content = new LocalizableContent<Map<String, String[]>>(this);
   }
 
@@ -169,30 +169,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public String getIdentifier() {
     return id_;
-  }
-
-  /**
-   * Sets the date of the last modification of this pagelet.
-   * 
-   * @param date
-   *          the modification date
-   * @param language
-   *          the language version
-   */
-  public void setModifiedSince(Date date, Language language) {
-    modificationCtx.setModificationDate(date, language);
-  }
-
-  /**
-   * Sets the user that last modified the pagelet.
-   * 
-   * @param editor
-   *          the modifying user
-   * @param language
-   *          the language
-   */
-  public void setModifiedBy(User editor, Language language) {
-    modificationCtx.setModifier(editor, language);
   }
 
   /**
@@ -270,7 +246,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @param owner
    *          the owner of this pagelet
    */
-  void setOwner(User owner) {
+  public void setOwner(User owner) {
     securityCtx.setOwner(owner);
   }
 
@@ -513,26 +489,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Sets the data when this page has been modified.
-   * 
-   * @param date
-   *          the modification date
-   */
-  void setModifiedSince(Date date) {
-    modificationCtx.setModificationDate(date);
-  }
-
-  /**
-   * Sets the user that last modified the page.
-   * 
-   * @param user
-   *          the modifying user
-   */
-  void setModifiedBy(User user) {
-    modificationCtx.setModifier(user);
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
@@ -560,12 +516,30 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAfter(java.util.Date,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public boolean isModifiedAfter(Date date, Language language) {
+    return modificationCtx.isModifiedAfter(date, language);
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedBefore(java.util.Date)
    */
   public boolean isModifiedBefore(Date date) {
     return modificationCtx.isModifiedBefore(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedBefore(java.util.Date,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public boolean isModifiedBefore(Date date, Language language) {
+    return modificationCtx.isModifiedBefore(date, language);
   }
 
   /**
@@ -589,37 +563,34 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAll()
-   */
-  public boolean isModifiedAtAll() {
-    return modificationCtx.isModifiedAtAll();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllAfter(java.util.Date)
-   */
-  public boolean isModifiedAtAllAfter(Date date) {
-    return modificationCtx.isModifiedAtAllAfter(date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAtAllBefore(java.util.Date)
-   */
-  public boolean isModifiedAtAllBefore(Date date) {
-    return modificationCtx.isModifiedAtAllBefore(date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
    */
   public boolean isModified() {
     return modificationCtx.isModified();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
+   */
+  public Date getModificationDate(Language language) {
+    return modificationCtx.getModificationDate(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier(ch.o2it.weblounge.common.language.Language)
+   */
+  public User getModifier(Language language) {
+    return modificationCtx.getModifier(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)
+   */
+  public void setModified(User user, Date date, Language language) {
+    modificationCtx.setModified(user, date, language);
   }
 
   /**
@@ -907,7 +878,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
+   *      ch.o2it.weblounge.common.language.Language)
    */
   public int compareTo(Localizable o, Language l) {
     return name.compareTo(o, l);
