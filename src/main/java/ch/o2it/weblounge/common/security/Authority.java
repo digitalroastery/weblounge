@@ -21,15 +21,33 @@
 package ch.o2it.weblounge.common.security;
 
 /**
- * This interface is used by objects that are used to access
- * <code>secured</code> objects. For example, a user is authorized with respect
- * to a given role if it actually owns this role.
+ * This interface is used by objects that are used to access that implement the
+ * {@link Securable} interface.
+ * <p>
+ * In order to be able to restrict access to an object to either roles, a group
+ * of users or even a single user, all of these objects implement this
+ * interface, thereby allowing for one signature on the secured objects.
+ * <p>
+ * The implementations then need to make sure they can recognize the authority
+ * and resolve the permissions that were applied. For example, if a secured
+ * object <code>o</code> is told to only allow access to {@link Role}
+ * <code>r</code>, and then <code>o</code> is being accessed by
+ * {@link ch.o2it.weblounge.common.user.User} <code>u</code> who happens to have
+ * role <code>r</code> assigned, access should be granted.
+ * <p>
+ * Known authorities are:
+ * <ul>
+ * <li><code>ch.o2it.weblounge.common.security.Role</code></li>
+ * <li><code>ch.o2it.weblounge.common.security.Group</code></li>
+ * <li><code>ch.o2it.weblounge.common.user.User</code></li>
+ * </ul>
  */
 public interface Authority {
 
   /**
    * Returns the authority type, e. g.
-   * <code>ch.o2it.weblounge.api.security.Role</code> for a role authorization.
+   * <code>ch.o2it.weblounge.common.security.Role</code> for a {@link Role}
+   * authorization.
    * 
    * @return the authority type
    */
@@ -44,16 +62,18 @@ public interface Authority {
 
   /**
    * Returns <code>true</code> if this authority and <code>authority</code>
-   * match by means of the respective authority. Like this, a <code>Role</code>
-   * may check if <code>authority</code> is of type role and if is an inherited
-   * role, which would be possible by calling the equals() method of
-   * <code>Role</code> with the authority as the parameter because the
-   * <code>instanceof</code> test will usually fail.
+   * match by means of the respective authority.
+   * <p>
+   * Like this, a {@link Securable} that is configured to allow access to
+   * {@link RoleOwner}s owning {@link Role} <code>r</code> only may call
+   * <code>isAuthorizedBy(r)</code> on a {@link User} that wants to access the
+   * object. The method will return <code>true</code> if the user owns the role
+   * or belongs to a group that does.
    * 
    * @param authority
    *          the authority to test
    * @return <code>true</code> if the authorities match
    */
-  boolean equals(Authority authority);
+  boolean isAuthorizedBy(Authority authority);
 
 }

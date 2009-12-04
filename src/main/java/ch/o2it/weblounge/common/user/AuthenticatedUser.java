@@ -70,21 +70,13 @@ public interface AuthenticatedUser extends User, GroupMember, RoleOwner, Authori
   boolean checkPassword(String password);
 
   /**
-   * Returns <code>true</code> if the user is currently logged in. Note that
-   * this is always <code>false</code> for the guest user.
+   * Adds the private credentials to this user. A public credentials would be
+   * for example the public key of an rsa keypair.
    * 
-   * @return <code>true</code> if the user is logged in
+   * @param credentials
+   *          the public credentials
    */
-  boolean isAuthenticated();
-
-  /**
-   * Adds the private credential to this user. A public credential would be for
-   * example the public key of an rsa keypair.
-   * 
-   * @param credential
-   *          the public credential
-   */
-  void addPublicCredential(Object credential);
+  void addPublicCredentials(Object credentials);
 
   /**
    * Returns the set of all public credentials of this user.
@@ -101,13 +93,13 @@ public interface AuthenticatedUser extends User, GroupMember, RoleOwner, Authori
   Set<Object> getPublicCredentials(Class<?> type);
 
   /**
-   * Adds the private credential to this user. A private credential would be for
-   * example the private key of an rsa keypair.
+   * Adds the private credentials to this user. A private credentials would be
+   * for example the private key of an RSA keypair.
    * 
-   * @param credential
-   *          the private credential
+   * @param credentials
+   *          the private credentials
    */
-  void addPrivateCredential(Object credential);
+  void addPrivateCredentials(Object credentials);
 
   /**
    * Returns the set of all private credentials of this user.
@@ -134,6 +126,7 @@ public interface AuthenticatedUser extends User, GroupMember, RoleOwner, Authori
   /**
    * This method is called by the authentication service when the user is logged
    * out of the site.
+   * 
    * @throws LoginException
    *           if logout fails for some reason
    */

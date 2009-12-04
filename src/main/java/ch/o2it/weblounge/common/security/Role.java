@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.site.Site;
 
 /**
  * A role models an entity that can be assigned a number of permissions.
@@ -46,13 +45,6 @@ public interface Role extends Authority, Localizable {
   String getContext();
 
   /**
-   * Returns the site or <code>null</code> if this is a system role.
-   * 
-   * @return the associated site
-   */
-  Site getSite();
-
-  /**
    * Makes this role an extension of <code>ancestor</code>.
    * 
    * @param ancestor
@@ -61,7 +53,7 @@ public interface Role extends Authority, Localizable {
   void extend(Role ancestor);
 
   /**
-   * Returns <code>true</code> if this role is a direct or indirec extension of
+   * Returns <code>true</code> if this role is a direct or indirect extension of
    * <code>ancestor</code>.
    * 
    * @param ancestor
@@ -69,5 +61,23 @@ public interface Role extends Authority, Localizable {
    * @return <code>true</code> if this role extends <code>ancestor</code>
    */
   boolean isExtensionOf(Role ancestor);
+
+  /**
+   * Returns all roles that are directly being extended by this roles.
+   * 
+   * @return the extended roles
+   */
+  Role[] getExtendedRoles();
+
+  /**
+   * Returns all roles that are included by this role, including this role.
+   * <p>
+   * If this role does not extend any other role, then the closure is equal to
+   * this role only. Otherwise, the closure consists of all of the extended
+   * roles plus this one.
+   * 
+   * @return the closure of this role
+   */
+  Role[] getClosure();
 
 }
