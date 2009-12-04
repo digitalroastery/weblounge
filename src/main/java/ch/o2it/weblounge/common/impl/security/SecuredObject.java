@@ -37,10 +37,10 @@ import java.util.List;
 public class SecuredObject implements Securable {
 
   /** The security context */
-  protected RestrictionSecurityContext securityCtx_;
+  protected RestrictionSecurityContext securityCtx_ = null;
 
   /** Security listener */
-  protected List<SecurityListener> listeners;
+  protected List<SecurityListener> listeners = null;
 
   /**
    * Creates a secured object with no security constraints applied to it, except

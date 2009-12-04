@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.security;
 
-import ch.o2it.weblounge.common.impl.security.PageSecurityContext;
+import ch.o2it.weblounge.common.impl.page.DefaultPageSecurityContext;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
@@ -111,7 +111,7 @@ public class PermissionSecurityContextTest extends TestCase {
     // "admin@weblounge.org");
 
     // Create the security context
-    PermissionSecurityContext context = new PageSecurityContext();
+    PermissionSecurityContext context = new DefaultPageSecurityContext();
     context.init(path, config);
 
     // Deny all

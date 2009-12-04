@@ -418,4 +418,43 @@ public class RestrictionImpl implements Restriction {
     return b.toString();
   }
 
+  /**
+   * A restriction rule represents the <code>allow</code> and <code>deny</code>
+   * entries of a restriction definition. It features a type and a value, e. g.
+   * the type <code>ch.o2it.weblounge.api.security.Role</code> and
+   * <code>system:editor</code>, meaning that this rule will match the system
+   * role <code>editor</code>.
+   */
+  final class RestrictionRule extends AuthorityImpl {
+
+    /**
+     * Creates a new allow or deny rule with the given type and id.
+     * 
+     * @param id
+     *          the authorization identifier
+     * @param type
+     *          the authorization type
+     */
+    public RestrictionRule(String type, String id) {
+      super(type, id);
+    }
+
+    /**
+     * Returns <code>true</code> if the authorization identifier of this
+     * authorization equals the string representation of <code>o</code>.
+     * <p>
+     * <strong>Note:</strong> this implementation also returns <code>true</code>
+     * if either the authorization type is different from the type specified in
+     * this rule or if <code>authorization</code> is <code>null</code>.
+     * 
+     * @param authority
+     *          the authority trying to evaluate
+     * @return <code>true</code> if this rule matches the authorization
+     */
+    public boolean evaluate(Authority authority) {
+      return authority == null || type.equals(authority.getAuthorityType()) || id.equals(authority.getAuthorityId());
+    }
+
+  }
+
 }

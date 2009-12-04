@@ -23,10 +23,10 @@ package ch.o2it.weblounge.common.impl.security;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.site.Site;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * A role models properties that can be applied to persons or groups of persons.
@@ -36,59 +36,38 @@ import java.util.Set;
 public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /** Role identifier */
-  private String identifier_;
+  private String identifier_ = null;
 
   /** The role context */
-  private String context_;
+  private String context_ = null;
 
   /** Roles that are extended by this role */
-  private Set<Role> ancestors_;
-
-  /** The associated site */
-  private Site site_;
+  private Set<Role> ancestors_ = null;
 
   /**
    * Creates a new role from the parameter context::id.
    * 
    * @param role
    *          the role
-   * @param site
-   *          the associated site
    */
-  public RoleImpl(String role, Site site) {
+  public RoleImpl(String role) {
     assert role != null;
     context_ = extractContext(role);
     identifier_ = extractIdentifier(role);
     ancestors_ = new HashSet<Role>();
-    site_ = site;
   }
 
   /**
    * Creates a role in the given context with the specified role identifier.
-   * @param identifier
-   *          the role identifier
    * @param context
    *          the role context
+   * @param identifier
+   *          the role identifier
    */
-  public RoleImpl(String identifier, String context) {
+  public RoleImpl(String context, String identifier) {
     context_ = context;
     identifier_ = identifier;
     ancestors_ = new HashSet<Role>();
-  }
-
-  /**
-   * Creates a role in the given context with the specified role identifier.
-   * 
-   * @param context
-   *          the role context
-   * @param identifier
-   *          the role identifier
-   * @param site
-   *          the associated site
-   */
-  public RoleImpl(String context, String identifier, Site site) {
-    this(identifier, context);
-    site_ = site;
   }
 
   /**
@@ -101,7 +80,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the role identifier
    */
   public RoleImpl(String context, String identifier, Role ancestor) {
-    this(context, identifier, ancestor.getSite());
+    this(identifier, context);
     extend(ancestor);
   }
 
@@ -112,15 +91,6 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    */
   public String getIdentifier() {
     return identifier_;
-  }
-
-  /**
-   * Returns the site or <code>null</code> if this is a system role.
-   * 
-   * @return the associated site
-   */
-  public Site getSite() {
-    return site_;
   }
 
   /**
@@ -156,6 +126,35 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
       }
     }
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Role#getExtendedRoles()
+   */
+  public Role[] getExtendedRoles() {
+    return ancestors_.toArray(new Role[ancestors_.size()]);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Role#getClosure()
+   */
+  public Role[] getClosure() {
+    HashSet<Role> roles = new HashSet<Role>();
+    Stack<Role> stack = new Stack<Role>();
+    stack.push(this);
+    while (!stack.empty()) {
+      Role r = stack.pop();
+      roles.add(r);
+      for (Role extendedRole : r.getExtendedRoles()) {
+        if (!stack.contains(extendedRole))
+          stack.push(extendedRole);
+      }
+    }
+    return roles.toArray(new Role[ancestors_.size()]);
   }
 
   /**
@@ -196,19 +195,13 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the authority to test
    * @return <code>true</code> if the authorities match
    */
-  public boolean equals(Authority authority) {
+  public boolean isAuthorizedBy(Authority authority) {
     if (authority != null && authority instanceof Role) {
       Role r = (Role) authority;
-      return this.equals((Object) r) || this.isExtensionOf(r);
+      return this.equals(r) || this.isExtensionOf(r);
     } else if (authority != null && authority.getAuthorityType().equals(Role.class.getName())) {
       String roleId = authority.getAuthorityId();
-      Role r = null;
-      if (site_ != null) {
-        r = site_.getRole(roleId, null);
-      } else {
-        r = SystemRole.getRole(roleId);
-      }
-      return (r != null) && (this.equals(r) || this.isExtensionOf(r));
+      return isExtensionOf(new RoleImpl(roleId));
     }
     return false;
   }
@@ -216,11 +209,11 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   /**
    * Returns the hash code for this role object.
    * 
-   * @return the hashcode
+   * @return the hash code
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
-    return toString().hashCode();
+    return context_.hashCode() | identifier_.hashCode() >> 16; 
   }
 
   /**

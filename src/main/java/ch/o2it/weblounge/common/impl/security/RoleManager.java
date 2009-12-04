@@ -58,7 +58,7 @@ public class RoleManager {
    */
   public static Role read(XPath path, Node node, Site site) {
     String id = XPathHelper.valueOf(node, "@id", path);
-    RoleImpl r = new RoleImpl(id, site);
+    RoleImpl r = new RoleImpl(id);
 
     // Read extensions
 

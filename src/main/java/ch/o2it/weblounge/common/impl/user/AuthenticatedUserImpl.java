@@ -30,6 +30,7 @@ import ch.o2it.weblounge.common.user.User;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -55,6 +56,9 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
   /** the password */
   protected byte[] password = null;
 
+  /** Authority identity */
+  protected String authorityId = null;
+
   /** Password digest type, either plain or md5 */
   protected DigestType passwordDigestType = DigestType.plain;
 
@@ -74,6 +78,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    */
   public AuthenticatedUserImpl(String login, String realm) {
     super(login, realm);
+    authorityId = realm + ":" + login;
   }
 
   /**
@@ -86,6 +91,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    */
   public AuthenticatedUserImpl(String login) {
     this(login, null);
+    authorityId = "*:" + login;
   }
 
   /**
@@ -164,11 +170,12 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
     if (password == null) {
       return true;
     }
+    String passwordString = new String(this.password);
     switch (passwordDigestType) {
       case plain:
-        return this.password.equals(password);
+        return passwordString.equals(password);
       case md5:
-        return this.password.equals(DigestUtils.md5(password));
+        return passwordString.equals(DigestUtils.md5(password));
     }
     return false;
   }
@@ -181,16 +188,6 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    */
   public DigestType getPasswordDigestType() {
     return passwordDigestType;
-  }
-
-  /**
-   * Returns <code>true</code> if the user is authenticated. This is the case if
-   * the user possesses a valid login context.
-   * 
-   * @see ch.o2it.weblounge.common.user.AuthenticatedUser#isAuthenticated()
-   */
-  public boolean isAuthenticated() {
-    return loginContext != null;
   }
 
   /**
@@ -208,13 +205,13 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
   }
 
   /**
-   * Adds the private credential to this user. A public credential would be for
-   * example the public key of an rsa keypair.
+   * Adds the private credentials to this user. A public credentials would be
+   * for example the public key of an RSA keypair.
    * 
    * @param credential
-   *          the public credential
+   *          the public credentials
    */
-  public void addPublicCredential(Object credential) {
+  public void addPublicCredentials(Object credential) {
     if (publicCredentials == null) {
       publicCredentials = new HashSet<Object>();
     }
@@ -243,20 +240,21 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
     Set<Object> set = new HashSet<Object>();
     if (publicCredentials != null) {
       for (Object c : publicCredentials) {
-        set.add(c);
+        if (type.equals(c.getClass()))
+          set.add(c);
       }
     }
     return set;
   }
 
   /**
-   * Adds the private credential to this user. A private credential would be for
-   * example the private key of an rsa keypair.
+   * Adds the private credentials to this user. A private credentials would be
+   * for example the private key of an RSA keypair.
    * 
    * @param credential
-   *          the private credential
+   *          the private credentials
    */
-  public void addPrivateCredential(Object credential) {
+  public void addPrivateCredentials(Object credential) {
     if (privateCredentials == null) {
       privateCredentials = new HashSet<Object>();
     }
@@ -285,7 +283,8 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
     Set<Object> set = new HashSet<Object>();
     if (privateCredentials != null) {
       for (Object c : privateCredentials) {
-        set.add(c);
+        if (type.equals(c.getClass()))
+          set.add(c);
       }
     }
     return set;
@@ -415,20 +414,28 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
   }
 
   /**
-   * Returns all roles that this user owns directly.
+   * Returns all roles that this user owns directly or indirectly.
    * 
    * @return the roles that this user owns
    */
   public Role[] getRoleClosure() {
     Set<Role> roles = new HashSet<Role>();
-    if (this.roles != null)
+
+    // First, consider the users roles
+    if (this.roles != null) {
       roles.addAll(this.roles);
-    if (this.groups != null) {
-      for (Group g : groups) {
-        for (Role r : g.getRoleClosure())
-          roles.add(r);
+      for (Role r : this.roles) {
+        roles.addAll(Arrays.asList(r.getClosure()));
       }
     }
+
+    // Groups can be assigned roles, too
+    if (this.groups != null) {
+      for (Group g : groups) {
+        roles.addAll(Arrays.asList(g.getRoleClosure()));
+      }
+    }
+
     return roles.toArray(new Role[roles.size()]);
   }
 
@@ -449,7 +456,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    *      java.lang.String)
    */
   public boolean hasRole(String context, String id) {
-    return hasRole(new RoleImpl(id, context));
+    return hasRole(new RoleImpl(context, id));
   }
 
   /**
@@ -508,7 +515,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * @return the authorization identifier
    */
   public String getAuthorityId() {
-    return getLogin();
+    return authorityId;
   }
 
   /**
@@ -517,9 +524,9 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    * TODO: Same implementation than equals(Object). What is the idea behind
    * this?
    * 
-   * @see ch.o2it.weblounge.common.security.Authority#equals(ch.o2it.weblounge.common.security.Authority)
+   * @see ch.o2it.weblounge.common.security.Authority#isAuthorizedBy(ch.o2it.weblounge.common.security.Authority)
    */
-  public boolean equals(Authority authority) {
+  public boolean isAuthorizedBy(Authority authority) {
     if (authority instanceof AuthenticatedUser) {
       AuthenticatedUser u = (AuthenticatedUser) authority;
       if (!login.equals(u.getLogin()))
@@ -552,7 +559,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    */
   public boolean equals(Object obj) {
     if (obj instanceof User) {
-      User u = (User)obj;
+      User u = (User) obj;
       if (!login.equals(u.getLogin()))
         return false;
       if (!realm.equals(u.getRealm()))

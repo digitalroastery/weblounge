@@ -189,7 +189,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
     // a matching role (after casting them to an authority) but not v. v.
     if (authorities != null) {
       for (Authority a : authorities) {
-        if (a.equals(authority)) {
+        if (a.isAuthorizedBy(authority)) {
           authorities.remove(a);
           return;
         }
@@ -274,7 +274,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
     Set<Authority> authorities = context.get(permission);
     if (authorities != null) {
       for (Authority a : authorities) {
-        if (authority.equals(a))
+        if (authority.isAuthorizedBy(a))
           return true;
       }
     }

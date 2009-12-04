@@ -28,10 +28,10 @@ import ch.o2it.weblounge.common.security.Authority;
 public class AuthorityImpl implements Authority {
 
   /** The authorization type */
-  protected String type;
+  protected String type = null;
 
   /** The authorization id */
-  protected String id;
+  protected String id = null;
 
   /**
    * Creates a new authorization with the given type and id.
@@ -56,6 +56,15 @@ public class AuthorityImpl implements Authority {
   }
 
   /**
+   * Returns the authorization identifier.
+   * 
+   * @see ch.o2it.weblounge.common.security.Authority#getAuthorityId()
+   */
+  public String getAuthorityId() {
+    return id;
+  }
+
+  /**
    * Returns the authority's hash code.
    * 
    * @return the hash code
@@ -65,42 +74,29 @@ public class AuthorityImpl implements Authority {
   }
 
   /**
-   * Returns <code>true<code> if the authoritiy matches <code>o</code> with
+   * Returns <code>true<code> if the authority matches <code>o</code> with
    * respect to type and identifier.
    */
   public boolean equals(Object o) {
     if (o != null && o instanceof Authority) {
-      return equals((Authority) o);
+      return isAuthorizedBy((Authority) o);
     }
     return false;
   }
 
   /**
-   * Returns <code>true</code> if this authority and <code>authority</code>
-   * match by means of the respective authority. Like this, a <code>Role</code>
-   * may check if <code>authority</code> is of type role and if is an inherited
-   * role, which would be possible by calling the equals() method of
-   * <code>Role</code> with the authority as the parameter because the
-   * <code>instanceof</code> test will usually fail.
+   * {@inheritDoc}
+   * <p>
+   * This default implementation only authorizes authorities with matching type
+   * and id.
    * 
-   * @param authority
-   *          the authority to test
-   * @return <code>true</code> if the authorities match
+   * @see ch.o2it.weblounge.common.security.Authority#isAuthorizedBy(ch.o2it.weblounge.common.security.Authority)
    */
-  public boolean equals(Authority authority) {
+  public boolean isAuthorizedBy(Authority authority) {
     if (authority != null) {
       return type.equals(authority.getAuthorityType()) && id.equals(authority.getAuthorityId());
     }
     return false;
-  }
-
-  /**
-   * Returns the authorization identifier.
-   * 
-   * @see ch.o2it.weblounge.common.security.Authority#getAuthorityId()
-   */
-  public String getAuthorityId() {
-    return id;
   }
 
 }

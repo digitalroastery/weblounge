@@ -276,7 +276,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    *      java.lang.String)
    */
   public boolean hasRole(String context, String id) {
-    return hasRole(new RoleImpl(id, context));
+    return hasRole(new RoleImpl(context, id));
   }
 
   /**

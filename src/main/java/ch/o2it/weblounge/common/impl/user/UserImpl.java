@@ -140,6 +140,7 @@ public class UserImpl implements User {
    * 
    * <p>
    * The input is expected as:
+   * 
    * <pre>
    * &lt;user id=&quot;login&quot; realm=&quot;realm&quot;&gt;Jon Doe&lt;/user&gt;
    * </pre>
@@ -171,21 +172,18 @@ public class UserImpl implements User {
    * @return the user or <code>null</code> if
    */
   public static UserImpl fromXml(Node xml, XPath xpath) {
-    Node userNode = XPathHelper.select(xml, "//user", xpath);
-    if (userNode == null)
-      return null;
-
-    String login = XPathHelper.valueOf(userNode, "//user/@id", xpath);
+    String login = XPathHelper.valueOf(xml, "@id", xpath);
     if (login == null)
       throw new IllegalStateException("Found user node without id");
-    String realm = XPathHelper.valueOf(userNode, "//user/@realm", xpath);
-    String name = XPathHelper.valueOf(userNode, "//user/text()", xpath);
+    String realm = XPathHelper.valueOf(xml, "@realm", xpath);
+    String name = XPathHelper.valueOf(xml, "text()", xpath);
     UserImpl user = new UserImpl(login, realm, name);
     return user;
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#clone()
    */
   @Override
@@ -220,6 +218,16 @@ public class UserImpl implements User {
       return login.equals(u.getLogin());
     }
     return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return (name != null) ? name : login;
   }
 
   /**

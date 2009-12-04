@@ -459,7 +459,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
         if (r != null)
           user.assignRole(r);
         else
-          user.assignRole(new RoleImpl(roleId, roleContext));
+          user.assignRole(new RoleImpl(roleContext, roleId));
       }
     }
 
@@ -617,7 +617,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       b.append("<roles>");
       for (Iterator<Role> ri = roles.iterator(); ri.hasNext();) {
         Role r = ri.next();
-        if (!r.equals(SystemRole.GUEST)) {
+        if (!r.isAuthorizedBy(SystemRole.GUEST)) {
           b.append("<role context=\"");
           b.append(r.getContext());
           b.append("\">");

@@ -72,9 +72,9 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl implements Weblo
    * Returns <code>true</code> if <code>authority</code> represents the same
    * user.
    * 
-   * @see ch.o2it.weblounge.common.security.Authority#equals(ch.o2it.weblounge.common.security.Authority)
+   * @see ch.o2it.weblounge.common.security.Authority#isAuthorizedBy(ch.o2it.weblounge.common.security.Authority)
    */
-  public boolean equals(Authority authority) {
+  public boolean isAuthorizedBy(Authority authority) {
     return authority instanceof WebloungeAdmin;
   }
 

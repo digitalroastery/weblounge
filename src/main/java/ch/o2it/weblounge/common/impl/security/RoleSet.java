@@ -43,7 +43,7 @@ public class RoleSet extends TreeSet<Role> {
   }
 
   /**
-   * Creates an empty roleset that may be used to group an aribtrary set of
+   * Creates an empty roleset that may be used to group an arbitrary set of
    * roles.
    */
   public RoleSet(Role[] roles) {

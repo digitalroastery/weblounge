@@ -92,7 +92,7 @@ public class WebloungeUserImplTest {
   protected Group publisherGroup = new GroupImpl("publisher", "system");
 
   /** Application role */
-  protected Role apprenticeRole = new RoleImpl("apprentice", "myapp");
+  protected Role apprenticeRole = new RoleImpl("myapp", "apprentice");
 
   /**
    * @throws java.lang.Exception
@@ -191,7 +191,7 @@ public class WebloungeUserImplTest {
    */
   @Test
   public void testEqualsObject() {
-    assertTrue(user.equals(user));
+    assertTrue(user.isAuthorizedBy(user));
     assertTrue(user.equals(new UserImpl(login, realm)));
     assertTrue(user.equals(new UserImpl(login, realm)));
     assertFalse(user.equals(new UserImpl(login, "wonderland")));

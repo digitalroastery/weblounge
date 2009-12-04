@@ -20,13 +20,12 @@
 
 package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.page.Composer;
 import ch.o2it.weblounge.common.security.Authority;
+import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.url.Url;
 import ch.o2it.weblounge.common.user.User;
 
 import java.util.ArrayList;
@@ -57,8 +56,7 @@ public abstract class AbstractSecurityContext implements SecurityContext {
   static {
     addAuthorityTypeShortcut(User.class.getName(), "user");
     addAuthorityTypeShortcut(Role.class.getName(), "role");
-    addAuthorityTypeShortcut(Url.class.getName(), "url");
-    addAuthorityTypeShortcut(Composer.class.getName(), "composer");
+    addAuthorityTypeShortcut(Group.class.getName(), "group");
   }
 
   /**
