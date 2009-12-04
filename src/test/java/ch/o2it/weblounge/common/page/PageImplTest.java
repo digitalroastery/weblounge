@@ -502,30 +502,6 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedAtAll()}.
-   */
-  @Test
-  public void testIsModifiedAtAll() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedAtAllAfter(java.util.Date)}.
-   */
-  @Test
-  public void testIsModifiedAtAllAfter() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedAtAllBefore(java.util.Date)}.
-   */
-  @Test
-  public void testIsModifiedAtAllBefore() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModified()}.
    */
   @Test
