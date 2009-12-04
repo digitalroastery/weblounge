@@ -18,20 +18,22 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.security;
+package ch.o2it.weblounge.common.impl.page;
 
+import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
+import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.SystemPermission;
 
 /**
  * Specialized security context for a page. This implementation adds the proper
  * name and default values.
  */
-public class PageSecurityContext extends PermissionSecurityContext {
+public class DefaultPageSecurityContext extends PermissionSecurityContext {
 
   /**
    * Creates a new security context for a page.
    */
-  public PageSecurityContext() {
+  public DefaultPageSecurityContext() {
     addDefaultValues();
   }
 
