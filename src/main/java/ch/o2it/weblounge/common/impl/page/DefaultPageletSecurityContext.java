@@ -25,30 +25,32 @@ import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.SystemPermission;
 
 /**
- * Specialized security context for a pagelet. This implementation adds the proper
- * name and default values.
+ * Specialized security context for a pagelet. This implementation adds the
+ * proper name and default values.
  */
-public class PageletSecurityContextImpl extends PermissionSecurityContext {
+public class DefaultPageletSecurityContext extends PermissionSecurityContext {
 
-	/**
-	 * Creates a new security context for a pagelet with the specified url.
-	 * 
-	 * @param module the pagelet module
-	 * @param id the pagelet id
-	 */
-	public PageletSecurityContextImpl(String module, String id) {
-		addDefaultValues();
-	}
+  /**
+   * Creates a new security context for a pagelet with the specified url.
+   * 
+   * @param module
+   *          the pagelet module
+   * @param id
+   *          the pagelet id
+   */
+  public DefaultPageletSecurityContext(String module, String id) {
+    addDefaultValues();
+  }
 
-	/**
-	 * Adds the default authorities to their respective permissions.
-	 */
-	private void addDefaultValues() {
-		allowDefault(SystemPermission.READ, SystemRole.GUEST);
-		allowDefault(SystemPermission.TRANSLATE, SystemRole.TRANSLATOR);
-		allowDefault(SystemPermission.WRITE, SystemRole.EDITOR);
-		allowDefault(SystemPermission.MANAGE, SystemRole.EDITOR);
-		allowDefault(SystemPermission.PUBLISH, SystemRole.PUBLISHER);
-	}
+  /**
+   * Adds the default authorities to their respective permissions.
+   */
+  private void addDefaultValues() {
+    allowDefault(SystemPermission.READ, SystemRole.GUEST);
+    allowDefault(SystemPermission.TRANSLATE, SystemRole.TRANSLATOR);
+    allowDefault(SystemPermission.WRITE, SystemRole.EDITOR);
+    allowDefault(SystemPermission.MANAGE, SystemRole.EDITOR);
+    allowDefault(SystemPermission.PUBLISH, SystemRole.PUBLISHER);
+  }
 
 }
