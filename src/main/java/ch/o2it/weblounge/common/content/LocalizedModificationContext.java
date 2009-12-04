@@ -21,9 +21,6 @@
 package ch.o2it.weblounge.common.content;
 
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.user.User;
-
-import java.util.Date;
 
 /**
  * This interface defines an object that encapsulates access to creation and
@@ -32,77 +29,14 @@ import java.util.Date;
 public interface LocalizedModificationContext extends LocalizedModifiable, Cloneable {
 
   /**
-   * Sets the date of the last modification of this object in the current
-   * language.
-   * 
-   * @param date
-   *          the modification date
-   */
-  void setModificationDate(Date date);
-
-  /**
-   * Sets the date of the last modification of this object.
-   * 
-   * @param date
-   *          the modification date
-   * @param language
-   *          the language
-   */
-  void setModificationDate(Date date, Language language);
-
-  /**
-   * Sets the user that last modified the object.
-   * 
-   * @param editor
-   *          the modifying user
-   */
-  void setModifier(User editor);
-
-  /**
-   * Sets the user that last modified the object.
-   * 
-   * @param editor
-   *          the modifying user
-   * @param language
-   *          the affected language version
-   */
-  void setModifier(User editor, Language language);
-
-  /**
-   * Sets creator and creation date.
-   * 
-   * @param user
-   *          the user that created the object
-   * @param date
-   *          the date of creation
-   * @param language
-   *          the language version that was modified
-   */
-  void setModified(User user, Date date, Language language);
-
-  /**
-   * Returns the time in milliseconds when the object was last modified.
+   * Returns an XML representation of this context for the specified language.
+   * If there is no modification for the given language, then <code>null</code>
+   * returned.
    * 
    * @param language
-   *          the language
-   * @return the modification time
+   *          the language to consider
+   * @return an XML representation of this context or <code>null</code>
    */
-  Date getModificationDate(Language language);
-
-  /**
-   * Returns the user that last modified the object.
-   * 
-   * @param language
-   *          the language
-   * @return the modifier
-   */
-  User getModifier(Language language);
-
-  /**
-   * Returns an XML representation of this context.
-   * 
-   * @return an XML representation of this context
-   */
-  String toXml();
+  String toXml(Language language);
 
 }

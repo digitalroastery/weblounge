@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.user.User;
 
@@ -32,32 +33,29 @@ import java.util.Date;
 public interface LocalizedModifiable extends Modifiable, Localizable {
 
   /**
-   * Returns <code>true</code> if this context contains information about a
-   * modification to the version identified by <code>language</code>.
-   * 
-   * @return <code>true</code> is this context' language version was modified
-   */
-  boolean isModifiedAtAll();
-
-  /**
-   * Returns <code>true</code> if this context was modified in any language
-   * after the given date.
+   * Returns <code>true</code> if this context was modified in the specified
+   * version after the given date.
    * 
    * @param date
    *          the date to compare to
-   * @return <code>true</code> is this context was modified
+   * @param the
+   *          language version
+   * @return <code>true</code> is this context was modified after the given date
    */
-  boolean isModifiedAtAllAfter(Date date);
+  boolean isModifiedAfter(Date date, Language language);
 
   /**
-   * Returns <code>true</code> if this context was modified in any language
-   * before the given date.
+   * Returns <code>true</code> if this context was modified in the specified
+   * language before the given date.
    * 
    * @param date
    *          the date to compare to
-   * @return <code>true</code> is this context was modified
+   * @param language
+   *          the language variant
+   * @return <code>true</code> is this context was modified before the given
+   *         date
    */
-  boolean isModifiedAtAllBefore(Date date);
+  boolean isModifiedBefore(Date date, Language language);
 
   /**
    * Returns the time in milliseconds when the object was last modified,
@@ -74,5 +72,35 @@ public interface LocalizedModifiable extends Modifiable, Localizable {
    * @return the modifier
    */
   User getLastModifier();
+
+  /**
+   * Sets creator and creation date.
+   * 
+   * @param user
+   *          the user that created the object
+   * @param date
+   *          the date of creation
+   * @param language
+   *          the language version that was modified
+   */
+  void setModified(User user, Date date, Language language);
+
+  /**
+   * Returns the time in milliseconds when the object was last modified.
+   * 
+   * @param language
+   *          the language
+   * @return the modification time
+   */
+  Date getModificationDate(Language language);
+
+  /**
+   * Returns the user that last modified the object.
+   * 
+   * @param language
+   *          the language
+   * @return the modifier
+   */
+  User getModifier(Language language);
 
 }
