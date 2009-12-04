@@ -1,0 +1,14 @@
+<content>
+	<locale language="de" original="true">
+		<modified>
+			<user id="hans" realm="testland">Hans Muster</user>
+			<date>2009/01/07 19:05:41 GMT</date>
+		</modified>
+	</locale>
+	<locale language="fr">
+		<modified>
+			<user id="amelie" realm="testland">Amélie Poulard</user>
+			<date>2009/02/18 21:06:40 GMT</date>
+		</modified>
+	</locale>
+</content>

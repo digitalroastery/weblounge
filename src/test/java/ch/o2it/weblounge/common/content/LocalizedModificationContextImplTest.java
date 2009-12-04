@@ -20,21 +20,72 @@
 
 package ch.o2it.weblounge.common.content;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
+import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.user.User;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
+import java.util.Locale;
+
 /**
- * TODO: Comment LocalizedModificationContextImplTest
+ * Test case for the implementation of {@link LocalizedModificationContextImpl}.
  */
 public class LocalizedModificationContextImplTest {
+
+  /** Default test instance */
+  protected LocalizedModificationContextImpl ctx = null;
+
+  /** Test context with an initial date only */
+  protected LocalizedModificationContextImpl ctxWithModifier = null;
+
+  /** The German language */
+  protected Language german = new LanguageImpl(new Locale("de"));
+
+  /** The French language */
+  protected Language french = new LanguageImpl(new Locale("fr"));
+
+  /** Content creation date */
+  protected Date creationDate = new Date(1000000000000L);
+
+  /** German modification date */
+  protected Date germanModifcationDate = new Date(1231355141000L);
+
+  /** French modification date */
+  protected Date frenchModifcationDate = new Date(1234991200000L);
+
+  /** Some date after the latest modification date */
+  protected Date futureDate = new Date(2000000000000L);
+
+  /** One day after the date identified by futureDate */
+  protected Date dayAfterFutureDate = new Date(futureDate.getTime() + Times.MS_PER_DAY);
+  
+  /** One day before the date identified by futureDate */
+  protected Date dayBeforeFutureDate = new Date(2000000000000L - Times.MS_PER_DAY);
+
+  /** German modifier */
+  protected User hans = new UserImpl("hans", "testland", "Hans Muster");
+
+  /** French modifier */
+  protected User amelie = new UserImpl("amelie", "testland", "Amélie Poulard");
 
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
+    ctx = new LocalizedModificationContextImpl();
+    ctx.setModified(hans, germanModifcationDate, german);
+    ctx.setModified(amelie, frenchModifcationDate, french);
   }
 
   /**
@@ -42,7 +93,13 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testGetModificationDate() {
-    fail("Not yet implemented"); // TODO
+    // Test behavior if no language is set
+    assertEquals(frenchModifcationDate, ctx.getModificationDate());
+
+    // Now switch to specific language version
+    ctx.enableLanguage(german);
+    ctx.switchTo(german);
+    assertEquals(germanModifcationDate, ctx.getModificationDate());
   }
 
   /**
@@ -50,7 +107,8 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testGetModificationDateLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(germanModifcationDate, ctx.getModificationDate(german));
+    assertEquals(frenchModifcationDate, ctx.getModificationDate(french));
   }
 
   /**
@@ -58,7 +116,13 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testGetModifier() {
-    fail("Not yet implemented"); // TODO
+    // Test behavior if no language is set
+    assertEquals(amelie, ctx.getModifier());
+
+    // Now switch to specific language version
+    ctx.enableLanguage(german);
+    ctx.switchTo(german);
+    assertEquals(hans, ctx.getModifier());
   }
 
   /**
@@ -66,7 +130,8 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testGetModifierLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(hans, ctx.getModifier(german));
+    assertEquals(amelie, ctx.getModifier(french));
   }
 
   /**
@@ -74,7 +139,7 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testIsModified() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(ctx.isModified());
   }
 
   /**
@@ -82,15 +147,16 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testIsModifiedAfter() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(ctx.isModifiedAfter(creationDate));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedAtAllAfter(java.util.Date)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedAfter(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
-  public void testIsModifiedAtAllAfter() {
-    fail("Not yet implemented"); // TODO
+  public void testIsModifiedAfterLanguage() {
+    assertTrue(ctx.isModifiedAfter(creationDate, german));
+    assertTrue(ctx.isModifiedAfter(creationDate, french));
   }
 
   /**
@@ -98,47 +164,16 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testIsModifiedBefore() {
-    fail("Not yet implemented"); // TODO
+    assertFalse(ctx.isModifiedBefore(creationDate));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedAtAllBefore(java.util.Date)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedBefore(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
-  public void testIsModifiedAtAllBefore() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#setModificationDate(java.util.Date)}.
-   */
-  @Test
-  public void testSetModificationDateDate() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#setModifier(ch.o2it.weblounge.common.user.User)}.
-   */
-  @Test
-  public void testSetModifierUser() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#setModificationDate(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testSetModificationDateDateLanguage() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#setModifier(ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testSetModifierUserLanguage() {
-    fail("Not yet implemented"); // TODO
+  public void testIsModifiedBeforeLanguage() {
+    assertTrue(ctx.isModifiedBefore(futureDate, german));
+    assertTrue(ctx.isModifiedBefore(futureDate, french));
   }
 
   /**
@@ -146,7 +181,13 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testSetModified() {
-    fail("Not yet implemented"); // TODO
+    ctx.setModified(hans, futureDate, german);
+    assertTrue(ctx.isModifiedBefore(dayAfterFutureDate));
+    assertTrue(ctx.isModifiedBefore(dayAfterFutureDate, german));
+    assertTrue(ctx.isModifiedAfter(dayBeforeFutureDate));
+    assertTrue(ctx.isModifiedAfter(dayBeforeFutureDate, german));
+    assertTrue(ctx.isModifiedBefore(dayAfterFutureDate, french));
+    assertFalse(ctx.isModifiedAfter(dayBeforeFutureDate, french));
   }
 
   /**
@@ -154,7 +195,7 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testGetLastModificationDate() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(frenchModifcationDate, ctx.getLastModificationDate());
   }
 
   /**
@@ -162,23 +203,7 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testGetLastModifier() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedAtAll()}.
-   */
-  @Test
-  public void testIsModifiedAtAll() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#switchedTo(ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testSwitchedTo() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(amelie, ctx.getLastModifier());
   }
 
   /**
@@ -186,23 +211,13 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testClone() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#init(javax.xml.xpath.XPath, org.w3c.dom.Node, ch.o2it.weblounge.common.site.Site)}.
-   */
-  @Test
-  public void testInit() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#toXml()}.
-   */
-  @Test
-  public void testToXml() {
-    fail("Not yet implemented"); // TODO
+    LocalizedModificationContext c = ctx.clone();
+    assertEquals(hans, c.getModifier(german));
+    assertEquals(germanModifcationDate, c.getModificationDate(german));
+    assertEquals(amelie, c.getModifier(french));
+    assertEquals(frenchModifcationDate, c.getModificationDate(french));
+    assertEquals(ctx.getLastModifier(), c.getLastModifier());
+    assertEquals(ctx.getLastModificationDate(), c.getLastModificationDate());
   }
 
 }
