@@ -41,7 +41,7 @@ public class PageletLocationImpl implements PageletLocation {
 	
 	/**
 	 * Creates a new <code>PageletLocationImpl</code> with the given url,
-	 * comoser and position.
+	 * composer and position.
 	 *
 	 *@param uri the pagelet's url
 	 *@param composer the pagelet's composer
@@ -134,4 +134,13 @@ public class PageletLocationImpl implements PageletLocation {
     return Integer.valueOf(position_).compareTo(Integer.valueOf(l.getPosition()));
   }
 	
+  /**
+   * {@inheritDoc}
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return uri_ + " [composer=" + composer_ + ",position=" + position_ + "]";
+  }
+  
 }

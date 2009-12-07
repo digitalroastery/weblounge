@@ -47,7 +47,7 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Default implementation of the localized modification context.
  */
-public class LocalizedModificationContextImpl extends LocalizableObject implements LocalizedModificationContext {
+public class LocalizedModificationContextImpl extends LocalizableObject implements ModificationContext, LocalizedModificationContext {
 
   /** The last modifier */
   protected transient User lastModifier = null;
@@ -425,6 +425,40 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
       return getModificationDate().compareTo(((ModificationContext) o).getModificationDate());
     }
     return 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.ModificationContext#setModificationDate(java.util.Date)
+   */
+  public void setModificationDate(Date date) {
+    Modification modification = modifications.get(getLanguage());
+    if (modification == null) {
+      modification = new Modification();
+      modifications.put(getLanguage(), modification);
+    }
+    modification.setDate(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.user.User)
+   */
+  public void setModifier(User user) {
+    Modification modification = modifications.get(getLanguage());
+    if (modification == null) {
+      modification = new Modification();
+      modifications.put(getLanguage(), modification);
+    }
+    modification.setUser(user);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.ModificationContext#toXml()
+   */
+  public String toXml() {
+    throw new UnsupportedOperationException("XML can only be generated per language");
   }
 
 }

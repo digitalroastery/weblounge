@@ -25,15 +25,15 @@ import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.SystemPermission;
 
 /**
- * Specialized security context for a page. This implementation adds the proper
- * name and default values.
+ * Specialized security context for a pagelet. This implementation adds the
+ * proper name and default values.
  */
-public class DefaultPageSecurityContext extends PermissionSecurityContext {
+public class PageletSecurityContext extends PermissionSecurityContext {
 
   /**
-   * Creates a new security context for a page.
+   * Creates a new security context for a pagelet with the specified url.
    */
-  public DefaultPageSecurityContext() {
+  public PageletSecurityContext() {
     addDefaultValues();
   }
 

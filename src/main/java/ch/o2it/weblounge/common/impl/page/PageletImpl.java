@@ -23,10 +23,8 @@ package ch.o2it.weblounge.common.impl.page;
 import ch.o2it.weblounge.common.content.CreationContext;
 import ch.o2it.weblounge.common.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.content.ModificationContext;
-import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
-import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
@@ -101,14 +99,11 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /** The security context */
   PermissionSecurityContext securityCtx = null;
 
-  /** The publishing context */
-  PublishingContext publishingCtx = null;
-
   /** The creation context */
-  CreationContext creationCtx = null;
+  CreationContextImpl creationCtx = null;
 
   /** The modification context */
-  LocalizedModificationContext modificationCtx = null;
+  LocalizedModificationContextImpl modificationCtx = null;
 
   /** The pagelet properties */
   Map<String, String[]> properties = null;
@@ -120,6 +115,18 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   LocalizableContent<String> name = null;
 
   /**
+   * Creates an empty pagelet. This constructor is for use with a
+   * {@link PageletReader} only.
+   */
+  PageletImpl() {
+    properties = new HashMap<String, String[]>();
+    creationCtx = new CreationContextImpl();
+    modificationCtx = new LocalizedModificationContextImpl();
+    securityCtx = new PageletSecurityContext();
+    content = new LocalizableContent<Map<String, String[]>>(this);
+  }
+
+  /**
    * Creates a new pagelet data holder.
    * 
    * @param module
@@ -128,14 +135,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *          the pagelet identifier
    */
   public PageletImpl(String module, String id) {
+    this();
     moduleId_ = module;
     id_ = id;
-    properties = new HashMap<String, String[]>();
-    creationCtx = new CreationContextImpl();
-    modificationCtx = new LocalizedModificationContextImpl();
-    publishingCtx = new PublishingContextImpl();
-    securityCtx = new DefaultPageletSecurityContext(module, id);
-    content = new LocalizableContent<Map<String, String[]>>(this);
   }
 
   /**
@@ -257,65 +259,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public User getOwner() {
     return securityCtx.getOwner();
-  }
-
-  /**
-   * Returns the publishing context that is associated with this pagelet. The
-   * context tells whether the pagelet may be published on a certain point in
-   * time or not.
-   * 
-   * @return the pagelet's publishing context
-   */
-  public PublishingContext getPublishingContext() {
-    return publishingCtx;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
-   */
-  public User getPublisher() {
-    return publishingCtx.getPublisher();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
-   */
-  public Date getPublishFrom() {
-    return publishingCtx.getPublishFrom();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
-   */
-  public Date getPublishTo() {
-    return publishingCtx.getPublishTo();
-  }
-
-  /**
-   * Returns <code>true</code> if the pagelet may be published. The output of
-   * this method depends on the <code>check</code> method of the
-   * <code>PublishingContext</code>.
-   * 
-   * @return <code>true</code> if the page may be published
-   * @see #getPublishingContext()
-   */
-  public boolean isPublished() {
-    return publishingCtx.isPublished();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
-   */
-  public boolean isPublished(Date date) {
-    return publishingCtx.isPublished(date);
   }
 
   /**
@@ -455,6 +398,16 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreated(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
+   */
+  public void setCreated(User creator, Date creationDate) {
+    creationCtx.setCreated(creator, creationDate);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
    */
   public Date getCreationDate() {
@@ -571,6 +524,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
    */
   public Date getModificationDate(Language language) {
@@ -579,6 +533,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier(ch.o2it.weblounge.common.language.Language)
    */
   public User getModifier(Language language) {
@@ -587,7 +542,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#setModified(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
     modificationCtx.setModified(user, date, language);
@@ -613,9 +570,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
     // Add root node
     b.append("<pagelet module=\"" + moduleId_ + "\" id=\"" + id_ + "\">");
-
-    // export publishing context
-    b.append(publishingCtx.toXml());
 
     // export security context
     b.append(securityCtx.toXml());

@@ -73,6 +73,17 @@ public class CreationContextImpl implements CreationContext {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.CreationContext#setCreated(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
+   */
+  public void setCreated(User user, Date date) {
+    this.creator = user;
+    this.creationDate = date;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.impl.content.CreationContext#setCreationDate(java.util.Date)
    */
   public void setCreationDate(Date date) {
@@ -105,9 +116,9 @@ public class CreationContextImpl implements CreationContext {
   public Object clone() {
     CreationContextImpl ctxt = new CreationContextImpl();
     if (creator != null)
-      ctxt.creator = (User)creator.clone();
+      ctxt.creator = (User) creator.clone();
     if (creationDate != null)
-    ctxt.creationDate = (Date)creationDate.clone();
+      ctxt.creationDate = (Date) creationDate.clone();
     return ctxt;
   }
 
@@ -143,12 +154,12 @@ public class CreationContextImpl implements CreationContext {
       return null;
 
     CreationContextImpl ctx = new CreationContextImpl();
-    
+
     // Creator
     Node creator = XPathHelper.select(contextRoot, "//created/user", xpathProcessor);
     if (creator != null)
       ctx.setCreator(UserImpl.fromXml(creator, xpathProcessor));
-    
+
     // Creation date
     String date = XPathHelper.valueOf(contextRoot, "//created/date", xpathProcessor);
     if (date != null)

@@ -20,9 +20,12 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
+import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.PageManager;
 import ch.o2it.weblounge.common.page.PageletLocation;
+import ch.o2it.weblounge.common.security.Authority;
+import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
@@ -42,7 +45,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse page data.
  */
-public final class PageReader extends GeneralContentReader {
+public final class PageReader extends WebloungeContentReader {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(PageReader.class);
@@ -113,6 +116,51 @@ public final class PageReader extends GeneralContentReader {
     SAXParserFactory factory = SAXParserFactory.newInstance();
     factory.newSAXParser().parse(is, this);
     return page_;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#allow(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority)
+   */
+  @Override
+  protected void allow(Permission permission, Authority authority) {
+    page_.securityCtx.allow(permission, authority);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setCreated(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
+   */
+  @Override
+  protected void setCreated(User user, Date date) {
+    // TODO Auto-generated method stub
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setModified(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
+   */
+  @Override
+  protected void setModified(User modifier, Date date) {
+    // TODO:
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setPublish(java.util.Date,
+   *      java.util.Date)
+   */
+  @Override
+  protected void setPublish(Date startDate, Date endDate) {
+    page_.publishingCtx.setPublishFrom(startDate);
+    page_.publishingCtx.setPublishTo(endDate);
   }
 
   /**
@@ -246,24 +294,6 @@ public final class PageReader extends GeneralContentReader {
       isHeadline_ = false;
     }
 
-    // Security
-    else if (contentReaderContext == CTXT_SECURITY && "security".equals(raw)) {
-      if (pagelet_ != null) {
-        pagelet_.securityCtx = getSecurityContext();
-      } else {
-        page_.securityCtx = getSecurityContext();
-      }
-    }
-
-    // Publishing
-    else if (contentReaderContext == CTXT_PUBLISH && "publish".equals(raw)) {
-      if (pagelet_ != null) {
-        pagelet_.publishingCtx = getPublishingContext();
-      } else {
-        page_.publishingCtx = getPublishingContext();
-      }
-    }
-
     // Template
     else if (context_.equals(ParserContext.Head) && "template".equals(raw)) {
       page_.template = characters.toString();
@@ -305,7 +335,7 @@ public final class PageReader extends GeneralContentReader {
       String id = (String) clipboard.get("property.id");
       pagelet_.setProperty(id, characters.toString());
     }
-    
+
     else if (context_.equals(ParserContext.Head) && "head".equals(raw))
       context_ = ParserContext.Page;
 
@@ -314,90 +344,11 @@ public final class PageReader extends GeneralContentReader {
 
     else if (context_.equals(ParserContext.Head) && "composer".equals(raw))
       context_ = ParserContext.Body;
-    
+
     else if (context_.equals(ParserContext.Head) && "pagelet".equals(raw))
       context_ = ParserContext.Composer;
 
     super.endElement(uri, local, raw);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * ch.o2it.weblounge.core.content.GeneralContentReader#addKeyword(java.lang
-   * .String)
-   */
-  protected void addKeyword(String keyword) {
-    super.addKeyword(keyword);
-    page_.addKeyword(keyword);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * ch.o2it.weblounge.core.content.GeneralContentReader#setModificationDate
-   * (java.util.Date)
-   */
-  protected void setModified(User user, Date date, Language language) {
-    switch (context_) {
-      case Page:
-        page_.setModified(user, date, language);
-        break;
-      case Pagelet:
-        pagelet_.setModified(user, date, language);
-        break;
-      default:
-        break;
-    }
-    super.setModifiedBy(user);
-    super.setModificationDate(date);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * ch.o2it.weblounge.core.content.GeneralContentReader#setOwner(ch.o2it.weblounge
-   * .api.staff.User)
-   */
-  protected void setOwner(User user) {
-    switch (context_) {
-      case Page:
-        page_.securityCtx.setOwner(user);
-        break;
-      case Pagelet:
-        pagelet_.securityCtx.setOwner(user);
-        break;
-      default:
-        break;
-    }
-    super.setModifiedBy(user);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * ch.o2it.weblounge.core.content.GeneralContentReader#setType(java.lang.String
-   * )
-   */
-  protected void setType(String type) {
-    page_.type = characters.toString();
-    super.setType(type);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * ch.o2it.weblounge.core.content.GeneralContentReader#setOriginalLanguage
-   * (ch.o2it.weblounge.api.language.Language)
-   */
-  protected void setOriginalLanguage(Language language) {
-    pagelet_.setOriginalLanguage(language);
-    super.setOriginalLanguage(language);
   }
 
   /**

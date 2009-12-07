@@ -132,7 +132,7 @@ public class PageImpl extends LocalizableObject implements Page {
     this.creationCtx = new CreationContextImpl();
     this.modificationCtx = new LocalizedModificationContextImpl();
     this.publishingCtx = new PublishingContextImpl();
-    this.securityCtx = new DefaultPageSecurityContext();
+    this.securityCtx = new PageSecurityContext();
     this.keywords_ = new ArrayList<String>();
     this.headlines = new ArrayList<Pagelet>();
     this.title = new LocalizableContent<String>(this);
@@ -574,6 +574,16 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public CreationContext getCreationContext() {
     return creationCtx;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreated(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
+   */
+  public void setCreated(User creator, Date creationDate) {
+    creationCtx.setCreated(creator, creationDate);
   }
 
   /**
