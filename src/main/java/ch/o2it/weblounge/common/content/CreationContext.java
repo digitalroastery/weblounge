@@ -50,6 +50,16 @@ public interface CreationContext extends Cloneable {
   void setCreator(User user);
 
   /**
+   * Sets the creation date and user.
+   * 
+   * @param user
+   *          the user that created the object
+   * @param date
+   *          the date of creation
+   */
+  void setCreated(User user, Date date);
+
+  /**
    * @see ch.o2it.weblounge.common.content.CreationContext#isCreatedAfter(java.util.Date)
    */
   boolean isCreatedAfter(Date date);

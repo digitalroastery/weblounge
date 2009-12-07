@@ -55,4 +55,14 @@ public interface Creatable {
    */
   boolean isCreatedAfter(Date date);
 
+  /**
+   * Sets the creation date and the user who created the object.
+   * 
+   * @param creator
+   *          the user creating the object
+   * @param creationDate
+   *          the date of creation
+   */
+  void setCreated(User creator, Date creationDate);
+
 }

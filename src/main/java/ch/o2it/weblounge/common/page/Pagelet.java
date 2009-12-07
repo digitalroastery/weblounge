@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.page;
 
 import ch.o2it.weblounge.common.content.Creatable;
 import ch.o2it.weblounge.common.content.LocalizedModifiable;
-import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.security.Permission;
@@ -54,7 +53,7 @@ import org.w3c.dom.Node;
  * 	&lt;/pagelet&gt;
  * </pre>
  */
-public interface Pagelet extends Localizable, Creatable, LocalizedModifiable, Publishable, Securable {
+public interface Pagelet extends Localizable, Creatable, LocalizedModifiable, Securable {
 
   /** Pagelet identifier in request */
   static final String ID = "pagelet";
