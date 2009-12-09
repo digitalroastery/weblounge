@@ -29,8 +29,6 @@ import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
 
-import org.w3c.dom.Node;
-
 /**
  * A page element is a piece of content, placed somewhere on a page. Depending
  * on the composer that created it, it consists of multiple elements and
@@ -85,6 +83,17 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   String getIdentifier();
 
   /**
+   * Adds a property to this pagelet. Properties are not language dependent, so
+   * there is no need to pass the language.
+   * 
+   * @param key
+   *          the property name
+   * @param value
+   *          the property value
+   */
+  void setProperty(String key, String value);
+
+  /**
    * Returns the property with name <code>key</code> or the empty string if no
    * such property is found.
    * 
@@ -106,7 +115,7 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   /**
    * Returns the array of values for the multivalue property <code>key</code>.
    * This method returns <code>null</code> if no value has been stored at all
-   * for the given key, a single element string array if there is excactly one
+   * for the given key, a single element string array if there is exactly one
    * string and an array of strings of all values in all other cases.
    * 
    * @param key
@@ -114,6 +123,17 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * @return the value collection
    */
   String[] getMultiValueProperty(String key);
+
+  /**
+   * Sets the pagelet's content in the given language. If the content identified
+   * by <code>name</code> has already been assigned, then the content element is
+   * being converted into a multiple value content element.
+   * 
+   * @see ch.o2it.weblounge.core.language.MultilingualObject#setContent(java.lang.String,
+   *      java.lang.Object, ch.o2it.weblounge.api.language.Language)
+   * @see #isMultiValueContent(String)
+   */
+  void setContent(String name, String value, Language language);
 
   /**
    * Returns <code>true</code> if this content element holds more than one
@@ -220,6 +240,6 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * 
    * @return an XML representation of this pagelet
    */
-  Node toXml();
+  String toXml();
 
 }

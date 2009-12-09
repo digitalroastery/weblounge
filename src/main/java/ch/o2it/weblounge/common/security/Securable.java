@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.user.User;
 
-
 /**
  * The <code>Secured</code> interface defines the required methods for a secured
  * object.
@@ -30,11 +29,45 @@ import ch.o2it.weblounge.common.user.User;
 public interface Securable {
 
   /**
+   * Sets the pagelet's owner.
+   * 
+   * @param owner
+   *          the owner of this pagelet
+   */
+  void setOwner(User owner);
+
+  /**
    * Returns the owner of this object.
    * 
    * @return the owner
    */
   User getOwner();
+
+  /**
+   * Adds <code>authority</code> to the authorized authorities regarding the
+   * given permission.
+   * <p>
+   * <b>Note:</b> Calling this method replaces any default authorities on the
+   * given permission, so if you want to keep them, add them here explicitly.
+   * 
+   * @param permission
+   *          the permission
+   * @param authority
+   *          the item that is allowed to obtain the permission
+   */
+  void allow(Permission permission, Authority authority);
+
+  /**
+   * Removes <code>authority</code> from the denied authorities regarding the
+   * given permission. This method will remove the authority from both the
+   * explicitly allowed and the default authorities.
+   * 
+   * @param permission
+   *          the permission
+   * @param authority
+   *          the authorization to deny
+   */
+  void deny(Permission permission, Authority authority);
 
   /**
    * Checks whether the authorization satisfy the constraints of this context on
