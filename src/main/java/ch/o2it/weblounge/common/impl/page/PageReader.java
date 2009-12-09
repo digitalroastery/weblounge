@@ -154,11 +154,12 @@ public final class PageReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setPublish(java.util.Date,
-   *      java.util.Date)
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setPublished(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, java.util.Date)
    */
   @Override
-  protected void setPublish(Date startDate, Date endDate) {
+  protected void setPublished(User publisher, Date startDate, Date endDate) {
+    page_.publishingCtx.setPublisher(publisher);
     page_.publishingCtx.setPublishFrom(startDate);
     page_.publishingCtx.setPublishTo(endDate);
   }

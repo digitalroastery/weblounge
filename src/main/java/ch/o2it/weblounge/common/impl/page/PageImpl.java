@@ -210,10 +210,28 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.Publishable#setPublisher(ch.o2it.weblounge.common.user.User)
+   */
+  public void setPublisher(User user) {
+    publishingCtx.setPublisher(user);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
    */
   public User getPublisher() {
     return publishingCtx.getPublisher();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#setPublishFrom(java.util.Date)
+   */
+  public void setPublishFrom(Date from) {
+    publishingCtx.setPublishFrom(from);
   }
 
   /**
@@ -223,6 +241,15 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public Date getPublishFrom() {
     return publishingCtx.getPublishFrom();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#setPublishTo(java.util.Date)
+   */
+  public void setPublishTo(Date to) {
+    publishingCtx.setPublishFrom(to);
   }
 
   /**
@@ -623,24 +650,6 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * Returns the modification date of the page.
-   * 
-   * @return the modification date
-   */
-  public Date getModifiedSince() {
-    return modificationCtx.getModificationDate();
-  }
-
-  /**
-   * Returns the modification user of the page.
-   * 
-   * @return the modification date
-   */
-  public User getModifiedBy() {
-    return modificationCtx.getModifier();
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
@@ -723,6 +732,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
    */
   public Date getModificationDate(Language language) {
@@ -731,6 +741,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier(ch.o2it.weblounge.common.language.Language)
    */
   public User getModifier(Language language) {
@@ -739,7 +750,9 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#setModified(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
     modificationCtx.setModified(user, date, language);

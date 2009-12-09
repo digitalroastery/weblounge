@@ -64,8 +64,10 @@ public abstract class WebloungeContentReader extends DefaultHandler {
   protected StringBuffer characters = null;
 
   /** Parser context */
-  protected enum Context { Unknown, Security, Creation, Modification, Publish, Content };
-  
+  protected enum Context {
+    Unknown, Security, Creation, Modification, Publish, Content
+  };
+
   /** The initial parser context */
   protected Context contentReaderContext = Context.Unknown;
 
@@ -127,12 +129,15 @@ public abstract class WebloungeContentReader extends DefaultHandler {
   /**
    * This method is called when the date of publication is read in.
    * 
+   * @param publisher
+   *          the user who published the resource
    * @param startDate
    *          the start date of publication
    * @param endDate
    *          the end date of publication
    */
-  protected abstract void setPublish(Date startDate, Date endDate);
+  protected abstract void setPublished(User publisher, Date startDate,
+      Date endDate);
 
   /**
    * The parser found the start of an element. Information about this element as
@@ -164,8 +169,8 @@ public abstract class WebloungeContentReader extends DefaultHandler {
     else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
       String id = attrs.getValue("id");
       String type = attrs.getValue("type");
-      //clipboard.put("id", id);
-      //clipboard.put("type", type);
+      // clipboard.put("id", id);
+      // clipboard.put("type", type);
     }
 
     // creation context
@@ -181,7 +186,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
     }
 
     // publishing context
-    else if ("publish".equals(raw)) {
+    else if ("published".equals(raw)) {
       contentReaderContext = Context.Publish;
       return;
     }
@@ -205,47 +210,47 @@ public abstract class WebloungeContentReader extends DefaultHandler {
     if ("user".equals(raw)) {
       String login = (String) clipboard.get("user");
       String realm = (String) clipboard.get("realm");
-      String name = characters.toString();
+      String name = getCharacters();
       User user = new UserImpl(login, realm, name);
       clipboard.put("user", user);
     }
-    
+
     // date
     else if ("date".equals(raw)) {
       try {
-        Date d = dateFormat.parse(characters.toString());
+        Date d = dateFormat.parse(getCharacters());
         clipboard.put("date", d);
       } catch (Exception e) {
-        throw new IllegalStateException("Reading in date " + characters + " failed: '" + characters.toString() + "'");
+        throw new IllegalStateException("Reading in date " + characters + " failed: '" + getCharacters() + "'");
       }
     }
 
     // publishing start date
     else if (contentReaderContext == Context.Publish && "from".equals(raw)) {
       try {
-        Date d = dateFormat.parse(characters.toString());
+        Date d = dateFormat.parse(getCharacters());
         clipboard.put("publish.start", d);
       } catch (Exception e) {
-        throw new IllegalStateException("Reading publishing start date failed: '" + characters.toString() + "'");
+        throw new IllegalStateException("Reading publishing start date failed: '" + getCharacters() + "'");
       }
     }
 
     // publishing end date
     else if (contentReaderContext == Context.Publish && "to".equals(raw)) {
       try {
-        Date d = dateFormat.parse(characters.toString());
+        Date d = dateFormat.parse(getCharacters());
         clipboard.put("publish.end", d);
       } catch (Exception e) {
-        throw new IllegalStateException("Reading publishing end date failed: '" + characters.toString() + "'");
+        throw new IllegalStateException("Reading publishing end date failed: '" + getCharacters() + "'");
       }
     }
 
     // created
-    else if (contentReaderContext == Context.Security && "created".equals(raw)) {
-      User owner = (User)clipboard.get("user");
+    else if (contentReaderContext == Context.Creation && "created".equals(raw)) {
+      User owner = (User) clipboard.get("user");
       if (owner == null)
         throw new IllegalStateException("Creator not found");
-      Date date = (Date)clipboard.get("date");
+      Date date = (Date) clipboard.get("date");
       if (date == null)
         throw new IllegalStateException("Creation date not found");
       setCreated(owner, date);
@@ -254,10 +259,10 @@ public abstract class WebloungeContentReader extends DefaultHandler {
 
     // modified
     else if (contentReaderContext == Context.Modification && "modified".equals(raw)) {
-      User modifier = (User)clipboard.get("user");
+      User modifier = (User) clipboard.get("user");
       if (modifier == null)
         throw new IllegalStateException("Modifier not found");
-      Date date = (Date)clipboard.get("date");
+      Date date = (Date) clipboard.get("date");
       if (date == null)
         throw new IllegalStateException("Modification date not found");
       setModified(modifier, date);
@@ -266,13 +271,16 @@ public abstract class WebloungeContentReader extends DefaultHandler {
 
     // published
     else if (contentReaderContext == Context.Publish && "published".equals(raw)) {
-      Date startDate = (Date)clipboard.get("publish.start");
+      User publisher = (User) clipboard.get("user");
+      if (publisher == null)
+        throw new IllegalStateException("Publisher not found");
+      Date startDate = (Date) clipboard.get("publish.start");
       if (startDate == null)
         throw new IllegalStateException("Publication start date not found");
-      Date endDate = (Date)clipboard.get("publish.start");
+      Date endDate = (Date) clipboard.get("publish.start");
       if (endDate == null)
         throw new IllegalStateException("Publication end date not found");
-      setPublish(startDate, endDate);
+      setPublished(publisher, startDate, endDate);
       contentReaderContext = Context.Unknown;
     }
 
@@ -283,7 +291,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
       String type = (String) clipboard.get("type");
       if (type != null) {
         type = AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
-        StringTokenizer tok = new StringTokenizer(characters.toString(), " ,;");
+        StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");
         while (tok.hasMoreTokens()) {
           String authorityId = tok.nextToken();
           Authority authority = new AuthorityImpl(type, authorityId);
@@ -297,6 +305,13 @@ public abstract class WebloungeContentReader extends DefaultHandler {
       contentReaderContext = Context.Unknown;
     }
 
+  }
+
+  /**
+   * Returns the trimmed contents of the characters buffer.
+   */
+  protected String getCharacters() {
+    return characters.toString().trim();
   }
 
   /**

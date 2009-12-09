@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
@@ -102,6 +103,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /** The creation context */
   CreationContextImpl creationCtx = null;
 
+  /** The publishing context */
+  PublishingContextImpl publishingCtx = null;
+
   /** The modification context */
   LocalizedModificationContextImpl modificationCtx = null;
 
@@ -121,6 +125,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   PageletImpl() {
     properties = new HashMap<String, String[]>();
     creationCtx = new CreationContextImpl();
+    publishingCtx = new PublishingContextImpl();
     modificationCtx = new LocalizedModificationContextImpl();
     securityCtx = new PageletSecurityContext();
     content = new LocalizableContent<Map<String, String[]>>(this);
@@ -259,15 +264,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public User getOwner() {
     return securityCtx.getOwner();
-  }
-
-  /**
-   * Returns the identifier of the renderer used to render this pagelet.
-   * 
-   * @return the pagelet's renderer
-   */
-  public String getRenderer() {
-    return id_;
   }
 
   /**
@@ -433,6 +429,70 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
+   */
+  public Date getPublishFrom() {
+    return publishingCtx.getPublishFrom();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
+   */
+  public Date getPublishTo() {
+    return publishingCtx.getPublishTo();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
+   */
+  public User getPublisher() {
+    return publishingCtx.getPublisher();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
+   */
+  public boolean isPublished() {
+    return publishingCtx.isPublished();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
+   */
+  public boolean isPublished(Date date) {
+    return publishingCtx.isPublished(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#setPublishFrom(java.util.Date)
+   */
+  public void setPublishFrom(Date from) {
+    publishingCtx.setPublishFrom(from);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#setPublishTo(java.util.Date)
+   */
+  public void setPublishTo(Date to) {
+    publishingCtx.setPublishTo(to);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.content.Publishable#setPublisher(ch.o2it.weblounge.common.user.User)
+   */
+  public void setPublisher(User user) {
+    publishingCtx.setPublisher(user);
+  }
+
+  /**
    * Returns the pagelet's {@link ModificationContext}.
    * 
    * @return the modification context
@@ -574,9 +634,12 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     // export security context
     b.append(securityCtx.toXml());
 
+    // export creation context
+    b.append(creationCtx.toXml());
+    
     // export content
     for (Language l : languages) {
-      b.append("<content language=\"");
+      b.append("<locale language=\"");
       b.append(l.getIdentifier());
       b.append("\"");
       if (l.equals(getOriginalLanguage()))
@@ -601,21 +664,16 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
       // export content
       Map<String, String[]> textualContent = content.get(l);
-      if (textualContent.size() == 0) {
-        b.append("<content/>");
-      } else {
-        b.append("<content>");
-        for (Map.Entry<String, String[]> e : textualContent.entrySet()) {
-          for (String value : e.getValue()) {
-            b.append("<text id=\"");
-            b.append(e.getKey());
-            b.append("\"><![CDATA[");
-            b.append(value);
-            b.append("]]></text>");
-          }
+      for (Map.Entry<String, String[]> e : textualContent.entrySet()) {
+        for (String value : e.getValue()) {
+          b.append("<text id=\"");
+          b.append(e.getKey());
+          b.append("\"><![CDATA[");
+          b.append(value);
+          b.append("]]></text>");
         }
-        b.append("</content>");
       }
+      b.append("</locale>");
     }
 
     // export properties
@@ -634,7 +692,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       }
       b.append("</properties>");
     }
-
+    
     b.append("</pagelet>");
 
     try {
@@ -741,7 +799,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       boolean force) {
     Map<String, String[]> languageContent = content.get(language, force);
     if (languageContent == null)
-      return null;
+      return new String[] {};
+    else if (languageContent.get(name) == null)
+      return new String[] {};
     return languageContent.get(name);
   }
 
@@ -790,6 +850,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     if (languageContent == null) {
       languageContent = new HashMap<String, String[]>();
       content.put(languageContent, language);
+      enableLanguage(language);
     }
     List<String> values = new ArrayList<String>();
     String[] existing = languageContent.remove(name);
@@ -832,12 +893,23 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * <p>
+   * This implementation does nothing, since it doesn't make sense to compare
+   * the pagelet due with respect to its language. If <code>o</code> is a
+   * pagelet as well, then the {@link PageletLocation} is used for the
+   * comparison.
    * 
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
    *      ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.page.PageletLocation#compareTo(PageletLocation)
    */
   public int compareTo(Localizable o, Language l) {
-    return name.compareTo(o, l);
+    if (location_ != null && o instanceof Pagelet) {
+      Pagelet p = (Pagelet)o;
+      if (p.getLocation() != null)
+        return location_.compareTo(p.getLocation());
+    }
+    return 0;
   }
 
 }

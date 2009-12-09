@@ -139,7 +139,7 @@ public final class PageletReader extends WebloungeContentReader {
       clipboard.put("language", l);
     }
 
-    // element
+    // text
     else if ("text".equals(raw)) {
       clipboard.put("text.id", attrs.getValue("id"));
     }
@@ -158,26 +158,26 @@ public final class PageletReader extends WebloungeContentReader {
   public void endElement(String uri, String local, String raw)
       throws SAXException {
 
-    // Pagelet
+    // pagelet
     if ("pagelet".equals(raw)) {
       log_.debug("Finished reading pagelet " + pagelet);
     }
 
-    // Text
+    // text
     else if ("text".equals(raw)) {
       String id = (String) clipboard.get("text.id");
       Language l = (Language) clipboard.get("language");
-      pagelet.setContent(id, characters.toString(), l);
+      pagelet.setContent(id, getCharacters(), l);
       if (log_.isTraceEnabled())
-        log_.trace("Adding " + l.toString().toLowerCase() + " text '" + characters.toString() + "'");
+        log_.trace("Adding " + l.toString().toLowerCase() + " text '" + getCharacters() + "'");
     }
 
-    // Property
+    // property
     else if ("property".equals(raw)) {
       String id = (String) clipboard.get("property.id");
-      pagelet.setProperty(id, characters.toString());
+      pagelet.setProperty(id, getCharacters());
       if (log_.isTraceEnabled())
-        log_.trace("Setting property '" + id + " to '" + characters.toString() + "'");
+        log_.trace("Setting property '" + id + " to '" + getCharacters() + "'");
     }
 
     super.endElement(uri, local, raw);
@@ -200,7 +200,7 @@ public final class PageletReader extends WebloungeContentReader {
    * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.user.User)
    */
   protected void setOwner(User user) {
-    pagelet.securityCtx.setOwner(user);
+    pagelet.setOwner(user);
   }
 
   /**
@@ -242,8 +242,10 @@ public final class PageletReader extends WebloungeContentReader {
    *      java.util.Date)
    */
   @Override
-  protected void setPublish(Date startDate, Date endDate) {
-// TODO:    pagelet.set
+  protected void setPublished(User publisher, Date startDate, Date endDate) {
+    pagelet.publishingCtx.setPublisher(publisher);
+    pagelet.publishingCtx.setPublishFrom(startDate);
+    pagelet.publishingCtx.setPublishTo(endDate);
   }
 
 }

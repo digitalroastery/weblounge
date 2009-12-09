@@ -20,10 +20,9 @@
 
 package ch.o2it.weblounge.common.page;
 
-import static org.junit.Assert.assertNotNull;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -89,14 +88,41 @@ public class PageletImplTest {
   /** Property name */
   protected String multivaluePropertyName = "tags";
 
-  /** Property value */
+  /** Property values */
   protected String[] multivaluePropertyValue = new String[] { "a", "b" };
+  
+  /** Name of the content */
+  protected String contentName = "title";
+
+  /** German content */
+  protected String germanContent = "Ein amüsanter Titel";
+
+  /** French content */
+  protected String frenchContent = "Un titre joyeux";
+
+  /** Lonely content name */
+  protected String lonelyContentName = "credits";
+
+  /** Lonely content name */
+  protected String lonelyContent = "Friedrich Nietzsche";
+
+  /** Content name */
+  protected String multivalueContentName = "tag";
+
+  /** Content values */
+  protected String[] multivalueGermanContent = new String[] { "Neu", "Technik" };
+
+  /** Content values */
+  protected String[] multivalueFrenchContent = new String[] { "Nouveau", "Technique" };
 
   /** The German language */
   protected Language german = new LanguageImpl(new Locale("de"));
 
   /** The French language */
   protected Language french = new LanguageImpl(new Locale("fr"));
+
+  /** The Italian language */
+  protected Language italian = new LanguageImpl(new Locale("it"));
 
   /** Content creation date */
   protected Date creationDate = new Date(1000000000000L);
@@ -106,6 +132,12 @@ public class PageletImplTest {
 
   /** French modification date */
   protected Date frenchModifcationDate = new Date(1234991200000L);
+
+  /** Publishing start date */
+  protected Date publishingStartDate = new Date(1231355141000L);
+
+  /** Publishing end date */
+  protected Date publishingEndDate = new Date(1234991200000L);
 
   /** Some date after the latest modification date */
   protected Date futureDate = new Date(2000000000000L);
@@ -135,6 +167,13 @@ public class PageletImplTest {
   public void setUp() throws Exception {
     setupPreliminaries();
     pagelet = new PageletImpl(location, module, id);
+    pagelet.setContent(contentName, germanContent, german);
+    pagelet.setContent(contentName, frenchContent, french);
+    pagelet.setContent(lonelyContentName, lonelyContent, german);
+    for (String s : multivalueGermanContent)
+      pagelet.setContent(multivalueContentName, s, german);
+    for (String s : multivalueFrenchContent)
+      pagelet.setContent(multivalueContentName, s, french);
     pagelet.setProperty(propertyName, propertyValue);
     for (String s : multivaluePropertyValue)
       pagelet.setProperty(multivaluePropertyName, s);
@@ -142,6 +181,9 @@ public class PageletImplTest {
     pagelet.setCreated(hans, germanModifcationDate);
     pagelet.setModified(hans, germanModifcationDate, german);
     pagelet.setModified(amelie, frenchModifcationDate, french);
+    pagelet.setPublisher(hans);
+    pagelet.setPublishFrom(publishingStartDate);
+    pagelet.setPublishTo(publishingEndDate);
   }
 
   /**
@@ -224,12 +266,55 @@ public class PageletImplTest {
   }
 
   /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getRenderer()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#isCreatedAfter(java.util.Date)}.
    */
   @Test
-  public void testGetRenderer() {
-    fail("Not yet implemented"); // TODO
+  public void testIsCreatedAfter() {
+    assertFalse(pagelet.isCreatedAfter(futureDate));
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getPublishFrom()}.
+   */
+  @Test
+  public void testGetPublishFrom() {
+    assertEquals(publishingStartDate, pagelet.getPublishFrom());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getPublishTo()}.
+   */
+  @Test
+  public void testGetPublishTo() {
+    assertEquals(publishingEndDate, pagelet.getPublishTo());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getPublisher()}.
+   */
+  @Test
+  public void testGetPublisher() {
+    assertEquals(hans, pagelet.getPublisher());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#isPublished()}.
+   */
+  @Test
+  public void testIsPublished() {
+    pagelet.setPublishFrom(new Date(new Date().getTime() - Times.MS_PER_DAY));
+    pagelet.setPublishTo(new Date(new Date().getTime() + Times.MS_PER_DAY));
+    assertTrue(pagelet.isPublished());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#isPublished(java.util.Date)}.
+   */
+  @Test
+  public void testIsPublishedDate() {
+    Date d = new Date(publishingStartDate.getTime() + Times.MS_PER_DAY);
+    assertTrue(pagelet.isPublished(d));
+    assertFalse(pagelet.isPublished(futureDate));
   }
 
   /**
@@ -353,7 +438,8 @@ public class PageletImplTest {
    */
   @Test
   public void testIsMultiValueContent() {
-    fail("Not yet implemented"); // TODO
+    assertFalse(pagelet.isMultiValueContent(contentName));
+    assertTrue(pagelet.isMultiValueContent(multivalueContentName));
   }
 
   /**
@@ -363,7 +449,22 @@ public class PageletImplTest {
    */
   @Test
   public void testGetContentStringLanguageBoolean() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(germanContent, pagelet.getContent(contentName, german, true));
+    assertEquals(germanContent, pagelet.getContent(contentName, german, false));
+    assertEquals(frenchContent, pagelet.getContent(contentName, french, true));
+    assertEquals(frenchContent, pagelet.getContent(contentName, french, false));
+    
+    // Test unsupported languages
+    assertEquals(germanContent, pagelet.getContent(contentName, italian, false));
+    assertTrue(pagelet.getContent(contentName, italian, true) == null);
+    
+    // Test lonely content (credits), available in German only
+    assertEquals(lonelyContent, pagelet.getContent(lonelyContentName, german, true));
+    assertEquals(lonelyContent, pagelet.getContent(lonelyContentName, german, false));
+    assertTrue(pagelet.getContent(lonelyContentName, french, true) == null);
+    assertTrue(pagelet.getContent(lonelyContentName, french, false) == null);
+    assertTrue(pagelet.getContent(lonelyContentName, italian, true) == null);
+    assertEquals(lonelyContent, pagelet.getContent(lonelyContentName, italian, false));
   }
 
   /**
@@ -373,7 +474,16 @@ public class PageletImplTest {
    */
   @Test
   public void testGetContentStringLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(germanContent, pagelet.getContent(contentName, german));
+    assertEquals(frenchContent, pagelet.getContent(contentName, french));
+    
+    // Test unsupported languages
+    assertEquals(germanContent, pagelet.getContent(contentName, italian));
+
+    // Test lonely content (credits), available in German only
+    assertEquals(lonelyContent, pagelet.getContent(lonelyContentName, german));
+    assertTrue(pagelet.getContent(lonelyContentName, french) == null);
+    assertEquals(lonelyContent, pagelet.getContent(lonelyContentName, italian));
   }
 
   /**
@@ -383,7 +493,18 @@ public class PageletImplTest {
    */
   @Test
   public void testGetContentString() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(germanContent, pagelet.getContent(contentName));
+    assertEquals(lonelyContent, pagelet.getContent(lonelyContentName));
+
+    pagelet.switchTo(french);
+    assertEquals(frenchContent, pagelet.getContent(contentName));
+    assertTrue(pagelet.getContent(lonelyContentName) == null);
+    
+    // Test unsupported languages.
+    // Switching to Italian will actually switch to German (original language)
+    pagelet.switchTo(italian);
+    assertEquals(germanContent, pagelet.getContent(contentName));
+    assertEquals(lonelyContent, pagelet.getContent(lonelyContentName));
   }
 
   /**
@@ -393,7 +514,26 @@ public class PageletImplTest {
    */
   @Test
   public void testGetMultiValueContentStringLanguageBoolean() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, german, true).length);
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, german, false).length);
+    assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName, german, true)[0]);
+    assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName, german, false)[0]);
+    assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName, german, true)[1]);
+    assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName, german, false)[1]);
+
+     // French
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, french, true).length);
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, french, false).length);
+    assertEquals(multivalueFrenchContent[0], pagelet.getMultiValueContent(multivalueContentName, french, true)[0]);
+    assertEquals(multivalueFrenchContent[0], pagelet.getMultiValueContent(multivalueContentName, french, false)[0]);
+    assertEquals(multivalueFrenchContent[1], pagelet.getMultiValueContent(multivalueContentName, french, true)[1]);
+    assertEquals(multivalueFrenchContent[1], pagelet.getMultiValueContent(multivalueContentName, french, false)[1]);
+    
+    // Test unsupported languages
+    assertEquals(0, pagelet.getMultiValueContent(multivalueContentName, italian, true).length);
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, italian, false).length);
+    assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName, italian, false)[0]);
+    assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName, italian, false)[1]);
   }
 
   /**
@@ -403,7 +543,19 @@ public class PageletImplTest {
    */
   @Test
   public void testGetMultiValueContentStringLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, german).length);
+    assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName, german)[0]);
+    assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName, german)[1]);
+
+     // French
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, french).length);
+    assertEquals(multivalueFrenchContent[0], pagelet.getMultiValueContent(multivalueContentName, french)[0]);
+    assertEquals(multivalueFrenchContent[1], pagelet.getMultiValueContent(multivalueContentName, french)[1]);
+    
+    // Test unsupported languages
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, italian).length);
+    assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName, italian)[0]);
+    assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName, italian)[1]);
   }
 
   /**
@@ -413,17 +565,22 @@ public class PageletImplTest {
    */
   @Test
   public void testGetMultiValueContentString() {
-    fail("Not yet implemented"); // TODO
-  }
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName).length);
+    assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName)[0]);
+    assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName)[1]);
 
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#setContent(java.lang.String, java.lang.String, ch.o2it.weblounge.common.language.Language)}
-   * .
-   */
-  @Test
-  public void testSetContent() {
-    fail("Not yet implemented"); // TODO
+     // French
+    pagelet.switchTo(french);
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName).length);
+    assertEquals(multivalueFrenchContent[0], pagelet.getMultiValueContent(multivalueContentName)[0]);
+    assertEquals(multivalueFrenchContent[1], pagelet.getMultiValueContent(multivalueContentName)[1]);
+    
+    // Test unsupported languages
+    // Switching to Italian will actually switch to German (original language)
+    pagelet.switchTo(italian);
+    assertEquals(2, pagelet.getMultiValueContent(multivalueContentName, italian).length);
+    assertEquals(multivalueGermanContent[0], pagelet.getMultiValueContent(multivalueContentName)[0]);
+    assertEquals(multivalueGermanContent[1], pagelet.getMultiValueContent(multivalueContentName)[1]);
   }
 
   /**
@@ -433,7 +590,12 @@ public class PageletImplTest {
    */
   @Test
   public void testEqualsObject() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(pagelet.equals(new PageletImpl(module, id)));
+    assertFalse(pagelet.equals(new PageletImpl(module, "x")));
+    assertFalse(pagelet.equals(new PageletImpl("x", id)));
+    assertTrue(pagelet.equals(new PageletImpl(location, module, id)));
+    PageletLocation otherLocation = new PageletLocationImpl(uri, composer, position + 1);
+    assertFalse(pagelet.equals(new PageletImpl(otherLocation, module, id)));
   }
 
   /**
@@ -443,7 +605,9 @@ public class PageletImplTest {
    */
   @Test
   public void testCompareTo() {
-    fail("Not yet implemented"); // TODO
+    PageletLocation otherLocation = new PageletLocationImpl(uri, composer, position + 1);
+    assertEquals(0, pagelet.compareTo(new PageletImpl(module, id), german));
+    assertEquals(-1, pagelet.compareTo(new PageletImpl(otherLocation, module, id), german));
   }
 
 }
