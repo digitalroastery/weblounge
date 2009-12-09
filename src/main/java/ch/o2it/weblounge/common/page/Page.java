@@ -32,8 +32,6 @@ import ch.o2it.weblounge.common.user.User;
 
 import org.w3c.dom.Node;
 
-import java.util.Date;
-
 /**
  * A <code>Page</code> encapsulates all data that is attached with a site url.
  * For performance reasons, this object keeps parts of the page data in memory
@@ -108,20 +106,6 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
   User getEditor();
 
   /**
-   * Returns the publishing start date.
-   * 
-   * @return the start date
-   */
-  public Date getPublishFrom();
-
-  /**
-   * Returns the publishing end date.
-   * 
-   * @return the end date
-   */
-  public Date getPublishTo();
-
-  /**
    * Returns the keywords that are defined for this page header.
    * 
    * @return the keywords
@@ -165,20 +149,6 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
    * @return the headline pagelets
    */
   public Pagelet[] getHeadlines();
-
-  /**
-   * Returns the modification date of the page.
-   * 
-   * @return the modification date
-   */
-  public Date getModifiedSince();
-
-  /**
-   * Returns the modification user of the page.
-   * 
-   * @return the modification date
-   */
-  public User getModifiedBy();
 
   /**
    * Returns the identifier of the layout associated with this page.

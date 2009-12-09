@@ -64,5 +64,31 @@ public interface Publishable {
    * @return <code>true</code> if published on the given date
    */
   boolean isPublished(Date date);
+  
+  /**
+   * Sets the user that published or unpublished the page.
+   * 
+   * @param user
+   *          the publisher
+   */
+  void setPublisher(User user);
+
+  /**
+   * Sets the publishing start date. Pass <code>null</code> to set no start date
+   * at all.
+   * 
+   * @param from
+   *          the start date
+   */
+  void setPublishFrom(Date from);
+  
+  /**
+   * Sets the publishing end date. Pass <code>null</code> to set no end date at
+   * all.
+   * 
+   * @param to
+   *          the end date
+   */
+  void setPublishTo(Date to);
 
 }

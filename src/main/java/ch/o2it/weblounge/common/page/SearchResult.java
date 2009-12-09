@@ -20,15 +20,13 @@
 
 package ch.o2it.weblounge.common.page;
 
-import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.renderer.Renderer;
-import ch.o2it.weblounge.common.security.Securable;
 
 /**
  * This interface defines methods for a search result.
  */
-public interface SearchResult extends Securable, Localizable, Publishable, Comparable<SearchResult> {
+public interface SearchResult extends Localizable, Comparable<SearchResult> {
 
   /**
    * Returns the uri that will lead to the location where the hit occurred.

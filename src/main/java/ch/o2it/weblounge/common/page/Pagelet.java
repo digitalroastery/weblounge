@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.page;
 
 import ch.o2it.weblounge.common.content.Creatable;
 import ch.o2it.weblounge.common.content.LocalizedModifiable;
+import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.security.Permission;
@@ -53,7 +54,7 @@ import org.w3c.dom.Node;
  * 	&lt;/pagelet&gt;
  * </pre>
  */
-public interface Pagelet extends Localizable, Creatable, LocalizedModifiable, Securable {
+public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedModifiable, Securable {
 
   /** Pagelet identifier in request */
   static final String ID = "pagelet";
@@ -205,13 +206,6 @@ public interface Pagelet extends Localizable, Creatable, LocalizedModifiable, Se
    * @return the content
    */
   String getContent(String name);
-
-  /**
-   * Returns the identifier of the renderer used to render this pagelet.
-   * 
-   * @return the pagelet's renderer
-   */
-  String getRenderer();
 
   /**
    * Returns the pagelet location, containing information about url, composer
