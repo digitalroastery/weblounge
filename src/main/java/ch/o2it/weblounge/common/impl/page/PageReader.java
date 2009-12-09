@@ -121,6 +121,16 @@ public final class PageReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.user.User)
+   */
+  @Override
+  protected void setOwner(User owner) {
+    page_.securityCtx.setOwner(owner);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#allow(ch.o2it.weblounge.common.security.Permission,
    *      ch.o2it.weblounge.common.security.Authority)
    */

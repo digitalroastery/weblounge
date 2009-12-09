@@ -117,6 +117,14 @@ public abstract class WebloungeContentReader extends DefaultHandler {
   protected abstract void setModified(User modifier, Date date);
 
   /**
+   * Sets the pagelet's owner.
+   * 
+   * @param owner
+   *          the owner of this pagelet
+   */
+  protected abstract void setOwner(User owner);
+
+  /**
    * This method is called if a new permission was found.
    * 
    * @param permission
@@ -206,7 +214,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
   public void endElement(String uri, String local, String raw)
       throws SAXException {
 
-    // owner, creator, modifier
+    // creator, modifier
     if ("user".equals(raw)) {
       String login = (String) clipboard.get("user");
       String realm = (String) clipboard.get("realm");
@@ -277,14 +285,22 @@ public abstract class WebloungeContentReader extends DefaultHandler {
       Date startDate = (Date) clipboard.get("publish.start");
       if (startDate == null)
         throw new IllegalStateException("Publication start date not found");
-      Date endDate = (Date) clipboard.get("publish.start");
+      Date endDate = (Date) clipboard.get("publish.end");
       if (endDate == null)
         throw new IllegalStateException("Publication end date not found");
       setPublished(publisher, startDate, endDate);
       contentReaderContext = Context.Unknown;
     }
 
-    /** security permission */
+    // owner
+    else if (contentReaderContext == Context.Security && "owner".equals(raw)) {
+      User owner = (User)clipboard.get("user");
+      if (owner == null)
+        throw new IllegalStateException("Owner not found");
+      setOwner(owner);
+    }
+
+    // permissions
     else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
       String id = (String) clipboard.get("id");
       Permission permission = new PermissionImpl(id);
@@ -298,11 +314,6 @@ public abstract class WebloungeContentReader extends DefaultHandler {
           allow(permission, authority);
         }
       }
-    }
-
-    /** Security */
-    else if (contentReaderContext == Context.Security && "security".equals(raw)) {
-      contentReaderContext = Context.Unknown;
     }
 
   }

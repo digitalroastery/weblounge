@@ -445,6 +445,35 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
+   */
+  public void setOwner(User owner) {
+    securityCtx.setOwner(owner);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#allow(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority)
+   */
+  public void allow(Permission permission, Authority authority) {
+    securityCtx.allow(permission, authority);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#deny(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority)
+   */
+  public void deny(Permission permission, Authority authority) {
+    securityCtx.deny(permission, authority);
+  }
+
+  /**
    * Returns <code>true</code> if the user <code>u</code> is allowed to do
    * actions that require permission <code>p</code> on this pagelet.
    * 

@@ -438,7 +438,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
     // Owner
     if (owner != null) {
       b.append("<owner>");
-      b.append(owner.getLogin());
+      b.append(owner.toXml());
       b.append("</owner>");
     }
 
