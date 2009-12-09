@@ -18,23 +18,23 @@
 			<user id="hans" realm="testland">Hans Muster</user>
 			<date>2009/01/07 19:05:41 GMT</date>
 		</modified>
-		<text id="title">Ein amüsanter Titel</text>
-		<text id="credits">Friedrich Nietzsche</text>
-		<text id="tag">Neu</text>
-		<text id="tag">Technik</text>
+		<text id="credits"><![CDATA[Friedrich Nietzsche]]></text>
+		<text id="tag"><![CDATA[Neu]]></text>
+		<text id="tag"><![CDATA[Technik]]></text>
+		<text id="title"><![CDATA[Ein amüsanter Titel]]></text>
 	</locale>
 	<locale language="fr">
 		<modified>
 			<user id="amelie" realm="testland">Amélie Poulard</user>
 			<date>2009/02/18 21:06:40 GMT</date>
 		</modified>
-		<text id="title">Un titre joyeux</text>
-		<text id="tag">Nouveau</text>
-		<text id="tag">Technique</text>
+		<text id="tag"><![CDATA[Nouveau]]></text>
+		<text id="tag"><![CDATA[Technique]]></text>
+		<text id="title"><![CDATA[Un titre joyeux]]></text>
 	</locale>
 	<properties>
-		<property id="headline">true</property>
-		<property id="tags">a</property>
-		<property id="tags">b</property>
+		<property id="headline"><![CDATA[true]]></property>
+		<property id="tags"><![CDATA[a]]></property>
+		<property id="tags"><![CDATA[b]]></property>
 	</properties>
 </pagelet>

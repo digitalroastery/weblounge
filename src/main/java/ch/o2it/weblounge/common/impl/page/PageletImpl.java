@@ -30,7 +30,6 @@ import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
-import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Pagelet;
@@ -44,21 +43,16 @@ import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.Map.Entry;
 
 /**
  * A page element is a piece of content, placed somewhere on a page. Depending
@@ -278,6 +272,26 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#allow(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority)
+   */
+  public void allow(Permission permission, Authority authority) {
+    securityCtx.allow(permission, authority);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#deny(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority)
+   */
+  public void deny(Permission permission, Authority authority) {
+    securityCtx.deny(permission, authority);
+  }
+
+  /**
    * Returns <code>true</code> if the user <code>u</code> is allowed to do
    * actions that require permission <code>p</code> on this pagelet.
    * 
@@ -430,6 +444,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
    */
   public Date getPublishFrom() {
@@ -438,6 +453,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
    */
   public Date getPublishTo() {
@@ -446,6 +462,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
    */
   public User getPublisher() {
@@ -454,6 +471,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
    */
   public boolean isPublished() {
@@ -462,6 +480,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
    */
   public boolean isPublished(Date date) {
@@ -470,6 +489,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#setPublishFrom(java.util.Date)
    */
   public void setPublishFrom(Date from) {
@@ -478,6 +498,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#setPublishTo(java.util.Date)
    */
   public void setPublishTo(Date to) {
@@ -486,6 +507,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#setPublisher(ch.o2it.weblounge.common.user.User)
    */
   public void setPublisher(User user) {
@@ -625,7 +647,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * 
    * @return an XML representation of this pagelet
    */
-  public Node toXml() {
+  public String toXml() {
     StringBuffer b = new StringBuffer();
 
     // Add root node
@@ -636,7 +658,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
     // export creation context
     b.append(creationCtx.toXml());
-    
+
+    // export publishing context
+    b.append(publishingCtx.toXml());
+
     // export content
     for (Language l : languages) {
       b.append("<locale language=\"");
@@ -648,23 +673,23 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
         b.append(">");
 
       b.append("<modified>");
+      User u = modificationCtx.getModifier(l);
+      if (u == null)
+        u = location_.getSite().getAdministrator();
+      b.append(u.toXml());
       b.append("<date>");
       Date d = modificationCtx.getModificationDate(l);
       if (d == null)
         d = new Date();
       b.append(WebloungeDateFormat.formatStatic(d));
       b.append("</date>");
-      b.append("<user>");
-      User u = modificationCtx.getModifier(l);
-      if (u == null)
-        u = location_.getSite().getAdministrator();
-      b.append(u.getLogin());
-      b.append("</user>");
       b.append("</modified>");
 
       // export content
-      Map<String, String[]> textualContent = content.get(l);
-      for (Map.Entry<String, String[]> e : textualContent.entrySet()) {
+      MapEntryComparator comparator = new MapEntryComparator();
+      SortedSet<Map.Entry<String, String[]>> entrySet = new TreeSet<Map.Entry<String, String[]>>(comparator);
+      entrySet.addAll(content.get(l).entrySet());
+      for (Map.Entry<String, String[]> e : entrySet) {
         for (String value : e.getValue()) {
           b.append("<text id=\"");
           b.append(e.getKey());
@@ -681,10 +706,13 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       b.append("<properties/>");
     } else {
       b.append("<properties>");
-      for (Map.Entry<String, String[]> e : properties.entrySet()) {
-        for (String value : e.getValue()) {
+      MapEntryComparator comparator = new MapEntryComparator();
+      SortedSet<Map.Entry<String, String[]>> entrySet = new TreeSet<Map.Entry<String, String[]>>(comparator);
+      entrySet.addAll(properties.entrySet());
+      for (Map.Entry<String, String[]> p : entrySet) {
+        for (String value : p.getValue()) {
           b.append("<property id=\"");
-          b.append(e.getKey());
+          b.append(p.getKey());
           b.append("\"><![CDATA[");
           b.append(value);
           b.append("]]></property>");
@@ -692,22 +720,20 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       }
       b.append("</properties>");
     }
-    
+
     b.append("</pagelet>");
 
-    try {
-      InputSource is = new InputSource(new StringReader(b.toString()));
-      DocumentBuilder docBuilder = XMLUtilities.getDocumentBuilder();
-      Document doc = docBuilder.parse(is);
-      return doc.getFirstChild();
-    } catch (SAXException e) {
-      log_.error("Error building dom tree for pagelet", e);
-    } catch (IOException e) {
-      log_.error("Error reading pagelet xml", e);
-    } catch (ParserConfigurationException e) {
-      log_.error("Error parsing pagelet xml", e);
-    }
-    return null;
+    return b.toString();
+
+    /*
+     * try { InputSource is = new InputSource(new StringReader(b.toString()));
+     * DocumentBuilder docBuilder = XMLUtilities.getDocumentBuilder(); Document
+     * doc = docBuilder.parse(is); return doc.getFirstChild(); } catch
+     * (SAXException e) { log_.error("Error building dom tree for pagelet", e);
+     * } catch (IOException e) { log_.error("Error reading pagelet xml", e); }
+     * catch (ParserConfigurationException e) {
+     * log_.error("Error parsing pagelet xml", e); } return null;
+     */
   }
 
   /**
@@ -905,11 +931,29 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public int compareTo(Localizable o, Language l) {
     if (location_ != null && o instanceof Pagelet) {
-      Pagelet p = (Pagelet)o;
+      Pagelet p = (Pagelet) o;
       if (p.getLocation() != null)
         return location_.compareTo(p.getLocation());
     }
     return 0;
+  }
+  
+  /**
+   * Utility class used to compare content and property map entries.
+   */
+  class MapEntryComparator implements Comparator<Map.Entry<String, String[]>> {
+
+    /**
+     * {@inheritDoc}
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     */
+    public int compare(Entry<String, String[]> o1, Entry<String, String[]> o2) {
+      int keyComparison = o1.getKey().compareTo(o2.getKey());
+      if (keyComparison != 0)
+        return keyComparison;
+      return o1.getValue()[0].compareTo(o2.getValue()[0]);
+    }
+    
   }
 
 }
