@@ -30,7 +30,7 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.page.PageletImpl;
-import ch.o2it.weblounge.common.impl.page.PageletLocationImpl;
+import ch.o2it.weblounge.common.impl.page.PageletURIImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
@@ -71,7 +71,7 @@ public class PageletImplTest {
   protected int position = 1;
 
   /** The pagelet location */
-  protected PageletLocationImpl location = null;
+  protected PageletURIImpl location = null;
 
   /** Module identifier */
   protected String module = "text";
@@ -193,7 +193,7 @@ public class PageletImplTest {
   public void setupPreliminaries() {
     site = EasyMock.createNiceMock(Site.class);
     uri = new PageURIImpl(site, path);
-    location = new PageletLocationImpl(uri, composer, position);
+    location = new PageletURIImpl(uri, composer, position);
   }
 
   /**
@@ -424,11 +424,11 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getLocation()}.
+   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getURI()}.
    */
   @Test
   public void testGetLocation() {
-    assertEquals(location, pagelet.getLocation());
+    assertEquals(location, pagelet.getURI());
   }
 
   /**
@@ -594,7 +594,7 @@ public class PageletImplTest {
     assertFalse(pagelet.equals(new PageletImpl(module, "x")));
     assertFalse(pagelet.equals(new PageletImpl("x", id)));
     assertTrue(pagelet.equals(new PageletImpl(location, module, id)));
-    PageletLocation otherLocation = new PageletLocationImpl(uri, composer, position + 1);
+    PageletURI otherLocation = new PageletURIImpl(uri, composer, position + 1);
     assertFalse(pagelet.equals(new PageletImpl(otherLocation, module, id)));
   }
 
@@ -605,7 +605,7 @@ public class PageletImplTest {
    */
   @Test
   public void testCompareTo() {
-    PageletLocation otherLocation = new PageletLocationImpl(uri, composer, position + 1);
+    PageletURI otherLocation = new PageletURIImpl(uri, composer, position + 1);
     assertEquals(0, pagelet.compareTo(new PageletImpl(module, id), german));
     assertEquals(-1, pagelet.compareTo(new PageletImpl(otherLocation, module, id), german));
   }
