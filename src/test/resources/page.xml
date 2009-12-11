@@ -1,95 +1,101 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <page id="/service/test" version="live">
-    <head>
-        <template>default</template>
-        <layout>default</layout>
-        <type>default</type>
-        <publish>
-            <from>2006/05/05 16:58:21 GMT</from>
-            <to>292278994/08/17 07:12:55 GMT</to>
-        </publish>
-        <security>
-            <security>
-                <owner>
-                    <user id="tobias.wunden" realm="weblounge">Tobias Wunden</user>
-                </owner>
-                <restrict>
-                    <permission realm="weblounge">translate</permission>
-                    <group realm="weblounge">translators</group>
-                </restrict>
-                <restrict>
-                    <permission realm="weblounge">manage</permission>
-                    <group realm="weblounge">editors</group>
-                </restrict>
-                <restrict>
-                    <permission realm="weblounge">write</permission>
-                    <group realm="weblounge">editors</group>
-                </restrict>
-                <restrict>
-                    <permission realm="weblounge">publish</permission>
-                    <group realm="weblounge">publishers</group>
-                </restrict>
-                <restrict>
-                    <permission realm="weblounge">read</permission>
-                    <group realm="weblounge">guests</group>
-                </restrict>
-            </security>
-        </security>
-        <keywords>
-            <keyword>su</keyword>
-            <keyword>wo</keyword>
-        </keywords>
-        <title language="de">Service</title>
-        <title language="it">Servizio</title>
-        <title language="fr">Services</title>
-        <modified>
-            <date>2007/05/02 21:07:00 GMT</date>
-            <user id="thorsten.brigmann" realm="weblounge">Thorsten Brigmann</user>
-        </modified>
-    </head>
-    <body>
-        <composer id="main">
-            <pagelet module="text" id="title">
-                <publish>
-                    <from>2006/05/05 16:58:21 GMT</from>
-                    <to>292278994/08/17 07:12:55 GMT</to>
-                </publish>
-                <security>
-                    <owner>
-                        <user id="tobias.wunden" realm="weblounge">Tobias Wunden</user>
-                    </owner>
-                </security>
-                <created>
-                    <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
-                    <date>2006/01/07 19:05:41 GMT</date>
-                </created>                
-                <content>
-                    <localized langage="de">
-                        <text id="title">
-                            Service auf swissunihockey.ch
-                        </text>
-                        <text id="keyword">
-                            Service
-                        </text>
-                    </localized>
-                    <localized langage="fr">
-                        <text id="title">
-                            Services sur swissunihockey.ch
-                        </text>
-                        <text id="keyword">
-                            Services
-                        </text>
-                        <text id="lead">
-                            Les nouveaux et les anciens services sont sous
-                            cette rubrique.
-                        </text>
-                    </localized>
-                </content>
-                <properties>
-                    <property id="author">false</property>
-                    <property id="date">false</property>
-                </properties>
-            </pagelet>
-        </composer>
-    </body>
+	<head>
+		<template>default</template>
+		<layout>default</layout>
+		<type>default</type>
+		<sitemap>true</sitemap>
+		<index>true</index>
+		<metadata>
+			<title language="de"><![CDATA[Service]]></title>
+			<title language="fr">Services</title>
+			<description language="de"><![CDATA[Beschreibung]]></description>
+			<description language="fr"><![CDATA[Déscription]]></description>
+			<subject><![CDATA[This topic]]></subject>
+			<subject><![CDATA[Other topic]]></subject>
+			<type><![CDATA[Text]]></type>
+			<source><![CDATA[http://www.source.com]]></source>
+			<coverage language="de"><![CDATA[Zürich]]></coverage>
+			<coverage language="fr"><![CDATA[Zurich]]></coverage>
+			<rights language="de"><![CDATA[Copyright 2009 by T. Wunden]]></rights>
+		</metadata>
+		<created>
+			<user id="hans" realm="testland">Hans Muster</user>
+			<date>2009/01/07 19:05:41 GMT</date>
+		</created>
+		<published>
+			<user id="hans" realm="testland">Hans Muster</user>
+			<from>2006/05/05 16:58:21 GMT</from>
+			<to>292278994/08/17 07:12:55 GMT</to>
+		</published>
+		<security>
+			<owner>
+				<user id="tobias.wunden" realm="weblounge">Tobias Wunden</user>
+			</owner>
+			<restrict>
+				<permission realm="weblounge">translate</permission>
+				<group realm="weblounge">translators</group>
+			</restrict>
+			<restrict>
+				<permission realm="weblounge">manage</permission>
+				<group realm="weblounge">editors</group>
+			</restrict>
+			<restrict>
+				<permission realm="weblounge">write</permission>
+				<group realm="weblounge">editors</group>
+			</restrict>
+			<restrict>
+				<permission realm="weblounge">publish</permission>
+				<group realm="weblounge">publishers</group>
+			</restrict>
+			<restrict>
+				<permission realm="weblounge">read</permission>
+				<group realm="weblounge">guests</group>
+			</restrict>
+		</security>
+	</head>
+	<body>
+		<composer id="main">
+			<pagelet module="text" id="title">
+				<security>
+					<owner>
+						<user id="hans" realm="testland">Hans Muster</user>
+					</owner>
+				</security>
+				<created>
+					<user id="hans" realm="testland">Hans Muster</user>
+					<date>2009/01/07 19:05:41 GMT</date>
+				</created>
+				<published>
+					<user id="hans" realm="testland">Hans Muster</user>
+					<from>2009/01/07 19:05:41 GMT</from>
+					<to>2009/02/18 21:06:40 GMT</to>
+				</published>
+				<locale language="de" original="true">
+					<modified>
+						<user id="hans" realm="testland">Hans Muster</user>
+						<date>2009/01/07 19:05:41 GMT</date>
+					</modified>
+					<text id="credits"><![CDATA[Friedrich Nietzsche]]></text>
+					<text id="tag"><![CDATA[Neu]]></text>
+					<text id="tag"><![CDATA[Technik]]></text>
+					<text id="title"><![CDATA[Ein amüsanter Titel]]></text>
+				</locale>
+				<locale language="fr">
+					<modified>
+						<user id="amelie" realm="testland">Amélie Poulard</user>
+						<date>2009/02/18 21:06:40 GMT</date>
+					</modified>
+					<text id="tag"><![CDATA[Nouveau]]></text>
+					<text id="tag"><![CDATA[Technique]]></text>
+					<text id="title"><![CDATA[Un titre joyeux]]></text>
+				</locale>
+				<properties>
+					<property id="headline"><![CDATA[true]]></property>
+					<property id="tags"><![CDATA[a]]></property>
+					<property id="tags"><![CDATA[b]]></property>
+				</properties>
+			</pagelet>
+		</composer>
+	</body>
 </page>
