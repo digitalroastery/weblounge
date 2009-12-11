@@ -28,10 +28,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * CachedResponseMetaInfo
- * 
- * @version $Revision: 1.1 $ $Date: 2005/05/11 19:51:58 $
- * @author Daniel Steiner
+ * TODO: Document me
  */
 class CachedResponseMetaInfo {
 

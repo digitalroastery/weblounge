@@ -38,8 +38,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 /**
- * @version $Revision: 1.6 $ $Date: 2005/07/30 01:27:18 $
- * @author Daniel Steiner
+ * TODO: Document me
  */
 class CacheableHttpServletResponse extends HttpServletResponseWrapper {
 

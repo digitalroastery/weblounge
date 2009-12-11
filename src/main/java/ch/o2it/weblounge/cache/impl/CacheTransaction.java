@@ -28,11 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Represents an active cache transaction.
- * 
- * @version $Revision: 1.5 $ $Date: 2005/05/11 19:51:58 $
- * @author Daniel Steiner
  */
-
 class CacheTransaction {
 
 	/**

@@ -909,9 +909,6 @@ public class CacheManager {
 
   /**
    * Represents a single entry in the cache.
-   * 
-   * @version $Revision: 1.25.2.3 $ $Date: 2006/10/26 00:25:37 $
-   * @author Daniel Steiner
    */
   public static class CacheEntry implements Comparable<CacheHandle> {
     protected CacheEntry(CacheHandle key, long expires, long recheck,
@@ -966,9 +963,6 @@ public class CacheManager {
 
   /**
    * Holds the statistics for a specific cached element type.
-   * 
-   * @version $Revision: 1.25.2.3 $ $Date: 2006/10/26 00:25:37 $
-   * @author Daniel Steiner
    */
   public static class TypeStats {
     protected int hit;

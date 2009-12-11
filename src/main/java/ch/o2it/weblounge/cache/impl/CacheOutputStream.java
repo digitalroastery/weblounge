@@ -32,8 +32,7 @@ import java.util.Stack;
 import javax.servlet.ServletOutputStream;
 
 /**
- * @version $Revision: 1.5 $ $Date: 2005/11/29 00:04:26 $
- * @author Daniel Steiner
+ * TODO: Document me
  */
 class CacheOutputStream extends ServletOutputStream {
 
