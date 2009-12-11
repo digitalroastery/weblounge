@@ -381,10 +381,6 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
   /**
    * The <code>ActionFactory</code> will serve as a action factory for actions
    * on a per method base.
-   * 
-   * @author Tobias Wunden
-   * @version 1.0
-   * @since Weblounge 2.0
    */
   private class ActionFactory implements LeaseFactory {
 

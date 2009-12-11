@@ -378,9 +378,6 @@ public abstract class AbstractAjaxAction extends ActionSupport {
 
   /**
    * Small wrapper for AJAX response parts.
-   * 
-   * @author Tobias Wunden
-   * @version 1.0
    */
   protected class AjaxResponsePart {
 
