@@ -74,22 +74,22 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
   String getType();
 
   /**
-   * Makes this page an anchor page. Specifying a collection of anchor pages
+   * Makes this a promoted page. Specifying a collection of promoted pages
    * throughout a site will allow you to build a sitemap or a list of points of
    * entrance.
    * 
-   * @param anchor
-   *          <code>true</code> to make this an achor page
+   * @param promoted
+   *          <code>true</code> to make this a promoted page
    */
-  void setAnchorpage(boolean anchor);
+  void setPromoted(boolean promoted);
 
   /**
    * Returns <code>true</code> if this page is considered important enough to
    * include it in a sitemap and similar listings.
    * 
-   * @return <code>true</code> if this is an anchor page
+   * @return <code>true</code> if this is a promoted page
    */
-  boolean isAnchorpage();
+  boolean isPromoted();
 
   /**
    * Sets this page to be either included or excluded from the search index.
@@ -138,6 +138,16 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
    *          the subject to remove
    */
   void removeSubject(String subject);
+
+  /**
+   * Returns <code>true</code> if <code>subject</code> is amongst the pages
+   * subjects.
+   * 
+   * @param subject
+   *          the subject
+   * @return <code>true</code> if the page contains the subject
+   */
+  boolean hasSubject(String subject);
 
   /**
    * Returns the topics that are defined for this page. Page topics are also
