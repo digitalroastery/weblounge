@@ -30,10 +30,7 @@ import javax.servlet.ServletResponse;
 
 /**
  * Interface for a class that is capable of including or forwarding requests, e.
- * g. a soap request or jsp dispatcher.
- * 
- * @author Tobias Wunden <tobias.wunden@o2it.ch>
- * @version 1.0
+ * g. a soap request or JSP dispatcher.
  */
 public interface DispatchListener {
 
