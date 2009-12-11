@@ -78,10 +78,10 @@ public class PageImpl extends LocalizableObject implements Page {
   protected String layout = null;
 
   /** True if this page should show up on the sitemap */
-  protected boolean isAnchorpage = false;
+  protected boolean isPromoted = false;
 
   /** True if the page contents should be indexed */
-  protected boolean index = true;
+  protected boolean isIndexed = true;
 
   /** The title pagelets */
   protected List<Pagelet> headlines = null;
@@ -125,7 +125,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * @param uri
    *          the page uri
    */
-  PageImpl(PageURIImpl uri) {
+  public PageImpl(PageURIImpl uri) {
     super(uri.getSite().getDefaultLanguage());
     this.uri = uri;
     this.creationCtx = new CreationContextImpl();
@@ -162,10 +162,10 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.page.Page#setAnchorpage(boolean)
+   * @see ch.o2it.weblounge.common.page.Page#setPromoted(boolean)
    */
-  public void setAnchorpage(boolean anchor) {
-    this.isAnchorpage = anchor;
+  public void setPromoted(boolean anchor) {
+    this.isPromoted = anchor;
   }
 
   /**
@@ -174,7 +174,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * @see ch.o2it.weblounge.common.page.Page#setIndexed(boolean)
    */
   public void setIndexed(boolean index) {
-    this.index = index;
+    this.isIndexed = index;
   }
 
   /**
@@ -213,6 +213,14 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public void removeSubject(String subject) {
     subjects.remove(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.page.Page#hasSubject(java.lang.String)
+   */
+  public boolean hasSubject(String subject) {
+    return subjects.contains(subject);
   }
 
   /**
@@ -287,7 +295,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * @see ch.o2it.weblounge.common.content.Publishable#setPublishTo(java.util.Date)
    */
   public void setPublishTo(Date to) {
-    publishingCtx.setPublishFrom(to);
+    publishingCtx.setPublishTo(to);
   }
 
   /**
@@ -302,10 +310,10 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.page.Page#isAnchorpage()
+   * @see ch.o2it.weblounge.common.page.Page#isPromoted()
    */
-  public boolean isAnchorpage() {
-    return isAnchorpage;
+  public boolean isPromoted() {
+    return isPromoted;
   }
 
   /**
@@ -314,7 +322,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * @see ch.o2it.weblounge.common.page.Page#isIndexed()
    */
   public boolean isIndexed() {
-    return isIndexed();
+    return isIndexed;
   }
 
   /**
@@ -581,17 +589,6 @@ public class PageImpl extends LocalizableObject implements Page {
   public String[] getSubjects() {
     String kw[] = new String[subjects.size()];
     return subjects.toArray(kw);
-  }
-
-  /**
-   * Sets the keywords that are defined on this page.
-   * 
-   * @param keywords
-   */
-  public void setKeywords(String[] keywords) {
-    this.subjects.clear();
-    for (int i = 0; i < keywords.length; i++)
-      this.subjects.add(keywords[i]);
   }
 
   /**
@@ -1001,32 +998,6 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * Returns <code>true</code> if the page is locked by <code>user</code>.
-   * 
-   * @return <code>true</code> if this page is locked by <code>user</code>
-   */
-  public boolean isLocked(User user) {
-    return isLocked() && user.equals(lockOwner);
-  }
-
-  /**
-   * Adds the pagelet to the composer located in this page.
-   * 
-   * @param pagelet
-   *          the pagelet to add
-   * @param composer
-   *          the composer identifier
-   */
-  void appendPagelet(Pagelet pagelet, String composer) {
-    List<Pagelet> c = composers.get(composer);
-    if (c == null) {
-      c = new ArrayList<Pagelet>();
-      composers.put(composer, c);
-    }
-    c.add(pagelet);
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.page.Page#addPagelet(ch.o2it.weblounge.common.page.Pagelet,
@@ -1058,8 +1029,8 @@ public class PageImpl extends LocalizableObject implements Page {
     // Insert
     if (position < c.size()) {
       c.add(position, pagelet);
-      for (int i = position; i < c.size(); i++) {
-        ((PageletURIImpl) ((PageletImpl) c.get(i)).getURI()).setPosition(i);
+      for (int i = position + 1; i < c.size(); i++) {
+        c.get(i).getURI().setPosition(i);
       }
     }
 
@@ -1079,36 +1050,6 @@ public class PageImpl extends LocalizableObject implements Page {
       location.setPosition(position);
     }
     return pagelet;
-  }
-
-  /**
-   * Moves the pagelet up by one step.
-   * 
-   * @param composer
-   *          the composer identifier
-   * @param position
-   *          the pagelet's original position
-   */
-  void movePageletUp(String composer, int position) {
-    List<Pagelet> c = composers.get(composer);
-    if (c == null || c.size() - 1 < position) {
-      return;
-    }
-    c.add(position - 1, c.remove(position));
-    ((PageletURIImpl) ((PageletImpl) c.get(position - 1)).getURI()).setPosition(position - 1);
-    ((PageletURIImpl) ((PageletImpl) c.get(position)).getURI()).setPosition(position);
-  }
-
-  /**
-   * Moves the pagelet down by one step.
-   * 
-   * @param composer
-   *          the composer identifier
-   * @param position
-   *          the pagelet's original position
-   */
-  void movePageletDown(String composer, int position) {
-    movePageletUp(composer, position + 1);
   }
 
   /**
@@ -1169,7 +1110,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
     // Test index
     if (pagelets == null || pagelets.size() < position)
-      throw new IndexOutOfBoundsException("No pagelet at position " + position + " found");
+      throw new IndexOutOfBoundsException("No pagelet found at position " + position);
 
     // Remove the pagelet and update uris of following pagelets
     Pagelet pagelet = pagelets.remove(position);

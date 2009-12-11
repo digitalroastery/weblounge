@@ -20,18 +20,33 @@
 
 package ch.o2it.weblounge.common.page;
 
+import static org.junit.Assert.assertFalse;
+
+import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.assertNotNull;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.language.English;
+import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.page.PageImpl;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Test case to test {@link PageImpl}.
@@ -44,36 +59,124 @@ public class PageImplTest {
   /** The page uri */
   protected PageURIImpl pageURI = null;
   
+  /** The German language */
+  protected Language german = new LanguageImpl(new Locale("de"));
+
+  /** The French language */
+  protected Language french = new LanguageImpl(new Locale("fr"));
+
+  /** The Italian language */
+  protected Language italian = new LanguageImpl(new Locale("it"));
+
   /** The site */
-  protected Site mockSite = null;
+  protected Site site = null;
   
   /** The page type */
-  protected String pageType = "default";
+  protected String pageType = "Text";
 
   /** The page template */
-  protected String template = "default";
+  protected String template = "home";
 
   /** The page layout */
-  protected String layout = "default";
+  protected String layout = "news";
+  
+  /** Indexed */
+  protected boolean isIndexed = true;
 
+  /** Anchor page */
+  protected boolean isPromoted = true;
+  
+  /** German page title */
+  protected String germanTitle = "Seitentitel"; 
+
+  /** French page title */
+  protected String frenchTitle = "Il titre de la page"; 
+
+  /** German page description */
+  protected String germanDescription = "Beschreibung"; 
+
+  /** French page description */
+  protected String frenchDescription = "Déscription";
+
+  /** German page coverage */
+  protected String germanCoverage = "Zürich"; 
+
+  /** French page coverage */
+  protected String frenchCoverage = "Zurich";
+
+  /** Content creation date */
+  protected Date creationDate = new Date(1231355141000L);
+  
+  /** Publishing start date */
+  protected Date publishingStartDate = new Date(1231355141000L);
+
+  /** Publishing end date */
+  protected Date publishingEndDate = new Date(1234991200000L);
+
+  /** Some date after the latest modification date */
+  protected Date futureDate = new Date(2000000000000L);
+
+  /** One day after the date identified by futureDate */
+  protected Date dayAfterFutureDate = new Date(futureDate.getTime() + Times.MS_PER_DAY);
+
+  /** One day before the date identified by futureDate */
+  protected Date dayBeforeFutureDate = new Date(2000000000000L - Times.MS_PER_DAY);
+
+  /** Creator */
+  protected User hans = new UserImpl("hans", "testland", "Hans Muster");
+  
+  /** Rights declaration */
+  protected String germanRights = "Copyright 2009 by T. Wunden";
+  
+  /** The subjects */
+  protected String[] subjects = new String[] { "This subject", "Other subject"};
+  
+  /** Name of the composer */
+  protected String composer = "main";
+  
+  /** Pagelet module */
+  protected String module = "text";
+  
+  /** Pagelet identifier */
+  protected String pagelet = "title";
+  
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
     setupPrerequisites();
+    page = new PageImpl(pageURI);
+    page.setIndexed(isIndexed);
+    page.setPromoted(isPromoted);
+    page.setCoverage(germanCoverage, german);
+    page.setCoverage(frenchCoverage, french);
+    page.setCreated(hans, creationDate);
+    page.setDescription(germanDescription, german);
+    page.setDescription(frenchDescription, french);
+    page.setLayout(layout);
+    page.setOwner(hans);
+    page.setPublished(hans, publishingStartDate, publishingEndDate);
+    page.setRights(germanRights, german);
+    page.setTemplate(template);
+    page.setTitle(germanTitle, german);
+    page.setTitle(frenchTitle, french);
+    page.setType(pageType);
+    for (String subject : subjects)
+      page.addSubject(subject);
+    page.addPagelet(new PageletImpl(module, pagelet), composer);
   }
   
   /**
    * Preliminary setup work.
    */
   protected void setupPrerequisites() {
-    mockSite = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(mockSite.getDefaultLanguage()).andReturn(English.getInstance());    
-    EasyMock.expect(mockSite.getAdministrator()).andReturn(new SiteAdminImpl("admin", "test"));    
-    EasyMock.expect(mockSite.getDefaultLanguage()).andReturn(English.getInstance());    
-    EasyMock.replay(mockSite);
-    pageURI = new PageURIImpl(mockSite, "/test", Page.LIVE);
+    site = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(site.getDefaultLanguage()).andReturn(English.getInstance());    
+    EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin", "test"));    
+    EasyMock.expect(site.getDefaultLanguage()).andReturn(English.getInstance());    
+    EasyMock.replay(site);
+    pageURI = new PageURIImpl(site, "/test", Page.LIVE);
   }
 
   /**
@@ -89,7 +192,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetSite() {
-    assertEquals(mockSite, page.getSite());
+    assertEquals(site, page.getSite());
   }
 
   /**
@@ -109,19 +212,12 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setType(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#removeSubject(java.lang.String)}.
    */
   @Test
-  public void testSetType() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#addKeyword(java.lang.String)}.
-   */
-  @Test
-  public void testAddKeyword() {
-    fail("Not yet implemented"); // TODO
+  public void testRemoveSubject() {
+    page.removeSubject(subjects[0]);
+    assertEquals(subjects.length - 1, page.getSubjects().length);
   }
 
   /**
@@ -129,7 +225,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetURI() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(pageURI, page.getURI());
   }
 
   /**
@@ -137,15 +233,15 @@ public class PageImplTest {
    */
   @Test
   public void testGetPublishingContext() {
-    fail("Not yet implemented"); // TODO
+    assertNotNull(page.getPublishingContext());
   }
-
+  
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getPublisher()}.
    */
   @Test
   public void testGetPublisher() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(hans, page.getPublisher());
   }
 
   /**
@@ -153,7 +249,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetPublishFrom() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(publishingStartDate, page.getPublishFrom());
   }
 
   /**
@@ -161,47 +257,116 @@ public class PageImplTest {
    */
   @Test
   public void testGetPublishTo() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(publishingEndDate, page.getPublishTo());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isAnchorpage()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isPromoted()}.
    */
   @Test
-  public void testInSitemap() {
-    fail("Not yet implemented"); // TODO
+  public void testIsPromoted() {
+    assertEquals(isPromoted, page.isPromoted());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getHeadline(java.lang.String, java.lang.String, ch.o2it.weblounge.common.user.AuthenticatedUser)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isIndexed()}.
    */
   @Test
-  public void testGetHeadlineStringStringAuthenticatedUser() {
-    fail("Not yet implemented"); // TODO
+  public void testIsIndexed() {
+    assertEquals(isIndexed, page.isIndexed());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getHeadline(java.lang.String, java.lang.String, ch.o2it.weblounge.common.user.AuthenticatedUser, ch.o2it.weblounge.common.security.Permission)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCoverage()}.
    */
   @Test
-  public void testGetHeadlineStringStringAuthenticatedUserPermission() {
-    fail("Not yet implemented"); // TODO
+  public void testGetCoverage() {
+    assertEquals(germanCoverage, page.getCoverage());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getHeadlines()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCoverage(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
-  public void testGetHeadlines() {
-    fail("Not yet implemented"); // TODO
+  public void testGetCoverageLanguage() {
+    assertEquals(germanCoverage, page.getCoverage(german));
+    assertEquals(frenchCoverage, page.getCoverage(french));
+    assertEquals(germanCoverage, page.getCoverage(italian));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setTitle(java.lang.String, ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCoverage(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
-  public void testSetTitle() {
-    fail("Not yet implemented"); // TODO
+  public void testGetCoverageLanguageBoolean() {
+    assertEquals(germanCoverage, page.getCoverage(german, false));
+    assertEquals(germanCoverage, page.getCoverage(german, true));
+    assertEquals(frenchCoverage, page.getCoverage(french, false));
+    assertEquals(frenchCoverage, page.getCoverage(french, true));
+    assertEquals(germanCoverage, page.getCoverage(italian, false));
+    assertTrue(page.getCoverage(italian, true) == null);
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getDescription()}.
+   */
+  @Test
+  public void testGetDescription() {
+    assertEquals(germanDescription, page.getDescription());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getDescription(ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testGetDescriptionLanguage() {
+    assertEquals(germanDescription, page.getDescription(german));
+    assertEquals(frenchDescription, page.getDescription(french));
+    assertEquals(germanDescription, page.getDescription(italian));
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getDescription(ch.o2it.weblounge.common.language.Language, boolean)}.
+   */
+  @Test
+  public void testGetDescriptionLanguageBoolean() {
+    assertEquals(germanDescription, page.getDescription(german, false));
+    assertEquals(germanDescription, page.getDescription(german, true));
+    assertEquals(frenchDescription, page.getDescription(french, false));
+    assertEquals(frenchDescription, page.getDescription(french, true));
+    assertEquals(germanDescription, page.getDescription(italian, false));
+    assertTrue(page.getDescription(italian, true) == null);
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getRights()}.
+   */
+  @Test
+  public void testGetRights() {
+    assertEquals(germanRights, page.getRights());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getRights(ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testGetRightsLanguage() {
+    assertEquals(germanRights, page.getRights(german));
+    assertEquals(germanRights, page.getRights(french));
+    assertEquals(germanRights, page.getRights(italian));
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getRights(ch.o2it.weblounge.common.language.Language, boolean)}.
+   */
+  @Test
+  public void testGetRightsLanguageBoolean() {
+    assertEquals(germanRights, page.getRights(german, false));
+    assertEquals(germanRights, page.getRights(german, true));
+    assertEquals(germanRights, page.getRights(french, false));
+    assertTrue(page.getRights(french, true) == null);
+    assertEquals(germanRights, page.getRights(italian, false));
+    assertTrue(page.getRights(italian, true) == null);
   }
 
   /**
@@ -209,7 +374,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetTitle() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(germanTitle, page.getTitle());
   }
 
   /**
@@ -217,7 +382,9 @@ public class PageImplTest {
    */
   @Test
   public void testGetTitleLanguage() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(germanTitle, page.getTitle(german));
+    assertEquals(frenchTitle, page.getTitle(french));
+    assertEquals(germanTitle, page.getTitle(italian));
   }
 
   /**
@@ -225,7 +392,12 @@ public class PageImplTest {
    */
   @Test
   public void testGetTitleLanguageBoolean() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(germanTitle, page.getTitle(german, false));
+    assertEquals(germanTitle, page.getTitle(german, true));
+    assertEquals(frenchTitle, page.getTitle(french, false));
+    assertEquals(frenchTitle, page.getTitle(french, true));
+    assertEquals(germanTitle, page.getTitle(italian, false));
+    assertTrue(page.getTitle(italian, true) == null);
   }
 
   /**
@@ -237,15 +409,6 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setLayout(java.lang.String)}.
-   */
-  @Test
-  public void testSetLayout() {
-    page.setLayout("test");
-    assertEquals("test", page.getLayout());
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getTemplate()}.
    */
   @Test
@@ -254,27 +417,21 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setTemplate(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#hasSubject(String)}.
    */
   @Test
-  public void testSetTemplate() {
-    fail("Not yet implemented"); // TODO
+  public void testHasSubject() {
+    assertTrue(page.hasSubject(subjects[0]));
+    assertFalse(page.hasSubject("xxx"));
   }
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getSubjects()}.
    */
   @Test
-  public void testGetKeywords() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setKeywords(java.lang.String[])}.
-   */
-  @Test
-  public void testSetKeywords() {
-    fail("Not yet implemented"); // TODO
+  public void testGetSubjects() {
+    assertEquals(subjects.length, page.getSubjects().length);
+    
   }
 
   /**
@@ -282,6 +439,22 @@ public class PageImplTest {
    */
   @Test
   public void testGetSecurityContext() {
+    assertNotNull(page.getSecurityContext());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#allow(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
+   */
+  @Test
+  public void testAllow() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#deny(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
+   */
+  @Test
+  public void testDeny() {
     fail("Not yet implemented"); // TODO
   }
 
@@ -330,23 +503,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetOwner() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#addSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)}.
-   */
-  @Test
-  public void testAddSecurityListener() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#removeSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)}.
-   */
-  @Test
-  public void testRemoveSecurityListener() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(hans, page.getOwner());
   }
 
   /**
@@ -354,15 +511,9 @@ public class PageImplTest {
    */
   @Test
   public void testEqualsObject() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#toString()}.
-   */
-  @Test
-  public void testToString() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(page, page);
+    assertEquals(page, new PageImpl(pageURI));
+    assertFalse(page.equals(new PageImpl(new PageURIImpl(site, "/test/2", Page.LIVE))));
   }
 
   /**
@@ -370,7 +521,9 @@ public class PageImplTest {
    */
   @Test
   public void testIsPublished() {
-    fail("Not yet implemented"); // TODO
+    page.setPublishFrom(new Date(new Date().getTime() - Times.MS_PER_DAY));
+    page.setPublishTo(new Date(new Date().getTime() + Times.MS_PER_DAY));
+    assertTrue(page.isPublished());
   }
 
   /**
@@ -378,7 +531,9 @@ public class PageImplTest {
    */
   @Test
   public void testIsPublishedDate() {
-    fail("Not yet implemented"); // TODO
+    Date d = new Date(publishingStartDate.getTime() + Times.MS_PER_DAY);
+    assertTrue(page.isPublished(d));
+    assertFalse(page.isPublished(futureDate));
   }
 
   /**
@@ -386,7 +541,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetCreationContext() {
-    fail("Not yet implemented"); // TODO
+    assertNotNull(page.getCreationContext());
   }
 
   /**
@@ -394,7 +549,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetCreationDate() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(creationDate, page.getCreationDate());
   }
 
   /**
@@ -402,7 +557,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetCreator() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(hans, page.getCreator());
   }
 
   /**
@@ -410,7 +565,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsCreatedAfter() {
-    fail("Not yet implemented"); // TODO
+    assertFalse(page.isCreatedAfter(futureDate));
   }
 
   /**
@@ -418,39 +573,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetModificationContext() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setModifiedSince(java.util.Date)}.
-   */
-  @Test
-  public void testSetModifiedSince() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModifiedSince()}.
-   */
-  @Test
-  public void testGetModifiedSince() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setModifiedBy(ch.o2it.weblounge.common.user.User)}.
-   */
-  @Test
-  public void testSetModifiedBy() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModifiedBy()}.
-   */
-  @Test
-  public void testGetModifiedBy() {
-    fail("Not yet implemented"); // TODO
+    assertNotNull(page.getModificationContext());
   }
 
   /**
@@ -473,7 +596,15 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedAfter(java.util.Date)}.
    */
   @Test
-  public void testIsModifiedAfter() {
+  public void testIsModifiedAfterDate() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedAfter(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testIsModifiedAfterDateLanguage() {
     fail("Not yet implemented"); // TODO
   }
 
@@ -481,7 +612,15 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedBefore(java.util.Date)}.
    */
   @Test
-  public void testIsModifiedBefore() {
+  public void testIsModifiedBeforeDate() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedBefore(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testIsModifiedBeforeDateLanguage() {
     fail("Not yet implemented"); // TODO
   }
 
@@ -510,10 +649,34 @@ public class PageImplTest {
   }
 
   /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModificationDate(ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testGetModificationDateLanguage() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModifier(ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testGetModifierLanguage() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testSetModified() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getLockOwner()}.
    */
   @Test
-  public void testGetEditor() {
+  public void testGetLockOwner() {
     fail("Not yet implemented"); // TODO
   }
 
@@ -542,35 +705,36 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#appendPagelet(ch.o2it.weblounge.common.page.Pagelet, java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#addPagelet(ch.o2it.weblounge.common.page.Pagelet, java.lang.String)}.
    */
   @Test
-  public void testAppendPagelet() {
-    fail("Not yet implemented"); // TODO
+  public void testAddPageletPageletString() {
+    Pagelet p = new PageletImpl(module, pagelet);
+    assertTrue(p.getURI() == null);
+    page.addPagelet(p, composer);
+    assertTrue(p.getURI() != null);
+    assertEquals(2, page.getPagelets(composer).length);
+    page.addPagelet(p, "xxx");
+    assertEquals(1, page.getPagelets("xxx").length);
   }
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#addPagelet(ch.o2it.weblounge.common.page.Pagelet, java.lang.String, int)}.
    */
   @Test
-  public void testAddPagelet() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#movePageletUp(java.lang.String, int)}.
-   */
-  @Test
-  public void testMovePageletUp() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#movePageletDown(java.lang.String, int)}.
-   */
-  @Test
-  public void testMovePageletDown() {
-    fail("Not yet implemented"); // TODO
+  public void testAddPageletPageletStringInt() {
+    Pagelet p = new PageletImpl(module, pagelet);
+    page.addPagelet(p, composer, 0);
+    page.addPagelet(p, composer, 1);
+    assertEquals(3, page.getPagelets(composer).length);
+    page.addPagelet(p, "xxx", 0);
+    assertEquals(1, page.getPagelets("xxx").length);
+    try {
+      page.addPagelet(p, composer, 5);
+      fail("Should not be able to add pagelet at impossible position");
+    } catch (IndexOutOfBoundsException e) {
+      // This is expected
+    }
   }
 
   /**
@@ -578,7 +742,8 @@ public class PageImplTest {
    */
   @Test
   public void testGetPageletsString() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(0, page.getPagelets("xxx").length);
+    assertEquals(1, page.getPagelets(composer).length);
   }
 
   /**
@@ -586,7 +751,9 @@ public class PageImplTest {
    */
   @Test
   public void testGetPageletsStringStringString() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(1, page.getPagelets(composer, "text", "title").length);
+    assertEquals(0, page.getPagelets("xxx", "text", "title").length);
+    assertEquals(0, page.getPagelets(composer, "text", "xxx").length);
   }
 
   /**
@@ -594,23 +761,20 @@ public class PageImplTest {
    */
   @Test
   public void testRemovePagelet() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#addPageContentListener(ch.o2it.weblounge.common.page.PageContentListener)}.
-   */
-  @Test
-  public void testAddPageContentListener() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#removePageContentListener(ch.o2it.weblounge.common.page.PageContentListener)}.
-   */
-  @Test
-  public void testRemovePageContentListener() {
-    fail("Not yet implemented"); // TODO
+    try {
+      page.removePagelet("xxx", 0);
+      fail("Should not be able to remove from non-existing composer");
+    } catch (IndexOutOfBoundsException e) {
+      // This is expected
+    }
+    try {
+      page.removePagelet(composer, 1);
+      fail("Should not be able to remove non-existing pagelet");
+    } catch (IndexOutOfBoundsException e) {
+      // This is expected
+    }
+    page.removePagelet(composer, 0);
+    assertEquals(0, page.getPagelets(composer).length);
   }
 
   /**
@@ -634,6 +798,14 @@ public class PageImplTest {
    */
   @Test
   public void testGetVersionString() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testCompareTo() {
     fail("Not yet implemented"); // TODO
   }
 
