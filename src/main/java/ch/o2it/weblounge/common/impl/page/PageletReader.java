@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Pagelet;
-import ch.o2it.weblounge.common.page.PageletLocation;
+import ch.o2it.weblounge.common.page.PageletURI;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.site.Site;
@@ -54,7 +54,7 @@ public final class PageletReader extends WebloungeContentReader {
   private PageletImpl pagelet = null;
 
   /** The pagelet location within a page */
-  private PageletLocation pageletLocation = null;
+  private PageletURI pageletLocation = null;
 
   /**
    * Creates a new pagelet reader that will parse serialized XML version of a
@@ -89,6 +89,15 @@ public final class PageletReader extends WebloungeContentReader {
   }
 
   /**
+   * Returns the pagelet that has been read in.
+   * 
+   * @return the pagelet
+   */
+  PageletImpl getPagelet() {
+    return pagelet;
+  }
+
+  /**
    * The location of the pagelet within the page. Note that when using this
    * reader as a helper for the {@link PageReader}, you need to set the location
    * prior to passing on the first SAX event, otherwise it won't be taken into
@@ -97,7 +106,7 @@ public final class PageletReader extends WebloungeContentReader {
    * @param location
    *          the pagelet's location on the page
    */
-  public void setPageletLocation(PageletLocation location) {
+  public void setPageletLocation(PageletURI location) {
     this.pageletLocation = location;
   }
 
@@ -243,9 +252,7 @@ public final class PageletReader extends WebloungeContentReader {
    */
   @Override
   protected void setPublished(User publisher, Date startDate, Date endDate) {
-    pagelet.publishingCtx.setPublisher(publisher);
-    pagelet.publishingCtx.setPublishFrom(startDate);
-    pagelet.publishingCtx.setPublishTo(endDate);
+    pagelet.publishingCtx.setPublished(publisher, startDate, endDate);
   }
 
 }

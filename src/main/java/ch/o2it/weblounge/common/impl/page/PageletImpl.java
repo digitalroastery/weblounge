@@ -33,7 +33,7 @@ import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Pagelet;
-import ch.o2it.weblounge.common.page.PageletLocation;
+import ch.o2it.weblounge.common.page.PageletURI;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
@@ -83,13 +83,13 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   protected final static Logger log_ = LoggerFactory.getLogger(Pagelet.class);
 
   /** Module that defined the pagelet */
-  private String moduleId_ = null;
+  private String moduleId = null;
 
   /** Pagelet identifier */
-  private String id_ = null;
+  private String pageletId = null;
 
   /** The pagelet location */
-  PageletLocation location_ = null;
+  PageletURI uri = null;
 
   /** The security context */
   PermissionSecurityContext securityCtx = null;
@@ -135,8 +135,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public PageletImpl(String module, String id) {
     this();
-    moduleId_ = module;
-    id_ = id;
+    moduleId = module;
+    pageletId = id;
   }
 
   /**
@@ -149,9 +149,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @param id
    *          the pagelet identifier
    */
-  public PageletImpl(PageletLocation location, String module, String id) {
+  public PageletImpl(PageletURI location, String module, String id) {
     this(module, id);
-    location_ = location;
+    uri = location;
   }
 
   /**
@@ -160,7 +160,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @return the module identifier
    */
   public String getModule() {
-    return moduleId_;
+    return moduleId;
   }
 
   /**
@@ -169,7 +169,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @return the identifier
    */
   public String getIdentifier() {
-    return id_;
+    return pageletId;
   }
 
   /**
@@ -387,13 +387,21 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.page.Pagelet#setURI(ch.o2it.weblounge.common.page.PageletURI)
+   */
+  public void setURI(PageletURI uri) {
+    this.uri = uri;
+  }
+
+  /**
    * Returns the pagelet location, containing information about url, composer
    * and composer position.
    * 
    * @return the pagelet location
    */
-  public PageletLocation getLocation() {
-    return location_;
+  public PageletURI getURI() {
+    return uri;
   }
 
   /**
@@ -476,6 +484,16 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public boolean isPublished() {
     return publishingCtx.isPublished();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#setPublished(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, java.util.Date)
+   */
+  public void setPublished(User publisher, Date from, Date to) {
+    publishingCtx.setPublished(publisher, from, to);
   }
 
   /**
@@ -639,7 +657,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @return the pagelet string representation
    */
   public String toString() {
-    return moduleId_ + "/" + id_;
+    return moduleId + "/" + pageletId;
   }
 
   /**
@@ -651,7 +669,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     StringBuffer b = new StringBuffer();
 
     // Add root node
-    b.append("<pagelet module=\"" + moduleId_ + "\" id=\"" + id_ + "\">");
+    b.append("<pagelet module=\"" + moduleId + "\" id=\"" + pageletId + "\">");
 
     // export security context
     b.append(securityCtx.toXml());
@@ -675,7 +693,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       b.append("<modified>");
       User u = modificationCtx.getModifier(l);
       if (u == null)
-        u = location_.getSite().getAdministrator();
+        u = uri.getSite().getAdministrator();
       b.append(u.toXml());
       b.append("<date>");
       Date d = modificationCtx.getModificationDate(l);
@@ -894,10 +912,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
-    if (location_ != null)
-      return location_.hashCode();
+    if (uri != null)
+      return uri.hashCode();
     else
-      return moduleId_.hashCode() | (id_.hashCode() >> 16);
+      return moduleId.hashCode() | (pageletId.hashCode() >> 16);
   }
 
   /**
@@ -908,9 +926,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   public boolean equals(Object o) {
     if (o instanceof Pagelet) {
       Pagelet p = (Pagelet) o;
-      if (p.getModule().equals(moduleId_) && p.getIdentifier().equals(id_)) {
-        if (p.getLocation() != null)
-          return p.getLocation().equals(location_);
+      if (p.getModule().equals(moduleId) && p.getIdentifier().equals(pageletId)) {
+        if (p.getURI() != null)
+          return p.getURI().equals(uri);
         return true;
       }
     }
@@ -922,22 +940,22 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * <p>
    * This implementation does nothing, since it doesn't make sense to compare
    * the pagelet due with respect to its language. If <code>o</code> is a
-   * pagelet as well, then the {@link PageletLocation} is used for the
+   * pagelet as well, then the {@link PageletURI} is used for the
    * comparison.
    * 
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
    *      ch.o2it.weblounge.common.language.Language)
-   * @see ch.o2it.weblounge.common.page.PageletLocation#compareTo(PageletLocation)
+   * @see ch.o2it.weblounge.common.page.PageletURI#compareTo(PageletURI)
    */
   public int compareTo(Localizable o, Language l) {
-    if (location_ != null && o instanceof Pagelet) {
+    if (uri != null && o instanceof Pagelet) {
       Pagelet p = (Pagelet) o;
-      if (p.getLocation() != null)
-        return location_.compareTo(p.getLocation());
+      if (p.getURI() != null)
+        return uri.compareTo(p.getURI());
     }
     return 0;
   }
-  
+
   /**
    * Utility class used to compare content and property map entries.
    */
@@ -945,6 +963,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
     /**
      * {@inheritDoc}
+     * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     public int compare(Entry<String, String[]> o1, Entry<String, String[]> o2) {
@@ -953,7 +972,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
         return keyComparison;
       return o1.getValue()[0].compareTo(o2.getValue()[0]);
     }
-    
+
   }
 
 }

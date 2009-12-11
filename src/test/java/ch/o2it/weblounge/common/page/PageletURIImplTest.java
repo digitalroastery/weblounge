@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.page.PageletLocationImpl;
+import ch.o2it.weblounge.common.impl.page.PageletURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;
@@ -32,9 +32,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test case for the implementation at {@link PageletLocationImpl}.
+ * Test case for the implementation at {@link PageletURIImpl}.
  */
-public class PageletLocationImplTest {
+public class PageletURIImplTest {
   
   /** Page identifier */
   protected PageURI uri = null;
@@ -52,7 +52,7 @@ public class PageletLocationImplTest {
   protected int position = 1;
   
   /** The pagelet location instance under test */
-  protected PageletLocationImpl location = null;
+  protected PageletURIImpl location = null;
 
   /**
    * @throws java.lang.Exception
@@ -61,11 +61,11 @@ public class PageletLocationImplTest {
   public void setUp() throws Exception {
     site = EasyMock.createNiceMock(Site.class);
     uri = new PageURIImpl(site, path);
-    location = new PageletLocationImpl(uri, composer, position);
+    location = new PageletURIImpl(uri, composer, position);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletLocationImpl#getSite()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -73,15 +73,15 @@ public class PageletLocationImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletLocationImpl#getURI()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#getPageURI()}.
    */
   @Test
   public void testGetURI() {
-    assertEquals(uri, location.getURI());
+    assertEquals(uri, location.getPageURI());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletLocationImpl#getComposer()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#getComposer()}.
    */
   @Test
   public void testGetComposer() {
@@ -89,7 +89,7 @@ public class PageletLocationImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletLocationImpl#getPosition()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#getPosition()}.
    */
   @Test
   public void testGetPosition() {
@@ -97,26 +97,26 @@ public class PageletLocationImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletLocationImpl#equals(java.lang.Object)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
     uri = new PageURIImpl(site, path);
-    location = new PageletLocationImpl(uri, composer, position);
-    PageletLocation sameLocation = new PageletLocationImpl(uri, composer, position);
+    location = new PageletURIImpl(uri, composer, position);
+    PageletURI sameLocation = new PageletURIImpl(uri, composer, position);
     assertEquals(location, sameLocation);
-    assertFalse(location.equals(new PageletLocationImpl(new PageURIImpl(site, "/test2"), composer, position)));
-    assertFalse(location.equals(new PageletLocationImpl(uri, "main2", position)));
-    assertFalse(location.equals(new PageletLocationImpl(uri, composer, position + 1)));
+    assertFalse(location.equals(new PageletURIImpl(new PageURIImpl(site, "/test2"), composer, position)));
+    assertFalse(location.equals(new PageletURIImpl(uri, "main2", position)));
+    assertFalse(location.equals(new PageletURIImpl(uri, composer, position + 1)));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletLocationImpl#compareTo(ch.o2it.weblounge.common.page.PageletLocation)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#compareTo(ch.o2it.weblounge.common.page.PageletURI)}.
    */
   @Test
   public void testCompareTo() {
-    PageletLocation previous = new PageletLocationImpl(uri, composer, position - 1);
-    PageletLocation next = new PageletLocationImpl(uri, composer, position + 1);
+    PageletURI previous = new PageletURIImpl(uri, composer, position - 1);
+    PageletURI next = new PageletURIImpl(uri, composer, position + 1);
     assertEquals(1, location.compareTo(previous));
     assertEquals(0, location.compareTo(location));
     assertEquals(-1, location.compareTo(next));
