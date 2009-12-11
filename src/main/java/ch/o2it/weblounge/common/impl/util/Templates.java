@@ -30,8 +30,6 @@ import java.util.regex.Pattern;
 /**
  * This is able to parse text content and replace any weblounge formatting
  * codes by their xhtml equivalent.
- * 
- * @author Tobias Wunden
  */
 public class Templates {
 

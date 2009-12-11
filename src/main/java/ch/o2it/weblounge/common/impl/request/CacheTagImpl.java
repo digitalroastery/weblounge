@@ -25,9 +25,6 @@ import ch.o2it.weblounge.common.request.CacheTag;
 
 /**
  * Tag used to identify entries in the caching service.
- * 
- * @author Tobias Wunden
- * @version 1.0
  */
 public final class CacheTagImpl implements Tag, CacheTag {
 

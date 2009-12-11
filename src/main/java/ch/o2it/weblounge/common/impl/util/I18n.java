@@ -256,9 +256,6 @@ public class I18n {
   /**
    * Class used to filter the acceptable files for the i18n mechanism. The files
    * have to be named <code>xyz.xml</code> or <code>xyz_de.xml</code>.
-   * 
-   * @author Tobias Wunden
-   * 
    */
   static final class I18nFileFilter extends FileFilter {
 
