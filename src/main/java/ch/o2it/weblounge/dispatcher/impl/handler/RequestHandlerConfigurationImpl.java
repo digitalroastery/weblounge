@@ -41,10 +41,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 
 /**
- * RequestHandlerConfigurationImpl
- * 
- * @version $Revision: 1.9 $ $Date: 2005/11/29 23:28:40 $
- * @author Daniel Steiner
+ * TODO: Document me
  */
 public class RequestHandlerConfigurationImpl implements RequestHandlerConfiguration {
 

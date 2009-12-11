@@ -41,9 +41,6 @@ import javax.security.auth.login.LoginException;
 /**
  * Implementation of the Weblounge login module, which will login users
  * according the the Weblounge user database.
- * 
- * @author Tobias Wunden
- * @version 1.0
  */
 public class WebloungeLoginModule extends AbstractLoginModule {
 	

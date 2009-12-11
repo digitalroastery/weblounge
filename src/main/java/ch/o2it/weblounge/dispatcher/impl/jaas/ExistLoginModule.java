@@ -31,9 +31,6 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 /**
  * Implementation of a login module which will look up the users and passwords
  * from the exist database.
- * 
- * @author Tobias Wunden
- * @version 1.0
  */
 public class ExistLoginModule extends AbstractLoginModule {
 

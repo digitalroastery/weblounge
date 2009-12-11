@@ -48,12 +48,7 @@ import javax.servlet.http.HttpServletResponse;
  * <code>Dispatcher</code> is used to dispatch the urls requested by the site
  * visitors. The handler tries to map the urls either to the community system
  * itself or to one of the modules.
- * 
- * @author Tobias Wunden
- * @version 2.0
- * @since WebLounge 1.0
  */
-
 public final class WebloungeDispatcher {
 
   /** List of request listeners */
