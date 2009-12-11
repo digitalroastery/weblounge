@@ -20,29 +20,11 @@
 
 package ch.o2it.weblounge.common.content;
 
-import java.util.Date;
-
 /**
  * This interface is used for objects that can be published from a given start
  * date to an end date.
  */
 public interface PublishingContext extends Publishable, Cloneable {
-
-  /**
-   * Sets the publishing start date.
-   * 
-   * @param from
-   *          the start date
-   */
-  void setPublishFrom(Date from);
-
-  /**
-   * Sets the publishing end date.
-   * 
-   * @param to
-   *          the end date
-   */
-  void setPublishTo(Date to);
 
   /**
    * Returns an XML representation of this context.
