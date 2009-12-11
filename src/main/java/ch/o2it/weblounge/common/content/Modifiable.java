@@ -31,6 +31,16 @@ import java.util.Date;
 public interface Modifiable {
 
   /**
+   * Sets creator and creation date.
+   * 
+   * @param user
+   *          the user that created the object
+   * @param date
+   *          the date of creation
+   */
+  void setModified(User user, Date date);
+
+  /**
    * Returns <code>true</code> if this context contains information about a
    * modification.
    * 
