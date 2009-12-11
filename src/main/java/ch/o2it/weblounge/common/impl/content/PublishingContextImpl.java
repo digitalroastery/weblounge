@@ -98,6 +98,18 @@ public class PublishingContextImpl implements PublishingContext {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.PublishingContext#setPublished(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, java.util.Date)
+   */
+  public void setPublished(User publisher, Date from, Date to) {
+    this.publisher = publisher;
+    this.startDate = from;
+    this.endDate = to;
+  }
+
+  /**
    * Sets the user that published or unpublished the page.
    * 
    * @param user
@@ -263,7 +275,7 @@ public class PublishingContextImpl implements PublishingContext {
     StringBuffer b = new StringBuffer();
     b.append("<published>");
     b.append(publisher.toXml());
-    
+
     b.append("<from>");
     b.append(WebloungeDateFormat.formatStatic(startDate));
     b.append("</from>");

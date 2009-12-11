@@ -115,6 +115,17 @@ public class ModificationContextImpl implements ModificationContext {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Modifiable#setModified(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
+   */
+  public void setModified(User user, Date date) {
+    this.modifier = user;
+    this.modificationDate = date;
+  }
+
+  /**
    * @see ch.o2it.weblounge.common.content.ModificationContext#setModificationDate(java.util.Date)
    */
   public void setModificationDate(Date date) {
@@ -136,9 +147,9 @@ public class ModificationContextImpl implements ModificationContext {
   public Object clone() {
     ModificationContextImpl ctxt = new ModificationContextImpl();
     if (modifier != null)
-      ctxt.modifier = (User)modifier.clone();
+      ctxt.modifier = (User) modifier.clone();
     if (modificationDate != null)
-      ctxt.modificationDate = (Date)modificationDate.clone();
+      ctxt.modificationDate = (Date) modificationDate.clone();
     return ctxt;
   }
 

@@ -47,7 +47,7 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Default implementation of the localized modification context.
  */
-public class LocalizedModificationContextImpl extends LocalizableObject implements ModificationContext, LocalizedModificationContext {
+public class LocalizedModificationContextImpl extends LocalizableObject implements LocalizedModificationContext {
 
   /** The last modifier */
   protected transient User lastModifier = null;
