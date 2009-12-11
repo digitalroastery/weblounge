@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.site.Site;
  * This interface describes a pagelet's position with respect to its url,
  * composer and position within this composer.
  */
-public interface PageletLocation extends Comparable<PageletLocation> {
+public interface PageletURI extends Comparable<PageletURI> {
 
   /** String identifier for the url */
   String URL = "url";
@@ -45,11 +45,27 @@ public interface PageletLocation extends Comparable<PageletLocation> {
   Site getSite();
 
   /**
+   * Sets the page uri.
+   * 
+   * @param uri
+   *          the page uri
+   */
+  void setURI(PageURI uri);
+
+  /**
    * Returns the page where this pagelet is situated.
    * 
    * @return the pagelet uri
    */
-  PageURI getURI();
+  PageURI getPageURI();
+
+  /**
+   * Sets the composer containing the pagelet.
+   * 
+   * @param composer
+   *          the composer
+   */
+  void setComposer(String composer);
 
   /**
    * Returns the pagelet's composer
@@ -57,6 +73,14 @@ public interface PageletLocation extends Comparable<PageletLocation> {
    * @return the composer
    */
   String getComposer();
+
+  /**
+   * Sets the pagelets position within the composer.
+   * 
+   * @param position
+   *          the position within the composer
+   */
+  void setPosition(int position);
 
   /**
    * Returns the pagelet's position within the composer.
