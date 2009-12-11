@@ -125,13 +125,13 @@ public class PageletImplTest {
   protected Language italian = new LanguageImpl(new Locale("it"));
 
   /** Content creation date */
-  protected Date creationDate = new Date(1000000000000L);
+  protected Date creationDate = new Date(1231355141000L);
 
   /** German modification date */
-  protected Date germanModifcationDate = new Date(1231355141000L);
+  protected Date germanModificationDate = new Date(1231355141000L);
 
   /** French modification date */
-  protected Date frenchModifcationDate = new Date(1234991200000L);
+  protected Date frenchModificationDate = new Date(1234991200000L);
 
   /** Publishing start date */
   protected Date publishingStartDate = new Date(1231355141000L);
@@ -178,9 +178,9 @@ public class PageletImplTest {
     for (String s : multivaluePropertyValue)
       pagelet.setProperty(multivaluePropertyName, s);
     pagelet.setOwner(john);
-    pagelet.setCreated(hans, germanModifcationDate);
-    pagelet.setModified(hans, germanModifcationDate, german);
-    pagelet.setModified(amelie, frenchModifcationDate, french);
+    pagelet.setCreated(hans, creationDate);
+    pagelet.setModified(hans, germanModificationDate, german);
+    pagelet.setModified(amelie, frenchModificationDate, french);
     pagelet.setPublisher(hans);
     pagelet.setPublishFrom(publishingStartDate);
     pagelet.setPublishTo(publishingEndDate);
