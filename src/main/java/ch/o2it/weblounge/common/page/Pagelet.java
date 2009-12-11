@@ -226,6 +226,14 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * @return the content
    */
   String getContent(String name);
+  
+  /**
+   * Sets the pagelet's location, containing the page that it's on, the composer
+   * that it is in and the position within the composer.
+   * 
+   * @param uri the pagelet uri
+   */
+  void setURI(PageletURI uri);
 
   /**
    * Returns the pagelet location, containing information about url, composer
@@ -233,7 +241,7 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * 
    * @return the pagelet location
    */
-  PageletLocation getLocation();
+  PageletURI getURI();
 
   /**
    * Returns an XML representation of this pagelet.
