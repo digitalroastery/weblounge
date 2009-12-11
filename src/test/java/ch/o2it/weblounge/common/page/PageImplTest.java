@@ -165,7 +165,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#inSitemap()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isAnchorpage()}.
    */
   @Test
   public void testInSitemap() {
@@ -262,7 +262,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getKeywords()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getSubjects()}.
    */
   @Test
   public void testGetKeywords() {
@@ -510,7 +510,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getEditor()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getLockOwner()}.
    */
   @Test
   public void testGetEditor() {
@@ -538,14 +538,6 @@ public class PageImplTest {
    */
   @Test
   public void testIsLocked() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isLocked(ch.o2it.weblounge.common.user.User)}.
-   */
-  @Test
-  public void testIsLockedUser() {
     fail("Not yet implemented"); // TODO
   }
 

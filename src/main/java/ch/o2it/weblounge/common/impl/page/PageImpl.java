@@ -32,13 +32,13 @@ import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
-import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageContentListener;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.page.Pagelet;
+import ch.o2it.weblounge.common.page.PageletURI;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
@@ -49,73 +49,72 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.AuthenticatedUser;
 import ch.o2it.weblounge.common.user.User;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.Set;
 
 /**
  * A <code>Page</code> encapsulates all data that is attached with a site URL.
  */
 public class PageImpl extends LocalizableObject implements Page {
 
-  /** The logging instance */
-  private final static Logger log_ = LoggerFactory.getLogger(PageImpl.class);
-
   /** The uri */
-  PageURIImpl uri = null;
+  protected PageURIImpl uri = null;
 
   /** PageHeader type */
-  String type = null;
+  protected String type = null;
 
   /** PageHeader keywords */
-  List<String> keywords_ = null;
+  protected Set<String> subjects = null;
 
   /** Renderer identifier */
-  String template = null;
+  protected String template = null;
 
   /** Layout identifier */
-  String layout = null;
+  protected String layout = null;
 
   /** True if this page should show up on the sitemap */
-  boolean inSitemap = false;
+  protected boolean isAnchorpage = false;
+
+  /** True if the page contents should be indexed */
+  protected boolean index = true;
 
   /** The title pagelets */
-  List<Pagelet> headlines = null;
+  protected List<Pagelet> headlines = null;
 
   /** Current page editor (and owner) */
-  User editor = null;
+  protected User lockOwner = null;
 
   /** Creation context */
-  CreationContext creationCtx = null;
+  protected CreationContext creationCtx = null;
 
   /** Modification context */
-  LocalizedModificationContext modificationCtx = null;
+  protected LocalizedModificationContext modificationCtx = null;
 
   /** The publishing context */
-  PublishingContext publishingCtx = null;
+  protected PublishingContext publishingCtx = null;
 
   /** The security context */
-  PermissionSecurityContext securityCtx = null;
+  protected PermissionSecurityContext securityCtx = null;
 
   /** The title */
-  LocalizableContent<String> title = null;
+  protected LocalizableContent<String> title = null;
+
+  /** The description */
+  protected LocalizableContent<String> description = null;
+
+  /** The coverage */
+  protected LocalizableContent<String> coverage = null;
+
+  /** The rights declaration */
+  protected LocalizableContent<String> rights = null;
 
   /** The pagelet container */
-  Map<String, List<Pagelet>> composers_ = null;
+  protected Map<String, List<Pagelet>> composers = null;
 
   /** The page content listeners */
   private List<PageContentListener> contentListeners = null;
@@ -133,10 +132,13 @@ public class PageImpl extends LocalizableObject implements Page {
     this.modificationCtx = new LocalizedModificationContextImpl();
     this.publishingCtx = new PublishingContextImpl();
     this.securityCtx = new PageSecurityContext();
-    this.keywords_ = new ArrayList<String>();
+    this.subjects = new HashSet<String>();
     this.headlines = new ArrayList<Pagelet>();
     this.title = new LocalizableContent<String>(this);
-    this.composers_ = new HashMap<String, List<Pagelet>>();
+    this.description = new LocalizableContent<String>(this);
+    this.coverage = new LocalizableContent<String>(this);
+    this.rights = new LocalizableContent<String>(this);
+    this.composers = new HashMap<String, List<Pagelet>>();
   }
 
   /**
@@ -155,6 +157,24 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public long getVersion() {
     return uri.getVersion();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#setAnchorpage(boolean)
+   */
+  public void setAnchorpage(boolean anchor) {
+    this.isAnchorpage = anchor;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#setIndexed(boolean)
+   */
+  public void setIndexed(boolean index) {
+    this.index = index;
   }
 
   /**
@@ -178,13 +198,21 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * Adds the keyword to this page.
+   * {@inheritDoc}
    * 
-   * @param keyword
-   *          the keyword to add
+   * @see ch.o2it.weblounge.common.page.Page#addSubject(java.lang.String)
    */
-  void addKeyword(String keyword) {
-    keywords_.add(keyword);
+  public void addSubject(String subject) {
+    subjects.add(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#removeSubject(java.lang.String)
+   */
+  public void removeSubject(String subject) {
+    subjects.remove(subject);
   }
 
   /**
@@ -205,6 +233,16 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public PublishingContext getPublishingContext() {
     return publishingCtx;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#setPublished(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, java.util.Date)
+   */
+  public void setPublished(User publisher, Date from, Date to) {
+    publishingCtx.setPublished(publisher, from, to);
   }
 
   /**
@@ -264,10 +302,19 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.page.Page#inSitemap()
+   * @see ch.o2it.weblounge.common.page.Page#isAnchorpage()
    */
-  public boolean inSitemap() {
-    return inSitemap;
+  public boolean isAnchorpage() {
+    return isAnchorpage;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#isIndexed()
+   */
+  public boolean isIndexed() {
+    return isIndexed();
   }
 
   /**
@@ -322,6 +369,120 @@ public class PageImpl extends LocalizableObject implements Page {
   public Pagelet[] getHeadlines() {
     Pagelet[] h = new Pagelet[headlines.size()];
     return headlines.toArray(h);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#setCoverage(java.lang.String,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public void setCoverage(String coverage, Language language) {
+    this.coverage.put(coverage, language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getCoverage()
+   */
+  public String getCoverage() {
+    return coverage.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getCoverage(ch.o2it.weblounge.common.language.Language)
+   */
+  public String getCoverage(Language language) {
+    return coverage.get(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getCoverage(ch.o2it.weblounge.common.language.Language,
+   *      boolean)
+   */
+  public String getCoverage(Language language, boolean force) {
+    return coverage.get(language, force);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#setDescription(java.lang.String,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public void setDescription(String description, Language language) {
+    this.description.put(description, language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getDescription()
+   */
+  public String getDescription() {
+    return description.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getDescription(ch.o2it.weblounge.common.language.Language)
+   */
+  public String getDescription(Language language) {
+    return description.get(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getDescription(ch.o2it.weblounge.common.language.Language,
+   *      boolean)
+   */
+  public String getDescription(Language language, boolean force) {
+    return description.get(language, force);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#setRights(java.lang.String,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public void setRights(String rights, Language language) {
+    this.rights.put(rights, language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getRights()
+   */
+  public String getRights() {
+    return rights.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getRights(ch.o2it.weblounge.common.language.Language)
+   */
+  public String getRights(Language language) {
+    return rights.get(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#getRights(ch.o2it.weblounge.common.language.Language,
+   *      boolean)
+   */
+  public String getRights(Language language, boolean force) {
+    return rights.get(language, force);
   }
 
   /**
@@ -417,9 +578,9 @@ public class PageImpl extends LocalizableObject implements Page {
    * 
    * @return the keywords
    */
-  public String[] getKeywords() {
-    String kw[] = new String[keywords_.size()];
-    return keywords_.toArray(kw);
+  public String[] getSubjects() {
+    String kw[] = new String[subjects.size()];
+    return subjects.toArray(kw);
   }
 
   /**
@@ -428,9 +589,9 @@ public class PageImpl extends LocalizableObject implements Page {
    * @param keywords
    */
   public void setKeywords(String[] keywords) {
-    keywords_.clear();
+    this.subjects.clear();
     for (int i = 0; i < keywords.length; i++)
-      keywords_.add(keywords[i]);
+      this.subjects.add(keywords[i]);
   }
 
   /**
@@ -792,8 +953,8 @@ public class PageImpl extends LocalizableObject implements Page {
    * 
    * @return the user holding the editing lock for this page
    */
-  public User getEditor() {
-    return editor;
+  public User getLockOwner() {
+    return lockOwner;
   }
 
   /**
@@ -806,8 +967,8 @@ public class PageImpl extends LocalizableObject implements Page {
    * @return <code>true</code> if the page was locked successfully
    */
   boolean lock(AuthenticatedUser user) {
-    if (editor == null || editor.equals(user)) {
-      editor = user;
+    if (lockOwner == null || lockOwner.equals(user)) {
+      lockOwner = user;
       return true;
     }
     return false;
@@ -823,8 +984,8 @@ public class PageImpl extends LocalizableObject implements Page {
    * @return <code>true</code> if the page was unlocked successfully
    */
   boolean unlock(AuthenticatedUser user) {
-    if (editor == null || editor.equals(user) || user.hasRole(SystemRole.PUBLISHER)) {
-      editor = null;
+    if (lockOwner == null || lockOwner.equals(user) || user.hasRole(SystemRole.PUBLISHER)) {
+      lockOwner = null;
       return true;
     }
     return false;
@@ -836,7 +997,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * @return <code>true</code> if this page is locked
    */
   public boolean isLocked() {
-    return editor != null;
+    return lockOwner != null;
   }
 
   /**
@@ -845,7 +1006,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * @return <code>true</code> if this page is locked by <code>user</code>
    */
   public boolean isLocked(User user) {
-    return isLocked() && user.equals(editor);
+    return isLocked() && user.equals(lockOwner);
   }
 
   /**
@@ -857,38 +1018,67 @@ public class PageImpl extends LocalizableObject implements Page {
    *          the composer identifier
    */
   void appendPagelet(Pagelet pagelet, String composer) {
-    List<Pagelet> c = composers_.get(composer);
+    List<Pagelet> c = composers.get(composer);
     if (c == null) {
       c = new ArrayList<Pagelet>();
-      composers_.put(composer, c);
+      composers.put(composer, c);
     }
     c.add(pagelet);
   }
 
   /**
-   * Adds the pagelet in the given composer at the specified position.
+   * {@inheritDoc}
    * 
-   * @param pagelet
-   *          the pagelet to add
-   * @param composer
-   *          the composer identifier
-   * @param position
-   *          the position
+   * @see ch.o2it.weblounge.common.page.Page#addPagelet(ch.o2it.weblounge.common.page.Pagelet,
+   *      java.lang.String)
    */
-  void addPagelet(Pagelet pagelet, String composer, int position) {
-    List<Pagelet> c = composers_.get(composer);
+  public Pagelet addPagelet(Pagelet pagelet, String composer) {
+    List<Pagelet> c = composers.get(composer);
+    int position = (c == null) ? 0 : c.size();
+    return addPagelet(pagelet, composer, position);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.page.Page#addPagelet(ch.o2it.weblounge.common.page.Pagelet,
+   *      java.lang.String, int)
+   */
+  public Pagelet addPagelet(Pagelet pagelet, String composer, int position) {
+    List<Pagelet> c = composers.get(composer);
     if (c == null) {
       c = new ArrayList<Pagelet>();
-      composers_.put(composer, c);
+      composers.put(composer, c);
     }
+
+    // Test position
+    if (position < 0 || position > c.size())
+      throw new IndexOutOfBoundsException("There are only " + c.size() + " pagelets in the composer");
+
+    // Insert
     if (position < c.size()) {
       c.add(position, pagelet);
       for (int i = position; i < c.size(); i++) {
-        ((PageletLocationImpl) ((PageletImpl) c.get(i)).getLocation()).setPosition(i);
+        ((PageletURIImpl) ((PageletImpl) c.get(i)).getURI()).setPosition(i);
       }
-    } else {
+    }
+
+    // Append
+    else {
       c.add(pagelet);
     }
+
+    // Adjust pagelet location
+    PageletURI location = pagelet.getURI();
+    if (location == null) {
+      location = new PageletURIImpl(uri, composer, position);
+      pagelet.setURI(location);
+    } else {
+      location.setURI(uri);
+      location.setComposer(composer);
+      location.setPosition(position);
+    }
+    return pagelet;
   }
 
   /**
@@ -900,13 +1090,13 @@ public class PageImpl extends LocalizableObject implements Page {
    *          the pagelet's original position
    */
   void movePageletUp(String composer, int position) {
-    List<Pagelet> c = composers_.get(composer);
+    List<Pagelet> c = composers.get(composer);
     if (c == null || c.size() - 1 < position) {
       return;
     }
     c.add(position - 1, c.remove(position));
-    ((PageletLocationImpl) ((PageletImpl) c.get(position - 1)).getLocation()).setPosition(position - 1);
-    ((PageletLocationImpl) ((PageletImpl) c.get(position)).getLocation()).setPosition(position);
+    ((PageletURIImpl) ((PageletImpl) c.get(position - 1)).getURI()).setPosition(position - 1);
+    ((PageletURIImpl) ((PageletImpl) c.get(position)).getURI()).setPosition(position);
   }
 
   /**
@@ -929,7 +1119,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * @return the pagelets
    */
   public Pagelet[] getPagelets(String composer) {
-    List<Pagelet> c = composers_.get(composer);
+    List<Pagelet> c = composers.get(composer);
     if (c == null) {
       c = new ArrayList<Pagelet>();
     }
@@ -951,7 +1141,7 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public Pagelet[] getPagelets(String composer, String module, String id) {
     List<Pagelet> l = new ArrayList<Pagelet>();
-    List<Pagelet> c = composers_.get(composer);
+    List<Pagelet> c = composers.get(composer);
     if (c != null) {
       l.addAll(c);
       int i = 0;
@@ -969,22 +1159,24 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * Removes the pagelet in the given composer at the specified position.
+   * {@inheritDoc}
    * 
-   * @param composer
-   *          the composer identifier
-   * @param position
-   *          the position
+   * @see ch.o2it.weblounge.common.page.Page#removePagelet(java.lang.String,
+   *      int)
    */
-  void removePagelet(String composer, int position) {
-    List<Pagelet> pagelets = composers_.get(composer);
-    if (pagelets == null) {
-      return;
-    }
-    pagelets.remove(position);
+  public Pagelet removePagelet(String composer, int position) {
+    List<Pagelet> pagelets = composers.get(composer);
+
+    // Test index
+    if (pagelets == null || pagelets.size() < position)
+      throw new IndexOutOfBoundsException("No pagelet at position " + position + " found");
+
+    // Remove the pagelet and update uris of following pagelets
+    Pagelet pagelet = pagelets.remove(position);
     for (int i = position; i < pagelets.size(); i++) {
-      ((PageletLocationImpl) ((PageletImpl) pagelets.get(i)).getLocation()).setPosition(i);
+      pagelets.get(i).getURI().setPosition(i);
     }
+    return pagelet;
   }
 
   /**
@@ -1101,7 +1293,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * 
    * @return an XML representation of this page header
    */
-  public Node toXml() {
+  public String toXml() {
     StringBuffer b = new StringBuffer();
 
     b.append("<page>");
@@ -1124,9 +1316,9 @@ public class PageImpl extends LocalizableObject implements Page {
     b.append(publishingCtx.toXml());
     b.append(securityCtx.toXml());
 
-    if (keywords_.size() != 0) {
+    if (subjects.size() != 0) {
       b.append("<keywords>\n");
-      for (String k : keywords_) {
+      for (String k : subjects) {
         b.append("<keyword><![CDATA[");
         b.append(k);
         b.append("]]></keyword>\n");
@@ -1165,23 +1357,35 @@ public class PageImpl extends LocalizableObject implements Page {
 
     b.append("</header>");
 
-    // TODO: Append body
+    b.append("<body>");
+
+    for (Map.Entry<String, List<Pagelet>> entry : composers.entrySet()) {
+      b.append("<composer name=\"");
+      b.append(entry.getKey());
+      b.append("\">");
+
+      for (Pagelet pagelet : entry.getValue()) {
+        b.append(pagelet.toXml());
+      }
+
+      b.append("</composer>");
+    }
+
+    b.append("</body>");
 
     b.append("</page>");
 
-    try {
-      InputSource is = new InputSource(new StringReader(b.toString()));
-      DocumentBuilder docBuilder = XMLUtilities.getDocumentBuilder();
-      Document doc = docBuilder.parse(is);
-      return doc.getFirstChild();
-    } catch (SAXException e) {
-      log_.error("Error building dom tree for pagelet", e);
-    } catch (IOException e) {
-      log_.error("Error reading pagelet xml", e);
-    } catch (ParserConfigurationException e) {
-      log_.error("Error parsing pagelet xml", e);
-    }
-    return null;
+    /**
+     * try { InputSource is = new InputSource(new StringReader(b.toString()));
+     * DocumentBuilder docBuilder = XMLUtilities.getDocumentBuilder(); Document
+     * doc = docBuilder.parse(is); return doc.getFirstChild(); } catch
+     * (SAXException e) { log_.error("Error building dom tree for pagelet", e);
+     * } catch (IOException e) { log_.error("Error reading pagelet xml", e); }
+     * catch (ParserConfigurationException e) {
+     * log_.error("Error parsing pagelet xml", e); }
+     */
+
+    return b.toString();
   }
 
 }
