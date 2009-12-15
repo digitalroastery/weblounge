@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <user id="john" realm="testland" enabled="true">
 	<profile>
 		<firstname>John</firstname>

@@ -31,7 +31,7 @@ import java.io.IOException;
  */
 @Ignore
 public class TestUtils {
-
+  
   /**
    * Loads the <code>XML</code> data from the specified file on the class
    * path and returns it after having stripped off any newlines, line breaks
@@ -47,7 +47,8 @@ public class TestUtils {
       byte[] buffer = new byte[(int)templateFile.length()];
       FileInputStream f = new FileInputStream(templateFile);
       f.read(buffer);
-      template = new String(buffer).replaceAll("(>\\s*)+", ">").replaceAll("(\\s*<)+", "<");
+      template = new String(buffer).replaceFirst("<\\?.*?>", "");
+      template = template.replaceAll("(>\\s*)+", ">").replaceAll("(\\s*<)+", "<");
     } catch (IOException e) {
       throw new RuntimeException("Error reading test resource at " + path);
     }
