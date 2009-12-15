@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.page;
 
 import ch.o2it.weblounge.common.content.Creatable;
-import ch.o2it.weblounge.common.content.LocalizedModifiable;
+import ch.o2it.weblounge.common.content.Modifiable;
 import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
@@ -30,16 +30,15 @@ import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
 import ch.o2it.weblounge.common.user.User;
 
+import java.util.Date;
+
 /**
  * A <code>Page</code> encapsulates all data that is attached with a site url.
  */
-public interface Page extends Localizable, Creatable, LocalizedModifiable, Publishable, Securable {
+public interface Page extends Localizable, Creatable, Modifiable, Publishable, Securable {
 
   /** Request page identifier */
   String ID = "page";
-
-  /** Page headlines in request */
-  static final String HEADLINES = "headlines";
 
   /** Live version of a page */
   long LIVE = 0;
@@ -64,6 +63,14 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
    * @return the page url
    */
   PageURI getURI();
+
+  /**
+   * Sets the page type.
+   * 
+   * @param type
+   *          the page type
+   */
+  void setType(String type);
 
   /**
    * Returns the page type, which is used to include this page into news lists
@@ -121,6 +128,19 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
    * @return the user holding the editing lock for this page
    */
   User getLockOwner();
+
+  /**
+   * Locks this page for editing.
+   * 
+   * @param user
+   *          the locking user
+   */
+  void setLocked(User user);
+
+  /**
+   * Removes the editing lock from this page.
+   */
+  void setUnlocked();
 
   /**
    * Adds <tt>subject</tt> to the set of subjects if it is not already
@@ -350,13 +370,6 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
   void setRights(String rights, Language language);
 
   /**
-   * Returns the headline pagelets
-   * 
-   * @return the headline pagelets
-   */
-  Pagelet[] getHeadlines();
-
-  /**
    * Sets the layout that should be applied to this page. The layout controls
    * which pagelets to place into a composer by default, which ones to protect
    * and which ones to allow for editing.
@@ -479,6 +492,29 @@ public interface Page extends Localizable, Creatable, LocalizedModifiable, Publi
    *          the page content listener
    */
   void removePageContentListener(PageContentListener listener);
+
+  /**
+   * Indicates the date of the last modification as well as the person who
+   * modified it.
+   * 
+   * @param user
+   *          the user that last modified the object
+   * @param date
+   *          the date of modification
+   */
+  void setModified(User user, Date date);
+
+  /**
+   * Sets the publisher and the publishing start and end date.
+   * 
+   * @param publisher
+   *          the publisher
+   * @param from
+   *          publishing start date
+   * @param to
+   *          publishing end date
+   */
+  void setPublished(User publisher, Date from, Date to);
 
   /**
    * Returns an XML representation of this page header.

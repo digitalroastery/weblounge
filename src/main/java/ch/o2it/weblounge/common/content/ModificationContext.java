@@ -31,20 +31,44 @@ import java.util.Date;
 public interface ModificationContext extends Modifiable, Cloneable {
 
   /**
-   * Sets the user that changed the object.
+   * Indicates the date of the last modification as well as the person who
+   * modified it.
    * 
    * @param user
-   *          the editor
+   *          the user that last modified the object
+   * @param date
+   *          the date of modification
    */
-  void setModifier(User user);
+  void setModified(User user, Date date);
 
   /**
-   * Sets the modification date of this object.
+   * Returns <code>true</code> if this context contains information about a
+   * modification.
+   * 
+   * @return <code>true</code> is this context was modified
+   */
+  boolean isModified();
+
+  /**
+   * Returns <code>true</code> if this context was modified after the given
+   * date.
    * 
    * @param date
-   *          the modification date
+   *          the date to compare to
+   * @return <code>true</code> is this context was modified after the given date
    */
-  void setModificationDate(Date date);
+  boolean isModifiedAfter(Date date);
+
+  /**
+   * Returns <code>true</code> if this context was modified before the given
+   * date.
+   * 
+   * @param date
+   *          the date to compare to
+   * @return <code>true</code> is this context was modified before the given
+   *         date
+   */
+  boolean isModifiedBefore(Date date);
 
   /**
    * Returns an XML representation of this context.

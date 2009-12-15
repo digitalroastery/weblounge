@@ -20,11 +20,67 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.user.User;
+
+import java.util.Date;
+
 /**
  * This interface is used for objects that can be published from a given start
  * date to an end date.
  */
 public interface PublishingContext extends Publishable, Cloneable {
+
+  /**
+   * Returns <code>true</code> if the object is published right now.
+   * 
+   * @return <code>true</code> if published
+   */
+  boolean isPublished();
+
+  /**
+   * Returns <code>true</code> if the object is published on the given date.
+   * 
+   * @return <code>true</code> if published on the given date
+   */
+  boolean isPublished(Date date);
+  
+  /**
+   * Sets the publisher and the publishing start and end date.
+   * 
+   * @param publisher
+   *          the publisher
+   * @param from
+   *          publishing start date
+   * @param to
+   *          publishing end date
+   */
+  void setPublished(User publisher, Date from, Date to);
+
+  /**
+   * Sets the user that published or unpublished the page.
+   * 
+   * @param user
+   *          the publisher
+   */
+  void setPublisher(User user);
+
+  /**
+   * Sets the publishing start date. Pass <code>null</code> to set no start date
+   * at all.
+   * 
+   * @param from
+   *          the start date
+   */
+  void setPublishFrom(Date from);
+  
+  /**
+   * Sets the publishing end date. Pass <code>null</code> to set no end date at
+   * all.
+   * 
+   * @param to
+   *          the end date
+   */
+  void setPublishTo(Date to);
 
   /**
    * Returns an XML representation of this context.

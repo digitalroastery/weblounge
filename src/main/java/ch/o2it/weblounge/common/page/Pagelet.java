@@ -28,6 +28,9 @@ import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
+import ch.o2it.weblounge.common.user.User;
+
+import java.util.Date;
 
 /**
  * A page element is a piece of content, placed somewhere on a page. Depending
@@ -242,6 +245,31 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * @return the pagelet location
    */
   PageletURI getURI();
+
+  /**
+   * Sets the user that last modified the object in the given language as well as
+   * the modification date.
+   * 
+   * @param user
+   *          the user that modified the object
+   * @param date
+   *          the date of modification
+   * @param language
+   *          the language version that was modified
+   */
+  void setModified(User user, Date date, Language language);
+
+  /**
+   * Sets the publisher and the publishing start and end date.
+   * 
+   * @param publisher
+   *          the publisher
+   * @param from
+   *          publishing start date
+   * @param to
+   *          publishing end date
+   */
+  void setPublished(User publisher, Date from, Date to);
 
   /**
    * Returns an XML representation of this pagelet.

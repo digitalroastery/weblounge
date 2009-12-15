@@ -46,23 +46,4 @@ public interface Creatable {
    */
   User getCreator();
 
-  /**
-   * Returns <code>true</code> if this context was created after the given date.
-   * 
-   * @param date
-   *          the date to compare to
-   * @return <code>true</code> is this context was created after the given date
-   */
-  boolean isCreatedAfter(Date date);
-
-  /**
-   * Sets the creation date and the user who created the object.
-   * 
-   * @param creator
-   *          the user creating the object
-   * @param creationDate
-   *          the date of creation
-   */
-  void setCreated(User creator, Date creationDate);
-
 }

@@ -27,35 +27,10 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * This interface is used to describe objects that know about a creator, a
- * creation time, a modifier and a modification time.
+ * This interface is used to describe objects that know about a modifier and a
+ * modification time.
  */
 public interface LocalizedModifiable extends Localizable {
-
-  /**
-   * Returns <code>true</code> if this context was modified in the specified
-   * version after the given date.
-   * 
-   * @param date
-   *          the date to compare to
-   * @param the
-   *          language version
-   * @return <code>true</code> is this context was modified after the given date
-   */
-  boolean isModifiedAfter(Date date, Language language);
-
-  /**
-   * Returns <code>true</code> if this context was modified in the specified
-   * language before the given date.
-   * 
-   * @param date
-   *          the date to compare to
-   * @param language
-   *          the language variant
-   * @return <code>true</code> is this context was modified before the given
-   *         date
-   */
-  boolean isModifiedBefore(Date date, Language language);
 
   /**
    * Returns the time in milliseconds when the object was last modified,
@@ -74,18 +49,6 @@ public interface LocalizedModifiable extends Localizable {
   User getLastModifier();
 
   /**
-   * Sets creator and creation date.
-   * 
-   * @param user
-   *          the user that created the object
-   * @param date
-   *          the date of creation
-   * @param language
-   *          the language version that was modified
-   */
-  void setModified(User user, Date date, Language language);
-
-  /**
    * Returns the time in milliseconds when the object was last modified.
    * 
    * @param language
@@ -102,35 +65,6 @@ public interface LocalizedModifiable extends Localizable {
    * @return the modifier
    */
   User getModifier(Language language);
-
-  /**
-   * Returns <code>true</code> if this context contains information about a
-   * modification.
-   * 
-   * @return <code>true</code> is this context was modified
-   */
-  boolean isModified();
-
-  /**
-   * Returns <code>true</code> if this context was modified after the given
-   * date.
-   * 
-   * @param date
-   *          the date to compare to
-   * @return <code>true</code> is this context was modified after the given date
-   */
-  boolean isModifiedAfter(Date date);
-
-  /**
-   * Returns <code>true</code> if this context was modified before the given
-   * date.
-   * 
-   * @param date
-   *          the date to compare to
-   * @return <code>true</code> is this context was modified before the given
-   *         date
-   */
-  boolean isModifiedBefore(Date date);
 
   /**
    * Returns the time in milliseconds when the object was last modified.

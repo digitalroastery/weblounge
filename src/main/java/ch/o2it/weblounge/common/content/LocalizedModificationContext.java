@@ -21,12 +21,57 @@
 package ch.o2it.weblounge.common.content;
 
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.user.User;
+
+import java.util.Date;
 
 /**
- * This interface defines an object that encapsulates access to creation and
- * modification data.
+ * This interface defines an object that encapsulates access to modification
+ * data.
  */
 public interface LocalizedModificationContext extends LocalizedModifiable, Cloneable {
+
+  /**
+   * Sets the user that last modified the object in the given language as well
+   * as the modification date.
+   * 
+   * @param user
+   *          the user that modified the object
+   * @param date
+   *          the date of modification
+   * @param language
+   *          the language version that was modified
+   */
+  void setModified(User user, Date date, Language language);
+
+  /**
+   * Returns <code>true</code> if this context contains information about a
+   * modification.
+   * 
+   * @return <code>true</code> is this context was modified
+   */
+  boolean isModified();
+
+  /**
+   * Returns <code>true</code> if this context was modified after the given
+   * date.
+   * 
+   * @param date
+   *          the date to compare to
+   * @return <code>true</code> is this context was modified after the given date
+   */
+  boolean isModifiedAfter(Date date);
+
+  /**
+   * Returns <code>true</code> if this context was modified before the given
+   * date.
+   * 
+   * @param date
+   *          the date to compare to
+   * @return <code>true</code> is this context was modified before the given
+   *         date
+   */
+  boolean isModifiedBefore(Date date);
 
   /**
    * Returns an XML representation of this context for the specified language.

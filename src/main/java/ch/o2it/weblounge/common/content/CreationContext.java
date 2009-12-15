@@ -25,44 +25,59 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * TODO: Comment CreationContext
+ * The context contains information about when an object was created and who the
+ * creator was.
  */
 public interface CreationContext extends Cloneable {
 
   /**
-   * @see ch.o2it.weblounge.common.content.CreationContext#getCreationDate()
-   */
-  Date getCreationDate();
-
-  /**
-   * @see ch.o2it.weblounge.common.content.CreationContext#getCreator()
-   */
-  User getCreator();
-
-  /**
-   * @see ch.o2it.weblounge.common.content.CreationContext#getCreationDate(java.util.Date)
-   */
-  void setCreationDate(Date date);
-
-  /**
-   * @see ch.o2it.weblounge.common.content.CreationContext#setCreator(ch.o2it.weblounge.common.user.User)
+   * Sets the user that created the object.
+   * 
+   * @param user
+   *          the creator
    */
   void setCreator(User user);
 
   /**
-   * Sets the creation date and user.
+   * Returns the user that created the object.
    * 
-   * @param user
-   *          the user that created the object
-   * @param date
-   *          the date of creation
+   * @return the creator
    */
-  void setCreated(User user, Date date);
+  User getCreator();
 
   /**
-   * @see ch.o2it.weblounge.common.content.CreationContext#isCreatedAfter(java.util.Date)
+   * Sets the creation date.
+   * 
+   * @param date
+   *          the creation date
+   */
+  void setCreationDate(Date date);
+
+  /**
+   * Returns the creation date.
+   * 
+   * @return the creation date
+   */
+  Date getCreationDate();
+
+  /**
+   * Returns <code>true</code> if this context was created after the given date.
+   * 
+   * @param date
+   *          the date to compare to
+   * @return <code>true</code> is this context was created after the given date
    */
   boolean isCreatedAfter(Date date);
+
+  /**
+   * Sets the creation date and the user who created the object.
+   * 
+   * @param creator
+   *          the user creating the object
+   * @param creationDate
+   *          the date of creation
+   */
+  void setCreated(User creator, Date creationDate);
 
   /**
    * Creates a clone of this <code>CreationContext</code>.

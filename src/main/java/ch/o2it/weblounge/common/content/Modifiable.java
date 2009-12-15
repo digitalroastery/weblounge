@@ -31,45 +31,6 @@ import java.util.Date;
 public interface Modifiable {
 
   /**
-   * Sets creator and creation date.
-   * 
-   * @param user
-   *          the user that created the object
-   * @param date
-   *          the date of creation
-   */
-  void setModified(User user, Date date);
-
-  /**
-   * Returns <code>true</code> if this context contains information about a
-   * modification.
-   * 
-   * @return <code>true</code> is this context was modified
-   */
-  boolean isModified();
-
-  /**
-   * Returns <code>true</code> if this context was modified after the given
-   * date.
-   * 
-   * @param date
-   *          the date to compare to
-   * @return <code>true</code> is this context was modified after the given date
-   */
-  boolean isModifiedAfter(Date date);
-
-  /**
-   * Returns <code>true</code> if this context was modified before the given
-   * date.
-   * 
-   * @param date
-   *          the date to compare to
-   * @return <code>true</code> is this context was modified before the given
-   *         date
-   */
-  boolean isModifiedBefore(Date date);
-
-  /**
    * Returns the time in milliseconds when the object was last modified.
    * 
    * @return the modification time
