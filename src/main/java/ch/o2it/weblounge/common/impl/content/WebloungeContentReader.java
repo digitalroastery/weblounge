@@ -302,6 +302,8 @@ public abstract class WebloungeContentReader extends DefaultHandler {
 
     // permissions
     else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
+      // TODO: Finish this code
+      /*
       String id = (String) clipboard.get("id");
       Permission permission = new PermissionImpl(id);
       String type = (String) clipboard.get("type");
@@ -314,6 +316,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
           allow(permission, authority);
         }
       }
+      */
     }
 
   }
