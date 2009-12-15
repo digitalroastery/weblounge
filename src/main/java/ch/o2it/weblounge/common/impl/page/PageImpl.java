@@ -21,17 +21,14 @@
 package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.content.CreationContext;
-import ch.o2it.weblounge.common.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.content.ModificationContext;
 import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
-import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
 import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
-import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Page;
@@ -44,18 +41,15 @@ import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.security.SystemPermission;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.AuthenticatedUser;
 import ch.o2it.weblounge.common.user.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A <code>Page</code> encapsulates all data that is attached with a site URL.
@@ -69,7 +63,7 @@ public class PageImpl extends LocalizableObject implements Page {
   protected String type = null;
 
   /** PageHeader keywords */
-  protected Set<String> subjects = null;
+  protected List<String> subjects = null;
 
   /** Renderer identifier */
   protected String template = null;
@@ -93,7 +87,7 @@ public class PageImpl extends LocalizableObject implements Page {
   protected CreationContext creationCtx = null;
 
   /** Modification context */
-  protected LocalizedModificationContext modificationCtx = null;
+  protected ModificationContext modificationCtx = null;
 
   /** The publishing context */
   protected PublishingContext publishingCtx = null;
@@ -129,10 +123,10 @@ public class PageImpl extends LocalizableObject implements Page {
     super(uri.getSite().getDefaultLanguage());
     this.uri = uri;
     this.creationCtx = new CreationContextImpl();
-    this.modificationCtx = new LocalizedModificationContextImpl();
+    this.modificationCtx = new ModificationContextImpl();
     this.publishingCtx = new PublishingContextImpl();
     this.securityCtx = new PageSecurityContext();
-    this.subjects = new HashSet<String>();
+    this.subjects = new ArrayList<String>();
     this.headlines = new ArrayList<Pagelet>();
     this.title = new LocalizableContent<String>(this);
     this.description = new LocalizableContent<String>(this);
@@ -217,6 +211,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.page.Page#hasSubject(java.lang.String)
    */
   public boolean hasSubject(String subject) {
@@ -256,28 +251,10 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Publishable#setPublisher(ch.o2it.weblounge.common.user.User)
-   */
-  public void setPublisher(User user) {
-    publishingCtx.setPublisher(user);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
    */
   public User getPublisher() {
     return publishingCtx.getPublisher();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#setPublishFrom(java.util.Date)
-   */
-  public void setPublishFrom(Date from) {
-    publishingCtx.setPublishFrom(from);
   }
 
   /**
@@ -287,15 +264,6 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public Date getPublishFrom() {
     return publishingCtx.getPublishFrom();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#setPublishTo(java.util.Date)
-   */
-  public void setPublishTo(Date to) {
-    publishingCtx.setPublishTo(to);
   }
 
   /**
@@ -323,60 +291,6 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public boolean isIndexed() {
     return isIndexed;
-  }
-
-  /**
-   * Returns the headline for the given user regarding the read permission that
-   * have been defined on the title pagelets. If no suitable headline is found,
-   * <code>null</code> is returned.
-   * 
-   * @param moduleId
-   *          the pagelet's module identifier
-   * @param pageletId
-   *          the pagelet identifier
-   * @param user
-   *          the user that wants access to the header
-   * @return the first suitable headline pagelet
-   */
-  public Pagelet getHeadline(String moduleId, String pageletId,
-      AuthenticatedUser user) {
-    return getHeadline(moduleId, pageletId, user, SystemPermission.READ);
-  }
-
-  /**
-   * Returns the headline for the given user regarding the permissions that have
-   * been defined on the title pagelets. If no suitable headline is found,
-   * <code>null</code> is returned.
-   * 
-   * @param moduleId
-   *          the pagelet's module identifier
-   * @param pageletId
-   *          the pagelet identifier
-   * @param user
-   *          the user that wants access to the header
-   * @param permission
-   *          the permission requirements
-   * @return the first suitable headline pagelet
-   */
-  public Pagelet getHeadline(String moduleId, String pageletId,
-      AuthenticatedUser user, Permission permission) {
-    for (int i = 0; i < headlines.size(); i++) {
-      Pagelet headline = headlines.get(i);
-      if (headline.getModule().equals(moduleId) && headline.getIdentifier().equals(pageletId))
-        if (headline.checkOne(permission, user.getRoleClosure()) || headline.check(permission, user))
-          return headline;
-    }
-    return null;
-  }
-
-  /**
-   * Returns the headline pagelets
-   * 
-   * @return the headline pagelets
-   */
-  public Pagelet[] getHeadlines() {
-    Pagelet[] h = new Pagelet[headlines.size()];
-    return headlines.toArray(h);
   }
 
   /**
@@ -832,7 +746,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * 
    * @return the modification context
    */
-  public LocalizedModificationContext getModificationContext() {
+  public ModificationContext getModificationContext() {
     return modificationCtx;
   }
 
@@ -857,92 +771,11 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
+   * @see ch.o2it.weblounge.common.content.Modifiable#setModified(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
    */
-  public boolean isModifiedAfter(Date date) {
-    return modificationCtx.isModifiedAfter(date);
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAfter(java.util.Date,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public boolean isModifiedAfter(Date date, Language language) {
-    return modificationCtx.isModifiedAfter(date, language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedBefore(java.util.Date)
-   */
-  public boolean isModifiedBefore(Date date) {
-    return modificationCtx.isModifiedBefore(date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedBefore(java.util.Date,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public boolean isModifiedBefore(Date date, Language language) {
-    return modificationCtx.isModifiedBefore(date, language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
-   */
-  public Date getLastModificationDate() {
-    return modificationCtx.getLastModificationDate();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModifier()
-   */
-  public User getLastModifier() {
-    return modificationCtx.getLastModifier();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
-   */
-  public boolean isModified() {
-    return modificationCtx.isModified();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
-   */
-  public Date getModificationDate(Language language) {
-    return modificationCtx.getModificationDate(language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier(ch.o2it.weblounge.common.language.Language)
-   */
-  public User getModifier(Language language) {
-    return modificationCtx.getModifier(language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#setModified(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date, ch.o2it.weblounge.common.language.Language)
-   */
-  public void setModified(User user, Date date, Language language) {
-    modificationCtx.setModified(user, date, language);
+  public void setModified(User user, Date date) {
+    modificationCtx.setModified(user, date);
   }
 
   /**
@@ -955,37 +788,20 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * Locks this page for editing and returns <code>true</code> if the page was
-   * previously unlocked or the user is the same that already had a lock on this
-   * page.
+   * Locks this page for editing.
    * 
    * @param user
    *          the locking user
-   * @return <code>true</code> if the page was locked successfully
    */
-  boolean lock(AuthenticatedUser user) {
-    if (lockOwner == null || lockOwner.equals(user)) {
-      lockOwner = user;
-      return true;
-    }
-    return false;
+  public void setLocked(User user) {
+    lockOwner = user;
   }
 
   /**
-   * Removes the editing lock from this page and returns <code>true</code> if
-   * the page was previously unlocked, the user was the one holding the lock or
-   * the user is a publisher.
-   * 
-   * @param user
-   *          the unlocking user
-   * @return <code>true</code> if the page was unlocked successfully
+   * Removes the editing lock from this page.
    */
-  boolean unlock(AuthenticatedUser user) {
-    if (lockOwner == null || lockOwner.equals(user) || user.hasRole(SystemRole.PUBLISHER)) {
-      lockOwner = null;
-      return true;
-    }
-    return false;
+  public void setUnlocked() {
+    lockOwner = null;
   }
 
   /**
@@ -1146,86 +962,14 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * Returns the document name for the given version. For the live version, this
-   * method will return <code>index.xml</code>. Available versions are:
-   * <ul>
-   * <li>{@link #LIVE}</li>
-   * <li>{@link #WORK}</li>
-   * <li>{@link #ORIGINAL}</li>
-   * 
-   * @param version
-   *          the version identifier
-   * @return the version string
-   */
-  public static String getDocument(long version) {
-    if (version == LIVE)
-      return "index.xml";
-    else if (version == ORIGINAL)
-      return "original.xml";
-    else if (version == WORK)
-      return "work.xml";
-    else
-      return Long.toString(version) + ".xml";
-  }
-
-  /**
-   * Returns the version identifier for the given version. Available versions
-   * are:
-   * <ul>
-   * <li>{@link #LIVE}</li>
-   * <li>{@link #WORK}</li>
-   * <li>{@link #ORIGINAL}</li>
-   * 
-   * @param version
-   *          the version identifier
-   * @return the version string
-   */
-  public static String getVersion(long version) {
-    if (version == LIVE)
-      return "live";
-    else if (version == ORIGINAL)
-      return "original";
-    else if (version == WORK)
-      return "work";
-    else
-      return Long.toString(version);
-  }
-
-  /**
-   * Returns the version for the given version identifier. Available versions
-   * are:
-   * <ul>
-   * <li>{@link #LIVE}</li>
-   * <li>{@link #WORK}</li>
-   * <li>{@link #ORIGINAL}</li>
-   * 
-   * @param version
-   *          the version identifier
-   * @return the version string
-   */
-  public static long getVersion(String version) {
-    if (version.equals("index")) {
-      return Page.LIVE;
-    } else if (version.equals("work")) {
-      return Page.WORK;
-    } else if (version.equals("original")) {
-      return Page.ORIGINAL;
-    } else {
-      try {
-        return Long.parseLong(version);
-      } catch (NumberFormatException e) {
-        return -1;
-      }
-    }
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public int compareTo(Localizable o, Language l) {
+    if (o instanceof Page)
+      return title.get(l).compareTo(((Page) o).getTitle(l));
     return title.compareTo(o, l);
   }
 
@@ -1237,71 +981,110 @@ public class PageImpl extends LocalizableObject implements Page {
   public String toXml() {
     StringBuffer b = new StringBuffer();
 
-    b.append("<page>");
+    b.append("<page id=\"");
+    b.append(uri.id);
+    b.append("\" version=\"");
+    b.append(PageUtils.getVersionString(uri.version));
+    b.append("\">");
 
     // Add header
-    b.append("<header>");
+    b.append("<head>");
 
-    b.append("<renderer>");
+    b.append("<template>");
     b.append(template);
-    b.append("</renderer>\n");
+    b.append("</template>");
 
     b.append("<layout>");
     b.append(layout);
-    b.append("</layout>\n");
+    b.append("</layout>");
 
-    b.append("<type>");
-    b.append(type);
-    b.append("</type>\n");
+    b.append("<promote>");
+    b.append(Boolean.toString(isPromoted));
+    b.append("</promote>");
 
-    b.append(publishingCtx.toXml());
-    b.append(securityCtx.toXml());
+    b.append("<index>");
+    b.append(Boolean.toString(isIndexed));
+    b.append("</index>");
 
-    if (subjects.size() != 0) {
-      b.append("<keywords>\n");
-      for (String k : subjects) {
-        b.append("<keyword><![CDATA[");
-        b.append(k);
-        b.append("]]></keyword>\n");
-      }
-      b.append("</keywords>\n");
-    } else {
-      b.append("<keywords/>\n");
-    }
+    // Metadata
+    b.append("<metadata>");
 
-    for (Language l : languages) {
+    // Title
+    for (Language language : title.languages()) {
       b.append("<title language=\"");
-      b.append(l.getIdentifier());
+      b.append(language.getIdentifier());
       b.append("\"><![CDATA[");
-      b.append(getTitle(l));
-      b.append("]]></title>\n");
+      b.append(title.get(language));
+      b.append("]]></title>");
     }
 
-    for (Language l : modificationCtx.languages()) {
-      b.append("<modified language=\"");
-      b.append(l.getIdentifier());
-      b.append("\">");
-      b.append("<date>");
-      Date d = modificationCtx.getModificationDate(l);
-      if (d == null)
-        d = new Date();
-      b.append(WebloungeDateFormat.formatStatic(d));
-      b.append("</date>\n");
-      b.append("<user>");
-      User u = modificationCtx.getModifier(l);
-      if (u == null)
-        u = uri.getSite().getAdministrator();
-      b.append(u.getLogin());
-      b.append("</user>\n");
-      b.append("</modified>\n");
+    // Description
+    for (Language language : description.languages()) {
+      b.append("<description language=\"");
+      b.append(language.getIdentifier());
+      b.append("\"><![CDATA[");
+      b.append(description.get(language));
+      b.append("]]></description>");
+    }
+    
+    // Subject
+    Collections.sort(subjects);
+    for (String s : subjects) {
+      b.append("<subject><![CDATA[");
+      b.append(s);
+      b.append("]]></subject>");
+    }
+    
+    // Type
+    b.append("<type><![CDATA[");
+    b.append(type);
+    b.append("]]></type>");
+
+    // Coverage
+    for (Language language : coverage.languages()) {
+      b.append("<coverage language=\"");
+      b.append(language.getIdentifier());
+      b.append("\"><![CDATA[");
+      b.append(coverage.get(language));
+      b.append("]]></coverage>");
     }
 
-    b.append("</header>");
+    // Rights
+    for (Language language : rights.languages()) {
+      b.append("<rights language=\"");
+      b.append(language.getIdentifier());
+      b.append("\"><![CDATA[");
+      b.append(rights.get(language));
+      b.append("]]></rights>");
+    }    
+
+    b.append("</metadata>");
+
+    // Created
+    b.append(creationCtx.toXml());
+
+    // Modified
+    b.append(modificationCtx.toXml());
+
+    // Published
+    b.append(publishingCtx.toXml());
+
+    // Security
+    b.append(securityCtx.toXml());
+    
+    // Pagelock
+    if (lockOwner != null) {
+      b.append("<locked>");
+      b.append(lockOwner.toXml());
+      b.append("</locked>");
+    }
+
+    b.append("</head>");
 
     b.append("<body>");
 
     for (Map.Entry<String, List<Pagelet>> entry : composers.entrySet()) {
-      b.append("<composer name=\"");
+      b.append("<composer id=\"");
       b.append(entry.getKey());
       b.append("\">");
 

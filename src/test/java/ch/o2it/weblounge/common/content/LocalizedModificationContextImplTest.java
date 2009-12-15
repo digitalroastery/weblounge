@@ -135,14 +135,6 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModified()}.
-   */
-  @Test
-  public void testIsModified() {
-    assertTrue(ctx.isModified());
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedAfter(java.util.Date)}.
    */
   @Test

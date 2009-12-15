@@ -360,4 +360,42 @@ public abstract class LocalizableObject implements Localizable {
     return languages;
   }
 
+  /**
+   * Returns the component title in the active language. The title is identified
+   * by the name "name".
+   * 
+   * @return the component title.
+   */
+  public String toString() {
+    return toString(resolveLanguage());
+  }
+
+  /**
+   * Returns the title in the requested language or <code>null</code> if the
+   * title doesn't exist in that language.
+   * 
+   * @param language
+   *          the requested language
+   * @return the object title
+   */
+  public String toString(Language language) {
+    return toString(language, false);
+  }
+
+  /**
+   * Returns the object using <code>language</code> as the output language. If
+   * no content can be found in that language, then it will be looked up in the
+   * default language (unless <code>force</code> is set to <code>true</code>). <br>
+   * If this doesn't produce a result as well, <code>null</code> is returned.
+   * 
+   * @param language
+   *          the language
+   * @param force
+   *          <code>true</code> to force the language
+   * @return the object's string representation in the given language
+   */
+  public String toString(Language language, boolean force) {
+    return super.toString();
+  }
+
 }

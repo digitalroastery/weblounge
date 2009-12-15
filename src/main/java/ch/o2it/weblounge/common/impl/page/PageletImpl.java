@@ -562,42 +562,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
-   */
-  public boolean isModifiedAfter(Date date) {
-    return modificationCtx.isModifiedAfter(date);
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAfter(java.util.Date,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public boolean isModifiedAfter(Date date, Language language) {
-    return modificationCtx.isModifiedAfter(date, language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedBefore(java.util.Date)
-   */
-  public boolean isModifiedBefore(Date date) {
-    return modificationCtx.isModifiedBefore(date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedBefore(java.util.Date,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public boolean isModifiedBefore(Date date, Language language) {
-    return modificationCtx.isModifiedBefore(date, language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
   public Date getLastModificationDate() {
@@ -611,15 +575,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public User getLastModifier() {
     return modificationCtx.getLastModifier();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
-   */
-  public boolean isModified() {
-    return modificationCtx.isModified();
   }
 
   /**

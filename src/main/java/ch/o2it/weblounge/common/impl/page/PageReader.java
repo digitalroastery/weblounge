@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.PageManager;
 import ch.o2it.weblounge.common.page.PageletURI;
@@ -81,6 +82,7 @@ public final class PageReader extends WebloungeContentReader {
    */
   public PageReader(Site site) {
     super(site);
+    pageletReader = new PageletReader(site);
   }
 
   /**
@@ -160,7 +162,7 @@ public final class PageReader extends WebloungeContentReader {
     if (context_.equals(ParserContext.Pagelet))
       pageletReader.setModified(modifier, date);
     else
-      page.setModified(modifier, date, null);
+      page.setModified(modifier, date);
   }
 
   /**
@@ -192,7 +194,6 @@ public final class PageReader extends WebloungeContentReader {
    */
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
-    super.startElement(uri, local, raw, attrs);
 
     // read the page url
     if ("page".equals(raw)) {
@@ -225,19 +226,22 @@ public final class PageReader extends WebloungeContentReader {
       position = 0;
     }
 
-    // title
-    else if ("title".equals(raw)) {
+    // title, subject and the like
+    else if ("title".equals(raw) || "subject".equals(raw)  || "description".equals(raw)  || "coverage".equals(raw)  || "rights".equals(raw)) {
       String language = attrs.getValue("language");
-      Language l = site.getLanguage(language);
-      if (l != null) {
+      if (language != null) {
+        Language l = LanguageSupport.getLanguage(language);
         clipboard.put("language", l);
-        if (attrs.getValue("original") != null && attrs.getValue("original").equals("true")) {
-          log_.info("Found original title language");
-          page.setOriginalLanguage(l);
-        }
       } else {
         clipboard.remove("language");
       }
+    }
+
+    // Forward to pagelet reader if the context matches
+    if (context_.equals(ParserContext.Pagelet)) {
+        pageletReader.startElement(uri, local, raw, attrs);
+    } else {
+      super.startElement(uri, local, raw, attrs);
     }
 
   }
@@ -276,6 +280,16 @@ public final class PageReader extends WebloungeContentReader {
       page.layout = characters.toString();
     }
 
+    // Indexed
+    else if (context_.equals(ParserContext.Head) && "index".equals(raw)) {
+      page.isIndexed = "true".equals(characters.toString());
+    }
+
+    // Promote
+    else if (context_.equals(ParserContext.Head) && "promote".equals(raw)) {
+      page.isPromoted = "true".equals(characters.toString());
+    }
+    
     // Type
     else if (context_.equals(ParserContext.Head) && "type".equals(raw)) {
       page.type = characters.toString();
@@ -287,21 +301,61 @@ public final class PageReader extends WebloungeContentReader {
       page.setTitle(characters.toString(), l);
     }
 
-    // Pagelock
-    else if (context_.equals(ParserContext.Head) && "pagelock".equals(raw)) {
-      String login = characters.toString();
-      User editor = site.getUser(login);
-      if (page != null)
-        page.lockOwner = editor;
+    // Description
+    else if ("description".equals(raw)) {
+      Language l = (Language) clipboard.get("language");
+      page.setDescription(characters.toString(), l);
     }
 
+    // Coverage
+    else if ("coverage".equals(raw)) {
+      Language l = (Language) clipboard.get("language");
+      page.setCoverage(characters.toString(), l);
+    }
+
+    // Rights
+    else if ("rights".equals(raw)) {
+      Language l = (Language) clipboard.get("language");
+      page.setRights(characters.toString(), l);
+    }
+
+    // Subject
+    else if ("subject".equals(raw)) {
+      page.addSubject(characters.toString());
+    }
+
+    // Pagelock
+    else if (context_.equals(ParserContext.Head) && "locked".equals(raw)) {
+      User user = (User)clipboard.get("user");
+      if (user != null)
+        page.lockOwner = user;
+    }
+
+    // Head
     else if (context_.equals(ParserContext.Head) && "head".equals(raw))
       context_ = ParserContext.Page;
 
+    // Body
     else if (context_.equals(ParserContext.Head) && "body".equals(raw))
       context_ = ParserContext.Page;
+    
+    // Forward to pagelet reader if the context matches
+    if (context_.equals(ParserContext.Pagelet)) {
+        pageletReader.endElement(uri, local, raw);
+    } else {
+      super.endElement(uri, local, raw);
+    }
 
-    super.endElement(uri, local, raw);
+  }
+
+  /**
+   * @see org.xml.sax.ContentHandler#characters(char[], int, int)
+   */
+  public void characters(char[] chars, int start, int end) throws SAXException {
+    if (context_.equals(ParserContext.Pagelet))
+      pageletReader.characters(chars, start, end);
+    else 
+      super.characters(chars, start, end);
   }
 
   /**

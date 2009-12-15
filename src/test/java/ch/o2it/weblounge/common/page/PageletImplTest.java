@@ -154,7 +154,7 @@ public class PageletImplTest {
   /** German editor */
   protected User hans = new UserImpl("hans", "testland", "Hans Muster");
 
-  /** German editor */
+  /** French editor */
   protected User amelie = new UserImpl("amelie", "testland", "Amélie Poulard");
 
   /** The pagelet instance under test */

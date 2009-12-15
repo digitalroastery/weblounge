@@ -20,17 +20,13 @@
 
 package ch.o2it.weblounge.common.page;
 
-import static org.junit.Assert.assertFalse;
-
-import static org.junit.Assert.assertTrue;
-
-import static org.junit.Assert.assertNotNull;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.language.English;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.page.PageImpl;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
@@ -107,11 +103,14 @@ public class PageImplTest {
   /** Content creation date */
   protected Date creationDate = new Date(1231355141000L);
   
+  /** French modification date */
+  protected Date frenchModificationDate = new Date(1234991200000L);
+
   /** Publishing start date */
-  protected Date publishingStartDate = new Date(1231355141000L);
+  protected Date publishingStartDate = new Date(1146848301000L);
 
   /** Publishing end date */
-  protected Date publishingEndDate = new Date(1234991200000L);
+  protected Date publishingEndDate = new Date(1262304000000L);
 
   /** Some date after the latest modification date */
   protected Date futureDate = new Date(2000000000000L);
@@ -125,6 +124,9 @@ public class PageImplTest {
   /** Creator */
   protected User hans = new UserImpl("hans", "testland", "Hans Muster");
   
+  /** French editor */
+  protected User amelie = new UserImpl("amelie", "testland", "Amélie Poulard");
+
   /** Rights declaration */
   protected String germanRights = "Copyright 2009 by T. Wunden";
   
@@ -155,6 +157,8 @@ public class PageImplTest {
     page.setDescription(germanDescription, german);
     page.setDescription(frenchDescription, french);
     page.setLayout(layout);
+    page.setLocked(amelie);
+    page.setModified(amelie, frenchModificationDate);
     page.setOwner(hans);
     page.setPublished(hans, publishingStartDate, publishingEndDate);
     page.setRights(germanRights, german);
@@ -172,9 +176,9 @@ public class PageImplTest {
    */
   protected void setupPrerequisites() {
     site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getDefaultLanguage()).andReturn(English.getInstance());    
+    EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin", "test"));    
-    EasyMock.expect(site.getDefaultLanguage()).andReturn(English.getInstance());    
+    EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
     EasyMock.replay(site);
     pageURI = new PageURIImpl(site, "/test", Page.LIVE);
   }
@@ -521,8 +525,9 @@ public class PageImplTest {
    */
   @Test
   public void testIsPublished() {
-    page.setPublishFrom(new Date(new Date().getTime() - Times.MS_PER_DAY));
-    page.setPublishTo(new Date(new Date().getTime() + Times.MS_PER_DAY));
+    Date yesterday = new Date(new Date().getTime() - Times.MS_PER_DAY);
+    Date tomorrow = new Date(new Date().getTime() + Times.MS_PER_DAY);
+    page.setPublished(amelie, yesterday, tomorrow);
     assertTrue(page.isPublished());
   }
 
@@ -581,7 +586,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetModificationDate() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(frenchModificationDate, page.getModificationDate());
   }
 
   /**
@@ -589,87 +594,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetModifier() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedAfter(java.util.Date)}.
-   */
-  @Test
-  public void testIsModifiedAfterDate() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedAfter(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testIsModifiedAfterDateLanguage() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedBefore(java.util.Date)}.
-   */
-  @Test
-  public void testIsModifiedBeforeDate() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModifiedBefore(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testIsModifiedBeforeDateLanguage() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getLastModificationDate()}.
-   */
-  @Test
-  public void testGetLastModificationDate() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getLastModifier()}.
-   */
-  @Test
-  public void testGetLastModifier() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isModified()}.
-   */
-  @Test
-  public void testIsModified() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModificationDate(ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testGetModificationDateLanguage() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModifier(ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testGetModifierLanguage() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testSetModified() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(amelie, page.getModifier());
   }
 
   /**
@@ -677,23 +602,16 @@ public class PageImplTest {
    */
   @Test
   public void testGetLockOwner() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(amelie, page.getLockOwner());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#lock(ch.o2it.weblounge.common.user.AuthenticatedUser)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setUnlocked()}.
    */
   @Test
-  public void testLock() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#unlock(ch.o2it.weblounge.common.user.AuthenticatedUser)}.
-   */
-  @Test
-  public void testUnlock() {
-    fail("Not yet implemented"); // TODO
+  public void testSetUnlocked() {
+    page.setUnlocked();
+    assertFalse(page.isLocked());
   }
 
   /**
@@ -701,7 +619,7 @@ public class PageImplTest {
    */
   @Test
   public void testIsLocked() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(page.isLocked());
   }
 
   /**
@@ -778,43 +696,13 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getDocument(long)}.
-   */
-  @Test
-  public void testGetDocument() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getVersion(long)}.
-   */
-  @Test
-  public void testGetVersionLong() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getVersion(java.lang.String)}.
-   */
-  @Test
-  public void testGetVersionString() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testCompareTo() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#toXml()}.
-   */
-  @Test
-  public void testToXml() {
-    fail("Not yet implemented"); // TODO
+    Page p2 = new PageImpl(new PageURIImpl(site, "/test/2", Page.LIVE));
+    p2.setTitle(germanTitle, german);
+    assertEquals(0, page.compareTo(p2, german));
   }
 
 }

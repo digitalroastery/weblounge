@@ -99,6 +99,7 @@ public class ModificationContextImplTest {
   public void testIsModified() {
     Date date = new Date();
     try {
+      // TODO: Redo this test using dayBefore and dayAfter
       assertTrue(date.before(modificationDate) || ctx.isModified());
       // Sleep, since date.before() needs a significant difference
       Thread.sleep(100);

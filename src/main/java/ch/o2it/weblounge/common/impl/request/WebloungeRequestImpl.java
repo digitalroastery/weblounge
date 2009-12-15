@@ -20,7 +20,8 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
-import ch.o2it.weblounge.common.impl.page.PageImpl;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.page.PageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.GuestImpl;
@@ -141,7 +142,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (language == null) {
       Matcher m = languageExtractor_.matcher(getRequestURI());
       if (m.find()) {
-        language = site.getLanguage(m.group(1));
+        language = LanguageSupport.getLanguage(m.group(1));
         log_.trace("Selected language " + language + " from request uri");
       }
     }
@@ -210,7 +211,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     Matcher m = urlAnalyzer_.matcher(urlPath);
     if (m.matches()) {
       urlPath = m.group(1);
-      version = PageImpl.getVersion(m.group(2));
+      version = PageUtils.getVersion(m.group(2));
       urlFlavor = m.group(3);
     }
 

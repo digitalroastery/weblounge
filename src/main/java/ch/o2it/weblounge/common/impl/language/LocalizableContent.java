@@ -225,32 +225,10 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable)
    */
   public int compareTo(Localizable o, Language l) {
-    if (o instanceof LocalizableContent<?>) {
-      return toString(l).compareTo(((LocalizableContent<?>) o).toString(l));
+    if (o instanceof LocalizableObject) {
+      return toString(l).compareTo(((LocalizableObject) o).toString(l));
     }
     return toString(l).compareTo(o.toString());
-  }
-
-  /**
-   * Returns the component title in the active language. The title is identified
-   * by the name "name".
-   * 
-   * @return the component title.
-   */
-  public String toString() {
-    return toString(resolveLanguage());
-  }
-
-  /**
-   * Returns the title in the requested language or <code>null</code> if the
-   * title doesn't exist in that language.
-   * 
-   * @param language
-   *          the requested language
-   * @return the object title
-   */
-  public String toString(Language language) {
-    return toString(language, false);
   }
 
   /**

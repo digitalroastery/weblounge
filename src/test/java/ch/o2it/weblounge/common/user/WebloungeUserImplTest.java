@@ -117,7 +117,6 @@ public class WebloungeUserImplTest {
   protected void setUpPrerequisites() throws Exception {
     mockSite = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(mockSite.getIdentifier()).andReturn("test");
-    EasyMock.expect(mockSite.getLanguage("en")).andReturn(English.getInstance());
     EasyMock.expect(mockSite.getGroup("publisher", "system")).andReturn(publisherGroup);
     EasyMock.expect(mockSite.getRole("apprentice", "myapp")).andReturn(apprenticeRole);
     EasyMock.replay(mockSite);
