@@ -9,21 +9,75 @@
   <description>Weblounge is a multilingual web content management system</description>
   <url>http://www.o2it.ch/weblounge</url>
   <inceptionYear>2009</inceptionYear>
+
   <prerequisites>
     <maven>2.0.6</maven>
   </prerequisites>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
+
+  <organization>
+    <name>O2 IT Engineering</name>
+    <url>http://www.o2it.ch</url>
+  </organization>
+  
+  <developers>
+    <developer>
+      <id>tobias.wunden</id>
+      <name>Tobias Wunden</name>
+      <email>tobias.wunden@o2it.ch</email>
+      <organization>O2 IT Engineering</organization>
+      <organizationUrl>http://www.o2it.ch</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>Weblounge Announcements</name>
+      <subscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-announce</subscribe>
+      <unsubscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-announce</unsubscribe>
+      <post>weblounge-announce@o2it.ch</post>
+      <archive>http://lists.o2it.ch/pipermail/weblounge-announce</archive>
+    </mailingList>
+    <mailingList>
+      <name>Weblounge Development</name>
+      <subscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-dev</subscribe>
+      <unsubscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-dev</unsubscribe>
+      <post>weblounge-dev@o2it.ch</post>
+      <archive>http://lists.o2it.ch/pipermail/weblounge-dev</archive>
+    </mailingList>
+    <mailingList>
+      <name>Weblounge Talk</name>
+      <subscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-talk</subscribe>
+      <unsubscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-talk</unsubscribe>
+      <post>weblounge-talk@o2it.ch</post>
+      <archive>http://lists.o2it.ch/pipermail/weblounge-talk</archive>
+    </mailingList>
+  </mailingLists>
+
+  <licenses>
+    <license>
+      <name>GNU General Public License, version 2</name>
+      <url>http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt</url>
+    </license>
+  </licenses>
+
   <scm>
-    <connection>scm:svn:http://svn.o2it.ch/weblounge/trunk</connection>
-    <developerConnection>scm:svn:https://svn.o2it.ch/weblounge/trunk</developerConnection>
-    <url>http://svn.o2it.ch/weblounge/trunk</url>
+    <connection>scm:svn:http://digitalcafe.svn.beanstalkapp.com/weblounge/products/weblounge/trunk</connection>
+    <developerConnection>scm:svn:http://digitalcafe.svn.beanstalkapp.com/weblounge/products/weblounge/trunk</developerConnection>
+    <url>http://digitalcafe.svn.beanstalkapp.com/weblounge</url>
   </scm>
+
   <issueManagement>
-    <system>trac</system>
-    <url>https://issues.o2it.ch/weblounge</url>
+    <system>lighthouse</system>
+    <url>http://digitalcafe.lighthouseapp.com/projects/35461-weblounge</url>
   </issueManagement>
   
   <profiles>
@@ -261,6 +315,7 @@
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
+            <encoding>UTF-8</encoding>
           </configuration>
         </plugin>
         <plugin>
@@ -418,6 +473,24 @@
         <version>1.5.3</version>
       </dependency>
   
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-bundle-minimal</artifactId>
+        <version>2.2.5</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.cxf.dosgi</groupId>
+        <artifactId>cxf-dosgi-ri-discovery-local</artifactId>
+        <version>1.1</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.cxf.dosgi</groupId>
+        <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
+        <version>1.1</version>
+      </dependency>
+
       <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
