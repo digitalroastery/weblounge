@@ -27,7 +27,6 @@ import ch.o2it.weblounge.common.security.Role;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Default implementation of a weblounge group.
@@ -44,10 +43,10 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   final Set<GroupMember> members = new HashSet<GroupMember>();
 
   /** Group memberships */
-  final Set<Group> groups = new TreeSet<Group>();
+  final Set<Group> groups = new HashSet<Group>();
 
   /** the roles directly owned by this group */
-  final Set<Role> roles = new TreeSet<Role>();
+  final Set<Role> roles = new HashSet<Role>();
 
   /**
    * Creates a new group with the given context and identifier.
@@ -173,7 +172,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    * @see ch.o2it.weblounge.common.security.GroupMember#getGroupClosure()
    */
   public Group[] getGroupClosure() {
-    Set<Group> result = new TreeSet<Group>();
+    Set<Group> result = new HashSet<Group>();
     if (groups != null) {
       result.addAll(groups);
       for (Group g : groups) {
@@ -188,7 +187,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    * @see ch.o2it.weblounge.common.security.GroupMember#getGroups()
    */
   public Group[] getGroups() {
-    Set<Group> result = new TreeSet<Group>();
+    Set<Group> result = new HashSet<Group>();
     if (groups != null) {
       result.addAll(groups);
     }
@@ -239,7 +238,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    * @return the roles that this user owns
    */
   public Role[] getRoleClosure() {
-    Set<Role> roles = new TreeSet<Role>();
+    Set<Role> roles = new HashSet<Role>();
     if (this.roles != null)
       roles.addAll(this.roles);
     if (this.groups != null) {
@@ -257,7 +256,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    * @return the user's primary roles
    */
   public Role[] getRoles() {
-    Set<Role> roles = new TreeSet<Role>();
+    Set<Role> roles = new HashSet<Role>();
     if (this.roles != null)
       roles.addAll(this.roles);
     return roles.toArray(new Role[roles.size()]);

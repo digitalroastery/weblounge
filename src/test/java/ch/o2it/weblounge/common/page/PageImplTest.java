@@ -39,6 +39,7 @@ import ch.o2it.weblounge.common.user.User;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
@@ -450,6 +451,7 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#allow(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
+  @Ignore
   public void testAllow() {
     fail("Not yet implemented"); // TODO
   }
@@ -458,6 +460,7 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#deny(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
+  @Ignore
   public void testDeny() {
     fail("Not yet implemented"); // TODO
   }
@@ -466,6 +469,7 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
+  @Ignore
   public void testCheckPermissionAuthority() {
     fail("Not yet implemented"); // TODO
   }
@@ -474,6 +478,7 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
+  @Ignore
   public void testCheckPermissionSetAuthority() {
     fail("Not yet implemented"); // TODO
   }
@@ -482,6 +487,7 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
    */
   @Test
+  @Ignore
   public void testCheckOne() {
     fail("Not yet implemented"); // TODO
   }
@@ -490,6 +496,7 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
    */
   @Test
+  @Ignore
   public void testCheckAll() {
     fail("Not yet implemented"); // TODO
   }
@@ -498,6 +505,7 @@ public class PageImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#permissions()}.
    */
   @Test
+  @Ignore
   public void testPermissions() {
     fail("Not yet implemented"); // TODO
   }

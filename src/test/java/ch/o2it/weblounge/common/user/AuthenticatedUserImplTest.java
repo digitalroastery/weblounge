@@ -20,11 +20,10 @@
 
 package ch.o2it.weblounge.common.user;
 
-import static org.junit.Assert.fail;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.security.GroupImpl;
 import ch.o2it.weblounge.common.impl.security.RoleImpl;
@@ -37,6 +36,7 @@ import ch.o2it.weblounge.common.security.Role;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -319,7 +319,7 @@ public class AuthenticatedUserImplTest {
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#isAuthorizedBy(ch.o2it.weblounge.common.security.Authority)}.
    */
-  @Test
+  @Test @Ignore
   public void testIsAuthorizedBy() {
     fail("Not yet implemented");
 
