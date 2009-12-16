@@ -80,7 +80,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the role identifier
    */
   public RoleImpl(String context, String identifier, Role ancestor) {
-    this(identifier, context);
+    this(context, identifier);
     extend(ancestor);
   }
 
@@ -104,7 +104,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   }
 
   /**
-   * Returns <code>true</code> if this role is a direct or indirec extension of
+   * Returns <code>true</code> if this role is a direct or indirect extension of
    * <code>ancestor</code>.
    * 
    * @param ancestor
@@ -201,7 +201,8 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
       return this.equals(r) || this.isExtensionOf(r);
     } else if (authority != null && authority.getAuthorityType().equals(Role.class.getName())) {
       String roleId = authority.getAuthorityId();
-      return isExtensionOf(new RoleImpl(roleId));
+      Role r = new RoleImpl(roleId);
+      return equals(r) || isExtensionOf(r);
     }
     return false;
   }
