@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.common.repository;
 
 import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.security.SecurityException;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
@@ -92,7 +91,7 @@ public interface RepositoryManager {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
-   *           if retreival fails due to a database error
+   *           if retrieval fails due to a database error
    */
   Collection getRootCollection(User user, Permission permission)
       throws SecurityException, IOException;
@@ -111,7 +110,7 @@ public interface RepositoryManager {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
-   *           if retreival fails due to a database error
+   *           if retrieval fails due to a database error
    */
   Collection getCollection(RepositoryURI uri, User user, Permission permission)
       throws SecurityException, IOException;
@@ -186,7 +185,7 @@ public interface RepositoryManager {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
-   *           if retreival fails due to a database error
+   *           if retrieval fails due to a database error
    */
   Resource getResource(RepositoryURI uri, User user, Permission permission)
       throws SecurityException, IOException;
@@ -211,7 +210,7 @@ public interface RepositoryManager {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
-   *           if retreival fails due to a database error
+   *           if retrieval fails due to a database error
    */
   Iterator<Collection> collections(RepositoryURI collectionURI, User user,
       Permission permission) throws SecurityException, IOException;
@@ -238,7 +237,7 @@ public interface RepositoryManager {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
-   *           if retreival fails due to a database error
+   *           if retrieval fails due to a database error
    */
   Iterator<Collection> collections(RepositoryURI collectionURI,
       CollectionFilter filter, User user, Permission permission)
@@ -264,7 +263,7 @@ public interface RepositoryManager {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
-   *           if retreival fails due to a database error
+   *           if retrieval fails due to a database error
    */
   Iterator<Resource> resources(RepositoryURI collectionURI, User user,
       Permission permission) throws SecurityException, IOException;
@@ -291,7 +290,7 @@ public interface RepositoryManager {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
-   *           if retreival fails due to a database error
+   *           if retrieval fails due to a database error
    */
   Iterator<Resource> resources(RepositoryURI collectionURI,
       ResourceFilter filter, User user, Permission permission)

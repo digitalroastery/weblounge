@@ -20,10 +20,12 @@
 
 package ch.o2it.weblounge.common.url;
 
+import java.io.Serializable;
+
 /**
  * The <code>Url</code> defines common methods for all urls.
  */
-public interface Url {
+public interface Url extends Serializable {
 
   /** identifier to locate the Url object in the session */
   final static String ID = "weblounge::url_id";

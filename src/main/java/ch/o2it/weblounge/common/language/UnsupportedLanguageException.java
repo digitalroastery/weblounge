@@ -47,6 +47,7 @@ public class UnsupportedLanguageException extends RuntimeException {
    */
   public UnsupportedLanguageException(String language) {
     super("Language " + language + " not supported!");
+    this.language_ = language;
   }
 
   /**

@@ -57,7 +57,7 @@ public interface User extends Cloneable {
    * 
    * @return the cloned user
    */
-  Object clone();
+  Object clone() throws CloneNotSupportedException;
 
   /**
    * Returns the <code>XML</code> representation of this user.

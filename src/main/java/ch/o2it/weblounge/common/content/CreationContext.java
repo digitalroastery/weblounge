@@ -84,7 +84,7 @@ public interface CreationContext extends Cloneable {
    * 
    * @return the cloned creation context
    */
-  Object clone();
+  Object clone() throws CloneNotSupportedException;
 
   /**
    * @see ch.o2it.weblounge.common.content.CreationContext#toXml()

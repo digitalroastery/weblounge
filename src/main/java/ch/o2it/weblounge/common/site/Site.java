@@ -41,12 +41,13 @@ import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  * The site interface defines the method that may be called on weblounge site
  * objects.
  */
-public interface Site extends ModuleListener, RequestListener {
+public interface Site extends ModuleListener, RequestListener, Serializable {
 
   /** Site descriptor */
   static final String CONFIG_FILE = "site.xml";
