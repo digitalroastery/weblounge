@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.language;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -120,7 +122,13 @@ public class LocalizableContentTest extends LocalizableObjectTest {
   public void testClone() {
     content.setDefaultLanguage(italian);
     content.setLanguageResolution(LanguageResolution.Default);
-    LocalizableContent<String> americanEnglish = (LocalizableContent<String>)content.clone();
+    LocalizableContent<String> americanEnglish = null;
+    try {
+      americanEnglish = (LocalizableContent<String>)content.clone();
+    } catch (CloneNotSupportedException e) {
+      fail("Creating clone of localizable content failed");
+      return;
+    }
     assertEquals(content.size(), americanEnglish.size());
     assertEquals(content.getLanguage(), americanEnglish.getLanguage());
     assertEquals(content.getOriginalLanguage(), americanEnglish.getOriginalLanguage());

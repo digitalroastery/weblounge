@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -203,13 +205,18 @@ public class LocalizedModificationContextImplTest {
    */
   @Test
   public void testClone() {
-    LocalizedModificationContext c = ctx.clone();
-    assertEquals(hans, c.getModifier(german));
-    assertEquals(germanModifcationDate, c.getModificationDate(german));
-    assertEquals(amelie, c.getModifier(french));
-    assertEquals(frenchModifcationDate, c.getModificationDate(french));
-    assertEquals(ctx.getLastModifier(), c.getLastModifier());
-    assertEquals(ctx.getLastModificationDate(), c.getLastModificationDate());
+    LocalizedModificationContext c = null;
+    try {
+      c = (LocalizedModificationContext)ctx.clone();
+      assertEquals(hans, c.getModifier(german));
+      assertEquals(germanModifcationDate, c.getModificationDate(german));
+      assertEquals(amelie, c.getModifier(french));
+      assertEquals(frenchModifcationDate, c.getModificationDate(french));
+      assertEquals(ctx.getLastModifier(), c.getLastModifier());
+      assertEquals(ctx.getLastModificationDate(), c.getLastModificationDate());
+    } catch (CloneNotSupportedException e) {
+      fail("Creating clone of modification context failed");
+    }
   }
 
 }

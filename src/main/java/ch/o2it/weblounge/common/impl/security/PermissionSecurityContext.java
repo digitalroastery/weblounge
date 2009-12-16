@@ -445,14 +445,15 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
     // Permissions
     for (Permission p : context_.keySet()) {
       Map<String, Set<Authority>> authorities = groupByType(context_.get(p));
-      for (String type : authorities.keySet()) {
+      for (Map.Entry<String, Set<Authority>> entry : authorities.entrySet()) {
+        String type = entry.getKey();
         b.append("<permission id=\"");
         b.append(p.getContext() + ":" + p.getIdentifier());
         b.append("\" type=\"");
         b.append(getAuthorityTypeShortcut(type));
         b.append("\">");
         boolean first = true;
-        for (Authority authority : authorities.get(type)) {
+        for (Authority authority : entry.getValue()) {
           if (!first) {
             b.append(",");
           }
@@ -491,8 +492,9 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * 
    * @see java.lang.Object#clone()
    */
-  public Object clone() {
-    PermissionSecurityContext ctxt = new PermissionSecurityContext(owner);
+  public Object clone() throws CloneNotSupportedException {
+    PermissionSecurityContext ctxt = (PermissionSecurityContext)super.clone();
+    ctxt.owner = owner;
     ctxt.context_.putAll(context_);
     ctxt.defaultContext_.putAll(defaultContext_);
     ctxt.permissions_ = permissions_;

@@ -52,7 +52,7 @@ public class IdentityHashSetTest {
     s = new IdentityHashSet<Object>();
     o = new Object[5];
     for (int i = 0; i < o.length; i++)
-      o[i] = new String("Test1");
+      o[i] = "Test1";
   }
 
   /**
@@ -135,7 +135,6 @@ public class IdentityHashSetTest {
   public final void testIdentityHashSet() {
     Set<String> l = new IdentityHashSet<String>();
     assertNotNull(l);
-    assertTrue(l instanceof IdentityHashSet<?>);
     assertTrue(l.size() == 0);
     assertTrue(l.isEmpty());
     assertTrue(!s.remove("Test"));

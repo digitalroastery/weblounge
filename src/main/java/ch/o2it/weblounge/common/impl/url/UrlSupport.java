@@ -136,7 +136,7 @@ public class UrlSupport {
       throw new IllegalArgumentException("Url cannot be null");
 
     url = checkSeparator(url);
-    url.trim();
+    url = url.trim();
 
     if (url.endsWith("/") || (url.length() == 1))
       return url;
@@ -343,24 +343,24 @@ public class UrlSupport {
   private static Character checkUrl(String url) {
     StringBuffer original = new StringBuffer(url);
     for (int i = 0; i < original.length(); i++) {
-      int value = (new Character(original.charAt(i))).charValue();
+      int value = original.charAt(i);
       // a-z
-      if (value >= new Character('a').charValue() && value <= new Character('z').charValue()) {
+      if (value >= 'a' && value <= 'z') {
         continue;
       }
       // A-Z
-      if (value >= new Character('A').charValue() && value <= new Character('Z').charValue()) {
+      if (value >= 'A' && value <= 'Z') {
         continue;
       }
       // 0-9
-      if (value >= new Character('0').charValue() && value <= new Character('9').charValue()) {
+      if (value >= '0' && value <= '9') {
         continue;
       }
       // Special characters
-      if ((value == new Character('-').charValue()) || (value == new Character('_').charValue()) || (value == new Character('.').charValue()) || (value == new Character(',').charValue()) || (value == new Character(';').charValue())) {
+      if (value == '-' || value == '_' || value == '.' || value == ',' || value == ';') {
         continue;
       }
-      return new Character(original.charAt(i));
+      return original.charAt(i);
     }
     return null;
   }

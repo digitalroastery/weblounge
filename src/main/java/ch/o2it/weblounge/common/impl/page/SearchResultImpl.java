@@ -171,5 +171,27 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
     }
     return 0;
   }
+  
+  /**
+   * {@inheritDoc}
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof SearchResult) {
+      SearchResult r = (SearchResult)obj;
+      return uri.equals(r.getURI()) && relevance == r.getRelevance();
+    }
+    return super.equals(obj);
+  }
 
+  /**
+   * {@inheritDoc}
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return Float.floatToIntBits(relevance);
+  }
+  
 }

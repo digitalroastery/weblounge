@@ -20,9 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.impl.security.AbstractSecurityContext;
-import ch.o2it.weblounge.common.impl.security.AuthorityImpl;
-import ch.o2it.weblounge.common.impl.security.PermissionImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.security.Authority;
@@ -40,7 +37,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * Utility class used to parse generic content including language sensitive
@@ -175,8 +171,8 @@ public abstract class WebloungeContentReader extends DefaultHandler {
 
     // permission
     else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
-      String id = attrs.getValue("id");
-      String type = attrs.getValue("type");
+      // String id = attrs.getValue("id");
+      // String type = attrs.getValue("type");
       // clipboard.put("id", id);
       // clipboard.put("type", type);
     }

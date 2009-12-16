@@ -56,7 +56,17 @@ public class SystemRole extends RoleImpl {
   public static final Role SYSTEMADMIN = new SystemRole("systemadmin", SITEADMIN);
 
   /** The system roles collection */
-  public static Set<Role> roles_;
+  public static Set<Role> roles_ = new HashSet<Role>();
+  
+  static {
+    roles_.add(SystemRole.GUEST);
+    roles_.add(SystemRole.TRANSLATOR);
+    roles_.add(SystemRole.EDITOR);
+    roles_.add(SystemRole.PUBLISHER);
+    roles_.add(SystemRole.DOMAINADMIN);
+    roles_.add(SystemRole.SITEADMIN);
+    roles_.add(SystemRole.SYSTEMADMIN);
+  }
 
   /**
    * Creates a new system Role.
@@ -135,16 +145,6 @@ public class SystemRole extends RoleImpl {
    * @return all system roles
    */
   public static Iterator<Role> roles() {
-    if (roles_ == null) {
-      roles_ = new HashSet<Role>();
-      roles_.add(SystemRole.GUEST);
-      roles_.add(SystemRole.TRANSLATOR);
-      roles_.add(SystemRole.EDITOR);
-      roles_.add(SystemRole.PUBLISHER);
-      roles_.add(SystemRole.DOMAINADMIN);
-      roles_.add(SystemRole.SITEADMIN);
-      roles_.add(SystemRole.SYSTEMADMIN);
-    }
     return roles_.iterator();
   }
 

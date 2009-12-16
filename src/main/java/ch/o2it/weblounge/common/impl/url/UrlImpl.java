@@ -27,6 +27,9 @@ import ch.o2it.weblounge.common.url.Url;
  */
 public class UrlImpl implements Url {
 
+  /** Serial version uid */
+  private static final long serialVersionUID = 3314907623908539157L;
+
   /** Default path separator */
   private static final char URL_PATH_SEPARATOR = '/';
 
@@ -155,11 +158,11 @@ public class UrlImpl implements Url {
    * @see java.lang.Object#equals(Object)
    */
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof UrlImpl) {
-      UrlImpl url = (UrlImpl) obj;
-      return path.equals(url.path);
+    if (obj != null && obj instanceof Url) {
+      Url url = (Url) obj;
+      return path.equals(url.getPath());
     }
-    return false;
+    return super.equals(obj);
   }
 
   /**
@@ -258,7 +261,7 @@ public class UrlImpl implements Url {
   protected String trim(String url) {
     if (url == null)
       throw new IllegalArgumentException("Url cannot be null");
-    url.trim();
+    url = url.trim();
     String separator = Character.toString(separatorChar);
     url = url.replaceAll(separator + separator, separator);
     if (!url.startsWith(separator))

@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
@@ -119,9 +121,14 @@ public class CreationContextImplTest {
    */
   @Test
   public void testClone() {
-    CreationContext c = (CreationContext) ctx.clone();
-    assertTrue(creator.equals(c.getCreator()));
-    assertTrue(creationDate.equals(c.getCreationDate()));
+    CreationContext c = null;
+    try {
+      c = (CreationContext) ctx.clone();
+      assertTrue(creator.equals(c.getCreator()));
+      assertTrue(creationDate.equals(c.getCreationDate()));
+    } catch (CloneNotSupportedException e) {
+      fail("Creating clone of creation context failed");
+    }
   }
 
 }

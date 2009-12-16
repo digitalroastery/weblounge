@@ -253,7 +253,7 @@ public class RestrictionImpl implements Restriction {
    */
   public Authority[] getAllowed() {
     if (allowRules_ != null)
-      return (Authority[]) allowRules_.toArray();
+      return allowRules_.toArray(new Authority[allowRules_.size()]);
     else
       return new Authority[] {};
   }
@@ -282,7 +282,7 @@ public class RestrictionImpl implements Restriction {
    */
   public Authority[] getDenied() {
     if (denyRules_ != null)
-      return (Authority[]) denyRules_.toArray();
+      return denyRules_.toArray(new Authority[denyRules_.size()]);
     else
       return new Authority[] {};
   }
@@ -296,7 +296,7 @@ public class RestrictionImpl implements Restriction {
    *          the authorization to test
    */
   public boolean isAllowed(Authority authority) {
-    return allowRules_ == null || allowRules_.contains("any") || allowRules_.contains(authority);
+    return allowRules_ == null || allowRules_.contains(authority);
   }
 
   /**
@@ -308,7 +308,7 @@ public class RestrictionImpl implements Restriction {
    *          the authorization to test
    */
   public boolean isDenied(Authority authority) {
-    return denyRules_ == null || denyRules_.contains("any") || denyRules_.contains(authority);
+    return denyRules_ == null || denyRules_.contains(authority);
   }
 
   /**
@@ -425,7 +425,7 @@ public class RestrictionImpl implements Restriction {
    * <code>system:editor</code>, meaning that this rule will match the system
    * role <code>editor</code>.
    */
-  final class RestrictionRule extends AuthorityImpl {
+  static final class RestrictionRule extends AuthorityImpl {
 
     /**
      * Creates a new allow or deny rule with the given type and id.

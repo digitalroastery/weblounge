@@ -201,8 +201,9 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    * 
    * @see java.lang.Object#clone()
    */
-  public Object clone() {
-    LocalizableContent<T> c = new LocalizableContent<T>();
+  @SuppressWarnings("unchecked")
+  public Object clone() throws CloneNotSupportedException {
+    LocalizableContent<T> c = (LocalizableContent<T>)super.clone();
     c.behavior = behavior;
     c.currentLanguage = currentLanguage;
     c.defaultLanguage = defaultLanguage;

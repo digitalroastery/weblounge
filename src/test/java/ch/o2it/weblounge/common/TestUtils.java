@@ -47,6 +47,7 @@ public class TestUtils {
       byte[] buffer = new byte[(int)templateFile.length()];
       FileInputStream f = new FileInputStream(templateFile);
       f.read(buffer);
+      f.close();
       template = new String(buffer).replaceFirst("<\\?.*?>", "");
       template = template.replaceAll("(>\\s*)+", ">").replaceAll("(\\s*<)+", "<");
     } catch (IOException e) {

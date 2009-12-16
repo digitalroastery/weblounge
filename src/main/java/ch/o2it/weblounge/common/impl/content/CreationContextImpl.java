@@ -113,8 +113,8 @@ public class CreationContextImpl implements CreationContext {
    * 
    * @see java.lang.Object#clone()
    */
-  public Object clone() {
-    CreationContextImpl ctxt = new CreationContextImpl();
+  public Object clone() throws CloneNotSupportedException {
+    CreationContextImpl ctxt = (CreationContextImpl)super.clone();
     if (creator != null)
       ctxt.creator = (User) creator.clone();
     if (creationDate != null)

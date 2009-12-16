@@ -57,7 +57,7 @@ public abstract class AbstractLoginModule implements LoginModule {
   protected String username = null;
 
   /** Password */
-  protected char[] password = null;
+  protected byte[] password = null;
 
   /** The user */
   protected AuthenticatedUser user = null;
@@ -168,7 +168,7 @@ public abstract class AbstractLoginModule implements LoginModule {
     if (tmpPassword == null) {
       tmpPassword = new char[0];
     }
-    password = new char[tmpPassword.length];
+    password = new byte[tmpPassword.length];
     System.arraycopy(tmpPassword, 0, password, 0, tmpPassword.length);
     ((PasswordCallback) callbacks[1]).clearPassword();
   }
@@ -260,7 +260,6 @@ public abstract class AbstractLoginModule implements LoginModule {
    *         ignored.
    */
   public boolean logout() throws LoginException {
-    succeeded = false;
     succeeded = commitSucceeded;
     username = null;
     if (password != null) {

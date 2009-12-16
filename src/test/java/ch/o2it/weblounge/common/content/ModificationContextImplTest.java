@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -140,9 +142,14 @@ public class ModificationContextImplTest {
    */
   @Test
   public void testClone() {
-    ModificationContext clonedCtx = (ModificationContext) ctx.clone();
-    assertEquals(modificationDate, clonedCtx.getModificationDate());
-    assertEquals(modifier, clonedCtx.getModifier());
+    ModificationContext clonedCtx;
+    try {
+      clonedCtx = (ModificationContext) ctx.clone();
+      assertEquals(modificationDate, clonedCtx.getModificationDate());
+      assertEquals(modifier, clonedCtx.getModifier());
+    } catch (CloneNotSupportedException e) {
+      fail("Creaing clone of modification context failed");
+    }
   }
 
 }

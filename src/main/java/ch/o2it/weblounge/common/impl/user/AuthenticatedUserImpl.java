@@ -45,10 +45,10 @@ import javax.security.auth.login.LoginException;
 public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser {
 
   /** The groups where this user is a member */
-  protected Set<Group> groups = null;
+  protected final Set<Group> groups = new HashSet<Group>();
 
   /** The groups where this user is a member */
-  protected Set<Role> roles = null;
+  protected final Set<Role> roles = new HashSet<Role>();
 
   /** The login context */
   protected LoginContext loginContext = null;
@@ -175,7 +175,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
       case plain:
         return passwordString.equals(password);
       case md5:
-        return passwordString.equals(DigestUtils.md5(password));
+        return passwordString.equals(new String(DigestUtils.md5(password)));
     }
     return false;
   }
@@ -316,9 +316,6 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    *          the group that has been joined
    */
   public void addMembership(Group group) {
-    if (groups == null) {
-      groups = new HashSet<Group>();
-    }
     if (!groups.contains(group)) {
       synchronized (groups) {
         groups.add(group);
@@ -389,9 +386,6 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
    *          the role to remove
    */
   public void assignRole(Role role) {
-    if (roles == null) {
-      roles = new HashSet<Role>();
-    }
     if (!roles.contains(role)) {
       synchronized (roles) {
         roles.add(role);
@@ -566,7 +560,7 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
         return false;
       return true;
     }
-    return false;
+    return super.equals(obj);
   }
 
   /**

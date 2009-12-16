@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -125,10 +127,15 @@ public class PublishingContextImplTest {
    */
   @Test
   public void testClone() {
-    PublishingContext c = (PublishingContext)ctx.clone();
-    assertEquals(ctx.getPublisher(), c.getPublisher());
-    assertEquals(ctx.getPublishFrom(), c.getPublishFrom());
-    assertEquals(ctx.getPublishTo(), c.getPublishTo());
+    PublishingContext c = null;
+    try {
+      c = (PublishingContext)ctx.clone();
+      assertEquals(ctx.getPublisher(), c.getPublisher());
+      assertEquals(ctx.getPublishFrom(), c.getPublishFrom());
+      assertEquals(ctx.getPublishTo(), c.getPublishTo());
+    } catch (CloneNotSupportedException e) {
+      fail("Creating clone of publishing context failed");
+    }
   }
 
 }

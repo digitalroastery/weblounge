@@ -209,4 +209,25 @@ public class WebloungeFileUrl extends UrlImpl {
     return path;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.url.UrlImpl#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    // Overwritten to document that we are using the super impl
+    return super.equals(obj);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.url.UrlImpl#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
 }

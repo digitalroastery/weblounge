@@ -204,7 +204,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
         return false;
       return true;
     }
-    return false;
+    return super.equals(obj);
   }
 
 }

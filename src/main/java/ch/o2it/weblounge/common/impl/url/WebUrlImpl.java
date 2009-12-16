@@ -44,6 +44,9 @@ import java.util.regex.Pattern;
  */
 public class WebUrlImpl extends UrlImpl implements WebUrl {
 
+  /** Serial version uid */
+  private static final long serialVersionUID = -5815146954734580746L;
+
   /** The logging facility */
   private static Logger log_ = LoggerFactory.getLogger(WebUrlImpl.class);
   

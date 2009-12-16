@@ -262,9 +262,8 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    * 
    * @see java.lang.Object#clone()
    */
-  public LocalizedModificationContextImpl clone() {
-    LocalizedModificationContextImpl ctxt = new LocalizedModificationContextImpl();
-
+  public Object clone() throws CloneNotSupportedException {
+    LocalizedModificationContextImpl ctxt = (LocalizedModificationContextImpl)super.clone();
     ctxt.behavior = behavior;
     ctxt.currentLanguage = currentLanguage;
     ctxt.defaultLanguage = defaultLanguage;
@@ -364,7 +363,7 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   /**
    * Helper class used to hold modification information.
    */
-  class Modification {
+  static class Modification {
 
     /** Modifier */
     private User modifier = null;

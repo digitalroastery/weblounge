@@ -168,7 +168,7 @@ public class UserImpl implements User {
    * @param xml
    *          the XML node
    * @param xpath
-   *          the xpath object
+   *          the XPATH object
    * @return the user or <code>null</code> if
    */
   public static UserImpl fromXml(Node xml, XPath xpath) {
@@ -187,8 +187,11 @@ public class UserImpl implements User {
    * @see java.lang.Object#clone()
    */
   @Override
-  public Object clone() {
-    UserImpl user = new UserImpl(login, realm, name);
+  public Object clone() throws CloneNotSupportedException {
+    UserImpl user = (UserImpl)super.clone();
+    user.login = login;
+    user.realm = realm;
+    user.name = name;
     return user;
   }
 
@@ -217,7 +220,7 @@ public class UserImpl implements User {
         return false;
       return login.equals(u.getLogin());
     }
-    return false;
+    return super.equals(obj);
   }
 
   /**

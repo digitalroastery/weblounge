@@ -44,6 +44,7 @@ import ch.o2it.weblounge.common.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -108,9 +109,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /** The content */
   LocalizableContent<Map<String, String[]>> content = null;
-
-  /** The pagelet name */
-  LocalizableContent<String> name = null;
 
   /**
    * Creates an empty pagelet. This constructor is for use with a
@@ -914,7 +912,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * Utility class used to compare content and property map entries.
    */
-  class MapEntryComparator implements Comparator<Map.Entry<String, String[]>> {
+  static class MapEntryComparator implements Comparator<Map.Entry<String, String[]>>, Serializable {
+
+    /** Serial version uid */
+    private static final long serialVersionUID = 853284601216740051L;
 
     /**
      * {@inheritDoc}

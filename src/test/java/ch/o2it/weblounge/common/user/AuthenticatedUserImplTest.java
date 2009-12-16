@@ -79,9 +79,9 @@ public class AuthenticatedUserImplTest {
     user.assignRole(SystemRole.EDITOR);
     addictsGroup.addMember(whiskyDrinkerGroup);
     user.addPublicCredentials(publicKey);
-    user.addPublicCredentials(new Long(1));
+    user.addPublicCredentials(Long.valueOf(1));
     user.addPrivateCredentials(privateKey);
-    user.addPrivateCredentials(new Long(1));
+    user.addPrivateCredentials(Long.valueOf(1));
   }
 
   /**

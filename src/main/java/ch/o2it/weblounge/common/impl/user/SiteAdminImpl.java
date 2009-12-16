@@ -28,10 +28,10 @@ import ch.o2it.weblounge.common.user.SiteAdmin;
  * This class represents the administrator user for a single site.
  */
 public final class SiteAdminImpl extends WebloungeUserImpl implements SiteAdmin {
-  
+
   /** The site identifier */
   protected String site = null;
-  
+
   /**
    * Creates a new SiteAdminImpl user with the <code>administrator</code> role
    * assigned.
@@ -63,11 +63,34 @@ public final class SiteAdminImpl extends WebloungeUserImpl implements SiteAdmin 
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.impl.user.UserImpl#setRealm(java.lang.String)
    */
   @Override
   public void setRealm(String realm) {
     throw new UnsupportedOperationException("The admin user realm cannot be changed");
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    // Overwritten to document that we are using the super impl
+    return super.equals(obj);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    // Overwritten to document that we are using the super impl
+    return super.hashCode();
+  }
+
 }

@@ -41,13 +41,13 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   private String id_ = null;
 
   /** The group members */
-  Set<GroupMember> members = null;
+  final Set<GroupMember> members = new HashSet<GroupMember>();
 
   /** Group memberships */
-  Set<Group> groups = null;
+  final Set<Group> groups = new TreeSet<Group>();
 
   /** the roles directly owned by this group */
-  Set<Role> roles = null;
+  final Set<Role> roles = new TreeSet<Role>();
 
   /**
    * Creates a new group with the given context and identifier.
@@ -87,8 +87,6 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    *          the member to add
    */
   public void addMember(GroupMember member) {
-    if (members == null)
-      members = new HashSet<GroupMember>();
     if (!members.contains(member)) {
       synchronized (members) {
         members.add(member);
@@ -150,9 +148,6 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    *          the group that has been joined
    */
   public void addMembership(Group group) {
-    if (groups == null) {
-      groups = new TreeSet<Group>();
-    }
     synchronized (groups) {
       groups.add(group);
     }
@@ -219,9 +214,6 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    *          the role to remove
    */
   public void assignRole(Role role) {
-    if (roles == null) {
-      roles = new TreeSet<Role>();
-    }
     synchronized (roles) {
       roles.add(role);
     }
@@ -320,7 +312,16 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns <codee>true</code> if <code>o</code> is equal to this group by
+   * {@inheritDoc}
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return context_.hashCode() | id_.hashCode() >> 16;
+  }
+  
+  /**
+   * Returns <code>true</code> if <code>o</code> is equal to this group by
    * means of context and identifier.
    * 
    * @return <code>true</code> if <code>o</code> is equal to <code>this</code>

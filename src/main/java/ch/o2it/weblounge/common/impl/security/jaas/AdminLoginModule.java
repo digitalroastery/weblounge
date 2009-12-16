@@ -29,6 +29,8 @@ import ch.o2it.weblounge.common.user.SiteAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 
@@ -53,7 +55,7 @@ public class AdminLoginModule extends AbstractLoginModule {
 
       // Test for site admin
       if (siteadmin.getLogin().equals(username) && !sysadmin.getLogin().equals(username)) {
-        if (siteadmin.getPassword().equals(new String(password))) {
+        if (Arrays.equals(siteadmin.getPassword(), password)) {
           user = siteadmin;
           return true;
         } else {
@@ -63,7 +65,7 @@ public class AdminLoginModule extends AbstractLoginModule {
 
       // Test for weblounge super user
       else if (sysadmin.getLogin().equals(username) && !siteadmin.getLogin().equals(username)) {
-        if (sysadmin.getPassword().equals(new String(password))) {
+        if (Arrays.equals(sysadmin.getPassword(), password)) {
           user = sysadmin;
           return true;
         } else {
@@ -73,10 +75,10 @@ public class AdminLoginModule extends AbstractLoginModule {
 
       // Special case where siteadmin has same login name than sysadmin
       else if (sysadmin.getLogin().equals(username) && siteadmin.getLogin().equals(username)) {
-        if (siteadmin.getPassword().equals(new String(password))) {
+        if (Arrays.equals(siteadmin.getPassword(), password)) {
           user = siteadmin;
           return true;
-        } else if (sysadmin.getPassword().equals(new String(password))) {
+        } else if (Arrays.equals(sysadmin.getPassword(), password)) {
           user = sysadmin;
           return true;
         } else {

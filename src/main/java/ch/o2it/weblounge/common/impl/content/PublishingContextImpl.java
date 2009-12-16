@@ -252,8 +252,8 @@ public class PublishingContextImpl implements PublishingContext {
    * 
    * @see java.lang.Object#clone()
    */
-  public Object clone() {
-    PublishingContextImpl ctxt = new PublishingContextImpl();
+  public Object clone() throws CloneNotSupportedException {
+    PublishingContextImpl ctxt = (PublishingContextImpl)super.clone();
     if (publisher != null)
       ctxt.publisher = (User) publisher.clone();
     if (startDate != null)

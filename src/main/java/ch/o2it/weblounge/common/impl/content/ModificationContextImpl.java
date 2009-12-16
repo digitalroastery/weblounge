@@ -144,8 +144,8 @@ public class ModificationContextImpl implements ModificationContext {
    * 
    * @see java.lang.Object#clone()
    */
-  public Object clone() {
-    ModificationContextImpl ctxt = new ModificationContextImpl();
+  public Object clone() throws CloneNotSupportedException {
+    ModificationContextImpl ctxt = (ModificationContextImpl)super.clone();
     if (modifier != null)
       ctxt.modifier = (User) modifier.clone();
     if (modificationDate != null)

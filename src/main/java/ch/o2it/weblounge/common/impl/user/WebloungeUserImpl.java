@@ -515,9 +515,9 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     //
     // Profile
     //
-    
+
     b.append("<profile>");
-    
+
     // First name
     if (firstName != null) {
       b.append("<firstname>");
@@ -565,9 +565,9 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     //
     // Security
     //
-    
+
     b.append("<security>");
-    
+
     // Password
     b.append("<password type=\"");
     b.append(passwordDigestType.toString());
@@ -651,6 +651,28 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
 
     b.append("</user>");
     return b.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    // Overwritten to document that we are using the super impl
+    return super.equals(obj);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    // Overwritten to document that we are using the super impl
+    return super.hashCode();
   }
 
 }
