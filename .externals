@@ -1,7 +1,3 @@
-../../../modules/weblounge-assetdirectory/trunk	modules/weblounge-assetdirectory
-../../../modules/weblounge-assetdirectory-api/trunk	modules/weblounge-assetdirectory-api
-../../../modules/weblounge-asseteditor/trunk	modules/weblounge-asseteditor
-../../../modules/weblounge-asseteditor-api/trunk	modules/weblounge-asseteditor-api
 ../../../modules/weblounge-cache/trunk	modules/weblounge-cache
 ../../../modules/weblounge-cache-api/trunk	modules/weblounge-cache-api
 ../../../modules/weblounge-common/trunk	modules/weblounge-common
@@ -10,15 +6,7 @@
 ../../../modules/weblounge-contentrepository-api/trunk	modules/weblounge-contentrepository-api
 ../../../modules/weblounge-dispatcher/trunk	modules/weblounge-dispatcher
 ../../../modules/weblounge-dispatcher-api/trunk	modules/weblounge-dispatcher-api
-../../../modules/weblounge-pagedirectory/trunk	modules/weblounge-pagedirectory
-../../../modules/weblounge-pagedirectory-api/trunk	modules/weblounge-pagedirectory-api
-../../../modules/weblounge-pageeditor/trunk	modules/weblounge-pageeditor
-../../../modules/weblounge-pageeditor-api/trunk	modules/weblounge-pageeditor-api
 ../../../modules/weblounge-site/trunk	modules/weblounge-site
 ../../../modules/weblounge-site-api/trunk	modules/weblounge-site-api
 ../../../modules/weblounge-user/trunk	modules/weblounge-user
 ../../../modules/weblounge-user-api/trunk	modules/weblounge-user-api
-../../../modules/weblounge-userdirectory/trunk	modules/weblounge-userdirectory
-../../../modules/weblounge-userdirectory-api/trunk	modules/weblounge-userdirectory-api
-../../../modules/weblounge-workspace/trunk	modules/weblounge-workspace
-../../../modules/weblounge-workspace-api/trunk	modules/weblounge-workspace-api
