@@ -51,8 +51,10 @@ public class IdentityHashSetTest {
   public void setUp() throws Exception {
     s = new IdentityHashSet<Object>();
     o = new Object[5];
-    for (int i = 0; i < o.length; i++)
-      o[i] = "Test1";
+    for (int i = 0; i < o.length; i++) {
+      // Need to do it this way, since we really want different objects
+      o[i] = new StringBuffer("Test1").toString();
+    }
   }
 
   /**
