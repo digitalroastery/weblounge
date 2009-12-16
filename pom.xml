@@ -157,16 +157,6 @@
 
   </profiles>
 
-  <mailingLists>
-	<mailingList>
-	  <name>Weblounge Mailing List</name>
-	  <subscribe>weblounge-join@lists.o2it.ch</subscribe>
-	  <unsubscribe>weblounge-leave@lists.o2it.ch</unsubscribe>
-	  <post>weblounge@lists.o2it.ch</post>
-	  <archive>http://lists.o2it.ch/weblounge/archives</archive>
-	</mailingList>
-  </mailingLists>
-
   <reporting>
     <plugins>
       <plugin>
