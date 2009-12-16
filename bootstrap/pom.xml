@@ -177,30 +177,28 @@
     </dependency>
 
     <!-- End Pax -->
-
-    <!-- Database support -->
     
-    <!--
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.6</version>
-    </dependency>
+    <!-- Apache CXF -->
 
     <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.3-603.jdbc4</version>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-bundle-minimal</artifactId>
+      <version>2.2.5</version>
     </dependency>
-
+    
     <dependency>
-      <groupId>org.apache.derby</groupId>
-      <artifactId>derby</artifactId>
-      <version>10.4.2.0</version>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-ri-discovery-local</artifactId>
+      <version>1.1</version>
     </dependency>
-    -->
-  
-    <!-- End Database support -->
+    
+    <dependency>
+      <groupId>org.apache.cxf.dosgi</groupId>
+      <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
+      <version>1.1</version>
+    </dependency>
+    
+    <!-- End Apache CXF -->
 
     <!-- Bundle-ized 3rd party deps -->
 
@@ -253,6 +251,30 @@
       <version>6.1.14</version>
     </dependency>
     -->
+
+    <!-- Database support -->
+    
+    <!--
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.6</version>
+    </dependency>
+
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>8.3-603.jdbc4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.4.2.0</version>
+    </dependency>
+    -->
+  
+    <!-- End Database support -->
 
   </dependencies>
 
