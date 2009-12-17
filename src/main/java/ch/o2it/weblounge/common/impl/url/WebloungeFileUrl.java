@@ -35,6 +35,9 @@ import java.io.File;
  */
 public class WebloungeFileUrl extends UrlImpl {
 
+  /** Serial version UID */
+  private static final long serialVersionUID = -130600183508443202L;
+
   /** The preferred language */
   private Language language_;
 

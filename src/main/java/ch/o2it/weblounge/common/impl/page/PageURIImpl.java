@@ -32,6 +32,9 @@ import ch.o2it.weblounge.common.site.Site;
  */
 public class PageURIImpl extends UrlImpl implements PageURI {
 
+  /** Serial version UID */
+  private static final long serialVersionUID = -686750395794924219L;
+
   /** The page identifier */
   String id = null;
 

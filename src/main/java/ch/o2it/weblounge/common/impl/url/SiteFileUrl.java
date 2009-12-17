@@ -35,6 +35,9 @@ import java.io.File;
  */
 public class SiteFileUrl extends UrlImpl {
 
+  /** Serial version UID */
+  private static final long serialVersionUID = 3676514803585070363L;
+
   /** The associated site */
   private Site site_;
 

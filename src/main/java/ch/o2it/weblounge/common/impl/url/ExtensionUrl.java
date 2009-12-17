@@ -29,6 +29,9 @@ import ch.o2it.weblounge.common.url.Url;
  */
 public class ExtensionUrl extends UrlImpl {
 
+  /** Serial version UID */
+  private static final long serialVersionUID = -3153754519868677495L;
+
   /** Indicates that the url is not extended */
   public final static int EXTENSION_NONE = 0;
 

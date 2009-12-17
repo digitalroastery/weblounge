@@ -32,6 +32,9 @@ import java.io.File;
  */
 public class SystemFileUrl extends UrlImpl {
 
+  /** Serial version UID */
+  private static final long serialVersionUID = 3870032508341053730L;
+
   /**
    * Creates a new weblounge specific url object. The url should be passed
    * relative to the weblounge root folder, e. g.
