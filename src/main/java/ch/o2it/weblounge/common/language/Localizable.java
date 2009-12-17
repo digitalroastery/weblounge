@@ -119,4 +119,31 @@ public interface Localizable {
    */
   int compareTo(Localizable o, Language l);
 
+  /**
+   * Returns the string representation in the requested language or
+   * <code>null</code> if the title doesn't exist in that language.
+   * <p>
+   * This implementation forwards the request to
+   * {@link #toString(Language, boolean)}.
+   * 
+   * @param language
+   *          the requested language
+   * @return the object title
+   */
+  String toString(Language language);
+
+  /**
+   * Returns the string representation in the specified language. If no content
+   * can be found in that language, then it will be looked up in the default
+   * language (unless <code>force</code> is set to <code>true</code>). <br>
+   * If this doesn't produce a result as well, <code>null</code> is returned.
+   * 
+   * @param language
+   *          the language
+   * @param force
+   *          <code>true</code> to force the language
+   * @return the object's string representation in the given language
+   */
+  String toString(Language language, boolean force);
+
 }
