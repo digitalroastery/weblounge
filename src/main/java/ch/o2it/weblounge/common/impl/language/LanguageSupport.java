@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.language.UnsupportedLanguageException;
-import ch.o2it.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,16 +219,16 @@ public final class LanguageSupport {
    * @return the localized variant of the text
    */
   public static String[] getLanguageVariantsByPriority(String s, Language l,
-      Site site) {
+      Language defaultLanguage) {
     if (s == null)
       throw new IllegalArgumentException("String must not be null");
-    if (site == null)
-      throw new IllegalArgumentException("Site must not be null");
+    if (defaultLanguage == null)
+      throw new IllegalArgumentException("Default language must not be null");
     String[] variants = new String[3 - ((l == null) ? 1 : 0)];
     if (l != null) {
       variants[0] = getLanguageVariant(s, l);
     }
-    variants[1 - ((l == null) ? 1 : 0)] = getLanguageVariant(s, site.getDefaultLanguage());
+    variants[1 - ((l == null) ? 1 : 0)] = getLanguageVariant(s, defaultLanguage);
     variants[2 - ((l == null) ? 1 : 0)] = s;
     return variants;
   }
