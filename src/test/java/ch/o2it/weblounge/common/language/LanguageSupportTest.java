@@ -20,18 +20,15 @@
 
 package ch.o2it.weblounge.common.language;
 
-import static org.junit.Assert.assertNull;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.site.Site;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -159,10 +156,7 @@ public class LanguageSupportTest {
    */
   @Test
   public void testGetLanguageVariantsByPriority() {
-    Site mockSite = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(mockSite.getDefaultLanguage()).andReturn(italian);
-    EasyMock.replay(mockSite);
-    String result[] = LanguageSupport.getLanguageVariantsByPriority("test.jsp", french, mockSite);
+    String result[] = LanguageSupport.getLanguageVariantsByPriority("test.jsp", french, italian);
     assertEquals(3, result.length);
     assertEquals("test_fr.jsp", result[0]);
     assertEquals("test_it.jsp", result[1]);
