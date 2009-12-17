@@ -68,7 +68,7 @@ public class SystemPermission implements Permission {
 
   /** The permission titles */
   private Map<Language, String> titles_ = null;
-  
+
   /** The selected language */
   private Language selectedLanguage = null;
 
@@ -143,6 +143,7 @@ public class SystemPermission implements Permission {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.language.Localizable#languages()
    */
   public Set<Language> languages() {
@@ -151,6 +152,7 @@ public class SystemPermission implements Permission {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.language.Localizable#supportsLanguage(ch.o2it.weblounge.common.language.Language)
    */
   public boolean supportsLanguage(Language language) {
@@ -159,6 +161,7 @@ public class SystemPermission implements Permission {
 
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.language.Localizable#switchTo(ch.o2it.weblounge.common.language.Language)
    */
   public Language switchTo(Language language) {
