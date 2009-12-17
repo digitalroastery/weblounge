@@ -36,7 +36,7 @@ import java.util.Set;
  * This class represents an abstract implementation of a {@link Localizable}
  * object.
  */
-public abstract class LocalizableObject implements Localizable {
+public class LocalizableObject implements Localizable {
 
   /** list of added languages */
   protected Set<Language> languages = null;
@@ -361,18 +361,35 @@ public abstract class LocalizableObject implements Localizable {
   }
 
   /**
-   * Returns the component title in the active language. The title is identified
-   * by the name "name".
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable)
+   */
+  public int compareTo(Localizable o, Language l) {
+    if (o instanceof LocalizableObject) {
+      return toString(l).compareTo(((LocalizableObject) o).toString(l));
+    }
+    return toString(l).compareTo(o.toString());
+  }
+
+  /**
+   * Returns the string representation in the current language.
+   * <p>
+   * This implementation forwards the request to
+   * {@link #toString(Language, boolean)}.
    * 
    * @return the component title.
    */
   public String toString() {
-    return toString(resolveLanguage());
+    return toString(resolveLanguage(), false);
   }
 
   /**
-   * Returns the title in the requested language or <code>null</code> if the
-   * title doesn't exist in that language.
+   * Returns the string representation in the requested language or
+   * <code>null</code> if the title doesn't exist in that language.
+   * <p>
+   * This implementation forwards the request to
+   * {@link #toString(Language, boolean)}.
    * 
    * @param language
    *          the requested language
@@ -383,9 +400,9 @@ public abstract class LocalizableObject implements Localizable {
   }
 
   /**
-   * Returns the object using <code>language</code> as the output language. If
-   * no content can be found in that language, then it will be looked up in the
-   * default language (unless <code>force</code> is set to <code>true</code>). <br>
+   * Returns the string representation in the specified language. If no content
+   * can be found in that language, then it will be looked up in the default
+   * language (unless <code>force</code> is set to <code>true</code>). <br>
    * If this doesn't produce a result as well, <code>null</code> is returned.
    * 
    * @param language

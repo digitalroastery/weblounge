@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.common.impl.language;
 
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.LocalizationListener;
 
 import java.util.Collection;
@@ -218,18 +217,6 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
     c.content.putAll(content);
 
     return c;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable)
-   */
-  public int compareTo(Localizable o, Language l) {
-    if (o instanceof LocalizableObject) {
-      return toString(l).compareTo(((LocalizableObject) o).toString(l));
-    }
-    return toString(l).compareTo(o.toString());
   }
 
   /**
