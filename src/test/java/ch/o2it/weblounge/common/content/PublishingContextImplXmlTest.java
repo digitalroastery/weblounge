@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.content;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
@@ -29,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -63,7 +65,12 @@ public class PublishingContextImplXmlTest extends PublishingContextImplTest {
    */
   @Test
   public void testFromXmlNode() {
-    assertEquals(TestUtils.loadXmlFromFile(testFile), ctx.toXml());
+    String testXml = TestUtils.loadXmlFromFile(testFile);
+    try {
+      assertEquals(testXml, new String(ctx.toXml().getBytes("UTF-8")));
+    } catch (UnsupportedEncodingException e) {
+      fail("Encoding to utf-8 failed");
+    }
   }
 
 }

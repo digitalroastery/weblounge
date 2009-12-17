@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.page;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
@@ -31,6 +33,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
@@ -62,7 +65,11 @@ public class PageletImplXmlTest extends PageletImplTest {
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromFile(testFile);
-    assertEquals(testXml, pagelet.toXml());
+    try {
+      assertEquals(testXml, new String(pagelet.toXml().getBytes("UTF-8")));
+    } catch (UnsupportedEncodingException e) {
+      fail("Encoding to utf-8 failed");
+    }
   }
 
 }

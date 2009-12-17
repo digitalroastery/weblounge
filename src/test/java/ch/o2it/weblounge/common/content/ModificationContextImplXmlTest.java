@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
@@ -29,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -63,7 +66,11 @@ public class ModificationContextImplXmlTest extends ModificationContextImplTest 
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromFile(testFile);
-    assertEquals(testXml, ctx.toXml());
+    try {
+      assertEquals(testXml, new String(ctx.toXml().getBytes("UTF-8")));
+    } catch (UnsupportedEncodingException e) {
+      fail("Encoding to utf-8 failed");
+    }
   }
 
 }
