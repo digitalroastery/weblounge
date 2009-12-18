@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
+import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
@@ -35,10 +36,14 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 /**
- * This class models the publishing constraints that apply to an arbitrary
- * object in the system.
+ * The publishing context contains information about when an object will be
+ * published and thus be openly accessible and can be used by
+ * <code>Publishable</code> objects as the backing implementation.
  * <p>
- * A publishing context definition contains information on the start and end
+ * The publishing context adds additional means of specifying and querying
+ * publisher and publishing start and end date. It also allows for easy
+ * serialization and deserialization of <code>Publishable</code> data.
+ * 
  * date of the publishing time. The context usually looks like follows:
  * 
  * <pre>
@@ -48,6 +53,8 @@ import javax.xml.xpath.XPathFactory;
  * 		&lt;to&gt;2006/06/11 00:00:00 GMT&lt;/to&gt;
  * 	&lt;/published&gt;
  * </pre>
+ * 
+ * @see Publishable
  */
 public class PublishingContextImpl implements PublishingContext {
 
