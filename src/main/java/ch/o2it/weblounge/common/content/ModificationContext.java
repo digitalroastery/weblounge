@@ -25,8 +25,15 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * This interface defines an object that encapsulates access to creation and
- * modification data.
+ * The modification context contains information about when an object was
+ * modified and who the modifier was and can be used by <code>Modifiable</code>
+ * objects as the backing implementation.
+ * <p>
+ * The modification context adds additional means of specifying and querying
+ * modifier and modification date. It also allows for easy serialization and
+ * deserialization of <code>Modifiable</code> data.
+ * 
+ * @see Modifiable
  */
 public interface ModificationContext extends Modifiable, Cloneable {
 

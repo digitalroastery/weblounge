@@ -25,8 +25,12 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * This interface is used to describe objects that know about a creator, a
- * creation time, a modifier and a modification time.
+ * A <code>Modifiable</code> describes objects that have a modifier and a
+ * modification date.
+ * <p>
+ * Prominent examples of such an object are pages or binary resources.
+ * 
+ * @see ModificationContext
  */
 public interface Modifiable {
 

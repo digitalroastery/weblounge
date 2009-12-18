@@ -25,8 +25,15 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * The context contains information about when an object was created and who the
- * creator was.
+ * The creation context contains information about when an object was created
+ * and who the creator was and can be used by <code>Creatable</code> objects as
+ * the backing implementation.
+ * <p>
+ * The creation context adds additional means of specifying and querying creator
+ * and creation date. It also allows for easy serialization and deserialization
+ * of <code>Creatable</code> data.
+ * 
+ * @see Creatable
  */
 public interface CreationContext extends Cloneable {
 

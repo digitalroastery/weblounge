@@ -25,8 +25,12 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * This interface is used to describe objects that know about a creator and a
- * creation time.
+ * A <code>Creatable</code> describes objects that have a creator and a creation
+ * date.
+ * <p>
+ * Prominent examples of such an object are pages or binary resources.
+ * 
+ * @see CreationContext
  */
 public interface Creatable {
 

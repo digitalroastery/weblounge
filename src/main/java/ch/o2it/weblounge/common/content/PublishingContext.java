@@ -25,8 +25,15 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * This interface is used for objects that can be published from a given start
- * date to an end date.
+ * The publishing context contains information about when an object will be
+ * published and thus be openly accessible and can be used by
+ * <code>Publishable</code> objects as the backing implementation.
+ * <p>
+ * The publishing context adds additional means of specifying and querying
+ * publisher and publishing start and end date. It also allows for easy
+ * serialization and deserialization of <code>Publishable</code> data.
+ * 
+ * @see Publishable
  */
 public interface PublishingContext extends Publishable, Cloneable {
 
@@ -43,7 +50,7 @@ public interface PublishingContext extends Publishable, Cloneable {
    * @return <code>true</code> if published on the given date
    */
   boolean isPublished(Date date);
-  
+
   /**
    * Sets the publisher and the publishing start and end date.
    * 
@@ -72,7 +79,7 @@ public interface PublishingContext extends Publishable, Cloneable {
    *          the start date
    */
   void setPublishFrom(Date from);
-  
+
   /**
    * Sets the publishing end date. Pass <code>null</code> to set no end date at
    * all.
