@@ -28,7 +28,6 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteNotFoundException;
-import ch.o2it.weblounge.common.url.Url;
 import ch.o2it.weblounge.dispatcher.DispatchListener;
 import ch.o2it.weblounge.dispatcher.impl.handler.StaticContentHandler;
 
@@ -299,12 +298,14 @@ public final class WebloungeDispatcher {
    * @param url
    *          target url
    */
-  public static void forward(WebloungeRequest request, WebloungeResponse response, String url) throws ServletException, IOException {
+  public static void forward(WebloungeRequest request,
+      WebloungeResponse response, String url) throws ServletException,
+      IOException {
 
     // Remove the url attribute to prevent loops. By removing, The Request
     // object
     // is forced to evaluate the url again.
-    request.removeAttribute(Url.ID);
+    request.removeAttribute(WebloungeRequest.SESSION_URL);
 
     // Ask registered listeners whether they want to redirect the url.
     for (int i = 0; i < dispatcher.size(); i++) {
@@ -312,7 +313,7 @@ public final class WebloungeDispatcher {
       url = d.redirect(url, request, response);
     }
 
-    // Ask registerd listeners whether they are willing to do the work for us
+    // Ask registered listeners whether they are willing to do the work for us
     for (int i = 0; i < dispatcher.size(); i++) {
       DispatchListener d = dispatcher.get(i);
       if (d.forward(request, response, url))
@@ -337,12 +338,13 @@ public final class WebloungeDispatcher {
    * @param url
    *          the url to include
    */
-  public static void include(WebloungeRequest request, WebloungeResponse response, String url) throws ServletException, IOException {
+  public static void include(WebloungeRequest request,
+      WebloungeResponse response, String url) throws ServletException,
+      IOException {
 
     // Remove the url attribute to prevent loops. By removing, The Request
-    // object
-    // is forced to evaluate the url again.
-    request.removeAttribute(Url.ID);
+    // object is forced to evaluate the url again.
+    request.removeAttribute(WebloungeRequest.SESSION_URL);
 
     // Ask registered listeners whether they want to redirect the url.
     for (int i = 0; i < dispatcher.size(); i++) {
@@ -350,7 +352,7 @@ public final class WebloungeDispatcher {
       url = d.redirect(url, request, response);
     }
 
-    // Ask registerd listeners whether they are willing to do the work for us
+    // Ask registered listeners whether they are willing to do the work for us
     for (int i = 0; i < dispatcher.size(); i++) {
       DispatchListener d = dispatcher.get(i);
       if (d.include(request, response, url))
@@ -392,7 +394,8 @@ public final class WebloungeDispatcher {
    * @param site
    *          the target site
    */
-  static void fireRequestStarted(WebloungeRequest request, WebloungeResponse response, Site site) {
+  static void fireRequestStarted(WebloungeRequest request,
+      WebloungeResponse response, Site site) {
     WebloungeResponseImpl resp = ((WebloungeResponseImpl) response);
     resp.setState(WebloungeResponse.STATE_SYSTEM_PROCESSING);
     for (int i = 0; i < requestListeners.size(); i++) {
@@ -412,7 +415,8 @@ public final class WebloungeDispatcher {
    * @param site
    *          the target site
    */
-  static void fireRequestDelivered(WebloungeRequest request, WebloungeResponse response, Site site) {
+  static void fireRequestDelivered(WebloungeRequest request,
+      WebloungeResponse response, Site site) {
     for (int i = 0; i < requestListeners.size(); i++) {
       RequestListener listener = requestListeners.get(i);
       listener.requestDelivered(request, response);
@@ -430,7 +434,8 @@ public final class WebloungeDispatcher {
    * @param site
    *          the target site
    */
-  static void fireRequestFailed(WebloungeRequest request, WebloungeResponse response, Site site) {
+  static void fireRequestFailed(WebloungeRequest request,
+      WebloungeResponse response, Site site) {
     WebloungeResponseImpl resp = ((WebloungeResponseImpl) response);
     for (int i = 0; i < requestListeners.size(); i++) {
       RequestListener listener = requestListeners.get(i);
