@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * This interface defines methods and fields for objects which are able to
- * collect tagging information.
+ * A <code>Taggable</code> object provides means of collecting tags, removing
+ * and iterating over them.
  */
 public interface Taggable {
 

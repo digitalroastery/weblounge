@@ -29,23 +29,19 @@ import java.util.Date;
  * date.
  * <p>
  * Prominent examples of such an object are pages or binary resources.
- * 
- * @see CreationContext
  */
 public interface Creatable {
 
   /**
-   * Returns the time in milliseconds when the object was created.
+   * Returns the object's creation date.
    * 
-   * @return the creation time
+   * @return the creation date
    */
   Date getCreationDate();
 
   /**
    * Returns the user that created the object.
    * 
-   * @param language
-   *          the language
    * @return the creator
    */
   User getCreator();

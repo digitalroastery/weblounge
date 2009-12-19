@@ -25,27 +25,31 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * This interface is used for objects that can be published from a given start
- * date to an end date.
+ * A <code>Publishable</code> represents an objects that can be published from a
+ * given start date to an end date. It also keeps track on who the publisher
+ * was.
  */
 public interface Publishable {
 
   /**
-   * Returns the user that published the resource.
+   * Returns the user that published the object.
    * 
    * @return the publisher
    */
   User getPublisher();
-  
+
   /**
-   * Returns the publishing start date.
+   * Returns the publishing start date. This method might return
+   * <code>null</code> in order to state that the object will be published until
+   * the publishing end date is reached.
    * 
    * @return the publishing start date
    */
   Date getPublishFrom();
 
   /**
-   * Returns the publishing end date.
+   * Returns the publishing end date. This method might return <code>null</code>
+   * in order to state that the object will be published forever.
    * 
    * @return the publishing end date
    */

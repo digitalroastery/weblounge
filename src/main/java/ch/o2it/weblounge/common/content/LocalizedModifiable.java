@@ -27,16 +27,22 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * This interface is used to describe objects that know about a modifier and a
- * modification time.
+ * A localized modifiable describes an object that knows about a modifier and a
+ * modification time in multiple languages.
+ * <p>
+ * For example, given that there is a page that has been created in German and
+ * now been translated to French, there will most likely be modification data
+ * for both the German and the French version of that page.
+ * 
+ * @see Modifiable
  */
 public interface LocalizedModifiable extends Localizable {
 
   /**
-   * Returns the time in milliseconds when the object was last modified,
-   * regardless of the selected language.
+   * Returns the date when the object was last modified, regardless of the
+   * selected language.
    * 
-   * @return the modification time
+   * @return the last modification date
    */
   Date getLastModificationDate();
 
@@ -44,21 +50,25 @@ public interface LocalizedModifiable extends Localizable {
    * Returns the user that last modified the object, regardless of the selected
    * language.
    * 
-   * @return the modifier
+   * @return the last modifier
    */
   User getLastModifier();
 
   /**
-   * Returns the time in milliseconds when the object was last modified.
+   * Returns the date when the object was last modified in the given language.
+   * When there is no modification information available in that language, the
+   * method returns <code>null</code>.
    * 
    * @param language
    *          the language
-   * @return the modification time
+   * @return the modification date
    */
   Date getModificationDate(Language language);
 
   /**
-   * Returns the user that last modified the object.
+   * Returns the user that last modified the object. When there is no
+   * modification information available in that language, the method returns
+   * <code>null</code>.
    * 
    * @param language
    *          the language
@@ -67,16 +77,28 @@ public interface LocalizedModifiable extends Localizable {
   User getModifier(Language language);
 
   /**
-   * Returns the time in milliseconds when the object was last modified.
+   * Returns the date when the object was last modified in the current language.
+   * <p>
+   * Should the current language be undefined, then this method will return the
+   * last modification date as returned by {@link #getLastModificationDate()}.
+   * If no modification information is available at all, then this method
+   * returns <code>null</code>.
    * 
    * @return the modification time
+   * @see #switchTo(Language)
    */
   Date getModificationDate();
 
   /**
-   * Returns the user that last modified the object.
+   * Returns the user that last modified the object in the current language.
+   * <p>
+   * Should the current language be undefined, then this method will return the
+   * last modification date as returned by {@link #getLastModificationDate()}.
+   * If no modification information is available at all, then this method
+   * returns <code>null</code>.
    * 
    * @return the modifier
+   * @see #switchTo(Language)
    */
   User getModifier();
 

@@ -27,17 +27,13 @@ import java.util.Date;
 /**
  * A <code>Modifiable</code> describes objects that have a modifier and a
  * modification date.
- * <p>
- * Prominent examples of such an object are pages or binary resources.
- * 
- * @see ModificationContext
  */
 public interface Modifiable {
 
   /**
-   * Returns the time in milliseconds when the object was last modified.
+   * Returns the object's modification date.
    * 
-   * @return the modification time
+   * @return the modification date
    */
   Date getModificationDate();
 

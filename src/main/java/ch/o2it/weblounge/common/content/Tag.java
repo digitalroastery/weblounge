@@ -34,13 +34,7 @@ public interface Tag {
   String getName();
 
   /**
-   * Returns the tag value. Although values may be arbitrary objects, a few
-   * special values exist:
-   * <ul>
-   * <li><i>*</i> - Matches any value for the given key</li>
-   * <li><i><code>Null</code></i> - Means that a tag with this key must not be
-   * defined</li>
-   * </ul>
+   * Returns the tag value.
    * 
    * @return the value
    */
