@@ -25,6 +25,8 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -33,6 +35,17 @@ import javax.servlet.http.HttpServletRequest;
  * site or language.
  */
 public interface WebloungeRequest extends HttpServletRequest {
+
+  /** The attribute name used to store the {@link User} in the session */
+  public static final String SESSION_USER = "weblounge-user";
+  /** The attribute name used to store the {@link Language} in the session */
+  public static final String SESSION_LANGUAGE = "weblounge-language";
+  /** The attribute name used to store the {@link Site} in the session */
+  public static final String SESSION_SITE = "weblounge-site";
+  /** The attribute name used to store the {@link URL} in the session */
+  public static final String SESSION_URL = "weblounge-url";
+  /** The attribute name used to store the last {@link URL} in the session */
+  public static final String SESSION_PREVIOUS_URL = "weblounge-lasturl";
 
   /**
    * Returns the requested language. The language is determined by evaluating

@@ -27,9 +27,6 @@ import java.io.Serializable;
  */
 public interface Url extends Serializable {
 
-  /** identifier to locate the Url object in the session */
-  final static String ID = "weblounge::url_id";
-
   /**
    * Returns the url separator character, like '/' in web urls.
    * 

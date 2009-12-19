@@ -23,19 +23,17 @@ package ch.o2it.weblounge.common.language;
 import java.util.Locale;
 
 /**
- * A <code>Language</code> mainly consists of a language identifier, e.g.
- * <code>de</code> to identify the German language, and of the language names in
- * the various supported languages.
+ * A <code>Language</code> consists of a language identifier, e.g.
+ * <code>de</code> to identify the German language, and of the language
+ * description in the various supported languages. There is also a connection
+ * to the associate <code>Locale</code>.
  * 
- * TODO Think about a replacement by java locale
+ * @see Locale
  */
 public interface Language {
 
-  /** Identifier to locate the language object in the request */
-  public static final String ID = "language";
-
   /**
-   * Returns the locale that is backing the language implementation.
+   * Returns the locale that is associated with the language.
    * 
    * @return the locale
    */
@@ -44,10 +42,9 @@ public interface Language {
   /**
    * Returns the name of this language in its own language, e.g
    * <ul>
-   * <li><code>en</code> for English</li>
-   * <li><code>de</code> for German</li>
-   * <li><code>fr</code> for French</li>
-   * <li><code>it</code> for Italian</li>
+   * <li><code>English</code> for English</li>
+   * <li><code>Deutsch</code> for German</li>
+   * <li><code>Français</code> for French</li>
    * </ul>
    * 
    * @return the language name in its own language
@@ -55,12 +52,12 @@ public interface Language {
   String getDescription();
 
   /**
-   * Returns the name of this language in the specified language, e.g
+   * Returns the name of this language in the specified language, e.g given that
+   * <code>language</code> was <code>German</code>, this method would return:
    * <ul>
-   * <li><code>en</code> for English</li>
-   * <li><code>de</code> for German</li>
-   * <li><code>fr</code> for French</li>
-   * <li><code>it</code> for Italian</li>
+   * <li><code>Englisch</code> for English</li>
+   * <li><code>Deutsch</code> for German</li>
+   * <li><code>Französisch</code> for French</li>
    * </ul>
    * 
    * @param language
@@ -70,8 +67,8 @@ public interface Language {
   String getDescription(Language language);
 
   /**
-   * Returns the language's identifier, which corresponds to the systems
-   * internal name for this language.
+   * Returns the language's identifier, which corresponds to the locales
+   * name for this language.
    * 
    * @return the language identifier
    */

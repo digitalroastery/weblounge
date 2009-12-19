@@ -21,16 +21,17 @@
 package ch.o2it.weblounge.common.language;
 
 /**
- * Exception that will be thrown if no default language can be determined.
- * WebLounge is depended on a default language, provided in the community.xml
- * configuration file.
+ * This exception is thrown to indicate either a missing language (content
+ * requested in a certain language that is not available) or a language that is
+ * unknown to the system in that there is no <code>Locale</code> available that
+ * corresponds to the requested language.
  */
 public class UnknownLanguageException extends RuntimeException {
 
   /** Serial version UID */
-  private static final long serialVersionUID = 9164162600017258853L;
+  private static final long serialVersionUID = -2196419109593080065L;
 
-  /** The unknown language identifier */
+  /** The unsupported language identifier */
   private String language_;
 
   /**
@@ -41,18 +42,19 @@ public class UnknownLanguageException extends RuntimeException {
   }
 
   /**
-   * Constructor for class UnknownLanguageException.
+   * Creates a new exception indicating that the language identified by
+   * <code>language</code> was not found or is unknown.
    * 
    * @param language
-   *          the unknown language identifier
+   *          the unsupported language identifier
    */
   public UnknownLanguageException(String language) {
-    super("Language " + language + " not found!");
-    language_ = language;
+    super("Language " + language + " not supported!");
+    this.language_ = language;
   }
 
   /**
-   * Returns the unknown language identifier.
+   * Returns the unsupported language identifier.
    * 
    * @return the language identifier
    */

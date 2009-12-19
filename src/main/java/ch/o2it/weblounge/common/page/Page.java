@@ -37,9 +37,6 @@ import java.util.Date;
  */
 public interface Page extends Localizable, Creatable, Modifiable, Publishable, Securable {
 
-  /** Request page identifier */
-  String ID = "page";
-
   /** Live version of a page */
   long LIVE = 0;
 

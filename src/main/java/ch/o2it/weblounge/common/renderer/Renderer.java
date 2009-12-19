@@ -52,9 +52,6 @@ import java.net.URL;
  */
 public interface Renderer extends Localizable {
 
-  /** Renderer id */
-  String ID = "renderer";
-
   /** The template used for rendering */
   String TEMPLATE = "template";
 

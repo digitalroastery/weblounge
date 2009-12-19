@@ -46,9 +46,6 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
  */
 public interface Action {
 
-  /** Constant to identify the handler in the request */
-  final static String ID = "Action";
-
   /** The target url */
   final static String TARGET = "target-url";
 

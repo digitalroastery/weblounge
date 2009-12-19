@@ -57,9 +57,6 @@ import java.util.Date;
  */
 public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedModifiable, Securable {
 
-  /** Pagelet identifier in request */
-  static final String ID = "pagelet";
-
   /** Identifier for passing additional data with the request */
   static final String ATTRIBUTES = "pagelet-attributes";
 
