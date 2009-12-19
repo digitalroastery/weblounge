@@ -20,8 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.LocalizedModificationContext;
-import ch.o2it.weblounge.common.content.ModificationContext;
+import ch.o2it.weblounge.common.content.LocalizedModifiable;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
@@ -45,9 +44,37 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 /**
- * Default implementation of the localized modification context.
+ * The localized modification context contains information about when an object
+ * was modified and who the modifier was in a given language. It can be used by
+ * <code>LocalizedModifiable</code> objects as the backing implementation.
+ * <p>
+ * The context adds additional means of specifying and querying modifier and
+ * modification date. It also allows for easy serialization and deserialization
+ * of <code>LocalizedModifiable</code> data.
+ * <p>
+ * Following is an example of the data structure that the modification context
+ * is able to handle:
+ * 
+ * <pre>
+ * &lt;content&gt;
+ *   &lt;locale language="de" original="true"&gt;
+ *     &lt;modified&gt;
+ *       &lt;user id="hans" realm="testland"&gt;Hans Muster&lt;/user&gt;
+ *       &lt;date&gt;2009/01/07 19:05:41 GMT&lt;/date&gt;
+ *     &lt;/modified&gt;
+ *   &lt;/locale&gt;
+ *   &lt;locale language="fr"&gt;
+ *     &lt;modified&gt;
+ *       &lt;user id="amelie" realm="testland"&gt;Amélie Poulard&lt;/user&gt;
+ *       &lt;date&gt;2009/02/18 21:06:40 GMT&lt;/date&gt;
+ *     &lt;/modified&gt;
+ *   &lt;/locale&gt;
+ * &lt;/content&gt;
+ * </pre>
+ * 
+ * @see LocalizedModifiable
  */
-public class LocalizedModificationContextImpl extends LocalizableObject implements LocalizedModificationContext {
+public class LocalizedModificationContext extends LocalizableObject implements Cloneable {
 
   /** The last modifier */
   protected transient User lastModifier = null;
@@ -62,17 +89,22 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   protected Map<Language, Modification> modifications = null;
 
   /**
-   * Creates a new and empty modification context with a creation date of
-   * <code>now</code>.
+   * Creates a new and empty localized modification context.
    */
-  public LocalizedModificationContextImpl() {
+  public LocalizedModificationContext() {
     this.modifications = new HashMap<Language, Modification>();
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the modification date in the current language. If the current
+   * language is undefined, then the last modification date is returned.
+   * <p>
+   * If no modification information is present for any language, this method
+   * returns <code>null</code>.
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
+   * @return the modification date in the current language
+   * @see #switchTo(Language)
+   * @see #switchTo(Language, boolean)
    */
   public Date getModificationDate() {
     Language currentLanguage = getLanguage();
@@ -86,9 +118,13 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the modification date in the specified language or
+   * <code>null</code> if no modification information is present in that
+   * language.
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#getModificationDate(ch.o2it.weblounge.common.language.Language)
+   * @param language
+   *          the language
+   * @return the modification time
    */
   public Date getModificationDate(Language language) {
     Modification modification = modifications.get(language);
@@ -96,9 +132,16 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the user that modified the object in the current language. If the
+   * current language is undefined, then the user is returned that last modified
+   * the object in any language.
+   * <p>
+   * If no modification information is present for any language, this method
+   * returns <code>null</code>.
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
+   * @return the modifier in the current language
+   * @see #switchTo(Language)
+   * @see #switchTo(Language, boolean)
    */
   public User getModifier() {
     Language currentLanguage = getLanguage();
@@ -112,9 +155,12 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the user that modified the object in the specified language or
+   * <code>null</code> if no modification in that language has occurred.
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#getModifier(ch.o2it.weblounge.common.language.Language)
+   * @param language
+   *          the language
+   * @return the modifier
    */
   public User getModifier(Language language) {
     Modification modification = modifications.get(language);
@@ -122,28 +168,67 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Returns <code>true</code> if the object is modified in the current language
+   * prior to <code>now</code> (or <code>new Date()</code>, for that matter). If
+   * the current language is undefined, then <code>true</code> is returned if
+   * there was any modification prior to <code>now</code>.
+   * <p>
+   * If no modification information is present for any language, this method
+   * returns <code>false</code>.
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
+   * @return <code>true</code> if the object was modified
+   * @see #switchTo(Language)
+   * @see #switchTo(Language, boolean)
    */
   public boolean isModified() {
-    Date d = getLastModificationDate();
-    return d != null && new Date().after(getLastModificationDate());
+    Language currentLanguage = getLanguage();
+    Date d = null;
+    if (currentLanguage != null) {
+      Modification c = modifications.get(currentLanguage);
+      if (c != null)
+        d = c.getDate();
+    }
+    if (d == null)
+      d = getLastModificationDate();
+    return d != null && new Date().after(d);
   }
 
   /**
-   * {@inheritDoc}
+   * Returns <code>true</code> if the object is modified in the current language
+   * after <code>date</code>. If the current language is undefined, then
+   * <code>true</code> is returned if there was any modification after
+   * <code>date</code>.
+   * <p>
+   * If no modification information is present for any language, this method
+   * returns <code>false</code>.
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModifiedAfter(java.util.Date)
+   * @return <code>true</code> if the object was modified after
+   *         <code>date</code>
+   * @see #switchTo(Language)
+   * @see #switchTo(Language, boolean)
    */
   public boolean isModifiedAfter(Date date) {
-    Date d = getLastModificationDate();
-    return (d != null) ? d.after(date) : false;
+    Language currentLanguage = getLanguage();
+    Date d = null;
+    if (currentLanguage != null) {
+      Modification c = modifications.get(currentLanguage);
+      if (c != null)
+        d = c.getDate();
+    }
+    if (d == null)
+      d = getLastModificationDate();
+    return d != null && d.after(date);
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedAfter(java.util.Date,
-   *      ch.o2it.weblounge.common.language.Language)
+   * Returns <code>true</code> if the object is modified in the specified
+   * language after <code>date</code>.
+   * <p>
+   * If no modification information is present for that language, this method
+   * returns <code>false</code>.
+   * 
+   * @return <code>true</code> if the object was modified after
+   *         <code>date</code>
    */
   public boolean isModifiedAfter(Date date, Language language) {
     Modification modification = modifications.get(language);
@@ -151,16 +236,41 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#isModifiedBefore(java.util.Date)
+   * Returns <code>true</code> if the object is modified in the current language
+   * before <code>date</code>. If the current language is undefined, then
+   * <code>true</code> is returned if there was any modification before
+   * <code>date</code>.
+   * <p>
+   * If no modification information is present for any language, this method
+   * returns <code>false</code>.
+   * 
+   * @return <code>true</code> if the object was modified before
+   *         <code>date</code>
+   * @see #switchTo(Language)
+   * @see #switchTo(Language, boolean)
    */
   public boolean isModifiedBefore(Date date) {
-    Date d = getEarliestModificationDate();
+    Language currentLanguage = getLanguage();
+    Date d = null;
+    if (currentLanguage != null) {
+      Modification c = modifications.get(currentLanguage);
+      if (c != null)
+        d = c.getDate();
+    }
+    if (d == null)
+      d = getLastModificationDate();
     return d != null && d.before(date);
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#isModifiedBefore(java.util.Date,
-   *      ch.o2it.weblounge.common.language.Language)
+   * Returns <code>true</code> if the object is modified in the specified
+   * language before <code>date</code>.
+   * <p>
+   * If no modification information is present for that language, this method
+   * returns <code>false</code>.
+   * 
+   * @return <code>true</code> if the object was modified before
+   *         <code>date</code>
    */
   public boolean isModifiedBefore(Date date, Language language) {
     Modification modification = modifications.get(language);
@@ -168,10 +278,15 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the user that last modified the object in the given language as well
+   * as the modification date.
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModificationContext#setModified(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * @param user
+   *          the user that modified the object
+   * @param date
+   *          the date of modification
+   * @param language
+   *          the language version that was modified
    */
   public void setModified(User user, Date date, Language language) {
     Modification modification = modifications.get(language);
@@ -188,9 +303,9 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the date when this object was last modified in any language.
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
+   * @return the last modification date, regardless of the language
    */
   public Date getLastModificationDate() {
     if (lastModification != null)
@@ -210,9 +325,9 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the date when this object was first modified in any language.
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getEarliestModificationDate()
+   * @return the first modification date, regardless of the language
    */
   public Date getEarliestModificationDate() {
     if (earliestModification != null)
@@ -232,9 +347,9 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the user that last modified the object, regardless of the language.
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModifier()
+   * @return the last modifier
    */
   public User getLastModifier() {
     if (lastModifier != null)
@@ -258,12 +373,27 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * Returns a copy of this modification context.
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#compareTo(ch.o2it.weblounge.common.language.Localizable,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public int compareTo(Localizable o, Language l) {
+    if (o instanceof LocalizedModificationContext) {
+      return getLastModificationDate().compareTo(getLastModificationDate());
+    } else if (o instanceof ModificationContext) {
+      return getModificationDate().compareTo(((ModificationContext) o).getModificationDate());
+    }
+    return 0;
+  }
+
+  /**
+   * Returns a copy of this context.
    * 
    * @see java.lang.Object#clone()
    */
   public Object clone() throws CloneNotSupportedException {
-    LocalizedModificationContextImpl ctxt = (LocalizedModificationContextImpl)super.clone();
+    LocalizedModificationContext ctxt = (LocalizedModificationContext) super.clone();
     ctxt.behavior = behavior;
     ctxt.currentLanguage = currentLanguage;
     ctxt.defaultLanguage = defaultLanguage;
@@ -274,25 +404,31 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
     for (Map.Entry<Language, Modification> entry : modifications.entrySet()) {
       ctxt.modifications.put(entry.getKey(), entry.getValue());
     }
-
     return ctxt;
   }
 
   /**
-   * Initializes this context from an <code>XML</code> node.
+   * Initializes this context from an XML node that was generated using
+   * {@link #toXml()}.
+   * <p>
+   * To speed things up, you might consider using the second signature that uses
+   * an existing <code>XPath</code> instance instead of creating a new one.
    * 
    * @param context
-   *          the publish context node
+   *          the localized modification context node
    * @throws IllegalArgumentException
    *           if the modification date found in this context cannot be parsed
+   * @see #fromXml(Node, XPath)
+   * @see #toXml()
    */
-  public static LocalizedModificationContextImpl fromXml(Node context) {
+  public static LocalizedModificationContext fromXml(Node context) {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(context, xpath);
   }
 
   /**
-   * Initializes this context from an xml node.
+   * Initializes this context from an XML node that was generated using
+   * {@link #toXml()}.
    * 
    * @param context
    *          the publish context node
@@ -300,14 +436,14 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
    *          the xpath processor
    * @throws IllegalArgumentException
    *           if the modification date found in this context cannot be parsed
+   * @see #toXml()
    */
-  public static LocalizedModificationContextImpl fromXml(Node context,
-      XPath xpath) {
+  public static LocalizedModificationContext fromXml(Node context, XPath xpath) {
     NodeList locales = XPathHelper.selectList(context, "//locale", xpath);
     if (locales == null)
       return null;
 
-    LocalizedModificationContextImpl ctx = new LocalizedModificationContextImpl();
+    LocalizedModificationContext ctx = new LocalizedModificationContext();
     for (int i = 0; i < locales.getLength(); i++) {
       xpath.reset();
       Node locale = locales.item(i);
@@ -344,7 +480,33 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#toXml()
+   * Returns an <code>XML</code> representation of the context, that will look
+   * similar to the following example:
+   * 
+   * <pre>
+   * &lt;content&gt;
+   *   &lt;locale language="de" original="true"&gt;
+   *     &lt;modified&gt;
+   *       &lt;user id="hans" realm="testland"&gt;Hans Muster&lt;/user&gt;
+   *       &lt;date&gt;2009/01/07 19:05:41 GMT&lt;/date&gt;
+   *     &lt;/modified&gt;
+   *   &lt;/locale&gt;
+   *   &lt;locale language="fr"&gt;
+   *     &lt;modified&gt;
+   *       &lt;user id="amelie" realm="testland"&gt;Amélie Poulard&lt;/user&gt;
+   *       &lt;date&gt;2009/02/18 21:06:40 GMT&lt;/date&gt;
+   *     &lt;/modified&gt;
+   *   &lt;/locale&gt;
+   * &lt;/content&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>LocalizedModificationContext</code> from the serialized output of
+   * this method.
+   * 
+   * @return the <code>XML</code> representation of the context
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
    */
   public String toXml(Language language) {
     Modification modification = modifications.get(language);
@@ -363,13 +525,19 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
   /**
    * Helper class used to hold modification information.
    */
-  static class Modification {
+  private static class Modification {
 
     /** Modifier */
     private User modifier = null;
 
     /** Date of modification */
     private Date modificationDate = null;
+
+    /**
+     * Creates a new modification.
+     */
+    Modification() {
+    }
 
     /**
      * Sets the modifier.
@@ -409,55 +577,6 @@ public class LocalizedModificationContextImpl extends LocalizableObject implemen
       return modificationDate;
     }
 
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public int compareTo(Localizable o, Language l) {
-    if (o instanceof LocalizedModificationContextImpl) {
-      return getLastModificationDate().compareTo(getLastModificationDate());
-    } else if (o instanceof ModificationContext) {
-      return getModificationDate().compareTo(((ModificationContext) o).getModificationDate());
-    }
-    return 0;
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setModificationDate(java.util.Date)
-   */
-  public void setModificationDate(Date date) {
-    Modification modification = modifications.get(getLanguage());
-    if (modification == null) {
-      modification = new Modification();
-      modifications.put(getLanguage(), modification);
-    }
-    modification.setDate(date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.user.User)
-   */
-  public void setModifier(User user) {
-    Modification modification = modifications.get(getLanguage());
-    if (modification == null) {
-      modification = new Modification();
-      modifications.put(getLanguage(), modification);
-    }
-    modification.setUser(user);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.content.ModificationContext#toXml()
-   */
-  public String toXml() {
-    throw new UnsupportedOperationException("XML can only be generated per language");
   }
 
 }

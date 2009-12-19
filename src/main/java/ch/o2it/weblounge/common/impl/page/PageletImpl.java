@@ -20,12 +20,9 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
-import ch.o2it.weblounge.common.content.CreationContext;
-import ch.o2it.weblounge.common.content.LocalizedModificationContext;
-import ch.o2it.weblounge.common.content.ModificationContext;
-import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
-import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
-import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
+import ch.o2it.weblounge.common.impl.content.CreationContext;
+import ch.o2it.weblounge.common.impl.content.LocalizedModificationContext;
+import ch.o2it.weblounge.common.impl.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
@@ -96,13 +93,13 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   PermissionSecurityContext securityCtx = null;
 
   /** The creation context */
-  CreationContextImpl creationCtx = null;
+  CreationContext creationCtx = null;
 
   /** The publishing context */
-  PublishingContextImpl publishingCtx = null;
+  PublishingContext publishingCtx = null;
 
   /** The modification context */
-  LocalizedModificationContextImpl modificationCtx = null;
+  LocalizedModificationContext modificationCtx = null;
 
   /** The pagelet properties */
   Map<String, String[]> properties = null;
@@ -116,9 +113,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   PageletImpl() {
     properties = new HashMap<String, String[]>();
-    creationCtx = new CreationContextImpl();
-    publishingCtx = new PublishingContextImpl();
-    modificationCtx = new LocalizedModificationContextImpl();
+    creationCtx = new CreationContext();
+    publishingCtx = new PublishingContext();
+    modificationCtx = new LocalizedModificationContext();
     securityCtx = new PageletSecurityContext();
     content = new LocalizableContent<Map<String, String[]>>(this);
   }
@@ -403,15 +400,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns the pagelet's {@link CreationContext}.
-   * 
-   * @return the creation context
-   */
-  public CreationContext getCreationContext() {
-    return creationCtx;
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Creatable#setCreated(ch.o2it.weblounge.common.user.User,
@@ -528,15 +516,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public void setPublisher(User user) {
     publishingCtx.setPublisher(user);
-  }
-
-  /**
-   * Returns the pagelet's {@link ModificationContext}.
-   * 
-   * @return the modification context
-   */
-  public LocalizedModificationContext getModificationContext() {
-    return modificationCtx;
   }
 
   /**

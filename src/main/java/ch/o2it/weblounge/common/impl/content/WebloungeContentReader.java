@@ -20,11 +20,12 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
+import ch.o2it.weblounge.common.impl.page.PageReader;
+import ch.o2it.weblounge.common.impl.page.PageletReader;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
@@ -40,15 +41,19 @@ import java.util.Map;
 
 /**
  * Utility class used to parse generic content including language sensitive
- * information and a security context.
+ * information, creation, modification and publication data as well as security
+ * settings.
+ * <p>
+ * The implementation is intended to be used by the <code>PageReader</code> and
+ * <code>PageletReader</code>.
+ * 
+ * @see PageReader
+ * @see PageletReader
  */
 public abstract class WebloungeContentReader extends DefaultHandler {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(WebloungeContentReader.class);
-
-  /** The associated site */
-  protected Site site = null;
 
   /** The attribute and element clipboard */
   protected Map<String, Object> clipboard = null;
@@ -68,70 +73,36 @@ public abstract class WebloungeContentReader extends DefaultHandler {
   protected Context contentReaderContext = Context.Unknown;
 
   /**
-   * Creates a new content SAX event reader that will parse the SAX data.
-   * 
-   * @param site
-   *          the associated site
+   * Creates a new content reader that will parse the XML data.
    */
-  public WebloungeContentReader(Site site) {
-    this.site = site;
+  public WebloungeContentReader() {
     clipboard = new HashMap<String, Object>();
     characters = new StringBuffer();
   }
 
   /**
-   * Resets the content reader by setting everything back to the original state
-   * where the object has been created. Only exception: The site that was passed
-   * remains.
-   */
-  public void reset() {
-    clipboard.clear();
-    characters = new StringBuffer();
-    contentReaderContext = Context.Unknown;
-  }
-
-  /**
-   * This method is called if the creation date was found and the user. This
-   * date can later be obtained using <code>{@link #getCreationDate()}</code>.
+   * This method is called if the creation date and user was found.
    * 
-   * @param user
+   * @param creator
    *          the creator
-   * @param date
+   * @param creationDate
    *          the creation date
    */
-  protected abstract void setCreated(User user, Date date);
+  protected abstract void setCreated(User creator, Date creationDate);
 
   /**
-   * This method is called if the user was found that changed this element. This
-   * user can later be obtained using <code>{@link #getModifiedBy()}</code>.
+   * This method is called if the user was found that modified this element at a
+   * given date.
    * 
    * @param modifier
-   *          the user
-   * @param date
+   *          the modifying user
+   * @param modificationDate
    *          the modification date
    */
-  protected abstract void setModified(User modifier, Date date);
+  protected abstract void setModified(User modifier, Date modificationDate);
 
   /**
-   * Sets the pagelet's owner.
-   * 
-   * @param owner
-   *          the owner of this pagelet
-   */
-  protected abstract void setOwner(User owner);
-
-  /**
-   * This method is called if a new permission was found.
-   * 
-   * @param permission
-   *          the permission to grant
-   * @param authority
-   *          the authority that this permission is granted to
-   */
-  protected abstract void allow(Permission permission, Authority authority);
-
-  /**
-   * This method is called when the date of publication is read in.
+   * This method is called when the publishing data was read in.
    * 
    * @param publisher
    *          the user who published the resource
@@ -144,8 +115,25 @@ public abstract class WebloungeContentReader extends DefaultHandler {
       Date endDate);
 
   /**
-   * The parser found the start of an element. Information about this element as
-   * well as the attached attributes are passed to this method.
+   * This callback is used if an owner was detected inside a security section.
+   * 
+   * @param owner
+   *          the owner
+   */
+  protected abstract void setOwner(User owner);
+
+  /**
+   * This method is called if a permission was found.
+   * 
+   * @param permission
+   *          the permission to grant
+   * @param authority
+   *          the authority that this permission is granted to
+   */
+  protected abstract void allow(Permission permission, Authority authority);
+
+  /**
+   * {@inheritDoc}
    * <p>
    * <b>Note:</b> This implementation is not suitable for mixed content, since
    * the characters buffer is cleared at the beginning of each tag.
@@ -204,7 +192,9 @@ public abstract class WebloungeContentReader extends DefaultHandler {
   }
 
   /**
-   * @see org.xml.sax.ContentHandler#endElement(java.lang.String,
+   * {@inheritDoc}
+   * 
+   * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
    *      java.lang.String, java.lang.String)
    */
   public void endElement(String uri, String local, String raw)
@@ -290,7 +280,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
 
     // owner
     else if (contentReaderContext == Context.Security && "owner".equals(raw)) {
-      User owner = (User)clipboard.get("user");
+      User owner = (User) clipboard.get("user");
       if (owner == null)
         throw new IllegalStateException("Owner not found");
       setOwner(owner);
@@ -300,65 +290,59 @@ public abstract class WebloungeContentReader extends DefaultHandler {
     else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
       // TODO: Finish this code
       /*
-      String id = (String) clipboard.get("id");
-      Permission permission = new PermissionImpl(id);
-      String type = (String) clipboard.get("type");
-      if (type != null) {
-        type = AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
-        StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");
-        while (tok.hasMoreTokens()) {
-          String authorityId = tok.nextToken();
-          Authority authority = new AuthorityImpl(type, authorityId);
-          allow(permission, authority);
-        }
-      }
-      */
+       * String id = (String) clipboard.get("id"); Permission permission = new
+       * PermissionImpl(id); String type = (String) clipboard.get("type"); if
+       * (type != null) { type =
+       * AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
+       * StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");
+       * while (tok.hasMoreTokens()) { String authorityId = tok.nextToken();
+       * Authority authority = new AuthorityImpl(type, authorityId);
+       * allow(permission, authority); } }
+       */
     }
 
   }
 
   /**
    * Returns the trimmed contents of the characters buffer.
+   * 
+   * @return the trimmed characters
    */
   protected String getCharacters() {
     return characters.toString().trim();
   }
 
   /**
-   * @see org.xml.sax.ContentHandler#characters(char[], int, int)
+   * {@inheritDoc}
+   * 
+   * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
    */
   public void characters(char[] chars, int start, int end) throws SAXException {
     characters.append(chars, start, end);
   }
 
   /**
-   * The parser encountered problems while parsing. The warning is printed out
-   * but the parsing process continues.
+   * {@inheritDoc}
    * 
-   * @param e
-   *          information about the warning
+   * @see org.xml.sax.helpers.DefaultHandler#warning(org.xml.sax.SAXParseException)
    */
   public void warning(SAXParseException e) throws SAXException {
     log_.warn("Warning while decoding " + this + ": " + e.getMessage());
   }
 
   /**
-   * The parser encountered problems while parsing. The error is printed out and
-   * the parsing process is stopped.
+   * {@inheritDoc}
    * 
-   * @param e
-   *          information about the error
+   * @see org.xml.sax.helpers.DefaultHandler#error(org.xml.sax.SAXParseException)
    */
   public void error(SAXParseException e) throws SAXException {
     log_.warn("Error while decoding " + this + ": " + e.getMessage());
   }
 
   /**
-   * The parser encountered problems while parsing. The fatal error is printed
-   * out and the parsing process is stopped.
+   * {@inheritDoc}
    * 
-   * @param e
-   *          information about the error
+   * @see org.xml.sax.helpers.DefaultHandler#fatalError(org.xml.sax.SAXParseException)
    */
   public void fatalError(SAXParseException e) throws SAXException {
     log_.warn("Fatal error while decoding " + this + ": " + e.getMessage());

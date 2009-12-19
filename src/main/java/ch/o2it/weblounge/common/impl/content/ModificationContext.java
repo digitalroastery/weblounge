@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.ModificationContext;
+import ch.o2it.weblounge.common.content.Modifiable;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -35,9 +35,27 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 /**
- * Default implementation of the {@link ModificationContext}.
+ * The modification context contains information about when an object was
+ * modified and who the modifier was. It can be used by <code>Modifiable</code>
+ * objects as the backing implementation.
+ * <p>
+ * The context adds additional means of specifying and querying modifier and
+ * modification date. It also allows for easy serialization and deserialization
+ * of <code>Modifiable</code> data.
+ * <p>
+ * Following is an example of the data structure that the modification context
+ * is able to handle:
+ * 
+ * <pre>
+ * &lt;modified&gt;
+ *   &lt;user id="john" realm="testland"&gt;John Doe&lt;/user&gt;
+ *   &lt;date&gt;2009/11/06 08:52:52 GMT&lt;/date&gt;
+ * &lt;/modified&gt;
+ * </pre>
+ * 
+ * @see Modifiable
  */
-public class ModificationContextImpl implements ModificationContext {
+public class ModificationContext implements Cloneable {
 
   /** Modification date */
   protected Date modificationDate = null;
@@ -46,79 +64,93 @@ public class ModificationContextImpl implements ModificationContext {
   protected User modifier = null;
 
   /**
-   * Creates a modification context with today's date.
+   * Creates a modification context with today's date and no modifier.
    */
-  public ModificationContextImpl() {
+  public ModificationContext() {
     this(new Date(), null);
   }
 
   /**
-   * Creates a modification context with the given modifier, with the
-   * modification time reflecting the current date.
+   * Creates a modification context with the given modifier and the modification
+   * time reflecting the current date.
    * 
    * @param modifier
    *          the modifying user
    */
-  public ModificationContextImpl(User modifier) {
+  public ModificationContext(User modifier) {
     this(new Date(), modifier);
   }
 
   /**
-   * Creates a modification context reflecting modification at the given date,
-   * made by the referenced user.
+   * Creates a modification context reflecting a modification by the specified
+   * user and at the given date.
    * 
    * @param date
    *          the modification date
    * @param modifier
    *          the modifying user
    */
-  public ModificationContextImpl(Date date, User modifier) {
+  public ModificationContext(Date date, User modifier) {
     this.modificationDate = date;
     this.modifier = modifier;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#getModificationDate()
+   * Returns the modification date.
+   * 
+   * @return the modification date
    */
   public Date getModificationDate() {
     return modificationDate;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#getModifier()
+   * Returns the modifier.
+   * 
+   * @return the modifier
    */
   public User getModifier() {
     return modifier;
   }
 
   /**
-   * {@inheritDoc}
+   * Returns <code>true</code> if the object was modified with respect to the
+   * current date (as in <code>new Date()<code>).
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#isModified()
+   * @return <code>true</code> if the object was modified
    */
   public boolean isModified() {
     return isModifiedBefore(new Date());
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#isModifiedAfter(java.util.Date)
+   * Returns <code>true</code> if the object was modified prior to the given
+   * date.
+   * 
+   * @return <code>true</code> if the object was modified prior to
+   *         <code>date</code>
    */
   public boolean isModifiedAfter(Date date) {
     return modificationDate != null && modificationDate.after(date);
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#isModifiedBefore(java.util.Date)
+   * Returns <code>true</code> if the object was modified after the given date.
+   * 
+   * @return <code>true</code> if the object was modified after to
+   *         <code>date</code>
    */
   public boolean isModifiedBefore(Date date) {
     return modificationDate != null && modificationDate.before(date);
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the modifier along with the modification date.
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#setModified(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date)
+   * @param user
+   *          the modifier
+   * @param date
+   *          the modification date
    */
   public void setModified(User user, Date date) {
     this.modifier = user;
@@ -126,14 +158,20 @@ public class ModificationContextImpl implements ModificationContext {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setModificationDate(java.util.Date)
+   * Sets the modification date.
+   * 
+   * @param date
+   *          the modification date
    */
   public void setModificationDate(Date date) {
     this.modificationDate = date;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#setModifier(ch.o2it.weblounge.common.user.User)
+   * Sets the user that modified the object.
+   * 
+   * @param modifier
+   *          the modifier
    */
   public void setModifier(User modifier) {
     this.modifier = modifier;
@@ -145,7 +183,7 @@ public class ModificationContextImpl implements ModificationContext {
    * @see java.lang.Object#clone()
    */
   public Object clone() throws CloneNotSupportedException {
-    ModificationContextImpl ctxt = (ModificationContextImpl)super.clone();
+    ModificationContext ctxt = (ModificationContext) super.clone();
     if (modifier != null)
       ctxt.modifier = (User) modifier.clone();
     if (modificationDate != null)
@@ -154,20 +192,27 @@ public class ModificationContextImpl implements ModificationContext {
   }
 
   /**
-   * Initializes this context from an <code>XML</code> node.
+   * Initializes this context from an XML node that was generated using
+   * {@link #toXml()}.
+   * <p>
+   * To speed things up, you might consider using the second signature that uses
+   * an existing <code>XPath</code> instance instead of creating a new one.
    * 
    * @param context
    *          the publish context node
    * @throws IllegalArgumentException
    *           if the modification date found in this context cannot be parsed
+   * @see #fromXml(Node, XPath)
+   * @see #toXml()
    */
-  public static ModificationContextImpl fromXml(Node context) {
+  public static ModificationContext fromXml(Node context) {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(context, xpath);
   }
 
   /**
-   * Initializes this context from an <code>XML</code> node.
+   * Initializes this context from an XML node that was generated using
+   * {@link #toXml()}.
    * 
    * @param context
    *          the publish context node
@@ -175,8 +220,9 @@ public class ModificationContextImpl implements ModificationContext {
    *          the xpath processor
    * @throws IllegalArgumentException
    *           if the modification date found in this context cannot be parsed
+   * @see #toXml()
    */
-  public static ModificationContextImpl fromXml(Node context, XPath xpath)
+  public static ModificationContext fromXml(Node context, XPath xpath)
       throws IllegalArgumentException {
 
     Node contextRoot = XPathHelper.select(context, "//modified", xpath);
@@ -184,7 +230,7 @@ public class ModificationContextImpl implements ModificationContext {
       return null;
 
     // Modifying user
-    ModificationContextImpl ctx = new ModificationContextImpl();
+    ModificationContext ctx = new ModificationContext();
     Node creator = XPathHelper.select(contextRoot, "/modified/user", xpath);
     if (creator == null)
       throw new IllegalStateException("Modifier cannot be null");
@@ -204,7 +250,22 @@ public class ModificationContextImpl implements ModificationContext {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.ModificationContext#toXml()
+   * Returns an <code>XML</code> representation of the context, that will look
+   * similar to the following example:
+   * 
+   * <pre>
+   * &lt;modified&gt;
+   *   &lt;user id="john" realm="testland"&gt;John Doe&lt;/user&gt;
+   *   &lt;date&gt;2009/11/06 08:52:52 GMT&lt;/date&gt;
+   * &lt;/modified&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>ModificationContext</code> from the serialized output of this method.
+   * 
+   * @return the <code>XML</code> representation of the context
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
    */
   public String toXml() {
     if (modifier == null || modificationDate == null)

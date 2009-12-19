@@ -234,14 +234,6 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getPublishingContext()}.
-   */
-  @Test
-  public void testGetPublishingContext() {
-    assertNotNull(page.getPublishingContext());
-  }
-  
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getPublisher()}.
    */
   @Test
@@ -550,14 +542,6 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCreationContext()}.
-   */
-  @Test
-  public void testGetCreationContext() {
-    assertNotNull(page.getCreationContext());
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCreationDate()}.
    */
   @Test
@@ -579,14 +563,6 @@ public class PageImplTest {
   @Test
   public void testIsCreatedAfter() {
     assertFalse(page.isCreatedAfter(futureDate));
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModificationContext()}.
-   */
-  @Test
-  public void testGetModificationContext() {
-    assertNotNull(page.getModificationContext());
   }
 
   /**

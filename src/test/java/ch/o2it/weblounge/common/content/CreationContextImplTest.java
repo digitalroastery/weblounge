@@ -24,7 +24,7 @@ import static org.junit.Assert.fail;
 
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
+import ch.o2it.weblounge.common.impl.content.CreationContext;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.user.User;
 
@@ -34,7 +34,7 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
- * Test cases for {@link CreationContextImpl}.
+ * Test cases for {@link CreationContext}.
  */
 public class CreationContextImplTest {
 
@@ -55,14 +55,14 @@ public class CreationContextImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    ctx = new CreationContextImpl();
+    ctx = new CreationContext();
     ctx.setCreationDate(creationDate);
     ctx.setCreator(creator);
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.CreationContextImpl#getCreationDate()}
+   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#getCreationDate()}
    * .
    */
   @Test
@@ -72,7 +72,7 @@ public class CreationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.CreationContextImpl#getCreator()}
+   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#getCreator()}
    * .
    */
   @Test
@@ -82,7 +82,7 @@ public class CreationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.CreationContextImpl#setCreationDate(java.util.Date)}
+   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#setCreationDate(java.util.Date)}
    * .
    */
   @Test
@@ -94,7 +94,7 @@ public class CreationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.CreationContextImpl#setCreator(ch.o2it.weblounge.common.user.User)}
+   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#setCreator(ch.o2it.weblounge.common.user.User)}
    * .
    */
   @Test
@@ -106,7 +106,7 @@ public class CreationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.CreationContextImpl#isCreatedAfter(java.util.Date)}
+   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#isCreatedAfter(java.util.Date)}
    * .
    */
   @Test
@@ -117,7 +117,7 @@ public class CreationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.CreationContextImpl#clone()}.
+   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#clone()}.
    */
   @Test
   public void testClone() {

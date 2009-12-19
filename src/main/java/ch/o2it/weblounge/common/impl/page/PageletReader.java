@@ -27,7 +27,6 @@ import ch.o2it.weblounge.common.page.Pagelet;
 import ch.o2it.weblounge.common.page.PageletURI;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
- * Utility class used to parse pagelet data.
+ * Utility class used to parse <code>Pagelet</code> data.
  */
 public final class PageletReader extends WebloungeContentReader {
 
@@ -58,14 +57,12 @@ public final class PageletReader extends WebloungeContentReader {
 
   /**
    * Creates a new pagelet reader that will parse serialized XML version of a
-   * pagelet and store it in the {@link Pagelet} that is returned by
-   * {@link #read}.
+   * pagelet and store it in the {@link Pagelet} that is returned by the
+   * {@link #read} method.
    * 
-   * @param site
-   *          the associated site
+   * @see #read(InputStream)
    */
-  public PageletReader(Site site) {
-    super(site);
+  public PageletReader() {
   }
 
   /**

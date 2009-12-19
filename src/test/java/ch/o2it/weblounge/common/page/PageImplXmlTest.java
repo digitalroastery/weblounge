@@ -49,7 +49,7 @@ public class PageImplXmlTest extends PageImplTest {
   public void setUp() throws Exception {
     setupPrerequisites();
     URL testContext = this.getClass().getResource(testFile);
-    PageReader reader = new PageReader(site);
+    PageReader reader = new PageReader();
     page = reader.read(testContext.openStream(), pageURI);
   }
   

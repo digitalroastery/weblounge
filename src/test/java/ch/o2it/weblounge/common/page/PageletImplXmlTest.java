@@ -20,16 +20,13 @@
 
 package ch.o2it.weblounge.common.page;
 
-import static org.junit.Assert.fail;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.page.PageletReader;
-import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,10 +47,8 @@ public class PageletImplXmlTest extends PageletImplTest {
   @Before
   public void setUp() throws Exception {
     setupPreliminaries();
-    EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin", "test"));
-    EasyMock.replay(site);
     URL testContext = this.getClass().getResource(testFile);
-    PageletReader reader = new PageletReader(site);
+    PageletReader reader = new PageletReader();
     reader.setPageletLocation(location);
     pagelet = reader.read(testContext.openStream());
   }

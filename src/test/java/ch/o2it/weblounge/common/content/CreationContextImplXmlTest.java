@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
+import ch.o2it.weblounge.common.impl.content.CreationContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Test case for the part of the implementation of {@link CreationContextImpl}
+ * Test case for the part of the implementation of {@link CreationContext}
  * that deals with <code>XML</code> serialization and deserialization.
  */
 public class CreationContextImplXmlTest extends CreationContextImplTest {
@@ -56,12 +56,12 @@ public class CreationContextImplXmlTest extends CreationContextImplTest {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    ctx = CreationContextImpl.fromXml(doc.getFirstChild());
+    ctx = CreationContext.fromXml(doc.getFirstChild());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.CreationContextImpl#toXml()}.
+   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#toXml()}.
    */
   @Test
   public void testToXml() {

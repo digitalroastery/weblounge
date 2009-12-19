@@ -27,7 +27,6 @@ import ch.o2it.weblounge.common.page.PageManager;
 import ch.o2it.weblounge.common.page.PageletURI;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
@@ -74,27 +73,21 @@ public final class PageReader extends WebloungeContentReader {
   private ParserContext context_ = ParserContext.Document;
 
   /**
-   * Creates a new page data reader that will parse the SAX data and store it in
-   * the page object.
-   * 
-   * @param site
-   *          the associated site
+   * Creates a new page data reader that will parse the XML data and store it in
+   * the <code>Page</code> object that is returned by the {@link #read} method.
    */
-  public PageReader(Site site) {
-    super(site);
-    pageletReader = new PageletReader(site);
+  public PageReader() {
+    pageletReader = new PageletReader();
   }
 
   /**
    * This method is called, when a <code>Page</code> object is instantiated by
    * the {@link PageManager}.
    * 
-   * @param data
-   *          the document data
-   * @param site
-   *          the associated site
-   * @param version
-   *          the page version
+   * @param is
+   *          the xml input stream
+   * @param uri
+   *          the page uri
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
    * @throws IOException
@@ -227,7 +220,7 @@ public final class PageReader extends WebloungeContentReader {
     }
 
     // title, subject and the like
-    else if ("title".equals(raw) || "subject".equals(raw)  || "description".equals(raw)  || "coverage".equals(raw)  || "rights".equals(raw)) {
+    else if ("title".equals(raw) || "subject".equals(raw) || "description".equals(raw) || "coverage".equals(raw) || "rights".equals(raw)) {
       String language = attrs.getValue("language");
       if (language != null) {
         Language l = LanguageSupport.getLanguage(language);
@@ -239,7 +232,7 @@ public final class PageReader extends WebloungeContentReader {
 
     // Forward to pagelet reader if the context matches
     if (context_.equals(ParserContext.Pagelet)) {
-        pageletReader.startElement(uri, local, raw, attrs);
+      pageletReader.startElement(uri, local, raw, attrs);
     } else {
       super.startElement(uri, local, raw, attrs);
     }
@@ -289,7 +282,7 @@ public final class PageReader extends WebloungeContentReader {
     else if (context_.equals(ParserContext.Head) && "promote".equals(raw)) {
       page.isPromoted = "true".equals(characters.toString());
     }
-    
+
     // Type
     else if (context_.equals(ParserContext.Head) && "type".equals(raw)) {
       page.type = characters.toString();
@@ -326,7 +319,7 @@ public final class PageReader extends WebloungeContentReader {
 
     // Pagelock
     else if (context_.equals(ParserContext.Head) && "locked".equals(raw)) {
-      User user = (User)clipboard.get("user");
+      User user = (User) clipboard.get("user");
       if (user != null)
         page.lockOwner = user;
     }
@@ -338,10 +331,10 @@ public final class PageReader extends WebloungeContentReader {
     // Body
     else if (context_.equals(ParserContext.Head) && "body".equals(raw))
       context_ = ParserContext.Page;
-    
+
     // Forward to pagelet reader if the context matches
     if (context_.equals(ParserContext.Pagelet)) {
-        pageletReader.endElement(uri, local, raw);
+      pageletReader.endElement(uri, local, raw);
     } else {
       super.endElement(uri, local, raw);
     }
@@ -354,7 +347,7 @@ public final class PageReader extends WebloungeContentReader {
   public void characters(char[] chars, int start, int end) throws SAXException {
     if (context_.equals(ParserContext.Pagelet))
       pageletReader.characters(chars, start, end);
-    else 
+    else
       super.characters(chars, start, end);
   }
 

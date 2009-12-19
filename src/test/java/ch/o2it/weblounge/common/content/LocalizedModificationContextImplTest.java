@@ -27,7 +27,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
@@ -40,15 +40,15 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Test case for the implementation of {@link LocalizedModificationContextImpl}.
+ * Test case for the implementation of {@link LocalizedModificationContext}.
  */
 public class LocalizedModificationContextImplTest {
 
   /** Default test instance */
-  protected LocalizedModificationContextImpl ctx = null;
+  protected LocalizedModificationContext ctx = null;
 
   /** Test context with an initial date only */
-  protected LocalizedModificationContextImpl ctxWithModifier = null;
+  protected LocalizedModificationContext ctxWithModifier = null;
 
   /** The German language */
   protected Language german = new LanguageImpl(new Locale("de"));
@@ -85,13 +85,13 @@ public class LocalizedModificationContextImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    ctx = new LocalizedModificationContextImpl();
+    ctx = new LocalizedModificationContext();
     ctx.setModified(hans, germanModifcationDate, german);
     ctx.setModified(amelie, frenchModifcationDate, french);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#getModificationDate()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#getModificationDate()}.
    */
   @Test
   public void testGetModificationDate() {
@@ -105,7 +105,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#getModificationDate(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#getModificationDate(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetModificationDateLanguage() {
@@ -114,7 +114,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#getModifier()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#getModifier()}.
    */
   @Test
   public void testGetModifier() {
@@ -128,7 +128,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#getModifier(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#getModifier(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetModifierLanguage() {
@@ -137,7 +137,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedAfter(java.util.Date)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#isModifiedAfter(java.util.Date)}.
    */
   @Test
   public void testIsModifiedAfter() {
@@ -145,7 +145,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedAfter(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#isModifiedAfter(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testIsModifiedAfterLanguage() {
@@ -154,7 +154,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedBefore(java.util.Date)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#isModifiedBefore(java.util.Date)}.
    */
   @Test
   public void testIsModifiedBefore() {
@@ -162,7 +162,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#isModifiedBefore(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#isModifiedBefore(java.util.Date, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testIsModifiedBeforeLanguage() {
@@ -171,7 +171,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testSetModified() {
@@ -185,7 +185,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#getLastModificationDate()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#getLastModificationDate()}.
    */
   @Test
   public void testGetLastModificationDate() {
@@ -193,7 +193,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#getLastModifier()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#getLastModifier()}.
    */
   @Test
   public void testGetLastModifier() {
@@ -201,7 +201,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContextImpl#clone()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#clone()}.
    */
   @Test
   public void testClone() {

@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.ModificationContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Test case for the part of the implementation of {@link ModificationContextImpl}
+ * Test case for the part of the implementation of {@link ModificationContext}
  * that deals with <code>XML</code> serialization and deserialization.
  */
 public class ModificationContextImplXmlTest extends ModificationContextImplTest {
@@ -56,12 +56,12 @@ public class ModificationContextImplXmlTest extends ModificationContextImplTest 
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    ctx = ModificationContextImpl.fromXml(doc.getFirstChild());
+    ctx = ModificationContext.fromXml(doc.getFirstChild());
     setupSpecialModificationContexts();
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.ModificationContextImpl#toXml()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ModificationContext#toXml()}.
    */
   @Test
   public void testToXml() {

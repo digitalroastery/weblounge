@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
+import ch.o2it.weblounge.common.impl.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.user.User;
 
@@ -36,12 +36,12 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
- * Test cases for {@link PublishingContextImpl}.
+ * Test cases for {@link PublishingContext}.
  */
 public class PublishingContextImplTest {
 
   /** The test context */
-  protected PublishingContextImpl ctx = null;
+  protected PublishingContext ctx = null;
   
   /** Publisher */
   protected User publisher = new UserImpl("john", "testland", "John Doe");
@@ -57,7 +57,7 @@ public class PublishingContextImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    ctx = new PublishingContextImpl();
+    ctx = new PublishingContext();
     ctx.setPublisher(publisher);
     ctx.setPublishFrom(startDate);
     ctx.setPublishTo(endDate);
@@ -65,7 +65,7 @@ public class PublishingContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.PublishingContextImpl#getPublisher()}
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContext#getPublisher()}
    * .
    */
   @Test
@@ -75,7 +75,7 @@ public class PublishingContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.PublishingContextImpl#getPublishFrom()}
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContext#getPublishFrom()}
    * .
    */
   @Test
@@ -85,7 +85,7 @@ public class PublishingContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.PublishingContextImpl#getPublishTo()}
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContext#getPublishTo()}
    * .
    */
   @Test
@@ -95,7 +95,7 @@ public class PublishingContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.PublishingContextImpl#isPublished()}
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContext#isPublished()}
    * .
    */
   @Test
@@ -105,11 +105,15 @@ public class PublishingContextImplTest {
     ctx.setPublishFrom(yesterday);
     ctx.setPublishTo(tomorrow);
     assertTrue(ctx.isPublished());
+    ctx.setPublishTo(null);
+    assertTrue(ctx.isPublished());
+    ctx.setPublishFrom(null);
+    assertTrue(ctx.isPublished());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.PublishingContextImpl#isPublished(java.util.Date)}
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContext#isPublished(java.util.Date)}
    * .
    */
   @Test
@@ -122,7 +126,7 @@ public class PublishingContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.PublishingContextImpl#clone()}
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContext#clone()}
    * .
    */
   @Test
@@ -135,6 +139,23 @@ public class PublishingContextImplTest {
       assertEquals(ctx.getPublishTo(), c.getPublishTo());
     } catch (CloneNotSupportedException e) {
       fail("Creating clone of publishing context failed");
+    }
+  }
+  
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContext#setPublished(User, Date, Date)}
+   * .
+   */
+  @Test
+  public void testSetPublished() {
+    try {
+      Date yesterday = new Date(new Date().getTime() - 86400000L);
+      Date tomorrow = new Date(new Date().getTime() + 86400000L);
+      ctx.setPublished(publisher, tomorrow, yesterday);
+      fail("Setting a start date that is after the end date should not be possible");
+    } catch (IllegalArgumentException e) {
+      // Expected
     }
   }
 

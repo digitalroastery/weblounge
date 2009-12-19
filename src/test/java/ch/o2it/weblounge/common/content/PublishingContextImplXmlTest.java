@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
+import ch.o2it.weblounge.common.impl.content.PublishingContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Test case for the part of the implementation of {@link PublishingContextImpl}
+ * Test case for the part of the implementation of {@link PublishingContext}
  * that deals with <code>XML</code> serialization and deserialization.
  */
 public class PublishingContextImplXmlTest extends PublishingContextImplTest {
@@ -55,12 +55,12 @@ public class PublishingContextImplXmlTest extends PublishingContextImplTest {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    ctx = PublishingContextImpl.fromXml(doc.getFirstChild());
+    ctx = PublishingContext.fromXml(doc.getFirstChild());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.PublishingContextImpl#fromXml(org.w3c.dom.Node)}
+   * {@link ch.o2it.weblounge.common.impl.content.PublishingContext#fromXml(org.w3c.dom.Node)}
    * .
    */
   @Test

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
+import ch.o2it.weblounge.common.impl.content.ModificationContext;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.user.User;
 
@@ -36,15 +36,15 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
- * Test cases for {@link ModificationContextImpl}.
+ * Test cases for {@link ModificationContext}.
  */
 public class ModificationContextImplTest {
 
   /** Default test instance */
-  protected ModificationContextImpl ctx = null;
+  protected ModificationContext ctx = null;
 
   /** Test context with an initial date only */
-  protected ModificationContextImpl ctxWithModifier = null;
+  protected ModificationContext ctxWithModifier = null;
 
   /** Creation date */
   protected Date modificationDate = new Date(1257497572000L);
@@ -57,7 +57,7 @@ public class ModificationContextImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    ctx = new ModificationContextImpl(modificationDate, modifier);
+    ctx = new ModificationContext(modificationDate, modifier);
     setupSpecialModificationContexts();
   }
 
@@ -67,13 +67,13 @@ public class ModificationContextImplTest {
    * @throws Exception
    */
   public void setupSpecialModificationContexts() throws Exception {
-    ctxWithModifier = new ModificationContextImpl(modifier);
+    ctxWithModifier = new ModificationContext(modifier);
   }
 
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.ModificationContextImpl#getModificationDate()}
+   * {@link ch.o2it.weblounge.common.impl.content.ModificationContext#getModificationDate()}
    * .
    */
   @Test
@@ -83,7 +83,7 @@ public class ModificationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.ModificationContextImpl#getModifier()}
+   * {@link ch.o2it.weblounge.common.impl.content.ModificationContext#getModifier()}
    * .
    */
   @Test
@@ -94,7 +94,7 @@ public class ModificationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.ModificationContextImpl#isModified()}
+   * {@link ch.o2it.weblounge.common.impl.content.ModificationContext#isModified()}
    * .
    */
   @Test
@@ -113,7 +113,7 @@ public class ModificationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.ModificationContextImpl#isModifiedAfter(java.util.Date)}
+   * {@link ch.o2it.weblounge.common.impl.content.ModificationContext#isModifiedAfter(java.util.Date)}
    * .
    */
   @Test
@@ -125,7 +125,7 @@ public class ModificationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.ModificationContextImpl#isModifiedBefore(java.util.Date)}
+   * {@link ch.o2it.weblounge.common.impl.content.ModificationContext#isModifiedBefore(java.util.Date)}
    * .
    */
   @Test
@@ -137,7 +137,7 @@ public class ModificationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.ModificationContextImpl#clone()}
+   * {@link ch.o2it.weblounge.common.impl.content.ModificationContext#clone()}
    * .
    */
   @Test

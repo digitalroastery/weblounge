@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.CreationContext;
+import ch.o2it.weblounge.common.content.Creatable;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -35,9 +35,27 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 /**
- * Default implementation of the creation context.
+ * The creation context contains information about when an object was created
+ * and who the creator was. It can be used by <code>Creatable</code> objects as
+ * the backing implementation.
+ * <p>
+ * The context adds additional means of specifying and querying creator and
+ * creation date. It also allows for easy serialization and deserialization of
+ * <code>Creatable</code> data.
+ * <p>
+ * Following is an example of the data structure that the modification context
+ * is able to handle:
+ * 
+ * <pre>
+ * &lt;created&gt;
+ *   &lt;user id="john" realm="testland"&gt;John Doe&lt;/user&gt;
+ *   &lt;date&gt;2009/11/06 08:52:52 GMT&lt;/date&gt;
+ * &lt;/created&gt;
+ * </pre>
+ * 
+ * @see Creatable
  */
-public class CreationContextImpl implements CreationContext {
+public class CreationContext implements Cloneable {
 
   /** Creation date */
   protected Date creationDate = null;
@@ -48,33 +66,35 @@ public class CreationContextImpl implements CreationContext {
   /**
    * Creates a new and empty modification context.
    */
-  public CreationContextImpl() {
+  public CreationContext() {
     this.creationDate = new Date();
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the creation date.
    * 
-   * @see ch.o2it.weblounge.common.impl.content.CreationContext#getCreationDate()
+   * @return the creation date
    */
   public Date getCreationDate() {
     return creationDate;
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the user that created the object.
    * 
-   * @see ch.o2it.weblounge.common.impl.content.CreationContext#getCreator()
+   * @return the creator
    */
   public User getCreator() {
     return creator;
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the creation date and the user who created the object.
    * 
-   * @see ch.o2it.weblounge.common.content.CreationContext#setCreated(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date)
+   * @param creator
+   *          the user creating the object
+   * @param creationDate
+   *          the date of creation
    */
   public void setCreated(User user, Date date) {
     this.creator = user;
@@ -82,39 +102,43 @@ public class CreationContextImpl implements CreationContext {
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the creation date.
    * 
-   * @see ch.o2it.weblounge.common.impl.content.CreationContext#setCreationDate(java.util.Date)
+   * @param date
+   *          the creation date
    */
   public void setCreationDate(Date date) {
     this.creationDate = date;
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the user that created the object.
    * 
-   * @see ch.o2it.weblounge.common.impl.content.CreationContext#setCreator(ch.o2it.weblounge.common.user.User)
+   * @param user
+   *          the creator
    */
   public void setCreator(User user) {
     this.creator = user;
   }
 
   /**
-   * {@inheritDoc}
+   * Returns <code>true</code> if this context was created after the given date.
    * 
-   * @see ch.o2it.weblounge.common.impl.content.CreationContext#isCreatedAfter(java.util.Date)
+   * @param date
+   *          the date to compare to
+   * @return <code>true</code> is this context was created after the given date
    */
   public boolean isCreatedAfter(Date date) {
     return creationDate != null && creationDate.after(date);
   }
 
   /**
-   * Returns a copy of this modification context.
+   * Creates a clone of this <code>CreationContext</code>.
    * 
-   * @see java.lang.Object#clone()
+   * @return the cloned creation context
    */
   public Object clone() throws CloneNotSupportedException {
-    CreationContextImpl ctxt = (CreationContextImpl)super.clone();
+    CreationContext ctxt = (CreationContext) super.clone();
     if (creator != null)
       ctxt.creator = (User) creator.clone();
     if (creationDate != null)
@@ -123,12 +147,18 @@ public class CreationContextImpl implements CreationContext {
   }
 
   /**
-   * Initializes this context from an XML node.
+   * Initializes this context from an XML node that was generated using
+   * {@link #toXml()}.
+   * <p>
+   * To speed things up, you might consider using the second signature that uses
+   * an existing <code>XPath</code> instance instead of creating a new one.
    * 
    * @param context
    *          the creation context node
    * @throws IllegalStateException
    *           if the date found in this context cannot be parsed
+   * @see #fromXml(Node, XPath)
+   * @see #toXml()
    */
   public static CreationContext fromXml(Node context)
       throws IllegalArgumentException {
@@ -137,7 +167,8 @@ public class CreationContextImpl implements CreationContext {
   }
 
   /**
-   * Initializes this context from an XML node.
+   * Initializes this context from an XML node that was generated using
+   * {@link #toXml()}.
    * 
    * @param context
    *          the creation context node
@@ -145,6 +176,7 @@ public class CreationContextImpl implements CreationContext {
    *          xpath processor to use
    * @throws IllegalArgumentException
    *           if the date found in this context cannot be parsed
+   * @see #toXml()
    */
   public static CreationContext fromXml(Node context, XPath xpathProcessor)
       throws IllegalArgumentException {
@@ -153,7 +185,7 @@ public class CreationContextImpl implements CreationContext {
     if (contextRoot == null)
       return null;
 
-    CreationContextImpl ctx = new CreationContextImpl();
+    CreationContext ctx = new CreationContext();
 
     // Creator
     Node creator = XPathHelper.select(contextRoot, "//created/user", xpathProcessor);
@@ -172,9 +204,22 @@ public class CreationContextImpl implements CreationContext {
   }
 
   /**
-   * {@inheritDoc}
+   * Returns an <code>XML</code> representation of the context, that will look
+   * similar to the following example:
    * 
-   * @see ch.o2it.weblounge.common.impl.content.CreationContext#toXml()
+   * <pre>
+   * &lt;created&gt;
+   *   &lt;user id="john" realm="testland"&gt;John Doe&lt;/user&gt;
+   *   &lt;date&gt;2009/11/06 08:52:52 GMT&lt;/date&gt;
+   * &lt;/created&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>CreationContext</code> from the serialized output of this method.
+   * 
+   * @return the <code>XML</code> representation of the context
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();

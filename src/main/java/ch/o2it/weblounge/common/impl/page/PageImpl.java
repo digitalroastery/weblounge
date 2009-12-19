@@ -20,12 +20,9 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
-import ch.o2it.weblounge.common.content.CreationContext;
-import ch.o2it.weblounge.common.content.ModificationContext;
-import ch.o2it.weblounge.common.content.PublishingContext;
-import ch.o2it.weblounge.common.impl.content.CreationContextImpl;
-import ch.o2it.weblounge.common.impl.content.ModificationContextImpl;
-import ch.o2it.weblounge.common.impl.content.PublishingContextImpl;
+import ch.o2it.weblounge.common.impl.content.CreationContext;
+import ch.o2it.weblounge.common.impl.content.ModificationContext;
+import ch.o2it.weblounge.common.impl.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
@@ -122,9 +119,9 @@ public class PageImpl extends LocalizableObject implements Page {
   public PageImpl(PageURIImpl uri) {
     super(uri.getSite().getDefaultLanguage());
     this.uri = uri;
-    this.creationCtx = new CreationContextImpl();
-    this.modificationCtx = new ModificationContextImpl();
-    this.publishingCtx = new PublishingContextImpl();
+    this.creationCtx = new CreationContext();
+    this.modificationCtx = new ModificationContext();
+    this.publishingCtx = new PublishingContext();
     this.securityCtx = new PageSecurityContext();
     this.subjects = new ArrayList<String>();
     this.headlines = new ArrayList<Pagelet>();
@@ -225,17 +222,6 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public PageURI getURI() {
     return uri;
-  }
-
-  /**
-   * Returns the publishing context of this page in the current version. The
-   * context tells whether the pagelet may be published on a certain point in
-   * time or not.
-   * 
-   * @return the publishing context
-   */
-  public PublishingContext getPublishingContext() {
-    return publishingCtx;
   }
 
   /**
@@ -696,15 +682,6 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * Returns the page's {@link CreationContext}.
-   * 
-   * @return the creation context
-   */
-  public CreationContext getCreationContext() {
-    return creationCtx;
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Creatable#setCreated(ch.o2it.weblounge.common.user.User,
@@ -739,15 +716,6 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public boolean isCreatedAfter(Date date) {
     return creationCtx.isCreatedAfter(date);
-  }
-
-  /**
-   * Returns the page's {@link ModificationContext}.
-   * 
-   * @return the modification context
-   */
-  public ModificationContext getModificationContext() {
-    return modificationCtx;
   }
 
   /**
