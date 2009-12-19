@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.http.Http11Constants;
 
 /**
  * The <code>Http11ProtocolHandler</code> analyzes HTTP 1.1 request headers and

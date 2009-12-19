@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
-import ch.o2it.weblounge.common.http.Http11Constants;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
 import java.io.IOException;
