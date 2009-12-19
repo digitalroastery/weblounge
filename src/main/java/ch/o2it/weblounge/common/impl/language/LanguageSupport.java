@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.impl.language;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
-import ch.o2it.weblounge.common.language.UnsupportedLanguageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,11 +54,11 @@ public final class LanguageSupport {
    * @param locale
    *          the locale
    * @return the language
-   * @throws UnsupportedLanguageException
+   * @throws UnknownLanguageException
    *           if there is no language for the given locale
    */
   public static Language getLanguage(Locale locale)
-      throws UnsupportedLanguageException {
+      throws UnknownLanguageException {
     Language language = systemLanguages.get(locale.getLanguage());
     if (language == null) {
       language = new LanguageImpl(locale);
@@ -74,11 +73,11 @@ public final class LanguageSupport {
    * @param languageCode
    *          the language identifier
    * @return the language
-   * @throws UnsupportedLanguageException
+   * @throws UnknownLanguageException
    *           if there is no language for the given locale
    */
   public static Language getLanguage(String languageCode)
-      throws UnsupportedLanguageException {
+      throws UnknownLanguageException {
     Language language = systemLanguages.get(languageCode);
     if (language != null)
       return language;
@@ -89,7 +88,7 @@ public final class LanguageSupport {
       }
     }
     if (language == null)
-      throw new UnsupportedLanguageException(languageCode);
+      throw new UnknownLanguageException(languageCode);
     return language;
   }
 
@@ -299,12 +298,8 @@ public final class LanguageSupport {
       return null;
 
     Language l = null;
-    try {
       String languageId = s.substring(languagePosition + 1, languagePosition + 3);
       l = getLanguage(languageId);
-    } catch (UnknownLanguageException e) {
-      return null;
-    }
     return l;
   }
 

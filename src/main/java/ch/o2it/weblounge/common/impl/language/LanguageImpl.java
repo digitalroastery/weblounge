@@ -25,17 +25,11 @@ import ch.o2it.weblounge.common.language.Language;
 import java.util.Locale;
 
 /**
- * A <code>Language</code> mainly consists of a language identifier, e.g.
- * <code>de</code> to identify the german language, and of the language names in
- * the various supported languages.
+ * A <code>Language</code> mainly consists of a language identifier (e.g.
+ * <code>de</code> to identify the German language), and of the language names
+ * in the various supported languages.
  */
 public class LanguageImpl implements Language {
-
-  /** Identifier to locate the language object in the session */
-  public final static String SESSION_ATTRIBUTE = "wl-language";
-
-  /** Identifier to indicate a language change request in the http request */
-  public final static String QUERY_STRING = "wl-language";
 
   /** The backing locale */
   protected Locale locale = null;
@@ -65,10 +59,9 @@ public class LanguageImpl implements Language {
   /**
    * Returns the name of this language in its own language, e.g
    * <ul>
-   * <li><code>English</code> for english</li>
-   * <li><code>Deutsch</code> for german</li>
-   * <li><code>Français</code> for french</li>
-   * <li><code>Italiano</code> for italian</li>
+   * <li><code>English</code> for English</li>
+   * <li><code>Deutsch</code> for German</li>
+   * <li><code>Français</code> for French</li>
    * </ul>
    * 
    * @return the language name in its own language
@@ -81,10 +74,9 @@ public class LanguageImpl implements Language {
    * Returns the name of this language in the specified language, e.g given that
    * <code>language</code> were <code>English</code>, the output would be
    * <ul>
-   * <li><code>English</code> for english</li>
-   * <li><code>German</code> for german</li>
-   * <li><code>French</code> for french</li>
-   * <li><code>Italian</code> for italian</li>
+   * <li><code>English</code> for English</li>
+   * <li><code>German</code> for German</li>
+   * <li><code>French</code> for French</li>
    * </ul>
    * 
    * @param language

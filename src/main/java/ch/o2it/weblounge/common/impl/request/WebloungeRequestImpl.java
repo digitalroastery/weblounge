@@ -36,7 +36,6 @@ import ch.o2it.weblounge.common.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -55,18 +54,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /** Logging facility */
   private Logger log_ = LoggerFactory.getLogger(WebloungeRequestImpl.class);
-
-  /** The attribute name used to store the {@link User} in the session */
-  public static final String SESSION_USER = "weblounge-user";
-
-  /** The attribute name used to store the {@link Language} in the session */
-  public static final String SESSION_LANGUAGE = "weblounge-language";
-
-  /** The attribute name used to store the {@link Site} in the session */
-  public static final String SESSION_SITE = "weblounge-site";
-
-  /** The attribute name used to store the last {@link URL} in the session */
-  public static final String SESSION_PREVIOUS_URL = "weblounge-lasturl";
 
   /** The language extraction regular expression */
   private static Pattern languageExtractor_ = Pattern.compile("_([a-zA-Z]+)\\.[\\w\\- ]+$");

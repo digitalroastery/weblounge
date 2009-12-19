@@ -107,7 +107,7 @@ public class LocalizableObjectTest {
   public void testSwitchedTo() {
     final StringBuffer newLanguage = new StringBuffer();
     content.addLocalizationListener(new LocalizationListener() {
-      public void switchedTo(Language language) {
+      public void switchedTo(Language language, Language requestedLanguage) {
         newLanguage.append(language.getIdentifier());
       }
     });

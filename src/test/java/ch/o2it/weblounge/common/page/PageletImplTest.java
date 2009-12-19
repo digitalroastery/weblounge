@@ -303,8 +303,8 @@ public class PageletImplTest {
    */
   @Test
   public void testIsPublished() {
-    pagelet.setPublishFrom(new Date(new Date().getTime() - Times.MS_PER_DAY));
     pagelet.setPublishTo(new Date(new Date().getTime() + Times.MS_PER_DAY));
+    pagelet.setPublishFrom(new Date(new Date().getTime() - Times.MS_PER_DAY));
     assertTrue(pagelet.isPublished());
   }
 

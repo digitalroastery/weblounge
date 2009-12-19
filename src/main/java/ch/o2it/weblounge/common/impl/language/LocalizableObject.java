@@ -26,6 +26,7 @@ import static ch.o2it.weblounge.common.language.Localizable.LanguageResolution.O
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.LocalizationListener;
+import ch.o2it.weblounge.common.language.Localizable.LanguageResolution;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,8 +34,36 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class represents an abstract implementation of a {@link Localizable}
- * object.
+ * This class represents a basic implementation of a {@link Localizable} object
+ * that brings support for all the language handling and dealing with language
+ * resolution strategies.
+ * <p>
+ * To keep the implementation simple, localized content can only be returned as
+ * a <code>String</code> using {@link #toString()}, {@link #toString(Language)}
+ * or {@link #toString(Language, boolean)}. To manage more complex content, it
+ * might be worth looking at {@link LocalizableContent}.
+ * <p>
+ * To be able to properly handle this object it should be noted that every
+ * localizable content will have an <i>original</i> language, a
+ * <code>current language</code> and possibly also a <i>default language</i>.
+ * <ul>
+ * <li><b>Original language</b>: the original language is automatically set as
+ * soon as localized content is added and thus represents the language of that
+ * first content.</li>
+ * <li><b>Current language</b>: the current language is what the object has been
+ * set to using the <code>switchTo(Language)</code> method. If that method has
+ * never been called, then the current language is either the original language
+ * or the default one if it has been set. In any case, as long as there is
+ * <i>some</code> content in the object, the current language will always be
+ * part of what is returned by <code>getSupportedLanguages()</code>, i. e.
+ * <code>supportsLanguage(currentLanguage)</code> will be true as long as
+ * <code>getCurrentLanguage()</code> does not return <code>null</code>.</li>
+ * <li><b>Default language</b>: The default language can be specified on a
+ * localized object as needed and yields an alternative way of getting content
+ * that is not available in the requested language.</li>
+ * </ul>
+ * 
+ * @see LocalizableContent
  */
 public class LocalizableObject implements Localizable {
 
@@ -57,7 +86,7 @@ public class LocalizableObject implements Localizable {
   protected List<LocalizationListener> localizationListeners = null;
 
   /**
-   * Constructor for class AbstractMultilingual with a default behavior of
+   * Creates a new localizable object with a default behavior of
    * {@link LanguageBehaviour#Original}.
    */
   public LocalizableObject() {
@@ -65,10 +94,12 @@ public class LocalizableObject implements Localizable {
   }
 
   /**
-   * Constructor for class AbstractMultilingual with the given language as the
-   * default language.
+   * Creates localizable object with a default language <code>language</code>
+   * and the behavior set to {@link LanguageResolution#Default} as long as
+   * <code>language</code> is not set to <code>null</code>, in which case the
+   * behavior will be set to {@link LanguageResolution#Original}.
    * 
-   * @param defaultLanguage
+   * @param language
    *          the default language
    */
   public LocalizableObject(Language defaultLanguage) {
@@ -79,7 +110,9 @@ public class LocalizableObject implements Localizable {
   }
 
   /**
-   * Adds the listener to the list of localization listeners.
+   * Adds the listener to the list of localization listeners. The listeners will
+   * be notified as soon as a call to {@link #switchTo(Language)} or
+   * {@link #switchTo(Language, boolean)} has been made.
    * 
    * @param listener
    *          the listener to add
@@ -211,14 +244,27 @@ public class LocalizableObject implements Localizable {
 
     // Notify interested parties
     if (original == null || !original.equals(currentLanguage)) {
-      synchronized (localizationListeners) {
-        for (LocalizationListener l : localizationListeners) {
-          l.switchedTo(language);
-        }
-      }
+      fireLanguageChanged(currentLanguage, language);
     }
 
     return currentLanguage;
+  }
+
+  /**
+   * Notifies the registered localization listeners about the newly selected
+   * language.
+   * 
+   * @param language
+   *          the language that has been switched to
+   * @param requested
+   *          the language that was originally requested
+   */
+  protected void fireLanguageChanged(Language language, Language requested) {
+    synchronized (localizationListeners) {
+      for (LocalizationListener l : localizationListeners) {
+        l.switchedTo(language, requested);
+      }
+    }
   }
 
   /**

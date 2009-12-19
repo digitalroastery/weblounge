@@ -94,7 +94,7 @@ public class LanguageSupportTest {
     try {
       LanguageSupport.getLanguage("xyz");
       fail("Language xyz should not be resolved");
-    } catch (UnsupportedLanguageException e) {
+    } catch (UnknownLanguageException e) {
       // Expected
     }
   }
@@ -188,8 +188,8 @@ public class LanguageSupportTest {
     assertEquals("test.jsp", LanguageSupport.getBaseVersion("test_en.jsp"));
     try {
       LanguageSupport.getBaseVersion("test_xyz.jsp");
-      fail("LanguageSupport was fooled by non existent language xyz");
-    } catch (UnsupportedLanguageException e) {
+      fail("LanguageSupport failed when presented with by non existent language xyz");
+    } catch (UnknownLanguageException e) {
       // Expected
     }
   }
@@ -206,7 +206,7 @@ public class LanguageSupportTest {
     try {
       assertEquals(italian, LanguageSupport.extractLanguage("test_xyz.jsp"));
       fail("LanguageSupport was fooled by non existent language xyz");
-    } catch (UnsupportedLanguageException e) {
+    } catch (UnknownLanguageException e) {
       // Expected
     }
   }

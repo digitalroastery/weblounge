@@ -29,7 +29,6 @@ import ch.o2it.weblounge.common.impl.security.GroupImpl;
 import ch.o2it.weblounge.common.impl.security.RoleImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
@@ -323,19 +322,19 @@ public class AuthenticatedUserImplTest {
   public void testIsAuthorizedBy() {
     fail("Not yet implemented");
 
-    User u = new UserImpl("john", "testland", "John Doe");
-
-    AuthenticatedUser translator = new AuthenticatedUserImpl("translator");
-    translator.assignRole(SystemRole.TRANSLATOR);
-    assertFalse(user.isAuthorizedBy(translator));
-
-    AuthenticatedUser editor = new AuthenticatedUserImpl("editor");
-    editor.assignRole(SystemRole.EDITOR);
-    assertFalse(user.isAuthorizedBy(editor));
-
-    AuthenticatedUser publisher = new AuthenticatedUserImpl("publisher");
-    editor.assignRole(SystemRole.PUBLISHER);
-    assertFalse(user.isAuthorizedBy(publisher));
+//    User u = new UserImpl("john", "testland", "John Doe");
+//
+//    AuthenticatedUser translator = new AuthenticatedUserImpl("translator");
+//    translator.assignRole(SystemRole.TRANSLATOR);
+//    assertFalse(user.isAuthorizedBy(translator));
+//
+//    AuthenticatedUser editor = new AuthenticatedUserImpl("editor");
+//    editor.assignRole(SystemRole.EDITOR);
+//    assertFalse(user.isAuthorizedBy(editor));
+//
+//    AuthenticatedUser publisher = new AuthenticatedUserImpl("publisher");
+//    editor.assignRole(SystemRole.PUBLISHER);
+//    assertFalse(user.isAuthorizedBy(publisher));
   }
 
 }

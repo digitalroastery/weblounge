@@ -25,10 +25,12 @@ import ch.o2it.weblounge.common.language.Language;
 import java.util.Locale;
 
 /**
- * This is a special instance of <code>Language</code>, representing then
+ * This is a special instance of a <code>Language</code>, representing then
  * English language.
+ * 
+ * @see Language
  */
-public class English extends LanguageImpl {
+public final class English extends LanguageImpl {
 
   /** The language identifier */
   public final static String ID = "en";

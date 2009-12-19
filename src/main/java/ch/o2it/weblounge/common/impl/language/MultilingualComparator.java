@@ -30,7 +30,7 @@ import java.util.Comparator;
  */
 public class MultilingualComparator<Type extends Localizable> implements Comparator<Type> {
 
-  /** The language used to compare */
+  /** The language used for comparison */
   private Language l = null;
 
   /**
