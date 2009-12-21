@@ -26,7 +26,6 @@ import ch.o2it.weblounge.common.http.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageManager;
 import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTagSet;
@@ -40,6 +39,7 @@ import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.contentrepository.PageManager;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;

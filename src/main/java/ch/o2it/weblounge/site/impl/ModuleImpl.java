@@ -275,7 +275,7 @@ public class ModuleImpl implements Module {
    * Returns the option value for option <code>name</code> if it has been
    * configured, <code>null</code> otherwise.
    * <p>
-   * If the option is a multivalue option (that is, if the option has been
+   * If the option is a multiple value option (that is, if the option has been
    * configured multiple times), this method returns the first value onyl. Use
    * {@link #getOptions(java.lang.String)} to get all option values.
    * 

@@ -27,7 +27,6 @@ import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageManager;
 import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTagSet;
@@ -41,6 +40,7 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteLogger;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.contentrepository.PageManager;
 import ch.o2it.weblounge.site.impl.ActionHandlerBundle;
 import ch.o2it.weblounge.site.impl.ActionRegistry;
 
