@@ -22,12 +22,12 @@ package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.UrlNotFoundException;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.site.impl.handler.PageRequestHandler;
 
 import org.apache.jasper.JasperException;

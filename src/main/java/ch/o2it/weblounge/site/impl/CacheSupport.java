@@ -65,7 +65,7 @@ public class CacheSupport {
    * @param tags
    *          the set of tags identifying the cache elements to be removed
    */
-  public static void invalidate(CacheTagSetImpl tags) {
+  public static void invalidate(CacheTagSet tags) {
     // If a shared cache is configured, invalidate shared
     if (isSharedCacheEnabled)
       sharedCache.invalidate(tags);
@@ -130,7 +130,7 @@ public class CacheSupport {
       return;
 
     // Create tag set
-    CacheTagSetImpl tags = new CacheTagSetImpl();
+    CacheTagSet tags = new CacheTagSet();
     tags.add("webl:url", url.getPath());
     tags.add("webl:site", url.getSite().getIdentifier());
     if (language != null)
@@ -261,7 +261,7 @@ public class CacheSupport {
       return;
 
     // Create tag set
-    CacheTagSetImpl tags = new CacheTagSetImpl();
+    CacheTagSet tags = new CacheTagSet();
     tags.add("webl:action", action.getIdentifier());
     tags.add("webl:module", action.getModule().getIdentifier());
     tags.add("webl:site", action.getSite().getIdentifier());
@@ -321,7 +321,7 @@ public class CacheSupport {
       throw new IllegalArgumentException("Action must not be null");
 
     // Create tag set
-    CacheTagSetImpl tags = new CacheTagSetImpl();
+    CacheTagSet tags = new CacheTagSet();
     tags.add("webl:action", action);
     tags.add("webl:module", module.getIdentifier());
     tags.add("webl:site", module.getSite().getIdentifier());
@@ -381,7 +381,7 @@ public class CacheSupport {
       throw new IllegalArgumentException("Action must not be null");
 
     // Create tag set
-    CacheTagSetImpl tags = new CacheTagSetImpl();
+    CacheTagSet tags = new CacheTagSet();
     tags.add("webl:renderer", renderer);
     tags.add("webl:module", module.getIdentifier());
     tags.add("webl:site", module.getSite().getIdentifier());

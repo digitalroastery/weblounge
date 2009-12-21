@@ -34,10 +34,10 @@ import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.renderer.Renderer;
-import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.user.SiteAdmin;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

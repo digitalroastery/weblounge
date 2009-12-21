@@ -260,7 +260,7 @@ public abstract class ActionSupport extends AbstractAction {
     }
     try {
       Object data = request.getAttribute(Pagelet.ATTRIBUTES);
-      renderer.configure(request.getOutputMethod(), data);
+      renderer.configure(request.getFlavor(), data);
       renderer.render(request, response);
     } catch (Exception e) {
       String params = RequestSupport.getParameters(request);

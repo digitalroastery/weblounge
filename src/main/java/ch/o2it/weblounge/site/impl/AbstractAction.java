@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.request.CacheTagSetImpl;
+import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
@@ -298,10 +298,10 @@ public abstract class AbstractAction implements Action {
     // Is a template defined in the request?
     String rendererId = (String) request.getAttribute(Renderer.TEMPLATE);
     if (rendererId != null) {
-      renderer = getSite().getRenderer(rendererId, request.getOutputMethod());
+      renderer = getSite().getRenderer(rendererId, request.getFlavor());
     } else {
       Page page = site.getPage(new PageURIImpl(request), request.getUser());
-      renderer = page.getRenderer(request.getOutputMethod());
+      renderer = page.getRenderer(request.getFlavor());
     }
 
     // Let's check the renderer configuration
@@ -414,7 +414,7 @@ public abstract class AbstractAction implements Action {
     User user = request.getUser();
     long validTime = renderer.getConfiguration().getValidTime();
     long recheckTime = renderer.getConfiguration().getRecheckTime();
-    CacheTagSet rendererTagSet = new CacheTagSetImpl();
+    CacheTagSet rendererTagSet = new CacheTagSet();
     CacheHandle rendererCacheHdl = null;
 
     rendererTagSet.add("webl:site", request.getSite().getIdentifier());
@@ -449,7 +449,7 @@ public abstract class AbstractAction implements Action {
       response.addTag("webl:renderer", renderer.getIdentifier());
 
       // Render
-      renderer.configure(request.getOutputMethod(), data);
+      renderer.configure(request.getFlavor(), data);
       renderer.render(request, response);
       renderer.cleanup();
 

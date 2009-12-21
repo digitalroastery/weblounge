@@ -29,8 +29,6 @@ import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTagSet;
-import ch.o2it.weblounge.common.request.RequestHandler;
-import ch.o2it.weblounge.common.request.RequestHandlerConfiguration;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.security.Permission;
@@ -40,6 +38,8 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.PageManager;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
+import ch.o2it.weblounge.dispatcher.RequestHandlerConfiguration;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
@@ -212,9 +212,9 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
       String rendererId = (String) request.getAttribute(Renderer.TEMPLATE);
       Renderer renderer = null;
       if (rendererId != null) {
-        renderer = site.getRenderer(rendererId, request.getOutputMethod());
+        renderer = site.getRenderer(rendererId, request.getFlavor());
       } else {
-        renderer = page.getRenderer(request.getOutputMethod());
+        renderer = page.getRenderer(request.getFlavor());
       }
       if (renderer == null) {
         String params = RequestSupport.getParameters(request);
@@ -229,7 +229,7 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
       // request. Since renderers are being pooled by the bundle, we
       // have to return it after the request has finished.
 
-      String method = request.getOutputMethod();
+      String method = request.getFlavor();
 
       try {
         if (renderer.provides(method)) {
@@ -314,7 +314,7 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandler#configure(ch.o2it.weblounge.api.request.RequestHandlerConfiguration)
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#configure(ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration)
    */
   public void configure(RequestHandlerConfiguration config)
       throws ConfigurationException {
@@ -322,21 +322,21 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandler#getIdentifier()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getIdentifier()
    */
   public String getIdentifier() {
     return "default";
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandler#getName()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
    */
   public String getName() {
     return "default request handler";
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandler#getDescription()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getDescription()
    */
   public String getDescription() {
     return "this handler handles all requets that are not handled by any other handler";
