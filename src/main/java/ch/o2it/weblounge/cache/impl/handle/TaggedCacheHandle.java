@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.cache.impl.handle;
 
+import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.content.Taggable;
 import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
@@ -37,10 +38,10 @@ import java.util.TreeSet;
 public class TaggedCacheHandle extends CacheHandleImpl {
 
   /** the default expiration time for a page */
-  protected static final long DEFAULT_EXPIRES = MS_PER_DAY;
+  protected static final long DEFAULT_EXPIRES = Times.MS_PER_DAY;
 
   /** the default recheck time for a page */
-  protected static final long DEFAULT_RECHECK = MS_PER_HOUR;
+  protected static final long DEFAULT_RECHECK = Times.MS_PER_HOUR;
 
   /** the hash code */
   private int hashCode;
@@ -122,14 +123,6 @@ public class TaggedCacheHandle extends CacheHandleImpl {
         return t;
     }
     return null;
-  }
-
-  /**
-   * @see ch.o2it.weblounge.cache.CacheHandle.cache.CacheHandle#getShortName()
-   */
-  @Override
-  public String getShortName() {
-    return toString();
   }
 
   /**

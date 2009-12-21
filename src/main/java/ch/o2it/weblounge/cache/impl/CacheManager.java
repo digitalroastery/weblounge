@@ -873,7 +873,7 @@ public class CacheManager {
       b.append("+--");
     b.append(Integer.toHexString(hnd.getClass().hashCode() ^ hnd.hashCode()).toUpperCase());
     b.append(": ");
-    b.append(hnd.getShortName());
+    b.append(hnd.toString());
     sb.append(b);
     int len = 80 - b.length();
     while (--len > 0)

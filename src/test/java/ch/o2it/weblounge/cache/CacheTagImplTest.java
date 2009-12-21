@@ -25,8 +25,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
-import ch.o2it.weblounge.common.request.CacheTag;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class CacheTagImplTest {
    */
   @Test
   public void testCacheTagImplString() {
-    CacheTag t = new CacheTagImpl(tagName);
+    Tag t = new CacheTagImpl(tagName);
     assertEquals(tagName, t.getName());
     assertEquals(CacheTagImpl.ANY, t.getValue());
     try {
@@ -87,7 +87,7 @@ public class CacheTagImplTest {
    */
   @Test
   public void testCacheTagImplStringObject() {
-    CacheTag t = null;
+    Tag t = null;
     
     // Test null value
     t = new CacheTagImpl(tagName, null);

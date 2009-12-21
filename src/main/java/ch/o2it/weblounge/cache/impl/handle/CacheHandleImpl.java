@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.cache.impl.handle;
 
+import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 import ch.o2it.weblounge.common.request.CacheHandle;
@@ -76,7 +77,7 @@ public abstract class CacheHandleImpl implements CacheHandle {
    *          the expiration time to set
    */
   public final void setExpires(long expires) {
-    this.expires = (expires > MS_PER_SECOND) ? expires : MS_PER_SECOND;
+    this.expires = (expires > Times.MS_PER_SECOND) ? expires : Times.MS_PER_SECOND;
   }
 
   /**
@@ -95,16 +96,8 @@ public abstract class CacheHandleImpl implements CacheHandle {
    *          the new recheck time
    */
   public final void setRecheck(long recheck) {
-    this.recheck = (recheck > MS_PER_SECOND) ? recheck : MS_PER_SECOND;
-
+    this.recheck = (recheck > Times.MS_PER_SECOND) ? recheck : Times.MS_PER_SECOND;
   }
-
-  /**
-   * Returns the short name of this cache handle.
-   * 
-   * @return the short name of this handle
-   */
-  public abstract String getShortName();
 
   /**
    * @see java.lang.Object#hashCode()
