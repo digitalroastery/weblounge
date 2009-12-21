@@ -269,8 +269,6 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     StringBuffer selector = new StringBuffer();
     if (version == Page.WORK) {
       selector.append("work");
-    } else if (version == Page.ORIGINAL) {
-      selector.append("original");
     } else if (version == Page.LIVE) {
       selector.append("index");
     } else {
@@ -357,8 +355,6 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
         this.version = Page.LIVE;
       } else if ("work".equals(v)) {
         this.version = Page.WORK;
-      } else if ("original".equals(v)) {
-        this.version = Page.ORIGINAL;
       } else {
         try {
           this.version = Long.parseLong(v);

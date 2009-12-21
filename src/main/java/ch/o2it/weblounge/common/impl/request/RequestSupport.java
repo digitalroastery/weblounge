@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
-import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 
 import java.util.Enumeration;
@@ -74,34 +73,6 @@ public final class RequestSupport {
       params.append(value);
     }
     return (params.length() > 0) ? "[" + params.toString() + "]" : "[-]";
-  }
-
-  /**
-   * Returns the version for the given version identifier. Available versions
-   * are:
-   * <ul>
-   * <li>{@link #LIVE}</li>
-   * <li>{@link #WORK}</li>
-   * <li>{@link #ORIGINAL}</li>
-   * 
-   * @param version
-   *          the version identifier
-   * @return the version string
-   */
-  public static long getVersion(String version) {
-    if (version.equals("index")) {
-      return Page.LIVE;
-    } else if (version.equals("work")) {
-      return Page.WORK;
-    } else if (version.equals("original")) {
-      return Page.ORIGINAL;
-    } else {
-      try {
-        return Long.parseLong(version);
-      } catch (NumberFormatException e) {
-        return -1;
-      }
-    }
   }
 
 }

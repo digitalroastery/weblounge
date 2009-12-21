@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
-import ch.o2it.weblounge.common.page.Layout;
+import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.PageListener;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.renderer.Renderer;
@@ -169,11 +169,11 @@ public class PageListenerAdapter implements PageListener {
    * @param user
    *          the editing user
    * @see ch.o2it.weblounge.api.content.PageListener#pageLayoutChanged(ch.o2it.weblounge.api.url.WebUrl,
-   *      ch.o2it.weblounge.core.content.Layout,
-   *      ch.o2it.weblounge.core.content.Layout,
+   *      ch.o2it.weblounge.PageLayout.content.Layout,
+   *      ch.o2it.weblounge.PageLayout.content.Layout,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
-  public void pageLayoutChanged(PageURI uri, Layout newLayout, Layout oldLayout,
+  public void pageLayoutChanged(PageURI uri, PageLayout newLayout, PageLayout oldLayout,
       User user) {
   }
 

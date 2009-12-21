@@ -23,8 +23,8 @@ package ch.o2it.weblounge.common.impl.page;
 import ch.o2it.weblounge.common.page.Page;
 
 /**
- * The page utils contain utility methods intended to facilitate dealing with
- * page versions and names.
+ * This class contains utility methods intended to facilitate dealing with page
+ * versions and names.
  */
 public class PageUtils {
 
@@ -32,9 +32,8 @@ public class PageUtils {
    * Returns the version for the given version identifier. Available versions
    * are:
    * <ul>
-   * <li>{@link #LIVE}</li>
-   * <li>{@link #WORK}</li>
-   * <li>{@link #ORIGINAL}</li>
+   * <li>{@link Page#LIVE}</li>
+   * <li>{@link Page#WORK}</li>
    * 
    * @param version
    *          the version identifier
@@ -45,8 +44,6 @@ public class PageUtils {
       return Page.LIVE;
     } else if (version.equals("work")) {
       return Page.WORK;
-    } else if (version.equals("original")) {
-      return Page.ORIGINAL;
     } else {
       try {
         return Long.parseLong(version);
@@ -60,9 +57,9 @@ public class PageUtils {
    * Returns the document name for the given version. For the live version, this
    * method will return <code>index.xml</code>. Available versions are:
    * <ul>
-   * <li>{@link #LIVE}</li>
-   * <li>{@link #WORK}</li>
-   * <li>{@link #ORIGINAL}</li>
+   * <li>{@link Page#LIVE}</li>
+   * <li>{@link Page#WORK}</li>
+   * <li>{@link Page#ORIGINAL}</li>
    * 
    * @param version
    *          the version identifier
@@ -71,8 +68,6 @@ public class PageUtils {
   public static String getDocument(long version) {
     if (version == Page.LIVE)
       return "index.xml";
-    else if (version == Page.ORIGINAL)
-      return "original.xml";
     else if (version == Page.WORK)
       return "work.xml";
     else
@@ -83,9 +78,9 @@ public class PageUtils {
    * Returns the version identifier for the given version. Available versions
    * are:
    * <ul>
-   * <li>{@link #LIVE}</li>
-   * <li>{@link #WORK}</li>
-   * <li>{@link #ORIGINAL}</li>
+   * <li>{@link Page#LIVE}</li>
+   * <li>{@link Page#WORK}</li>
+   * <li>{@link Page#ORIGINAL}</li>
    * 
    * @param version
    *          the version identifier
@@ -94,8 +89,6 @@ public class PageUtils {
   public static String getVersionString(long version) {
     if (version == Page.LIVE)
       return "live";
-    else if (version == Page.ORIGINAL)
-      return "original";
     else if (version == Page.WORK)
       return "work";
     else

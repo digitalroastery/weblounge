@@ -761,15 +761,21 @@ public class PageImpl extends LocalizableObject implements Page {
    * @param user
    *          the locking user
    */
-  public void setLocked(User user) {
+  public void setLocked(User user) throws IllegalStateException {
+    if (lockOwner != null && !lockOwner.equals(user))
+      throw new IllegalStateException("The page is already locked by " + lockOwner);
     lockOwner = user;
   }
 
   /**
-   * Removes the editing lock from this page.
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Page#setUnlocked()
    */
-  public void setUnlocked() {
+  public User setUnlocked() {
+    User previousLockOwner = lockOwner;
     lockOwner = null;
+    return previousLockOwner;
   }
 
   /**
