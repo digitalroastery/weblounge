@@ -104,7 +104,7 @@ public class SiteDispatcher implements Dispatcher {
    *          the request handler
    */
   public void addRequestHandler(RequestHandler handler) {
-    if (!requestHandler_.contains(handler)) {
+    if (!requestHandler_.startsWith(handler)) {
       requestHandler_.add(handler);
     }
   }
