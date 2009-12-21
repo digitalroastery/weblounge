@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.repository;
+package ch.o2it.weblounge.common.resource;
 
 /**
  * A <code>RepositoryTransactionListener</code> can observe and react on all

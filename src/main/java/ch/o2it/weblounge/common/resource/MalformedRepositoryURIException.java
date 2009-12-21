@@ -18,31 +18,29 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.repository;
+package ch.o2it.weblounge.common.resource;
 
 /**
- * TODO: Comment RepositoryIterator
+ * This exception is thrown if an invalid <code>RepositoryURI</code> is about to
+ * be created.
  */
-public interface RepositoryIterator {
+public class MalformedRepositoryURIException extends RuntimeException {
+
+  /** The serial version UID */
+  private static final long serialVersionUID = 1173634225373472347L;
 
   /**
-   * Callback for the visitor. After calling <code>accept</code> on the visited
-   * <code>RepositoryCollection</code>, the collection will call this method, so
-   * that the iterator may perform some operations on it.
-   * 
-   * @param collection
-   *          the visited repository collection
+   * @param arg0
    */
-  void visit(Collection collection);
+  public MalformedRepositoryURIException(String path) {
+    super("The repository uri path '" + path + "' is invalid!");
+  }
 
   /**
-   * Callback for the visitor. After calling <code>accept</code> on the visited
-   * <code>RepositoryItem</code>, the item will call this method, so that the
-   * iterator may perform some operations on it.
-   * 
-   * @param item
-   *          the visited repository item
+   * @param arg0
    */
-  void visit(Resource item);
+  public MalformedRepositoryURIException(long id) {
+    super("The repository uri identifier " + id + " is invalid!");
+  }
 
 }

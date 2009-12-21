@@ -18,24 +18,33 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.repository;
+package ch.o2it.weblounge.common.resource;
 
 /**
- * Interface for a class that is able to filter a list of repository
- * collections.
+ * This interface defines fields and methods for a repository collection or item
+ * transaction.
  */
-public interface CollectionFilter {
+public interface RepositoryTransaction {
 
   /**
-   * Whether to accept the collection, i.e. whether the collection should be
-   * included in the filtered collection list.
+   * Causes this transaction to be stopped and rolled back.
    * 
-   * @param collection
-   *          the collection to test
-   * @return <code>true</code> if the collection passes the filter <code>false
-	 * </code>
-   *         otherwise.
+   * <code>RepositoryTransactionListener</code>s can call this method to cancel
+   * an ongoing transaction.
+   * 
+   * @param listener
+   *          the aborting <code>RepositoryTransactionListener</code>
+   * @param reason
+   *          ideally, this is the i18n - key to the error message, but a string
+   *          will also be fine
    */
-  boolean accept(Collection collection);
+  void abort(RepositoryTransactionListener listener, String reason);
+
+  /**
+   * Returns the transaction subject.
+   * 
+   *@return uri of the repository item that is affected by this transaction
+   */
+  RepositoryURI getURI();
 
 }
