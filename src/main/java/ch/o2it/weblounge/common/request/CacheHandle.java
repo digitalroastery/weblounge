@@ -20,36 +20,44 @@
 
 package ch.o2it.weblounge.common.request;
 
-import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.content.Taggable;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 /**
- * Identifies a cached object. Implementing classes must provide meaningful
- * <code>hashCode()</code> and </code>equals()</code> methods.
+ * Identifies a cached object with a recheck and expiration time. Clients may
+ * locally cache objects and use them without checking with the object's
+ * original source until <code>recheck</code> time is reached. At that point,
+ * the client should check if the object has been modified. Once the expiration
+ * time has been reached, the object must be thrown away and reloaded from the
+ * original source.
+ * <p>
+ * Implementing classes must provide meaningful <code>hashCode()</code> and
+ * </code>equals()</code> methods.
+ * 
+ * @see ch.o2it.weblounge.common.Times
  */
-public interface CacheHandle extends Times, Taggable {
+public interface CacheHandle extends Taggable {
 
   /**
-   * Returns the time the cached object expires
+   * Returns the time the cached object expires in milliseconds. When that time
+   * is reached, the object will be invalidated and removed from the cache.
    * 
    * @return the expiration time
    */
   long getExpires();
 
   /**
-   * Sets the time the cached object expires.
+   * Sets the time the cached object expires in milliseconds.
    * 
    * @param expires
    *          the expiration time to set
+   * @see ch.o2it.weblounge.common.Times
    */
   void setExpires(long expires);
 
   /**
-   * Returns the recheck time of the cached objects.
+   * Returns the recheck time of the cached objects in milliseconds. When the
+   * recheck time is reached, clients should check if their locally cached
+   * version of the object is still valid.
    * 
    * @return the recheck time
    */
@@ -60,55 +68,8 @@ public interface CacheHandle extends Times, Taggable {
    * 
    * @param recheck
    *          the new recheck time
+   * @see ch.o2it.weblounge.common.Times
    */
   void setRecheck(long recheck);
-
-  /**
-   * Returns the short name of this cache handle.
-   * 
-   * @return the short name of this handle
-   */
-  String getShortName();
-
-  /**
-   * @see ch.o2it.weblounge.api.util.Taggable#addTag(java.lang.String,
-   *      java.lang.Object)
-   */
-  boolean addTag(String key, Object value);
-
-  /**
-   * @see ch.o2it.weblounge.api.util.Taggable#addTag(ch.o2it.weblounge.api.util.Tag)
-   */
-  boolean addTag(Tag tag);
-
-  /**
-   * @see ch.o2it.weblounge.api.util.Taggable#addTags(java.util.Collection)
-   */
-  boolean addTags(Collection<Tag> t);
-
-  /**
-   * @see ch.o2it.weblounge.api.util.Taggable#clearTags()
-   */
-  void clearTags();
-
-  /**
-   * @see ch.o2it.weblounge.api.util.Taggable#containsTag(ch.o2it.weblounge.api.util.Tag)
-   */
-  boolean containsTag(Tag tag);
-
-  /**
-   * @see ch.o2it.weblounge.api.util.Taggable#isTagged()
-   */
-  boolean isTagged();
-
-  /**
-   * @see ch.o2it.weblounge.api.util.Taggable#removeTag(ch.o2it.weblounge.api.util.Tag)
-   */
-  boolean removeTag(Tag tag);
-
-  /**
-   * @see ch.o2it.weblounge.api.util.Taggable#tags()
-   */
-  Iterator<Tag> tags();
 
 }

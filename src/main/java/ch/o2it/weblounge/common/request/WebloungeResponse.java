@@ -28,8 +28,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Wrapper for a request that is being processed by the weblounge content
- * management system.
+ * The <code>WebloungeResponse</code> defines a few extensions to the default
+ * <code>HttpServletResponse</code>. In particular, they deal with support for
+ * server side caching of the response stream.
  */
 public interface WebloungeResponse extends HttpServletResponse, Taggable {
 
@@ -162,7 +163,7 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable {
   
   /**
    * Tells the cache to not cache this response. This method should be called in
-   * case of a rendering error.
+   * case of any rendering error.
    */
   void invalidate();
 

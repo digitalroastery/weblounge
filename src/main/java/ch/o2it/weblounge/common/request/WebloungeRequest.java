@@ -38,34 +38,38 @@ public interface WebloungeRequest extends HttpServletRequest {
 
   /** The attribute name used to store the {@link User} in the session */
   public static final String SESSION_USER = "weblounge-user";
+
   /** The attribute name used to store the {@link Language} in the session */
   public static final String SESSION_LANGUAGE = "weblounge-language";
+
   /** The attribute name used to store the {@link Site} in the session */
   public static final String SESSION_SITE = "weblounge-site";
+
   /** The attribute name used to store the {@link URL} in the session */
   public static final String SESSION_URL = "weblounge-url";
-  /** The attribute name used to store the last {@link URL} in the session */
-  public static final String SESSION_PREVIOUS_URL = "weblounge-lasturl";
 
   /**
    * Returns the requested language. The language is determined by evaluating
-   * the respective request header fields.
+   * the request header fields.
    * 
    * @return the requested language
    */
   Language getLanguage();
 
   /**
-   * Returns the requested site.
+   * Returns the site that is serving this request.
    * 
    * @return the requested site
    */
   Site getSite();
 
   /**
-   * Returns the requested url.
+   * Returns the url that is used to render the content for this request. Note
+   * that due to redirection, this might not be the url that the client
+   * originally requested.
    * 
-   * @return the requested url
+   * @return the url
+   * @see #getRequestedUrl()
    */
   WebUrl getUrl();
 
@@ -73,15 +77,9 @@ public interface WebloungeRequest extends HttpServletRequest {
    * Returns the originally requested url.
    * 
    * @return the requested url
+   * @see #getUrl()
    */
   WebUrl getRequestedUrl();
-
-  /**
-   * Returns the url that was called before this request.
-   * 
-   * @return the previous url
-   */
-  WebUrl getPreviousUrl();
 
   /**
    * Returns the current user.
@@ -95,7 +93,6 @@ public interface WebloungeRequest extends HttpServletRequest {
    * <ul>
    * <li>{@link ch.o2it.weblounge.common.page.Page#LIVE}</li>
    * <li>{@link ch.o2it.weblounge.common.page.Page#WORK}</li>
-   * <li>{@link ch.o2it.weblounge.common.page.Page#ORIGINAL}</li>
    * </ul>
    * 
    * @return the requested version
@@ -103,10 +100,12 @@ public interface WebloungeRequest extends HttpServletRequest {
   long getVersion();
 
   /**
-   * Returns the requested output method.
+   * Returns the requested content flavor. The default output method is
+   * <code>HTML</code>, but <code>XML</code> and <code>JSON</code> are supported
+   * as well.
    * 
    * @return the requested output method
    */
-  String getOutputMethod();
+  String getFlavor();
 
 }

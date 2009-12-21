@@ -22,21 +22,24 @@ package ch.o2it.weblounge.common.request;
 
 /**
  * Interface for listeners that are interested in the lifecycle of a weblounge
- * request. A typical listener would be a request statistics implementation.
+ * request. A typical example for such a listener would be a request statistics
+ * implementation.
  * <p>
- * It is important to understand the meaning of this interface. The interface
- * gives access to tracking requests that go through the system. Although both
- * request and response are passed, it is not intended to serve a s a request
- * handler interface, since there might be plenty of listeners and if one starts
- * writing output to the request, no other listener will be able to.
+ * <b>Note:</b> It is important to understand the meaning of this interface. The
+ * interface gives access to tracking requests that go through the system.
+ * Although both request and response are passed, it is not intended to serve a
+ * s a request handler interface, since there might be plenty of listeners and
+ * if one starts writing output to the request, no other listener will be able
+ * to.
  * <p>
- * That's why this interface relies on the cooperation of implementers. Do not
- * write any output to the response until you know for sure what you are doing!
+ * That's why this interface relies on the cooperation of implementers. <b>Do
+ * not write any output to the response</b> until you know for sure what you are
+ * doing!
  */
 public interface RequestListener {
 
   /**
-   * Called when a request is about to be processed
+   * Called when a request is about to be processed.
    * 
    * @param request
    *          the incoming request

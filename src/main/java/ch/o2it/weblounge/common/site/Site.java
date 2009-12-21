@@ -25,7 +25,6 @@ import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.renderer.Renderer;
-import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -116,22 +115,6 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   void removeRequestListener(RequestListener listener);
 
   /**
-   * Adds <code>handler</code> to the list of request handlers.
-   * 
-   * @param handler
-   *          the request handler
-   */
-  void addRequestHandler(RequestHandler handler);
-
-  /**
-   * Removes the request handler from the list of request handlers.
-   * 
-   * @param handler
-   *          the request handler to remove
-   */
-  void removeRequestHandler(RequestHandler handler);
-
-  /**
    * Returns the site module with the given identifier or <code>null</code> if
    * no such module can be found.
    * 
@@ -204,14 +187,6 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @return the layout
    */
   PageLayout getLayout(String layoutId);
-
-  /**
-   * Returns this site's request handlers which keeps track of the defined
-   * request handler for servlets etc.
-   * 
-   * @return the request handlers
-   */
-  RequestHandler[] getRequestHandler();
 
   /**
    * Returns the image styles.
@@ -441,5 +416,5 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @return the role
    */
   Group getGroup(String group, String context);
-  
+
 }
