@@ -24,14 +24,15 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.Url;
 
 /**
- * This interface is used to locate and point to pages within a site.
+ * A page uri defines the location of a page within a <code>Site</code>. In
+ * addition, it provides a unique identifier and a page version.
  */
 public interface PageURI extends Url {
 
   /**
-   * Returns the id of the page that this uri is pointing to.
+   * Returns the page identifier.
    * 
-   * @return the id
+   * @return the page identifier
    */
   String getId();
 
@@ -43,16 +44,21 @@ public interface PageURI extends Url {
   String getPath();
 
   /**
-   * Returns the page version.
+   * Returns the page version. The version represents the various editing stages
+   * of a page. Note that there are two special version values:
+   * <ul>
+   * <li>{@link Page#LIVE}: the live version of the page</li>
+   * <li>{@link Page#WORK}: the work version of the page</li>
+   * </ul>
    * 
    * @return the version
    */
   long getVersion();
 
   /**
-   * Returns the page uri in the given version.
+   * Returns the page uri for the given version.
    * 
-   * @return the new page uri
+   * @return the page uri
    */
   PageURI getVersion(long version);
 
@@ -66,6 +72,10 @@ public interface PageURI extends Url {
   /**
    * Returns the URI for the parent page. If the current URI is the site's root
    * then <code>null</code> is returned.
+   * <p>
+   * <b>Note:</b> The version of the parent uri will match the version of this
+   * uri. Keep in mind that the parent page might not exist in that version, so
+   * be careful when requesting the associated page.
    * 
    * @return the parent uri
    */

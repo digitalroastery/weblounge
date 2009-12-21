@@ -24,7 +24,12 @@ import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.renderer.Renderer;
 
 /**
- * This interface defines methods for a search result.
+ * The search result is what is delivered by the search function of weblounge.
+ * Search results can be delivered by two sources: First of all, the site is
+ * searched and hits may include pages or resources. Second, the site's modules
+ * will be queried adding the ability to add search results that are found
+ * outside of the site's content repository. It is up to the module to decide
+ * what the relevance value should be for the search results that it adds.
  */
 public interface SearchResult extends Localizable, Comparable<SearchResult> {
 
@@ -50,24 +55,19 @@ public interface SearchResult extends Localizable, Comparable<SearchResult> {
   String getPreview();
 
   /**
-   * Returns the search result's content type. By default, this will be
-   * <code>text/html</code>.
-   * 
-   * @return the content type
-   */
-  String getContentType();
-
-  /**
-   * Returns the renderer that is used to render the search result.
+   * Returns the renderer that is used to render the search result. Depending on
+   * who delivered the result (could be either weblounge or a custom module),
+   * the result might be rendered by a simple pagelet or some more sophisticated
+   * renderer.
    * 
    * @return the renderer
    */
   Renderer getPreviewRenderer();
 
   /**
-   * Returns the relevance of this hit regarding the term that was looked up.
-   * Greater values mean increased relevance, a 1.0 signifies a direct hit while
-   * 0.0 means a very unlikely hit.
+   * Returns the relevance of this hit with respect to the search terms. Greater
+   * values mean increased relevance, a 1.0 signifies a direct hit while 0.0
+   * means a very unlikely hit.
    * 
    * @return the relevance
    */

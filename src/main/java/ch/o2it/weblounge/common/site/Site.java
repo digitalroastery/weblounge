@@ -21,12 +21,10 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageManager;
+import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.renderer.Renderer;
-import ch.o2it.weblounge.common.repository.RepositoryManager;
 import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -34,7 +32,6 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.security.SecurityManager;
 import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.user.SiteAdmin;
 import ch.o2it.weblounge.common.user.User;
@@ -133,34 +130,6 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    *          the request handler to remove
    */
   void removeRequestHandler(RequestHandler handler);
-
-  /**
-   * Returns the site's security manager.
-   * 
-   * @return the security manager
-   */
-  SecurityManager getSecurityManager();
-
-  /**
-   * Returns the site's page manager. TODO: Rename
-   * 
-   * @return
-   */
-  PageManager getPages();
-
-  /**
-   * Returns the repository associated with this site. TODO: Rename
-   * 
-   * @return the site repository
-   */
-  RepositoryManager getRepository();
-
-  /**
-   * Returns the keyword manager for this site. TODO: Rename
-   * 
-   * @return the keyword manager
-   */
-  KeywordManager getKeywords();
 
   /**
    * Returns the site module with the given identifier or <code>null</code> if

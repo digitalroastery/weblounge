@@ -33,43 +33,24 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * A page element is a piece of content, placed somewhere on a page. Depending
- * on the composer that created it, it consists of multiple elements and
- * properties.
+ * A pagelet is a piece of content, placed inside a composer on a page. It
+ * consists of multilingual content and properties that are valid for all
+ * languages.
  * <p>
- * Such an element is stored in a page in the following form:
- * 
- * <pre>
- * 	&lt;pagelet&gt;
- * 		&lt;content language=&quot;de&quot; original=&quot;true&quot;&gt;
- * 			&lt;modified&gt;
- * 				&lt;date/&gt;
- * 				&lt;user&gt;wunden&lt;/user&gt;
- * 			&lt;/modified&gt;
- * 			&lt;text id=&quot;keyword&quot;&gt;Keyword&lt;/text&gt;
- * 			&lt;text id=&quot;title&quot;&gt;My Big Title&lt;/text&gt;
- * 			&lt;text id=&quot;lead&quot;&gt;This is the leading sentence.&lt;/text&gt;
- * 		&lt;/content&gt;
- * 		&lt;property id=&quot;showauthor&quot;&gt;true&lt;/property&gt;
- * 		&lt;property id=&quot;showdate&quot;&gt;true&lt;/property&gt;
- * 	&lt;/pagelet&gt;
- * </pre>
+ * During lifetime, the pagelet keeps track of creation, modification and
+ * publishing processes.
  */
 public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedModifiable, Securable {
 
-  /** Identifier for passing additional data with the request */
-  static final String ATTRIBUTES = "pagelet-attributes";
-
   /** The pagelet's permissions */
   static final Permission[] permissions = new Permission[] {
-    SystemPermission.READ,
-    SystemPermission.WRITE,
-    SystemPermission.TRANSLATE,
-    SystemPermission.MANAGE
-  };
+      SystemPermission.READ,
+      SystemPermission.WRITE,
+      SystemPermission.TRANSLATE,
+      SystemPermission.MANAGE };
 
   /**
-   * Returns the defining module identifier.
+   * Returns identifier of the module that contains the pagelet.
    * 
    * @return the module identifier
    */
@@ -83,7 +64,7 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   String getIdentifier();
 
   /**
-   * Adds a property to this pagelet. Properties are not language dependent, so
+   * Adds a property to this pagelet. Properties are language independent, so
    * there is no need to pass the language.
    * 
    * @param key
@@ -94,7 +75,7 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   void setProperty(String key, String value);
 
   /**
-   * Returns the property with name <code>key</code> or the empty string if no
+   * Returns the property with name <code>key</code> or <code>null</code> if no
    * such property is found.
    * 
    * @param key
@@ -104,7 +85,7 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   String getProperty(String key);
 
   /**
-   * Returns <code>true</code> if this is a multivalue property.
+   * Returns <code>true</code> if this is a multiple value property.
    * 
    * @param key
    *          the key
@@ -113,21 +94,21 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   boolean isMultiValueProperty(String key);
 
   /**
-   * Returns the array of values for the multivalue property <code>key</code>.
-   * This method returns <code>null</code> if no value has been stored at all
-   * for the given key, a single element string array if there is exactly one
-   * string and an array of strings of all values in all other cases.
+   * Returns the values for the multiple value property <code>key</code>. This
+   * method returns <code>null</code> if no value has been stored at all for the
+   * given key, a single element string array if there is exactly one string and
+   * an array of strings containing the values in all other cases.
    * 
    * @param key
-   *          the value's name
-   * @return the value collection
+   *          the property name
+   * @return the property values
    */
   String[] getMultiValueProperty(String key);
 
   /**
    * Sets the pagelet's content in the given language. If the content identified
    * by <code>name</code> has already been assigned, then the content element is
-   * being converted into a multiple value content element.
+   * converted into a multiple value content element.
    * 
    * @see ch.o2it.weblounge.core.language.MultilingualObject#setContent(java.lang.String,
    *      java.lang.Object, ch.o2it.weblounge.api.language.Language)
@@ -137,61 +118,62 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
 
   /**
    * Returns <code>true</code> if this content element holds more than one
-   * entry.
+   * entry. This is the case if {@link #setContent(String, String, Language)}
+   * has been called multiple times with the same element name.
    * 
    * @param name
    *          the element name
-   * @return <code>true</code> if this is multidimensional content
+   * @return <code>true</code> if this content element holds more than one value
    */
   boolean isMultiValueContent(String name);
 
   /**
-   * Returns the multivalue content in the specified language. If the language
-   * is forced using the <code>force</code> parameter, then this method will
-   * return <code>null</code> if there is no entry in this language. Otherwise,
-   * the content is returned in the default language.
+   * Returns the content in the specified language. If that language version is
+   * not available, the original version is looked up, unless <code>force</code>
+   * is set to <code>true</code>, which will lead to <code>null</code> being
+   * returned instead.
    * <p>
-   * If this is single value content, then this method returns an array
-   * containing only the single value.
+   * If there is no content with the given name, this method will return
+   * <code>null</code>.
    * 
    * @see #getContent(String, Language, boolean)
    * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language, boolean)
-   * @see ch.o2it.weblounge.common.language.MultilingualObject#getDefaultLanguage()
    */
   String[] getMultiValueContent(String name, Language language, boolean force);
 
   /**
-   * Returns the multivalue content in the specified language. If there is no
-   * entry in this language, the content is returned in the default language.
+   * Returns the content in the specified language. If that language version is
+   * not available, the original version is looked up.
    * <p>
-   * If this is single value content, then this method returns an array
-   * containing only the single value.
+   * If there is no content with the given name, this method will return
+   * <code>null</code>.
    * 
    * @see #getContent(String, Language)
    * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language)
-   * @see ch.o2it.weblounge.common.language.MultilingualObject#getDefaultLanguage()
    */
   String[] getMultiValueContent(String name, Language language);
 
   /**
-   * Returns the multivalue content in the specified language. If there is no
-   * entry in this language, the content is returned in the active language.
+   * Returns the content in the pagelet's current language. If that language
+   * version is not available, the original version is looked up.
    * <p>
-   * If this is single value content, then this method returns an array
-   * containing only the single value.
+   * If there is no content with the given name, this method will return
+   * <code>null</code>.
    * 
    * @see #getContent(String)
+   * @see #switchTo(Language)
    * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String)
-   * @see ch.o2it.weblounge.common.language.MultilingualObject#getActiveLanguage()
    */
   String[] getMultiValueContent(String name);
 
   /**
-   * Returns the content in the required language. If no content can be found in
-   * that language, then it will be looked up in the default language. If that
-   * doesn't produce a result as well, <code>null</code> is returned.
+   * Returns the content in the specified language. If that language version is
+   * not available, the original version is looked up.
+   * <p>
+   * If there is no content with the given name, this method will return
+   * <code>null</code>.
    * 
    * @param name
    *          the content name
@@ -202,10 +184,13 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   String getContent(String name, Language language);
 
   /**
-   * Returns the content in the required language. If no content can be found in
-   * that language, then it will be looked up in the default language (unless
-   * <code>force</code> is set to <code>true</code>). If that doesn't produce a
-   * result as well, <code>null</code> is returned.
+   * Returns the content in the specified language. If that language version is
+   * not available, the original version is looked up, unless <code>force</code>
+   * is set to <code>true</code>, which will lead to <code>null</code> being
+   * returned instead.
+   * <p>
+   * If there is no content with the given name, this method will return
+   * <code>null</code>.
    * 
    * @param name
    *          the content name
@@ -218,20 +203,24 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   String getContent(String name, Language language, boolean force);
 
   /**
-   * Returns the content element with the given identifier or <code>null</code>
-   * if no such content was found.
+   * Returns the content in the pagelet's current language. If that language
+   * version is not available, the original version is looked up.
+   * <p>
+   * If there is no content with the given name, this method will return
+   * <code>null</code>.
    * 
    * @param name
-   *          the content identifier
+   *          the content name
    * @return the content
    */
   String getContent(String name);
-  
+
   /**
    * Sets the pagelet's location, containing the page that it's on, the composer
-   * that it is in and the position within the composer.
+   * that it is in and the position within that composer.
    * 
-   * @param uri the pagelet uri
+   * @param uri
+   *          the pagelet uri
    */
   void setURI(PageletURI uri);
 
@@ -244,8 +233,18 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   PageletURI getURI();
 
   /**
-   * Sets the user that last modified the object in the given language as well as
-   * the modification date.
+   * Sets the user that created the pagelet along with the creation date.
+   * 
+   * @param creator
+   *          the user creating the pagelet
+   * @param creationDate
+   *          the creation date
+   */
+  void setCreated(User creator, Date creationDate);
+
+  /**
+   * Sets the user that last modified the object in the given language as well
+   * as the modification date.
    * 
    * @param user
    *          the user that modified the object

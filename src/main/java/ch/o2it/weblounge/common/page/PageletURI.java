@@ -23,19 +23,10 @@ package ch.o2it.weblounge.common.page;
 import ch.o2it.weblounge.common.site.Site;
 
 /**
- * This interface describes a pagelet's position with respect to its url,
- * composer and position within this composer.
+ * A pagelet uri describes the position of a pagelet with regard to the page
+ * it's on, the composer it's in and the position within that composer.
  */
 public interface PageletURI extends Comparable<PageletURI> {
-
-  /** String identifier for the url */
-  String URL = "url";
-
-  /** String identifier for the composer */
-  String COMPOSER = "composer";
-
-  /** String identifier for the position */
-  String POSITION = "position";
 
   /**
    * Returns the associated site.
