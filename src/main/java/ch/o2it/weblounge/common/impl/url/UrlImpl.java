@@ -78,6 +78,9 @@ public class UrlImpl implements Url {
       throw new IllegalArgumentException("Url path must be absolute");
     this.separatorChar = separator;
     this.path = trim(path);
+    if (!this.path.startsWith(Character.toString(separator)))
+      this.path = separator + this.path;
+
   }
 
   /**
@@ -207,9 +210,7 @@ public class UrlImpl implements Url {
     url = url.trim();
     String separator = Character.toString(separatorChar);
     url = url.replaceAll(separator + separator, separator);
-    if (!url.startsWith(separator))
-      url = separator + url;
-    if (url.endsWith(separator) || (url.length() == 1))
+    if (url.endsWith(separator) || url.equals(separator))
       return url;
     int index = url.lastIndexOf(separator);
     index = url.indexOf(".", index);
