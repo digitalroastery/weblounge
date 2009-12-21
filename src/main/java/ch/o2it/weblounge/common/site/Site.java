@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.Layout;
+import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageManager;
 import ch.o2it.weblounge.common.page.PageURI;
@@ -224,7 +224,7 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * 
    * @return the layouts
    */
-  Layout[] getLayouts();
+  PageLayout[] getLayouts();
 
   /**
    * Returns the layout with the given identifier or <code>null</code> if no
@@ -234,7 +234,7 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    *          layout identifier
    * @return the layout
    */
-  Layout getLayout(String layoutId);
+  PageLayout getLayout(String layoutId);
 
   /**
    * Returns this site's request handlers which keeps track of the defined

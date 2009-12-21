@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.page;
 
 /**
- * This exception is thrown if an invalid <code>RepositoryURI</code> is about to
+ * This exception is thrown if an invalid <code>PageURI</code> is about to
  * be created.
  */
 public class MalformedPageURIException extends RuntimeException {
@@ -32,19 +32,10 @@ public class MalformedPageURIException extends RuntimeException {
   /**
    * Creates an exception stating that <code>path</code> is malformed.
    * 
-   * @param path
+   * @param path the path to the page
    */
   public MalformedPageURIException(String path) {
     super("The page uri path '" + path + "' is invalid!");
-  }
-
-  /**
-   * Creates an exception stating that <code>id</code> is malformed.
-   * 
-   * @param id
-   */
-  public MalformedPageURIException(long id) {
-    super("The page uri identifier " + id + " is invalid!");
   }
 
 }

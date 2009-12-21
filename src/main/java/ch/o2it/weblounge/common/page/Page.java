@@ -33,18 +33,25 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.Date;
 
 /**
- * A <code>Page</code> encapsulates all data that is attached with a site url.
+ * A <code>Page</code> encapsulates all data that is attached to a site url and
+ * that can be edited in terms of composers and pagelets. All the content may
+ * also be supplied in multiple languages.
+ * <p>
+ * During lifetime, the page keeps track of creation, modification and
+ * publishing processes. Note that a page can exist in many versions, with a few
+ * of them being special:
+ * <ul>
+ * <li>{@link LIVE}: the live version of the page</li>
+ * <li>{@link WORK}: the work version of the page</li>
+ * </ul>
  */
 public interface Page extends Localizable, Creatable, Modifiable, Publishable, Securable {
 
   /** Live version of a page */
   long LIVE = 0;
 
-  /** Original version of a page */
-  long ORIGINAL = 1;
-
   /** Work version of a page */
-  long WORK = 2;
+  long WORK = 1;
 
   /** The page's permissions */
   static final Permission[] permissions = new Permission[] {
@@ -79,7 +86,7 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
 
   /**
    * Makes this a promoted page. Specifying a collection of promoted pages
-   * throughout a site will allow you to build a sitemap or a list of points of
+   * throughout a site will allow for building a sitemap or a list of points of
    * entrance.
    * 
    * @param promoted
@@ -113,38 +120,51 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   boolean isIndexed();
 
   /**
-   * Returns <code>true</code> if the page is locked.
+   * Returns <code>true</code> if the page is locked. A page is locked if an
+   * editor is currently editing the page and therefore holding the lock.
    * 
    * @return <code>true</code> if this page is locked
+   * @see #getLockOwner()
    */
   boolean isLocked();
 
   /**
-   * Returns the user holding the editing lock for this page.
+   * Returns the user holding the lock for this page. This method returns
+   * <code>null</code> if the page is not locked.
    * 
-   * @return the user holding the editing lock for this page
+   * @return the user holding the lock for this page
    */
   User getLockOwner();
 
   /**
-   * Locks this page for editing.
+   * Locks this page for editing by <code>user</code>. This method will throw an
+   * <code>IllegalStateException</code> if the page is already locked by a
+   * different user.
    * 
    * @param user
-   *          the locking user
+   *          the user locking the page
+   * @throws IllegalStateException
+   *           if the page is already locked by a different user
    */
-  void setLocked(User user);
+  void setLocked(User user) throws IllegalStateException;
 
   /**
-   * Removes the editing lock from this page.
+   * Removes the editing lock from this page and returns the user if the page
+   * was locked prior to this call, <code>null</code> otherwise.
+   * 
+   * @return the user that had locked the page
    */
-  void setUnlocked();
+  User setUnlocked();
 
   /**
-   * Adds <tt>subject</tt> to the set of subjects if it is not already
+   * Adds <code>subject</code> to the set of subjects if it is not already
    * contained.
+   * <p>
+   * The term <tt>subject</tt> is taken from the Dublin Core specification. In
+   * the web world, subjects are usually referred to as <tt>tags<tt>.
    * 
    * @param subject
-   *          the subject (or tag) to add
+   *          the subject to add
    */
   void addSubject(String subject);
 
@@ -185,8 +205,9 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   String getTitle();
 
   /**
-   * Returns the page title in the specified language or <code>null</code> if
-   * this language version is not available.
+   * Returns the page title in the specified language. If there is no title in
+   * that language, then the original title is looked up and returned. If that
+   * is not available as well, <code>null</code> is returned.
    * 
    * @param language
    *          the language identifier
@@ -198,7 +219,7 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
 
   /**
    * Returns the page title in the specified language. If that title can't be
-   * found, it will be looked up in the default language (unless
+   * found, it will be looked up in the original language (unless
    * <code>force</code> is set to <code>true</code>). If that doesn't produce a
    * result as well, <code>null</code> is returned.
    * 
@@ -223,7 +244,10 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   void setTitle(String title, Language language);
 
   /**
-   * Returns the page description in the current language.
+   * Returns the page description in the current language. If there is no
+   * description in that language, then the original description is looked up
+   * and returned. If that is not available as well, <code>null</code> is
+   * returned.
    * 
    * @return the content
    * @see #switchTo(Language)
@@ -233,8 +257,10 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   String getDescription();
 
   /**
-   * Returns the page description in the specified language or <code>null</code>
-   * if this language version is not available.
+   * Returns the page description in the specified language. If there is no
+   * description in that language, then the original description is looked up
+   * and returned. If that is not available as well, <code>null</code> is
+   * returned.
    * 
    * @param language
    *          the language identifier
@@ -271,7 +297,9 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   void setDescription(String description, Language language);
 
   /**
-   * Returns the page coverage in the current language.
+   * Returns the page coverage in the current language. If there is no coverage
+   * in that language, then the original coverage is looked up and returned. If
+   * that is not available as well, <code>null</code> is returned.
    * 
    * @return the content
    * @see #switchTo(Language)
@@ -281,8 +309,9 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   String getCoverage();
 
   /**
-   * Returns the page coverage in the specified language or <code>null</code> if
-   * this language version is not available.
+   * Returns the page coverage in the specified language. If there is no
+   * coverage in that language, then the original coverage is looked up and
+   * returned. If that is not available as well, <code>null</code> is returned.
    * 
    * @param language
    *          the language identifier
@@ -329,8 +358,9 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   String getRights();
 
   /**
-   * Returns the page rights in the specified language or <code>null</code> if
-   * this language version is not available.
+   * Returns the page rights in the specified language. If there is no title in
+   * that language, then the original page rights are looked up and returned. If
+   * that is not available as well, <code>null</code> is returned.
    * 
    * @param language
    *          the language identifier
