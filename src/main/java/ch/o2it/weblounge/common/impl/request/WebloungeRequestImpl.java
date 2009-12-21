@@ -28,6 +28,7 @@ import ch.o2it.weblounge.common.impl.user.Guest;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -108,9 +109,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    */
   public Language getLanguage() {
     // Has the language been cached?
-    if (language != null) {
+    if (language != null)
       return language;
-    }
 
     if (site == null)
       throw new IllegalStateException("Site has not been set");
@@ -146,7 +146,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     // Still no valid language? Let's go with the site default.
     if (language == null) {
-      language = getSite().getDefaultLanguage();
+      language = site.getDefaultLanguage();
       log_.trace("Selected default site language " + language);
     }
 
@@ -172,9 +172,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getUrl()
    */
   public WebUrl getUrl() {
-    if (url != null) {
+    if (url != null)
       return url;
-    }
 
     if (site == null)
       throw new IllegalStateException("Site has not been set");
@@ -186,7 +185,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     String uri = getRequestURI();
     String urlPath = uri.substring(urlPrefix.length() - 1);
-    String urlFlavor = "html";
+    String urlFlavor = RequestFlavor.html.toString();
     long version = Page.LIVE;
     log_.trace("url prefix=" + urlPrefix + "; request uri=" + uri + "; url=" + urlPath);
 
@@ -209,16 +208,16 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getRequestedUrl()
    */
   public WebUrl getRequestedUrl() {
-    if (requestedUrl != null) {
+    if (requestedUrl != null)
       return requestedUrl;
-    }
 
     if (site == null)
       throw new IllegalStateException("Site has not been set");
 
     // If the requested url has not been stored so far, it will anyway be equal
     // to what getUrl() returns
-    return getUrl();
+    requestedUrl = getUrl();
+    return requestedUrl;
   }
 
   /**
@@ -227,9 +226,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getUser()
    */
   public User getUser() {
-    if (user != null) {
+    if (user != null)
       return user;
-    }
 
     if (site == null)
       throw new IllegalStateException("Site has not been set");
@@ -255,6 +253,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getVersion()
    */
   public long getVersion() {
+    if (url != null)
+      return url.getVersion();
     return getUrl().getVersion();
   }
 
@@ -264,11 +264,13 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getFlavor()
    */
   public String getFlavor() {
+    if (url != null)
+      return url.getFlavor();
     return getUrl().getFlavor();
   }
 
   /**
-   * Tells the request what site it is serving. This call updates the site in
+   * Tells the request which site it is serving. This call updates the site in
    * the user's session, since it's being used by {@link #getUser()} and other
    * methods.
    * 
