@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common;
 
 /**
- * This exception is thrown if any part of the system is malconfigured.
+ * This exception is thrown if any part of the system is improperly configured.
  */
 public class ConfigurationException extends RuntimeException {
 
@@ -46,17 +46,17 @@ public class ConfigurationException extends RuntimeException {
   }
 
   /**
-   * Creates a new <code>ConfigurationException</code>, giving <code>msg</code>
-   * as the reason for this exception and <code>t</code> as the exception that
-   * has originally been risen.
+   * Creates a new <code>ConfigurationException</code>, giving
+   * <code>message</code> as the reason for this exception and <code>t</code> as
+   * the exception that has originally been risen.
    * 
-   * @param msg
+   * @param message
    *          exception description
    * @param t
    *          the original exception
    */
-  public ConfigurationException(String msg, Throwable t) {
-    super(msg, t);
+  public ConfigurationException(String message, Throwable t) {
+    super(message, t);
   }
 
 }

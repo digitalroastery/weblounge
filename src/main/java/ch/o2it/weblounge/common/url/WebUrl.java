@@ -20,54 +20,69 @@
 
 package ch.o2it.weblounge.common.url;
 
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Site;
 
 /**
- * A web url represents a url that is used to address locations within the
- * webapp, such as html pages or module actions.
+ * A web url represents a url that is used to address locations within the web
+ * application such as pages, binary resources or module actions. It not only
+ * contains information about the path but also the version of the page or
+ * resource it is pointing to as well as the flavor.
+ * <p>
+ * Following is a list of supported urls:
+ * <ul>
+ * <li><code>http://www.example.org/</code></li>
+ * <li><code>http://www.example.org/test</code></li>
+ * <li><code>http://www.example.org/test/index.(html|json|xml)</code></li>
+ * <li><code>http://www.example.org/test/index_de.(html|json|xml)</code></li>
+ * <li><code>http://www.example.org/test/127.(html|json|xml)</code></li>
+ * </ul>
  */
 public interface WebUrl extends Url {
 
-  /** Default flavors */
-  public enum Flavor { html, xml, json };
-
   /**
-   * Returns the parent site.
+   * Returns the associated site.
    * 
-   * @return the parent site
+   * @return the site
    */
   Site getSite();
 
   /**
-   * Returns the encoded url to be used when calling the url through the web
-   * application. <br>
-   * What this method does in detail is prepending the mount point of the
-   * web application and the servlet path obtained via <code>Env.getURI()</code>
-   * and <code>getServletPath()</code> to the url.
+   * Returns the encoded url.
    * 
    * @return the encoded url
    */
   String getLink();
 
   /**
-   * Returns the encoded url to be used when calling the url through the web
-   * application. <br>
-   * What this method does in detail is prepending the mount point of the
-   * web application and the servlet path obtained via <code>Env.getURI()</code>
-   * and <code>getServletPath()</code> to the url.
-   * <p>
-   * The parameter version is used to create links to special versions of a
-   * given page. Possible values are:
-   * <ul>
-   * <li>live</li>
-   * <li>work</li>
-   * </ul>
+   * Returns a link to the indicated version of this url.
    * 
    * @param version
    *          the requested version
    * @return the encoded url
+   * @see #getVersion()
    */
-  String getLink(String version);
+  String getLink(long version);
+
+  /**
+   * Returns a link to the indicated flavored version of this url.
+   * 
+   * @param version
+   *          the requested version
+   * @param flavor
+   *          the requested flavor
+   * @return the encoded url
+   */
+  String getLink(long version, String flavor);
+
+  /**
+   * Returns a link to the indicated flavored live version of this url.
+   * 
+   * @param flavor
+   *          the requested flavor
+   * @return the encoded url
+   */
+  String getLink(String flavor);
 
   /**
    * Returns the version of this url. Possible versions are:
@@ -83,6 +98,9 @@ public interface WebUrl extends Url {
   /**
    * Returns the url flavor. For example, in case of "index.xml" the flavor will
    * be <code>XML</code>.
+   * <p>
+   * It is good practice to use the enumeration at
+   * {@link RequestFlavor} when passing around and comparing flavors.
    * 
    * @return the url flavor
    */

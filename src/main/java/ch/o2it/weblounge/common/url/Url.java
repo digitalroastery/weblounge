@@ -23,7 +23,8 @@ package ch.o2it.weblounge.common.url;
 import java.io.Serializable;
 
 /**
- * The <code>Url</code> defines common methods for all urls.
+ * A <code>Url</code> is what defines a path to a page, a binary resource or
+ * an action in the system.
  */
 public interface Url extends Serializable {
 
@@ -35,21 +36,29 @@ public interface Url extends Serializable {
   char getPathSeparator();
 
   /**
-   * Returns the webapp-relativ path for this url, e. g.
-   * <code>/news/articles/</code>.
+   * Returns the path for this url.
    * 
    * @return the url path
    */
   String getPath();
 
   /**
-   * Returns <code>true</code> if the url contains the given path.
+   * Returns <code>true</code> if the url starts with the given path.
    * 
    * @param path
    *          the path
-   * @return <code>true</code> if the path is contained in this url
+   * @return <code>true</code> if the url starts with <code>path</code>
    */
-  boolean contains(String path);
+  boolean startsWith(String path);
+
+  /**
+   * Returns <code>true</code> if the url ends with the given path.
+   * 
+   * @param path
+   *          the path
+   * @return <code>true</code> if the url ends with <code>path</code>
+   */
+  boolean endsWith(String path);
 
   /**
    * Returns <code>true</code> if this url is a prefix of <code>url</code> by

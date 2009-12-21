@@ -18,11 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.user;
+package ch.o2it.weblounge.common.request;
 
 /**
- * Marker interface for guest users.
+ * Common flavor definitions for requests.
  */
-public interface Guest extends AuthenticatedUser {
+public enum RequestFlavor {
 
+  html, xml, json;
+  
 }

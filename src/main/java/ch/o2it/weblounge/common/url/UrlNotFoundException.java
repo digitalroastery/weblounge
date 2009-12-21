@@ -29,18 +29,17 @@ public class UrlNotFoundException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   /** The url */
-  private String url_;
+  private String url = null;
 
   /**
-   * Constructor for UrlNotFoundException which takes the requested url as an
-   * argument.
+   * Creates an exception for the given url.
    * 
    * @param url
    *          the url that had been looked up
    */
   public UrlNotFoundException(String url) {
     super("Url " + url + " was not found!");
-    url_ = url;
+    this.url = url;
   }
 
   /**
@@ -49,7 +48,7 @@ public class UrlNotFoundException extends RuntimeException {
    * @return the url
    */
   public String getUrl() {
-    return url_;
+    return url;
   }
 
 }

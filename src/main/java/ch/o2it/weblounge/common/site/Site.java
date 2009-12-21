@@ -32,7 +32,6 @@ import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
-import ch.o2it.weblounge.common.user.SiteAdmin;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
@@ -360,7 +359,7 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * 
    * @return the site administrator user
    */
-  SiteAdmin getAdministrator();
+  WebloungeUser getAdministrator();
 
   /**
    * Returns a reference to the site's work directory. This is usually located
