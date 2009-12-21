@@ -157,7 +157,11 @@ public class PageletURIImpl implements PageletURI {
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the page uri along with the pagelet position on that page as in the
+   * following example:
+   * <pre>
+   *  /test/a/b [composer=main,position=7]
+   * </pre>
    * 
    * @see java.lang.Object#toString()
    */

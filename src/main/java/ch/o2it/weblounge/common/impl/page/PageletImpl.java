@@ -34,7 +34,6 @@ import ch.o2it.weblounge.common.page.PageletURI;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
-import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
 import ch.o2it.weblounge.common.user.User;
 
@@ -108,16 +107,11 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   LocalizableContent<Map<String, String[]>> content = null;
 
   /**
-   * Creates an empty pagelet. This constructor is for use with a
+   * Creates an empty pagelet. This constructor is for use by the
    * {@link PageletReader} only.
    */
   PageletImpl() {
-    properties = new HashMap<String, String[]>();
-    creationCtx = new CreationContext();
-    publishingCtx = new PublishingContext();
-    modificationCtx = new LocalizedModificationContext();
-    securityCtx = new PageletSecurityContext();
-    content = new LocalizableContent<Map<String, String[]>>(this);
+    this(null, null);
   }
 
   /**
@@ -129,9 +123,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *          the pagelet identifier
    */
   public PageletImpl(String module, String id) {
-    this();
     moduleId = module;
     pageletId = id;
+    setLanguageResolution(LanguageResolution.Original);
+    properties = new HashMap<String, String[]>();
+    creationCtx = new CreationContext();
+    publishingCtx = new PublishingContext();
+    modificationCtx = new LocalizedModificationContext();
+    securityCtx = new PageletSecurityContext();
+    content = new LocalizableContent<Map<String, String[]>>(this);
   }
 
   /**
@@ -150,34 +150,27 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns the defining module identifier.
-   * 
-   * @return the module identifier
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getModule()
    */
   public String getModule() {
     return moduleId;
   }
 
   /**
-   * Returns the pagelet identifier.
-   * 
-   * @return the identifier
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getIdentifier()
    */
   public String getIdentifier() {
     return pageletId;
   }
 
   /**
-   * Returns the property with name <code>key</code> or the empty string if no
-   * such property is found. If there is more than one value for the given key,
-   * e. g. if this is a multiple value property, then this method returns the
-   * first value of the value collection.
-   * <p>
-   * If no value is found at all, then the empty string is returned.
-   * 
-   * @param key
-   *          the property name
-   * @return the property value
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getProperty(java.lang.String)
    */
   public String getProperty(String key) {
     String[] values = properties.get(key);
@@ -187,11 +180,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns <code>true</code> if this is a multiple value property.
-   * 
-   * @param key
-   *          the key
-   * @return <code>true</code> if this key holds more than one value
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#isMultiValueProperty(java.lang.String)
    */
   public boolean isMultiValueProperty(String key) {
     String[] values = properties.get(key);
@@ -199,15 +190,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns the array of values for the multiple value property
-   * <code>key</code>. This method returns <code>null</code> if no value has
-   * been stored at all for the given key, a single element string array if
-   * there is exactly one string and an array of strings of all values in all
-   * other cases.
-   * 
-   * @param key
-   *          the value's name
-   * @return the value collection
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getMultiValueProperty(java.lang.String)
    */
   public String[] getMultiValueProperty(String key) {
     String[] values = properties.get(key);
@@ -217,13 +202,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Adds a property to this pagelet. Properties are not language dependent, so
-   * there is no need to pass the language.
-   * 
-   * @param key
-   *          the property name
-   * @param value
-   *          the property value
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#setProperty(java.lang.String, java.lang.String)
    */
   public void setProperty(String key, String value) {
     String[] existing = properties.remove(key);
@@ -237,40 +218,27 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Sets the pagelet's owner.
-   * 
-   * @param owner
-   *          the owner of this pagelet
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
    */
   public void setOwner(User owner) {
     securityCtx.setOwner(owner);
   }
 
   /**
-   * Returns this pagelet's owner.
-   * 
-   * @return the owner
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#getOwner()
    */
   public User getOwner() {
     return securityCtx.getOwner();
   }
 
   /**
-   * Returns the security context that is associated with this pagelet. The
-   * context tells whether the pagelet may be accessed in a certain way by a
-   * user or not.
-   * 
-   * @return the pagelet's security context
-   */
-  public SecurityContext getSecurityContext() {
-    return securityCtx;
-  }
-
-  /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.security.Securable#allow(ch.o2it.weblounge.common.security.Permission,
-   *      ch.o2it.weblounge.common.security.Authority)
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#allow(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)
    */
   public void allow(Permission permission, Authority authority) {
     securityCtx.allow(permission, authority);
@@ -278,104 +246,71 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.security.Securable#deny(ch.o2it.weblounge.common.security.Permission,
-   *      ch.o2it.weblounge.common.security.Authority)
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#deny(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)
    */
   public void deny(Permission permission, Authority authority) {
     securityCtx.deny(permission, authority);
   }
 
   /**
-   * Returns <code>true</code> if the user <code>u</code> is allowed to do
-   * actions that require permission <code>p</code> on this pagelet.
-   * 
-   * @param p
-   *          the required permission
-   * @param a
-   *          the authorization used to access to this pagelet
-   * @return <code>true</code> if the user has the required permission
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)
    */
   public boolean check(Permission p, Authority a) {
     return securityCtx.check(p, a);
   }
 
   /**
-   * Returns <code>true</code> if the user <code>u</code> is allowed to act on
-   * the secured object in a way that satisfies the given permissionset
-   * <code>p</code>.
-   * 
-   * @param p
-   *          the required set of permissions
-   * @param a
-   *          the authorization used to access to this pagelet
-   * @return <code>true</code> if the user owns the required permissions
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)
    */
   public boolean check(PermissionSet p, Authority a) {
     return securityCtx.check(p, a);
   }
 
   /**
-   * Checks whether at least one of the given authorities pass with respect to
-   * the given permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the objects claiming the permission
-   * @return <code>true</code> if all authorities pass
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])
    */
   public boolean checkOne(Permission permission, Authority[] authorities) {
     return securityCtx.checkOne(permission, authorities);
   }
 
   /**
-   * Checks whether all of the given authorities pass with respect to the given
-   * permission.
-   * 
-   * @param permission
-   *          the permission to obtain
-   * @param authorities
-   *          the object claiming the permission
-   * @return <code>true</code> if all authorities pass
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])
    */
   public boolean checkAll(Permission permission, Authority[] authorities) {
     return securityCtx.checkAll(permission, authorities);
   }
 
   /**
-   * Returns the pagelets permissions, which are
-   * <ul>
-   * <li>READ</li>
-   * <li>WRITE</li>
-   * <li>TRANSLATE</li>
-   * <li>MANAGE</li>
-   * </ul>
-   * 
-   * @return the permissions that can be set on the pagelet
-   * @see ch.o2it.weblounge.api.security.Secured#permissions()
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#permissions()
    */
   public Permission[] permissions() {
     return permissions;
   }
 
   /**
-   * Adds the security listener to the pagelets security context.
-   * 
-   * @param listener
-   *          the security listener
-   * @see ch.o2it.weblounge.api.security.Secured#addSecurityListener(ch.o2it.weblounge.api.security.SecurityListener)
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#addSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)
    */
   public void addSecurityListener(SecurityListener listener) {
     securityCtx.addSecurityListener(listener);
   }
 
   /**
-   * Removes the security listener from the pagelets security context.
-   * 
-   * @param listener
-   *          the security listener
-   * @see ch.o2it.weblounge.api.security.Secured#removeSecurityListener(ch.o2it.weblounge.api.security.SecurityListener)
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Securable#removeSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)
    */
   public void removeSecurityListener(SecurityListener listener) {
     securityCtx.removeSecurityListener(listener);
@@ -383,6 +318,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   *
    * @see ch.o2it.weblounge.common.page.Pagelet#setURI(ch.o2it.weblounge.common.page.PageletURI)
    */
   public void setURI(PageletURI uri) {
@@ -390,10 +326,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns the pagelet location, containing information about url, composer
-   * and composer position.
-   * 
-   * @return the pagelet location
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getURI()
    */
   public PageletURI getURI() {
     return uri;
@@ -401,9 +336,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreated(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date)
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#setCreated(ch.o2it.weblounge.common.user.User, java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
     creationCtx.setCreated(creator, creationDate);
@@ -411,8 +345,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
+   *
+   * @see ch.o2it.weblounge.common.content.Creatable#getCreationDate()
    */
   public Date getCreationDate() {
     return creationCtx.getCreationDate();
@@ -420,8 +354,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getCreator()
+   *
+   * @see ch.o2it.weblounge.common.content.Creatable#getCreator()
    */
   public User getCreator() {
     return creationCtx.getCreator();
@@ -429,16 +363,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
-   */
-  public boolean isCreatedAfter(Date date) {
-    return creationCtx.isCreatedAfter(date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
    */
   public Date getPublishFrom() {
@@ -447,7 +372,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
    */
   public Date getPublishTo() {
@@ -456,7 +381,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
    */
   public User getPublisher() {
@@ -465,18 +390,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
-   */
-  public boolean isPublished() {
-    return publishingCtx.isPublished();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#setPublished(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date, java.util.Date)
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#setPublished(ch.o2it.weblounge.common.user.User, java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
     publishingCtx.setPublished(publisher, from, to);
@@ -484,44 +399,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
-   */
-  public boolean isPublished(Date date) {
-    return publishingCtx.isPublished(date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#setPublishFrom(java.util.Date)
-   */
-  public void setPublishFrom(Date from) {
-    publishingCtx.setPublishFrom(from);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#setPublishTo(java.util.Date)
-   */
-  public void setPublishTo(Date to) {
-    publishingCtx.setPublishTo(to);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#setPublisher(ch.o2it.weblounge.common.user.User)
-   */
-  public void setPublisher(User user) {
-    publishingCtx.setPublisher(user);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
+   *
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate()
    */
   public Date getModificationDate() {
     return modificationCtx.getModificationDate();
@@ -529,8 +408,8 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
+   *
+   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier()
    */
   public User getModifier() {
     return modificationCtx.getModifier();
@@ -538,7 +417,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
   public Date getLastModificationDate() {
@@ -547,7 +426,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModifier()
    */
   public User getLastModifier() {
@@ -556,7 +435,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
    */
   public Date getModificationDate(Language language) {
@@ -565,7 +444,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier(ch.o2it.weblounge.common.language.Language)
    */
   public User getModifier(Language language) {
@@ -574,28 +453,174 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#setModified(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date, ch.o2it.weblounge.common.language.Language)
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
     modificationCtx.setModified(user, date, language);
   }
 
   /**
-   * Returns a string representation of this pagelet, consisting of the module
-   * identifier and the pagelet id.
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#isMultiValueContent(java.lang.String)
+   */
+  public boolean isMultiValueContent(String name) {
+    Map<String, String[]> languageContent = content.get();
+    if (languageContent == null)
+      return false;
+    String[] values = languageContent.get(name);
+    return values != null && values.length > 1;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String, ch.o2it.weblounge.common.language.Language, boolean)
+   */
+  public String getContent(String name, Language language, boolean force) {
+    Map<String, String[]> languageContent = content.get(language, force);
+    if (languageContent == null)
+      return null;
+    String[] values = languageContent.get(name);
+    return (values != null && values.length > 0) ? values[0] : null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String, ch.o2it.weblounge.common.language.Language)
+   */
+  public String getContent(String name, Language language) {
+    return getContent(name, language, false);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String)
+   */
+  public String getContent(String name) {
+    return getContent(name, getLanguage(), false);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getMultiValueContent(java.lang.String, ch.o2it.weblounge.common.language.Language, boolean)
+   */
+  public String[] getMultiValueContent(String name, Language language,
+      boolean force) {
+    Map<String, String[]> languageContent = content.get(language, force);
+    if (languageContent == null)
+      return new String[] {};
+    else if (languageContent.get(name) == null)
+      return new String[] {};
+    return languageContent.get(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getMultiValueContent(java.lang.String, ch.o2it.weblounge.common.language.Language)
+   */
+  public String[] getMultiValueContent(String name, Language language) {
+    return getMultiValueContent(name, language, false);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#getMultiValueContent(java.lang.String)
+   */
+  public String[] getMultiValueContent(String name) {
+    return getMultiValueContent(name, getLanguage(), false);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#setContent(java.lang.String, java.lang.String, ch.o2it.weblounge.common.language.Language)
+   */
+  public void setContent(String name, String value, Language language) {
+    Map<String, String[]> languageContent = content.get(language, true);
+    if (languageContent == null) {
+      languageContent = new HashMap<String, String[]>();
+      content.put(languageContent, language);
+      enableLanguage(language);
+    }
+    List<String> values = new ArrayList<String>();
+    String[] existing = languageContent.remove(name);
+    if (existing != null) {
+      for (String e : existing)
+        values.add(e);
+    }
+    values.add(value);
+    languageContent.put(name, values.toArray(new String[values.size()]));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#hashCode()
+   */
+  public int hashCode() {
+    if (uri != null)
+      return uri.hashCode();
+    else
+      return moduleId.hashCode() | (pageletId.hashCode() >> 16);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(Object o) {
+    if (o instanceof Pagelet) {
+      Pagelet p = (Pagelet) o;
+      if (p.getModule().equals(moduleId) && p.getIdentifier().equals(pageletId)) {
+        if (p.getURI() != null)
+          return p.getURI().equals(uri);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation does nothing, since it doesn't make sense to compare
+   * the pagelet due with respect to its language. If <code>o</code> is a
+   * pagelet as well, then the {@link PageletURI} is used for the comparison.
    * 
-   * @return the pagelet string representation
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
+   *      ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.page.PageletURI#compareTo(PageletURI)
+   */
+  public int compareTo(Localizable o, Language l) {
+    if (uri != null && o instanceof Pagelet) {
+      Pagelet p = (Pagelet) o;
+      if (p.getURI() != null)
+        return uri.compareTo(p.getURI());
+    }
+    return 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#toString()
    */
   public String toString() {
     return moduleId + "/" + pageletId;
   }
 
   /**
-   * Returns an XML representation of this pagelet.
-   * 
-   * @return an XML representation of this pagelet
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.page.Pagelet#toXml()
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();
@@ -687,211 +712,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   }
 
   /**
-   * Returns <code>true</code> if this content element holds more than one
-   * entry.
-   * 
-   * @param name
-   *          the element name
-   * @return <code>true</code> if this is multidimensional content
-   */
-  public boolean isMultiValueContent(String name) {
-    Map<String, String[]> languageContent = content.get();
-    if (languageContent == null)
-      return false;
-    String[] values = languageContent.get(name);
-    return values != null && values.length > 1;
-  }
-
-  /**
-   * Returns the content in the specified language. If the language is forced
-   * using the <code>force</code> parameter, then this method will return
-   * <code>null</code> if there is no entry in this language. Otherwise, the
-   * content is returned in the default language.
-   * <p>
-   * If this is multiple value content, then this method returns the first entry
-   * only. Use {@link #getMultiValueContent(String, Language, boolean)} to get
-   * all values.
-   * 
-   * @see ch.o2it.weblounge.api.content.Pagelet#getContent(java.lang.String,
-   *      ch.o2it.weblounge.api.language.Language, boolean)
-   * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
-   */
-  public String getContent(String name, Language language, boolean force) {
-    Map<String, String[]> languageContent = content.get(language, force);
-    if (languageContent == null)
-      return null;
-    String[] values = languageContent.get(name);
-    return (values != null && values.length > 0) ? values[0] : null;
-  }
-
-  /**
-   * Returns the content in the specified language. This method will return the
-   * content in the default language if there is no entry in the specified
-   * language.
-   * <p>
-   * If this is multiple value content, then this method returns the first entry
-   * only. Use {@link #getMultiValueContent(String, Language)} to get all
-   * values.
-   * 
-   * @see ch.o2it.weblounge.api.content.Pagelet#getContent(java.lang.String,
-   *      ch.o2it.weblounge.api.language.Language, boolean)
-   * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
-   */
-  public String getContent(String name, Language language) {
-    return getContent(name, language, false);
-  }
-
-  /**
-   * Returns the content in the specified language. This method will return the
-   * content in the currently active language if there is no entry in the
-   * specified language.
-   * <p>
-   * If this is multiple value content, then this method returns the first entry
-   * only. Use {@link #getMultiValueContent(String)} to get all values.
-   * 
-   * @see ch.o2it.weblounge.api.content.Pagelet#getContent(java.lang.String,
-   *      ch.o2it.weblounge.api.language.Language, boolean)
-   * @see ch.o2it.weblounge.core.language.MultilingualObject#getActiveLanguage()
-   */
-  public String getContent(String name) {
-    return getContent(name, getLanguage(), false);
-  }
-
-  /**
-   * Returns the multiple value content in the specified language. If the
-   * language is forced using the <code>force</code> parameter, then this method
-   * will return <code>null</code> if there is no entry in this language.
-   * Otherwise, the content is returned in the default language.
-   * <p>
-   * If this is single value content, then this method returns an array
-   * containing only the single value.
-   * 
-   * @see #getContent(String, Language, boolean)
-   * @see ch.o2it.weblounge.api.content.Pagelet#getContent(java.lang.String,
-   *      ch.o2it.weblounge.api.language.Language, boolean)
-   * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
-   */
-  public String[] getMultiValueContent(String name, Language language,
-      boolean force) {
-    Map<String, String[]> languageContent = content.get(language, force);
-    if (languageContent == null)
-      return new String[] {};
-    else if (languageContent.get(name) == null)
-      return new String[] {};
-    return languageContent.get(name);
-  }
-
-  /**
-   * Returns the multiple value content in the specified language. If there is
-   * no entry in this language, the content is returned in the default language.
-   * <p>
-   * If this is single value content, then this method returns an array
-   * containing only the single value.
-   * 
-   * @see #getContent(String, Language)
-   * @see ch.o2it.weblounge.api.content.Pagelet#getContent(java.lang.String,
-   *      ch.o2it.weblounge.api.language.Language)
-   * @see ch.o2it.weblounge.core.language.MultilingualObject#getDefaultLanguage()
-   */
-  public String[] getMultiValueContent(String name, Language language) {
-    return getMultiValueContent(name, language, false);
-  }
-
-  /**
-   * Returns the multiple value content in the specified language. If there is
-   * no entry in this language, the content is returned in the active language.
-   * <p>
-   * If this is single value content, then this method returns an array
-   * containing only the single value.
-   * 
-   * @see #getContent(String)
-   * @see ch.o2it.weblounge.api.content.Pagelet#getContent(java.lang.String)
-   * @see ch.o2it.weblounge.core.language.MultilingualObject#getActiveLanguage()
-   */
-  public String[] getMultiValueContent(String name) {
-    return getMultiValueContent(name, getLanguage(), false);
-  }
-
-  /**
-   * Sets the pagelet's content in the given language. If the content identified
-   * by <code>name</code> has already been assigned, then the content element is
-   * being converted into a multiple value content element.
-   * 
-   * @see ch.o2it.weblounge.core.language.MultilingualObject#setContent(java.lang.String,
-   *      java.lang.Object, ch.o2it.weblounge.api.language.Language)
-   * @see #isMultiValueContent(String)
-   */
-  public void setContent(String name, String value, Language language) {
-    Map<String, String[]> languageContent = content.get(language, true);
-    if (languageContent == null) {
-      languageContent = new HashMap<String, String[]>();
-      content.put(languageContent, language);
-      enableLanguage(language);
-    }
-    List<String> values = new ArrayList<String>();
-    String[] existing = languageContent.remove(name);
-    if (existing != null) {
-      for (String e : existing)
-        values.add(e);
-    }
-    values.add(value);
-    languageContent.put(name, values.toArray(new String[values.size()]));
-  }
-
-  /**
-   * Returns the pagelet's hash code.
-   * 
-   * @see java.lang.Object#hashCode()
-   */
-  public int hashCode() {
-    if (uri != null)
-      return uri.hashCode();
-    else
-      return moduleId.hashCode() | (pageletId.hashCode() >> 16);
-  }
-
-  /**
-   * Returns <code>true</code> if <code>o</code> represent the same pagelet.
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  public boolean equals(Object o) {
-    if (o instanceof Pagelet) {
-      Pagelet p = (Pagelet) o;
-      if (p.getModule().equals(moduleId) && p.getIdentifier().equals(pageletId)) {
-        if (p.getURI() != null)
-          return p.getURI().equals(uri);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   * <p>
-   * This implementation does nothing, since it doesn't make sense to compare
-   * the pagelet due with respect to its language. If <code>o</code> is a
-   * pagelet as well, then the {@link PageletURI} is used for the
-   * comparison.
-   * 
-   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
-   *      ch.o2it.weblounge.common.language.Language)
-   * @see ch.o2it.weblounge.common.page.PageletURI#compareTo(PageletURI)
-   */
-  public int compareTo(Localizable o, Language l) {
-    if (uri != null && o instanceof Pagelet) {
-      Pagelet p = (Pagelet) o;
-      if (p.getURI() != null)
-        return uri.compareTo(p.getURI());
-    }
-    return 0;
-  }
-
-  /**
    * Utility class used to compare content and property map entries.
    */
-  static class MapEntryComparator implements Comparator<Map.Entry<String, String[]>>, Serializable {
+  private static class MapEntryComparator implements Comparator<Map.Entry<String, String[]>>, Serializable {
 
     /** Serial version uid */
     private static final long serialVersionUID = 853284601216740051L;

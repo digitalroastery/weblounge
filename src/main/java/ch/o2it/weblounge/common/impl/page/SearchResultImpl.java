@@ -28,9 +28,7 @@ import ch.o2it.weblounge.common.page.SearchResult;
 import ch.o2it.weblounge.common.renderer.Renderer;
 
 /**
- * Search result implementation.
- * 
- * TODO: Add language sensitivity
+ * Default implementation of a {@link SearchResult}.
  */
 public class SearchResultImpl extends LocalizableObject implements SearchResult {
 
@@ -42,9 +40,6 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
 
   /** The hit location */
   protected PageURI uri = null;
-
-  /** The content type */
-  protected String contentType = "text/html";
 
   /** The renderer used to show the preview */
   protected Renderer previewRenderer = null;
@@ -81,17 +76,6 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
    */
   public String getTitle() {
     return title;
-  }
-
-  /**
-   * Returns the search result's content type. By default, this will be
-   * <code>text/html</code>.
-   * 
-   * @see ch.o2it.weblounge.api.content.SearchResult#getContentType()
-   * @return the content type
-   */
-  public String getContentType() {
-    return contentType;
   }
 
   /**
@@ -142,6 +126,18 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#switchTo(ch.o2it.weblounge.common.language.Language, boolean)
+   */
+  @Override
+  public Language switchTo(Language language, boolean force) {
+    if (previewRenderer != null)
+      previewRenderer.switchTo(language);
+    return super.switchTo(language, force);
+  }
+  
+  /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(SearchResult sr) {
@@ -155,11 +151,13 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
+   *      ch.o2it.weblounge.common.language.Language)
    */
   public int compareTo(Localizable o, Language l) {
     if (o instanceof SearchResult) {
-      SearchResult r = (SearchResult)o;
+      SearchResult r = (SearchResult) o;
       if (relevance > r.getRelevance())
         return 1;
       else if (relevance < r.getRelevance())
@@ -171,15 +169,16 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
     }
     return 0;
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof SearchResult) {
-      SearchResult r = (SearchResult)obj;
+      SearchResult r = (SearchResult) obj;
       return uri.equals(r.getURI()) && relevance == r.getRelevance();
     }
     return super.equals(obj);
@@ -187,11 +186,12 @@ public class SearchResultImpl extends LocalizableObject implements SearchResult 
 
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
     return Float.floatToIntBits(relevance);
   }
-  
+
 }

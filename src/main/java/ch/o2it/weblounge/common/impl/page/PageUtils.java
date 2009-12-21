@@ -59,7 +59,6 @@ public class PageUtils {
    * <ul>
    * <li>{@link Page#LIVE}</li>
    * <li>{@link Page#WORK}</li>
-   * <li>{@link Page#ORIGINAL}</li>
    * 
    * @param version
    *          the version identifier
@@ -80,7 +79,6 @@ public class PageUtils {
    * <ul>
    * <li>{@link Page#LIVE}</li>
    * <li>{@link Page#WORK}</li>
-   * <li>{@link Page#ORIGINAL}</li>
    * 
    * @param version
    *          the version identifier

@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.impl.page;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.PageManager;
 import ch.o2it.weblounge.common.page.PageletURI;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
@@ -81,8 +80,7 @@ public final class PageReader extends WebloungeContentReader {
   }
 
   /**
-   * This method is called, when a <code>Page</code> object is instantiated by
-   * the {@link PageManager}.
+   * This method is called, when a <code>Page</code> object is instantiated.
    * 
    * @param is
    *          the xml input stream

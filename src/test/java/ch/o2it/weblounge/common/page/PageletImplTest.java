@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.page;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -182,9 +181,7 @@ public class PageletImplTest {
     pagelet.setCreated(hans, creationDate);
     pagelet.setModified(hans, germanModificationDate, german);
     pagelet.setModified(amelie, frenchModificationDate, french);
-    pagelet.setPublisher(hans);
-    pagelet.setPublishFrom(publishingStartDate);
-    pagelet.setPublishTo(publishingEndDate);
+    pagelet.setPublished(hans, publishingStartDate, publishingEndDate);
   }
 
   /**
@@ -267,14 +264,6 @@ public class PageletImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#isCreatedAfter(java.util.Date)}.
-   */
-  @Test
-  public void testIsCreatedAfter() {
-    assertFalse(pagelet.isCreatedAfter(futureDate));
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getPublishFrom()}.
    */
   @Test
@@ -296,36 +285,6 @@ public class PageletImplTest {
   @Test
   public void testGetPublisher() {
     assertEquals(hans, pagelet.getPublisher());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#isPublished()}.
-   */
-  @Test
-  public void testIsPublished() {
-    pagelet.setPublishTo(new Date(new Date().getTime() + Times.MS_PER_DAY));
-    pagelet.setPublishFrom(new Date(new Date().getTime() - Times.MS_PER_DAY));
-    assertTrue(pagelet.isPublished());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#isPublished(java.util.Date)}.
-   */
-  @Test
-  public void testIsPublishedDate() {
-    Date d = new Date(publishingStartDate.getTime() + Times.MS_PER_DAY);
-    assertTrue(pagelet.isPublished(d));
-    assertFalse(pagelet.isPublished(futureDate));
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getSecurityContext()}
-   * .
-   */
-  @Test
-  public void testGetSecurityContext() {
-    assertNotNull(pagelet.getSecurityContext());
   }
 
   /**
@@ -401,7 +360,7 @@ public class PageletImplTest {
       }
     });
     pagelet.setOwner(john);
-    pagelet.getSecurityContext().allow(SystemPermission.READ, SystemRole.EDITOR);
+    pagelet.allow(SystemPermission.READ, SystemRole.EDITOR);
     assertEquals(2, result.size());
   }
 
@@ -425,7 +384,7 @@ public class PageletImplTest {
     pagelet.addSecurityListener(listener);
     pagelet.removeSecurityListener(listener);
     pagelet.setOwner(john);
-    pagelet.getSecurityContext().allow(SystemPermission.READ, SystemRole.EDITOR);
+    pagelet.allow(SystemPermission.READ, SystemRole.EDITOR);
     assertEquals(0, result.size());
   }
 

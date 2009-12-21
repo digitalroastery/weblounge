@@ -97,7 +97,7 @@ public final class PageletReader extends WebloungeContentReader {
   /**
    * The location of the pagelet within the page. Note that when using this
    * reader as a helper for the {@link PageReader}, you need to set the location
-   * prior to passing on the first SAX event, otherwise it won't be taken into
+   * prior to passing the first SAX event, otherwise it won't be taken into
    * account.
    * 
    * @param location
@@ -108,17 +108,9 @@ public final class PageletReader extends WebloungeContentReader {
   }
 
   /**
-   * The parser found the start of an element. Information about this element as
-   * well as the attached attributes are passed to this method.
-   * 
-   * @param uri
-   *          information about the name space
-   * @param local
-   *          the local name of the element
-   * @param raw
-   *          the raw name of the element
-   * @param attrs
-   *          the element's attributes
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
    */
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
@@ -158,8 +150,9 @@ public final class PageletReader extends WebloungeContentReader {
   }
 
   /**
-   * @see org.xml.sax.ContentHandler#endElement(java.lang.String,
-   *      java.lang.String, java.lang.String)
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#endElement(java.lang.String, java.lang.String, java.lang.String)
    */
   public void endElement(String uri, String local, String raw)
       throws SAXException {
