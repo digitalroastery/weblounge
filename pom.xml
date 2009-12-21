@@ -10,6 +10,13 @@
     <artifactId>weblounge-base</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
+  <dependencies>
+  	<dependency>
+  		<groupId>ch.o2it.weblounge</groupId>
+  		<artifactId>weblounge-common-api</artifactId>
+  		<version>3.0-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
