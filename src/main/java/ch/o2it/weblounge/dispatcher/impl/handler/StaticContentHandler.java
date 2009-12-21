@@ -26,10 +26,10 @@ import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.util.Env;
-import ch.o2it.weblounge.common.request.RequestHandler;
-import ch.o2it.weblounge.common.request.RequestHandlerConfiguration;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
+import ch.o2it.weblounge.dispatcher.RequestHandlerConfiguration;
 import ch.o2it.weblounge.dispatcher.impl.WebloungeDispatcher;
 
 import org.apache.jasper.JasperException;
@@ -133,7 +133,7 @@ public class StaticContentHandler implements RequestHandler, Times {
 	}
 	
 	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandler#service(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse)
+	 * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#service(ch.o2it.weblounge.api.request.WebloungeRequest, ch.o2it.weblounge.api.request.WebloungeResponse)
 	 */
 	public boolean service(WebloungeRequest request, WebloungeResponse response) {
 		String pathInfo = request.getPathInfo();
@@ -165,28 +165,28 @@ public class StaticContentHandler implements RequestHandler, Times {
 	}
 
 	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandler#configure(ch.o2it.weblounge.api.request.RequestHandlerConfiguration)
+	 * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#configure(ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration)
 	 */
 	public void configure(RequestHandlerConfiguration config)
 		throws ConfigurationException {
 	}
 
 	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandler#getIdentifier()
+	 * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getIdentifier()
 	 */
 	public String getIdentifier() {
 		return "static";
 	}
 
 	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandler#getName()
+	 * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
 	 */
 	public String getName() {
 		return "static content handler";
 	}
 
 	/**
-	 * @see ch.o2it.weblounge.api.request.RequestHandler#getDescription()
+	 * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getDescription()
 	 */
 	public String getDescription() {
 		return "handles all content that isn't handled by any other handler";

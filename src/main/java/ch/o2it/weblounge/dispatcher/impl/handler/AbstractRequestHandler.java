@@ -24,9 +24,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.request.RequestHandler;
-import ch.o2it.weblounge.common.request.RequestHandlerConfiguration;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
+import ch.o2it.weblounge.dispatcher.RequestHandlerConfiguration;
 
 /**
  * This is an abstract base implementation for request handlers.
@@ -37,7 +37,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	protected RequestHandlerConfiguration config;
 	
 	/**
-	 * @see ch.o2it.weblounge.common.request.RequestHandler#configure(ch.o2it.weblounge.common.request.RequestHandlerConfiguration)
+	 * @see ch.o2it.weblounge.dispatcher.RequestHandler#configure(ch.o2it.weblounge.dispatcher.RequestHandlerConfiguration)
 	 */
 	public final void configure(RequestHandlerConfiguration config)
 		throws ConfigurationException {
@@ -47,7 +47,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	
 	
 	/**
-	 * @see ch.o2it.weblounge.common.request.RequestHandler#getIdentifier()
+	 * @see ch.o2it.weblounge.dispatcher.RequestHandler#getIdentifier()
 	 */
 	public String getIdentifier() {
 		return config.getIdentifier();
@@ -55,7 +55,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	
 	
 	/**
-	 * @see ch.o2it.weblounge.common.request.RequestHandler#getName()
+	 * @see ch.o2it.weblounge.dispatcher.RequestHandler#getName()
 	 */
 	public String getName() {
 		return config.getName();
@@ -63,7 +63,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
 	
 	
 	/**
-	 * @see ch.o2it.weblounge.common.request.RequestHandler#getDescription()
+	 * @see ch.o2it.weblounge.dispatcher.RequestHandler#getDescription()
 	 */
 	public String getDescription() {
 		return config.getDescription();

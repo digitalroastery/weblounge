@@ -22,13 +22,13 @@ package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
-import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteNotFoundException;
 import ch.o2it.weblounge.dispatcher.DispatchListener;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.handler.StaticContentHandler;
 
 import org.apache.jasper.JasperException;

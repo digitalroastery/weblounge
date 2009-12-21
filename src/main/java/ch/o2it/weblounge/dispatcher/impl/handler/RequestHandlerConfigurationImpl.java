@@ -23,7 +23,7 @@ package ch.o2it.weblounge.dispatcher.impl.handler;
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.util.config.Options;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.request.RequestHandlerConfiguration;
+import ch.o2it.weblounge.dispatcher.RequestHandlerConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,42 +153,42 @@ public class RequestHandlerConfigurationImpl implements RequestHandlerConfigurat
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getIdentifier()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#getIdentifier()
    */
   public String getIdentifier() {
     return identifier;
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getName()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#getName()
    */
   public String getName() {
     return name;
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getDescription()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#getDescription()
    */
   public String getDescription() {
     return description;
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#properties()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#properties()
    */
   public Iterator properties() {
     return env.keySet().iterator();
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#hasProperty(java.lang.String)
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#hasProperty(java.lang.String)
    */
   public boolean hasProperty(String name) {
     return env.containsKey(name);
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperty(java.lang.String)
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#getProperty(java.lang.String)
    */
   public String getProperty(String name) {
     Object property = env.get(name);
@@ -200,7 +200,7 @@ public class RequestHandlerConfigurationImpl implements RequestHandlerConfigurat
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperty(java.lang.String,
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#getProperty(java.lang.String,
    *      java.lang.String)
    */
   public String getProperty(String name, String defaultValue) {
@@ -209,7 +209,7 @@ public class RequestHandlerConfigurationImpl implements RequestHandlerConfigurat
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getProperties(java.lang.String)
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#getProperties(java.lang.String)
    */
   public String[] getProperties(String name) {
     Object property = env.get(name);
@@ -222,7 +222,7 @@ public class RequestHandlerConfigurationImpl implements RequestHandlerConfigurat
   }
 
   /**
-   * @see ch.o2it.weblounge.api.request.RequestHandlerConfiguration#getClassName()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration#getClassName()
    */
   public String getClassName() {
     return className;
