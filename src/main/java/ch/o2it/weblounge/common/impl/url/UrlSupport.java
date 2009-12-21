@@ -33,8 +33,8 @@ import java.util.TreeSet;
 public class UrlSupport {
 
   /**
-   * This class should not be instantiated, since it only provides static
-   * utility methods.
+   * This class should not be instantiated, since it provides static utility
+   * methods only.
    */
   private UrlSupport() {
   }

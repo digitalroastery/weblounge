@@ -23,12 +23,11 @@ package ch.o2it.weblounge.common.impl.user;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.user.User;
-import ch.o2it.weblounge.common.user.WebloungeAdmin;
 
 /**
  * This class implements the system administrator for weblounge.
  */
-public final class WebloungeAdminImpl extends WebloungeUserImpl implements WebloungeAdmin {
+public final class WebloungeAdminImpl extends WebloungeUserImpl {
 
   /** The singleton instance */
   private static WebloungeAdminImpl instance = null;
@@ -75,7 +74,7 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl implements Weblo
    * @see ch.o2it.weblounge.common.security.Authority#isAuthorizedBy(ch.o2it.weblounge.common.security.Authority)
    */
   public boolean isAuthorizedBy(Authority authority) {
-    return authority instanceof WebloungeAdmin;
+    return authority instanceof WebloungeAdminImpl;
   }
 
   /**

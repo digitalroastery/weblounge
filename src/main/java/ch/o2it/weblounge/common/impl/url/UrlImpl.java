@@ -40,7 +40,7 @@ public class UrlImpl implements Url {
   protected char separatorChar = 0;
 
   /**
-   * Creates a new url from a given path and using the default path separator
+   * Creates a new url from a given path using the default path separator
    * <code>"/"</code>.
    * 
    * @param path
@@ -51,7 +51,7 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * Creates a new url from a given path and using the default path separator
+   * Creates a new url from a given path using the default path separator
    * <code>"/"</code>.
    * 
    * @param url
@@ -64,7 +64,7 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * Creates a new url from a given path.
+   * Creates a new url from a given path and separator.
    * 
    * @param path
    *          the url path
@@ -92,18 +92,17 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * Returns the url separator character, like '/' in web urls.
+   * {@inheritDoc}
    * 
-   * @return the separator character
+   * @see ch.o2it.weblounge.common.url.Url#getPathSeparator()
    */
   public char getPathSeparator() {
     return separatorChar;
   }
 
   /**
-   * Returns url path, e. g.<code>/news/articles/</code>.
+   * {@inheritDoc}
    * 
-   * @return the url path
    * @see ch.o2it.weblounge.common.url.Url#getPath()
    */
   public String getPath() {
@@ -128,70 +127,33 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * Returns the hash code for this url which equals the hash code taken from
-   * the url path.
-   * <p>
-   * <b>Note:</b> This hash code is not site dependent. Overwrite this method if
-   * you want to be able to distinguish between two urls with the same paths but
-   * from different sites.
+   * {@inheritDoc}
    * 
-   * @return the url hash code
-   * @see java.lang.Object#hashCode()
+   * @see ch.o2it.weblounge.common.url.Url#startsWith(java.lang.String)
    */
-  public int hashCode() {
-    return path.hashCode();
-  }
-
-  /**
-   * Returns <code>true</code> if <code>obj</code> is of type
-   * <code>BaseUrl</code> object literally representing the same instance than
-   * this one.
-   * 
-   * <b>Note:</b> This implementation is not site sensitive. Overwrite it if you
-   * want to be able to distinguish between two urls with the same paths but
-   * from different sites.
-   * 
-   * @param obj
-   *          the object to test for equality
-   * @return <code>true</code> if <code>obj</code> represents the same
-   *         <code>BaseUrl</code>
-   * @see java.lang.Object#equals(Object)
-   */
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Url) {
-      Url url = (Url) obj;
-      return path.equals(url.getPath());
-    }
-    return super.equals(obj);
-  }
-
-  /**
-   * Returns <code>true</code> if the url contains the given path.
-   * 
-   * @param path
-   *          the path
-   * @return <code>true</code> if the path is contained in this url
-   */
-  public boolean contains(String path) {
+  public boolean startsWith(String path) {
     if (path == null)
       throw new IllegalArgumentException("Cannot contain null string!");
     String trimmedPathelement = trim(path);
-    int found = this.path.indexOf(trimmedPathelement);
-    return found != -1;
+    return this.path.startsWith(trimmedPathelement);
   }
 
   /**
-   * Returns <code>true</code> if this url is a prefix of <code>url</code> by
-   * means of the implementation of <code>equals</code>. Note that this url is
-   * also a prefix if it is identical to <code>url</code>.
+   * {@inheritDoc}
    * 
-   * <b>Note:</b> This implementation is not site sensitive. Overwrite it if you
-   * want to be able to distinguish between two urls with the same paths but
-   * from different sites.
+   * @see ch.o2it.weblounge.common.url.Url#endsWith(java.lang.String)
+   */
+  public boolean endsWith(String path) {
+    if (path == null)
+      throw new IllegalArgumentException("Cannot contain null string!");
+    String trimmedPathelement = trim(path);
+    return this.path.endsWith(trimmedPathelement);
+  }
+
+  /**
+   * {@inheritDoc}
    * 
-   * @param url
-   *          the url
-   * @return <code>true</code> if this url is a prefix
+   * @see ch.o2it.weblounge.common.url.Url#isPrefixOf(ch.o2it.weblounge.common.url.Url)
    */
   public boolean isPrefixOf(Url url) {
     if (url == null)
@@ -200,31 +162,12 @@ public class UrlImpl implements Url {
   }
 
   /**
-   * Returns <code>true</code> if this url is an extension of <code>url</code>
-   * by means of the implementation of <code>equals</code>. Note that this url
-   * is also an extension if it is identical to <code>url</code>.
+   * {@inheritDoc}
    * 
-   * <b>Note:</b> This implementation is not site sensitive. Overwrite it if you
-   * want to be able to distinguish between two urls with the same paths but
-   * from different sites.
-   * 
-   * @param url
-   *          the url
-   * @return <code>true</code> if this url is a prefix
+   * @see ch.o2it.weblounge.common.url.Url#isExtensionOf(ch.o2it.weblounge.common.url.Url)
    */
   public boolean isExtensionOf(Url url) {
     return path.indexOf(url.getPath()) == 0;
-  }
-
-  /**
-   * Returns the string representation of this object, which is equal to the url
-   * path.
-   * 
-   * @return the path
-   * @see java.lang.Object#toString()
-   */
-  public String toString() {
-    return path;
   }
 
   /**
@@ -273,6 +216,39 @@ public class UrlImpl implements Url {
     if (index < 0)
       url += separator;
     return url;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  public int hashCode() {
+    return path.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof Url) {
+      Url url = (Url) obj;
+      return path.equals(url.getPath());
+    }
+    return super.equals(obj);
+  }
+
+  /**
+   * Returns the <code>String</code> representation of this object, which is
+   * equal to the url's path as returned by {@ link #getPath()}.
+   * 
+   * @return the path
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+    return path;
   }
 
 }

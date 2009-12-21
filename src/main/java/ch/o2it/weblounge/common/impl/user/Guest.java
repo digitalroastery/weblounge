@@ -21,19 +21,18 @@
 package ch.o2it.weblounge.common.impl.user;
 
 import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.user.Guest;
 
 /**
  * Guest user, which is automatically taken as the user object if no valid user
  * is found in the current session. The guest user normally has the smallest set
  * of rights.
  */
-public class GuestImpl extends WebloungeUserImpl implements Guest {
+public class Guest extends WebloungeUserImpl {
 
   /**
    * Creates a new guest user for the given site.
    */
-  public GuestImpl() {
+  public Guest() {
     super("guest");
     setName("Guest");
     assignRole(SystemRole.GUEST);

@@ -22,12 +22,11 @@ package ch.o2it.weblounge.common.impl.user;
 
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.Authority;
-import ch.o2it.weblounge.common.user.SiteAdmin;
 
 /**
  * This class represents the administrator user for a single site.
  */
-public final class SiteAdminImpl extends WebloungeUserImpl implements SiteAdmin {
+public final class SiteAdminImpl extends WebloungeUserImpl {
 
   /** The site identifier */
   protected String site = null;

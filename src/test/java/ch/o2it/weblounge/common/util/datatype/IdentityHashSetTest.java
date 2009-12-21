@@ -163,7 +163,7 @@ public class IdentityHashSetTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#contains(java.lang.Object)}
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#startsWith(java.lang.Object)}
    * .
    */
   @Test

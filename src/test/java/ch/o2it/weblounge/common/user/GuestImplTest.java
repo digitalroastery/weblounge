@@ -24,25 +24,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.impl.user.GuestImpl;
+import ch.o2it.weblounge.common.impl.user.Guest;
 
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test case for the implementation of {@link GuestImpl}.
+ * Test case for the implementation of {@link Guest}.
  */
 public class GuestImplTest {
 
   /** The guest instance under test */
-  protected GuestImpl guest = null;
+  protected Guest guest = null;
   
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
-    guest = new GuestImpl();
+    guest = new Guest();
   }
 
   /**

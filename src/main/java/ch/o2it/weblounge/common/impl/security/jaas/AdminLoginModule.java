@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.SiteAdmin;
+import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +50,8 @@ public class AdminLoginModule extends AbstractLoginModule {
     Site site = null;
     if (callbackHandler instanceof HttpAuthCallback) {
       site = ((HttpAuthCallback) callbackHandler).getRequest().getSite();
-      SiteAdmin siteadmin = site.getAdministrator();
-      WebloungeAdminImpl sysadmin = WebloungeAdminImpl.getInstance();
+      WebloungeUser siteadmin = site.getAdministrator();
+      WebloungeUser sysadmin = WebloungeAdminImpl.getInstance();
 
       // Test for site admin
       if (siteadmin.getLogin().equals(username) && !sysadmin.getLogin().equals(username)) {

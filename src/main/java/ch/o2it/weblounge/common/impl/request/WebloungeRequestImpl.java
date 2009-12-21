@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.page.PageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
-import ch.o2it.weblounge.common.impl.user.GuestImpl;
+import ch.o2it.weblounge.common.impl.user.Guest;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
@@ -243,7 +243,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // being logged in as guest.
     if (user == null) {
       log_.debug("New guest at " + getLocalName());
-      user = new GuestImpl();
+      user = new Guest();
     }
 
     return user;

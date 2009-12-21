@@ -136,15 +136,15 @@ public class UrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.UrlImpl#contains(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.url.UrlImpl#startsWith(java.lang.String)}.
    */
   @Test
   public void testContains() {
     Url u = new UrlImpl("/ab/c/d");
-    assertTrue(u.contains("ab"));
-    assertTrue(u.contains("c/d"));
-    assertFalse(u.contains("a"));
-    assertFalse(u.contains("abc"));
+    assertTrue(u.startsWith("ab"));
+    assertTrue(u.startsWith("c/d"));
+    assertFalse(u.startsWith("a"));
+    assertFalse(u.startsWith("abc"));
   }
 
   /**

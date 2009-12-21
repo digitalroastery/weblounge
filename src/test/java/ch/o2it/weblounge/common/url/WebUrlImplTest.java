@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.url;
 
-import static ch.o2it.weblounge.common.url.WebUrl.Flavor.html;
-import static ch.o2it.weblounge.common.url.WebUrl.Flavor.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.Env;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;
@@ -161,7 +160,7 @@ public class WebUrlImplTest {
    */
   @Test
   public void testGetLinkStringLong() {
-    assertEquals("/test/28.json", defaultUrl.getLink("json", 28));
+    assertEquals("/test/28.json", defaultUrl.getLink(28, RequestFlavor.json.toString()));
   }
 
   /**
@@ -169,11 +168,11 @@ public class WebUrlImplTest {
    */
   @Test
   public void testGetFlavor() {
-    assertEquals(html.toString(), defaultUrl.getFlavor());
-    assertEquals(json.toString(), flavoredUrl.getFlavor());
-    assertEquals(json.toString(), new WebUrlImpl(siteMock, "/test/json").getFlavor());
-    assertEquals(json.toString(), new WebUrlImpl(siteMock, "/test/JSON").getFlavor());
-    assertEquals(html.toString(), new WebUrlImpl(siteMock, "/test/json/").getFlavor());
+    assertEquals(RequestFlavor.html.toString(), defaultUrl.getFlavor());
+    assertEquals(RequestFlavor.json.toString(), flavoredUrl.getFlavor());
+    assertEquals(RequestFlavor.json.toString(), new WebUrlImpl(siteMock, "/test/json").getFlavor());
+    assertEquals(RequestFlavor.json.toString(), new WebUrlImpl(siteMock, "/test/JSON").getFlavor());
+    assertEquals(RequestFlavor.html.toString(), new WebUrlImpl(siteMock, "/test/json/").getFlavor());
   }
 
 }

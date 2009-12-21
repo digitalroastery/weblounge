@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import static ch.o2it.weblounge.common.url.WebUrl.Flavor.html;
-import static ch.o2it.weblounge.common.url.WebUrl.Flavor.xml;
-import static ch.o2it.weblounge.common.url.WebUrl.Flavor.json;
+import static ch.o2it.weblounge.common.request.RequestFlavor.html;
+import static ch.o2it.weblounge.common.request.RequestFlavor.json;
+import static ch.o2it.weblounge.common.request.RequestFlavor.xml;
 
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.page.Page;
@@ -49,7 +49,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
 
   /** The logging facility */
   private static Logger log_ = LoggerFactory.getLogger(WebUrlImpl.class);
-  
+
   /** Regular expression used to take urls apart */
   private final static Pattern inspector = Pattern.compile("^(.*)/(work|original|index|[0-9]*)(_[a-zA-Z0-9]+)?\\.([a-zA-Z0-9]+)$");
 
@@ -168,30 +168,23 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   }
 
   /**
-   * Returns the associated site.
+   * {@inheritDoc}
    * 
-   * @return the site
+   * @see ch.o2it.weblounge.common.url.WebUrl#getSite()
    */
   public Site getSite() {
     return site;
   }
 
   /**
-   * Returns the encoded url to be used when calling the url through the web
-   * application. <br>
-   * What this method does in detail is prepending the mount point of the web
-   * application and the servlet path obtained via <code>Env.getURI()</code> and
-   * <code>getServletPath()</code> to the url.
-   * <p>
-   * The generated link is free from version information. It just points to the
-   * correct database collection.
+   * {@inheritDoc}
    * 
-   * @return the encoded url
+   * @see ch.o2it.weblounge.common.url.WebUrl#getLink()
    */
   public String getLink() {
     if (link_ == null) {
       try {
-        link_ = URLEncoder.encode(getLink(flavor, version), "UTF-8");
+        link_ = URLEncoder.encode(getLink(version, flavor), "UTF-8");
       } catch (UnsupportedEncodingException e) {
         log_.error("Unexpected error while urlencoding link " + link_, e);
       }
@@ -201,71 +194,29 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   }
 
   /**
-   * Returns the encoded url to be used when calling the url through the web
-   * application. <br>
-   * What this method does in detail is prepending the mount point of the web
-   * application and the servlet path obtained via <code>Env.getURI()</code> and
-   * <code>getServletPath()</code> to the url.
-   * <p>
-   * The parameter version is used to create includes to special versions of a
-   * given page. Possible values are:
-   * <ul>
-   * <li>live</li>
-   * <li>work</li>
-   * <li>original</li>
-   * </ul>
+   * {@inheritDoc}
    * 
-   * @param version
-   *          the requested version
-   * @return the encoded url
+   * @see ch.o2it.weblounge.common.url.WebUrl#getLink(long)
    */
   public String getLink(long version) {
-    return getLink(flavor, version);
+    return getLink(version, flavor);
   }
 
   /**
-   * Returns the encoded url to be used when calling the url through the web
-   * application. <br>
-   * What this method does in detail is prepending the mount point of the web
-   * application and the servlet path obtained via <code>Env.getURI()</code> and
-   * <code>getServletPath()</code> to the url.
-   * <p>
-   * The parameter version is used to create includes to special versions of a
-   * given page. Possible values are:
-   * <ul>
-   * <li>live</li>
-   * <li>work</li>
-   * <li>original</li>
-   * </ul>
+   * {@inheritDoc}
    * 
-   * @param version
-   *          the requested version
-   * @return the encoded url
+   * @see ch.o2it.weblounge.common.url.WebUrl#getLink(java.lang.String)
    */
   public String getLink(String flavor) {
-    return getLink(flavor, version);
+    return getLink(version, flavor);
   }
 
   /**
-   * Returns the encoded url to be used when calling the url through the web
-   * application.<br>
-   * What this method does in detail is prepending the mount point of the web
-   * application and the servlet path obtained via <code>Env.getURI()</code> and
-   * <code>getServletPath()</code> to the url.
-   * <p>
-   * The parameter version is used to create includes to special versions of a
-   * given page. Possible values are:
-   * <ul>
-   * <li>live</li>
-   * <li>work</li>
-   * <li>original</li>
-   * </ul>
+   * {@inheritDoc}
    * 
-   * @param version
-   *          the requested version
-   * @return the encoded url
+   * @see ch.o2it.weblounge.common.url.WebUrl#getLink(long, java.lang.String)
    */
-  public String getLink(String flavor, long version) {
+  public String getLink(long version, String flavor) {
     StringBuffer selector = new StringBuffer();
     if (version == Page.WORK) {
       selector.append("work");
@@ -278,29 +229,23 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     return UrlSupport.concat(new String[] {
         Env.getMountpoint(),
         Env.getServletPath(),
-        path, 
-        selector.toString()
-    });
+        path,
+        selector.toString() });
   }
 
   /**
-   * Returns the url flavor. For example, in case of "index.xml" the flavor will
-   * be <code>XML</code>.
+   * {@inheritDoc}
    * 
-   * @return the url flavor
+   * @see ch.o2it.weblounge.common.url.WebUrl#getFlavor()
    */
   public String getFlavor() {
     return flavor;
   }
 
   /**
-   * Returns the version of this url. Possible versions are:
-   * <ul>
-   * <li>{@link ch.o2it.weblounge.common.page.Page#LIVE}</li>
-   * <li>{@link ch.o2it.weblounge.common.page.Page#WORK}</li>
-   * </ul>
+   * {@inheritDoc}
    * 
-   * @return the url version
+   * @see ch.o2it.weblounge.common.url.WebUrl#getVersion()
    */
   public long getVersion() {
     return version;
@@ -313,7 +258,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
-    return super.hashCode() | site.hashCode();
+    return super.hashCode() | site.hashCode() >> 16;
   }
 
   /**
@@ -326,11 +271,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   public boolean equals(Object object) {
     if (object instanceof WebUrl) {
       WebUrl url = (WebUrl) object;
-      return 
-        (super.equals(object) &&
-        version == url.getVersion() && 
-        flavor.equals(url.getFlavor()) && 
-        site.equals(url.getSite()));
+      return (super.equals(object) && version == url.getVersion() && flavor.equals(url.getFlavor()) && site.equals(url.getSite()));
     } else if (object instanceof Url) {
       return super.equals(object);
     }
@@ -369,7 +310,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     // Make sure we've not been fooled
     if (path.indexOf('.') > 0)
       throw new IllegalArgumentException("Path is malformed: " + path);
-    
+
     // Test for well-known flavors in the last path element
     path = path.toLowerCase();
     if (path.endsWith(html.toString()))
@@ -380,9 +321,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       this.flavor = json.toString();
     return trim(path);
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.impl.url.UrlImpl#toString()
    */
   @Override
