@@ -21,12 +21,11 @@
 package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.request.CacheTag;
 
 /**
  * Tag used to identify entries in the caching service.
  */
-public final class CacheTagImpl implements Tag, CacheTag {
+public final class CacheTagImpl implements Tag {
 
   /** Special object representing the "any" value */
   public final static Object ANY = new Object();

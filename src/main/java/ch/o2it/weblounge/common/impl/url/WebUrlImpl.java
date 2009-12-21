@@ -298,7 +298,6 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * <ul>
    * <li>{@link ch.o2it.weblounge.common.page.Page#LIVE}</li>
    * <li>{@link ch.o2it.weblounge.common.page.Page#WORK}</li>
-   * <li>{@link ch.o2it.weblounge.common.page.Page#ORIGINAL}</li>
    * </ul>
    * 
    * @return the url version

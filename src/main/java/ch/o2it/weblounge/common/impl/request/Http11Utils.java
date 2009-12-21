@@ -31,7 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 /**
- * Http11Utils.
+ * Utility class used to facilitate in creating <code>HTTP 1.1</code> responses
+ * and header analysis.
  * 
  * TODO: use set instead of array
  */
@@ -231,7 +232,7 @@ public class Http11Utils implements Http11Constants {
   }
 
   /**
-   * Ouput stream that discards all output and only counts the number of bytes
+   * Output stream that discards all output and only counts the number of bytes
    * that have been written.
    */
   static class NullOutputStream extends ServletOutputStream {

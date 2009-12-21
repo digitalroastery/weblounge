@@ -82,9 +82,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   /** Url that was originally requested */
   protected WebUrl requestedUrl = null;
 
-  /** Url that was requested before this requested */
-  protected WebUrl previousUrl = null;
-
   /**
    * Creates a new wrapper for <code>request</code>.
    * 
@@ -103,12 +100,11 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     url = null;
     language = null;
   }
-
+  
   /**
-   * Returns the requested language. The language is determined by evaluating
-   * the respective request header fields.
-   * 
-   * @return the requested language
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getLanguage()
    */
   public Language getLanguage() {
     // Has the language been cached?
@@ -159,9 +155,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
-   * Returns the requested site.
-   * 
-   * @return the requested site
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getSite()
    */
   public Site getSite() {
     if (site == null)
@@ -171,9 +167,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
-   * Returns the requested url.
-   * 
-   * @return the requested url
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getUrl()
    */
   public WebUrl getUrl() {
     if (url != null) {
@@ -204,14 +200,13 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     this.url = new WebUrlImpl(site, urlPath, version, urlFlavor);
     this.requestedUrl = url;
-    getSession(true).setAttribute(SESSION_PREVIOUS_URL, url);
     return url;
   }
 
   /**
-   * Returns the originally requested url.
-   * 
-   * @return the requested url
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getRequestedUrl()
    */
   public WebUrl getRequestedUrl() {
     if (requestedUrl != null) {
@@ -227,27 +222,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
-   * Returns the user's history.
-   * 
-   * @return the history
-   */
-  public WebUrl getPreviousUrl() {
-    if (previousUrl != null)
-      return previousUrl;
-
-    if (site == null)
-      throw new IllegalStateException("Site has not been set");
-    
-    // Seems that no on has shown interest in the previous url so far. Let's see
-    // if we can extract it from the session
-    previousUrl = (WebUrl) getSession(true).getAttribute(SESSION_PREVIOUS_URL);    
-    return previousUrl;
-  }
-
-  /**
-   * Returns the current user.
-   * 
-   * @return the user
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getUser()
    */
   public User getUser() {
     if (user != null) {
@@ -273,28 +250,20 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
-   * Returns the requested version. Possible values are:
-   * <ul>
-   * <li>{@link ch.o2it.weblounge.common.page.Page#LIVE}</li>
-   * <li>{@link ch.o2it.weblounge.common.page.Page#WORK}</li>
-   * <li>{@link ch.o2it.weblounge.common.page.Page#ORIGINAL}</li>
-   * </ul>
-   * 
-   * @return the requested version
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getVersion()
    */
   public long getVersion() {
     return getUrl().getVersion();
   }
 
   /**
-   * Returns the requested output method.
-   * 
-   * @return the requested output method
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getFlavor()
    */
-  public String getOutputMethod() {
-    if (site == null)
-      throw new IllegalStateException("Site has not been set");
-
+  public String getFlavor() {
     return getUrl().getFlavor();
   }
 
@@ -328,17 +297,16 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   /**
    * Method to reset this request object, forcing it to release any cached
    * information.
-   * <p/>
+   * <p>
    * Note that you should only set <code>clearSession</code> to <code>true</code>
    * if you want to get rid of cached information to force a change in the way
    * the current user is treated, e. g. if he/she has been logged out.
-   * <p/>
+   * <p>
    * The following things are stored in the session
    * <ul>
    *  <li>The current site</li>
    *  <li>The user</li>
    *  <li>The selected language</li>
-   *  <li>The previously visited url (on this site)</li>
    * </ul>
    * 
    * @param clearSession <code>true</code> to remove cached information as well
@@ -366,9 +334,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
-   * Returns <code>true</code> if <code>o</code> represents the same request
-   * object.
-   * 
+   * {@inheritDoc}
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object o) {
@@ -379,8 +346,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
-   * Returns the hash code for this request.
-   * 
+   * {@inheritDoc}
+   *
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
@@ -388,12 +355,12 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
-   * Returns a string representation of this request.
-   * 
+   * {@inheritDoc}
+   *
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return id;
+    return url + " [" + id + "]";
   }
 
 }
