@@ -57,10 +57,10 @@ import javax.xml.xpath.XPath;
  * 		&lt;/security&gt;
  * </pre>
  */
-public class PermissionSecurityContext extends AbstractSecurityContext {
+public class SecurityContextImpl extends AbstractSecurityContext {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(PermissionSecurityContext.class);
+  private final static Logger log_ = LoggerFactory.getLogger(SecurityContextImpl.class);
 
   /** Allowed authorizations */
   private Map<Permission, Set<Authority>> context_ = null;
@@ -75,7 +75,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * Creates a default restriction set with no restrictions and a context
    * identifier of <tt>&lt;default&gt;</tt>.
    */
-  public PermissionSecurityContext() {
+  public SecurityContextImpl() {
     this(null);
   }
 
@@ -86,7 +86,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * @param owner
    *          the secured object owner
    */
-  public PermissionSecurityContext(User owner) {
+  public SecurityContextImpl(User owner) {
     super(owner);
     context_ = new HashMap<Permission, Set<Authority>>();
     defaultContext_ = new HashMap<Permission, Set<Authority>>();
@@ -493,7 +493,7 @@ public class PermissionSecurityContext extends AbstractSecurityContext {
    * @see java.lang.Object#clone()
    */
   public Object clone() throws CloneNotSupportedException {
-    PermissionSecurityContext ctxt = (PermissionSecurityContext)super.clone();
+    SecurityContextImpl ctxt = (SecurityContextImpl)super.clone();
     ctxt.owner = owner;
     ctxt.context_.putAll(context_);
     ctxt.defaultContext_.putAll(defaultContext_);

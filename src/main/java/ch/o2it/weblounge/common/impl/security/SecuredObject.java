@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.Securable;
-import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
 import ch.o2it.weblounge.common.user.User;
 
@@ -32,12 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is the base class for secured objects.
+ * This is the base implementation for secured objects.
  */
 public class SecuredObject implements Securable {
 
   /** The security context */
-  protected RestrictionSecurityContext securityCtx_ = null;
+  protected SecurityContextImpl securityCtx_ = null;
 
   /** Security listener */
   protected List<SecurityListener> listeners = null;
@@ -50,14 +49,14 @@ public class SecuredObject implements Securable {
    *          the object owner
    */
   public SecuredObject(User owner) {
-    securityCtx_ = new RestrictionSecurityContext(owner);
+    securityCtx_ = new SecurityContextImpl(owner);
   }
 
   /**
    * Creates a secured object with no security constraints applied to it.
    */
   public SecuredObject() {
-    securityCtx_ = new RestrictionSecurityContext();
+    securityCtx_ = new SecurityContextImpl();
   }
 
   /**
@@ -65,7 +64,7 @@ public class SecuredObject implements Securable {
    * 
    * @return the security context
    */
-  public SecurityContext getSecurityContext() {
+  public SecurityContextImpl getSecurityContext() {
     return securityCtx_;
   }
 
@@ -185,18 +184,6 @@ public class SecuredObject implements Securable {
   }
 
   /**
-   * Allows everyone and everything regarding permission <code>permission</code>
-   * .
-   * 
-   * @param permission
-   *          the permission
-   */
-  public void allowAll(Permission permission) {
-    securityCtx_.allowAll(permission);
-    firePermissionChanged(permission);
-  }
-
-  /**
    * Removes the permission and any associated role requirements from this
    * context.
    * 
@@ -205,18 +192,6 @@ public class SecuredObject implements Securable {
    */
   public void deny(Permission permission, Authority authorization) {
     securityCtx_.deny(permission, authorization);
-    firePermissionChanged(permission);
-  }
-
-  /**
-   * Allows everyone and everything regarding permission <code>permission</code>
-   * .
-   * 
-   * @param permission
-   *          the permission
-   */
-  public void denyAll(Permission permission) {
-    securityCtx_.denyAll(permission);
     firePermissionChanged(permission);
   }
 

@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.impl.content.ModificationContext;
 import ch.o2it.weblounge.common.impl.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
-import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
+import ch.o2it.weblounge.common.impl.security.SecurityContextImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Page;
@@ -36,7 +36,6 @@ import ch.o2it.weblounge.common.page.PageletURI;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
-import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
@@ -90,7 +89,7 @@ public class PageImpl extends LocalizableObject implements Page {
   protected PublishingContext publishingCtx = null;
 
   /** The security context */
-  protected PermissionSecurityContext securityCtx = null;
+  protected SecurityContextImpl securityCtx = null;
 
   /** The title */
   protected LocalizableContent<String> title = null;
@@ -489,17 +488,6 @@ public class PageImpl extends LocalizableObject implements Page {
   public String[] getSubjects() {
     String kw[] = new String[subjects.size()];
     return subjects.toArray(kw);
-  }
-
-  /**
-   * Returns the security context that is associated with this pagelet. The
-   * context tells whether the pagelet may be accessed in a certain way by a
-   * user or not.
-   * 
-   * @return the pagelet's security context
-   */
-  public SecurityContext getSecurityContext() {
-    return securityCtx;
   }
 
   /**

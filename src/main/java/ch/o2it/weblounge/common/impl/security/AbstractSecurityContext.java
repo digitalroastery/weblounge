@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Role;
-import ch.o2it.weblounge.common.security.SecurityContext;
 import ch.o2it.weblounge.common.security.SecurityListener;
 import ch.o2it.weblounge.common.user.User;
 
@@ -36,7 +35,7 @@ import java.util.Map;
 /**
  * Basic implementation for a security context.
  */
-public abstract class AbstractSecurityContext implements SecurityContext {
+public abstract class AbstractSecurityContext {
 
   /** The owner */
   protected User owner = null;
@@ -179,6 +178,8 @@ public abstract class AbstractSecurityContext implements SecurityContext {
     for (Authority authority : authorities)
       allow(permission, authority);
   }
+  
+  public abstract void allow(Permission permission, Authority authoriy);
 
   /**
    * Adds <code>authorities</code> to the denied authorities regarding the given
@@ -195,6 +196,8 @@ public abstract class AbstractSecurityContext implements SecurityContext {
     for (Authority authority : authorities)
       deny(permission, authority);
   }
+
+  public abstract void deny(Permission permission, Authority authoriy);
 
   /**
    * Checks whether at least one of the given authorities pass with respect to
@@ -215,6 +218,8 @@ public abstract class AbstractSecurityContext implements SecurityContext {
     }
     return false;
   }
+  
+  public abstract boolean check(Permission permission, Authority authority);
 
   /**
    * Checks whether all of the given authorities pass with respect to the given

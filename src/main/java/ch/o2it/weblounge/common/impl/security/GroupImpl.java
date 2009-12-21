@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Default implementation of a weblounge group.
+ * Default implementation of a group.
  */
 public class GroupImpl extends LocalizableContent<String> implements Group {
 
@@ -50,6 +50,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
 
   /**
    * Creates a new group with the given context and identifier.
+   * 
    * @param id
    *          the group identifier
    * @param context
@@ -61,29 +62,36 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns the group context.
+   * {@inheritDoc}
    * 
-   * @return the group context
+   * @see ch.o2it.weblounge.common.security.Group#getContext()
    */
   public String getContext() {
     return context_;
   }
 
   /**
-   * Returns the group identifier.
+   * {@inheritDoc}
    * 
-   * @return the group identifier
+   * @see ch.o2it.weblounge.common.security.Group#getIdentifier()
    */
   public String getIdentifier() {
     return id_;
   }
 
   /**
-   * Adds <code>member</code> to this group and tells the member that is may
-   * register this membership by calling <code>addMembership()</code>.
+   * {@inheritDoc}
    * 
-   * @param member
-   *          the member to add
+   * @see java.security.Principal#getName()
+   */
+  public String getName() {
+    return id_;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.Group#addMember(ch.o2it.weblounge.common.security.GroupMember)
    */
   public void addMember(GroupMember member) {
     if (!members.contains(member)) {
@@ -97,11 +105,9 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Removes <code>member</code> from this group and tells the member to remove
-   * the membership by calling <code>removeMembership()</code>.
+   * {@inheritDoc}
    * 
-   * @param member
-   *          the member to remove
+   * @see ch.o2it.weblounge.common.security.Group#removeMember(ch.o2it.weblounge.common.security.GroupMember)
    */
   public void removeMember(GroupMember member) {
     if (members == null)
@@ -117,21 +123,18 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns <code>true</code> if this <code>member</code> is a member of this
-   * group.
+   * {@inheritDoc}
    * 
-   * @param member
-   *          the member to test for membership
-   * @return <code>true</code> if member is part of this group
+   * @see ch.o2it.weblounge.common.security.Group#hasMember(ch.o2it.weblounge.common.security.GroupMember)
    */
   public boolean hasMember(GroupMember member) {
     return members != null && members.contains(member);
   }
 
   /**
-   * Returns all members of this group.
+   * {@inheritDoc}
    * 
-   * @return all group members
+   * @see ch.o2it.weblounge.common.security.Group#getMembers()
    */
   public GroupMember[] getMembers() {
     if (members == null) {
@@ -141,10 +144,9 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Registers a membership with <code>group</code>.
+   * {@inheritDoc}
    * 
-   * @param group
-   *          the group that has been joined
+   * @see ch.o2it.weblounge.common.security.GroupMember#addMembership(ch.o2it.weblounge.common.security.Group)
    */
   public void addMembership(Group group) {
     synchronized (groups) {
@@ -153,10 +155,9 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Removes the membership with <code>group</code>.
+   * {@inheritDoc}
    * 
-   * @param group
-   *          the group that has been left
+   * @see ch.o2it.weblounge.common.security.GroupMember#removeMembership(ch.o2it.weblounge.common.security.Group)
    */
   public void removeMembership(Group group) {
     if (groups != null) {
@@ -167,7 +168,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns an array of all groups that have this user as a member.
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.security.GroupMember#getGroupClosure()
    */
@@ -184,6 +185,8 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.security.GroupMember#getGroups()
    */
   public Group[] getGroups() {
@@ -195,22 +198,18 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns <code>true</code> if the user is member of the given group,
-   * <code>false</code> otherwise.
+   * {@inheritDoc}
    * 
-   * @param group
-   *          the group to test for membership
-   * @return <code>true</code> if the user is member of this group
+   * @see ch.o2it.weblounge.common.security.GroupMember#isMemberOf(ch.o2it.weblounge.common.security.Group)
    */
   public boolean isMemberOf(Group group) {
     return groups != null && groups.contains(group);
   }
 
   /**
-   * Removes <code>role</code> from the list of roles assigned to this user.
+   * {@inheritDoc}
    * 
-   * @param role
-   *          the role to remove
+   * @see ch.o2it.weblounge.common.security.RoleOwner#assignRole(ch.o2it.weblounge.common.security.Role)
    */
   public void assignRole(Role role) {
     synchronized (roles) {
@@ -219,10 +218,9 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Removes <code>role</code> from the list of roles assigned to this user.
+   * {@inheritDoc}
    * 
-   * @param role
-   *          the role to remove
+   * @see ch.o2it.weblounge.common.security.RoleOwner#unassignRole(ch.o2it.weblounge.common.security.Role)
    */
   public void unassignRole(Role role) {
     if (roles != null) {
@@ -233,9 +231,9 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns all roles that this user owns directly.
+   * {@inheritDoc}
    * 
-   * @return the roles that this user owns
+   * @see ch.o2it.weblounge.common.security.RoleOwner#getRoleClosure()
    */
   public Role[] getRoleClosure() {
     Set<Role> roles = new HashSet<Role>();
@@ -251,9 +249,9 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns all roles that this user directly owns.
+   * {@inheritDoc}
    * 
-   * @return the user's primary roles
+   * @see ch.o2it.weblounge.common.security.RoleOwner#getRoles()
    */
   public Role[] getRoles() {
     Set<Role> roles = new HashSet<Role>();
@@ -263,6 +261,8 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.security.RoleOwner#hasRole(java.lang.String,
    *      java.lang.String)
    */
@@ -271,11 +271,9 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns <code>true</code> if this object owns the specified role.
+   * {@inheritDoc}
    * 
-   * @param role
-   *          the role
-   * @return <code>true</code> if the role is owned
+   * @see ch.o2it.weblounge.common.security.RoleOwner#hasRole(ch.o2it.weblounge.common.security.Role)
    */
   public boolean hasRole(Role role) {
     if (roles != null) {
@@ -312,16 +310,17 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
 
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
     return context_.hashCode() | id_.hashCode() >> 16;
   }
-  
+
   /**
-   * Returns <code>true</code> if <code>o</code> is equal to this group by
-   * means of context and identifier.
+   * Returns <code>true</code> if <code>o</code> is equal to this group by means
+   * of context and identifier.
    * 
    * @return <code>true</code> if <code>o</code> is equal to <code>this</code>
    */
@@ -334,7 +333,8 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   }
 
   /**
-   * Returns the string representation of this group.
+   * Returns the string representation of this group in the form
+   * <code>&lt;context&gt;:&lt;identifier&gt;</code>.
    * 
    * @return the string representation
    */

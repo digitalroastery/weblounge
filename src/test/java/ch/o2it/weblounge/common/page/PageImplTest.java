@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.page;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -429,14 +428,6 @@ public class PageImplTest {
   public void testGetSubjects() {
     assertEquals(subjects.length, page.getSubjects().length);
     
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getSecurityContext()}.
-   */
-  @Test
-  public void testGetSecurityContext() {
-    assertNotNull(page.getSecurityContext());
   }
 
   /**

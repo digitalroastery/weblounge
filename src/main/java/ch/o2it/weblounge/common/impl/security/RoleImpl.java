@@ -59,6 +59,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * Creates a role in the given context with the specified role identifier.
+   * 
    * @param context
    *          the role context
    * @param identifier
@@ -94,22 +95,27 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   }
 
   /**
-   * Makes this role an extension of <code>ancestor</code>.
+   * {@inheritDoc}
    * 
-   * @param ancestor
-   *          the role to extend
+   * @see java.security.Principal#getName()
+   */
+  public String getName() {
+    return identifier_;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Role#extend(ch.o2it.weblounge.common.security.Role)
    */
   public void extend(Role ancestor) {
     ancestors_.add(ancestor);
   }
 
   /**
-   * Returns <code>true</code> if this role is a direct or indirect extension of
-   * <code>ancestor</code>.
-   * 
-   * @param ancestor
-   *          the extension in question
-   * @return <code>true</code> if this role extends <code>ancestor</code>
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Role#isExtensionOf(ch.o2it.weblounge.common.security.Role)
    */
   public boolean isExtensionOf(Role ancestor) {
     if (ancestors_.contains(ancestor))
@@ -130,7 +136,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.common.security.Role#getExtendedRoles()
    */
   public Role[] getExtendedRoles() {
@@ -158,9 +164,8 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   }
 
   /**
-   * Returns the role context.
-   * 
-   * @return the role context
+   * {@inheritDoc}
+   *
    * @see ch.o2it.weblounge.common.security.Role#getContext()
    */
   public String getContext() {
@@ -168,32 +173,27 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   }
 
   /**
-   * Returns the authorization type, e. g.
-   * <code>ch.o2it.weblounge.api.security.Role</code> for a role authorization.
-   * 
-   * @return the authorization type
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Authority#getAuthorityType()
    */
   public String getAuthorityType() {
     return Role.class.getName();
   }
 
   /**
-   * Returns the authorization identifier.
-   * 
-   * @return the authorization identifier
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Authority#getAuthorityId()
    */
   public String getAuthorityId() {
     return context_ + ":" + identifier_;
   }
 
   /**
-   * Returns <code>true</code> if this authority and <code>authority</code>
-   * match by means of the respective authority. This is the case if
-   * <code>authority</code> represents the same role or
-   * 
-   * @param authority
-   *          the authority to test
-   * @return <code>true</code> if the authorities match
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.security.Authority#isAuthorizedBy(ch.o2it.weblounge.common.security.Authority)
    */
   public boolean isAuthorizedBy(Authority authority) {
     if (authority != null && authority instanceof Role) {
@@ -208,43 +208,6 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   }
 
   /**
-   * Returns the hash code for this role object.
-   * 
-   * @return the hash code
-   * @see java.lang.Object#hashCode()
-   */
-  public int hashCode() {
-    return context_.hashCode() | identifier_.hashCode() >> 16; 
-  }
-
-  /**
-   * Returns <code>true</code> if <code>obj</code> is of type <code>Role</code>
-   * object literally representing the same instance than this one.
-   * 
-   * @param obj
-   *          the object to test for equality
-   * @return <code>true</code> if <code>obj</code> represents the same
-   *         <code>Role</code>
-   * @see java.lang.Object#equals(Object)
-   */
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Role) {
-      Role r = (Role) obj;
-      return r.getIdentifier().equals(identifier_) && r.getContext().equals(context_);
-    }
-    return false;
-  }
-
-  /**
-   * Returns the role identifier.
-   * 
-   * @return a role description
-   */
-  public String toString() {
-    return context_ + ":" + identifier_;
-  }
-
-  /**
    * Returns the context for a role identifier. For example, given the role
    * <code>system:editor</code>, this method will return <code>editor</code>.
    * <p>
@@ -255,7 +218,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the role
    * @return the context part of the role
    */
-  public static String extractContext(String role) {
+  protected static String extractContext(String role) {
     assert role != null;
     int divider = role.indexOf(':');
     if (divider <= 0 || divider >= (role.length() - 1))
@@ -274,12 +237,44 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the role
    * @return the context part of the role
    */
-  public static String extractIdentifier(String role) {
+  protected static String extractIdentifier(String role) {
     assert role != null;
     int divider = role.indexOf(':');
     if (divider <= 0 || divider >= (role.length() - 1))
       throw new IllegalArgumentException("Role must be of the form 'context:id'!");
     return role.substring(divider + 1);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#hashCode()
+   */
+  public int hashCode() {
+    return context_.hashCode() | identifier_.hashCode() >> 16;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof Role) {
+      Role r = (Role) obj;
+      return r.getIdentifier().equals(identifier_) && r.getContext().equals(context_);
+    }
+    return false;
+  }
+
+  /**
+   * Returns the string representation of this role in the form
+   * <code>&lt;context&gt;:&lt;identifier&gt;</code>.
+   * 
+   * @return the role's string representation
+   */
+  public String toString() {
+    return context_ + ":" + identifier_;
   }
 
 }

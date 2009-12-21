@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.impl.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.impl.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
-import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
+import ch.o2it.weblounge.common.impl.security.SecurityContextImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
@@ -89,7 +89,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   PageletURI uri = null;
 
   /** The security context */
-  PermissionSecurityContext securityCtx = null;
+  SecurityContextImpl securityCtx = null;
 
   /** The creation context */
   CreationContext creationCtx = null;

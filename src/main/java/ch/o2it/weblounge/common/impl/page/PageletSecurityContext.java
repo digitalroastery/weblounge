@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.page;
 
-import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
+import ch.o2it.weblounge.common.impl.security.SecurityContextImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.security.SystemPermission;
 
@@ -28,7 +28,7 @@ import ch.o2it.weblounge.common.security.SystemPermission;
  * Specialized security context for a pagelet. This implementation adds the
  * proper name and default values.
  */
-public class PageletSecurityContext extends PermissionSecurityContext {
+public class PageletSecurityContext extends SecurityContextImpl {
 
   /**
    * Creates a new security context for a pagelet with the specified url.

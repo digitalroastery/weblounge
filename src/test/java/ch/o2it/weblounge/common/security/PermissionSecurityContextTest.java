@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.impl.page.PageSecurityContext;
-import ch.o2it.weblounge.common.impl.security.PermissionSecurityContext;
+import ch.o2it.weblounge.common.impl.security.SecurityContextImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 
@@ -40,7 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 
 /**
- * Testcase for {@link PermissionSecurityContext}.
+ * Testcase for {@link SecurityContextImpl}.
  */
 
 public class PermissionSecurityContextTest extends TestCase {
@@ -85,7 +85,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Role translator = SystemRole.TRANSLATOR;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Deny all
@@ -111,7 +111,7 @@ public class PermissionSecurityContextTest extends TestCase {
     // "admin@weblounge.org");
 
     // Create the security context
-    PermissionSecurityContext context = new PageSecurityContext();
+    SecurityContextImpl context = new PageSecurityContext();
     context.init(path, config);
 
     // Deny all
@@ -138,7 +138,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Role translator = SystemRole.TRANSLATOR;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Deny all
@@ -160,7 +160,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Role editor = SystemRole.TRANSLATOR;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Deny all
@@ -189,7 +189,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Role publisher = SystemRole.PUBLISHER;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Deny all
@@ -217,7 +217,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Role publisher = SystemRole.PUBLISHER;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Deny all
@@ -244,7 +244,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Role editor = SystemRole.EDITOR;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Test (write, editor) - expected: success
@@ -268,7 +268,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Permission manage = SystemPermission.MANAGE;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Test write permission - expected: 3
@@ -302,7 +302,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Permission write = SystemPermission.WRITE;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Test write permission - expected: 0
@@ -332,7 +332,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Role publisher = SystemRole.PUBLISHER;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Test one of (editor, publisher) - expected: success
@@ -359,7 +359,7 @@ public class PermissionSecurityContextTest extends TestCase {
     Role publisher = SystemRole.PUBLISHER;
 
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     // Test one of (editor, publisher) - expected: success
@@ -380,7 +380,7 @@ public class PermissionSecurityContextTest extends TestCase {
   @Test
   public final void testPermissions() {
     // Create the security context
-    PermissionSecurityContext context = new PermissionSecurityContext();
+    SecurityContextImpl context = new SecurityContextImpl();
     context.init(path, config);
 
     int expected = 2;
