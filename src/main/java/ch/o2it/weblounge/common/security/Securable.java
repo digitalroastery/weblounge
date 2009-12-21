@@ -29,10 +29,10 @@ import ch.o2it.weblounge.common.user.User;
 public interface Securable {
 
   /**
-   * Sets the pagelet's owner.
+   * Sets the object owner.
    * 
    * @param owner
-   *          the owner of this pagelet
+   *          the object owner
    */
   void setOwner(User owner);
 

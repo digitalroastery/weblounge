@@ -22,13 +22,12 @@ package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.language.Localizable;
 
+import java.security.Principal;
+
 /**
  * A role models an entity that can be assigned a number of permissions.
  */
-public interface Role extends Authority, Localizable {
-
-  /** The system context */
-  String CTXT_SYSTEM = "system";
+public interface Role extends Principal, Authority, Localizable {
 
   /**
    * Returns the role identifier.

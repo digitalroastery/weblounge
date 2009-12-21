@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.security;
 
-
 /**
  * A group member may be member of zero or more groups and can tell whether it
  * has certain memberships or not.

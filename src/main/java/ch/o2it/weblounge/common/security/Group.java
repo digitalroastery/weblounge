@@ -22,11 +22,13 @@ package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.language.Localizable;
 
+import java.security.Principal;
+
 /**
- * Methods for a group. A group has zero or more members and may tell if a given
- * user or group is member of this group.
+ * A group has zero or more members and may tell if a given user or group is a
+ * member of this group.
  */
-public interface Group extends GroupMember, RoleOwner, Localizable {
+public interface Group extends Principal, GroupMember, RoleOwner, Localizable {
 
   /**
    * Returns the group context.
@@ -63,7 +65,7 @@ public interface Group extends GroupMember, RoleOwner, Localizable {
    * group.
    * 
    * @param member
-   *          the meber to test for membership
+   *          the member to test for membership
    * @return <code>true</code> if member is part of this group
    */
   boolean hasMember(GroupMember member);

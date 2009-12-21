@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.common.security;
 
-
 /**
- * Interface for objects that may take roles.
+ * Interface for objects that are able to take on a certain number of roles and
+ * thereby being able to gain a unified set of permissions.
  */
 public interface RoleOwner {
 
