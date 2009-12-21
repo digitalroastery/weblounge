@@ -714,7 +714,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * Utility class used to compare content and property map entries.
    */
-  private static class MapEntryComparator implements Comparator<Map.Entry<String, String[]>>, Serializable {
+  protected static class MapEntryComparator implements Comparator<Map.Entry<String, String[]>>, Serializable {
 
     /** Serial version uid */
     private static final long serialVersionUID = 853284601216740051L;
