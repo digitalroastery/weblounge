@@ -24,11 +24,11 @@ import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.util.I18n;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.page.Pagelet;
-import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionConfiguration;
 import ch.o2it.weblounge.common.site.ActionException;
+import ch.o2it.weblounge.common.site.Renderer;
 
 import org.apache.jasper.JasperException;
 

@@ -29,7 +29,6 @@ import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.impl.util.classloader.SiteClassLoader;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Layout;
-import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -40,6 +39,7 @@ import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Module;
+import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteListener;
 import ch.o2it.weblounge.common.site.SiteLogger;
@@ -1146,8 +1146,8 @@ public class SiteImpl implements Site {
    * @param user
    *          the editing user
    * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageRendererChanged(ch.o2it.weblounge.api.url.WebUrl,
-   *      ch.o2it.weblounge.api.renderer.Renderer,
-   *      ch.o2it.weblounge.api.renderer.Renderer,
+   *      ch.o2it.weblounge.common.site.api.renderer.Renderer,
+   *      ch.o2it.weblounge.common.site.api.renderer.Renderer,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageRendererChanged(WebUrl url, Renderer newRenderer,
