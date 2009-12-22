@@ -74,7 +74,6 @@
               ch.o2it.weblounge.common.impl.content,
               ch.o2it.weblounge.common.impl.language,
               ch.o2it.weblounge.common.impl.page,
-              ch.o2it.weblounge.common.impl.renderer,
               ch.o2it.weblounge.common.impl.request,
               ch.o2it.weblounge.common.impl.security,
               ch.o2it.weblounge.common.impl.security.jaas,

@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.page.SearchResult;
-import ch.o2it.weblounge.common.renderer.Renderer;
+import ch.o2it.weblounge.common.site.Renderer;
 
 /**
  * Default implementation of a {@link SearchResult}.

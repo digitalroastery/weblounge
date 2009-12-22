@@ -240,7 +240,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @param cache
    *          the cache
    */
-  public void setCache(ResponseCache cache) {
+  public void setResponseCache(ResponseCache cache) {
     this.cache = cache;
   }
 
