@@ -19,45 +19,41 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.cache.CacheService;
+import ch.o2it.weblounge.common.request.ResponseCache;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
-import java.util.Properties;
-
-import javax.servlet.ServletException;
-
 /**
- * The <code>HttpServiceTracker</code> watches OSGi web service instances and
- * registers and unregisters the weblounge dispatcher with the first service
- * implementation to come.
+ * The <code>CacheServiceTracker</code> watches OSGi services that implement the
+ * {@link CacheService} interface and registers and unregisters the weblounge
+ * dispatcher with the first service implementation to come.
  */
-public class HttpServiceTracker extends ServiceTracker {
+public class CacheServiceTracker extends ServiceTracker {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(HttpServiceTracker.class);
+  private static final Logger log_ = LoggerFactory.getLogger(CacheServiceTracker.class);
 
   /** Main dispatcher */
   private WebloungeDispatcherServlet dispatcher = null;
 
   /**
-   * Creates a new HTTP service tracker that will, upon an appearing http
-   * service, register the dispatcher servlet.
+   * Creates a new <code>CacheServiceTracker</code> that will, upon an appearing
+   * <code>CacheService</code> implementation, register the cache service with
+   * the dispatcher.
    * 
    * @param context
    *          the bundle context
    * @param dispatcher
    *          the dispatcher
    */
-  HttpServiceTracker(BundleContext context,
+  CacheServiceTracker(BundleContext context,
       WebloungeDispatcherServlet dispatcher) {
-    super(context, HttpService.class.getName(), null);
+    super(context, ResponseCache.class.getName(), null);
     this.dispatcher = dispatcher;
   }
 
@@ -68,24 +64,11 @@ public class HttpServiceTracker extends ServiceTracker {
    */
   @Override
   public Object addingService(ServiceReference reference) {
-    HttpService httpService = null;
-
-    // Register the weblounge dispatcher
-    try {
-      log_.debug("Registering weblounge dispatcher with http service {}", reference.getBundle().getSymbolicName());
-      httpService = (HttpService) context.getService(reference);
-      HttpContext httpContext = httpService.createDefaultHttpContext();
-      Dictionary<?, ?> initParams = new Properties();
-      httpService.registerServlet("/", dispatcher, initParams, httpContext);
-      log_.info("Weblounge dispatcher hooked up with {}", reference.getBundle().getSymbolicName());
-    } catch (ServletException e) {
-      log_.error("Error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
-      httpService = null;
-    } catch (NamespaceException e) {
-      log_.error("Namespace error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
-      httpService = null;
-    }
-    return httpService;
+    log_.debug("Registering weblounge dispatcher with {}", reference.getBundle().getSymbolicName());
+    ResponseCache cache = (ResponseCache) context.getService(reference);
+    dispatcher.setResponseCache(cache);
+    log_.info("Enabled response caching through {}", reference.getBundle().getSymbolicName());
+    return cache;
   }
 
   /**
@@ -96,7 +79,7 @@ public class HttpServiceTracker extends ServiceTracker {
    */
   @Override
   public void modifiedService(ServiceReference reference, Object service) {
-    log_.info("Http service was modified");
+    log_.info("Cache service was modified");
     super.modifiedService(reference, service);
   }
 
@@ -108,8 +91,8 @@ public class HttpServiceTracker extends ServiceTracker {
    */
   @Override
   public void removedService(ServiceReference reference, Object service) {
-    log_.info("Weblounge dispatcher disconnected from {}", reference.getBundle().getSymbolicName());
-    ((HttpService) service).unregister("/");
+    log_.info("Response caching disabled ({} disappeared)", reference.getBundle().getSymbolicName());
+    dispatcher.setResponseCache(null);
     super.removedService(reference, service);
   }
 

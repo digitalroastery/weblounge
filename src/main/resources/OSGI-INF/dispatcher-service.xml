@@ -6,13 +6,4 @@
     <provide interface="ch.o2it.weblounge.dispatcher.DispatcherService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-  <!--
-  <reference
-  	name="workspace" 
-  	interface="ch.o2it.weblounge.Service"
-    cardinality="1..1"
-    policy="static"
-    bind="setWorkspace"
-  />
-  -->
 </component>

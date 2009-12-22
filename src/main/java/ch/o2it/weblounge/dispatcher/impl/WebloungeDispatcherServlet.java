@@ -21,6 +21,7 @@ package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
+import ch.o2it.weblounge.common.request.ResponseCache;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
@@ -34,15 +35,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * TODO: Comment WebloungeDispatcherServlet
+ * This is the main dispatcher for weblounge, every request starts and ends
+ * here. Using the <code>HttpServiceTracker</code>, the servlet is registered
+ * with an instance of the OSGi web service.
+ * <p>
+ * The servlet is also where you enable and disable response caching by calling
+ * <code>setResponseCache()</code> with the appropriate implementation
+ * reference.
  */
-public class WebloungeDispatcherServlet extends HttpServlet {
+public final class WebloungeDispatcherServlet extends HttpServlet {
 
   /** Serial version uid */
   private static final long serialVersionUID = 8939686825567275614L;
 
   /** Logger */
   private static final Logger log_ = LoggerFactory.getLogger(WebloungeDispatcherServlet.class);
+
+  /** The response cache */
+  private ResponseCache cache = null;
 
   /** The sites that are online */
   private SiteTracker siteTracker = null;
@@ -59,35 +69,36 @@ public class WebloungeDispatcherServlet extends HttpServlet {
   /**
    * {@inheritDoc}
    * 
-   * @see javax.servlet.http.HttpServlet#doDelete(javax.servlet.http.HttpServletRequest,
-   *      javax.servlet.http.HttpServletResponse)
-   */
-  @Override
-  protected void doDelete(HttpServletRequest request,
-      HttpServletResponse response) throws ServletException, IOException {
-    // TODO Auto-generated method stub
-    super.doDelete(request, response);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
+    log_.info("Serving request to {}", request);
     Site site = getSiteByRequest(request);
     if (site != null) {
       // TODO: Add object pooling for request and response
       WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(request);
       WebloungeResponseImpl webloungeResponse = new WebloungeResponseImpl(response);
       webloungeRequest.init(site);
+      webloungeResponse.setResponseCache(cache);
       site.dispatch(webloungeRequest, webloungeResponse);
     } else {
       super.doGet(request, response);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.http.HttpServlet#doDelete(javax.servlet.http.HttpServletRequest,
+   *      javax.servlet.http.HttpServletResponse)
+   */
+  @Override
+  protected void doDelete(HttpServletRequest request,
+      HttpServletResponse response) throws ServletException, IOException {
+    super.doDelete(request, response);
   }
 
   /**
@@ -99,7 +110,6 @@ public class WebloungeDispatcherServlet extends HttpServlet {
   @Override
   protected void doHead(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    // TODO Auto-generated method stub
     super.doHead(request, response);
   }
 
@@ -112,7 +122,6 @@ public class WebloungeDispatcherServlet extends HttpServlet {
   @Override
   protected void doOptions(HttpServletRequest request,
       HttpServletResponse response) throws ServletException, IOException {
-    // TODO Auto-generated method stub
     super.doOptions(request, response);
   }
 
@@ -125,7 +134,6 @@ public class WebloungeDispatcherServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    // TODO Auto-generated method stub
     super.doPost(request, response);
   }
 
@@ -138,7 +146,6 @@ public class WebloungeDispatcherServlet extends HttpServlet {
   @Override
   protected void doPut(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    // TODO Auto-generated method stub
     super.doPut(request, response);
   }
 
@@ -151,7 +158,6 @@ public class WebloungeDispatcherServlet extends HttpServlet {
   @Override
   protected void doTrace(HttpServletRequest request,
       HttpServletResponse response) throws ServletException, IOException {
-    // TODO Auto-generated method stub
     super.doTrace(request, response);
   }
 
@@ -162,7 +168,6 @@ public class WebloungeDispatcherServlet extends HttpServlet {
    */
   @Override
   protected long getLastModified(HttpServletRequest req) {
-    // TODO Auto-generated method stub
     return super.getLastModified(req);
   }
 
@@ -175,8 +180,19 @@ public class WebloungeDispatcherServlet extends HttpServlet {
   @Override
   protected void service(HttpServletRequest request,
       HttpServletResponse response) throws ServletException, IOException {
-    // TODO Auto-generated method stub
     super.service(request, response);
+  }
+
+  /**
+   * Enables and disables caching by telling the dispatcher to use
+   * <code>cache</code> for response caching. Pass <code>null</code> to disable
+   * response caching.
+   * 
+   * @param cache
+   *          the response cache implementation
+   */
+  public void setResponseCache(ResponseCache cache) {
+    this.cache = cache;
   }
 
   /**
@@ -199,11 +215,12 @@ public class WebloungeDispatcherServlet extends HttpServlet {
 
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return "Weblounge Dispatcher Servlet";
   }
-  
+
 }

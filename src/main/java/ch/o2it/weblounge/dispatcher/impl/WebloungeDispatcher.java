@@ -50,6 +50,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public final class WebloungeDispatcher {
 
+  /** Logging facility */
+  private final static Logger log_ = LoggerFactory.getLogger(WebloungeDispatcher.class);
+
   /** List of request listeners */
   private static List<RequestListener> requestListeners;
 
@@ -61,14 +64,6 @@ public final class WebloungeDispatcher {
 
   /** Reference to dispatcher singleton */
   private static WebloungeDispatcher instance_;
-
-  // Logging
-
-  /** the class name, used for the logging facility */
-  private final static String className = WebloungeDispatcher.class.getName();
-
-  /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(className);
 
   static {
     requestListeners = new ArrayList<RequestListener>();
@@ -109,12 +104,14 @@ public final class WebloungeDispatcher {
    *          the response object
    */
   public void dispatch(WebloungeRequest request, WebloungeResponse response) {
+    log_.info("Dispatching request to {}", request.getPathInfo());
+
     try {
 
       /**
        * Extract the site information. If no suitable site can be found and all
        * sites have been loaded, send an internal error message, since this is
-       * due to malconfiguration.
+       * due to misconfiguration.
        */
       Site site = null;
       try {

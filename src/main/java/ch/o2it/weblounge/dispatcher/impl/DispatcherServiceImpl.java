@@ -47,6 +47,9 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
   /** Tracker for the http service */
   private HttpServiceTracker httpTracker = null;
 
+  /** Tracker for the cache service */
+  private CacheServiceTracker cacheTracker = null;
+
   /** Tracker for weblounge sites */
   private SiteTracker siteTracker = null;
 
@@ -64,7 +67,7 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   public void start(BundleContext context) throws Exception {
-    log_.debug("Weblounge dispatcher activating");
+    log_.debug("Activating weblounge dispatcher");
 
     // Start site service tracking
     siteTracker = new SiteTracker(context);
@@ -72,8 +75,14 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
 
     // Create an http tracker and make sure it forwards to our servlet
     WebloungeDispatcherServlet dispatcher = new WebloungeDispatcherServlet(siteTracker);
+    log_.trace("Start looking for http service implementations");
     httpTracker = new HttpServiceTracker(context, dispatcher);
     httpTracker.open();
+
+    // Start looking for a cache service
+    log_.trace("Start looking for response cache service implementations");
+    cacheTracker = new CacheServiceTracker(context, dispatcher);
+    cacheTracker.open();
 
     log_.debug("Weblounge dispatcher activated");
   }
@@ -84,11 +93,15 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   public void stop(BundleContext context) throws Exception {
-    log_.debug("Weblounge dispatcher deactivating");
+    log_.debug("Deactivating weblounge dispatcher");
 
     // Get rid of the http tracker
     httpTracker.close();
     httpTracker = null;
+
+    // Get rid of the http tracker
+    cacheTracker.close();
+    cacheTracker = null;
 
     // Get rid of the site tracker
     siteTracker.close();
