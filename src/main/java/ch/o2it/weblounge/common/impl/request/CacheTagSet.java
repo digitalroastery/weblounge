@@ -159,7 +159,7 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.util.Set#iterator()
    */
   public Iterator<Tag> iterator() {
@@ -178,6 +178,24 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
   }
 
   /**
+   * Removes the tag with the given name and value.
+   * 
+   * @param name
+   *          the tag name
+   * @param value
+   *          the tag value
+   * @return <code>true</code> if the tag has been removed
+   */
+  public boolean remove(String name, String value) {
+    List<Tag> candidates = new ArrayList<Tag>();
+    for (Tag t : tags_) {
+      if (t.getName().equals(name) && t.getValue().equals(value))
+        candidates.add(t);
+    }
+    return tags_.removeAll(candidates);
+  }
+
+  /**
    * Works like specified in the documentation of {@link Set}, with the
    * exception that tags contained in the primary key (the <code>CacheSet</code>
    * handed over in the constructor of this class) will not be removed, even if
@@ -187,6 +205,22 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
    */
   public boolean removeAll(Collection<?> c) {
     return tags_.removeAll(c);
+  }
+
+  /**
+   * Removes all tags with the given tag name.
+   * 
+   * @param name
+   *          the tag name
+   * @return <code>true</code> if at least one tag has been removed
+   */
+  public boolean removeAllByTagName(String name) {
+    List<Tag> candidates = new ArrayList<Tag>();
+    for (Tag t : tags_) {
+      if (t.getName().equals(name))
+        candidates.add(t);
+    }
+    return tags_.removeAll(candidates);
   }
 
   /**
@@ -203,7 +237,7 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.util.Set#size()
    */
   public int size() {
@@ -212,7 +246,7 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.util.Set#toArray()
    */
   public Object[] toArray() {
@@ -221,7 +255,7 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.util.Set#toArray(T[])
    */
   public <T> T[] toArray(T[] a) {
@@ -230,7 +264,7 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   public String toString() {

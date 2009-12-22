@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.ResponseCache;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Stack;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -46,16 +48,22 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   private int state_ = STATE_SYSTEM_INITIALIZING;
 
   /** Flag for invalidated responses that should not be cached */
-  private boolean invalidated = false;
+  private boolean isValid = false;
 
   /** HTTP error code */
-  private int httpError_ = SC_OK;
+  private int httpError = SC_OK;
 
   /** HTTP error message */
-  private String httpErrorMsg_ = null;
+  private String httpErrorMsg = null;
 
   /** Associated HTTP request object */
-  private WebloungeRequest request_ = null;
+  private WebloungeRequest request = null;
+
+  /** The cache service */
+  private ResponseCache cache = null;
+
+  /** The response part's cache handle */
+  private Stack<CacheHandle> cacheHandles = null;
 
   // Logging
 
@@ -75,7 +83,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   public WebloungeResponseImpl(HttpServletResponse response) {
     super(response);
     state_ = STATE_SYSTEM_INITIALIZING;
-    httpError_ = SC_OK;
+    httpError = SC_OK;
   }
 
   /**
@@ -98,8 +106,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
-   * Returns <code>true</code> if a request listener detects that a
-   * precondition failed and triggered the <code>sendError</code> method.
+   * Returns <code>true</code> if a request listener detects that a precondition
+   * failed and triggered the <code>sendError</code> method.
    * 
    * @return <code>true</code> if a precondition failed
    */
@@ -158,8 +166,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
         break;
     }
 
-    httpError_ = error;
-    httpErrorMsg_ = msg;
+    httpError = error;
+    httpErrorMsg = msg;
     try {
       if (msg == null)
         super.sendError(error);
@@ -173,10 +181,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     Site site = null;
     if (notifySite) {
       try {
-        site = request_.getSite();
-        site.requestFailed(request_, this, httpError_);
+        site = request.getSite();
+        site.requestFailed(request, this, httpError);
       } catch (SiteNotFoundException e) {
-        log_.warn("Site request failure notification failed for " + request_);
+        log_.warn("Site request failure notification failed for " + request);
       }
     }
 
@@ -185,7 +193,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /**
    * Method to be called when an error is detected while processing the request.
    * <p>
-   * <b>Note:</b> Call <code>super.sendError(error, msg)<code> when
+   * <b>Note:</b> Call <code>super.sendError(error)<code> when
    * overwriting this method. Otherwise the system will not be able to
 	 * handle the notification of request listeners.
    * 
@@ -198,21 +206,22 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
-   * Returns the http error code.
+   * Returns the <code>HTTP</code> error code.
    * 
    * @return the error code
    */
   public int getError() {
-    return httpError_;
+    return httpError;
   }
 
   /**
-   * Returns the http error message, which may be <code>null</code>.
+   * Returns the <code>HTTP</code> error message, which may be <code>null</code>
+   * .
    * 
    * @return the error message
    */
   String getErrorMessage() {
-    return httpErrorMsg_;
+    return httpErrorMsg;
   }
 
   /**
@@ -222,7 +231,17 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *          the request
    */
   public void setRequest(WebloungeRequest request) {
-    request_ = request;
+    this.request = request;
+  }
+
+  /**
+   * Sets the service that is used to cache responses to clients.
+   * 
+   * @param cache
+   *          the cache
+   */
+  public void setCache(ResponseCache cache) {
+    this.cache = cache;
   }
 
   /**
@@ -230,33 +249,54 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *      java.lang.Object)
    */
   public boolean addTag(String name, Object value) {
-    return false;
+    boolean result = false;
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      result |= cacheHandles.firstElement().addTag(name, value);
+      result |= cacheHandles.peek().addTag(name, value);
+    }
+    return result;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.Taggable#addTags(java.util.Collection)
    */
   public boolean addTags(Collection<Tag> tags) {
-    return false;
+    boolean result = false;
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      result |= cacheHandles.firstElement().addTags(tags);
+      result |= cacheHandles.peek().addTags(tags);
+    }
+    return result;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.Taggable#addTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean addTag(Tag tag) {
-    return false;
+    boolean result = false;
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      result |= cacheHandles.firstElement().addTag(tag);
+      result |= cacheHandles.peek().addTag(tag);
+    }
+    return result;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.Taggable#clearTags()
    */
   public void clearTags() {
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      cacheHandles.peek().clearTags();
+    }
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.Taggable#containsTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean containsTag(Tag tag) {
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().containsTag(tag);
+    }
     return false;
   }
 
@@ -264,6 +304,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#containsTag(java.lang.String)
    */
   public boolean containsTag(String name) {
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().containsTag(name);
+    }
     return false;
   }
 
@@ -272,6 +315,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *      java.lang.String)
    */
   public boolean containsTag(String name, String value) {
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().containsTag(name, value);
+    }
     return false;
   }
 
@@ -279,6 +325,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#isTagged()
    */
   public boolean isTagged() {
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().isTagged();
+    }
     return false;
   }
 
@@ -286,13 +335,19 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#removeTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean removeTag(Tag tag) {
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().removeTag(tag);
+    }
     return false;
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.Taggable#removeTag(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.Taggable#removeTags(java.lang.String)
    */
-  public boolean removeTag(String name) {
+  public boolean removeTags(String name) {
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().removeTags(name);
+    }
     return false;
   }
 
@@ -301,6 +356,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *      java.lang.String)
    */
   public boolean removeTag(String name, String value) {
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().removeTag(name, value);
+    }
     return false;
   }
 
@@ -308,7 +366,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#tags()
    */
   public Iterator<Tag> tags() {
-    return (new ArrayList<Tag>()).iterator();
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().tags();
+    }
+    return new ArrayList<Tag>().iterator();
   }
 
   /**
@@ -317,68 +378,33 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#getTags()
    */
   public Tag[] getTags() {
-    return new Tag[] {};
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#invalidate()
-   */
-  public void invalidate() {
-    this.invalidated = true;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#isValid()
-   */
-  public boolean isValid() {
-    return !invalidated;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#endResponse()
-   */
-  public boolean endResponse() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#endResponsePart(ch.o2it.weblounge.common.request.CacheHandle)
-   */
-  public void endResponsePart(CacheHandle handle) {
-    // TODO Auto-generated method stub
+    if (cacheHandles != null && cacheHandles.size() > 0) {
+      return cacheHandles.peek().getTags();
+    }
+    return new Tag [] {};
   }
 
   /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponse(java.lang.Iterable,
-   *      ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse, long, long)
+   *      long, long)
    */
-  public CacheHandle startResponse(Iterable<Tag> uniqueTags,
-      WebloungeRequest request, WebloungeResponse response, long validTime,
-      long recheckTime) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponse(ch.o2it.weblounge.common.request.CacheHandle,
-   *      ch.o2it.weblounge.common.request.WebloungeRequest)
-   */
-  public boolean startResponse(CacheHandle handle, WebloungeRequest request) {
-    // TODO Auto-generated method stub
+  public boolean startResponse(Iterable<Tag> tags, long validTime,
+      long recheckTime) throws IllegalStateException {
+    if (!isValid || cache == null)
+      return false;
+    if (cacheHandles != null)
+      throw new IllegalStateException("The response is already being cached");
+    
+    // Is the response in the cache?
+    CacheHandle hdl = cache.startResponse(tags, request, this, validTime, recheckTime);
+    if (hdl == null)
+      return true;
+    
+    // It's not
+    cacheHandles = new Stack<CacheHandle>();
+    cacheHandles.push(hdl);
     return false;
   }
 
@@ -388,20 +414,92 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponsePart(java.lang.Iterable,
    *      long, long)
    */
-  public CacheHandle startResponsePart(Iterable<Tag> uniqueTags,
-      long validTime, long recheckTime) {
-    // TODO Auto-generated method stub
-    return null;
+  public boolean startResponsePart(Iterable<Tag> uniqueTags, long validTime,
+      long recheckTime) {
+    if (!isValid || cache == null)
+      return false;
+    if (cacheHandles == null)
+      throw new IllegalStateException("Cache root entry is missing");
+
+    // Do a cache lookup
+    CacheHandle handle = null;
+    try {
+      handle = cache.startResponsePart(uniqueTags, this, validTime, recheckTime);
+    } catch (Exception e) {
+      log_.warn("Error starting response part in cache", e);
+      return false;
+    }
+
+    // Is the response part in the cache?
+    if (handle == null)
+      return true;
+
+    // It's not in the cache. Make sure the stack is set up and push the
+    // handle onto of it.
+    cacheHandles.push(handle);
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#endResponse()
+   */
+  public void endResponse() throws IllegalStateException {
+    if (!isValid || cache == null)
+      return;
+    if (cacheHandles == null)
+      throw new IllegalStateException("Cache root entry is missing");
+    if (cacheHandles.size() > 1)
+      throw new IllegalStateException("Unfinished response parts detected");
+    
+    // End the response and have the output sent back to the client
+    try {
+      cache.endResponse(this);
+    } catch (Exception e) {
+      log_.warn("Error sending end of response to cache", e);
+    } finally {
+      cacheHandles.clear();
+      cacheHandles = null;
+    }
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponsePart(ch.o2it.weblounge.common.request.CacheHandle)
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#endResponsePart(ch.o2it.weblounge.common.request.CacheHandle)
    */
-  public boolean startResponsePart(CacheHandle handle) {
-    // TODO Auto-generated method stub
-    return false;
+  public void endResponsePart() {
+    if (!isValid || cache == null)
+      return;
+    if (cacheHandles == null || cacheHandles.size() < 1)
+      throw new IllegalStateException("No response part has been started");
+    CacheHandle handle = cacheHandles.pop();
+    try {
+      cache.endResponsePart(handle, this);
+    } catch (Exception e) {
+      log_.warn("Error sending end of response part to cache", e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#invalidate()
+   */
+  public void invalidate() {
+    isValid = false;
+    cacheHandles.clear();
+    cacheHandles = null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#isValid()
+   */
+  public boolean isValid() {
+    return isValid;
   }
 
 }
