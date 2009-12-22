@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="ch.o2it.weblounge.cache.CacheService">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="ch.o2it.weblounge.cache.impl.CacheServiceImpl">
   <implementation class="ch.o2it.weblounge.cache.impl.CacheServiceImpl" />
   <property name="service.description" value="Cache Service" />
   <service>
     <provide interface="ch.o2it.weblounge.cache.CacheService" />
+    <provide interface="ch.o2it.weblounge.common.request.ResponseCache" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
 </scr:component>

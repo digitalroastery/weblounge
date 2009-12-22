@@ -88,10 +88,7 @@
               jtidy
             </Embed-Dependency>
             <Export-Package>
-              ch.o2it.weblounge.cache.impl,
-              ch.o2it.weblounge.cache.impl.filter,
-              ch.o2it.weblounge.cache.impl.handle,
-              ch.o2it.weblounge.cache.impl.index
+              ch.o2it.weblounge.cache.impl
             </Export-Package>
             <Service-Component>
               OSGI-INF/cache-service.xml
