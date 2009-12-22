@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.content.Tag;
 /**
  * Tag used to identify entries in the caching service.
  */
-public final class CacheTagImpl implements Tag {
+public final class CacheTag implements Tag {
 
   /** Special object representing the "any" value */
   public final static Object ANY = new Object();
@@ -43,7 +43,7 @@ public final class CacheTagImpl implements Tag {
    * @param key
    *          the tag key
    */
-  public CacheTagImpl(String key) {
+  public CacheTag(String key) {
     this(key, ANY);
   }
 
@@ -58,7 +58,7 @@ public final class CacheTagImpl implements Tag {
    * @param value
    *          the tag value
    */
-  public CacheTagImpl(String key, Object value) {
+  public CacheTag(String key, Object value) {
     if (key == null)
       throw new IllegalArgumentException("Tag key must not be null!");
     if (value == null)
@@ -90,8 +90,8 @@ public final class CacheTagImpl implements Tag {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof CacheTagImpl) {
-      CacheTagImpl tag = (CacheTagImpl) obj;
+    if (obj instanceof CacheTag) {
+      CacheTag tag = (CacheTag) obj;
       return key.equals(tag.key) && value.equals(tag.value);
     }
     return super.equals(obj);

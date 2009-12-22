@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
-import ch.o2it.weblounge.common.content.Tag;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -36,16 +34,16 @@ import java.util.Set;
  * The set allows multiple tags with the same key, but only one tag with a
  * key-value pair.
  */
-public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
+public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
 
   /** The tags */
-  private List<Tag> tags_ = null;
+  private List<CacheTag> tags_ = null;
 
   /**
    * Creates a new set of cache tags.
    */
   public CacheTagSet() {
-    tags_ = new ArrayList<Tag>();
+    tags_ = new ArrayList<CacheTag>();
   }
 
   /**
@@ -59,13 +57,13 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
    * @return <code>true</code> if the tag could be inserted
    */
   public boolean add(String key, Object value) {
-    return add(new CacheTagImpl(key, value));
+    return add(new CacheTag(key, value));
   }
 
   /**
    * @see java.util.Set#add(java.lang.Object)
    */
-  public boolean add(Tag tag) {
+  public boolean add(CacheTag tag) {
     if (!tags_.contains(tag))
       return tags_.add(tag);
     return false;
@@ -80,10 +78,10 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
    *          the tag key
    * @return <code>true</code> if the tag could be inserted
    */
-  public boolean prevent(String key) {
+  public boolean excludeTagsWith(String key) {
     if (key == null)
       throw new IllegalArgumentException("Key must not be null!");
-    return add(new CacheTagImpl(key, CacheTagImpl.ANY));
+    return add(new CacheTag(key, CacheTag.ANY));
   }
 
   /**
@@ -95,12 +93,12 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
    *          the tag keys
    * @return <code>true</code> if the tags could be inserted
    */
-  public boolean preventAll(Collection<String> keys) {
+  public boolean excludeTagsWith(Collection<String> keys) {
     if (keys == null)
       throw new IllegalArgumentException("Keys must not be null!");
     boolean changed = false;
     for (String key : keys) {
-      changed |= add(new CacheTagImpl(key, CacheTagImpl.ANY));
+      changed |= add(new CacheTag(key, CacheTag.ANY));
     }
     return changed;
   }
@@ -110,9 +108,9 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
    * 
    * @see java.util.Set#addAll(java.util.Collection)
    */
-  public boolean addAll(Collection<? extends Tag> c) {
+  public boolean addAll(Collection<? extends CacheTag> c) {
     boolean inserted = false;
-    for (Tag tag : c) {
+    for (CacheTag tag : c) {
       if (!tags_.contains(tag)) {
         tags_.add(tag);
         inserted = true;
@@ -162,15 +160,13 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
    * 
    * @see java.util.Set#iterator()
    */
-  public Iterator<Tag> iterator() {
+  public Iterator<CacheTag> iterator() {
     return tags_.iterator();
   }
 
   /**
-   * Works like specified in the documentation of {@link Set}, with the
-   * exception that tags contained in the primary key (the <code>CacheSet</code>
-   * handed over in the constructor of this class) will not be removed.
-   * 
+   * {@inheritDoc}
+   *
    * @see java.util.Set#remove(java.lang.Object)
    */
   public boolean remove(Object o) {
@@ -186,9 +182,9 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
    *          the tag value
    * @return <code>true</code> if the tag has been removed
    */
-  public boolean remove(String name, String value) {
-    List<Tag> candidates = new ArrayList<Tag>();
-    for (Tag t : tags_) {
+  public boolean remove(String name, Object value) {
+    List<CacheTag> candidates = new ArrayList<CacheTag>();
+    for (CacheTag t : tags_) {
       if (t.getName().equals(name) && t.getValue().equals(value))
         candidates.add(t);
     }
@@ -215,8 +211,8 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
    * @return <code>true</code> if at least one tag has been removed
    */
   public boolean removeAllByTagName(String name) {
-    List<Tag> candidates = new ArrayList<Tag>();
-    for (Tag t : tags_) {
+    List<CacheTag> candidates = new ArrayList<CacheTag>();
+    for (CacheTag t : tags_) {
       if (t.getName().equals(name))
         candidates.add(t);
     }
@@ -224,11 +220,8 @@ public final class CacheTagSet implements Set<Tag>, Iterable<Tag> {
   }
 
   /**
-   * Works like specified in the documentation of {@link Set}, with the
-   * exception that tags contained in the primary key (the <code>CacheSet</code>
-   * handed over in the constructor of this class) will also be retained, no
-   * matter if its contained in set <code>c</code> or not.
-   * 
+   * {@inheritDoc}
+   *
    * @see java.util.Set#retainAll(java.util.Collection)
    */
   public boolean retainAll(Collection<?> c) {
