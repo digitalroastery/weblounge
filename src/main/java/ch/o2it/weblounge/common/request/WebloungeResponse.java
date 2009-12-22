@@ -53,58 +53,42 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable {
   int STATE_PROCESSING_FAILED = -2;
 
   /**
-   * Starts a cacheable response. By calling this method, a new response wrapper
-   * is generated which will write the response output to the cache as well as
-   * to the client.
+   * Starts a cacheable response. By calling this method, the response output
+   * will be written to the cache as well as to the client.
    * <p>
-   * If the method returns <code>true</code>, then the response part was found
-   * in the cache and has been directly written to the response from the cache.
-   * If it returns <code>false</code>, the data was not found but will be put
-   * into the cache when {@link #endResponse(WebloungeResponse)} is called.
+   * If the method returns <code>true</code>, then the response was found in the
+   * cache and has been directly written to the response from the cache. In this
+   * case, clients <b>must not</b> write data to the response, since it has been
+   * submitted to the client already.
+   * <p>
+   * If the method returns <code>false</code>, the data was not found but will
+   * be put into the cache when {@link #endResponse()} is called.
    * 
    * @param uniqueTags
    *          the tags identifying this response
-   * @param request
-   *          the request
-   * @param response
-   *          the response
    * @param validTime
    *          the valid time in milliseconds
    * @param recheckTime
    *          the recheck time in milliseconds
    * @return the <code>CacheHandle</code> of the response or <code>null</code>
    *         if the response was found in the cache
+   * @throws IllegalStateException
+   *           if the response has already been started
    */
-  CacheHandle startResponse(Iterable<Tag> uniqueTags, WebloungeRequest request,
-      WebloungeResponse response, long validTime, long recheckTime);
-
-  /**
-   * Starts a cacheable response. By calling this method, a new response wrapper
-   * is generated which will write the response output to the cache as well as
-   * to the client.
-   * <p>
-   * If the method returns <code>true</code>, then the response part was found
-   * in the cache and has been directly written to the response from the cache.
-   * If it returns <code>false</code>, the data was not found but will be put
-   * into the cache when {@link #endResponse(WebloungeResponse)} is called.
-   * 
-   * @param request
-   *          the request
-   * @param response
-   *          the response
-   * @return boolean <code>true</code> if the response was found in the cache
-   */
-  boolean startResponse(CacheHandle handle, WebloungeRequest request);
+  boolean startResponse(Iterable<Tag> uniqueTags, long validTime,
+      long recheckTime) throws IllegalStateException;
 
   /**
    * Tell the cache service that writing the response to the client is now
-   * finished and that the cache buffer containing the response may be written to
-   * the cache.
+   * finished and that the cache buffer containing the response may be written
+   * to the cache.
    * 
    * @param response
    *          the servlet response
+   * @throws IllegalStateException
+   *           if the response has never been started
    */
-  boolean endResponse();
+  void endResponse() throws IllegalStateException;
 
   /**
    * Starts caching a sub portion of the current response, identified by a set
@@ -117,8 +101,10 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable {
    * <p>
    * If the method returns <code>true</code>, then the response part was found
    * in the cache and has been directly written to the response from the cache.
+   * In this case, clients <b>must not</b> write data to the response.
+   * <p>
    * If it returns <code>false</code>, the data was not found but will be put
-   * into the cache.
+   * into the cache when {@link #endResponsePart()} is called.
    * 
    * @param uniqueTags
    *          the tag set identifying the response part
@@ -129,38 +115,19 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable {
    * @return the <code>CacheHandle</code> of the response part or
    *         <code>null</code> if the response part was found in the cache
    */
-  CacheHandle startResponsePart(Iterable<Tag> uniqueTags, long validTime, long recheckTime);
+  boolean startResponsePart(Iterable<Tag> uniqueTags, long validTime,
+      long recheckTime);
 
   /**
-   * Starts caching a sub portion of the current response, identified by
-   * <code>handle</code>. Dividing the cached response into parts has the
-   * advantage, that, if for example on part of a page becomes invalid, the
-   * other parts remain in the cache and only the invalidated part and the page
-   * in whole have to be rebuilt.
-   * <p>
-   * If the method returns <code>true</code>, then the response part was found
-   * in the cache and has been directly written to the response from the cache.
-   * If it returns <code>false</code>, the data was not found but will be put
-   * into the cache.
+   * Tells the cache manager that the current response part is complete and may
+   * be written to the cache.
    * 
-   * @param handle
-   *          the response part identifier
-   * @return boolean <code>true</code> if the response part was found in the
-   *         cache
+   * @throws IllegalStateException
+   *           if the response part was never started or if another response
+   *           part needs to be finished first
    */
-  boolean startResponsePart(CacheHandle handle);
+  void endResponsePart() throws IllegalStateException;
 
-  /**
-   * Tells the cache manager that the data identified by <code>handle</code> is
-   * complete and may be written to the cache.
-   * 
-   * @param handle
-   *          the response part identifier. <br>
-   *          NOTE: This MUST be the same instance that was used to start the
-   *          corresponding response part!
-   */
-  void endResponsePart(CacheHandle handle);
-  
   /**
    * Tells the cache to not cache this response. This method should be called in
    * case of any rendering error.

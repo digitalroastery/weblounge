@@ -125,7 +125,7 @@ public interface Taggable {
    *          the tag to remove
    * @return <code>true</code> if the set changed
    */
-  boolean removeTag(String name);
+  boolean removeTags(String name);
 
   /**
    * Removes the tag with the given name and value from the tag set and returns
