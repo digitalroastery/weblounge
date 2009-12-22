@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.cache.impl.index;
 
 import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
+import ch.o2it.weblounge.common.impl.request.CacheTag;
 import ch.o2it.weblounge.common.impl.util.datatype.IdentityHashSet;
 import ch.o2it.weblounge.common.request.CacheHandle;
 
@@ -170,14 +170,14 @@ public final class CacheIndexMapMap {
 		if (tag != null) {
 			Map<Object, Set<CacheHandle>> m = map.get(tag.getName());
 			if (m != null) {
-				if (tag.getValue() == CacheTagImpl.ANY) {
+				if (tag.getValue() == CacheTag.ANY) {
 					for (Set<CacheHandle> l : m.values())
 						res.addAll(l);
 				} else {
 					Set<CacheHandle> l = m.get(tag.getValue());
 					if (l != null)
 						res.addAll(l);
-					l = m.get(CacheTagImpl.ANY);
+					l = m.get(CacheTag.ANY);
 					if (l != null)
 						res.addAll(l);
 				}
@@ -199,7 +199,7 @@ public final class CacheIndexMapMap {
 		if (tag != null) {
 			Map<Object, Set<CacheHandle>> m = map.get(tag.getName());
 			if (m != null) {
-				if (tag.getValue() == CacheTagImpl.ANY) {
+				if (tag.getValue() == CacheTag.ANY) {
 					Set<CacheHandle> s = new IdentityHashSet<CacheHandle>();
 					for (Set<CacheHandle> l : m.values())
 						s.addAll(l);
@@ -208,7 +208,7 @@ public final class CacheIndexMapMap {
 							i.remove();
 				} else {
 					Set<CacheHandle> v = m.get(tag.getValue());
-					Set<CacheHandle> a = m.get(CacheTagImpl.ANY);
+					Set<CacheHandle> a = m.get(CacheTag.ANY);
 					if (v != null) {
 						if (a != null) {
 							for (Iterator<CacheHandle> i = res.iterator(); i.hasNext(); ) {
@@ -357,7 +357,7 @@ public final class CacheIndexMapMap {
 		if (tag != null) {
 			Map<Object, Set<CacheHandle>> m = map.get(tag.getName());
 			if (m != null) {
-				if (tag.getValue() == CacheTagImpl.ANY) {
+				if (tag.getValue() == CacheTag.ANY) {
 					outer: for (Iterator<CacheHandle> i = res.iterator(); i.hasNext(); ) {
 						CacheHandle h = i.next(); 
 						for (Set<CacheHandle> l : m.values())
@@ -367,7 +367,7 @@ public final class CacheIndexMapMap {
 					}
 				} else {
 					Set<CacheHandle> v = m.get(tag.getValue());
-					Set<CacheHandle> a = m.get(CacheTagImpl.ANY);
+					Set<CacheHandle> a = m.get(CacheTag.ANY);
 					if (v != null) {
 						if (a != null) {
 							for (Iterator<CacheHandle> i = res.iterator(); i.hasNext(); ) {
