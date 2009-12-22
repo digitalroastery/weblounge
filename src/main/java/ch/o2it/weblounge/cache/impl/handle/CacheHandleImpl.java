@@ -134,9 +134,9 @@ public abstract class CacheHandleImpl implements CacheHandle {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.content.Taggable#removeTag(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.Taggable#removeTags(java.lang.String)
    */
-  public boolean removeTag(String name) {
+  public boolean removeTags(String name) {
     return removeTag(name, null);
   }
 
@@ -207,7 +207,7 @@ public abstract class CacheHandleImpl implements CacheHandle {
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#removeTag(ch.o2it.weblounge.api.util.Tag)
+   * @see ch.o2it.weblounge.api.util.Taggable#removeTags(ch.o2it.weblounge.api.util.Tag)
    */
   public boolean removeTag(Tag tag) {
     return tags.remove(tag);
