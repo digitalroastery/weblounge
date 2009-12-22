@@ -258,7 +258,7 @@ public class CacheTagSetTest {
    */
   @Test
   public void testSize() {
-    assertEquals(2, set.size());
+    assertEquals(3, set.size());
   }
 
 }
