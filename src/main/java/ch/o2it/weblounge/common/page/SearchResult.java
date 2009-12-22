@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.page;
 
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.renderer.Renderer;
+import ch.o2it.weblounge.common.site.Renderer;
 
 /**
  * The search result is what is delivered by the search function of weblounge.

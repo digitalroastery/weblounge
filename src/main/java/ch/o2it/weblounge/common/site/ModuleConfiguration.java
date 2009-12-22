@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.renderer.Renderer;
 
 import java.util.Collection;
 

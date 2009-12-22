@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.PageURI;
-import ch.o2it.weblounge.common.renderer.Renderer;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;

@@ -18,15 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.renderer;
+package ch.o2it.weblounge.common.site;
 
 import java.io.File;
 
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.site.Include;
-import ch.o2it.weblounge.common.site.ScriptInclude;
 
 /**
  * The renderer configuration stores configuration information about a certain

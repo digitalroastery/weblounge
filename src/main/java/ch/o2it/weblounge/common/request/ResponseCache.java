@@ -146,7 +146,7 @@ public interface ResponseCache {
    *          the valid time in milliseconds
    * @param recheckTime
    *          the recheck time in milliseconds
-   * @return the <code>CacheHandle</code> of the responose part or
+   * @return the <code>CacheHandle</code> of the response part or
    *         <code>null</code> if the response part was found in the cache
    */
   CacheHandle startResponsePart(Iterable<Tag> uniqueTags,
@@ -174,8 +174,8 @@ public interface ResponseCache {
   boolean startResponsePart(CacheHandle handle, HttpServletResponse response);
 
   /**
-   * Tells the cache manager that the data identified by <code>handle</code> is
-   * complete and may be written to the cache.
+   * Tells the cache that the data identified by <code>handle</code> is complete
+   * and may be written to the cache.
    * 
    * @param handle
    *          the response part identifier. <br>
@@ -187,8 +187,15 @@ public interface ResponseCache {
   void endResponsePart(CacheHandle handle, HttpServletResponse response);
 
   /**
-   * Tells the cache manager to throw away the data identified by
-   * <code>handle</code>..
+   * Tells the cache to throw away the data identified by the given set of tags.
+   * 
+   * @param tags
+   *          the set of tags
+   */
+  Set<CacheHandle> invalidateEntry(Iterable<Tag> tags);
+
+  /**
+   * Tells the cache to throw away the data identified by <code>handle</code>.
    * 
    * @param handle
    *          the cache data identifier

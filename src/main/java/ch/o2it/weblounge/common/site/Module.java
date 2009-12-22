@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.site;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.SearchResult;
-import ch.o2it.weblounge.common.renderer.Renderer;
 
 /**
  * The module interface defines the method that may be called on weblounge
