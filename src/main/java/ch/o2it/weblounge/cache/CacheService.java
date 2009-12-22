@@ -20,25 +20,14 @@
 
 package ch.o2it.weblounge.cache;
 
-import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.ResponseCache;
 
-import java.util.Set;
-
 /**
- * TODO: Comment CacheService
+ * The <code>ResponseCacheService</code> is a service providing an
+ * implementation of the {@link ResponseCache} interface along with some methods
+ * to manage the cache and get cache statistics.
  */
 public interface CacheService extends ResponseCache {
-
-  /**
-   * Tells the cache manager to throw away the data identified by
-   * <code>handle</code>..
-   * 
-   * @param tags
-   *          the cache data identifier
-   */
-  Set<CacheHandle> invalidate(Iterable<Tag> tags);
 
   /**
    * Sets the maximum cache size to the given number of bytes.
@@ -56,6 +45,6 @@ public interface CacheService extends ResponseCache {
   /**
    * Clears the cache.
    */
-  void empty();
+  void clear();
 
 }
