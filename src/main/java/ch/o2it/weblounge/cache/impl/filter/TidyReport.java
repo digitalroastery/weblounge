@@ -33,7 +33,7 @@ import java.io.PipedOutputStream;
 import java.io.PrintWriter;
 
 /**
- * This stream writer will analyze the output stream and report problems 
+ * This stream writer will analyze the output stream and report problems
  * (warnings and errors) related to the html standard to the console.
  */
 public class TidyReport implements StreamFilter {

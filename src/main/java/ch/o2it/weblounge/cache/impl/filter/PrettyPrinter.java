@@ -31,49 +31,51 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 /**
- * Pretty printer for html output. This class uses the implementation of the w3c library
- * <code>JTidy</code>.
+ * Pretty printer for html output. This class uses the implementation of the w3c
+ * library <code>JTidy</code>.
  */
 public class PrettyPrinter implements StreamFilter {
 
-	/** the logger */
-	protected static Logger log = LoggerFactory.getLogger(TidyReport.class.getName());
-	
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#filter(java.lang.StringBuffer, java.lang.String)
-	 */
-	public StringBuffer filter(StringBuffer buffer, String contentType) {
-		if ("text/html".equals(contentType)) {
-			Tidy tidy = new Tidy();
-			StringBuffer outBuffer = new StringBuffer(buffer.length());
-			InputStream is = new ByteArrayInputStream(buffer.toString().getBytes());
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			// PENDING Read from filter options
-			tidy.setTidyMark(false);
-			tidy.setFixBackslash(true);
-			tidy.setFixComments(true);
-			tidy.setIndentContent(true);
-			tidy.setMakeClean(true);
-			tidy.setSmartIndent(true);
-			tidy.setUpperCaseAttrs(false);
-			tidy.setUpperCaseTags(false);
-			tidy.pprint(tidy.parseDOM(is, null), os);
-			outBuffer.append(os.toString());
-			return outBuffer;
-		}
-		return buffer;
-	}
+  /** the logger */
+  protected static Logger log = LoggerFactory.getLogger(TidyReport.class.getName());
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#flush()
-	 */
-	public StringBuffer flush() {
-		return null;
-	}
+  /**
+   * @see ch.o2it.weblounge.api.request.StreamFilter#filter(java.lang.StringBuffer,
+   *      java.lang.String)
+   */
+  public StringBuffer filter(StringBuffer buffer, String contentType) {
+    if ("text/html".equals(contentType)) {
+      Tidy tidy = new Tidy();
+      StringBuffer outBuffer = new StringBuffer(buffer.length());
+      InputStream is = new ByteArrayInputStream(buffer.toString().getBytes());
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      // PENDING Read from filter options
+      tidy.setTidyMark(false);
+      tidy.setFixBackslash(true);
+      tidy.setFixComments(true);
+      tidy.setIndentContent(true);
+      tidy.setMakeClean(true);
+      tidy.setSmartIndent(true);
+      tidy.setUpperCaseAttrs(false);
+      tidy.setUpperCaseTags(false);
+      tidy.pprint(tidy.parseDOM(is, null), os);
+      outBuffer.append(os.toString());
+      return outBuffer;
+    }
+    return buffer;
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#close()
-	 */
-	public void close() { }
+  /**
+   * @see ch.o2it.weblounge.api.request.StreamFilter#flush()
+   */
+  public StringBuffer flush() {
+    return null;
+  }
+
+  /**
+   * @see ch.o2it.weblounge.api.request.StreamFilter#close()
+   */
+  public void close() {
+  }
 
 }

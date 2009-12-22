@@ -32,9 +32,11 @@ import java.util.Stack;
 import javax.servlet.ServletOutputStream;
 
 /**
- * TODO: Document me
+ * Extension to the <code>ServletOutputStream</code> that allows to copy the
+ * output that has been written to a <code>HtttpServletResponse</code> to the
+ * response cache as well as to the client.
  */
-class CacheOutputStream extends ServletOutputStream {
+final class CacheOutputStream extends ServletOutputStream {
 
   /** the modification date of the new cached elements */
   private long modified = System.currentTimeMillis();
@@ -164,15 +166,15 @@ class CacheOutputStream extends ServletOutputStream {
 
     /* do some consistency checks */
     switch (count) {
-    case 0:
-      log.error("Cache inconsistency: no active elements in endEntry() for " + hnd);
-      invalid = true;
-      break;
-    case 1:
-      break;
-    default:
-      log.error("Cache inconsistency: sequencing error in endEntry() for " + hnd + ", removed " + count + " entries" + (hierarchy.empty() ? ", no more entries left" : ""));
-      break;
+      case 0:
+        log.error("Cache inconsistency: no active elements in endEntry() for " + hnd);
+        invalid = true;
+        break;
+      case 1:
+        break;
+      default:
+        log.error("Cache inconsistency: sequencing error in endEntry() for " + hnd + ", removed " + count + " entries" + (hierarchy.empty() ? ", no more entries left" : ""));
+        break;
     }
   }
 
@@ -225,15 +227,15 @@ class CacheOutputStream extends ServletOutputStream {
   @SuppressWarnings("fallthrough")
   synchronized void endOutput(CachedResponseMetaInfo meta) {
     switch (hierarchy.size()) {
-    case 0:
-      log.error("Cache inconsistency: no active elements in endOutput()");
-      return;
-    default:
-      log.error("Cache inconsistency: too many active elements in endOutput()");
-      invalid = true;
-    case 1:
-      while (!hierarchy.empty())
-        copyToCache(hierarchy.pop(), meta);
+      case 0:
+        log.error("Cache inconsistency: no active elements in endOutput()");
+        return;
+      default:
+        log.error("Cache inconsistency: too many active elements in endOutput()");
+        invalid = true;
+      case 1:
+        while (!hierarchy.empty())
+          copyToCache(hierarchy.pop(), meta);
     }
   }
 

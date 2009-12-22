@@ -23,7 +23,10 @@ package ch.o2it.weblounge.cache.impl.filter;
 import ch.o2it.weblounge.cache.StreamFilter;
 
 /**
- * TODO: Comment WhitespaceRemover
+ * This filter removes whitespace from html output. Using this filter will
+ * significantly reduce the amount of characters in the output, but will also
+ * lead to the output being on one single line, since newline and return
+ * characters will be removed as well.
  */
 public class WhitespaceRemover implements StreamFilter {
 

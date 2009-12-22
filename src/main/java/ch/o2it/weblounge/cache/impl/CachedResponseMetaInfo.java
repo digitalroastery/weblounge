@@ -28,56 +28,76 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * TODO: Document me
+ * In the <code>CachedResponseMetaInfo</code>, the cache stores
+ * <code>HTTP</code> headers that have been set in the associated
+ * <code>HttpServletResponse</code>.
  */
-class CachedResponseMetaInfo {
+final class CachedResponseMetaInfo {
 
-	/** the list of custom headers */
-	Map<String, Object> headers = new HashMap<String, Object>(5);
-	
-	/** the content type of the message */
-	String contentType;
-	
-	/**
-	 * Apply the cached response meta info to a new response.
-	 * @param resp the response
-	 */
-	@SuppressWarnings("unchecked")
-	void apply(HttpServletResponse resp) {
-		if (resp == null)
-			return;
-		if (contentType != null)
-			resp.setContentType(contentType);
-		for (Map.Entry<String, Object> e : headers.entrySet()) {
-			Object v = e.getValue();
-			if (v instanceof List)
-				for (String s : (List<String>)v)
-					resp.addHeader(e.getKey(), s);
-			else if (v instanceof String)
-				resp.setHeader(e.getKey(), (String)v);
-		}
-	}
-	
-	/** sets response a header */
-	void setHeader(String key, String value) {
-		headers.put(key, value);
-	}
-	
-	/** adds a response header */
-	@SuppressWarnings("unchecked")
-	void addHeader(String key, String value) {
-		Object o = headers.get(key);
-		if (o == null) {
-			headers.put(key, value);
-		}
-		else if (o instanceof List) {
-			((List<String>) o).add(value);
-		}
-		else if (o instanceof String) {
-			List<String> l = new ArrayList<String>(3);
-			l.add((String)o);
-			l.add(value);
-			headers.put(key, l);
-		}
-	}
+  /** the list of custom headers */
+  Map<String, Object> headers = new HashMap<String, Object>(5);
+
+  /** the content type of the message */
+  String contentType = null;
+
+  /**
+   * Applies the cached response meta information to a new response.
+   * 
+   * @param resp
+   *          the response
+   */
+  @SuppressWarnings("unchecked")
+  void apply(HttpServletResponse resp) {
+    if (resp == null)
+      return;
+    if (contentType != null)
+      resp.setContentType(contentType);
+    for (Map.Entry<String, Object> e : headers.entrySet()) {
+      Object v = e.getValue();
+      if (v instanceof List)
+        for (String s : (List<String>) v)
+          resp.addHeader(e.getKey(), s);
+      else if (v instanceof String)
+        resp.setHeader(e.getKey(), (String) v);
+    }
+  }
+
+  /**
+   * Adds an <code>HTTP</code> header to the response, possibly replacing any
+   * existing headers with that name.
+   * 
+   * @param key
+   *          the header name
+   * @param value
+   *          the header value
+   */
+  void setHeader(String key, String value) {
+    headers.put(key, value);
+  }
+
+  /**
+   * Adds an <code>HTTP</code> header to the response. If a header with that
+   * name has already been set, then the value is added to the existing values
+   * for that header.
+   * 
+   * @param key
+   *          the header name
+   * @param value
+   *          the header value
+   */
+  @SuppressWarnings("unchecked")
+  void addHeader(String key, String value) {
+    Object o = headers.get(key);
+    if (o == null) {
+      headers.put(key, value);
+    } else if (o instanceof List) {
+      ((List<String>) o).add(value);
+    } else if (o instanceof String) {
+      List<String> l = new ArrayList<String>(3);
+      l.add((String) o);
+      l.add(value);
+      headers.put(key, l);
+    }
+  }
+
 }

@@ -42,12 +42,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 /**
- * <code>Cache</code> implements the caching service that is used to store
- * rendered pages so that they may be served much faster than if they would have
- * been if rendered again.
+ * Default implementation of the <code>CacheService</code> that is used to store
+ * rendered pages and page elements so that they may be served out of the cache
+ * upon the next request.
  * <p>
- * The service class itself has no logic implemented besides configuring,
- * starting and stopping the cache. The caching is provided by the
+ * The service itself has no logic implemented besides configuring, starting and
+ * stopping the cache. The actual caching is provided by the
  * <code>CacheManager</code>.
  */
 public class CacheServiceImpl implements CacheService, ManagedService {
@@ -117,7 +117,33 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       throw new ConfigurationException("Error configuring the cache filters: " + e.getMessage(), e);
     }
 
-    // TODO: Add support for "enabled" option
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.cache.impl.CacheService1#setSize(long)
+   */
+  public void setSize(long size) {
+    CacheManager.setMaxCacheSize(size);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.cache.impl.CacheService1#resetStatistics()
+   */
+  public void resetStatistics() {
+    CacheManager.resetStats();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.cache.impl.CacheService1#clear()
+   */
+  public void clear() {
+    CacheManager.emptyCache();
   }
 
   /**
@@ -216,9 +242,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#invalidate(java.lang.Iterable)
+   * @see ch.o2it.weblounge.cache.impl.CacheService1#invalidateEntry(java.lang.Iterable)
    */
-  public Set<CacheHandle> invalidate(Iterable<Tag> tags) {
+  public Set<CacheHandle> invalidateEntry(Iterable<Tag> tags) {
     return CacheManager.invalidate(tags);
   }
 
@@ -229,33 +255,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public Set<CacheHandle> invalidateEntry(CacheHandle handle) {
     return CacheManager.invalidateEntry(handle);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#setSize(long)
-   */
-  public void setSize(long size) {
-    CacheManager.setMaxCacheSize(size);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#resetStatistics()
-   */
-  public void resetStatistics() {
-    CacheManager.resetStats();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#empty()
-   */
-  public void empty() {
-    CacheManager.emptyCache();
   }
 
   /**

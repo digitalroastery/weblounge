@@ -27,46 +27,53 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Represents an active cache transaction.
+ * Represents a transaction in the response cache. A transaction keeps track of
+ * the state of a response that is to be written to both the response cache and
+ * the client.
  */
-class CacheTransaction {
+final class CacheTransaction {
 
-	/**
-	 * Creates a new CacheTransaction.
-	 * @param hnd
-	 * @param req
-	 * @param resp
-	 * @param filter
-	 */
-	CacheTransaction(
-		CacheHandle hnd,
-		HttpServletRequest req,
-		HttpServletResponse resp,
-		StreamFilter filter) {
-		this.req = req;
-		this.hnd = hnd;
-		this.resp = resp;
-		this.filter = filter;
-	}
+  /** The main cache handle for this transaction */
+  CacheHandle hnd = null;
 
-	/** the main cache handle for this transaction */
-	CacheHandle hnd;
+  /** The request that initiated this transaction */
+  HttpServletRequest req = null;
 
-	/** the request that initiated this transaction */
-	HttpServletRequest req;
+  /** The response that accepts the result of this transaction */
+  HttpServletResponse resp = null;
 
-	/** the response that accepts the result of this transaction */
-	HttpServletResponse resp;
+  /** The associated cache output stream */
+  CacheOutputStream os = new CacheOutputStream();
 
-	/** the associated cache output stream */
-	CacheOutputStream os = new CacheOutputStream();
-	
-	/** the cached response meta info */
-	CachedResponseMetaInfo meta = new CachedResponseMetaInfo();
+  /** The cached response meta info */
+  CachedResponseMetaInfo meta = new CachedResponseMetaInfo();
 
-	/** the output filter */
-	StreamFilter filter;
-	
-	/** true if the transaction has been invalidated */
-	boolean invalidated = false;
+  /** The output filter */
+  StreamFilter filter = null;
+
+  /** True if the transaction has been invalidated */
+  boolean invalidated = false;
+
+  /**
+   * Creates a new transaction for the given handle, request and response. Any
+   * output that is written to the response will be processed by the filter
+   * prior to being sent to cache and client.
+   * 
+   * @param hnd
+   *          the cache handle
+   * @param req
+   *          the servlet request
+   * @param resp
+   *          the servlet response
+   * @param filter
+   *          the filter
+   */
+  CacheTransaction(CacheHandle hnd, HttpServletRequest req,
+      HttpServletResponse resp, StreamFilter filter) {
+    this.req = req;
+    this.hnd = hnd;
+    this.resp = resp;
+    this.filter = filter;
+  }
+
 }

@@ -45,7 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * TODO Comment CacheManager
+ * LRU implementation of an http response cache.
  */
 public class CacheManager {
 
