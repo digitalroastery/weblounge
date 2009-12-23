@@ -191,7 +191,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     blogNode.setProperty("blogtext", new StringValue("JCR is an interesting API to lo learn."));
     session.save();
 
-    log_.info("Blog node has been saved to jcr");
+    log_.debug("Blog node has been saved to jcr");
 
     // See if the node can be retrieved
     Workspace ws = session.getWorkspace();
@@ -204,11 +204,11 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     while (it.hasNext()) {
       Node n = it.nextNode();
       Property prop = n.getProperty("blogtitle");
-      log_.info("Found blog entry with title: " + prop.getString());
+      log_.debug("Found blog entry with title: " + prop.getString());
       
       VersionHistory history = n.getVersionHistory();
       if (history.getAllVersions().hasNext()) {
-        log_.info("Blog entry is versioned");
+        log_.debug("Blog entry is versioned");
       }
     }    
   }
