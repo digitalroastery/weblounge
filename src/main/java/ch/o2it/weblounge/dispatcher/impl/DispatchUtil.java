@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * TODO: Comment DispatchUtil
+ * Utility class for error reporting using <code>HttpServletResponse</code>.
  */
 public class DispatchUtil {
 
@@ -45,7 +45,8 @@ public class DispatchUtil {
    * @param response
    *          the response object
    */
-  public static void sendInternalError(String msg, WebloungeRequest request, WebloungeResponse response) {
+  public static void sendInternalError(String msg, WebloungeRequest request,
+      WebloungeResponse response) {
     sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg, request, response);
   }
 
@@ -58,7 +59,8 @@ public class DispatchUtil {
    * @param response
    *          the response object
    */
-  public static void sendServiceUnavailable(String msg, WebloungeRequest request, WebloungeResponse response) {
+  public static void sendServiceUnavailable(String msg,
+      WebloungeRequest request, WebloungeResponse response) {
     sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, msg, request, response);
   }
 
@@ -70,7 +72,8 @@ public class DispatchUtil {
    * @param response
    *          the response object
    */
-  public static void sendUrlNotFound(String msg, WebloungeRequest request, WebloungeResponse response) {
+  public static void sendUrlNotFound(String msg, WebloungeRequest request,
+      WebloungeResponse response) {
     sendError(HttpServletResponse.SC_NOT_FOUND, msg, request, response);
   }
 
@@ -82,7 +85,8 @@ public class DispatchUtil {
    * @param response
    *          the response object
    */
-  public static void sendAccessDenied(String msg, WebloungeRequest request, WebloungeResponse response) {
+  public static void sendAccessDenied(String msg, WebloungeRequest request,
+      WebloungeResponse response) {
     sendError(HttpServletResponse.SC_FORBIDDEN, msg, request, response);
   }
 
@@ -97,10 +101,10 @@ public class DispatchUtil {
    * @param response
    *          the response object
    */
-  public static void sendError(int status, String msg, WebloungeRequest request, WebloungeResponse response) {
+  public static void sendError(int status, String msg,
+      WebloungeRequest request, WebloungeResponse response) {
     try {
       response.invalidate();
-      request.getSite().getLogger().debug("Http Error (" + status + "): " + msg);
       response.sendError(status, msg);
     } catch (Exception e2) {
       log_.error("I/O Error when sending back error message " + status + ": " + e2.getMessage());

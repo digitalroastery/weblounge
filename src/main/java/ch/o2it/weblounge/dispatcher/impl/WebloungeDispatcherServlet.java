@@ -75,13 +75,14 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    log_.info("Serving request to {}", request);
+    log_.info("Serving request to {}", request.getRequestURI());
     Site site = getSiteByRequest(request);
     if (site != null) {
       // TODO: Add object pooling for request and response
       WebloungeRequestImpl webloungeRequest = new WebloungeRequestImpl(request);
       WebloungeResponseImpl webloungeResponse = new WebloungeResponseImpl(response);
       webloungeRequest.init(site);
+      webloungeResponse.setRequest(webloungeRequest);
       webloungeResponse.setResponseCache(cache);
       site.dispatch(webloungeRequest, webloungeResponse);
     } else {

@@ -29,7 +29,6 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteNotFoundException;
 import ch.o2it.weblounge.dispatcher.DispatchListener;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.impl.handler.StaticContentHandler;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
@@ -158,7 +157,6 @@ public final class WebloungeDispatcher {
           // Inform listeners about delivered request, but check first if we
           // encountered
           // an error while processing it.
-          ((WebloungeResponseImpl) response).setRequest(request);
           if (response.preconditionFailed()) {
             log_.info("Precondition failed on request " + request);
             return;
