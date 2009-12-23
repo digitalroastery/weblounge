@@ -45,11 +45,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * This <code>RequestHandler</code> maps the request uri to local file paths and
- * loads static content from the file system. The handler is used as a last
- * resort in the the chain of request handlers, meaning that if no other handler
- * is taking responsibility for a request, this handler is explicitly called to
- * make sure static resources are being served instead.
+ * The <code>StaticContentHandler</code> maps the request uri to local file
+ * paths and returns its content to the client.
+ * <p>
+ * This handler is used as a last resort in the the chain of request handlers,
+ * meaning that if no other handler is taking responsibility for a request, this
+ * handler is explicitly called to make sure static resources are being served
+ * instead.
  */
 public class StaticContentHandler implements RequestHandler, Times {
 
@@ -57,6 +59,7 @@ public class StaticContentHandler implements RequestHandler, Times {
   private static final Logger log = LoggerFactory.getLogger(StaticContentHandler.class);
 
   /** Path rules */
+  // TODO: Configure 
   private static final PathRule url_rules[] = {
       new PathRule("^/(?:sites/[^/]+|shared)/module/[^/]+/[^/]+/", new String[] { "^/(?:sites/[^/]+|shared)/module/[^/]+/(?:lib|classes|conf|doc)/" }),
       new PathRule("^/(?:sites/[^/]+|shared)/[^/]+/", new String[] { "^/(?:sites/[^/]+|shared)/(?:lib|classes|module)/" }) };
@@ -164,7 +167,7 @@ public class StaticContentHandler implements RequestHandler, Times {
           return false;
         try {
           log.trace("Handling request {}", request.getUrl());
-          WebloungeDispatcher.forward(request, response, pathInfo);
+          DispatchSupport.forward(request, response, pathInfo);
         } catch (Exception e) {
           if (e instanceof JasperException && ((JasperException) e).getRootCause() != null) {
             String msg = "Error while dispatching static request to " + pathInfo + ": ";

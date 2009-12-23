@@ -134,9 +134,7 @@
           <instructions>
             <Bundle-Activator>ch.o2it.weblounge.dispatcher.impl.DispatcherServiceImpl</Bundle-Activator>
             <Export-Package>
-            	ch.o2it.weblounge.dispatcher.impl,
-            	ch.o2it.weblounge.dispatcher.impl.handler,
-            	ch.o2it.weblounge.dispatcher.impl.jaas
+          	  ch.o2it.weblounge.dispatcher.impl
             </Export-Package>
             <Service-Component>
               OSGI-INF/dispatcher-service.xml
