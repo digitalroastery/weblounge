@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.dispatcher;
 
-import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
@@ -54,15 +53,6 @@ public interface RequestHandler {
   boolean service(WebloungeRequest request, WebloungeResponse response);
 
   /**
-   * Configures the request handler.
-   * 
-   * @param config
-   *          the request handler configuration
-   */
-  void configure(RequestHandlerConfiguration config)
-      throws ConfigurationException;
-
-  /**
    * Returns the request handler identifier.
    * 
    * @return the handler identifier
@@ -75,12 +65,5 @@ public interface RequestHandler {
    * @return the handler name
    */
   String getName();
-
-  /**
-   * Returns the request handler description.
-   * 
-   * @return the handler description
-   */
-  String getDescription();
 
 }
