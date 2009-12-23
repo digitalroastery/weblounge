@@ -75,7 +75,7 @@ public final class RequestSupport {
       params.append("=");
       params.append(value);
     }
-    return (params.length() > 0) ? "[" + params.toString() + "]" : "[-]";
+    return (params.length() > 0) ? params.toString() : "-";
   }
 
   /**

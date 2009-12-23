@@ -25,12 +25,11 @@ import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.ResponseCache;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.site.SiteNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -47,17 +46,14 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(WebloungeResponseImpl.class);
 
-  /** the response state */
-  private int state = STATE_SYSTEM_INITIALIZING;
-
   /** Flag for invalidated responses that should not be cached */
   private boolean isValid = false;
 
-  /** HTTP error code */
-  private int httpError = SC_OK;
+  /** True if an error has been reported */
+  private boolean hasError = false;
 
-  /** HTTP error message */
-  private String httpErrorMsg = null;
+  /** Response status */
+  private int responseStatus = SC_OK;
 
   /** Associated HTTP request object */
   private WebloungeRequest request = null;
@@ -77,146 +73,47 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public WebloungeResponseImpl(HttpServletResponse response) {
     super(response);
-    this.state = STATE_SYSTEM_INITIALIZING;
-    this.httpError = SC_OK;
   }
 
   /**
-   * Sets the response state.
+   * {@inheritDoc}
    * 
-   * @param state
-   *          the response state
-   */
-  public void setState(int state) {
-    this.state = state;
-  }
-
-  /**
-   * Returns the response state.
-   * 
-   * @return the response state
-   */
-  int getState() {
-    return state;
-  }
-
-  /**
-   * Returns <code>true</code> if a request listener detects that a precondition
-   * failed and triggered the <code>sendError</code> method.
-   * 
-   * @return <code>true</code> if a precondition failed
-   */
-  public boolean preconditionFailed() {
-    return state == STATE_PRECONDITION_FAILED;
-  }
-
-  /**
-   * Returns <code>true</code> if a request listener detects that a error
-   * occurred while processing the request.
-   * 
-   * @return <code>true</code> if an error has occurred
-   */
-  public boolean processingFailed() {
-    return state == STATE_PROCESSING_FAILED;
-  }
-
-  /**
-   * Method to be called when an error is detected while processing the request.
-   * <p>
-   * <b>Note:</b> Call <code>super.sendError(error, msg)<code> when
-   * overwriting this method. Otherwise the system will not be able to
-	 * handle the notification of request listeners.
-   * 
-   * @param error
-   *          the HTTP error code
-   * @param msg
-   *          the error message
-   * @see javax.servlet.http.HttpServletResponse#sendError(int,
+   * @see javax.servlet.http.HttpServletResponseWrapper#sendError(int,
    *      java.lang.String)
    */
-  public void sendError(int error, String msg) {
-    boolean notifySite = false;
-    switch (state) {
-
-      // We already had an error. Therefore ignore any other
-      // error sending
-      case STATE_PRECONDITION_FAILED:
-      case STATE_PROCESSING_FAILED:
-        return;
-
-      case STATE_SITE_INITIALIZING:
-        notifySite = true;
-        state = STATE_PRECONDITION_FAILED;
-        break;
-      case STATE_SYSTEM_INITIALIZING:
-        state = STATE_PRECONDITION_FAILED;
-        break;
-
-      case STATE_SITE_PROCESSING:
-        notifySite = true;
-        state = STATE_PROCESSING_FAILED;
-        break;
-      case STATE_SYSTEM_PROCESSING:
-        state = STATE_PROCESSING_FAILED;
-        break;
-    }
-
-    httpError = error;
-    httpErrorMsg = msg;
-    try {
-      if (msg == null)
-        super.sendError(error);
-      else
-        super.sendError(error, msg);
-      log_.debug("Error '{}' written to response", msg);
-    } catch (Exception e) {
-      log_.error("I/O Error when sending back error message {}!", error);
-    }
-
-    Site site = null;
-    if (notifySite) {
-      try {
-        site = request.getSite();
-        site.requestFailed(request, this, httpError);
-      } catch (SiteNotFoundException e) {
-        log_.warn("Site request failure notification failed for {}", request);
-      }
-    }
-
+  public void sendError(int error, String msg) throws IOException {
+    hasError = true;
+    responseStatus = error;
+    super.sendError(error, msg);
   }
 
   /**
-   * Method to be called when an error is detected while processing the request.
-   * <p>
-   * <b>Note:</b> Call <code>super.sendError(error)<code> when
-   * overwriting this method. Otherwise the system will not be able to
-	 * handle the notification of request listeners.
+   * {@inheritDoc}
    * 
-   * @param error
-   *          the HTTP error code
-   * @see javax.servlet.http.HttpServletResponse#sendError(int)
+   * @see javax.servlet.http.HttpServletResponseWrapper#sendError(int)
    */
-  public void sendError(int error) {
+  public void sendError(int error) throws IOException {
     sendError(error, null);
   }
 
   /**
-   * Returns the <code>HTTP</code> error code.
+   * Returns <code>true</code> if an error code has been sent back to the
+   * client.
    * 
-   * @return the error code
+   * @return <code>true</code> if an error code has been sent to the client
    */
-  public int getError() {
-    return httpError;
+  public boolean hasError() {
+    return hasError;
   }
 
   /**
-   * Returns the <code>HTTP</code> error message, which may be <code>null</code>
-   * .
+   * Returns the value of the response status. The value will match
+   * <code>SC_OK</code> as long as no error has been reported.
    * 
-   * @return the error message
+   * @return the status code
    */
-  String getErrorMessage() {
-    return httpErrorMsg;
+  public int getResponseStatus() {
+    return responseStatus;
   }
 
   /**
@@ -240,6 +137,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#addTag(java.lang.String,
    *      java.lang.Object)
    */
@@ -253,6 +152,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#addTags(java.util.Collection)
    */
   public boolean addTags(Collection<Tag> tags) {
@@ -265,6 +166,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#addTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean addTag(Tag tag) {
@@ -277,6 +180,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#clearTags()
    */
   public void clearTags() {
@@ -286,6 +191,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#containsTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean containsTag(Tag tag) {
@@ -296,6 +203,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#containsTag(java.lang.String)
    */
   public boolean containsTag(String name) {
@@ -306,6 +215,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#containsTag(java.lang.String,
    *      java.lang.String)
    */
@@ -317,6 +228,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#isTagged()
    */
   public boolean isTagged() {
@@ -327,6 +240,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#removeTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean removeTag(Tag tag) {
@@ -337,6 +252,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#removeTags(java.lang.String)
    */
   public boolean removeTags(String name) {
@@ -347,6 +264,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#removeTag(java.lang.String,
    *      java.lang.String)
    */
@@ -358,6 +277,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#tags()
    */
   public Iterator<Tag> tags() {
@@ -376,7 +297,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     if (cacheHandles != null && cacheHandles.size() > 0) {
       return cacheHandles.peek().getTags();
     }
-    return new Tag [] {};
+    return new Tag[] {};
   }
 
   /**
@@ -391,12 +312,12 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       return false;
     if (cacheHandles != null)
       throw new IllegalStateException("The response is already being cached");
-    
+
     // Is the response in the cache?
     CacheHandle hdl = cache.startResponse(tags, request, this, validTime, recheckTime);
     if (hdl == null)
       return true;
-    
+
     // It's not
     cacheHandles = new Stack<CacheHandle>();
     cacheHandles.push(hdl);
@@ -437,7 +358,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#endResponse()
    */
   public void endResponse() throws IllegalStateException {
@@ -447,7 +368,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       throw new IllegalStateException("Cache root entry is missing");
     if (cacheHandles.size() > 1)
       throw new IllegalStateException("Unfinished response parts detected");
-    
+
     // End the response and have the output sent back to the client
     try {
       cache.endResponse(this);
@@ -462,7 +383,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#endResponsePart(ch.o2it.weblounge.common.request.CacheHandle)
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#endResponsePart()
    */
   public void endResponsePart() {
     if (!isValid || cache == null)
@@ -484,8 +405,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public void invalidate() {
     isValid = false;
-    cacheHandles.clear();
-    cacheHandles = null;
+    if (cacheHandles != null) {
+      cacheHandles.clear();
+      cacheHandles = null;
+    }
   }
 
   /**

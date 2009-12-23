@@ -362,7 +362,10 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return url + " [" + id + "]";
+    if (url != null)
+      return url + " [" + id + "]";
+    else
+      return getRequestURI();
   }
 
 }
