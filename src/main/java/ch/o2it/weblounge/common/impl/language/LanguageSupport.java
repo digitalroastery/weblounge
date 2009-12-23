@@ -150,7 +150,7 @@ public final class LanguageSupport {
         String lAttrib = XPathHelper.valueOf(name, "@language", xpath);
         Language language = LanguageSupport.getLanguage(lAttrib);
         if (language == null) {
-          log_.debug("Found name in unsupported language " + lAttrib);
+          log_.debug("Found name in unsupported language {}", lAttrib);
           continue;
         }
 
@@ -161,7 +161,7 @@ public final class LanguageSupport {
         }
 
         // Add the entry
-        log_.debug("Found description " + description);
+        log_.debug("Found description {}", description);
         o.put(description, language);
         if (language.equals(defaultLanguage)) {
           o.setDefaultLanguage(defaultLanguage);

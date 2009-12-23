@@ -109,7 +109,7 @@ public class SecurityContextImpl extends AbstractSecurityContext {
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    log_.debug("Security context '" + this + "' requires '" + authority + "' for permission '" + permission + "'");
+    log_.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
 
     Set<Authority> a = context_.get(permission);
     if (a == null) {
@@ -136,7 +136,7 @@ public class SecurityContextImpl extends AbstractSecurityContext {
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    log_.debug("Security context '" + this + "' requires '" + authority + "' for permission '" + permission + "'");
+    log_.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
     Set<Authority> a = defaultContext_.get(permission);
     if (a == null) {
       a = new HashSet<Authority>();
@@ -161,7 +161,7 @@ public class SecurityContextImpl extends AbstractSecurityContext {
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    log_.debug("Security context '" + this + "' requires '" + authority + "' for permission '" + permission + "'");
+    log_.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
 
     deny(permission, authority, context_);
     deny(permission, authority, defaultContext_);
@@ -252,7 +252,7 @@ public class SecurityContextImpl extends AbstractSecurityContext {
       throw new IllegalArgumentException("Permission cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    log_.debug("Request to check permission '" + permission + "' for authority '" + authority + "' at " + this);
+    log_.debug("Request to check permission '{}' for authority '{}' at {}", new Object[] {permission, authority, this});
 
     return check(permission, authority, defaultContext_) || check(permission, authority, context_);
   }
@@ -297,7 +297,7 @@ public class SecurityContextImpl extends AbstractSecurityContext {
       throw new IllegalArgumentException("Permissions cannot be null");
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
-    log_.debug("Request to check permissionset for authorization '" + authority + "' at " + this);
+    log_.debug("Request to check permissionset for authorization '{}' at {}", authority, this);
 
     return checkOneOf(permissions, authority) && checkAllOf(permissions, authority);
   }

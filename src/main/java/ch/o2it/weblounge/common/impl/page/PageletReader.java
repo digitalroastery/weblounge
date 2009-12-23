@@ -122,7 +122,7 @@ public final class PageletReader extends WebloungeContentReader {
       String module = attrs.getValue("module");
       String id = attrs.getValue("id");
       pagelet = new PageletImpl(pageletLocation, module, id);
-      log_.debug("Started reading pagelet " + pagelet);
+      log_.debug("Started reading pagelet {}", pagelet);
     }
 
     // locale
@@ -159,7 +159,7 @@ public final class PageletReader extends WebloungeContentReader {
 
     // pagelet
     if ("pagelet".equals(raw)) {
-      log_.debug("Finished reading pagelet " + pagelet);
+      log_.debug("Finished reading pagelet {}", pagelet);
     }
 
     // text

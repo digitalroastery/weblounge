@@ -200,21 +200,21 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
 
     /* precondidtion check failed */
     if (ifNoneMatch != null && ifNoneMatchMatch && !reqGetHead) {
-      log.error("412 PCF: Method=" + req.getMethod() + ", If-None-Match=" + ifNoneMatch + ", match=" + ifNoneMatchMatch);
+      log.error("412 PCF: Method={}, If-None-Match={}, match={}", new Object[] {req.getMethod(), ifNoneMatch, ifNoneMatchMatch});
       log.info("If-None-Match header only supported in GET or HEAD requests.");
       type.type = RESPONSE_PRECONDITION_FAILED;
       type.err = "If-None-Match header only supported in GET or HEAD requests.";
       return type;
     }
     if (ifUnmodifiedSince != -1 && modified > ifUnmodifiedSince) {
-      log.error("412 PCF: modified=" + modified + " > ifUnmodifiedSince=" + ifUnmodifiedSince);
+      log.error("412 PCF: modified={} > ifUnmodifiedSince={}", modified, ifUnmodifiedSince);
       log.info("If-Unmodified-Since precondition check failed.");
       type.type = RESPONSE_PRECONDITION_FAILED;
       type.err = "If-Unmodified-Since precondition check failed.";
       return type;
     }
     if (ifMatch != null && !matchETag(eTag, ifMatch)) {
-      log.error("412 PCF: !matchETag(" + eTag + ", " + ifMatch + ")");
+      log.error("412 PCF: !matchETag({}, {})", eTag, ifMatch);
       log.info("If-match precondition check failed.");
       type.type = RESPONSE_PRECONDITION_FAILED;
       type.err = "If-match precondition check failed.";
@@ -383,7 +383,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
         return true;
       }
       ++stats[STATS_ERRORS];
-      log.warn("IOException while sending response: " + e.getMessage(), e);
+      log.warn("IOException while sending response: {}", e.getMessage(), e);
       return false;
     }
 

@@ -240,7 +240,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // visitor's first access to this site. Therefore, he/she is automatically
     // being logged in as guest.
     if (user == null) {
-      log_.debug("New guest at " + getLocalName());
+      log_.debug("New guest at {}", getLocalName());
       user = new Guest();
     }
 

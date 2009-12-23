@@ -97,7 +97,7 @@ public class XPathHelper {
       String value = processor.evaluate(xpath, node);
       return nullable && value.length() == 0 ? null : value;
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '" + xpath + "' from " + node, e);
+      log_.warn("Error when selecting '{}' from {}", new Object[] {xpath, node, e});
       return nullable ? null : "";
     }
   }
@@ -114,7 +114,7 @@ public class XPathHelper {
     try {
       return (Node) processor.evaluate(xpath, node, XPathConstants.NODE);
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '" + xpath + "' from " + node, e);
+      log_.warn("Error when selecting '{}' from {}", new Object[] {xpath, node, e});
       return null;
     }
   }
@@ -131,7 +131,7 @@ public class XPathHelper {
     try {
       return (NodeList) processor.evaluate(xpath, node, XPathConstants.NODESET);
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '" + xpath + "' from " + node, e);
+      log_.warn("Error when selecting '{}' from {}", new Object[] {xpath, node, e});
       return null;
     }
   }

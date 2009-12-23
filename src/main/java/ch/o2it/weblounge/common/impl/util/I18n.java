@@ -192,7 +192,7 @@ public class I18n {
         }
       }
 
-      log_.info("Reading i18n dictionary " + f);
+      log_.info("Reading i18n dictionary {}", f);
 
       // Get the target properties
 
@@ -216,16 +216,16 @@ public class I18n {
         String key = XPathHelper.valueOf(messageNode, "@name", path);
         String value = XPathHelper.valueOf(messageNode, "value/text()", path);
         if (warn && p.containsKey(key)) {
-          log_.warn("I18n key '" + key + "' redefined in " + f);
+          log_.warn("I18n key '{}' redefined in {}", key, f);
         }
         p.put(key, value);
       }
     } catch (ParserConfigurationException e) {
-      log_.warn("Parser configuration error when reading i18n file " + f + ":" + e.getMessage());
+      log_.warn("Parser configuration error when reading i18n file {}: {}", f, e.getMessage());
     } catch (SAXException e) {
-      log_.warn("SAX exception while parsing i18n file " + f + ":" + e.getMessage());
+      log_.warn("SAX exception while parsing i18n file {}: {}", f, e.getMessage());
     } catch (IOException e) {
-      log_.warn("IO exception while parsing i18n file " + f + ":" + e.getMessage());
+      log_.warn("IO exception while parsing i18n file {}: {}", f, e.getMessage());
     }
   }
 

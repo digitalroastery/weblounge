@@ -357,7 +357,7 @@ public final class PageReader extends WebloungeContentReader {
    *          information about the warning
    */
   public void warning(SAXParseException e) {
-    log_.warn("Warning while reading " + page + ": " + e.getMessage());
+    log_.warn("Warning while reading {}: {}", page, e.getMessage());
   }
 
   /**
@@ -368,7 +368,7 @@ public final class PageReader extends WebloungeContentReader {
    *          information about the error
    */
   public void error(SAXParseException e) {
-    log_.warn("Error while reading " + page + ": " + e.getMessage());
+    log_.warn("Error while reading {}: {}", page, e.getMessage());
   }
 
   /**
@@ -379,7 +379,7 @@ public final class PageReader extends WebloungeContentReader {
    *          information about the error
    */
   public void fatalError(SAXParseException e) {
-    log_.warn("Fatal error while reading " + page + ": " + e.getMessage());
+    log_.warn("Fatal error while reading {}: {}", page, e.getMessage());
   }
 
 }

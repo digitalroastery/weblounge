@@ -155,7 +155,7 @@ public class XMLDocument {
       try {
         file_.createNewFile();
       } catch (IOException e) {
-        log_.error("Unable to create file '" + file_ + "'");
+        log_.error("Unable to create file {}", file_);
         return false;
       }
     }
@@ -171,16 +171,16 @@ public class XMLDocument {
       fos.flush();
       fos.close();
     } catch (FileNotFoundException e) {
-      log_.error("File '" + file_ + "' was not found!");
+      log_.error("File {} was not found!", file_);
       return false;
     } catch (IOException e) {
-      log_.error("Error when serializing xml document to '" + file_ + "'");
+      log_.error("Error when serializing xml document to {}", file_);
       return false;
     } catch (TransformerConfigurationException e) {
-      log_.error("Transformer configuration error when serializing xml document to '" + file_ + "'");
+      log_.error("Transformer configuration error when serializing xml document to {}", file_);
       return false;
     } catch (TransformerException e) {
-      log_.error("Error when serializing xml document to '" + file_ + "'");
+      log_.error("Error when serializing xml document to {}", file_);
       return false;
     }
     isDirty = false;
@@ -368,10 +368,10 @@ public class XMLDocument {
         try {
           document = docBuilder.parse(file_);
         } catch (IOException e) {
-          log_.error("Unable to create file '" + file_ + "'");
+          log_.error("Unable to create file {}", file_);
           document = docBuilder.newDocument();
         } catch (SAXException e) {
-          log_.error("SAX error when parsing file '" + file_ + "'");
+          log_.error("SAX error when parsing file {}", file_);
           document = docBuilder.newDocument();
         }
       }

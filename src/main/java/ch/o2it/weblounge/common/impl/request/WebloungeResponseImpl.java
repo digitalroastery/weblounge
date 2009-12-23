@@ -168,9 +168,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
         super.sendError(error);
       else
         super.sendError(error, msg);
-      log_.debug("Error '" + msg + "' written to response");
+      log_.debug("Error '{}' written to response", msg);
     } catch (Exception e) {
-      log_.error("I/O Error when sending back error message " + error + "!");
+      log_.error("I/O Error when sending back error message {}!", error);
     }
 
     Site site = null;
@@ -179,7 +179,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
         site = request.getSite();
         site.requestFailed(request, this, httpError);
       } catch (SiteNotFoundException e) {
-        log_.warn("Site request failure notification failed for " + request);
+        log_.warn("Site request failure notification failed for {}", request);
       }
     }
 

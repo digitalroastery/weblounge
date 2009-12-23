@@ -327,7 +327,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
    * @see org.xml.sax.helpers.DefaultHandler#warning(org.xml.sax.SAXParseException)
    */
   public void warning(SAXParseException e) throws SAXException {
-    log_.warn("Warning while decoding " + this + ": " + e.getMessage());
+    log_.warn("Warning while decoding {}: {}", this, e.getMessage());
   }
 
   /**
@@ -336,7 +336,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
    * @see org.xml.sax.helpers.DefaultHandler#error(org.xml.sax.SAXParseException)
    */
   public void error(SAXParseException e) throws SAXException {
-    log_.warn("Error while decoding " + this + ": " + e.getMessage());
+    log_.warn("Error while decoding {}: {}", this, e.getMessage());
   }
 
   /**
@@ -345,7 +345,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
    * @see org.xml.sax.helpers.DefaultHandler#fatalError(org.xml.sax.SAXParseException)
    */
   public void fatalError(SAXParseException e) throws SAXException {
-    log_.warn("Fatal error while decoding " + this + ": " + e.getMessage());
+    log_.warn("Fatal error while decoding {}: {}", this, e.getMessage());
   }
 
 }

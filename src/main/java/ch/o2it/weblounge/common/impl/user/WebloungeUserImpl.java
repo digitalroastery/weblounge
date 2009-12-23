@@ -446,7 +446,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       user.lastLoginSource = XPathHelper.valueOf(rootNode, "//security/lastlogin/ip", xpath);
     } catch (ParseException e) {
       // It's not important. Let's log and then forget about it
-      log_.error("Unable to parse last login date: " + lastLogin, e);
+      log_.error("Unable to parse last login date '{}'", lastLogin, e);
     }
 
     // Roles

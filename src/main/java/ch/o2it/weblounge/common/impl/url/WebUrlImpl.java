@@ -186,7 +186,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       try {
         link_ = URLEncoder.encode(getLink(version, flavor), "UTF-8");
       } catch (UnsupportedEncodingException e) {
-        log_.error("Unexpected error while urlencoding link " + link_, e);
+        log_.error("Unexpected error while urlencoding link {}", link_, e);
       }
       link_ = link_.replaceAll("%2F", "/");
     }

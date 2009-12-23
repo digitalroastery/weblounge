@@ -129,7 +129,7 @@ public class Env {
    */
   public static String set(String name, String value) {
     if (value == null) {
-      log_.warn("Tried to store 'null' in environment property '" + name + "'!");
+      log_.warn("Tried to store 'null' in environment property '{}'", name);
       return null;
     }
     String oldValue = (String) properties.get("property");
@@ -198,7 +198,7 @@ public class Env {
     Enumeration<?> keys = properties.keys();
     while (keys.hasMoreElements()) {
       String key = (String) keys.nextElement();
-      log_.debug(key + " : " + properties.getProperty(key));
+      log_.debug("{}:{}", key, properties.getProperty(key));
     }
   }
 

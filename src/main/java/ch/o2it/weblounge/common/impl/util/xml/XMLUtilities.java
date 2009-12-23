@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.util.xml;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -30,7 +28,6 @@ import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -39,7 +36,6 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -48,25 +44,12 @@ import javax.xml.xpath.XPathFactory;
  */
 public class XMLUtilities {
 
-  // Logging
-
-  /** the class name, used for the logging facility */
-  private final static String className = XMLUtilities.class.getName();
-
-  /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(className);
-
   /** the DOM parser factory */
   private static final DocumentBuilderFactory docBuilderFactory_;
 
   /** initialize the DOM parser factory */
   static {
-    try {
-      docBuilderFactory_ = DocumentBuilderFactory.newInstance();
-    } catch (FactoryConfigurationError e) {
-      log_.error("No document builder factroy could be found: " + e.getMessage());
-      throw e;
-    }
+    docBuilderFactory_ = DocumentBuilderFactory.newInstance();
     docBuilderFactory_.setNamespaceAware(true);
   }
 
@@ -75,12 +58,7 @@ public class XMLUtilities {
 
   /** initialize the SAX parser factory */
   static {
-    try {
-      saxParserFactory_ = SAXParserFactory.newInstance();
-    } catch (FactoryConfigurationError e) {
-      log_.error("No SAX parser factroy could be found: " + e.getMessage());
-      throw e;
-    }
+    saxParserFactory_ = SAXParserFactory.newInstance();
     saxParserFactory_.setNamespaceAware(true);
   }
 
@@ -95,12 +73,7 @@ public class XMLUtilities {
     String nvalue = "org.apache.xalan.xsltc.trax.TransformerFactoryImpl";
     if (ovalue.equals(System.getProperty(key)))
       System.setProperty(key, nvalue);
-    try {
-      transformerFactory_ = TransformerFactory.newInstance();
-    } catch (TransformerFactoryConfigurationError e) {
-      log_.error("No transformer factroy could be found: " + e.getMessage());
-      throw e;
-    }
+    transformerFactory_ = TransformerFactory.newInstance();
   }
 
   /** the xpath factory */
