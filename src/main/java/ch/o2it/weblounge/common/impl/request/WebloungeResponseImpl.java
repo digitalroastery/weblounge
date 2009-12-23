@@ -44,8 +44,11 @@ import javax.servlet.http.HttpServletResponseWrapper;
  */
 public class WebloungeResponseImpl extends HttpServletResponseWrapper implements WebloungeResponse {
 
+  /** Logging facility */
+  private final static Logger log_ = LoggerFactory.getLogger(WebloungeResponseImpl.class);
+
   /** the response state */
-  private int state_ = STATE_SYSTEM_INITIALIZING;
+  private int state = STATE_SYSTEM_INITIALIZING;
 
   /** Flag for invalidated responses that should not be cached */
   private boolean isValid = false;
@@ -65,14 +68,6 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /** The response part's cache handle */
   private Stack<CacheHandle> cacheHandles = null;
 
-  // Logging
-
-  /** the class name, used for the logging facility */
-  private final static String className = WebloungeResponseImpl.class.getName();
-
-  /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(className);
-
   /**
    * Creates a new <code>HttpServletResponse</code> wrapper around the original
    * response object.
@@ -82,8 +77,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public WebloungeResponseImpl(HttpServletResponse response) {
     super(response);
-    state_ = STATE_SYSTEM_INITIALIZING;
-    httpError = SC_OK;
+    this.state = STATE_SYSTEM_INITIALIZING;
+    this.httpError = SC_OK;
   }
 
   /**
@@ -93,7 +88,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *          the response state
    */
   public void setState(int state) {
-    state_ = state;
+    this.state = state;
   }
 
   /**
@@ -102,7 +97,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @return the response state
    */
   int getState() {
-    return state_;
+    return state;
   }
 
   /**
@@ -112,7 +107,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @return <code>true</code> if a precondition failed
    */
   public boolean preconditionFailed() {
-    return state_ == STATE_PRECONDITION_FAILED;
+    return state == STATE_PRECONDITION_FAILED;
   }
 
   /**
@@ -122,7 +117,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @return <code>true</code> if an error has occurred
    */
   public boolean processingFailed() {
-    return state_ == STATE_PROCESSING_FAILED;
+    return state == STATE_PROCESSING_FAILED;
   }
 
   /**
@@ -141,7 +136,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public void sendError(int error, String msg) {
     boolean notifySite = false;
-    switch (state_) {
+    switch (state) {
 
       // We already had an error. Therefore ignore any other
       // error sending
@@ -151,18 +146,18 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
       case STATE_SITE_INITIALIZING:
         notifySite = true;
-        state_ = STATE_PRECONDITION_FAILED;
+        state = STATE_PRECONDITION_FAILED;
         break;
       case STATE_SYSTEM_INITIALIZING:
-        state_ = STATE_PRECONDITION_FAILED;
+        state = STATE_PRECONDITION_FAILED;
         break;
 
       case STATE_SITE_PROCESSING:
         notifySite = true;
-        state_ = STATE_PROCESSING_FAILED;
+        state = STATE_PROCESSING_FAILED;
         break;
       case STATE_SYSTEM_PROCESSING:
-        state_ = STATE_PROCESSING_FAILED;
+        state = STATE_PROCESSING_FAILED;
         break;
     }
 

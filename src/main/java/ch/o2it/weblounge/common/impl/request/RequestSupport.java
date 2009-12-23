@@ -22,6 +22,8 @@ package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +36,8 @@ public final class RequestSupport {
   /**
    * RequestSupport is a static class and therefore has no constructor.
    */
-  private RequestSupport() { }
+  private RequestSupport() {
+  }
 
   /**
    * Dumps the request headers to <code>System.out</code>.
@@ -73,6 +76,106 @@ public final class RequestSupport {
       params.append(value);
     }
     return (params.length() > 0) ? "[" + params.toString() + "]" : "[-]";
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and is not equal to the empty string.
+   * 
+   * @return <code>true</code> if the parameter is available
+   */
+  public static boolean parameterExists(WebloungeRequest request,
+      String parameter) {
+    String p = request.getParameter(parameter);
+    return (p != null && !p.equals(""));
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and is not equal to the empty string. In this case, the parameter itself is
+   * returned, <code>null</code> otherwise.
+   * <p>
+   * Note that this method includes the check for <tt>hidden</tt> parameters.
+   * 
+   * @return the parameter value or <code>null</code> if the parameter is not
+   *         available
+   */
+  public static String getParameter(WebloungeRequest request, String parameter) {
+    String p = request.getParameter(parameter);
+    if (p != null) {
+      try {
+        p = URLDecoder.decode(p.trim(), "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+      }
+    }
+    return (p != null && !p.trim().equals("")) ? p : null;
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and is not equal to the empty string. In this case, the parameter itself is
+   * returned, <code>defaultValue</code> otherwise.
+   * <p>
+   * Note that this method includes the check for <tt>hidden</tt> parameters.
+   * 
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   */
+  public static String getParameter(WebloungeRequest request, String parameter,
+      String defaultValue) {
+    String p = getParameter(request, parameter);
+    return (p != null) ? p : defaultValue;
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and is not equal to the empty string. In this case, the parameter itself is
+   * returned, <code>null</code> otherwise.
+   * <p>
+   * Note that this method includes the check for <tt>hidden</tt> parameters.
+   * 
+   * @return <code>null</code> if the parameter is not available
+   * @throws IllegalStateException
+   *           if the required parameter was not found
+   */
+  public static String getRequiredParameter(WebloungeRequest request,
+      String parameter) throws IllegalStateException {
+    String p = getParameter(request, parameter);
+    if (p == null) {
+      throw new IllegalStateException(parameter);
+    }
+    return p;
+  }
+
+  /**
+   * This method returns without noise if one of the specified parameters can be
+   * found in the request and is not equal to the empty string. Otherwise, a
+   * <code>IllegalArgumentException</code> is thrown.
+   * 
+   * @param request
+   *          the request
+   * @param parameters
+   *          the parameter list
+   * @throws IllegalStateException
+   *           if none of the given argument can be found in the request
+   */
+  public static void requireAny(WebloungeRequest request, String[] parameters)
+      throws IllegalStateException {
+    if (parameters == null)
+      return;
+    for (int i = 0; i < parameters.length; i++) {
+      if (getParameter(request, parameters[i]) != null)
+        return;
+    }
+    StringBuffer buf = new StringBuffer();
+    buf.append("[");
+    for (int i = 0; i < parameters.length; i++) {
+      buf.append(parameters[i]);
+      if (i < parameters.length - 1)
+        buf.append(" | ");
+    }
+    buf.append("]");
+    throw new IllegalStateException(buf.toString());
   }
 
 }
