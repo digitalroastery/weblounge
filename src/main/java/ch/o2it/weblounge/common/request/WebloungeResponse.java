@@ -144,22 +144,6 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable {
   boolean isValid();
 
   /**
-   * Returns <code>true</code> if a request listener detects that a precondition
-   * failed and triggered the <code>sendError</code> method.
-   * 
-   * @return <code>true</code> if a precondition failed
-   */
-  boolean preconditionFailed();
-
-  /**
-   * Returns <code>true</code> if a request listener detects that a error
-   * occurred while processing the request.
-   * 
-   * @return <code>true</code> if an error has occurred
-   */
-  boolean processingFailed();
-
-  /**
    * Method to be called when an error is detected while processing the request.
    * <p>
    * <b>Note:</b> Call <code>super.sendError(error, msg)<code> when
