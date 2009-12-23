@@ -160,7 +160,7 @@ public class ActionRegistry extends Registry {
     assert o instanceof ActionHandlerBundle;
     ActionHandlerBundle bundle = (ActionHandlerBundle) o;
     if (bundle.getConfiguration().getMountpoint() == null) {
-      log_.warn("Unable to register action '" + bundle + "' since mountpoint is null!");
+      log_.warn("Unable to register action '{}' since mountpoint is null!", bundle);
       return null;
     }
     mappings_.put(((ActionHandlerBundle) o).getConfiguration().getMountpoint(), o);

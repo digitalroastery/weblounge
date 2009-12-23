@@ -78,7 +78,7 @@ public final class ModuleManager {
     File dir = new File(modulesPath);
     File moduleFolder = new File(site_.getPhysicalPath("/") + ModuleManager.MODULE_DIR);
     if (moduleFolder.exists() && moduleFolder.isDirectory() && moduleFolder.canRead()) {
-      log_.info("Looking for site modules in '" + dir + "'");
+      log_.info("Looking for site modules in '{}'", dir);
       loader_ = new ModuleLoader(dir, site_, this);
       loader_.init();
     }
@@ -123,10 +123,10 @@ public final class ModuleManager {
               throw new ConfigurationException(msg);
             }
             modules.remove(config.identifier);
-            log_.info("Shared module '" + config.identifier + "' is shadowed by site specific module");
+            log_.info("Shared module '{}' is shadowed by site specific module", config.identifier);
           } else {
             modules.remove(config.identifier);
-            log_.info("Site module '" + config.identifier + "' hides shared module");
+            log_.info("Site module '{}' hides shared module", config.identifier);
           }
         } else if (existing != null) {
           String msg = "Two or more modules named '" + config.identifier + "' detected";
@@ -285,7 +285,7 @@ public final class ModuleManager {
       module.stop();
       site_.moduleStopped(module);
     } catch (Throwable t) {
-      log_.error("Error stopping module " + module + ": " + t.getMessage(), t);
+      log_.error("Error stopping module {}: {}", new Object[] {module, t.getMessage(), t});
     }
   }
 

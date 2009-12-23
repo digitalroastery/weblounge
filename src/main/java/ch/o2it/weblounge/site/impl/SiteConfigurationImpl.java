@@ -182,7 +182,7 @@ public class SiteConfigurationImpl implements Customizable {
     } catch (ConfigurationException e) {
       throw e;
     } catch (Exception e) {
-      log_.error("Error when reading site configuration: " + e.getMessage(), e);
+      log_.error("Error when reading site configuration: {}", e.getMessage(), e);
       throw new ConfigurationException("Error when reading site configuration!", e);
     }
   }
@@ -293,7 +293,7 @@ public class SiteConfigurationImpl implements Customizable {
       Node node = urlNodes.item(i);
       String url = node.getFirstChild().getNodeValue();
       urls.add(new URL(url));
-      log_.debug("Found site url " + url);
+      log_.debug("Found site url {}", url);
     }
   }
 
@@ -316,7 +316,7 @@ public class SiteConfigurationImpl implements Customizable {
       try {
         AuthenticationModule module = new AuthenticationModuleImpl(path, node);
         authenticationModules.add(module);
-        log_.debug("Login module " + module.getClass() + " registered");
+        log_.debug("Login module {} registered", module.getClass());
       } catch (Exception e) {
         String msg = "Error reading authentication module: " + e.getMessage();
         log_.warn(msg);
@@ -459,7 +459,7 @@ public class SiteConfigurationImpl implements Customizable {
       RendererBundle bundle = null;
       try {
         id = XPathHelper.valueOf(node, "@id", path);
-        log_.debug("Reading renderer bundle '" + id + "'");
+        log_.debug("Reading renderer bundle '{}'", id);
         RendererBundleConfiguration bundleConfig = new RendererBundleConfiguration(id, getFile());
         bundleConfig.read(path, node);
         bundle = new RendererBundle(id);
@@ -501,12 +501,12 @@ public class SiteConfigurationImpl implements Customizable {
             Class clazz = classLoader.loadClass(rendererConfig.getClassName());
             bundle.define(clazz, rendererConfig);
           } catch (ClassNotFoundException e) {
-            log_.error("Unable to load custom renderer, since class " + rendererConfig.getClassName() + " was not found!", e);
+            log_.error("Unable to load custom renderer, since class {} was not found",rendererConfig.getClassName(), e);
           }
         }
         this.templates.put(id, bundle);
       } catch (ConfigurationException e) {
-        log_.warn("Error when reading renderer bundle '" + id + "'!", e);
+        log_.warn("Error when reading renderer bundle '{}'", id, e);
       }
     }
 
@@ -517,7 +517,7 @@ public class SiteConfigurationImpl implements Customizable {
       throw new ConfigurationException(msg);
     }
     this.templates.setDefault(defaultRenderer);
-    log_.info("Renderer '" + defaultRenderer + "' is the default renderer");
+    log_.info("Renderer '{}' is the default renderer", defaultRenderer);
   }
 
   /**
@@ -544,6 +544,7 @@ public class SiteConfigurationImpl implements Customizable {
       if (enabled != null && !"true".equals(enabled))
         continue;
 
+      String id = XPathHelper.valueOf(jobNode, "@id", path);
       String className = XPathHelper.valueOf(jobNode, "class", path);
       try {
         Class<?> jobClass = Class.forName(className);
@@ -552,18 +553,17 @@ public class SiteConfigurationImpl implements Customizable {
         jobs.add(job);
       } catch (ConfigurationException e) {
         log_.debug("Error configuring service!", e.getCause());
-        log_.error("Error configuring cronjob '" + job.getName() + "' of site '" + identifier + "': " + e.getMessage());
+        log_.error("Error configuring cronjob '{}' of site '{}': {}", new Object[] {job.getName(), identifier, e.getMessage(), e});
       } catch (InstantiationException e) {
-        log_.error("Error instantiating cronjob '" + className + "' of site '" + identifier + "': " + e.getMessage());
+        log_.error("Error instantiating cronjob '{}' of site '{}': {}", new Object[] {className, identifier, e.getMessage(), e});
       } catch (IllegalAccessException e) {
-        log_.error("Access error instantiating cronjob '" + className + "' of site '" + identifier + "': " + e.getMessage());
+        log_.error("Access error instantiating cronjob '{}' of site '{}': {}", new Object[] {className, identifier, e.getMessage(), e});
       } catch (ClassNotFoundException e) {
-        log_.error("Class '" + className + "' for cronjob of site '" + identifier + "' not found: " + e.getMessage());
+        log_.error("Class '{}' for cronjob of site '{}' not found: {}", new Object[] {className, identifier, e.getMessage(), e});
       } catch (NoClassDefFoundError e) {
-        log_.error("Required class '" + className + "' for cronjob of site '" + identifier + "' not found: " + e.getMessage());
+        log_.error("Required class '{}' for cronjob of site '{}' not found: {}", new Object[] {className, identifier, e.getMessage(), e});
       } catch (Exception e) {
-        log_.debug("Error configuring job!", e);
-        log_.error("Error configuring job '" + ((job != null) ? job.getIdentifier() : "?") + "' of site '" + identifier + "': " + e.getMessage());
+        log_.error("Error configuring job '{}' of site '{}': {}", new Object[] {id, identifier, e.getMessage()});
       }
     }
     log_.debug("Jobs configured");
@@ -615,13 +615,9 @@ public class SiteConfigurationImpl implements Customizable {
         LanguageSupport.addDescriptions(path, styleNode, languages.getDefaultLanguage(), style);
         imagestyles.addStyle(style);
       } catch (ConfigurationException e) {
-        String msg = "Configuration error when reading imagestyle '" + id + "': ";
-        log_.debug(msg, e.getReason());
-        log_.warn(msg + e.getReason().getMessage());
+        log_.error("Configuration error when reading imagestyle '{}': {}", new Object[] {id, e.getCause().getMessage(), e.getCause()});
       } catch (Exception e) {
-        String msg = "Error reading imagestyle '" + id + "': ";
-        log_.debug(msg, e);
-        log_.warn(msg + e.getMessage());
+        log_.error("Configuration error when reading imagestyle '{}': {}", new Object[] {id, e.getMessage(), e});
       }
     }
     log_.debug("Imagestyles configured");
@@ -651,8 +647,7 @@ public class SiteConfigurationImpl implements Customizable {
         RequestHandler h = RequestHandlerManager.loadAndConfigure(config, classLoader);
         handlers.put(config.getIdentifier(), h);
       } catch (ConfigurationException e) {
-        log_.debug("Error configuring handler!", e.getReason());
-        log_.error("Error configuring handler '" + config.getIdentifier() + "': " + e.getMessage());
+        log_.error("Error configuring handler '{}': {}", config.getIdentifier(), e.getMessage(), e);
       }
     }
     log_.debug("Request handlers configured");

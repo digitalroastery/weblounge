@@ -142,10 +142,10 @@ public class SiteDispatcher implements Dispatcher {
     if (!dispatching_) {
       synchronized (site_) {
         queueSize_++;
-        log_.debug("Queue size for site '" + site_ + "' is " + queueSize_);
+        log_.debug("Queue size for site '{}' is {}", site_, queueSize_);
         try {
           while (!dispatching_) {
-            log_.info("Request " + request + " locked in '" + site_ + "' site dispatcher queue");
+            log_.info("Request {} locked in '{}' site dispatcher queue", request, site_);
             site_.wait(QUEUING_TIME);
           }
         } catch (InterruptedException e) {
@@ -155,9 +155,9 @@ public class SiteDispatcher implements Dispatcher {
           return;
         } finally {
           queueSize_--;
-          log_.debug("Queue size for site '" + site_ + "' is " + queueSize_);
+          log_.debug("Queue size for site '{}' is {}", site_, queueSize_);
         }
-        log_.info("Request " + request + " released from '" + site_ + "' site dispatcher queue");
+        log_.info("Request {} released from '{}' site dispatcher queue", request, site_);
       }
     }
 
@@ -192,7 +192,7 @@ public class SiteDispatcher implements Dispatcher {
      * internal error message, since this is due to misconfiguration.
      */
     Language language = SessionSupport.getLanguage(request);
-    log_.debug("Session language is " + language);
+    log_.debug("Session language is {}", language);
     if (language == null) {
       String msg = request + " - Unable to assign default language in site '" + site + "'";
       log_.info(msg);
@@ -208,12 +208,9 @@ public class SiteDispatcher implements Dispatcher {
     WebUrl url = null;
     try {
       url = request.getUrl();
-      log_.debug(request + " - Request for " + url + " received.");
-      log_.debug(request + " - Url mountpoint is " + url.getMountpoint());
+      log_.debug("{} - Request for {} received", request, url);
     } catch (UrlNotFoundException e) {
-      String msg = request + " - Url '" + request.getRequestURL() + "' not found.";
-      log_.info(e.getMessage());
-      log_.warn(request + " - Sending 404 - " + msg);
+      log_.warn("Url {} not found", request.getRequestURL());
       DispatchUtil.sendUrlNotFound(msg, request, response);
       return;
     }

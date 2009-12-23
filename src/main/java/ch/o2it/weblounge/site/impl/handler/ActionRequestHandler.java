@@ -95,18 +95,18 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
    * Registers the handler with this request handler.
    * 
    * @param handler
-   *          the webservice handler
+   *          the action handler
    */
   public void addHandler(ActionHandlerBundle handler) {
     actions_.put(handler.getIdentifier(), handler);
-    log_.debug("Action handler '" + handler + "' registered for " + handler.getConfiguration().getMountpoint());
+    log_.debug("Action handler '{}' registered for {}", handler, handler.getConfiguration().getMountpoint());
   }
 
   /**
    * Removes <code>handler</code> from the list of registered handlers.
    * 
    * @param handler
-   *          the webservice handler
+   *          the action handler
    */
   public void removeHandler(ActionHandlerBundle handler) {
     actions_.remove(handler.getIdentifier());
@@ -141,11 +141,11 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
     Action action = actions_.getByUrl(request.getUrl().getPath(), "html");
     if (action == null) {
-      log_.debug("Action handler denies to handle " + request.getUrl());
+      log_.debug("Action handler {}, denies to handle {}", this, request.getUrl());
       return false;
     }
 
-    log_.debug("Action handler " + action + " agrees to handle " + request.getUrl());
+    log_.debug("Action handler {} agrees to handle {}", this, request.getUrl());
     try {
       // check the request method
       String requestMethod = request.getMethod();
@@ -179,9 +179,7 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
             response.sendError(w.getState());
             return true;
           } catch (IOException e) {
-            String m = "Error when sending error";
-            log_.error(m + ": " + e.getMessage());
-            log_.debug(m, e);
+            log_.error("Error when sending {} back to client: {}", w.getState(), e.getMessage());
           }
         }
         request = w;
@@ -190,13 +188,11 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
       Page page = getTargetPage(action, request);
       if (page == null) {
         try {
-          log_.error("No page available to serve action " + action);
+          log_.error("No page available to serve action {}", action);
           response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
           return true;
         } catch (IOException e) {
-          String m = "Error when sending error";
-          log_.error(m + ": " + e.getMessage());
-          log_.debug(m, e);
+          log_.error("Error when sending {} back to client: {}", HttpServletResponse.SC_SERVICE_UNAVAILABLE, e.getMessage());
         }
       }
 
@@ -246,7 +242,7 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
       String method = request.getFlavor();
       try {
         if (action.provides(method)) {
-          log_.info("Handling action request through " + action);
+          log_.info("Handling action request through {}", action);
           request.setAttribute(Action.ID, action);
 
           request.setAttribute(Page.ID, page);
@@ -382,7 +378,7 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
         decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
         target = new WebUrlImpl(site, decocedTargetUrl);
       } catch (UnsupportedEncodingException e) {
-        log_.warn("Error while decoding target url " + targetUrl + ": " + e.getMessage());
+        log_.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
         target = request.getPreviousUrl().getLatestMove();
       }
     } else if (action.getConfiguration().getTargetUrl() != null) {

@@ -368,7 +368,7 @@ public abstract class AbstractAction implements Action {
       try {
         files = upload.parseRequest(request);
       } catch (FileUploadException e) {
-        log_.error("Error parsing uploads:" + e.getMessage(), e);
+        log_.error("Error parsing uploads: {}", e.getMessage(), e);
       }
     }
 
@@ -559,7 +559,7 @@ public abstract class AbstractAction implements Action {
       String msg = "Trying to include unknown renderer '" + renderer + "'";
       throw new ActionException(this, "html", new IllegalArgumentException(msg));
     }
-    log_.debug("Including renderer " + renderer);
+    log_.debug("Including renderer {}", renderer);
     include(request, response, r, data);
   }
 

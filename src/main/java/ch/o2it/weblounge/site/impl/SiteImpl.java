@@ -1334,9 +1334,9 @@ public class SiteImpl implements Site {
       try {
         ServiceManager.startService(service);
       } catch (ServiceException e) {
-        log_.error("Unable to start service '" + service + "' of site '" + this + "':" + e.getMessage());
+        log_.error("Unable to start service '{}' of site '{}': {}", new Object[] {service, this, e.getMessage()});
       } catch (ServiceDependencyException e) {
-        log_.error("Unable to start service '" + service + "' of site '" + this + "' due to circular dependencies.");
+        log_.error("Unable to start service '{}' of site '{}' due to circular dependencies", service, this);
       }
     }
 

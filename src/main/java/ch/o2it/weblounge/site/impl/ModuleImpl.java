@@ -547,10 +547,10 @@ public class ModuleImpl implements Module {
     Iterator options = config.options();
     while (options.hasNext()) {
       String o = (String) options.next();
-      log_.debug("Found option " + o + ": " + config.getOption(o));
+      log_.debug("Found option {}: {}", o, config.getOption(o));
     }
 
-    s handlerRegistry = SiteRegistries.get(RequestHandlerRegistry.ID, site);
+    handlerRegistry = SiteRegistries.get(RequestHandlerRegistry.ID, site);
 
     // Renderers
 
@@ -577,28 +577,7 @@ public class ModuleImpl implements Module {
         ActionHandlerBundle actionHandler = (ActionHandlerBundle) ai.next();
         actionHandler.setModule(this);
         actionRequestHandler.addHandler(actionHandler);
-        log_.debug("Action handler '" + actionHandler + "' registered");
-      }
-    }
-
-    // Wizards
-
-    WizardRequestHandler wizardRequestHandler = null;
-    wizardRequestHandler = (WizardRequestHandler) handlerRegistry.get(WizardRequestHandler.ID);
-    if (wizardRequestHandler == null) {
-      wizardRequestHandler = new WizardRequestHandler();
-      handlerRegistry.put(WizardRequestHandler.ID, wizardRequestHandler);
-    }
-
-    ModuleRegistries.add(WizardRegistry.ID, this, wizards);
-    if (wizards.size() > 0) {
-      getSite().addRequestHandler(wizardRequestHandler);
-      Iterator wi = wizards.values().iterator();
-      while (wi.hasNext()) {
-        WizardHandler wizardHandler = (WizardHandler) wi.next();
-        wizardHandler.setModule(this);
-        wizardRequestHandler.addHandler(wizardHandler);
-        log_.debug("Wizard handler '" + wizardHandler + "' registered");
+        log_.debug("Action handler '{}' registered", actionHandler);
       }
     }
 
@@ -612,47 +591,9 @@ public class ModuleImpl implements Module {
       try {
         ServiceManager.startService(service);
       } catch (ServiceException e) {
-        log_.error("Unable to start service '" + service + "' of module '" + this + "':" + e.getMessage());
+        log_.error("Unable to start service '{}' of module '{}': {}", new Object[] {service, this, e.getMessage(), e});
       } catch (ServiceDependencyException e) {
-        log_.error("Unable to start service '" + service + "' of module '" + this + "' due to cirular dependencies.");
-      }
-    }
-
-    // Servlets
-
-    ServletRequestHandler servletHandler = null;
-    s handlers = SiteRegistries.get(RequestHandlerRegistry.ID, site);
-    servletHandler = (ServletRequestHandler) handlers.get(ServletRequestHandler.ID);
-    if (servletHandler != null) {
-      for (Iterator servlets = ((ModuleConfigurationImpl) config).servlets.iterator(); servlets.hasNext();) {
-        try {
-          servletHandler.addServlet((ServletConfiguration) servlets.next(), classLoader);
-        } catch (ConfigurationException e) {
-          log_.debug("Error configuring servlet!", e);
-          log_.error("Error configuring servlet: " + e.getMessage());
-        }
-      }
-      for (Iterator mappings = ((ModuleConfigurationImpl) config).servletMappings.iterator(); mappings.hasNext();) {
-        try {
-          servletHandler.addServletMapping((ServletMapping) mappings.next());
-        } catch (ConfigurationException e) {
-          log_.debug("Error configuring servlet mapping!", e);
-          log_.error("Error configuring servlet: " + e.getMessage());
-        }
-      }
-    } else {
-      log_.error("The servlet request handler for site '" + site + "' is not accessible!");
-    }
-
-    // Control Panels
-
-    ModuleRegistries.add(ControlPanelRegistry.ID, this, controlpanels);
-    if (controlpanels.size() > 0) {
-      Iterator ci = controlpanels.values().iterator();
-      while (ci.hasNext()) {
-        ControlPanel cp = (ControlPanel) ci.next();
-        getSite().getControlPanels().addControlPanel(cp);
-        log_.debug("Control panel '" + cp + "' registered");
+        log_.error("Unable to start service '{}' of module '{}' due to cirular dependencies", new Object[] {service, this, e});
       }
     }
 
@@ -704,31 +645,9 @@ public class ModuleImpl implements Module {
       actionRequestHandler.removeHandler(aHandler);
     }
 
-    // Wizards
-
-    WizardRequestHandler wizardRequestHandler = null;
-    wizardRequestHandler = (WizardRequestHandler) handlerRegistry.get(WizardRequestHandler.ID);
-    site.removeRequestHandler(wizardRequestHandler);
-    Iterator wi = wizards.values().iterator();
-    while (wi.hasNext()) {
-      WizardHandler wizardHandler = (WizardHandler) wi.next();
-      wizardRequestHandler.removeHandler(wizardHandler);
-    }
-
     // Services
 
     ServiceManager.stopAllServices(services);
-
-    // Control Panels
-
-    if (controlpanels.size() > 0) {
-      Iterator ci = controlpanels.values().iterator();
-      while (ci.hasNext()) {
-        ControlPanel cp = (ControlPanel) ci.next();
-        site.getControlPanels().removeControlPanel(cp);
-        log_.debug("Control panel '" + cp + "' removed");
-      }
-    }
 
     // Tell the others
 

@@ -178,11 +178,11 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
    *          the action configuration
    */
   public void define(Class actionClass, ActionConfiguration config) {
-    log_.debug("Defining action '" + config.getIdentifier() + "' as a " + actionClass);
+    log_.debug("Defining action '{}' as a {}", config.getIdentifier(), actionClass);
     configurations_.put(actionClass, config);
     String methods[] = config.methods();
     for (int i = 0; i < methods.length; i++) {
-      log_.debug("ActionHandler supports method " + methods[i]);
+      log_.debug("ActionHandler supports method {}", methods[i]);
       classes_.put(methods[i], actionClass);
       Pool pool = (Pool) pools_.get(methods[i]);
       if (pool == null) {
@@ -192,7 +192,7 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
         pool.setStep(loadfactor_);
         pool.addPoolListener(this);
         pools_.put(methods[i], pool);
-        log_.debug("Created pool for '" + identifier_ + "/" + methods[i] + "'");
+        log_.debug("Created pool for '{}/{}'",identifier_, methods[i]);
       }
     }
   }
@@ -241,7 +241,7 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
       handler.setModule(module_);
       return handler;
     }
-    log_.debug("No pool found for '" + identifier_ + "/" + method + "'");
+    log_.debug("No pool found for '{}/{}", identifier_, method);
     return null;
   }
 
@@ -281,14 +281,14 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
    * @see #getAction(java.lang.String)
    */
   public void returnAction(Action action) {
-    log_.debug("ActionHandler '" + action + "' returned.");
+    log_.debug("ActionHandler '{}' returned", action);
     String[] methods = action.methods();
     for (int i = 0; i < methods.length; i++) {
       Pool pool = (Pool) pools_.get(methods[i]);
       if (pool != null) {
         pool.returnLease(action);
       } else {
-        log_.warn("Pool for '" + identifier_ + "/" + methods[i] + "' has disappeared!");
+        log_.warn("Pool for '{}/{}' has disappeared", identifier_, methods[i]);
       }
     }
   }
@@ -312,9 +312,9 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
       r.init((ActionConfiguration) configurations_.get(actionClass));
       return r;
     } catch (InstantiationException e) {
-      log_.error("Error instantiating action handler of type '" + actionClass + "' for action '" + this + "'");
+      log_.error("Error instantiating action handler of type '{}' for action '{}'", actionClass, this);
     } catch (IllegalAccessException e) {
-      log_.error("Access violation instantiating action handler of type '" + actionClass + "' for action '" + this + "'");
+      log_.error("Access violation instantiating action handler of type '{}' for action '{}'", actionClass, this);
     }
     return null;
   }
@@ -352,9 +352,9 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
    */
   public void poolSizeChanged(Pool pool, int amount, int size) {
     if (amount > 0) {
-      log_.info("Poolsize for '" + pool + "' increased to " + size);
+      log_.info("Poolsize for '{}' increased to {}", pool, size);
     } else {
-      log_.info("Poolsize for '" + pool + "' decreased to " + size);
+      log_.info("Poolsize for '{}' decreased to ", pool, size);
     }
   }
 
@@ -412,9 +412,9 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
         a.init(getConfiguration(actionClass));
         return a;
       } catch (InstantiationException e) {
-        log_.error("Error instantiating action handler of type '" + actionClass + "' for action '" + ActionHandlerBundle.this + "'");
+        log_.error("Error instantiating action handler of type '{}' for action '{}'", actionClass, ActionHandlerBundle.this);
       } catch (IllegalAccessException e) {
-        log_.error("Access violation instantiating action handler of type '" + actionClass + "' for action '" + ActionHandlerBundle.this + "'");
+        log_.error("Access violation instantiating action handler of type '{}' for action '{}'", actionClass, ActionHandlerBundle.this);
       }
       return null;
     }

@@ -159,7 +159,7 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
     } catch (ConfigurationException e) {
       throw e;
     } catch (Exception e) {
-      log_.error("Error when reading module configuration '" + file + "':" + e.getMessage(), e);
+      log_.error("Error when reading module configuration '{}': {}", new Object[] {file, e.getMessage(), e});
       throw new ConfigurationException("Error when reading module configuration!", e);
     }
   }
@@ -287,7 +287,7 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
       throws ConfigurationException {
     loadfactor = 1;
     if (config == null) {
-      log_.debug("No performance settings found for module '" + identifier + "'");
+      log_.debug("No performance settings found for module '{}'", identifier);
       return;
     }
     String factor = XPathHelper.valueOf(config, "loadfactor", path);
@@ -299,7 +299,7 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
           log_.error(msg);
         }
       } catch (NumberFormatException e) {
-        log_.warn("Loadfactor " + factor + " is not a number! Adjusting to 1");
+        log_.warn("Loadfactor {} is not a number! Adjusting to 1", factor);
         loadfactor = -1;
       }
     }
@@ -316,7 +316,7 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
   private void readRenderers(XPath path, Node config)
       throws ConfigurationException {
     if (config == null) {
-      log_.debug("No renderer definitions found for module '" + identifier + "'");
+      log_.debug("No renderer definitions found for module '{}'", identifier);
       return;
     }
     NodeList bundleNodes = XPathHelper.selectList(config, "renderer", path);
@@ -325,7 +325,7 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
       String id = null;
       try {
         id = XPathHelper.valueOf(node, "@id", path);
-        log_.debug("Reading renderer bundle '" + id + "'");
+        log_.debug("Reading renderer bundle '{}'", id);
         RendererBundleConfiguration bundleConfig = new RendererBundleConfiguration(id, getFile());
         bundleConfig.read(path, node);
         LanguageSupport.addDescriptions(path, node, null, bundleConfig.getDescriptions());
@@ -358,12 +358,12 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
             Class<?> clazz = classLoader.loadClass(rendererConfig.getClassName());
             bundleConfig.define(clazz, rendererConfig);
           } catch (ClassNotFoundException e) {
-            log_.error("Unable to load custom renderer, since class " + rendererConfig.getClassName() + " was not found!", e);
+            log_.error("Unable to load custom renderer, since class {} was not found!", rendererConfig.getClassName(), e);
           }
         }
         renderers.put(id, bundleConfig);
       } catch (Exception e) {
-        log_.warn("Error when reading renderer bundle '" + id + "': " + e.getMessage());
+        log_.warn("Error when reading renderer bundle '{}': {}", id, e.getMessage());
       }
     }
   }
@@ -413,11 +413,9 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
         LanguageSupport.addDescriptions(path, styleNode, null, style);
         imagestyles.put(id, style);
       } catch (ConfigurationException e) {
-        String msg = "Configuration error when reading imagestyle '" + id + "': ";
-        log_.warn(msg + e.getCause());
+        log_.warn("Configuration error when reading imagestyle '{}': {}", new Object[] { id, e.getMessage(), e });
       } catch (Exception e) {
-        String msg = "Error reading imagestyle '" + id + "': ";
-        log_.warn(msg, e);
+        log_.warn("Error reading imagestyle '{}': {}", new Object[] { id, e.getMessage(), e });
       }
     }
     log_.debug("Imagestyles configured");
@@ -434,7 +432,7 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
   private void readActions(XPath path, Node config)
       throws ConfigurationException, ConfigurationException {
     if (config == null) {
-      log_.debug("No action definitions found for module '" + identifier + "'");
+      log_.debug("No action definitions found for module '{}'", identifier);
       return;
     }
     NodeList actionNodes = XPathHelper.selectList(config, "action", path);
@@ -443,7 +441,7 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
       String id = null;
       try {
         id = XPathHelper.valueOf(node, "@id", path);
-        log_.debug("Reading action bundle '" + id + "'");
+        log_.debug("Reading action bundle '{}'", id);
         ActionBundleConfiguration bundleConfig = new ActionBundleConfiguration(id, this);
         LanguageSupport.addDescriptions(path, node, site.getLanguages(), site.getDefaultLanguage(), bundleConfig.getDescription());
         bundleConfig.read(path, node);
@@ -459,30 +457,27 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
             handlerClass.newInstance();
             bundleConfig.define(handlerClass, actionConfig);
           } catch (InstantiationException e) {
-            log_.error("Error instantiating action handler of type '" + id + "'");
-            log_.error("InstatiationException when instantiating action '" + id + "' of module '" + identifier + "': " + e.getMessage());
+            log_.error("Error instantiating action of type '{}' in modue {}: {}", new Object[] {id, identifier, e.getMessage(), e});
             continue;
           } catch (IllegalAccessException e) {
-            log_.error("Access violation when instantiating action '" + id + "' of module '" + identifier + "': " + e.getMessage());
-            log_.error("Error when reading wizard '" + id + "' of module '" + identifier + "': " + e.getMessage());
+            log_.error("Access violation when instantiating action of type '{}' in modue {}: {}", new Object[] {id, identifier, e.getMessage(), e});
             continue;
           } catch (NoClassDefFoundError e) {
-            log_.error("Class '" + e.getMessage() + "' cannot be found but is required by " + actionConfig.getClassName() + "' in action '" + id + "' of module '" + identifier + "'!");
+            log_.error("Class required by action {} of module '{}' not found", actionConfig.getClassName(), identifier);
             continue;
           } catch (ClassNotFoundException e) {
-            log_.error("Handler class '" + actionConfig.getClassName() + "' for action '" + id + "' of module '" + identifier + "' not found!");
+            log_.error("Class {} for action '{}' of module '{}' not found!", new Object[] {actionConfig.getClassName(), id, identifier});
             continue;
           } catch (Throwable e) {
             if (e.getCause() != null)
               e = e.getCause();
-            log_.error("Error creating action handler '" + id + "' of module '" + identifier + "': " + e.getMessage());
+            log_.error("Error creating action handler '{}' of module '{}': {}", new Object[] {id, identifier, e.getMessage(), e});
             continue;
           }
         }
         this.actions.put(id, bundleConfig);
       } catch (Exception e) {
-        log_.error("Error when reading action bundle '" + id + "' of module '" + identifier + "': " + e.getMessage());
-        log_.debug("Error when reading action bundle '" + id + "'!", e);
+        log_.error("Error when reading action bundle '{}' of module '{}': {}", new Object[] {id, identifier, e.getMessage(), e});
       }
     }
   }
@@ -512,25 +507,29 @@ public final class ModuleConfigurationImpl extends Options implements ModuleConf
       if (enabled != null && !"true".equals(enabled))
         continue;
 
+      String id = XPathHelper.valueOf(jobNode, "@id", path);
       String className = XPathHelper.valueOf(jobNode, "class", path);
       try {
         job = (ModuleJob) classLoader.loadClass(className).newInstance();
         job.load(path, jobNode);
         jobs.put(job.getIdentifier(), job);
-      } catch (ConfigurationException e) {
-        log_.debug("Error configuring service!", e.getCause());
-        log_.error("Error configuring cronjob '" + job.getName() + "' of module '" + identifier + "': " + e.getMessage());
       } catch (InstantiationException e) {
-        log_.error("Error instantiating cronjob '" + className + "' of module '" + identifier + "': " + e.getMessage());
+        log_.error("Error instantiating job of type '{}' in modue {}: {}", new Object[] {id, identifier, e.getMessage(), e});
+        continue;
       } catch (IllegalAccessException e) {
-        log_.error("Access error instantiating cronjob '" + className + "' of module '" + identifier + "': " + e.getMessage());
-      } catch (ClassNotFoundException e) {
-        log_.error("Class '" + className + "' for cronjob of module '" + identifier + "' not found: " + e.getMessage());
+        log_.error("Access violation when instantiating job of type '{}' in modue {}: {}", new Object[] {id, identifier, e.getMessage(), e});
+        continue;
       } catch (NoClassDefFoundError e) {
-        log_.error("Required class '" + className + "' for cronjob of module '" + identifier + "' not found: " + e.getMessage());
-      } catch (Exception e) {
-        log_.debug("Error configuring job!", e);
-        log_.error("Error configuring job '" + ((job != null) ? job.getIdentifier() : "?") + "' of module '" + identifier + "': " + e.getMessage());
+        log_.error("Class required by job {} of module '{}' not found", className, identifier);
+        continue;
+      } catch (ClassNotFoundException e) {
+        log_.error("Class {} for job '{}' of module '{}' not found!", new Object[] {className, id, identifier});
+        continue;
+      } catch (Throwable e) {
+        if (e.getCause() != null)
+          e = e.getCause();
+        log_.error("Error creating job handler '{}' of module '{}': {}", new Object[] {id, identifier, e.getMessage(), e});
+        continue;
       }
     }
     log_.debug("Jobs configured");

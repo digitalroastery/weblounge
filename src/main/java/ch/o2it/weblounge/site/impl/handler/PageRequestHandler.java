@@ -86,11 +86,11 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
    * @param request
    *          the weblounge request
    * @param response
-   *          the webloungeresponse
+   *          the weblounge response
    */
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
 
-    log_.debug("Page handler agrees to handle " + request.getUrl());
+    log_.debug("Page handler agrees to handle {}", request.getUrl());
 
     WebUrl url = request.getUrl();
     String path = url.getPath();
@@ -108,7 +108,7 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
     if (pathLength > 3 && path.lastIndexOf(".") == pathLength - 4) {
       String extension = path.substring(pathLength - 4);
       if (!extensions.contains(extension)) {
-        log_.debug("Skipping request for " + path);
+        log_.debug("Skipping request for {}", path);
         return false;
       }
     }
@@ -242,7 +242,7 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
               response.addTag("webl:keyword", keyword);
             }
 
-            log_.info("Rendering '" + path + "' through '" + renderer + "'");
+            log_.info("Rendering {} through {}", path, renderer);
             renderer.configure(method, null);
             renderer.render(request, response);
             if (action == null) {

@@ -111,7 +111,7 @@ class ModuleLoader extends DirectoryWatchdog {
     } else {
       String filename = moduleDir.getAbsolutePath();
       String modulename = filename.substring(filename.lastIndexOf(File.separator) + 1);
-      log_.info("No module descriptor (" + Module.CONFIG_FILE + ") found for module '" + modulename + "'");
+      log_.info("Module descriptor {} not found for module '{}'", Module.CONFIG_FILE, modulename);
     }
   }
 
