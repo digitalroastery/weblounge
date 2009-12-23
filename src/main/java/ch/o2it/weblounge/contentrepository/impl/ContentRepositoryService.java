@@ -137,31 +137,31 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     // jcrHome
     if (properties.get(OPT_JCR_HOME) != null) {
       jcrHome = properties.get(OPT_JCR_HOME).toString();
-      log_.info("Jackrabbit home is now " + jcrHome);
+      log_.info("Jackrabbit home is now {}", jcrHome);
     }
 
     // jcrDbDriver
     if (properties.get(OPT_JCR_DB_DRIVER) != null) {
       jcrDbDriver = properties.get(OPT_JCR_DB_DRIVER).toString();
-      log_.info("Driver for jackrabbit persistence database is now " + jcrDbDriver);
+      log_.info("Driver for jackrabbit persistence database is now {}", jcrDbDriver);
     }
 
     // jcrDbUrl
     if (properties.get(OPT_JCR_DB_URL) != null) {
       jcrDbUrl = properties.get(OPT_JCR_DB_URL).toString();
-      log_.info("Url to jackrabbit persistence database is now " + jcrDbUrl);
+      log_.info("Url to jackrabbit persistence database is now {}", jcrDbUrl);
     }
 
     // jcrDbUsername
     if (properties.get(OPT_JCR_DB_USER) != null) {
       jcrDbUsername = properties.get(OPT_JCR_DB_USER).toString();
-      log_.info("Username for jackrabbit persistence database is now " + jcrDbUsername);
+      log_.info("Username for jackrabbit persistence database is now {}", jcrDbUsername);
     }
 
     // jcrDbPassword
     if (properties.get(OPT_JCR_DB_PASSWORD) != null) {
       jcrDbPassword = properties.get(OPT_JCR_DB_PASSWORD).toString();
-      log_.info("Password for jackrabbit persistence database is now " + jcrDbPassword);
+      log_.info("Password for jackrabbit persistence database is now {}", jcrDbPassword);
     }
 
   }
@@ -204,7 +204,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     while (it.hasNext()) {
       Node n = it.nextNode();
       Property prop = n.getProperty("blogtitle");
-      log_.debug("Found blog entry with title: " + prop.getString());
+      log_.debug("Found blog entry with title: {}", prop.getString());
       
       VersionHistory history = n.getVersionHistory();
       if (history.getAllVersions().hasNext()) {
@@ -233,7 +233,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
   @SuppressWarnings("unchecked")
   public <T> T getObject(Class<T> type, String path) {
     assertSupported(type);
-    log_.debug("getting data from " + path);
+    log_.debug("getting data from {}", path);
     Session session = getSession();
     if (session == null) {
       throw new RuntimeException("Couldn't log in to the repo");
@@ -325,14 +325,14 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
       } else {
         fileNode = buildPath(session, path);
       }
-      log_.debug("fileNode path=" + fileNode.getPath());
+      log_.debug("fileNode path={}", fileNode.getPath());
       Node resNode;
       try {
         resNode = (Node) fileNode.getNode("jcr:content");
-        log_.debug("resource node exists: " + resNode.getPath());
+        log_.debug("resource node exists: {}", resNode.getPath());
       } catch (PathNotFoundException e) {
         resNode = fileNode.addNode("jcr:content", "nt:resource");
-        log_.debug("resource node created: " + resNode.getPath());
+        log_.debug("resource node created: {}", resNode.getPath());
         resNode.addMixin("mix:referenceable");
         resNode.setProperty("jcr:mimeType", "application/octet-stream");
         resNode.setProperty("jcr:encoding", "");
@@ -354,7 +354,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
    * @return The leaf nt:unstructured node
    */
   protected Node buildPath(Session session, String path) throws Exception {
-    log_.debug("Building nodes for " + path);
+    log_.debug("Building nodes for {}", path);
     StringBuilder partialPath = new StringBuilder();
     Node currentNode = session.getRootNode();
     String[] sa = path.split("/");
@@ -364,11 +364,11 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
         continue;
       partialPath.append("/");
       partialPath.append(pathElement);
-      log_.debug("checking for node " + pathElement + " at path " + partialPath);
+      log_.debug("checking for node {} at path {}", pathElement, partialPath);
       if (session.itemExists(partialPath.toString())) {
         currentNode = currentNode.getNode(pathElement);
       } else {
-        log_.debug("Adding node " + pathElement);
+        log_.debug("Adding node {}", pathElement);
         currentNode = currentNode.addNode(pathElement, "nt:unstructured");
       }
       currentNode.addMixin("mix:referenceable");
