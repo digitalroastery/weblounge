@@ -155,7 +155,7 @@ final class CacheOutputStream extends ServletOutputStream {
       count++;
       ActiveElement e = hierarchy.pop();
       if (e.hnd != hnd) {
-        log.error("Cache inconsistency: removed entry " + e.hnd);
+        log.error("Cache inconsistency: removed entry {}", e.hnd);
         invalid = true;
         copyToCache(e, null);
       } else {
@@ -167,13 +167,13 @@ final class CacheOutputStream extends ServletOutputStream {
     /* do some consistency checks */
     switch (count) {
       case 0:
-        log.error("Cache inconsistency: no active elements in endEntry() for " + hnd);
+        log.error("Cache inconsistency: no active elements in endEntry() for {}", hnd);
         invalid = true;
         break;
       case 1:
         break;
       default:
-        log.error("Cache inconsistency: sequencing error in endEntry() for " + hnd + ", removed " + count + " entries" + (hierarchy.empty() ? ", no more entries left" : ""));
+        log.error("Cache inconsistency: sequencing error in endEntry() for {}, removed {} entries" + (hierarchy.empty() ? ", no more entries left" : ""), hnd, count);
         break;
     }
   }
@@ -204,7 +204,7 @@ final class CacheOutputStream extends ServletOutputStream {
     if (e.hit) {
       /* modify the existing cache element */
       CacheManager.modify(e.hnd, e.parent);
-      log.debug("Modified element of type " + e.hnd.getClass().getName());
+      log.debug("Modified element of type {}", e.hnd.getClass().getName());
     } else {
 
       /* copy the text in a new cache buffer */
@@ -213,7 +213,7 @@ final class CacheOutputStream extends ServletOutputStream {
       System.arraycopy(this.buf, e.startPos, buf, 0, length);
 
       /* insert the new cache buffer into the cache */
-      log.debug("Trying to insert " + e.hnd.getClass().getName() + " into cache");
+      log.debug("Trying to insert {} into cache", e.hnd.getClass().getName());
       CacheManager.insert(e.hnd, buf, modified, e.parent, e.children, hierarchy.empty() ? meta : null);
     }
   }

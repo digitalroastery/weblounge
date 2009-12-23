@@ -89,10 +89,10 @@ public class TidyReport implements StreamFilter {
     int err = tt.getErrors();
     int wrn = tt.getWarnings();
     if (err > 0 || wrn > 0) {
-      log.warn("Filter report for " + name + ": Document contains " + wrn + " warning(s) and " + err + " error(s)");
+      log.warn("Filter report for {}: document contains {} warning(s) and {} error(s)", new Object[] {name, wrn, err});
       log.info(tt.wr.toString());
     } else
-      log.info("Filter report for " + name + ": Document clean");
+      log.info("Filter report for {}: document clean", name);
     tt = null;
     name = null;
   }

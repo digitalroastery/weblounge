@@ -179,7 +179,7 @@ public class CacheManager {
 
     if (entry != null) {
       /* handle the request */
-      log.debug("Lookup for " + rootHnd + " succeeded (hit)");
+      log.debug("Lookup for {} succeeded (hit)", rootHnd);
       incStats(rootHnd.getClass(), true);
       incStats(CACHE_TRANSACTION_SKIP);
 
@@ -197,7 +197,7 @@ public class CacheManager {
     }
 
     /* start a new response */
-    log.debug("Lookup for " + rootHnd + " failed (miss)");
+    log.debug("Lookup for {} failed (miss)", rootHnd);
     incStats(rootHnd.getClass(), false);
     incStats(CACHE_TRANSACTION_START);
 
@@ -213,7 +213,7 @@ public class CacheManager {
           filter = new FilterChain(f);
         }
       } catch (Exception e) {
-        log.error("Unable to create filter: " + e.getMessage());
+        log.error("Unable to create filter: {}", e.getMessage());
       }
     return new CacheableHttpServletResponse(new CacheTransaction(rootHnd, req, resp, filter));
 
@@ -241,13 +241,13 @@ public class CacheManager {
     if (e == null) {
       incStats(hnd.getClass(), false);
       resp.cacheMiss(hnd);
-      log.debug("Lookup for " + hnd + " failed (miss)");
+      log.debug("Lookup for {} failed (miss)", hnd);
       return false;
     }
 
     incStats(hnd.getClass(), true);
     resp.cacheHit(hnd, e.buf);
-    log.debug("Lookup for " + hnd + " succeeded (hit)");
+    log.debug("Lookup for {} succeeded (hit)", hnd);
     return true;
   }
 
@@ -401,7 +401,7 @@ public class CacheManager {
    */
   private static void invalidateEntry(CacheHandle hnd, boolean children,
       Set<CacheHandle> handles) {
-    log.debug("Trying to invalidate " + hnd);
+    log.debug("Trying to invalidate {}", hnd);
     synchronized (cache) {
       CacheEntry e = cache.remove(hnd);
       if (e != null) {
@@ -416,7 +416,7 @@ public class CacheManager {
         /* update the statistics */
         cacheSize -= e.buf.length;
         incStats(CACHE_INVALIDATE);
-        log.debug("Entry " + e + " invalidated");
+        log.debug("Entry {} invalidated", e);
 
         /* remove parent entry */
         log.debug("Invalidating parents...");
@@ -472,7 +472,7 @@ public class CacheManager {
 
     /* check whether the object is still valid */
     if (e.expires < System.currentTimeMillis()) {
-      log.debug(hnd + " is no longer valid");
+      log.debug("{} is no longer valid", hnd);
       synchronized (cache) {
         if (cache.remove(hnd) != null) {
           e.unlink();
@@ -481,7 +481,7 @@ public class CacheManager {
           cacheSize -= e.buf.length;
           incStats(CACHE_EXPIRE);
         } else {
-          log.debug("Unable to remove " + hnd);
+          log.debug("Unable to remove {}", hnd);
         }
       }
       return null;
@@ -533,14 +533,14 @@ public class CacheManager {
           cleanupRelationships(old, false);
           cacheSize -= old.buf.length;
           incStats(CACHE_REPLACE);
-          log.debug("Replaced " + hnd + " in cache");
+          log.debug("Replaced {} in cache", hnd);
         } else {
           incStats(CACHE_INSERT);
-          log.debug("Wrote " + hnd + " to cache");
+          log.debug("Wrote {} to cache", hnd);
         }
       }
     } else {
-      log.debug("Element " + hnd + " is not valid or too big");
+      log.debug("Element {} is not valid or too big", hnd);
     }
   }
 
@@ -561,7 +561,7 @@ public class CacheManager {
         if (parent == p)
           return;
         if (parent.equals(p)) {
-          log.debug("Replacing parent " + p + " of " + hnd + " with " + parent);
+          log.debug("Replacing parent {} of {} with {}", new Object[] {parent, hnd, parent});
           e.parents.remove(p);
           e.parents.add(parent);
           incStats(CACHE_MODIFY);
@@ -569,7 +569,7 @@ public class CacheManager {
         }
       }
     }
-    log.debug("Adding parent " + parent + " to " + hnd);
+    log.debug("Adding parent {} to {}", parent, hnd);
     e.parents.add(parent);
     incStats(CACHE_MODIFY);
 
@@ -663,7 +663,7 @@ public class CacheManager {
   static void setMaxCacheSize(long maxCacheSize) {
     CacheManager.maxCacheSize = maxCacheSize;
     ensureFreeSpace(0);
-    log.debug("New cache size is now " + maxCacheSize + " bytes");
+    log.debug("New cache size is now {} bytes", maxCacheSize);
   }
 
   /**
@@ -688,10 +688,10 @@ public class CacheManager {
         continue;
       Class<? extends StreamFilter> c = allFilters.get(tok);
       if (c == null)
-        log.warn("ignoring unknown filter: " + tok);
+        log.warn("ignoring unknown filter: {}", tok);
       else {
         l.add(c);
-        log.debug("using filter: " + tok);
+        log.debug("using filter: {}", tok);
       }
     }
     filters = new Class[l.size()];
@@ -772,7 +772,7 @@ public class CacheManager {
    * Dumps the whole cache hierarchy to the associated logger.
    */
   public static void dumpCacheAsError() {
-    log.error("Full cache dump...\n\n" + dumpCache() + "done!");
+    log.error("Full cache dump...\n\n{}\ndone!", dumpCache());
   }
 
   /**
