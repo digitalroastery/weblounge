@@ -107,7 +107,7 @@ public class DispatchUtil {
       response.invalidate();
       response.sendError(status, msg);
     } catch (Exception e2) {
-      log_.error("I/O Error when sending back error message " + status + ": " + e2.getMessage());
+      log_.error("I/O Error when sending back error message {}: {}", status, e2.getMessage());
     }
   }
 

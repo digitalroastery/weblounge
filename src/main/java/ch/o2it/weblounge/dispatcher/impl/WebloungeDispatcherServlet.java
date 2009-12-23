@@ -208,7 +208,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private Site getSiteByRequest(HttpServletRequest request) {
     Site site = siteTracker.getSiteByName(request.getServerName());
     if (site != null && !site.isEnabled()) {
-      log_.debug("Ignoring request for disabled site " + site);
+      log_.debug("Ignoring request for disabled site {}", site);
       return null;
     }
     return site;

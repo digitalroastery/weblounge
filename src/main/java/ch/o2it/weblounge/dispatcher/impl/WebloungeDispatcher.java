@@ -116,7 +116,7 @@ public final class WebloungeDispatcher {
       try {
         // TODO: Get from service
         site = request.getSite();
-        log_.debug("Request is being delegated to site " + site);
+        log_.debug("Request is being delegated to site {}", site);
       } catch (SiteNotFoundException e) {
         String msg = "No site not found to handle requests for host '" + request.getServerName() + "'";
         log_.info(e.getMessage());
@@ -140,11 +140,11 @@ public final class WebloungeDispatcher {
       for (RequestHandler handler : requestHandler) {
         try {
           if (handler.service(request, response)) {
-            log_.debug("Request handler " + handler + " took request " + request);
+            log_.debug("Request handler {} took request {}", handler, request);
             return;
           }
         } catch (Throwable t) {
-          log_.error("Request handler " + handler + " produced error: " + t.getMessage(), t);
+          log_.error("Request handler {} produced error: {}", new Object[] {handler, t.getMessage(), t});
         }
       }
 
@@ -158,7 +158,7 @@ public final class WebloungeDispatcher {
           // encountered
           // an error while processing it.
           if (response.preconditionFailed()) {
-            log_.info("Precondition failed on request " + request);
+            log_.info("Precondition failed on request {}", request);
             return;
           }
 
@@ -168,14 +168,14 @@ public final class WebloungeDispatcher {
           // encountered
           // an error while processing it.
           if (response.processingFailed()) {
-            log_.info("Processing failed on request " + request);
+            log_.info("Processing failed on request {}", request);
             return;
           }
 
           response.setHeader("X-Powered-By", "Weblounge Content Mangement System");
           site.dispatch(request, response);
           if (response.processingFailed()) {
-            log_.info("Processing failed on request " + request);
+            log_.info("Processing failed on request {}", request);
             return;
           }
 
@@ -205,7 +205,7 @@ public final class WebloungeDispatcher {
         return;
       }
     } finally {
-      log_.debug("Request " + request + " processed");
+      log_.debug("Request {} processed", request);
     }
   }
 
@@ -354,7 +354,7 @@ public final class WebloungeDispatcher {
         return;
     }
     log_.debug("No dispatch listener took the request.");
-    log_.debug("Handling " + url + " as static content");
+    log_.debug("Handling {} as static content", url);
 
     // If we get here, then no dispatcher seems to be responsible for handling
     // the request.

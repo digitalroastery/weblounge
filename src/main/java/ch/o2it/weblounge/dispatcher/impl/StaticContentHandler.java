@@ -107,7 +107,7 @@ public class StaticContentHandler implements RequestHandler, Times {
       return;
 
     try {
-      log.debug("Static request for: " + url);
+      log.trace("Static request for {}", url);
       // check the url
       if (url == null) {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -125,7 +125,7 @@ public class StaticContentHandler implements RequestHandler, Times {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
         return;
       }
-      log.debug("Serving file: " + path);
+      log.debug("Serving file {}", path);
       /* analyze the HTTP request */
       Http11ResponseType responseType = Http11ProtocolHandler.analyzeRequest(request, file.lastModified(), MS_PER_DAY + System.currentTimeMillis(), file.length());
 
@@ -144,7 +144,7 @@ public class StaticContentHandler implements RequestHandler, Times {
         is.close();
       }
     } catch (IOException e) {
-      log.error("Exception while handling static request for '" + url);
+      log.error("Exception while handling static request for {}", url, e);
     }
   }
 
@@ -163,7 +163,7 @@ public class StaticContentHandler implements RequestHandler, Times {
         if (rule.excludes(pathInfo))
           return false;
         try {
-          log.debug("Handling request " + request.getUrl());
+          log.trace("Handling request {}", request.getUrl());
           WebloungeDispatcher.forward(request, response, pathInfo);
         } catch (Exception e) {
           if (e instanceof JasperException && ((JasperException) e).getRootCause() != null) {

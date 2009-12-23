@@ -80,13 +80,13 @@ public class SiteTracker extends ServiceTracker {
       String alias = e.getKey();
       if (serverName.matches(alias)) {
         site = e.getValue();
-        log_.info("Registering " + serverName + " for site " + site);
+        log_.info("Registering {} for site ", serverName, site);
         sitesByServerName.put(serverName, site);
         return site;
       }
     }
     
-    log_.debug("Lookup for " + serverName + " did not match any site");
+    log_.debug("Lookup for {} did not match any site", serverName);
     return null;
   }
 
@@ -99,7 +99,7 @@ public class SiteTracker extends ServiceTracker {
     SiteService service = (SiteService) super.addingService(reference);
     Site site = service.getSite();
     registerSite(site);
-    log_.info("Site " + site + " started");
+    log_.info("Site {} started", site);
     return super.addingService(reference);
   }
 
@@ -112,11 +112,11 @@ public class SiteTracker extends ServiceTracker {
   public void modifiedService(ServiceReference reference, Object service) {
     SiteService s = (SiteService) service;
     Site site = s.getSite();
-    log_.debug("Site " + site + " modified");
-    log_.info("Restarting site " + site);
+    log_.debug("Site {} modified", site);
+    log_.info("Restarting site {}", site);
     unregisterSite(site);
     registerSite(site);
-    log_.info("Site " + site + " started");
+    log_.info("Site {} started", site);
   }
 
   /**
@@ -130,7 +130,7 @@ public class SiteTracker extends ServiceTracker {
     Site site = s.getSite();
     unregisterSite(site);
     super.removedService(reference, service);
-    log_.info("Site " + site + " stopped");
+    log_.info("Site {} stopped", site);
   }
 
   /**
