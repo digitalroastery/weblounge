@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
+import ch.o2it.weblounge.common.request.CacheTag;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -57,7 +59,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @return <code>true</code> if the tag could be inserted
    */
   public boolean add(String key, Object value) {
-    return add(new CacheTag(key, value));
+    return add(new CacheTagImpl(key, value));
   }
 
   /**
@@ -81,7 +83,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
   public boolean excludeTagsWith(String key) {
     if (key == null)
       throw new IllegalArgumentException("Key must not be null!");
-    return add(new CacheTag(key, CacheTag.ANY));
+    return add(new CacheTagImpl(key, CacheTag.ANY));
   }
 
   /**
@@ -98,7 +100,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
       throw new IllegalArgumentException("Keys must not be null!");
     boolean changed = false;
     for (String key : keys) {
-      changed |= add(new CacheTag(key, CacheTag.ANY));
+      changed |= add(new CacheTagImpl(key, CacheTag.ANY));
     }
     return changed;
   }

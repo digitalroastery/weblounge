@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.request.CacheTag;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 
 import org.junit.Before;
@@ -54,16 +54,16 @@ public class CacheTagSetTest {
   protected Object cValue = new Object();
 
   /** Sample tag "a" */
-  protected CacheTag a = new CacheTag("a", aValue);
+  protected CacheTagImpl a = new CacheTagImpl("a", aValue);
 
   /** Sample tag "b" */
-  protected CacheTag b = new CacheTag("b", bValue);
+  protected CacheTagImpl b = new CacheTagImpl("b", bValue);
 
   /** Sample tag "b" */
-  protected CacheTag c = new CacheTag("c", cValue);
+  protected CacheTagImpl c = new CacheTagImpl("c", cValue);
 
   /** Sample tag "any" */
-  protected CacheTag any = new CacheTag("any");
+  protected CacheTagImpl any = new CacheTagImpl("any");
 
   /**
    * @throws java.lang.Exception
@@ -96,9 +96,9 @@ public class CacheTagSetTest {
   public void testAddTag() {
     set.add(a);
     assertEquals(3, set.size());
-    set.add(new CacheTag("a", aValue));
+    set.add(new CacheTagImpl("a", aValue));
     assertEquals(3, set.size());
-    set.add(new CacheTag("d", aValue));
+    set.add(new CacheTagImpl("d", aValue));
     assertEquals(4, set.size());
   }
 
@@ -108,7 +108,7 @@ public class CacheTagSetTest {
   @Test
   public void testExcludeTagsWithString() {
     set.excludeTagsWith("d");
-    assertTrue(set.contains(new CacheTag("d", CacheTag.ANY)));
+    assertTrue(set.contains(new CacheTagImpl("d", CacheTag.ANY)));
   }
 
   /**
@@ -120,8 +120,8 @@ public class CacheTagSetTest {
     keys.add("d");
     keys.add("e");
     set.excludeTagsWith(keys);
-    assertTrue(set.contains(new CacheTag("d", CacheTag.ANY)));
-    assertTrue(set.contains(new CacheTag("e", CacheTag.ANY)));
+    assertTrue(set.contains(new CacheTagImpl("d", CacheTag.ANY)));
+    assertTrue(set.contains(new CacheTagImpl("e", CacheTag.ANY)));
   }
 
   /**
@@ -129,12 +129,12 @@ public class CacheTagSetTest {
    */
   @Test
   public void testAddAll() {
-    List<CacheTag> tags = new ArrayList<CacheTag>();
-    tags.add(new CacheTag("d"));
-    tags.add(new CacheTag("e"));
+    List<CacheTagImpl> tags = new ArrayList<CacheTagImpl>();
+    tags.add(new CacheTagImpl("d"));
+    tags.add(new CacheTagImpl("e"));
     set.addAll(tags);
-    assertTrue(set.contains(new CacheTag("d", CacheTag.ANY)));
-    assertTrue(set.contains(new CacheTag("e", CacheTag.ANY)));
+    assertTrue(set.contains(new CacheTagImpl("d", CacheTag.ANY)));
+    assertTrue(set.contains(new CacheTagImpl("e", CacheTag.ANY)));
     assertEquals(5, set.size());
   }
 
@@ -154,7 +154,7 @@ public class CacheTagSetTest {
   @Test
   public void testContains() {
     assertTrue(set.contains(a));
-    assertFalse(set.contains(new CacheTag("f")));
+    assertFalse(set.contains(new CacheTagImpl("f")));
   }
 
   /**
@@ -198,7 +198,7 @@ public class CacheTagSetTest {
   public void testRemoveObject() {
     set.remove(a);
     assertEquals(2, set.size());
-    set.remove(new CacheTag("e"));
+    set.remove(new CacheTagImpl("e"));
     assertEquals(2, set.size());
   }
 
@@ -223,7 +223,7 @@ public class CacheTagSetTest {
     List<Tag> tags = new ArrayList<Tag>();
     tags.add(a);
     tags.add(c);
-    tags.add(new CacheTag("e"));
+    tags.add(new CacheTagImpl("e"));
     set.removeAll(tags);
     assertEquals(1, set.size());
   }
@@ -233,7 +233,7 @@ public class CacheTagSetTest {
    */
   @Test
   public void testRemoveAllByTagName() {
-    set.add(new CacheTag("a", bValue));
+    set.add(new CacheTagImpl("a", bValue));
     set.removeAllByTagName("b");
     assertEquals(3, set.size());
     set.removeAllByTagName("a");
@@ -248,7 +248,7 @@ public class CacheTagSetTest {
     List<Tag> tags = new ArrayList<Tag>();
     tags.add(a);
     tags.add(c);
-    tags.add(new CacheTag("e"));
+    tags.add(new CacheTagImpl("e"));
     set.retainAll(tags);
     assertEquals(2, set.size());
   }

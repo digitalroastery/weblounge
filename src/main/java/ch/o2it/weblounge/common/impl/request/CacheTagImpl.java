@@ -20,15 +20,12 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
-import ch.o2it.weblounge.common.content.Tag;
+import ch.o2it.weblounge.common.request.CacheTag;
 
 /**
  * Tag used to identify entries in the caching service.
  */
-public final class CacheTag implements Tag {
-
-  /** Special object representing the "any" value */
-  public final static Object ANY = new Object();
+public final class CacheTagImpl implements CacheTag {
 
   /** Tag key */
   String key = null;
@@ -43,7 +40,7 @@ public final class CacheTag implements Tag {
    * @param key
    *          the tag key
    */
-  public CacheTag(String key) {
+  public CacheTagImpl(String key) {
     this(key, ANY);
   }
 
@@ -58,7 +55,7 @@ public final class CacheTag implements Tag {
    * @param value
    *          the tag value
    */
-  public CacheTag(String key, Object value) {
+  public CacheTagImpl(String key, Object value) {
     if (key == null)
       throw new IllegalArgumentException("Tag key must not be null!");
     if (value == null)
@@ -90,8 +87,8 @@ public final class CacheTag implements Tag {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof CacheTag) {
-      CacheTag tag = (CacheTag) obj;
+    if (obj instanceof CacheTagImpl) {
+      CacheTagImpl tag = (CacheTagImpl) obj;
       return key.equals(tag.key) && value.equals(tag.value);
     }
     return super.equals(obj);

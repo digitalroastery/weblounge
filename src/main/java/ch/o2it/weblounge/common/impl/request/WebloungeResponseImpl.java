@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
-import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.ResponseCache;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -156,7 +156,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.o2it.weblounge.common.content.Taggable#addTags(java.util.Collection)
    */
-  public boolean addTags(Collection<Tag> tags) {
+  public boolean addTags(Collection<CacheTag> tags) {
     boolean result = false;
     if (cacheHandles != null && cacheHandles.size() > 0) {
       result |= cacheHandles.firstElement().addTags(tags);
@@ -170,7 +170,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.o2it.weblounge.common.content.Taggable#addTag(ch.o2it.weblounge.common.content.Tag)
    */
-  public boolean addTag(Tag tag) {
+  public boolean addTag(CacheTag tag) {
     boolean result = false;
     if (cacheHandles != null && cacheHandles.size() > 0) {
       result |= cacheHandles.firstElement().addTag(tag);
@@ -195,7 +195,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.o2it.weblounge.common.content.Taggable#containsTag(ch.o2it.weblounge.common.content.Tag)
    */
-  public boolean containsTag(Tag tag) {
+  public boolean containsTag(CacheTag tag) {
     if (cacheHandles != null && cacheHandles.size() > 0) {
       return cacheHandles.peek().containsTag(tag);
     }
@@ -244,7 +244,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.o2it.weblounge.common.content.Taggable#removeTag(ch.o2it.weblounge.common.content.Tag)
    */
-  public boolean removeTag(Tag tag) {
+  public boolean removeTag(CacheTag tag) {
     if (cacheHandles != null && cacheHandles.size() > 0) {
       return cacheHandles.peek().removeTag(tag);
     }
@@ -281,11 +281,11 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.o2it.weblounge.common.content.Taggable#tags()
    */
-  public Iterator<Tag> tags() {
+  public Iterator<CacheTag> tags() {
     if (cacheHandles != null && cacheHandles.size() > 0) {
       return cacheHandles.peek().tags();
     }
-    return new ArrayList<Tag>().iterator();
+    return new ArrayList<CacheTag>().iterator();
   }
 
   /**
@@ -293,11 +293,11 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * 
    * @see ch.o2it.weblounge.common.content.Taggable#getTags()
    */
-  public Tag[] getTags() {
+  public CacheTag[] getTags() {
     if (cacheHandles != null && cacheHandles.size() > 0) {
       return cacheHandles.peek().getTags();
     }
-    return new Tag[] {};
+    return new CacheTag[] {};
   }
 
   /**
@@ -306,7 +306,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponse(java.lang.Iterable,
    *      long, long)
    */
-  public boolean startResponse(Iterable<Tag> tags, long validTime,
+  public boolean startResponse(Iterable<CacheTag> tags, long validTime,
       long recheckTime) throws IllegalStateException {
     if (!isValid || cache == null)
       return false;
@@ -330,7 +330,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponsePart(java.lang.Iterable,
    *      long, long)
    */
-  public boolean startResponsePart(Iterable<Tag> uniqueTags, long validTime,
+  public boolean startResponsePart(Iterable<CacheTag> uniqueTags, long validTime,
       long recheckTime) {
     if (!isValid || cache == null)
       return false;

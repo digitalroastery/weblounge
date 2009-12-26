@@ -24,19 +24,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.request.CacheTag;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test cases for {@link CacheTag}.
+ * Test cases for {@link CacheTagImpl}.
  */
 public class CacheTagTest {
   
   /** The tag instance under test */
-  protected CacheTag tagWithValue = null;
-  protected CacheTag tagWithoutValue = null;
+  protected CacheTagImpl tagWithValue = null;
+  protected CacheTagImpl tagWithoutValue = null;
   
   /** The default key */
   protected String name = "key";
@@ -49,12 +49,12 @@ public class CacheTagTest {
    */
   @Before
   public void setUp() throws Exception {
-    tagWithValue = new CacheTag(name, value);
-    tagWithoutValue = new CacheTag(name);
+    tagWithValue = new CacheTagImpl(name, value);
+    tagWithoutValue = new CacheTagImpl(name);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTag#getName()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#getName()}.
    */
   @Test
   public void testGetName() {
@@ -63,26 +63,26 @@ public class CacheTagTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTag#getValue()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#getValue()}.
    */
   @Test
   public void testGetValue() {
     assertEquals(value, tagWithValue.getValue());
-    assertEquals(CacheTag.ANY, tagWithoutValue.getValue());
+    assertEquals(CacheTagImpl.ANY, tagWithoutValue.getValue());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTag#equals(java.lang.Object)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
-    assertTrue(tagWithValue.equals(new CacheTag(name, value)));
-    assertTrue(tagWithoutValue.equals(new CacheTag(name)));
+    assertTrue(tagWithValue.equals(new CacheTagImpl(name, value)));
+    assertTrue(tagWithoutValue.equals(new CacheTagImpl(name)));
     assertFalse(tagWithValue.equals(tagWithoutValue));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTag#setMatchAny()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#setMatchAny()}.
    */
   @Test
   public void testSetMatchAny() {
@@ -91,7 +91,7 @@ public class CacheTagTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTag#matchesAny()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#matchesAny()}.
    */
   @Test
   public void testMatchesAny() {

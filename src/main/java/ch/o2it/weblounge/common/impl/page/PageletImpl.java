@@ -400,6 +400,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    *
+   * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
+   */
+  public boolean isPublished() {
+    return publishingCtx.isPublished();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate()
    */
   public Date getModificationDate() {
