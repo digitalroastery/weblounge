@@ -55,4 +55,12 @@ public interface Publishable {
    */
   Date getPublishTo();
 
+  /**
+   * Returns <code>true</code> if the object is published with respect to the
+   * current date.
+   * 
+   * @return <code>true</code> if the object is published
+   */
+  boolean isPublished();
+
 }

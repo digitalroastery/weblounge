@@ -35,7 +35,7 @@ import ch.o2it.weblounge.common.content.Taggable;
  * 
  * @see ch.o2it.weblounge.common.Times
  */
-public interface CacheHandle extends Taggable {
+public interface CacheHandle extends Taggable<CacheTag> {
 
   /**
    * Returns the time the cached object expires in milliseconds. When that time

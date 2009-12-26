@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.request;
 
-import ch.o2it.weblounge.common.content.Tag;
-
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -79,7 +77,7 @@ public interface ResponseCache {
    * @return the <code>CacheHandle</code> of the response or <code>null</code>
    *         if the response was found in the cache
    */
-  CacheHandle startResponse(Iterable<Tag> uniqueTags, WebloungeRequest request,
+  CacheHandle startResponse(Iterable<CacheTag> uniqueTags, WebloungeRequest request,
       WebloungeResponse response, long validTime, long recheckTime);
 
   /**
@@ -149,7 +147,7 @@ public interface ResponseCache {
    * @return the <code>CacheHandle</code> of the response part or
    *         <code>null</code> if the response part was found in the cache
    */
-  CacheHandle startResponsePart(Iterable<Tag> uniqueTags,
+  CacheHandle startResponsePart(Iterable<CacheTag> uniqueTags,
       HttpServletResponse response, long validTime, long recheckTime);
 
   /**
@@ -192,7 +190,7 @@ public interface ResponseCache {
    * @param tags
    *          the set of tags
    */
-  Set<CacheHandle> invalidateEntry(Iterable<Tag> tags);
+  Set<CacheHandle> invalidateEntry(Iterable<CacheTag> tags);
 
   /**
    * Tells the cache to throw away the data identified by <code>handle</code>.

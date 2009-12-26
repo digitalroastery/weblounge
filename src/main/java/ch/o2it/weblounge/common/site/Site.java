@@ -31,10 +31,10 @@ import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
-import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -131,36 +131,21 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   Module[] getModules();
 
   /**
-   * Returns this site's renderers which keeps track of the defined renderer
+   * Returns this site's templates which keeps track of the defined renderer
    * bundles.
    * 
-   * @return the renderers
+   * @return the templates
    */
-  Renderer[] getRenderers();
+  Renderer[] getTemplates();
 
   /**
-   * Returns the renderer with the specified id or <code>null</code> if no such
-   * renderer is defined.
+   * Returns the template with the given identifier or <code>null</code> if no
+   * such template is defined.
    * 
-   * @param rendererId
-   *          the renderer identifier
-   * 
-   * @return the renderer
+   * @param template
+   * @return the template
    */
-  Renderer getRenderer(String rendererId);
-
-  /**
-   * Returns the renderer with the specified id that is suited for the given
-   * rendering method or <code>null</code> if no such renderer is defined.
-   * 
-   * @param rendererId
-   *          the renderer identifier
-   * @param method
-   *          the rendering method
-   * 
-   * @return the renderer
-   */
-  Renderer getRenderer(String rendererId, String method);
+  Renderer getTemplate(String template);
 
   /**
    * Returns the identifier of the default template for this site.
@@ -385,11 +370,11 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * 
    * @param uri
    *          the page uri
-   * @param user
-   *          the user requesting the page
    * @return the page or <code>null</code> if the page doesn't exist
+   * @throws IOException
+   *           if the page cannot be read from its source
    */
-  Page getPage(PageURI uri, User user);
+  Page getPage(PageURI uri) throws IOException;
 
   /**
    * Returns the role with the given identifier, defined in the specified

@@ -48,6 +48,15 @@ public interface WebloungeRequest extends HttpServletRequest {
   /** The attribute name used to store the {@link URL} in the session */
   public static final String SESSION_URL = "weblounge-url";
 
+  /** The attribute name used to store the {@link Page} in the request */
+  public static final String REQUEST_PAGE = "weblounge-page";
+
+  /** The attribute name used to store the {@link Action} in the request */
+  public static final String REQUEST_ACTION = "weblounge-action";
+
+  /** The attribute name used to store the {@link Renderer} in the request */
+  public static final String REQUEST_TEMPLATE = "weblounge-template";
+
   /**
    * Returns the requested language. The language is determined by evaluating
    * the request header fields.

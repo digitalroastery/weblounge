@@ -27,7 +27,7 @@ import java.util.Iterator;
  * A <code>Taggable</code> object provides means of collecting tags, removing
  * and iterating over them.
  */
-public interface Taggable {
+public interface Taggable<T extends Tag> {
 
   /**
    * Inserts the new tag into the tag set, provided an identical tag is not
@@ -37,7 +37,7 @@ public interface Taggable {
    *          the tag to add
    * @return <code>true</code> if the tag could be inserted
    */
-  boolean addTag(Tag tag);
+  boolean addTag(T tag);
 
   /**
    * Adds a new tag with the given name and value and inserts it into the set,
@@ -59,7 +59,7 @@ public interface Taggable {
    *          the tags to add
    * @return <code>true</code> if the tag set was modified
    */
-  boolean addTags(Collection<Tag> tags);
+  boolean addTags(Collection<T> tags);
 
   /**
    * Removes all tags from the tag set.
@@ -74,7 +74,7 @@ public interface Taggable {
    *          the tag
    * @return <code>true</code> if the tag is contained in the tag set
    */
-  boolean containsTag(Tag tag);
+  boolean containsTag(T tag);
 
   /**
    * Returns <code>true</code> if at least one tag with the specified name is
@@ -104,7 +104,7 @@ public interface Taggable {
    * 
    * @return the tags
    */
-  Iterator<Tag> tags();
+  Iterator<T> tags();
 
   /**
    * Removes the tag from the tag set and returns <code>true</code> if it was
@@ -114,7 +114,7 @@ public interface Taggable {
    *          the tag to remove
    * @return <code>true</code> if the set changed
    */
-  boolean removeTag(Tag tag);
+  boolean removeTag(T tag);
 
   /**
    * Removes all tags from the tag set with the given name and returns
@@ -151,6 +151,6 @@ public interface Taggable {
    * 
    * @return an array of tags
    */
-  Tag[] getTags();
+  T[] getTags();
 
 }

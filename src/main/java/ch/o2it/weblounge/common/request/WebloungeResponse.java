@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.request;
 
-import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.content.Taggable;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
  * <code>HttpServletResponse</code>. In particular, they deal with support for
  * server side caching of the response stream.
  */
-public interface WebloungeResponse extends HttpServletResponse, Taggable {
+public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTag> {
 
   /** Initial response state */
   int STATE_SYSTEM_INITIALIZING = 0;
@@ -70,12 +69,12 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable {
    *          the valid time in milliseconds
    * @param recheckTime
    *          the recheck time in milliseconds
-   * @return the <code>CacheHandle</code> of the response or <code>null</code>
-   *         if the response was found in the cache
+   * @return <code>true</code> if the item was found in the cache, false
+   *         otherwise
    * @throws IllegalStateException
    *           if the response has already been started
    */
-  boolean startResponse(Iterable<Tag> uniqueTags, long validTime,
+  boolean startResponse(Iterable<CacheTag> uniqueTags, long validTime,
       long recheckTime) throws IllegalStateException;
 
   /**
@@ -112,10 +111,10 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable {
    *          the valid time in milliseconds
    * @param recheckTime
    *          the recheck time in milliseconds
-   * @return the <code>CacheHandle</code> of the response part or
-   *         <code>null</code> if the response part was found in the cache
+   * @return <code>true</code> if the response part was found in the cache,
+   *         false otherwise
    */
-  boolean startResponsePart(Iterable<Tag> uniqueTags, long validTime,
+  boolean startResponsePart(Iterable<CacheTag> uniqueTags, long validTime,
       long recheckTime);
 
   /**
