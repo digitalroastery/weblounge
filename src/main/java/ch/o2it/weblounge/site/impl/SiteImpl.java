@@ -702,7 +702,7 @@ public class SiteImpl implements Site {
    * 
    * @return the renderer registry
    */
-  public RendererRegistry getRenderers() {
+  public RendererRegistry getTemplates() {
     return config_.templates;
   }
 

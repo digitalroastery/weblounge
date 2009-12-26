@@ -20,60 +20,47 @@
 
 package ch.o2it.weblounge.site.impl.handler;
 
-import ch.o2it.weblounge.common.ConfigurationException;
+import static ch.o2it.weblounge.common.request.RequestFlavor.html;
+
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.http.Http11Constants;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.request.CacheTagSet;
+import ch.o2it.weblounge.common.impl.request.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.request.CacheHandle;
-import ch.o2it.weblounge.common.request.CacheTagSet;
+import ch.o2it.weblounge.common.page.PageURI;
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.security.SystemPermission;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
-import ch.o2it.weblounge.contentrepository.PageManager;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.RequestHandlerConfiguration;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Enumeration;
-import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * The <code>PageRequestHandler</code> is used to handle requests to urls simply
  * mapped to a certain template. The request handler will verify access rights
  * and then simply forward the request to the template handler.
  */
-public class PageRequestHandler implements RequestHandler, Http11Constants {
+public class PageRequestHandler implements RequestHandler {
 
   /** Logging facility */
   protected final static Logger log_ = LoggerFactory.getLogger(PageRequestHandler.class);
 
-  /** The handler identifier */
-  public static final String ID = "pagerequesthandler";
-
   /** The singleton handler instance */
-  private static PageRequestHandler handler_ = new PageRequestHandler();
-
-  /** Valid extensions for page urls */
-  private static List<String> extensions = new ArrayList<String>();
-
-  // Add the valid extensions
-  static {
-    extensions.add(".xml");
-    extensions.add(".html");
-    extensions.add(".htm");
-  }
+  private final static PageRequestHandler handler_ = new PageRequestHandler();
 
   /**
    * Handles the request for a simple url available somewhere in the system. The
@@ -92,38 +79,27 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
 
     log_.debug("Page handler agrees to handle {}", request.getUrl());
 
+    Mode processingMode = Mode.Default;
     WebUrl url = request.getUrl();
     String path = url.getPath();
-    Site site = null;
-    int pathLength = path.length();
 
-    // Check if there is a path extension like ".xml". Since this is the default
-    // handler,
-    // requests to .gif might also appear, which will lead to a database
-    // exception
-    // because the corresponding page will not be found.
-    // Because of this, we do some simple filtering here before bothering the
-    // database.
-
-    if (pathLength > 3 && path.lastIndexOf(".") == pathLength - 4) {
-      String extension = path.substring(pathLength - 4);
-      if (!extensions.contains(extension)) {
-        log_.debug("Skipping request for {}", path);
-        return false;
-      }
+    // Check the request flavor
+    // TODO: Add support for XML and JSON
+    if (!html.equals(request.getFlavor())) {
+      log_.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
+      return false;
     }
 
-    // check the request method
+    // Check the request method
     String requestMethod = request.getMethod();
     if (!Http11Utils.checkDefaultMethods(requestMethod, response))
       return true;
 
     // Check if the request is controlled by an action.
-    Action action = (Action) request.getAttribute(Action.ID);
+    Action action = (Action) request.getAttribute(WebloungeRequest.REQUEST_ACTION);
 
     // Check if browser must be told not to cache the page
-    Object controlCenter = request.getSession().getAttribute("Weblounge-Control-Center");
-    if (request.getVersion() == Page.WORK || controlCenter != null) {
+    if (request.getVersion() == Page.WORK) {
       response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
       response.setHeader("Pragma", "no-cache");
       response.setHeader("Expires", "0");
@@ -131,97 +107,102 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
 
     // Check if the page is already part of the cache. If so, our task is
     // already done!
-    Cache cache = (Cache) ServiceManager.getEnabledSystemService(Cache.ID);
-    CacheHandle cacheHdl = null;
-    boolean cachePages = cache != null && !"false".equals(cache.getConfiguration().getOption("pages"));
     if (request.getVersion() == Page.LIVE && action == null) {
-      if (cachePages && controlCenter == null) {
+      CacheTagSet cacheTags = new CacheTagSet();
+      long validTime = Times.MS_PER_DAY;
+      long recheckTime = Times.MS_PER_HOUR;
 
-        CacheTagSet cacheTags = new CacheTagSet();
-        long validTime = Times.MS_PER_DAY;
-        long recheckTime = Times.MS_PER_HOUR;
-
-        // Create tagset
-        cacheTags.add("webl:url", url.getPath());
-        cacheTags.add("webl:url", request.getRequestedUrl().getPath());
-        cacheTags.add("webl:language", request.getLanguage().getIdentifier());
-        cacheTags.add("webl:user", request.getUser().getLogin());
-        cacheTags.add("webl:site", url.getSite().getIdentifier());
-        Enumeration<?> pe = request.getParameterNames();
-        int parameterCount = 0;
-        while (pe.hasMoreElements()) {
-          parameterCount++;
-          String key = pe.nextElement().toString();
-          String[] values = request.getParameterValues(key);
-          for (String value : values) {
-            cacheTags.add(key, value);
-          }
+      // Create the set of tags that identify the page
+      cacheTags.add(CacheTag.Url, url.getPath());
+      cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
+      cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
+      cacheTags.add(CacheTag.User, request.getUser().getLogin());
+      cacheTags.add(CacheTag.Site, url.getSite().getIdentifier());
+      Enumeration<?> pe = request.getParameterNames();
+      int parameterCount = 0;
+      while (pe.hasMoreElements()) {
+        parameterCount++;
+        String key = pe.nextElement().toString();
+        String[] values = request.getParameterValues(key);
+        for (String value : values) {
+          cacheTags.add(key, value);
         }
-        cacheTags.add("webl:parameters", Integer.toString(parameterCount));
-
-        // Check if the page is already part of the cache
-        cacheHdl = cache.startResponse(cacheTags, request, response, validTime, recheckTime);
-        if (cacheHdl == null) {
-          request.getPreviousUrl().addEntry(url);
-          return true;
-        }
-
-      } else if (METHOD_HEAD.equals(requestMethod)) {
-        // handle HEAD requests
-        Http11Utils.startHeadResponse(response);
       }
+      cacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
+
+      // Check if the page is already part of the cache
+      if (response.startResponse(cacheTags, validTime, recheckTime))
+        return true;
+      
+      processingMode = Mode.Cached;
+    } else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
+      // handle HEAD requests
+      Http11Utils.startHeadResponse(response);
+      processingMode = Mode.Head;
     }
 
     // Get the renderer id that has been registered with the url. For this, we
-    // first
-    // have to load the page data, then get the associated renderer bundle.
-
+    // first have to load the page data, then get the associated renderer
+    // bundle.
     try {
       Page page = null;
-      site = request.getSite();
-      User user = request.getUser();
-      long version = request.getVersion();
-
+      PageURI pageURI = new PageURIImpl(request);
+      Site site = request.getSite();
+      
+      // Load the page
       try {
-        page = PageManager.getPage(path, site, user, SystemPermission.READ, version);
-        request.setAttribute(Page.ID, page);
-      } catch (SecurityException e) {
-        String msg = "User '" + user + "' at " + request.getRemoteAddr() + " was denied acces to page " + url;
-        site.getLogger().warn(msg);
-        DispatchUtil.sendAccessDenied("Access denied!", request, response);
+        page = site.getPage(pageURI);
+      } catch (IOException e) {
+        log_.error("Unable to load page {}: {}", new Object[] {pageURI, e.getMessage(), e});
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         return true;
       }
+      
+      // Does it exist at all?
       if (page == null) {
-        String msg = "No data found for url '" + url + "'";
-        site.getLogger().debug("Url not found: '" + url + "'");
-        DispatchUtil.sendUrlNotFound(msg, request, response);
+        log_.debug("No page found for {}", pageURI);
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
         return true;
       }
 
-      Permission p = SystemPermission.TRANSLATE;
-      if (!page.isPublished() && !page.checkOne(p, user.getRoleClosure()) && !page.check(p, user)) {
-        String msg = "No data found for url '" + url + "'";
-        site.getLogger().debug("Access denied to unpublished url '" + url + "'");
-        DispatchUtil.sendUrlNotFound(msg, request, response);
+      // Is it published?
+      if (!page.isPublished()) {
+        log_.debug("Access to unpublished page {}", pageURI);
+        response.sendError(HttpServletResponse.SC_FORBIDDEN);
         return true;
       }
-
-      // See if the request contains instructions concerning the template
+      
+      // Can the page be accessed by the current user?
+      User user = request.getUser();
+      try {
+        // TODO: Check permission
+        //PagePermission p = new PagePermission(page, user);
+        //AccessController.checkPermission(p);
+      } catch (SecurityException e) {
+        log_.warn("Accessed to page {} denied for user {}", pageURI, user);
+        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        return true;
+      }
+      
+      // Store the page in the request
+      request.setAttribute(WebloungeRequest.REQUEST_PAGE, page);
+      
+      // See if the request contains instructions regarding the template
       // to be used
-
-      String rendererId = (String) request.getAttribute(Renderer.TEMPLATE);
+      String rendererId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
       Renderer renderer = null;
       if (rendererId != null) {
-        renderer = site.getRenderer(rendererId, request.getFlavor());
+        renderer = site.getTemplate(rendererId);
       } else {
-        renderer = page.getRenderer(request.getFlavor());
+        renderer = site.getTemplate(page.getTemplate());
       }
+
       if (renderer == null) {
         String params = RequestSupport.getParameters(request);
         String msg = (rendererId != null) ? "Template '" + rendererId + "' was not found " : "No template was found ";
         msg += "to render url '" + url + "' " + params;
         site.getLogger().warn(msg);
-        DispatchUtil.sendInternalError(msg, request, response);
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         return true;
       }
 
@@ -231,75 +212,83 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
 
       String method = request.getFlavor();
 
-      try {
-        if (renderer.provides(method)) {
-          try {
+      if (renderer.provides(method)) {
+        try {
 
-            // Add additional cache tags
-            response.addTag("webl:template", rendererId);
-            response.addTag("webl:pagetype", page.getType());
-            for (String keyword : page.getKeywords()) {
-              response.addTag("webl:keyword", keyword);
-            }
-
-            log_.info("Rendering {} through {}", path, renderer);
-            renderer.configure(method, null);
-            renderer.render(request, response);
-            if (action == null) {
-              request.getPreviousUrl().addEntry(url);
-              if (cache != null) {
-                request.getPreviousUrl().addEntry(url);
-              } else if (METHOD_HEAD.equals(requestMethod)) {
-                Http11Utils.endHeadResponse(response);
-              }
-            }
-          } catch (Exception e) {
-            String params = RequestSupport.getParameters(request);
-            String msg = "Error rendering template '" + renderer + "' on '" + path + "' " + params;
-            Throwable o = e.getCause();
-            if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
-              Throwable rootCause = ((JasperException) o).getRootCause();
-              msg += ": " + rootCause.getMessage();
-              site.getLogger().error(msg, rootCause);
-            } else if (o != null) {
-              msg += ": " + o.getMessage();
-              site.getLogger().error(msg, o);
-            } else {
-              site.getLogger().error(msg, e);
-            }
-            DispatchUtil.sendInternalError(msg, request, response);
-          } finally {
-            renderer.cleanup();
+          // Add additional cache tags
+          response.addTag("webl:template", rendererId);
+          response.addTag("webl:pagetype", page.getType());
+          for (String keyword : page.getSubjects()) {
+            response.addTag("webl:keyword", keyword);
           }
-        } else {
+
+          log_.info("Rendering {} through {}", path, renderer);
+          renderer.configure(method, null);
+          renderer.render(request, response);
+        } catch (Exception e) {
           String params = RequestSupport.getParameters(request);
-          String msg = "Method '" + method + "' not supported by template '" + renderer + "' on '" + path + "' " + params;
-          site.getLogger().warn(msg);
-          DispatchUtil.sendInternalError(msg, request, response);
-          return true;
+          String msg = "Error rendering template '" + renderer + "' on '" + path + "' " + params;
+          Throwable o = e.getCause();
+          if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
+            Throwable rootCause = ((JasperException) o).getRootCause();
+            msg += ": " + rootCause.getMessage();
+            site.getLogger().error(msg, rootCause);
+          } else if (o != null) {
+            msg += ": " + o.getMessage();
+            site.getLogger().error(msg, o);
+          } else {
+            site.getLogger().error(msg, e);
+          }
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } finally {
+          renderer.cleanup();
         }
-      } finally {
-        site.getRenderers().returnRenderer(renderer);
+      } else {
+        String params = RequestSupport.getParameters(request);
+        String msg = "Method '" + method + "' not supported by template '" + renderer + "' on '" + path + "' " + params;
+        site.getLogger().warn(msg);
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        return true;
       }
       return true;
-
+    } catch (IOException e) {
+      log_.error("I/O exception while sending error status: {}", e.getMessage(), e);
+      return true;
     } finally {
-      if (cachePages && action == null) {
-        if (cacheHdl != null && !cache.endResponse(response)) {
-          String params = RequestSupport.getParameters(request);
-          site.getLogger().warn("Error caching response for page " + request.getUrl() + " " + params);
-        }
+      switch (processingMode) {
+        case Cached:
+          response.endResponsePart();
+          break;
+        case Head:
+          Http11Utils.endHeadResponse(response);
+          break;
+        default:
+          break;
       }
     }
   }
 
   /**
-   * Returns an instance of class <code>SimpleRequestHandler</code>.
+   * Returns the singleton instance of this class.
    * 
    * @return the request handler instance
    */
-  public static RequestHandler getHandler() {
+  public static RequestHandler getInstance() {
     return handler_;
+  }
+
+  /**
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getIdentifier()
+   */
+  public String getIdentifier() {
+    return "page";
+  }
+
+  /**
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
+   */
+  public String getName() {
+    return "Page request handler";
   }
 
   /**
@@ -310,36 +299,7 @@ public class PageRequestHandler implements RequestHandler, Http11Constants {
    */
   @Override
   public String toString() {
-    return "default request handler";
-  }
-
-  /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#configure(ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration)
-   */
-  public void configure(RequestHandlerConfiguration config)
-      throws ConfigurationException {
-    /* this handler ist configured explicitly */
-  }
-
-  /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getIdentifier()
-   */
-  public String getIdentifier() {
-    return "default";
-  }
-
-  /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
-   */
-  public String getName() {
-    return "default request handler";
-  }
-
-  /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getDescription()
-   */
-  public String getDescription() {
-    return "this handler handles all requets that are not handled by any other handler";
+    return getName();
   }
 
 }

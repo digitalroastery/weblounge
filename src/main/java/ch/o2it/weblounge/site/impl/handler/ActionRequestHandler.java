@@ -20,15 +20,15 @@
 
 package ch.o2it.weblounge.site.impl.handler;
 
+import static ch.o2it.weblounge.common.impl.request.CacheTagImpl.*;
+
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.http.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.request.CacheHandle;
-import ch.o2it.weblounge.common.request.CacheTagSet;
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -40,7 +40,6 @@ import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.PageManager;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.RequestHandlerConfiguration;
 import ch.o2it.weblounge.site.impl.ActionHandlerBundle;
 import ch.o2it.weblounge.site.impl.ActionRegistry;
 
@@ -51,6 +50,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -60,35 +61,19 @@ import javax.servlet.http.HttpServletResponse;
  * <code>match</code> call and handle the request by forwarding it to the
  * appropriate action handler.
  */
-
-public class ActionRequestHandler implements RequestHandler, Http11Constants {
-
-  /** The handler identifier */
-  public static final String ID = "actionrequesthandler";
-
-  /** The registered actions */
-  private final ActionRegistry actions_;
-
-  // Logging
-
-  /** the class name, used for the logging facility */
-  private final static String className = ActionRequestHandler.class.getName();
+public final class ActionRequestHandler implements RequestHandler {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(className);
+  private final static Logger log_ = LoggerFactory.getLogger(ActionRequestHandler.class);
 
-  /** The site logger */
-  private final SiteLogger sitelogger_;
+  /** The registered actions */
+  private Map<String, Action> actions = null;
 
   /**
-   * Creates a new action request handler for the given site.
-   * 
-   * @param site
-   *          the site
+   * Creates a new action request handler.
    */
-  public ActionRequestHandler(Site site) {
-    actions_ = new ActionRegistry();
-    sitelogger_ = site.getLogger();
+  public ActionRequestHandler() {
+    actions = new HashMap<String, Action>();
   }
 
   /**
@@ -98,7 +83,7 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
    *          the action handler
    */
   public void addHandler(ActionHandlerBundle handler) {
-    actions_.put(handler.getIdentifier(), handler);
+    actions.put(handler.getMountpoint(), handler);
     log_.debug("Action handler '{}' registered for {}", handler, handler.getConfiguration().getMountpoint());
   }
 
@@ -109,37 +94,36 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
    *          the action handler
    */
   public void removeHandler(ActionHandlerBundle handler) {
-    actions_.remove(handler.getIdentifier());
+    actions.remove(handler.getIdentifier());
   }
 
   /**
-   * Returns the handle that is registered to serve the given url or
+   * Returns the action handler that is registered to serve the given url or
    * <code>null</code> if no such handler exists.
    * 
    * @param url
    *          the url
    * @return the handler
    */
-  public Action getHandlerByUrl(WebUrl url) {
-    return actions_.getByUrl(url.getPath(), "html");
+  public Action getHandlerForUrl(WebUrl url) {
+    return actions.getByUrl(url.getPath(), "html");
   }
 
   /**
    * Handles the request for a simple url available somewhere in the system. The
-   * handler sets the response type, does the url history and then forwards
-   * request to the corresponding jsp page or xslt stylesheet.
+   * handler sets the response type and then starts processing.
    * <p>
-   * This method should return <code>true</code> if the handler is decided to
+   * This method should return <code>true</code> if the handler has decided to
    * handle the request, <code>false</code> otherwise.
    * 
    * @param request
    *          the weblounge request
    * @param response
-   *          the webloungeresponse
+   *          the weblounge response
    * @return <code>true</code> if this handler processed the request
    */
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
-    Action action = actions_.getByUrl(request.getUrl().getPath(), "html");
+    Action action = actions.getByUrl(request.getUrl().getPath(), "html");
     if (action == null) {
       log_.debug("Action handler {}, denies to handle {}", this, request.getUrl());
       return false;
@@ -203,15 +187,15 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
         long validTime = action.getConfiguration().getValidTime();
         long recheckTime = action.getConfiguration().getRecheckTime();
 
-        // Create tagset
-        cacheTags.add("webl:url", url.getPath());
-        cacheTags.add("webl:url", request.getRequestedUrl().getPath());
-        cacheTags.add("webl:url", url.getPath());
-        cacheTags.add("webl:language", language.getIdentifier());
-        cacheTags.add("webl:user", user.getLogin());
-        cacheTags.add("webl:module", action.getModule().getIdentifier());
-        cacheTags.add("webl:action", action.getIdentifier());
-        cacheTags.add("webl:site", url.getSite().getIdentifier());
+        // Create the set of tags that identify the action
+        cacheTags.add(CacheTag.Url, url.getPath());
+        cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
+        cacheTags.add(CacheTag.Url, url.getPath());
+        cacheTags.add(CacheTag.Language, language.getIdentifier());
+        cacheTags.add(CacheTag.User, user.getLogin());
+        cacheTags.add(CacheTag.Module, action.getModule().getIdentifier());
+        cacheTags.add(CacheTag.Action, action.getIdentifier());
+        cacheTags.add(CacheTag.Site, url.getSite().getIdentifier());
         Enumeration<?> pe = request.getParameterNames();
         int parameterCount = 0;
         while (pe.hasMoreElements()) {
@@ -255,7 +239,7 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
           Renderer renderer = null;
           Site site = request.getSite();
           if (rendererId != null) {
-            renderer = site.getRenderers().getRenderer(rendererId, request.getFlavor());
+            renderer = site.getTemplates().getRenderer(rendererId, request.getFlavor());
           } else {
             renderer = page.getRenderer(request.getFlavor());
           }
@@ -283,7 +267,7 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
             action.configure(request, response, method);
             if (action.startPage(request, response) == Action.EVAL_PAGE) {
               RequestSupport.setTargetUrl(page.getUrl(), request);
-              PageRequestHandler.getHandler().service(request, response);
+              PageRequestHandler.getInstance().service(request, response);
             }
           } catch (Exception e) {
             String msg = "Error executing action " + action + ": " + e.getMessage();
@@ -318,17 +302,9 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
         }
       }
     } finally {
-      actions_.returnHandler(action);
+      actions.returnHandler(action);
     }
     return true;
-  }
-
-  /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#configure(ch.o2it.weblounge.dispatcher.api.request.RequestHandlerConfiguration)
-   */
-  public void configure(RequestHandlerConfiguration config)
-      throws ConfigurationException {
-    /* this handler ist configured explicitly */
   }
 
   /**
@@ -343,13 +319,6 @@ public class ActionRequestHandler implements RequestHandler, Http11Constants {
    */
   public String getName() {
     return "action handler";
-  }
-
-  /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getDescription()
-   */
-  public String getDescription() {
-    return "Handles action requests";
   }
 
   /**

@@ -216,7 +216,7 @@ public class SiteDispatcher implements Dispatcher {
     }
 
     try {
-      PageRequestHandler.getHandler().service(request, response);
+      PageRequestHandler.getInstance().service(request, response);
       site_.requestDelivered(request, response);
     } catch (Exception e) {
       String params = RequestSupport.getParameters(request);

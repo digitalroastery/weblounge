@@ -430,4 +430,12 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
 
   }
 
+  /**
+   * @return
+   */
+  public String getMountpoint() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }
