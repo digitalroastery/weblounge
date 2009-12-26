@@ -22,9 +22,9 @@ package ch.o2it.weblounge.cache.index;
 
 import ch.o2it.weblounge.cache.impl.handle.TaggedCacheHandle;
 import ch.o2it.weblounge.cache.impl.index.CacheIndexMapMap;
-import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.request.CacheTag;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.CacheTag;
 
 import org.junit.Test;
 
@@ -35,37 +35,37 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * TODO: Comment CacheIndexMapMapTest
+ * Test case for the {@link CacheIndexMapMap}.
  */
 public class CacheIndexMapMapTest {
 
   @Test
   public final void testLookup() {
     CacheIndexMapMap idx = new CacheIndexMapMap();
-    List<Tag> l = new ArrayList<Tag>();
-    l.add(new CacheTag("key1", "value1"));
-    l.add(new CacheTag("key2", "value1"));
+    List<CacheTag> l = new ArrayList<CacheTag>();
+    l.add(new CacheTagImpl("key1", "value1"));
+    l.add(new CacheTagImpl("key2", "value1"));
     CacheHandle h1 = new TaggedCacheHandle(l, 0, 0); 
     idx.addEntry(h1); 
     l.clear();
-    l.add(new CacheTag("key1", "value2"));
+    l.add(new CacheTagImpl("key1", "value2"));
     CacheHandle h2 = new TaggedCacheHandle(l, 0, 0);
-    h2.addTag(new CacheTag("key2", "value1"));
+    h2.addTag(new CacheTagImpl("key2", "value1"));
     idx.addEntry(h2);   
     l.clear();
-    l.add(new CacheTag("key1", "value1"));
-    l.add(new CacheTag("key3", "value1"));
+    l.add(new CacheTagImpl("key1", "value1"));
+    l.add(new CacheTagImpl("key3", "value1"));
     CacheHandle h3 = new TaggedCacheHandle(l, 0, 0);
     idx.addEntry(h3);   
     l.clear();
-    l.add(new CacheTag("key4", "value1"));
+    l.add(new CacheTagImpl("key4", "value1"));
     CacheHandle h4 = new TaggedCacheHandle(l, 0, 0);
-    h4.addTag(new CacheTag("key3"));
+    h4.addTag(new CacheTagImpl("key3"));
     idx.addEntry(h4);
 
     
     l.clear();
-    l.add(new CacheTag("key1", "value1"));
+    l.add(new CacheTagImpl("key1", "value1"));
     Set<CacheHandle> res = new HashSet<CacheHandle>();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -75,7 +75,7 @@ public class CacheIndexMapMapTest {
   
     // tests
     l.clear();
-    l.add(new CacheTag("key1", "value2"));
+    l.add(new CacheTagImpl("key1", "value2"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -83,21 +83,21 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h2));
   
     l.clear();
-    l.add(new CacheTag("key1", "value3"));
+    l.add(new CacheTagImpl("key1", "value3"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
     assert(res.size() == 0);
 
     l.clear();
-    l.add(new CacheTag("key1", new Object()));
+    l.add(new CacheTagImpl("key1", new Object()));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
     assert(res.size() == 0);
 
     l.clear();
-    l.add(new CacheTag("key1", null));
+    l.add(new CacheTagImpl("key1", null));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -107,7 +107,7 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h3));
 
     l.clear();
-    l.add(new CacheTag("key1"));
+    l.add(new CacheTagImpl("key1"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -117,7 +117,7 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h3));
 
     l.clear();
-    l.add(new CacheTag("key2", "value1"));
+    l.add(new CacheTagImpl("key2", "value1"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -126,14 +126,14 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h2));
 
     l.clear();
-    l.add(new CacheTag("key2", "value2"));
+    l.add(new CacheTagImpl("key2", "value2"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
     assert(res.size() == 0);
 
     l.clear();
-    l.add(new CacheTag("key2"));
+    l.add(new CacheTagImpl("key2"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -142,8 +142,8 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h2));
 
     l.clear();
-    l.add(new CacheTag("key1", "value1"));
-    l.add(new CacheTag("key2", "value1"));
+    l.add(new CacheTagImpl("key1", "value1"));
+    l.add(new CacheTagImpl("key2", "value1"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -151,8 +151,8 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h1));
 
     l.clear();
-    l.add(new CacheTag("key1", "value1"));
-    l.add(new CacheTag("key2"));
+    l.add(new CacheTagImpl("key1", "value1"));
+    l.add(new CacheTagImpl("key2"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -160,8 +160,8 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h1));
 
     l.clear();
-    l.add(new CacheTag("key1"));
-    l.add(new CacheTag("key2", "value1"));
+    l.add(new CacheTagImpl("key1"));
+    l.add(new CacheTagImpl("key2", "value1"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -170,8 +170,8 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h2));
 
     l.clear();
-    l.add(new CacheTag("key1"));
-    l.add(new CacheTag("key2"));
+    l.add(new CacheTagImpl("key1"));
+    l.add(new CacheTagImpl("key2"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -180,15 +180,15 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h2));
 
     l.clear();
-    l.add(new CacheTag("key2", "value2"));
-    l.add(new CacheTag("key1"));
+    l.add(new CacheTagImpl("key2", "value2"));
+    l.add(new CacheTagImpl("key1"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
     assert(res.size() == 0);
 
     l.clear();
-    l.add(new CacheTag("key3", "value1"));
+    l.add(new CacheTagImpl("key3", "value1"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -197,7 +197,7 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h4));
 
     l.clear();
-    l.add(new CacheTag("key3", "value2"));
+    l.add(new CacheTagImpl("key3", "value2"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -205,7 +205,7 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h4));
 
     l.clear();
-    l.add(new CacheTag("key3", new Object()));
+    l.add(new CacheTagImpl("key3", new Object()));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -213,7 +213,7 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h4));
 
     l.clear();
-    l.add(new CacheTag("key3"));
+    l.add(new CacheTagImpl("key3"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -222,7 +222,7 @@ public class CacheIndexMapMapTest {
     assert(res.contains(h4));
 
     l.clear();
-    l.add(new CacheTag("key5"));
+    l.add(new CacheTagImpl("key5"));
     res.clear();
     for (CacheHandle h : idx.lookup(l))
       res.add(h);
@@ -242,7 +242,7 @@ public class CacheIndexMapMapTest {
   @Test
   public final void perfLookup() {
     testPerformance(new PerfTest() {
-      @Override void lookup(CacheIndexMapMap idx, List<Tag> l) { idx.lookup(l); }
+      @Override void lookup(CacheIndexMapMap idx, List<CacheTag> l) { idx.lookup(l); }
       @Override public String toString() { return "Unoptimized lookup, optimized intersect, optimized ANY"; }
       });
   }
@@ -261,11 +261,11 @@ public class CacheIndexMapMapTest {
     
     long t = System.currentTimeMillis();
     for (int i = 1; i < NR_HDL; i++) {
-      List<Tag> l = new ArrayList<Tag>(10);
-      l.add(new CacheTag("hdl", i));
+      List<CacheTag> l = new ArrayList<CacheTag>(10);
+      l.add(new CacheTagImpl("hdl", i));
       CacheHandle h = new TaggedCacheHandle(l, 0, 0);
       for (int j = 0; j < TAGS_PER_HDL; j++) {
-        h.addTag(new CacheTag("key" + r.nextInt(MAX_RND), j == 0 ? CacheTag.ANY : "value" + r.nextInt(MAX_RND)));
+        h.addTag(new CacheTagImpl("key" + r.nextInt(MAX_RND), j == 0 ? CacheTag.ANY : "value" + r.nextInt(MAX_RND)));
       }
       idx.addEntry(h);
     }
@@ -275,8 +275,8 @@ public class CacheIndexMapMapTest {
     t = System.currentTimeMillis();
     for (int i = 0; i < PERF_LOOPS; i++)
     {
-      List<Tag> l = new ArrayList<Tag>(10);
-      l.add(new CacheTag("key1", "value1"));
+      List<CacheTag> l = new ArrayList<CacheTag>(10);
+      l.add(new CacheTagImpl("key1", "value1"));
       pt.lookup(idx, l);
     }
     t = System.currentTimeMillis() - t;
@@ -284,9 +284,9 @@ public class CacheIndexMapMapTest {
     t = System.currentTimeMillis();
     for (int i = 0; i < PERF_LOOPS; i++)
     {
-      List<Tag> l = new ArrayList<Tag>(10);
-      l.add(new CacheTag("key1", "value1"));
-      l.add(new CacheTag("key2", "value2"));
+      List<CacheTag> l = new ArrayList<CacheTag>(10);
+      l.add(new CacheTagImpl("key1", "value1"));
+      l.add(new CacheTagImpl("key2", "value2"));
       pt.lookup(idx, l);
     }
     t = System.currentTimeMillis() - t;
@@ -294,10 +294,10 @@ public class CacheIndexMapMapTest {
     t = System.currentTimeMillis();
     for (int i = 0; i < PERF_LOOPS; i++)
     {
-      List<Tag> l = new ArrayList<Tag>(10);
-      l.add(new CacheTag("key1", "value1"));
-      l.add(new CacheTag("key2", "value2"));
-      l.add(new CacheTag("key3", "value3"));
+      List<CacheTag> l = new ArrayList<CacheTag>(10);
+      l.add(new CacheTagImpl("key1", "value1"));
+      l.add(new CacheTagImpl("key2", "value2"));
+      l.add(new CacheTagImpl("key3", "value3"));
       pt.lookup(idx, l);
     }
     t = System.currentTimeMillis() - t;
@@ -305,9 +305,9 @@ public class CacheIndexMapMapTest {
     t = System.currentTimeMillis();
     for (int i = 0; i < PERF_LOOPS; i++)
     {
-      List<Tag> l = new ArrayList<Tag>(10);
-      l.add(new CacheTag("key1", "value1"));
-      l.add(new CacheTag("key2", null));
+      List<CacheTag> l = new ArrayList<CacheTag>(10);
+      l.add(new CacheTagImpl("key1", "value1"));
+      l.add(new CacheTagImpl("key2", null));
       pt.lookup(idx, l);
     }
     t = System.currentTimeMillis() - t;
@@ -315,9 +315,9 @@ public class CacheIndexMapMapTest {
     t = System.currentTimeMillis();
     for (int i = 0; i < PERF_LOOPS; i++)
     {
-      List<Tag> l = new ArrayList<Tag>(10);
-      l.add(new CacheTag("key1", null));
-      l.add(new CacheTag("key2", "value2"));
+      List<CacheTag> l = new ArrayList<CacheTag>(10);
+      l.add(new CacheTagImpl("key1", null));
+      l.add(new CacheTagImpl("key2", "value2"));
       pt.lookup(idx, l);
     }
     t = System.currentTimeMillis() - t;
@@ -325,9 +325,9 @@ public class CacheIndexMapMapTest {
     t = System.currentTimeMillis();
     for (int i = 0; i < PERF_LOOPS; i++)
     {
-      List<Tag> l = new ArrayList<Tag>(10);
-      l.add(new CacheTag("key1", null));
-      l.add(new CacheTag("key2", null));
+      List<CacheTag> l = new ArrayList<CacheTag>(10);
+      l.add(new CacheTagImpl("key1", null));
+      l.add(new CacheTagImpl("key2", null));
       pt.lookup(idx, l);
     }
     t = System.currentTimeMillis() - t;
@@ -339,7 +339,7 @@ public class CacheIndexMapMapTest {
     int getMaxRnd()  { return 50; }
     int getTagsPerHdl() { return 10; }
     int getPerfLoops() { return 1000; }
-    abstract void lookup(CacheIndexMapMap idx, List<Tag> l);
+    abstract void lookup(CacheIndexMapMap idx, List<CacheTag> l);
   }
 
 }

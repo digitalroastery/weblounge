@@ -21,9 +21,9 @@
 package ch.o2it.weblounge.cache.impl.handle;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.request.CacheTag;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
 import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.CacheTag;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +46,7 @@ public abstract class CacheHandleImpl implements CacheHandle {
   private long recheck;
 
   /** the set of cache tags */
-  private Set<Tag> tags = new HashSet<Tag>();
+  private Set<CacheTag> tags = new HashSet<CacheTag>();
 
   /**
    * Creates a new CacheHandle that expires at the given time.
@@ -116,20 +116,20 @@ public abstract class CacheHandleImpl implements CacheHandle {
    *      java.lang.Object)
    */
   public boolean addTag(String key, Object value) {
-    return tags.add(new CacheTag(key, value));
+    return tags.add(new CacheTagImpl(key, value));
   }
 
   /**
    * @see ch.o2it.weblounge.api.util.Taggable#addTag(ch.o2it.weblounge.api.util.Tag)
    */
-  public boolean addTag(Tag tag) {
+  public boolean addTag(CacheTag tag) {
     return tags.add(tag);
   }
 
   /**
    * @see ch.o2it.weblounge.api.util.Taggable#addTags(java.util.Collection)
    */
-  public boolean addTags(Collection<Tag> t) {
+  public boolean addTags(Collection<CacheTag> t) {
     return tags.addAll(t);
   }
 
@@ -150,10 +150,10 @@ public abstract class CacheHandleImpl implements CacheHandle {
     if (name == null)
       throw new IllegalArgumentException("Cannot remove tag without a name");
     Object tag = null;
-    List<Tag> tags = new ArrayList<Tag>();
-    for (Tag t : tags) {
+    List<CacheTag> tags = new ArrayList<CacheTag>();
+    for (CacheTag t : tags) {
       if (t.getName().equals(name) && t.getValue().equals(value)) {
-        tag = null;
+        tag = t;
         break;
       }
     }
@@ -170,7 +170,7 @@ public abstract class CacheHandleImpl implements CacheHandle {
   /**
    * @see ch.o2it.weblounge.api.util.Taggable#containsTag(ch.o2it.weblounge.api.util.Tag)
    */
-  public boolean containsTag(Tag tag) {
+  public boolean containsTag(CacheTag tag) {
     return tags.contains(tag);
   }
 
@@ -192,7 +192,7 @@ public abstract class CacheHandleImpl implements CacheHandle {
   public boolean containsTag(String name, String value) {
     if (name == null)
       throw new IllegalArgumentException("Name cannot be null");
-    for (Tag t : tags) {
+    for (CacheTag t : tags) {
       if (t.getName().equals(name) && (value == null || t.getValue().equals(value)))
         return true;
     }
@@ -209,21 +209,21 @@ public abstract class CacheHandleImpl implements CacheHandle {
   /**
    * @see ch.o2it.weblounge.api.util.Taggable#removeTags(ch.o2it.weblounge.api.util.Tag)
    */
-  public boolean removeTag(Tag tag) {
+  public boolean removeTag(CacheTag tag) {
     return tags.remove(tag);
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.Taggable#getTags()
    */
-  public Tag[] getTags() {
-    return (Tag[]) tags.toArray(new Tag[tags.size()]);
+  public CacheTag[] getTags() {
+    return tags.toArray(new CacheTag[tags.size()]);
   }
 
   /**
    * @see ch.o2it.weblounge.api.util.Taggable#tags()
    */
-  public Iterator<Tag> tags() {
+  public Iterator<CacheTag> tags() {
     return Collections.unmodifiableSet(tags).iterator();
   }
 

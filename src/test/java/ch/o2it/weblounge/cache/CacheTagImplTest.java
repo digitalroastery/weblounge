@@ -26,7 +26,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.request.CacheTag;
+import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
+import ch.o2it.weblounge.common.request.CacheTag;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +38,7 @@ import org.junit.Test;
 public class CacheTagImplTest {
 
   /** A test tag instances */
-  protected CacheTag tag = null;
+  protected CacheTagImpl tag = null;
   
   /** The tag name */
   protected static final String tagName = "test";
@@ -50,12 +51,12 @@ public class CacheTagImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    tag = new CacheTag(tagName, tagValue);
+    tag = new CacheTagImpl(tagName, tagValue);
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.request.CacheTag#hashCode()}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#hashCode()}.
    */
   @Test
   public void testHashCode() {
@@ -64,16 +65,16 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.request.CacheTag#CacheTagImpl(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#CacheTagImpl(java.lang.String)}
    * .
    */
   @Test
   public void testCacheTagImplString() {
-    Tag t = new CacheTag(tagName);
+    Tag t = new CacheTagImpl(tagName);
     assertEquals(tagName, t.getName());
     assertEquals(CacheTag.ANY, t.getValue());
     try {
-      new CacheTag(null);
+      new CacheTagImpl(null);
       fail("Managed to initialize tag without name");
     } catch (IllegalArgumentException e) {
       // Expected
@@ -82,7 +83,7 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.request.CacheTag#CacheTagImpl(java.lang.String, java.lang.Object)}
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#CacheTagImpl(java.lang.String, java.lang.Object)}
    * .
    */
   @Test
@@ -90,17 +91,17 @@ public class CacheTagImplTest {
     Tag t = null;
     
     // Test null value
-    t = new CacheTag(tagName, null);
+    t = new CacheTagImpl(tagName, null);
     assertEquals("test", t.getName());
     assertEquals(CacheTag.ANY, t.getValue());
     
     // Test non-null value
-    t = new CacheTag(tagName, tagValue);
+    t = new CacheTagImpl(tagName, tagValue);
     assertEquals("test", t.getName());
     assertEquals(tagValue, t.getValue());
 
     try {
-      new CacheTag(null, tagValue);
+      new CacheTagImpl(null, tagValue);
       fail("Managed to initialize tag without name");
     } catch (IllegalArgumentException e) {
       // Expected
@@ -108,7 +109,7 @@ public class CacheTagImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTag#getName()}
+   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#getName()}
    * .
    */
   @Test
@@ -118,7 +119,7 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.request.CacheTag#getValue()}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#getValue()}.
    */
   @Test
   public void testGetValue() {
@@ -127,32 +128,32 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.request.CacheTag#equals(java.lang.Object)}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
-    CacheTag strictTag = null;
+    CacheTagImpl strictTag = null;
 
     // Test equals -> true
-    strictTag = new CacheTag(tagName, tagValue);
+    strictTag = new CacheTagImpl(tagName, tagValue);
     assertTrue(tag.equals(strictTag));
     
     // Test differing value
-    strictTag = new CacheTag(tagName, "othervalue");
+    strictTag = new CacheTagImpl(tagName, "othervalue");
     assertFalse(tag.equals(strictTag));
 
     // Test differing name
-    strictTag = new CacheTag("othername", tagValue);
+    strictTag = new CacheTagImpl("othername", tagValue);
     assertFalse(tag.equals(strictTag));
 
     // Test null value
-    strictTag = new CacheTag(tagName);
+    strictTag = new CacheTagImpl(tagName);
     assertFalse(tag.equals(strictTag));
   }
   
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.request.CacheTag#equals(java.lang.Object)}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testSetMatchAny() {

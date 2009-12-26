@@ -23,8 +23,8 @@ package ch.o2it.weblounge.cache.impl;
 import ch.o2it.weblounge.cache.CacheService;
 import ch.o2it.weblounge.cache.impl.handle.TaggedCacheHandle;
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
@@ -122,7 +122,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#setSize(long)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#setSize(long)
    */
   public void setSize(long size) {
     CacheManager.setMaxCacheSize(size);
@@ -131,7 +131,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#resetStatistics()
+   * @see ch.o2it.weblounge.common.request.ResponseCache#resetStatistics()
    */
   public void resetStatistics() {
     CacheManager.resetStats();
@@ -140,7 +140,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#clear()
+   * @see ch.o2it.weblounge.common.request.ResponseCache#clear()
    */
   public void clear() {
     CacheManager.emptyCache();
@@ -148,12 +148,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#startResponse(java.lang.Iterable,
-   *      ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse, long, long)
+   *
+   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponse(java.lang.Iterable, ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse, long, long)
    */
-  public CacheHandle startResponse(Iterable<Tag> uniqueTags,
+  public CacheHandle startResponse(Iterable<CacheTag> uniqueTags,
       WebloungeRequest request, WebloungeResponse response, long validTime,
       long recheckTime) {
     CacheHandle hdl = new TaggedCacheHandle(uniqueTags, validTime, recheckTime);
@@ -162,10 +160,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#startResponse(ch.o2it.weblounge.cache.CacheHandle,
-   *      ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse)
+   *
+   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponse(ch.o2it.weblounge.common.request.CacheHandle, ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public boolean startResponse(CacheHandle handle, WebloungeRequest request,
       WebloungeResponse response) {
@@ -190,7 +186,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#endResponse(ch.o2it.weblounge.common.request.WebloungeResponse)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#endResponse(ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public boolean endResponse(WebloungeResponse response) {
     return CacheManager.endCacheableResponse(unwrapResponse(response));
@@ -199,7 +195,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#invalidateResponse(ch.o2it.weblounge.common.request.WebloungeResponse)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateResponse(ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public void invalidateResponse(WebloungeResponse response) {
     CacheManager.invalidateCacheableResponse(unwrapResponse(response));
@@ -208,10 +204,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#startResponsePart(java.lang.Iterable,
+   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponsePart(java.lang.Iterable,
    *      javax.servlet.http.HttpServletResponse, long, long)
    */
-  public CacheHandle startResponsePart(Iterable<Tag> uniqueTags,
+  public CacheHandle startResponsePart(Iterable<CacheTag> uniqueTags,
       HttpServletResponse response, long validTime, long recheckTime) {
     CacheHandle hdl = new TaggedCacheHandle(uniqueTags, validTime, recheckTime);
     return startResponsePart(hdl, response) ? null : hdl;
@@ -220,7 +216,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#startResponsePart(ch.o2it.weblounge.cache.CacheHandle,
+   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponsePart(ch.o2it.weblounge.cache.CacheHandle,
    *      javax.servlet.http.HttpServletResponse)
    */
   public boolean startResponsePart(CacheHandle handle,
@@ -232,7 +228,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#endResponsePart(ch.o2it.weblounge.cache.CacheHandle,
+   * @see ch.o2it.weblounge.common.request.ResponseCache#endResponsePart(ch.o2it.weblounge.cache.CacheHandle,
    *      javax.servlet.http.HttpServletResponse)
    */
   public void endResponsePart(CacheHandle handle, HttpServletResponse response) {
@@ -242,16 +238,16 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#invalidateEntry(java.lang.Iterable)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateEntry(java.lang.Iterable)
    */
-  public Set<CacheHandle> invalidateEntry(Iterable<Tag> tags) {
+  public Set<CacheHandle> invalidateEntry(Iterable<CacheTag> tags) {
     return CacheManager.invalidate(tags);
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.cache.impl.CacheService1#invalidateEntry(ch.o2it.weblounge.cache.CacheHandle)
+   *
+   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateEntry(ch.o2it.weblounge.common.request.CacheHandle)
    */
   public Set<CacheHandle> invalidateEntry(CacheHandle handle) {
     return CacheManager.invalidateEntry(handle);

@@ -20,10 +20,9 @@
 
 package ch.o2it.weblounge.cache.impl.index;
 
-import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.impl.request.CacheTag;
 import ch.o2it.weblounge.common.impl.util.datatype.IdentityHashSet;
 import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.CacheTag;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -107,7 +106,7 @@ public final class CacheIndexMapMap {
   public void addEntry(CacheHandle entry) {
     wl.lock();
     try {
-      for (Tag tag : entry.getTags()) {
+      for (CacheTag tag : entry.getTags()) {
         Map<Object, Set<CacheHandle>> m = map.get(tag.getName());
         if (m == null) {
           m = new HashMap<Object, Set<CacheHandle>>();
@@ -134,7 +133,7 @@ public final class CacheIndexMapMap {
   public final void removeEntry(CacheHandle entry) {
     wl.lock();
     try {
-      for (Tag tag : entry.getTags()) {
+      for (CacheTag tag : entry.getTags()) {
         Map<Object, Set<CacheHandle>> m = map.get(tag.getName());
         if (m != null) {
           Set<CacheHandle> l = m.get(tag.getValue());
@@ -173,7 +172,7 @@ public final class CacheIndexMapMap {
    *          a set of tags identifying the index entries
    * @return all index entries that hold the given tags
    */
-  public final Iterable<CacheHandle> lookup(Iterable<Tag> tags) {
+  public final Iterable<CacheHandle> lookup(Iterable<CacheTag> tags) {
     rl.lock();
     try {
       if (tags == null)
@@ -184,14 +183,14 @@ public final class CacheIndexMapMap {
 
       // TODO: use some lookup order optimization
 
-      for (Tag tag : tags) {
+      for (CacheTag tag : tags) {
         if (first) {
           first = false;
           res = lookup(tag);
         } else {
           lookupAndIntersect(tag, res);
         }
-        if (res.size() == 0)
+        if (res == null || res.size() == 0)
           break;
       }
       return res == null ? new EmptyIterable<CacheHandle>() : res;
@@ -207,7 +206,7 @@ public final class CacheIndexMapMap {
    *          a tag identifying the index entries
    * @return a set of index entries holding the given tag
    */
-  private final Set<CacheHandle> lookup(Tag tag) {
+  private final Set<CacheHandle> lookup(CacheTag tag) {
     Set<CacheHandle> res = new IdentityHashSet<CacheHandle>();
     if (tag != null) {
       Map<Object, Set<CacheHandle>> m = map.get(tag.getName());
@@ -238,7 +237,7 @@ public final class CacheIndexMapMap {
    *          the set of previously matched entries that will be intersected
    *          with the set of matching entries for <code>tag</code>
    */
-  private final void lookupAndIntersect(Tag tag, Set<CacheHandle> res) {
+  private final void lookupAndIntersect(CacheTag tag, Set<CacheHandle> res) {
     assert (res != null);
     if (tag != null) {
       Map<Object, Set<CacheHandle>> m = map.get(tag.getName());

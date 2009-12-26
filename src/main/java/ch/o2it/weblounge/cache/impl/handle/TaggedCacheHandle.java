@@ -23,8 +23,8 @@ package ch.o2it.weblounge.cache.impl.handle;
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.content.Taggable;
-import ch.o2it.weblounge.common.impl.request.CacheTag;
 import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.CacheTag;
 
 import java.util.Comparator;
 import java.util.Set;
@@ -60,11 +60,11 @@ public class TaggedCacheHandle extends CacheHandleImpl {
    *          number of milliseconds that this handle is likely to need to be
    *          rechecked
    */
-  public TaggedCacheHandle(Iterable<Tag> primary, long expires, long recheck) {
+  public TaggedCacheHandle(Iterable<CacheTag> primary, long expires, long recheck) {
     super(expires, recheck);
     Set<Tag> s = new TreeSet<Tag>(new TagComparator());
     hashCode = 0;
-    for (Tag t : primary) {
+    for (CacheTag t : primary) {
       if (t == null)
         throw new NullPointerException("Tag must no be null");
       if (t.getName() == null)
@@ -151,7 +151,7 @@ public class TaggedCacheHandle extends CacheHandleImpl {
    * <li>value hash codes</li>
    * </ul>
    */
-  private static class TagComparator implements Comparator<Tag> {
+  static class TagComparator implements Comparator<Tag> {
 
     public int compare(Tag o1, Tag o2) {
       int diff = o1.hashCode() - o2.hashCode();

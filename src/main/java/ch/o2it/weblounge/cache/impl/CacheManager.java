@@ -23,10 +23,10 @@ package ch.o2it.weblounge.cache.impl;
 import ch.o2it.weblounge.cache.StreamFilter;
 import ch.o2it.weblounge.cache.impl.filter.FilterChain;
 import ch.o2it.weblounge.cache.impl.index.CacheIndexMapMap;
-import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
 import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.CacheTag;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 public class CacheManager {
 
   /** the default character encoding */
-  /* TODO: Is this hardcoding correct? */
+  /* TODO: Is this hard coding correct? */
   public static final String DEFAULT_ENCODING = "ISO-8859-1";
 
   /** The default cache size maximum */
@@ -174,7 +174,7 @@ public class CacheManager {
         }
         activeHandles.put(rootHnd, rootHnd);
       }
-      incStats(entry == null ? CACHE_WAIT_FAIL : CACHE_WAIT_SUCCESS);
+      incStats(CACHE_WAIT_FAIL);
     }
 
     if (entry != null) {
@@ -374,7 +374,7 @@ public class CacheManager {
    * @param tags
    * @return
    */
-  static Set<CacheHandle> invalidate(Iterable<Tag> tags) {
+  static Set<CacheHandle> invalidate(Iterable<CacheTag> tags) {
     Set<CacheHandle> handles = new HashSet<CacheHandle>();
     for (CacheHandle hnd : index.lookup(tags)) {
       invalidateEntry(hnd, true, handles);
