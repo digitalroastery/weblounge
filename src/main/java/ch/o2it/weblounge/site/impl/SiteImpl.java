@@ -77,7 +77,7 @@ public class SiteImpl implements Site {
   private String id_;
 
   /** Site xml configuration file */
-  private SiteConfigurationImpl config_ = null;
+  private SiteConfiguration config_ = null;
 
   /** The site request dispatcher */
   private SiteDispatcher dispatcher_;
@@ -249,32 +249,25 @@ public class SiteImpl implements Site {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.api.util.Customizable#getOption(java.lang.String)
+   * @see ch.o2it.weblounge.common.api.util.Customizable#getOptionValue(java.lang.String)
    */
   public String getOption(String name) {
-    return config_.getOption(name);
+    return config_.getOptionValue(name);
   }
 
   /**
-   * @see ch.o2it.weblounge.common.api.util.Customizable#getOption(java.lang.String,
+   * @see ch.o2it.weblounge.common.api.util.Customizable#getOptionValue(java.lang.String,
    *      java.lang.String)
    */
   public String getOption(String name, String defaultValue) {
-    return config_.getOption(name, defaultValue);
+    return config_.getOptionValue(name, defaultValue);
   }
 
   /**
-   * @see ch.o2it.weblounge.common.api.util.Customizable#getOptions(java.lang.String)
+   * @see ch.o2it.weblounge.common.api.util.Customizable#getOptionValues(java.lang.String)
    */
   public String[] getOptions(String name) {
-    return config_.getOptions(name);
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.api.util.Customizable#options()
-   */
-  public Map getOptions() {
-    return config_.options();
+    return config_.getOptionValues(name);
   }
 
   /**
@@ -282,13 +275,6 @@ public class SiteImpl implements Site {
    */
   public boolean hasOption(String name) {
     return config_.hasOption(name);
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.api.util.Customizable#options()
-   */
-  public Iterator options() {
-    return config_.options();
   }
 
   /**
@@ -1239,7 +1225,7 @@ public class SiteImpl implements Site {
    * @param config
    *          the site configuration
    */
-  void configure(SiteConfigurationImpl config) throws ConfigurationException {
+  void configure(SiteConfiguration config) throws ConfigurationException {
     config_ = config;
     virtualPath_ = UrlSupport.trim("/sites/" + config.identifier);
     dispatcher_ = new SiteDispatcher(this, config_.isEnabled);

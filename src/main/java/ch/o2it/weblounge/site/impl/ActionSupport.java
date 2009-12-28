@@ -23,7 +23,6 @@ package ch.o2it.weblounge.site.impl;
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.util.I18n;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.o2it.weblounge.common.page.Pagelet;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionConfiguration;
@@ -259,7 +258,7 @@ public abstract class ActionSupport extends AbstractAction {
       return;
     }
     try {
-      Object data = request.getAttribute(Pagelet.ATTRIBUTES);
+      Object data = request.getAttribute(WebloungeRequest.REQUEST_PAGELET);
       renderer.configure(request.getFlavor(), data);
       renderer.render(request, response);
     } catch (Exception e) {

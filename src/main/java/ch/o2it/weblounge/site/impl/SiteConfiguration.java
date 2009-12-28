@@ -34,9 +34,10 @@ import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
+import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.site.ImageStyle;
+import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.Renderer;
-import ch.o2it.weblounge.common.user.SiteAdmin;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 
 import org.slf4j.Logger;
@@ -45,14 +46,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * <code>SiteConfiguration</code> represents the contents of the
@@ -72,10 +74,10 @@ import javax.xml.xpath.XPath;
  * 	&lt;/site&gt;
  * </pre>
  */
-public class SiteConfigurationImpl implements Customizable {
+public class SiteConfiguration implements Customizable {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(SiteConfigurationImpl.class);
+  private final static Logger log_ = LoggerFactory.getLogger(SiteConfiguration.class);
 
   /** The default load factor */
   public static final int DEFAULT_LOADFACTOR = 1;
@@ -84,58 +86,52 @@ public class SiteConfigurationImpl implements Customizable {
   public static final int DEFAULT_HISTORYSIZE = 1;
 
   /** Site identifier */
-  String identifier = null;
+  protected String identifier = null;
 
   /** Site description */
-  LocalizableContent<String> description = null;
+  protected LocalizableContent<String> description = null;
 
   /** True if the site is enabled */
-  boolean isEnabled = false;
+  protected boolean isEnabled = false;
 
   /** True if this is the system default site */
-  boolean isDefault = false;
+  protected boolean isDefault = false;
 
   /** Site implementation class */
-  String siteClass = null;
+  protected String siteClass = null;
 
   /** Server names that match to this site */
-  List<URL> urls = null;
+  protected List<URL> urls = null;
 
   /** JAAS authentication modules */
-  List<AuthenticationModule> authenticationModules = null;
+  protected List<AuthenticationModule> authenticationModules = null;
 
   /** The default language */
-  Language defaultLanguage = null;
+  protected Language defaultLanguage = null;
 
   /** Site languages */
-  List<Language> languages = null;
+  protected List<Language> languages = null;
 
   /** Site templates */
-  List<Renderer> templates = null;
-
-  /** Request handlers */
-  List<RequestHandler> handlers = null;
+  protected List<PageTemplate> templates = null;
 
   /** Image styles */
-  List<ImageStyle> imagestyles = null;
+  protected List<ImageStyle> imagestyles = null;
 
   /** Site cron jobs */
-  List<SiteJob> jobs = null;
+  protected List<SiteJob> jobs = null;
 
   /** Site options */
-  Options options = null;
+  protected Options options = null;
 
   /** Site load factor */
-  int loadfactor = DEFAULT_LOADFACTOR;
+  protected int loadfactor = DEFAULT_LOADFACTOR;
 
   /** Number of versions to keep */
-  int historysize = DEFAULT_HISTORYSIZE;
-
-  /** True to use the page cache */
-  boolean usePageCache = true;
+  protected int historysize = DEFAULT_HISTORYSIZE;
 
   /** the site administrator */
-  SiteAdmin admin = null;
+  protected SiteAdminImpl admin = null;
 
   /**
    * Creates a configuration for the site that is located at
@@ -144,29 +140,27 @@ public class SiteConfigurationImpl implements Customizable {
    * @param siteRoot
    *          url pointing to the site root
    */
-  public SiteConfigurationImpl(URL siteRoot) {
+  public SiteConfiguration(URL siteRoot) {
     authenticationModules = new ArrayList<AuthenticationModule>();
-    handlers = new ArrayList<RequestHandler>();
     imagestyles = new ArrayList<ImageStyle>();
-    templates = new ArrayList<Renderer>();
+    templates = new ArrayList<PageTemplate>();
     urls = new ArrayList<URL>();
     jobs = new ArrayList<SiteJob>();
   }
 
   /**
-   * Reads the site configuration from the given xml configuration node.
+   * Reads the site configuration.
    * 
    * @param config
-   *          the configuration node
+   *          the configuration
    * @throws ConfigurationException
    *           if there are errors in the configuration
    */
   public void configure(Document config) throws ConfigurationException {
     if (config == null)
       throw new IllegalArgumentException("Site configuration cannot be null");
-
-    XPath path = XMLUtilities.getXPath();
     try {
+      XPath path = XPathFactory.newInstance().newXPath();
       readMainSettings(path, XPathHelper.select(config, "/site", path));
       readAdmin(path, XPathHelper.select(config, "/site/admin", path));
       readUrls(path, XPathHelper.select(config, "/site/urls", path));
@@ -174,21 +168,16 @@ public class SiteConfigurationImpl implements Customizable {
       readLanguages(path, XPathHelper.select(config, "/site/languages", path));
       readPerformanceSettings(path, XPathHelper.select(config, "/site/performance", path));
       readLayouts(path, XPathHelper.select(config, "/site/layouts", path));
-      readRenderers(path, XPathHelper.select(config, "/site/renderers", path));
+      readRenderers(path, XPathHelper.select(config, "/site/templates", path));
       readImagestyles(path, XPathHelper.select(config, "/site/imagestyles", path));
       readJobs(path, XPathHelper.select(config, "/site/jobs", path));
-      readHandlers(path, XPathHelper.select(config, "/site/handlers", path));
-      options = Options.load(path, XPathHelper.select(config, "/site", path));
-    } catch (ConfigurationException e) {
-      throw e;
-    } catch (Exception e) {
-      log_.error("Error when reading site configuration: {}", e.getMessage(), e);
-      throw new ConfigurationException("Error when reading site configuration!", e);
+    } catch (Throwable t) {
+      throw new ConfigurationException("Error when reading site configuration", t);
     }
   }
 
   /**
-   * Returns the site identifier, e. g. <tt>wfc2004</tt>.
+   * Returns the site identifier, e. g. <tt>o2it.ch</tt>.
    * 
    * @return the site identifier
    */
@@ -208,26 +197,6 @@ public class SiteConfigurationImpl implements Customizable {
   }
 
   /**
-   * Returns <code>true</code> if <code>o</code> is a <code>SiteConfiguration
-	 * </code> and maches this
-   * configuration in every aspect.
-   * 
-   * @return <code>true</code> if o is equal to this configuration
-   */
-  public boolean equals(Object o) {
-    if (o instanceof SiteConfigurationImpl) {
-      SiteConfigurationImpl s = (SiteConfigurationImpl) o;
-      return (identifier.equals(s.identifier) && description.equals(s.description) && isEnabled == s.isEnabled);
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return identifier.hashCode();
-  }
-
-  /**
    * Reads the main site settings like identifier, name and description from the
    * site configuration.
    * 
@@ -242,10 +211,10 @@ public class SiteConfigurationImpl implements Customizable {
     isDefault = "true".equals(XPathHelper.valueOf(config, "@default", path));
     siteClass = XPathHelper.valueOf(config, "class", path);
     if (siteClass == null)
-      siteClass = "ch.o2it.weblounge.core.site.SiteImpl";
-    description = new LocalizableContent();
-    LanguageSupport.addDescriptions(path, config, null, description);
-    isEnabled = "true".equals(XPathHelper.valueOf(config, "enable", false, path).toLowerCase());
+      siteClass = SiteImpl.class.getCanonicalName();
+    description = LanguageSupport.addDescriptions(config, "description", defaultLanguage, null, false);
+    isEnabled = "true".equalsIgnoreCase(XPathHelper.valueOf(config, "enable", false, path));
+    options = Options.load(path, XPathHelper.select(config, "/site", path));
   }
 
   /**
@@ -258,20 +227,21 @@ public class SiteConfigurationImpl implements Customizable {
    */
   private void readAdmin(XPath path, Node config) {
     if (config != null) {
-      String login = XPathHelper.valueOf(config, "login", path);
+      String login = XPathHelper.valueOf(config, "login", path);     
       if (login.equals(WebloungeAdminImpl.getInstance().getLogin())) {
         throw new ConfigurationException("Site administrator login '" + login + "' is not allowed. Login is taken by system administrator");
       }
       String password = XPathHelper.valueOf(config, "password", path);
+      String digest = XPathHelper.valueOf(config, "password/@type", path);
       String email = XPathHelper.valueOf(config, "email", path);
       String firstname = XPathHelper.valueOf(config, "firstname", path);
       String lastname = XPathHelper.valueOf(config, "lastname", path);
-
-      if (login == null || password == null) {
-        throw new ConfigurationException("Site administrator definition missing!");
-      }
-
-      admin = new SiteAdminImpl(login, password, email);
+      DigestType digestType = DigestType.plain;
+      if (digest != null)
+        digestType = DigestType.valueOf(digest);
+      admin = new SiteAdminImpl(login);
+      admin.setPassword(password.getBytes(), digestType);
+      admin.setEmail(email);
       admin.setFirstName(firstname);
       admin.setLastName(lastname);
     } else {
@@ -289,11 +259,15 @@ public class SiteConfigurationImpl implements Customizable {
    */
   private void readUrls(XPath path, Node config) {
     NodeList urlNodes = XPathHelper.selectList(config, "url", path);
-    for (int i = 0; i < urlNodes.getLength(); i++) {
-      Node node = urlNodes.item(i);
-      String url = node.getFirstChild().getNodeValue();
-      urls.add(new URL(url));
-      log_.debug("Found site url {}", url);
+    try {
+      for (int i = 0; i < urlNodes.getLength(); i++) {
+        Node node = urlNodes.item(i);
+        String url = node.getFirstChild().getNodeValue();
+        urls.add(new URL(url));
+        log_.debug("Found site url {}", url);
+      }
+    } catch (MalformedURLException e) {
+      throw new ConfigurationException("Site url " + e.getMessage() + " is malformed");
     }
   }
 
@@ -356,16 +330,13 @@ public class SiteConfigurationImpl implements Customizable {
     String defaultLanguageId = XPathHelper.valueOf(config, "default", path);
     if (defaultLanguageId == null)
       throw new ConfigurationException("No default language has been specified");
-      
-    if (defaultLanguageId != null) {
-      Language l = LanguageSupport.getLanguage(defaultLanguageId);
-      if (l != null) {
-        defaultLanguage = l;
-      } else {
-        throw new ConfigurationException("The default language " + defaultLanguage + " is not a system language");
-      }
-    }
 
+    Language l = LanguageSupport.getLanguage(defaultLanguageId);
+    if (l != null) {
+      defaultLanguage = l;
+    } else {
+      throw new ConfigurationException("The default language " + defaultLanguage + " is not a system language");
+    }
   }
 
   /**
@@ -416,9 +387,6 @@ public class SiteConfigurationImpl implements Customizable {
     } else {
       historysize = DEFAULT_HISTORYSIZE;
     }
-
-    // Page cache
-    usePageCache = !"false".equalsIgnoreCase(XPathHelper.valueOf(config, "pagecache", false, path));
   }
 
   /**
@@ -501,7 +469,7 @@ public class SiteConfigurationImpl implements Customizable {
             Class clazz = classLoader.loadClass(rendererConfig.getClassName());
             bundle.define(clazz, rendererConfig);
           } catch (ClassNotFoundException e) {
-            log_.error("Unable to load custom renderer, since class {} was not found",rendererConfig.getClassName(), e);
+            log_.error("Unable to load custom renderer, since class {} was not found", rendererConfig.getClassName(), e);
           }
         }
         this.templates.put(id, bundle);
@@ -548,22 +516,45 @@ public class SiteConfigurationImpl implements Customizable {
       String className = XPathHelper.valueOf(jobNode, "class", path);
       try {
         Class<?> jobClass = Class.forName(className);
-        job = (SiteJob)jobClass.newInstance();
+        job = (SiteJob) jobClass.newInstance();
         job.load(path, jobNode);
         jobs.add(job);
       } catch (ConfigurationException e) {
         log_.debug("Error configuring service!", e.getCause());
-        log_.error("Error configuring cronjob '{}' of site '{}': {}", new Object[] {job.getName(), identifier, e.getMessage(), e});
+        log_.error("Error configuring cronjob '{}' of site '{}': {}", new Object[] {
+            job.getName(),
+            identifier,
+            e.getMessage(),
+            e });
       } catch (InstantiationException e) {
-        log_.error("Error instantiating cronjob '{}' of site '{}': {}", new Object[] {className, identifier, e.getMessage(), e});
+        log_.error("Error instantiating cronjob '{}' of site '{}': {}", new Object[] {
+            className,
+            identifier,
+            e.getMessage(),
+            e });
       } catch (IllegalAccessException e) {
-        log_.error("Access error instantiating cronjob '{}' of site '{}': {}", new Object[] {className, identifier, e.getMessage(), e});
+        log_.error("Access error instantiating cronjob '{}' of site '{}': {}", new Object[] {
+            className,
+            identifier,
+            e.getMessage(),
+            e });
       } catch (ClassNotFoundException e) {
-        log_.error("Class '{}' for cronjob of site '{}' not found: {}", new Object[] {className, identifier, e.getMessage(), e});
+        log_.error("Class '{}' for cronjob of site '{}' not found: {}", new Object[] {
+            className,
+            identifier,
+            e.getMessage(),
+            e });
       } catch (NoClassDefFoundError e) {
-        log_.error("Required class '{}' for cronjob of site '{}' not found: {}", new Object[] {className, identifier, e.getMessage(), e});
+        log_.error("Required class '{}' for cronjob of site '{}' not found: {}", new Object[] {
+            className,
+            identifier,
+            e.getMessage(),
+            e });
       } catch (Exception e) {
-        log_.error("Error configuring job '{}' of site '{}': {}", new Object[] {id, identifier, e.getMessage()});
+        log_.error("Error configuring job '{}' of site '{}': {}", new Object[] {
+            id,
+            identifier,
+            e.getMessage() });
       }
     }
     log_.debug("Jobs configured");
@@ -615,83 +606,68 @@ public class SiteConfigurationImpl implements Customizable {
         LanguageSupport.addDescriptions(path, styleNode, languages.getDefaultLanguage(), style);
         imagestyles.addStyle(style);
       } catch (ConfigurationException e) {
-        log_.error("Configuration error when reading imagestyle '{}': {}", new Object[] {id, e.getCause().getMessage(), e.getCause()});
+        log_.error("Configuration error when reading imagestyle '{}': {}", new Object[] {
+            id,
+            e.getCause().getMessage(),
+            e.getCause() });
       } catch (Exception e) {
-        log_.error("Configuration error when reading imagestyle '{}': {}", new Object[] {id, e.getMessage(), e});
+        log_.error("Configuration error when reading imagestyle '{}': {}", new Object[] {
+            id,
+            e.getMessage(),
+            e });
       }
     }
     log_.debug("Imagestyles configured");
   }
 
   /**
-   * Configures the request handlers.
+   * {@inheritDoc}
    * 
-   * @param node
-   *          the handlers node
-   * @param path
-   *          the XPath object used to parse the configuration
+   * @see java.lang.Object#equals(java.lang.Object)
    */
-  private void readHandlers(XPath path, Node node) {
-    log_.debug("Configuring request handlers");
-    if (node == null) {
-      log_.debug("No request handler definitions found");
-      return;
+  public boolean equals(Object o) {
+    if (o instanceof SiteConfiguration) {
+      SiteConfiguration s = (SiteConfiguration) o;
+      return (identifier.equals(s.identifier) && description.equals(s.description) && isEnabled == s.isEnabled);
     }
-    NodeList handlerNodes = XPathHelper.selectList(path, node, "handler");
-    for (int i = 0; i < handlerNodes.getLength(); i++) {
-      Node handlerNode = handlerNodes.item(i);
-      RequestHandlerConfigurationImpl config = null;
-      try {
-        config = new RequestHandlerConfigurationImpl();
-        config.load(path, handlerNode);
-        RequestHandler h = RequestHandlerManager.loadAndConfigure(config, classLoader);
-        handlers.put(config.getIdentifier(), h);
-      } catch (ConfigurationException e) {
-        log_.error("Error configuring handler '{}': {}", config.getIdentifier(), e.getMessage(), e);
-      }
-    }
-    log_.debug("Request handlers configured");
+    return false;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.Customizable#getOption(java.lang.String)
+   * @see java.lang.Object#hashCode()
    */
-  public String getOption(String name) {
-    // TODO Auto-generated method stub
-    return null;
+  public int hashCode() {
+    return identifier.hashCode();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.Customizable#getOption(java.lang.String,
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValue(java.lang.String)
+   */
+  public String getOptionValue(String name) {
+    return options.getOptionValue(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValue(java.lang.String,
    *      java.lang.String)
    */
-  public String getOption(String name, String defaultValue) {
-    // TODO Auto-generated method stub
-    return null;
+  public String getOptionValue(String name, String defaultValue) {
+    return options.getOptionValue(name, defaultValue);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.Customizable#getOptions(java.lang.String)
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValues(java.lang.String)
    */
-  public String[] getOptions(String name) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.Customizable#options()
-   */
-  public Map<String, List<String>> options() {
-    // TODO Auto-generated method stub
-    return null;
+  public String[] getOptionValues(String name) {
+    return options.getOptionValues(name);
   }
 
   /**
@@ -700,8 +676,7 @@ public class SiteConfigurationImpl implements Customizable {
    * @see ch.o2it.weblounge.common.Customizable#hasOption(java.lang.String)
    */
   public boolean hasOption(String name) {
-    // TODO Auto-generated method stub
-    return false;
+    return options.hasOption(name);
   }
 
   /**
@@ -709,7 +684,16 @@ public class SiteConfigurationImpl implements Customizable {
    * 
    * @see ch.o2it.weblounge.common.Customizable#options()
    */
-  public Iterator<String> options() {
+  public Map<String, List<String>> options() {
+    return options.options();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptionNames()
+   */
+  public String[] getOptionNames() {
     // TODO Auto-generated method stub
     return null;
   }

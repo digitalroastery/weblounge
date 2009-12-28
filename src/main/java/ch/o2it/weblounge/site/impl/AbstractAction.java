@@ -20,14 +20,13 @@
 
 package ch.o2it.weblounge.site.impl;
 
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.request.CacheHandle;
-import ch.o2it.weblounge.common.request.CacheTagSet;
+import ch.o2it.weblounge.common.request.CacheTag;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
@@ -36,6 +35,8 @@ import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.Include;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.PageRendererConfiguation;
+import ch.o2it.weblounge.common.site.PageTemplate;
+import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.ScriptInclude;
 import ch.o2it.weblounge.common.site.Site;
@@ -61,6 +62,8 @@ import java.util.List;
  * Be aware of the fact that action handlers are pooled, so make sure to
  * implement the <code>cleanup</code> method to clear any state information from
  * this handler instance.
+ * 
+ * TODO: Integrate with pooling api
  */
 public abstract class AbstractAction implements Action {
 
@@ -292,25 +295,20 @@ public abstract class AbstractAction implements Action {
   protected boolean isStage(String composer, WebloungeRequest request) {
     if (composer == null)
       throw new IllegalArgumentException("Composer may not be null!");
-
-    Renderer renderer = null;
+    
+    String stage = PageRendererConfiguation.DEFAULT_STAGE;
 
     // Is a template defined in the request?
-    String rendererId = (String) request.getAttribute(Renderer.TEMPLATE);
-    if (rendererId != null) {
-      renderer = getSite().getRenderer(rendererId, request.getFlavor());
-    } else {
-      Page page = site.getPage(new PageURIImpl(request), request.getUser());
-      renderer = page.getRenderer(request.getFlavor());
+    String templateId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+    PageTemplate template = null;
+    if (templateId != null) {
+      template = site.getTemplate(templateId);
+      if (template != null)
+        stage = template.getStage();
+      else
+        log_.warn("Action {} was told to use non-existing template {}", this, templateId);
     }
-
-    // Let's check the renderer configuration
-    if (renderer != null && renderer.getConfiguration() instanceof PageRendererConfiguation) {
-      return composer.equalsIgnoreCase(((PageRendererConfiguation) renderer.getConfiguration()).getStage());
-    }
-
-    // No template found, let's return the default stage
-    return composer.equalsIgnoreCase(PageRendererConfiguation.DEFAULT_STAGE);
+    return composer.equalsIgnoreCase(stage);
   }
 
   /**
@@ -326,13 +324,12 @@ public abstract class AbstractAction implements Action {
   }
 
   /**
-   * Returns the supported action methods. The meaning of methods is the
-   * possible output format of an action. Therefore, the methods usually include
-   * <tt>html</tt>, <tt>pdf</tt> and so on.
+   * Returns the supported flavors of this action. Common flavors are defined in
+   * {@link RequestFlavor}, but you are free to define your own.
    * 
-   * @return the supported methods
+   * @return the supported flavors
    */
-  public String[] methods() {
+  public String[] getFlavors() {
     return config.methods();
   }
 
@@ -403,7 +400,7 @@ public abstract class AbstractAction implements Action {
    *           if the passed renderer is <code>null</code>
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      Renderer renderer, Object data) {
+      PageletRenderer renderer, Object data) {
     if (renderer == null) {
       String msg = "The renderer passed to include in action '" + this + "' was <null>!";
       throw new ActionException(this, "html", new IllegalArgumentException(msg));
@@ -412,19 +409,18 @@ public abstract class AbstractAction implements Action {
     // Prepare caching
     Language language = request.getLanguage();
     User user = request.getUser();
-    long validTime = renderer.getConfiguration().getValidTime();
-    long recheckTime = renderer.getConfiguration().getRecheckTime();
+    long validTime = renderer.getValidTime();
+    long recheckTime = renderer.getRecheckTime();
     CacheTagSet rendererTagSet = new CacheTagSet();
-    CacheHandle rendererCacheHdl = null;
 
-    rendererTagSet.add("webl:site", request.getSite().getIdentifier());
-    rendererTagSet.add("webl:url", request.getUrl().getPath());
-    rendererTagSet.add("webl:url", request.getRequestedUrl().getPath());
-    rendererTagSet.add("webl:language", language.getIdentifier());
-    rendererTagSet.add("webl:user", user.getLogin());
-    rendererTagSet.add("webl:module", getModule().getIdentifier());
-    rendererTagSet.add("webl:action", getIdentifier());
-    rendererTagSet.add("webl:include-position", includes);
+    rendererTagSet.add(CacheTag.Site, request.getSite().getIdentifier());
+    rendererTagSet.add(CacheTag.Url, request.getUrl().getPath());
+    rendererTagSet.add(CacheTag.Url, request.getRequestedUrl().getPath());
+    rendererTagSet.add(CacheTag.Language, language.getIdentifier());
+    rendererTagSet.add(CacheTag.User, user.getLogin());
+    rendererTagSet.add(CacheTag.Module, getModule().getIdentifier());
+    rendererTagSet.add(CacheTag.Action, getIdentifier());
+    rendererTagSet.add(CacheTag.Position, includes);
     Enumeration<?> pe = request.getParameterNames();
     int parameterCount = 0;
     while (pe.hasMoreElements()) {
@@ -435,18 +431,19 @@ public abstract class AbstractAction implements Action {
         rendererTagSet.add(key, value);
       }
     }
-    rendererTagSet.add("webl:parameters", Integer.toString(parameterCount));
-    rendererCacheHdl = response.startResponsePart(rendererTagSet, validTime, recheckTime);
-    if (rendererCacheHdl == null)
+    rendererTagSet.add(CacheTag.Parameters, Integer.toString(parameterCount));
+    if (response.startResponsePart(rendererTagSet, validTime, recheckTime)) {
+      log_.debug("Action handler {} answered request for {} from cache", this, renderer);
       return;
+    }
 
     // Include renderer
     try {
 
       // Add additional cache tags
       if (renderer.getModule() != null)
-        response.addTag("webl:module", renderer.getModule());
-      response.addTag("webl:renderer", renderer.getIdentifier());
+        response.addTag(CacheTag.Module, renderer.getModule());
+      response.addTag(CacheTag.Renderer, renderer.getIdentifier());
 
       // Render
       renderer.configure(request.getFlavor(), data);
@@ -457,7 +454,7 @@ public abstract class AbstractAction implements Action {
       Module m = renderer.getModule();
       if (m != null)
         m.returnRenderer(renderer);
-      response.endResponsePart(rendererCacheHdl);
+      response.endResponsePart();
     }
     includes++;
   }
@@ -554,13 +551,23 @@ public abstract class AbstractAction implements Action {
       throw new ActionException(this, "html", new IllegalArgumentException("Module is null!"));
     if (renderer == null)
       throw new ActionException(this, "html", new IllegalArgumentException("Renderer is null!"));
-    Renderer r = module.getRenderer(renderer);
+    PageletRenderer r = module.getRenderer(renderer);
     if (r == null) {
       String msg = "Trying to include unknown renderer '" + renderer + "'";
       throw new ActionException(this, "html", new IllegalArgumentException(msg));
     }
     log_.debug("Including renderer {}", renderer);
     include(request, response, r, data);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return config.getIdentifier().hashCode();
   }
 
   /**

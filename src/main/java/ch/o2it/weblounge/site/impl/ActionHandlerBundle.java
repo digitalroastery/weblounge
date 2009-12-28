@@ -204,7 +204,7 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
    * 
    * @return the supported methods
    */
-  public String[] methods() {
+  public String[] getFlavors() {
     String[] result = new String[methods_.size()];
     return (String[]) methods_.toArray(result);
   }
@@ -282,7 +282,7 @@ public class ActionHandlerBundle extends LocalizableContent implements PoolListe
    */
   public void returnAction(Action action) {
     log_.debug("ActionHandler '{}' returned", action);
-    String[] methods = action.methods();
+    String[] methods = action.getFlavors();
     for (int i = 0; i < methods.length; i++) {
       Pool pool = (Pool) pools_.get(methods[i]);
       if (pool != null) {

@@ -162,6 +162,16 @@ public class IncludeImpl implements Include {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return href.hashCode();
+  }
+  
+  /**
    * Returns <code>true</code> if <code>o</code> is a <code>Link</code> as well
    * pointing to the same resource.
    */

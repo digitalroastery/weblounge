@@ -148,7 +148,7 @@ public final class ActionRequestHandler implements RequestHandler {
       Language language = request.getLanguage();
       Cache cache = (Cache) ServiceManager.getEnabledSystemService(Cache.ID);
       CacheHandle cacheHdl = null;
-      boolean cacheActions = cache != null && !"false".equals(cache.getConfiguration().getOption("actions")) && request.getVersion() == Page.LIVE;
+      boolean cacheActions = cache != null && !"false".equals(cache.getConfiguration().getOptionValue("actions")) && request.getVersion() == Page.LIVE;
 
       // Check the request. If it is a common POST request then just go on
       // like usual. In case of multipart/form-data content wrap the request

@@ -58,7 +58,7 @@ public class ModuleImpl implements Module {
   protected ModuleConfiguration config = null;
 
   /** The renderers */
-  protected Map<String, Renderer> renderers = null;
+  protected Map<String, PageletRenderer> renderers = null;
 
   /** The actions */
   protected Map<String, Action> actions = null;
@@ -245,18 +245,6 @@ public class ModuleImpl implements Module {
   }
 
   /**
-   * Returns an iteration of all available option names.
-   * 
-   * @return the available option names
-   * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
-   */
-  public Iterator options() {
-    return config.options();
-  }
-
-  /**
    * Returns <code>true</code> if the the option with name <code>name</code> has
    * been configured.
    * 
@@ -264,8 +252,8 @@ public class ModuleImpl implements Module {
    *          the option name
    * @return <code>true</code> if an option with that name exists
    * @see #options()
-   * @see #getOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
+   * @see #getOptionValue(java.lang.String)
+   * @see #getOptionValue(java.lang.String, java.lang.String)
    */
   public boolean hasOption(String name) {
     return config.hasOption(name);
@@ -277,17 +265,17 @@ public class ModuleImpl implements Module {
    * <p>
    * If the option is a multiple value option (that is, if the option has been
    * configured multiple times), this method returns the first value onyl. Use
-   * {@link #getOptions(java.lang.String)} to get all option values.
+   * {@link #getOptionValues(java.lang.String)} to get all option values.
    * 
    * @param name
    *          the option name
    * @return the option value
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
+   * @see #getOptionValue(java.lang.String, java.lang.String)
    */
-  public String getOption(String name) {
-    return config.getOption(name);
+  public String getOptionValue(String name) {
+    return config.getOptionValue(name);
   }
 
   /**
@@ -301,10 +289,10 @@ public class ModuleImpl implements Module {
    * @return the option value
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
+   * @see #getOptionValue(java.lang.String)
    */
-  public String getOption(String name, String defaultValue) {
-    String value = getOption(name);
+  public String getOptionValue(String name, String defaultValue) {
+    String value = getOptionValue(name);
     return (value != null) ? value : defaultValue;
   }
 
@@ -317,10 +305,10 @@ public class ModuleImpl implements Module {
    * @return the option values
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
+   * @see #getOptionValue(java.lang.String)
    */
-  public String[] getOptions(String name) {
-    return config.getOptions(name);
+  public String[] getOptionValues(String name) {
+    return config.getOptionValues(name);
   }
 
   /**
@@ -547,7 +535,7 @@ public class ModuleImpl implements Module {
     Iterator options = config.options();
     while (options.hasNext()) {
       String o = (String) options.next();
-      log_.debug("Found option {}: {}", o, config.getOption(o));
+      log_.debug("Found option {}: {}", o, config.getOptionValue(o));
     }
 
     handlerRegistry = SiteRegistries.get(RequestHandlerRegistry.ID, site);

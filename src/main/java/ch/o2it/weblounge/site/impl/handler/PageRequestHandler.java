@@ -34,7 +34,7 @@ import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.Renderer;
+import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
@@ -84,6 +84,8 @@ public class PageRequestHandler implements RequestHandler {
     String path = url.getPath();
 
     // Check the request flavor
+    // TODO: Criteria would be loading the page from the repository
+    // TODO: Think about performance, page lookup is expensive
     // TODO: Add support for XML and JSON
     if (!html.equals(request.getFlavor())) {
       log_.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
@@ -92,18 +94,13 @@ public class PageRequestHandler implements RequestHandler {
 
     // Check the request method
     String requestMethod = request.getMethod();
-    if (!Http11Utils.checkDefaultMethods(requestMethod, response))
+    if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
+      log_.debug("Page handler answered head request for {}", request.getUrl());
       return true;
+    }
 
     // Check if the request is controlled by an action.
     Action action = (Action) request.getAttribute(WebloungeRequest.REQUEST_ACTION);
-
-    // Check if browser must be told not to cache the page
-    if (request.getVersion() == Page.WORK) {
-      response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
-      response.setHeader("Pragma", "no-cache");
-      response.setHeader("Expires", "0");
-    }
 
     // Check if the page is already part of the cache. If so, our task is
     // already done!
@@ -131,14 +128,20 @@ public class PageRequestHandler implements RequestHandler {
       cacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
 
       // Check if the page is already part of the cache
-      if (response.startResponse(cacheTags, validTime, recheckTime))
+      if (response.startResponse(cacheTags, validTime, recheckTime)) {
+        log_.debug("Page handler answered request for {} from cache", request.getUrl());
         return true;
+      }
       
       processingMode = Mode.Cached;
     } else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
       // handle HEAD requests
       Http11Utils.startHeadResponse(response);
       processingMode = Mode.Head;
+    } else if (request.getVersion() == Page.WORK) {
+      response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
+      response.setHeader("Pragma", "no-cache");
+      response.setHeader("Expires", "0");
     }
 
     // Get the renderer id that has been registered with the url. For this, we
@@ -189,66 +192,64 @@ public class PageRequestHandler implements RequestHandler {
       
       // See if the request contains instructions regarding the template
       // to be used
-      String rendererId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
-      Renderer renderer = null;
-      if (rendererId != null) {
-        renderer = site.getTemplate(rendererId);
+      String requestFlavor = request.getFlavor();
+      String templateId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+      PageTemplate template = null;
+      if (templateId != null) {
+        template = site.getTemplate(templateId);
+        if (template == null) {
+          log_.warn("Template {} specified by request was not found", templateId);
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          return true;
+        }
       } else {
-        renderer = site.getTemplate(page.getTemplate());
+        template = site.getTemplate(page.getTemplate());
+        if (template == null) {
+          log_.warn("Template {} specified by page was not found", templateId);
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          return true;
+        }
       }
 
-      if (renderer == null) {
-        String params = RequestSupport.getParameters(request);
-        String msg = (rendererId != null) ? "Template '" + rendererId + "' was not found " : "No template was found ";
-        msg += "to render url '" + url + "' " + params;
-        site.getLogger().warn(msg);
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      // Did we find a template?
+      if (!template.supportsFlavor(requestFlavor)) {
+        log_.warn("Template {} does not support requested flavor {}", templateId, requestFlavor);
+        response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
         return true;
       }
 
       // Select the actual renderer by method and have it render the
       // request. Since renderers are being pooled by the bundle, we
       // have to return it after the request has finished.
+      try {
 
-      String method = request.getFlavor();
-
-      if (renderer.provides(method)) {
-        try {
-
-          // Add additional cache tags
-          response.addTag("webl:template", rendererId);
-          response.addTag("webl:pagetype", page.getType());
-          for (String keyword : page.getSubjects()) {
-            response.addTag("webl:keyword", keyword);
-          }
-
-          log_.info("Rendering {} through {}", path, renderer);
-          renderer.configure(method, null);
-          renderer.render(request, response);
-        } catch (Exception e) {
-          String params = RequestSupport.getParameters(request);
-          String msg = "Error rendering template '" + renderer + "' on '" + path + "' " + params;
-          Throwable o = e.getCause();
-          if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
-            Throwable rootCause = ((JasperException) o).getRootCause();
-            msg += ": " + rootCause.getMessage();
-            site.getLogger().error(msg, rootCause);
-          } else if (o != null) {
-            msg += ": " + o.getMessage();
-            site.getLogger().error(msg, o);
-          } else {
-            site.getLogger().error(msg, e);
-          }
-          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-          renderer.cleanup();
+        // Add additional cache tags
+        response.addTag("webl:template", templateId);
+        response.addTag("webl:pagetype", page.getType());
+        for (String keyword : page.getSubjects()) {
+          response.addTag("webl:keyword", keyword);
         }
-      } else {
+
+        log_.info("Rendering {} through {}", path, template);
+        template.configure(requestFlavor, null);
+        template.render(request, response);
+      } catch (Exception e) {
         String params = RequestSupport.getParameters(request);
-        String msg = "Method '" + method + "' not supported by template '" + renderer + "' on '" + path + "' " + params;
-        site.getLogger().warn(msg);
+        String msg = "Error rendering template '" + template + "' on '" + path + "' " + params;
+        Throwable o = e.getCause();
+        if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
+          Throwable rootCause = ((JasperException) o).getRootCause();
+          msg += ": " + rootCause.getMessage();
+          site.getLogger().error(msg, rootCause);
+        } else if (o != null) {
+          msg += ": " + o.getMessage();
+          site.getLogger().error(msg, o);
+        } else {
+          site.getLogger().error(msg, e);
+        }
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        return true;
+      } finally {
+        template.cleanup();
       }
       return true;
     } catch (IOException e) {
