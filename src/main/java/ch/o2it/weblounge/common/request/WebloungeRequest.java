@@ -57,6 +57,9 @@ public interface WebloungeRequest extends HttpServletRequest {
   /** The attribute name used to store the {@link Renderer} in the request */
   public static final String REQUEST_TEMPLATE = "weblounge-template";
 
+  /** The attribute name used to store the {@link Pagelet} in the request */
+  public static final String REQUEST_PAGELET = "weblounge-pagelet";
+
   /**
    * Returns the requested language. The language is determined by evaluating
    * the request header fields.

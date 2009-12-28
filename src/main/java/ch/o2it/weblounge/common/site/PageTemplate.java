@@ -6,7 +6,7 @@
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2
- *  of the License;
+ *  of the License, or (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,31 +14,24 @@
  *  GNU Lesser General Public License for more details.
  *
  *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program; if not;
- *  Inc.;
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.request;
-
-import ch.o2it.weblounge.common.content.Tag;
+package ch.o2it.weblounge.common.site;
 
 /**
- * This interface contains the cache tags that are used by default throughout
- * the system.
+ * A <code>PageTemplate</code> is a renderer that is used to render a whole page
+ * rather than just a <code>Pagelet</code>, which is just a small part of it.
  */
-public interface CacheTag extends Tag {
+public interface PageTemplate extends Renderer {
 
-  /** Special object representing the "any" value */
-  Object ANY = new Object();
-
-  String Url = "webl:url";
-  String Language = "webl:language";
-  String User = "webl:user";
-  String Module = "webl:module";
-  String Action = "webl:action";
-  String Site = "webl:site";
-  String Parameters = "webl:parameters";
-  String Position = "webl:position";
-  String Renderer = "webl:renderer";
+  /**
+   * Returns the stage, which is the identifier of a composer in that template
+   * that takes the main content as returned by an <code>Action</code>.
+   * 
+   * @return the main composer
+   */
+  String getStage();
 
 }

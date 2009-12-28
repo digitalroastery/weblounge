@@ -136,7 +136,7 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * 
    * @return the templates
    */
-  Renderer[] getTemplates();
+  PageTemplate[] getTemplates();
 
   /**
    * Returns the template with the given identifier or <code>null</code> if no
@@ -145,7 +145,7 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @param template
    * @return the template
    */
-  Renderer getTemplate(String template);
+  PageTemplate getTemplate(String template);
 
   /**
    * Returns the identifier of the default template for this site.

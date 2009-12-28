@@ -26,8 +26,6 @@ import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
-import java.net.URL;
-
 /**
  * A <code>Renderer</code> is an object that is capable to render given
  * pageContent into a desired output format.
@@ -73,37 +71,6 @@ public interface Renderer extends Localizable {
   String getIdentifier();
 
   /**
-   * Sets the associated site if this is a site related renderer configuration.
-   * 
-   * @param site
-   *          the associated site
-   */
-  void setSite(Site site);
-
-  /**
-   * Sets the associated module if this is a module renderer configuration.
-   * 
-   * @param module
-   *          the associated module
-   */
-  void setModule(Module module);
-
-  /**
-   * Returns the associated site or <code>null</code> if no site has been set.
-   * 
-   * @return the site
-   */
-  Site getSite();
-
-  /**
-   * Returns the associated module or <code>null</code> if no module has been
-   * set.
-   * 
-   * @return the module
-   */
-  Module getModule();
-
-  /**
    * Returns the supported rendering methods. The meaning of methods is the
    * possible output format of a renderer. Therefore, the methods usually
    * include <tt>html</tt>, <tt>pdf</tt> and so on.
@@ -123,26 +90,12 @@ public interface Renderer extends Localizable {
   String getTitle(Language language);
 
   /**
-   * Return the path leading to the renderer.
-   * 
-   * @return the renderer url
-   */
-  URL getURL();
-
-  /**
    * Initializes the renderer using the given configuration.
    * 
    * @param configuration
    *          the renderer configuration
    */
   void init(RendererConfiguration configuration);
-
-  /**
-   * Returns <code>true</code> if this renderer is composeable.
-   * 
-   * @return <code>true</code> if this renderer is composeable
-   */
-  boolean isComposeable();
 
   /**
    * This method is called just before the call to
@@ -157,21 +110,13 @@ public interface Renderer extends Localizable {
   void configure(String method, Object data);
 
   /**
-   * Returns <code>true</code> if the given method is supported by the renderer.
-   * The method is used to lookup a rendering method for a given renderer id.
+   * Returns <code>true</code> if the given flavor is supported by the renderer.
    * 
-   * @param method
-   *          the method name
+   * @param flavor
+   *          the flavor name
    * @return <code>true</code> if the renderer supports the rendering method
    */
-  boolean provides(String method);
-
-  /**
-   * Returns <code>true</code> if this renderer has an editor defined.
-   * 
-   * @return <code>true</code> if there is an editor for this renderer
-   */
-  boolean hasEditor();
+  boolean supportsFlavor(String flavor);
 
   /**
    * Performs the actual rendering.
@@ -187,17 +132,21 @@ public interface Renderer extends Localizable {
       throws RenderException;
 
   /**
-   * Performs the actual rendering by showing the editor.
+   * Returns the amount of time in milliseconds that output using this renderer
+   * will be valid.
    * 
-   * @param request
-   *          the request object
-   * @param response
-   *          the http servlet response object
-   * @throws RenderException
-   *           if rendering fails
+   * @return the valid time
    */
-  void renderAsEditor(WebloungeRequest request, WebloungeResponse response)
-      throws RenderException;
+  long getValidTime();
+
+  /**
+   * Returns the amount of time in milliseconds that output using this renderer
+   * is likely to still be valid. However, clients should check to make sure
+   * that this actually is the case.
+   * 
+   * @return the recheck time
+   */
+  long getRecheckTime();
 
   /**
    * This method is called after the rendering request has been accomplished by
@@ -205,13 +154,5 @@ public interface Renderer extends Localizable {
    * acquired.
    */
   void cleanup();
-
-  /**
-   * Returns the renderer configuration as read in from the renderer
-   * configuration section of the configuration file.
-   * 
-   * @return the renderer configuration
-   */
-  RendererConfiguration getConfiguration();
 
 }

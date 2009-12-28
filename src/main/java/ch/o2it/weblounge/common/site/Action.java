@@ -261,7 +261,7 @@ public interface Action {
    * 
    * @return the supported methods
    */
-  String[] methods();
+  String[] getFlavors();
 
   /**
    * This method is called after the request has been processed by the action.

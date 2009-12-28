@@ -38,10 +38,17 @@ public interface Customizable {
    *          the option name
    * @return <code>true</code> if an option with that name exists
    * @see #options()
-   * @see #getOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
+   * @see #getOptionValue(java.lang.String)
+   * @see #getOptionValue(java.lang.String, java.lang.String)
    */
   boolean hasOption(String name);
+
+  /**
+   * Returns the names of the configured options.
+   * 
+   * @return the option names
+   */
+  String[] getOptionNames();
 
   /**
    * Returns the option value for option <code>name</code> if it has been
@@ -49,16 +56,16 @@ public interface Customizable {
    * <p>
    * If the option is a multiple value option (that is, if the option has been
    * configured multiple times), this method returns the first value onyl. Use
-   * {@link #getOptions(java.lang.String)} to get all option values.
+   * {@link #getOptionValues(java.lang.String)} to get all option values.
    * 
    * @param name
    *          the option name
    * @return the option value
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
+   * @see #getOptionValue(java.lang.String, java.lang.String)
    */
-  String getOption(String name);
+  String getOptionValue(String name);
 
   /**
    * Returns the option value for option <code>name</code> if it has been
@@ -71,9 +78,9 @@ public interface Customizable {
    * @return the option value
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
+   * @see #getOptionValue(java.lang.String)
    */
-  String getOption(String name, String defaultValue);
+  String getOptionValue(String name, String defaultValue);
 
   /**
    * Returns the option values for option <code>name</code> if it has been
@@ -84,9 +91,9 @@ public interface Customizable {
    * @return the option values
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
+   * @see #getOptionValue(java.lang.String)
    */
-  String[] getOptions(String name);
+  String[] getOptionValues(String name);
 
   /**
    * Returns the options as a <code>Map</code>.

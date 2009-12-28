@@ -138,7 +138,7 @@ public interface Module extends Customizable {
    * 
    * @return the renderer registry
    */
-  Renderer[] getRenderers();
+  PageletRenderer[] getRenderers();
 
   /**
    * Returns the module renderer identified by <code>renderer</code> or
@@ -150,7 +150,7 @@ public interface Module extends Customizable {
    *          the rendering method
    * @return the renderer
    */
-  Renderer getRenderer(String renderer, String method);
+  PageletRenderer getRenderer(String renderer, String method);
 
   /**
    * Returns the module renderer identified by <code>renderer</code> or
@@ -161,7 +161,7 @@ public interface Module extends Customizable {
    *          the renderer identifier
    * @return the renderer
    */
-  Renderer getRenderer(String renderer);
+  PageletRenderer getRenderer(String renderer);
 
   /**
    * Returns the renderer to the renderer pool. Returning the renderers is
@@ -171,7 +171,7 @@ public interface Module extends Customizable {
    * @param r
    *          the renderer
    */
-  void returnRenderer(Renderer r);
+  void returnRenderer(PageletRenderer r);
 
   /**
    * Returns the image styles defined by this module.
