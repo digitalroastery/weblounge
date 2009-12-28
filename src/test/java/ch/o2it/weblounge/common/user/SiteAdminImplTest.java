@@ -41,9 +41,9 @@ public class SiteAdminImplTest extends WebloungeUserImplTest {
   @Before
   public void setUp() throws Exception {
     setUpPrerequisites();
-    user = new SiteAdminImpl(login, "test");
+    user = new SiteAdminImpl(login);
     realm = User.SystemRealm;
-    adminName = "Site Administrator (test)";
+    adminName = "Site Administrator (" + login + ")";
     setUpUser();
   }
 

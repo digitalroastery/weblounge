@@ -152,26 +152,35 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.Customizable#getOption(java.lang.String)
+   *
+   * @see ch.o2it.weblounge.common.Customizable#getOptionNames()
    */
-  public String getOption(String name) {
-    return configuration.getOption(name);
+  public String[] getOptionNames() {
+    return configuration.getOptionNames();
   }
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.Customizable#getOption(java.lang.String, java.lang.String)
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValue(java.lang.String)
    */
-  public String getOption(String name, String defaultValue) {
-    return configuration.getOption(name, defaultValue);
+  public String getOptionValue(String name) {
+    return configuration.getOptionValue(name);
   }
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.Customizable#getOptions(java.lang.String)
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValue(java.lang.String, java.lang.String)
    */
-  public String[] getOptions(String name) {
-    return configuration.getOptions(name);
+  public String getOptionValue(String name, String defaultValue) {
+    return configuration.getOptionValue(name, defaultValue);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValues(java.lang.String)
+   */
+  public String[] getOptionValues(String name) {
+    return configuration.getOptionValues(name);
   }
 
   /**

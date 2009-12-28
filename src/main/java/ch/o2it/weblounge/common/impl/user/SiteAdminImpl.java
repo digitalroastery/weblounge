@@ -21,43 +21,23 @@
 package ch.o2it.weblounge.common.impl.user;
 
 import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.security.Authority;
 
 /**
  * This class represents the administrator user for a single site.
  */
 public final class SiteAdminImpl extends WebloungeUserImpl {
 
-  /** The site identifier */
-  protected String site = null;
-
   /**
-   * Creates a new SiteAdminImpl user with the <code>administrator</code> role
+   * Creates a new SiteAdminImpl user with the {@link SystemRole.SITEADMIN} role
    * assigned.
    * 
    * @param login
    *          the login name
-   * @param site
-   *          identifier of the associated site
    */
-  public SiteAdminImpl(String login, String site) {
+  public SiteAdminImpl(String login) {
     super(login, SystemRealm);
-    this.site = site;
     assignRole(SystemRole.SITEADMIN);
-    setName("Site Administrator (" + site + ")");
-  }
-
-  /**
-   * Returns <code>true</code> if <code>authority</code> represents the same
-   * user.
-   * 
-   * @see ch.o2it.weblounge.common.security.Authority#isAuthorizedBy(ch.o2it.weblounge.common.security.Authority)
-   */
-  public boolean isAuthorizedBy(Authority authority) {
-    if (authority != null && authority instanceof SiteAdminImpl) {
-      return site.equals(((SiteAdminImpl) authority).site);
-    }
-    return false;
+    setName("Site Administrator (" + login + ")");
   }
 
   /**
@@ -77,7 +57,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
    */
   @Override
   public boolean equals(Object obj) {
-    // Overwritten to document that we are using the super impl
+    // Overwritten to document that we are using the super implementation
     return super.equals(obj);
   }
 
@@ -88,7 +68,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
    */
   @Override
   public int hashCode() {
-    // Overwritten to document that we are using the super impl
+    // Overwritten to document that we are using the super implementation
     return super.hashCode();
   }
 

@@ -60,29 +60,38 @@ public class Options implements Customizable {
    *          the option name
    * @return <code>true</code> if an option with that name exists
    * @see #options()
-   * @see #getOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
+   * @see #getOptionValue(java.lang.String)
+   * @see #getOptionValue(java.lang.String, java.lang.String)
    */
   public boolean hasOption(String name) {
     return (options.keySet().contains(name));
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.Customizable#getOptionNames()
+   */
+  public String[] getOptionNames() {
+    return options.keySet().toArray(new String[options.size()]);
+  }
+  
+  /**
    * Returns the option value for option <code>name</code> if it has been
    * configured, <code>null</code> otherwise.
    * <p>
    * If the option is a multi value option (that is, if the option has been
    * configured multiple times), this method returns the first value only. Use
-   * {@link #getOptions(java.lang.String)} to get all option values.
+   * {@link #getOptionValues(java.lang.String)} to get all option values.
    * 
    * @param name
    *          the option name
    * @return the option value
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String, java.lang.String)
+   * @see #getOptionValue(java.lang.String, java.lang.String)
    */
-  public String getOption(String name) {
+  public String getOptionValue(String name) {
     List<String> optionList = options.get(name);
     if (optionList != null && optionList.size() > 0) {
       return optionList.get(0);
@@ -101,10 +110,10 @@ public class Options implements Customizable {
    * @return the option value
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
+   * @see #getOptionValue(java.lang.String)
    */
-  public String getOption(String name, String defaultValue) {
-    String value = getOption(name);
+  public String getOptionValue(String name, String defaultValue) {
+    String value = getOptionValue(name);
     return (value != null) ? value : defaultValue;
   }
 
@@ -117,9 +126,9 @@ public class Options implements Customizable {
    * @return the option values
    * @see #options()
    * @see #hasOption(java.lang.String)
-   * @see #getOption(java.lang.String)
+   * @see #getOptionValue(java.lang.String)
    */
-  public String[] getOptions(String name) {
+  public String[] getOptionValues(String name) {
     List<String> optionList = options.get(name);
     if (optionList != null) {
       return optionList.toArray(new String[] {});

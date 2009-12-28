@@ -177,7 +177,7 @@ public class PageImplTest {
   protected void setupPrerequisites() {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
-    EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin", "test"));    
+    EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));    
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
     EasyMock.replay(site);
     pageURI = new PageURIImpl(site, "/test", Page.LIVE);
