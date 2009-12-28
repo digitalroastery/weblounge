@@ -24,56 +24,35 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 
 /**
- * The <code>ImageStyle</code> class defines a presentation style for images of
- * a certain size as well as the method to get from the original image verision
- * to scaled ones.
+ * The <code>ImageStyle</code> defines a presentation style for images of a
+ * certain size as well as the method to get from the original image version to
+ * scaled ones.
  */
 public interface ImageStyle extends Localizable {
 
   /**
-   * This constants defines no scaling.
-   */
-  public final static int SCALE_NONE = -1;
-
-  /**
-   * This constants defines the scaling mode for the generated images of this
-   * type such that the image is being scaled to fill the whole rectangle
-   * defined by width and height properties. <br>
-   * Like this, the image will eventually have to be cropped on the overlapping
-   * side but the resulting images are all exactly of the dimensions
-   * <tt>(width, height)</tt>.
-   */
-  public final static int SCALE_TO_FILL = 0;
-
-  /**
-   * This constants defines the scaling mode for the generated images of this
-   * type such that the image is being scaled to fit the maximum of width and
-   * height. Like this, the image will eventually not fill the whole rectangle,
-   * but all image data is kept. <br>
-   * This is the default scaling mode.
-   */
-  public final static int SCALE_TO_FIT = 1;
-
-  /**
-   * Sets the scale mode for this image style. For the mode, use one out of
-   * <ul>
-   * <li>{@link #SCALE_TO_FIT} - Scales until either both width and height fit
-   * the bounds</li>
-   * <li>{@link #SCALE_TO_FILL} - Scales until the smaller of width and height
-   * fit and the crops the image</li>
-   * </ul>
+   * Sets the scaling mode for this image style. The scaling mode defines which
+   * of the dimensions need to be strictly respected when the image is scaled.
    * 
    * @param mode
    *          the scaling mode
    */
-  void setScalingMode(int mode);
+  void setScalingMode(ScalingMode mode);
 
   /**
    * Returns the scaling mode for this image style.
    * 
    * @return the scaling mode
    */
-  int getScalingMode();
+  ScalingMode getScalingMode();
+
+  /**
+   * Sets the image height.
+   * 
+   * @param height
+   *          the height
+   */
+  void setHeight(int height);
 
   /**
    * Returns the image height.
@@ -83,27 +62,12 @@ public interface ImageStyle extends Localizable {
   int getHeight();
 
   /**
-   * Returns the style identifier.
+   * Sets the image width.
    * 
-   * @return the identifier
+   * @param width
+   *          the width
    */
-  String getIdentifier();
-
-  /**
-   * Returns the style name.
-   * 
-   * @return the style name
-   */
-  String getName();
-
-  /**
-   * Returns the style name in the required language.
-   * 
-   * @param language
-   *          the required language
-   * @return the style name
-   */
-  String getName(Language language);
+  void setWidth(int width);
 
   /**
    * Returns the image width.
@@ -113,11 +77,75 @@ public interface ImageStyle extends Localizable {
   int getWidth();
 
   /**
+   * Set to <code>true</code> if this image style should available to the user
+   * when it comes to placing images on a page.
+   * 
+   * @param composeable
+   *          <code>true</code> if the image style might be selected by the user
+   */
+  void setComposeable(boolean composeable);
+
+  /**
    * Returns <code>true</code> if the style is composeable. Non composeable
    * style may be used internally by image galleries etc.
    * 
    * @return <code>true</code> if the style is composeable
    */
   boolean isComposeable();
+
+  /**
+   * Returns the style identifier.
+   * 
+   * @return the identifier
+   */
+  String getIdentifier();
+
+  /**
+   * Sets the name in the specified language.
+   * 
+   * @param name
+   *          the name
+   * @param language
+   *          the language
+   */
+  void setName(String name, Language language);
+
+  /**
+   * Returns the style name.
+   * 
+   * @return the style name
+   */
+  String getName();
+
+  /**
+   * Returns the style name in the required language. If not available, the name
+   * will be returned in the default language.
+   * 
+   * @param language
+   *          the required language
+   * @return the style name
+   */
+  String getName(Language language);
+
+  /**
+   * Returns the style name in the required language. If not available, either
+   * <code>null</code> or the name in a fallback language will be returned,
+   * depending on the value of <code>force</code>.
+   * 
+   * @param language
+   *          the required language
+   * @param force
+   *          <code>true</code> to force a <code>null</code> value rather then a
+   *          fallback language
+   * @return the style name
+   */
+  String getName(Language language, boolean force);
+
+  /**
+   * Returns an xml representation of this image style.
+   * 
+   * @return the xml representation
+   */
+  String toXml();
 
 }

@@ -30,7 +30,7 @@ import java.util.Locale;
  * 
  * @see Locale
  */
-public interface Language {
+public interface Language extends Comparable<Language> {
 
   /**
    * Returns the locale that is associated with the language.
