@@ -115,9 +115,6 @@ public class SiteConfiguration implements Customizable {
   /** Image styles */
   protected List<ImageStyle> imagestyles = null;
 
-  /** Site cron jobs */
-  protected List<SiteJob> jobs = null;
-
   /** Site options */
   protected OptionsSupport options = null;
 
@@ -142,7 +139,6 @@ public class SiteConfiguration implements Customizable {
     imagestyles = new ArrayList<ImageStyle>();
     templates = new ArrayList<PageTemplate>();
     urls = new ArrayList<URL>();
-    jobs = new ArrayList<SiteJob>();
   }
 
   /**
@@ -167,7 +163,6 @@ public class SiteConfiguration implements Customizable {
       readLayouts(path, XPathHelper.select(config, "/site/layouts", path));
       readRenderers(path, XPathHelper.select(config, "/site/templates", path));
       readImagestyles(path, XPathHelper.select(config, "/site/imagestyles", path));
-      readJobs(path, XPathHelper.select(config, "/site/jobs", path));
     } catch (Throwable t) {
       throw new ConfigurationException("Error when reading site configuration", t);
     }
@@ -224,7 +219,7 @@ public class SiteConfiguration implements Customizable {
    */
   private void readAdmin(XPath path, Node config) {
     if (config != null) {
-      String login = XPathHelper.valueOf(config, "login", path);     
+      String login = XPathHelper.valueOf(config, "login", path);
       if (login.equals(WebloungeAdminImpl.getInstance().getLogin())) {
         throw new ConfigurationException("Site administrator login '" + login + "' is not allowed. Login is taken by system administrator");
       }
@@ -294,6 +289,7 @@ public class SiteConfiguration implements Customizable {
       }
     }
     // By default, add authentication for superuser login
+    // TODO: Move this to the site impl
     authenticationModules.add(new AuthenticationModuleImpl(AdminLoginModule.class.getName(), "sufficient"));
   }
 
@@ -400,6 +396,7 @@ public class SiteConfiguration implements Customizable {
       log_.debug("No layout definitions found");
       return;
     }
+    // TODO: Read layouts
   }
 
   /**
@@ -486,82 +483,10 @@ public class SiteConfiguration implements Customizable {
   }
 
   /**
-   * Configures the job settings.
-   * 
-   * @param config
-   *          the jobs node
-   * @param path
-   *          the XPath object used to parse the configuration
-   */
-  private void readJobs(XPath path, Node config) {
-    if (config == null) {
-      log_.debug("No job definitions found");
-      return;
-    }
-    log_.debug("Configuring jobs");
-    NodeList jobNodes = XPathHelper.selectList(config, "job", path);
-    for (int i = 0; i < jobNodes.getLength(); i++) {
-      Node jobNode = jobNodes.item(i);
-      SiteJob job = null;
-
-      // See if job is enabled
-      String enabled = XPathHelper.valueOf(jobNode, "@enabled", path);
-      if (enabled != null && !"true".equals(enabled))
-        continue;
-
-      String id = XPathHelper.valueOf(jobNode, "@id", path);
-      String className = XPathHelper.valueOf(jobNode, "class", path);
-      try {
-        Class<?> jobClass = Class.forName(className);
-        job = (SiteJob) jobClass.newInstance();
-        job.load(path, jobNode);
-        jobs.add(job);
-      } catch (ConfigurationException e) {
-        log_.debug("Error configuring service!", e.getCause());
-        log_.error("Error configuring cronjob '{}' of site '{}': {}", new Object[] {
-            job.getName(),
-            identifier,
-            e.getMessage(),
-            e });
-      } catch (InstantiationException e) {
-        log_.error("Error instantiating cronjob '{}' of site '{}': {}", new Object[] {
-            className,
-            identifier,
-            e.getMessage(),
-            e });
-      } catch (IllegalAccessException e) {
-        log_.error("Access error instantiating cronjob '{}' of site '{}': {}", new Object[] {
-            className,
-            identifier,
-            e.getMessage(),
-            e });
-      } catch (ClassNotFoundException e) {
-        log_.error("Class '{}' for cronjob of site '{}' not found: {}", new Object[] {
-            className,
-            identifier,
-            e.getMessage(),
-            e });
-      } catch (NoClassDefFoundError e) {
-        log_.error("Required class '{}' for cronjob of site '{}' not found: {}", new Object[] {
-            className,
-            identifier,
-            e.getMessage(),
-            e });
-      } catch (Exception e) {
-        log_.error("Error configuring job '{}' of site '{}': {}", new Object[] {
-            id,
-            identifier,
-            e.getMessage() });
-      }
-    }
-    log_.debug("Jobs configured");
-  }
-
-  /**
    * Configures the image styles.
    * 
    * @param config
-   *          the services node
+   *          the image styles node
    * @param path
    *          the XPath object used to parse the configuration
    */
@@ -570,51 +495,18 @@ public class SiteConfiguration implements Customizable {
       log_.debug("No image styles found");
       return;
     }
-    log_.debug("Configuring imagestyles");
-    NodeList styleNodes = XPathHelper.selectList(config, "imagestyle", path);
-    for (int i = 0; i < styleNodes.getLength(); i++) {
-      Node styleNode = styleNodes.item(i);
-      String id = XPathHelper.valueOf(styleNode, "@id", path);
-      String composeableAttribute = XPathHelper.valueOf(styleNode, "@composeable", path);
-      boolean composeable = composeableAttribute == null || "true".equalsIgnoreCase(composeableAttribute);
-      try {
-        String mode = XPathHelper.valueOf(styleNode, "scalingmode", path);
-        String width = XPathHelper.valueOf(styleNode, "width", path);
-        String height = XPathHelper.valueOf(styleNode, "height", path);
-        int m = ImageStyle.SCALE_NONE;
-        int h = -1;
-        int w = -1;
-        if (mode != null && !mode.equals("none")) {
-          w = Integer.parseInt(width);
-          h = Integer.parseInt(height);
-          if ((mode != null) && mode.equals("fit")) {
-            m = ImageStyle.SCALE_TO_FIT;
-          } else if ((mode != null) && mode.equals("fill")) {
-            m = ImageStyle.SCALE_TO_FILL;
-          } else {
-            String msg = "Found unknown scalingmode for imagestyle '" + id + "': " + mode;
-            log_.warn(msg);
-            throw new ConfigurationException(msg);
-          }
-        }
-
-        ImageStyleImpl style = ImageStyleImpl.fromXml(styleNode);
-        style.setScalingMode(m);
-        LanguageSupport.addDescriptions(path, styleNode, languages.getDefaultLanguage(), style);
-        imagestyles.addStyle(style);
-      } catch (ConfigurationException e) {
-        log_.error("Configuration error when reading imagestyle '{}': {}", new Object[] {
-            id,
-            e.getCause().getMessage(),
-            e.getCause() });
-      } catch (Exception e) {
-        log_.error("Configuration error when reading imagestyle '{}': {}", new Object[] {
-            id,
-            e.getMessage(),
-            e });
+    log_.debug("Configuring image styles");
+    try {
+      NodeList styleNodes = XPathHelper.selectList(config, "imagestyle", path);
+      for (int i = 0; i < styleNodes.getLength(); i++) {
+        Node styleNode = styleNodes.item(i);
+        ImageStyle style = ImageStyleImpl.fromXml(styleNode, path);
+        imagestyles.add(style);
       }
+    } catch (Exception e) {
+      log_.error("Configuration error when reading image styles: {}", e.getMessage(), e);
     }
-    log_.debug("Imagestyles configured");
+    log_.debug("Image styles configured");
   }
 
   /**

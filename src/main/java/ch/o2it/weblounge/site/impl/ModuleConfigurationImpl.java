@@ -21,16 +21,15 @@
 package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.ConfigurationException;
+import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.impl.util.classloader.WebloungeClassLoader;
 import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ImageStyle;
-import ch.o2it.weblounge.common.site.Job;
 import ch.o2it.weblounge.common.site.ModuleConfiguration;
 import ch.o2it.weblounge.common.site.Renderer;
 
@@ -41,8 +40,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.xpath.XPath;
@@ -74,7 +75,7 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
   File file = null;
 
   /** Module description */
-  LocalizableContent<String> descriptions = null;
+  protected LocalizableContent<String> description = null;
 
   /** True if the module is enabled */
   boolean isEnabled = true;
@@ -88,11 +89,8 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
   /** The action handlers */
   Map<String, Action> actions = null;
 
-  /** Module jobs */
-  Map<String, Job> jobs = null;
-
   /** The image styles */
-  Map<String, ImageStyle> imagestyles = null;
+  List<ImageStyle> imagestyles = null;
 
   /** The module load factor */
   int loadfactor = 1;
@@ -120,9 +118,8 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
     this.file = file;
     this.defaultLanguage = defaultLanguage;
     actions = new HashMap<String, Action>();
-    imagestyles = new HashMap<String, ImageStyle>();
+    imagestyles = new ArrayList<ImageStyle>();
     renderers = new HashMap<String, Renderer>();
-    jobs = new HashMap<String, Job>();
     classLoader = Thread.currentThread().getContextClassLoader();
   }
 
@@ -242,16 +239,7 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
    * @return the image styles
    */
   public Collection<ImageStyle> getImageStyles() {
-    return imagestyles.values();
-  }
-
-  /**
-   * Returns the module jobs.
-   * 
-   * @return the module jobs
-   */
-  public Collection<Job> getJobs() {
-    return jobs.values();
+    return imagestyles;
   }
 
   /**
@@ -269,10 +257,8 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
     moduleClass = XPathHelper.valueOf(config, "class", path);
     if (moduleClass == null)
       moduleClass = "ch.o2it.weblounge.core.module.ModuleImpl";
-    descriptions = new LocalizableContent<String>();
-    LanguageSupport.addDescriptions(path, config, descriptions, true);
-    String enable = XPathHelper.valueOf(config, "enable", path);
-    isEnabled = (enable == null || "true".equals(enable.toLowerCase()));
+    description = LanguageSupport.addDescriptions(config, "description", defaultLanguage, null, false);
+    isEnabled = "true".equalsIgnoreCase(XPathHelper.valueOf(config, "enable", path));
   }
 
   /**
@@ -372,7 +358,7 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
    * Configures the image styles.
    * 
    * @param config
-   *          the services node
+   *          the image styles node
    * @param path
    *          the XPath object used to parse the configuration
    */
@@ -381,45 +367,20 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
       log_.debug("No image styles found");
       return;
     }
-    log_.debug("Configuring imagestyles");
-    NodeList styleNodes = XPathHelper.selectList(config, "imagestyle", path);
-    for (int j = 0; j < styleNodes.getLength(); j++) {
-      Node styleNode = styleNodes.item(j);
-      String id = XPathHelper.valueOf(styleNode, "@id", path);
-      String composeableAttribute = XPathHelper.valueOf(styleNode, "@composeable", path);
-      boolean composeable = composeableAttribute == null || "true".equalsIgnoreCase(composeableAttribute);
-      try {
-        String mode = XPathHelper.valueOf(styleNode, "scalingmode", path);
-        String width = XPathHelper.valueOf(styleNode, "width", path);
-        String height = XPathHelper.valueOf(styleNode, "height", path);
-        int m = ImageStyle.SCALE_NONE;
-        int h = -1;
-        int w = -1;
-        if (mode != null && !mode.equals("none")) {
-          w = Integer.parseInt(width);
-          h = Integer.parseInt(height);
-          if ((mode != null) && mode.equals("fit")) {
-            m = ImageStyle.SCALE_TO_FIT;
-          } else if ((mode != null) && mode.equals("fill")) {
-            m = ImageStyle.SCALE_TO_FILL;
-          } else {
-            String msg = "Found unknown scalingmode for imagestyle '" + id + "': " + mode;
-            log_.warn(msg);
-            throw new ConfigurationException(msg);
-          }
-        }
-        ImageStyleImpl style = new ImageStyleImpl(id, w, h, composeable);
-        style.setScalingMode(m);
-        LanguageSupport.addDescriptions(path, styleNode, null, style);
-        imagestyles.put(id, style);
-      } catch (ConfigurationException e) {
-        log_.warn("Configuration error when reading imagestyle '{}': {}", new Object[] { id, e.getMessage(), e });
-      } catch (Exception e) {
-        log_.warn("Error reading imagestyle '{}': {}", new Object[] { id, e.getMessage(), e });
+    log_.debug("Configuring image styles");
+    try {
+      NodeList styleNodes = XPathHelper.selectList(config, "imagestyle", path);
+      for (int i = 0; i < styleNodes.getLength(); i++) {
+        Node styleNode = styleNodes.item(i);
+        ImageStyle style = ImageStyleImpl.fromXml(styleNode, path);
+        imagestyles.add(style);
       }
+    } catch (Exception e) {
+      log_.error("Configuration error when reading image styles: {}", e.getMessage(), e);
     }
-    log_.debug("Imagestyles configured");
+    log_.debug("Image styles configured");
   }
+
 
   /**
    * Reads the action definitions.
@@ -480,59 +441,6 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
         log_.error("Error when reading action bundle '{}' of module '{}': {}", new Object[] {id, identifier, e.getMessage(), e});
       }
     }
-  }
-
-  /**
-   * Configures the job settings.
-   * 
-   * @param config
-   *          the jobs node
-   * @param path
-   *          the XPath object used to parse the configuration
-   */
-  private void readJobs(XPath path, Node config) {
-    if (config == null) {
-      log_.debug("No job definitions found");
-      return;
-    }
-    log_.debug("Configuring cron jobs");
-
-    NodeList jobNodes = XPathHelper.selectList(config, "job", path);
-    for (int i = 0; i < jobNodes.getLength(); i++) {
-      Node jobNode = jobNodes.item(i);
-      ModuleJob job = null;
-
-      // See if job is enabled
-      String enabled = XPathHelper.valueOf(jobNode, "@enabled", path);
-      if (enabled != null && !"true".equals(enabled))
-        continue;
-
-      String id = XPathHelper.valueOf(jobNode, "@id", path);
-      String className = XPathHelper.valueOf(jobNode, "class", path);
-      try {
-        job = (ModuleJob) classLoader.loadClass(className).newInstance();
-        job.load(path, jobNode);
-        jobs.put(job.getIdentifier(), job);
-      } catch (InstantiationException e) {
-        log_.error("Error instantiating job of type '{}' in modue {}: {}", new Object[] {id, identifier, e.getMessage(), e});
-        continue;
-      } catch (IllegalAccessException e) {
-        log_.error("Access violation when instantiating job of type '{}' in modue {}: {}", new Object[] {id, identifier, e.getMessage(), e});
-        continue;
-      } catch (NoClassDefFoundError e) {
-        log_.error("Class required by job {} of module '{}' not found", className, identifier);
-        continue;
-      } catch (ClassNotFoundException e) {
-        log_.error("Class {} for job '{}' of module '{}' not found!", new Object[] {className, id, identifier});
-        continue;
-      } catch (Throwable e) {
-        if (e.getCause() != null)
-          e = e.getCause();
-        log_.error("Error creating job handler '{}' of module '{}': {}", new Object[] {id, identifier, e.getMessage(), e});
-        continue;
-      }
-    }
-    log_.debug("Jobs configured");
   }
 
   /**
