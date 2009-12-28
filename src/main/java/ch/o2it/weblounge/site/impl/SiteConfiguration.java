@@ -22,6 +22,7 @@ package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Customizable;
+import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule;
@@ -29,16 +30,13 @@ import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.o2it.weblounge.common.impl.util.config.Options;
-import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
+import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.PageTemplate;
-import ch.o2it.weblounge.common.site.Renderer;
-import ch.o2it.weblounge.dispatcher.RequestHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +47,6 @@ import org.w3c.dom.NodeList;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -122,7 +119,7 @@ public class SiteConfiguration implements Customizable {
   protected List<SiteJob> jobs = null;
 
   /** Site options */
-  protected Options options = null;
+  protected OptionsSupport options = null;
 
   /** Site load factor */
   protected int loadfactor = DEFAULT_LOADFACTOR;
@@ -214,7 +211,7 @@ public class SiteConfiguration implements Customizable {
       siteClass = SiteImpl.class.getCanonicalName();
     description = LanguageSupport.addDescriptions(config, "description", defaultLanguage, null, false);
     isEnabled = "true".equalsIgnoreCase(XPathHelper.valueOf(config, "enable", false, path));
-    options = Options.load(path, XPathHelper.select(config, "/site", path));
+    options = OptionsSupport.load(path, XPathHelper.select(config, "/site", path));
   }
 
   /**
@@ -601,7 +598,7 @@ public class SiteConfiguration implements Customizable {
           }
         }
 
-        ImageStyleImpl style = new ImageStyleImpl(id, w, h, composeable);
+        ImageStyleImpl style = ImageStyleImpl.fromXml(styleNode);
         style.setScalingMode(m);
         LanguageSupport.addDescriptions(path, styleNode, languages.getDefaultLanguage(), style);
         imagestyles.addStyle(style);
@@ -694,8 +691,7 @@ public class SiteConfiguration implements Customizable {
    * @see ch.o2it.weblounge.common.Customizable#getOptionNames()
    */
   public String[] getOptionNames() {
-    // TODO Auto-generated method stub
-    return null;
+    return options.getOptionNames();
   }
 
 }

@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.classloader.WebloungeClassLoader;
-import ch.o2it.weblounge.common.impl.util.config.Options;
+import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -65,7 +65,7 @@ import javax.xml.xpath.XPath;
  * 	&lt;/module&gt;
  * </pre>
  */
-public final class ModuleConfigurationImpl extends Options implements ModuleConfiguration {
+public final class ModuleConfigurationImpl extends OptionsSupport implements ModuleConfiguration {
 
   /** Module identifier */
   String identifier = null;
