@@ -68,7 +68,7 @@ public class CacheTagTest {
   @Test
   public void testGetValue() {
     assertEquals(value, tagWithValue.getValue());
-    assertEquals(CacheTagImpl.ANY, tagWithoutValue.getValue());
+    assertEquals(CacheTag.ANY, tagWithoutValue.getValue());
   }
 
   /**
