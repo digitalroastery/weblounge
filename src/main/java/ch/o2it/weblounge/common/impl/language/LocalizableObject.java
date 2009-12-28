@@ -26,12 +26,11 @@ import static ch.o2it.weblounge.common.language.Localizable.LanguageResolution.O
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.LocalizationListener;
-import ch.o2it.weblounge.common.language.Localizable.LanguageResolution;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * This class represents a basic implementation of a {@link Localizable} object
@@ -104,7 +103,7 @@ public class LocalizableObject implements Localizable {
    */
   public LocalizableObject(Language defaultLanguage) {
     this.defaultLanguage = defaultLanguage;
-    languages = new HashSet<Language>();
+    languages = new TreeSet<Language>();
     behavior = (defaultLanguage != null) ? Default : Original;
     localizationListeners = new ArrayList<LocalizationListener>();
   }

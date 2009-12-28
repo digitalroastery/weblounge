@@ -416,12 +416,13 @@ public class LocalizedModificationContext extends LocalizableObject implements C
    * 
    * @param context
    *          the localized modification context node
-   * @throws IllegalArgumentException
-   *           if the modification date found in this context cannot be parsed
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
-  public static LocalizedModificationContext fromXml(Node context) {
+  public static LocalizedModificationContext fromXml(Node context)
+      throws IllegalArgumentException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(context, xpath);
   }
@@ -434,11 +435,12 @@ public class LocalizedModificationContext extends LocalizableObject implements C
    *          the publish context node
    * @param xpath
    *          the xpath processor
-   * @throws IllegalArgumentException
-   *           if the modification date found in this context cannot be parsed
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
    * @see #toXml()
    */
-  public static LocalizedModificationContext fromXml(Node context, XPath xpath) {
+  public static LocalizedModificationContext fromXml(Node context, XPath xpath)
+      throws IllegalStateException {
     NodeList locales = XPathHelper.selectList(context, "//locale", xpath);
     if (locales == null)
       return null;
@@ -468,7 +470,7 @@ public class LocalizedModificationContext extends LocalizableObject implements C
       try {
         modificationDate = WebloungeDateFormat.parseStatic(date);
       } catch (ParseException e) {
-        throw new IllegalArgumentException("The modification date '" + date + "' cannot be parsed", e);
+        throw new IllegalStateException("The modification date '" + date + "' cannot be parsed", e);
       }
 
       ctx.setModified(modifier, modificationDate, language);

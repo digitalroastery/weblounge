@@ -98,6 +98,15 @@ public class LanguageImpl implements Language {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(Language l) {
+    return locale.getISO3Language().compareTo(l.getLocale().getISO3Language());
+  }
+
+  /**
    * Returns true if <code>obj</code> is a language object representing the same
    * language than this one.
    * 

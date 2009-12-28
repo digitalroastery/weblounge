@@ -47,7 +47,7 @@ import javax.xml.xpath.XPath;
  *  &lt;/options&gt;
  * </pre>
  */
-public class Options implements Customizable {
+public class OptionsSupport implements Customizable {
 
   /** Options */
   protected Map<String, List<String>> options = new HashMap<String, List<String>>();
@@ -155,9 +155,9 @@ public class Options implements Customizable {
    * @throws ConfigurationException
    *           if the configuration data is incomplete or invalid
    */
-  public static Options load(XPath path, Node config)
+  public static OptionsSupport load(XPath path, Node config)
       throws ConfigurationException {
-    Options configurationBase = new Options();
+    OptionsSupport configurationBase = new OptionsSupport();
 
     // No options available?
     if (path == null || config == null)

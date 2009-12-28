@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.impl.security.jaas;
 
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.impl.util.config.Options;
+import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 
@@ -46,7 +46,7 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
   protected Relevance relevance = null;
 
   /** Module configuration */
-  protected Options configuration = null;
+  protected OptionsSupport configuration = null;
   
   /**
    * Creates a new authentication module and throws various exceptions while
@@ -68,7 +68,7 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
   public AuthenticationModuleImpl(String classname, String relevance) {
     setClass(classname);
     setRelevance(relevance);
-    configuration = new Options();
+    configuration = new OptionsSupport();
   }
 
   /**
@@ -202,7 +202,7 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
   public void init(XPath path, Node config) throws ConfigurationException {
     setClass(XPathHelper.valueOf(config, "@class", path));
     setRelevance(XPathHelper.valueOf(config, "@relevance", path));
-    configuration = Options.load(path, config);
+    configuration = OptionsSupport.load(path, config);
   }
 
 }

@@ -156,12 +156,12 @@ public class CreationContext implements Cloneable {
    * @param context
    *          the creation context node
    * @throws IllegalStateException
-   *           if the date found in this context cannot be parsed
+   *           if the context cannot be parsed
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
   public static CreationContext fromXml(Node context)
-      throws IllegalArgumentException {
+      throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(context, xpath);
   }
@@ -174,12 +174,12 @@ public class CreationContext implements Cloneable {
    *          the creation context node
    * @param xpathProcessor
    *          xpath processor to use
-   * @throws IllegalArgumentException
-   *           if the date found in this context cannot be parsed
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
    * @see #toXml()
    */
   public static CreationContext fromXml(Node context, XPath xpathProcessor)
-      throws IllegalArgumentException {
+      throws IllegalStateException {
 
     Node contextRoot = XPathHelper.select(context, "//created", xpathProcessor);
     if (contextRoot == null)
@@ -198,7 +198,7 @@ public class CreationContext implements Cloneable {
       try {
         ctx.setCreationDate(WebloungeDateFormat.parseStatic(date));
       } catch (ParseException e) {
-        throw new IllegalArgumentException("The creation date '" + date + "' cannot be parsed", e);
+        throw new IllegalStateException("The creation date '" + date + "' cannot be parsed", e);
       }
     return ctx;
   }

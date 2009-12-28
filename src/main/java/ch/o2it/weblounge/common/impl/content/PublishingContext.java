@@ -258,14 +258,13 @@ public class PublishingContext implements Cloneable {
    * 
    * @param context
    *          the publish context node
-   * @throws IllegalArgumentException
-   *           if either the publishing start date or the publishing end date
-   *           found in this context cannot be parsed
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
   public static PublishingContext fromXml(Node context)
-      throws IllegalArgumentException {
+      throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(context, xpath);
   }
@@ -278,13 +277,12 @@ public class PublishingContext implements Cloneable {
    *          the publish context node
    * @param xpathProcessor
    *          the xpath processor
-   * @throws IllegalArgumentException
-   *           if either the publishing start date or the publishing end date
-   *           found in this context cannot be parsed
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
    * @see #toXml()
    */
   public static PublishingContext fromXml(Node context, XPath xpathProcessor)
-      throws IllegalArgumentException {
+      throws IllegalStateException {
 
     // Look up the root node
     Node contextRoot = XPathHelper.select(context, "//published", xpathProcessor);
@@ -304,7 +302,7 @@ public class PublishingContext implements Cloneable {
       try {
         ctx.setPublishFrom(WebloungeDateFormat.parseStatic(startDate));
       } catch (ParseException e) {
-        throw new IllegalArgumentException("The publishing start date '" + startDate + "' cannot be parsed", e);
+        throw new IllegalStateException("The publishing start date '" + startDate + "' cannot be parsed", e);
       }
     }
 
@@ -314,7 +312,7 @@ public class PublishingContext implements Cloneable {
       try {
         ctx.setPublishTo(WebloungeDateFormat.parseStatic(endDate));
       } catch (ParseException e) {
-        throw new IllegalArgumentException("The publishing end date '" + endDate + "' cannot be parsed", e);
+        throw new IllegalStateException("The publishing end date '" + endDate + "' cannot be parsed", e);
       }
     }
 

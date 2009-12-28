@@ -200,12 +200,13 @@ public class ModificationContext implements Cloneable {
    * 
    * @param context
    *          the publish context node
-   * @throws IllegalArgumentException
-   *           if the modification date found in this context cannot be parsed
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
-  public static ModificationContext fromXml(Node context) {
+  public static ModificationContext fromXml(Node context)
+      throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(context, xpath);
   }
@@ -218,12 +219,12 @@ public class ModificationContext implements Cloneable {
    *          the publish context node
    * @param xpath
    *          the xpath processor
-   * @throws IllegalArgumentException
-   *           if the modification date found in this context cannot be parsed
+   * @throws IllegalStateException
+   *           if the context cannot be parsed
    * @see #toXml()
    */
   public static ModificationContext fromXml(Node context, XPath xpath)
-      throws IllegalArgumentException {
+      throws IllegalStateException {
 
     Node contextRoot = XPathHelper.select(context, "//modified", xpath);
     if (contextRoot == null)
@@ -243,7 +244,7 @@ public class ModificationContext implements Cloneable {
     try {
       ctx.setModificationDate(WebloungeDateFormat.parseStatic(date));
     } catch (ParseException e) {
-      throw new IllegalArgumentException("The modification date '" + date + "' cannot be parsed", e);
+      throw new IllegalStateException("The modification date '" + date + "' cannot be parsed", e);
     }
 
     return ctx;
