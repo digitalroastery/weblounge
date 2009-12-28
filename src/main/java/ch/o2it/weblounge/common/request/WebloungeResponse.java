@@ -33,24 +33,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTag> {
 
-  /** Initial response state */
-  int STATE_SYSTEM_INITIALIZING = 0;
-
-  /** Response state when the request is about to be processed by the site */
-  int STATE_SITE_INITIALIZING = 1;
-
-  /** State while the request is being processed by the system */
-  int STATE_SYSTEM_PROCESSING = 2;
-
-  /** State while the request is being processed by the site */
-  int STATE_SITE_PROCESSING = 3;
-
-  /** Error while checking preconditions */
-  int STATE_PRECONDITION_FAILED = -1;
-
-  /** Error while processing the request */
-  int STATE_PROCESSING_FAILED = -2;
-
   /**
    * Starts a cacheable response. By calling this method, the response output
    * will be written to the cache as well as to the client.
