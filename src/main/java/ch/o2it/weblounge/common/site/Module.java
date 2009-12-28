@@ -126,13 +126,6 @@ public interface Module extends Customizable {
   SearchResult[] search(String query);
 
   /**
-   * Returns this module's job registry which keeps track of the defined jobs.
-   * 
-   * @return the job registry
-   */
-  JobDefinition[] getJobs();
-
-  /**
    * Returns this module's renderer registry which keeps track of the defined
    * renderer bundles.
    * 

@@ -91,11 +91,4 @@ public interface ModuleConfiguration extends Customizable {
    */
   Collection<ImageStyle> getImageStyles();
 
-  /**
-   * Returns the module jobs.
-   * 
-   * @return the module jobs
-   */
-  Collection<JobDefinition> getJobs();
-
 }
