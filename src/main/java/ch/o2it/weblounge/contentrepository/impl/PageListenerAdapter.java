@@ -149,8 +149,8 @@ public class PageListenerAdapter implements PageListener {
    * @param user
    *          the editing user
    * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageRendererChanged(ch.o2it.weblounge.api.url.WebUrl,
-   *      ch.o2it.weblounge.common.site.api.renderer.Renderer,
-   *      ch.o2it.weblounge.common.site.api.renderer.Renderer,
+   *      ch.o2it.weblounge.common.site.Renderer.renderer.Renderer,
+   *      ch.o2it.weblounge.common.site.Renderer.renderer.Renderer,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageRendererChanged(PageURI url, Renderer newRenderer,
