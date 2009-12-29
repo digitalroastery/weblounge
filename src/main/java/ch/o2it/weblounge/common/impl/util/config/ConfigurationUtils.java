@@ -20,9 +20,13 @@
 
 package ch.o2it.weblounge.common.impl.util.config;
 
+import ch.o2it.weblounge.common.Times;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility class used to handle parameters from configuration files.
@@ -90,6 +94,135 @@ public class ConfigurationUtils {
       return false;
     value = value.trim().toLowerCase();
     return "false".equals(value) || "off".equals(value) || "no".equals(value);
+  }
+
+  /**
+   * Returns the string representation of the given duration in milliseconds.
+   * The string follows the pattern <code>ymwdHMS</code>, with the following
+   * meanings:
+   * <ul>
+   * <li><b>y</b> - years</li>
+   * <li><b>m</b> - months</li>
+   * <li><b>w</b> - weeks</li>
+   * <li><b>d</b> - days</li>
+   * <li><b>H</b> - hours</li>
+   * <li><b>M</b> - minutes</li>
+   * <li><b>S</b> - seconds</li>
+   * </ul>
+   * Therefore, an example representing 1 week, 3 days and 25 minutes would
+   * result in <code>1w3d25M</code>.
+   * 
+   * @param millis
+   *          the duration in milliseconds
+   * @return the duration as a human readable string
+   */
+  public static String toDuration(long millis) {
+    StringBuffer result = new StringBuffer();
+    long v = 0;
+
+    // Years
+    if (millis > Times.MS_PER_YEAR) {
+      v = millis / Times.MS_PER_YEAR;
+      millis -= v*Times.MS_PER_YEAR;
+      result.append(v).append("y");
+    }
+
+    // Months
+    if (millis > Times.MS_PER_MONTH) {
+      v = millis / Times.MS_PER_MONTH;
+      millis -= v*Times.MS_PER_MONTH;
+      result.append(v).append("m");
+    }
+
+    // Weeks
+    if (millis > Times.MS_PER_WEEK) {
+      v = millis / Times.MS_PER_WEEK;
+      millis -= v*Times.MS_PER_WEEK;
+      result.append(v).append("w");
+    }
+
+    // Days
+    if (millis > Times.MS_PER_DAY) {
+      v = millis / Times.MS_PER_DAY;
+      millis -= v*Times.MS_PER_DAY;
+      result.append(v).append("d");
+    }
+
+    // Hours
+    if (millis > Times.MS_PER_HOUR) {
+      v = millis / Times.MS_PER_HOUR;
+      millis -= v*Times.MS_PER_HOUR;
+      result.append(v).append("H");
+    }
+
+    // Minutes
+    if (millis > Times.MS_PER_MIN) {
+      v = millis / Times.MS_PER_MIN;
+      millis -= v*Times.MS_PER_MIN;
+      result.append(v).append("M");
+    }
+
+    // Seconds
+    if (millis > Times.MS_PER_SECOND) {
+      v = millis / Times.MS_PER_SECOND;
+      millis -= v*Times.MS_PER_SECOND;
+      result.append(v).append("S");
+    }
+
+    return result.toString();
+  }
+
+  /**
+   * Parses <code>duration</code> to determine the number of milliseconds that
+   * it represents. <code>duration</code> may either be a <code>Long</code>
+   * value or a duration encoded using the following characters:
+   * <ul>
+   * <li><b>y</b> - years</li>
+   * <li><b>m</b> - months</li>
+   * <li><b>w</b> - weeks</li>
+   * <li><b>d</b> - days</li>
+   * <li><b>H</b> - hours</li>
+   * <li><b>M</b> - minutes</li>
+   * <li><b>S</b> - seconds</li>
+   * </ul>
+   * Therefore, an example representing 1 week, 3 days and 25 minutes would
+   * result in <code>1w3d25m</code>.
+   * 
+   * @param duration the duration either in milliseconds or encoded
+   * @return the duration in milliseconds
+   */
+  public static long parseDuration(String duration) {
+    if (duration == null)
+      return 0;
+    long millis = 0;
+    try {
+      return Long.parseLong(duration);
+    } catch (NumberFormatException e) {
+      Pattern p = Pattern.compile("^(\\d+y)?(\\d+m)?(\\d+w)?(\\d+d)?(\\d+H)?(\\d+M)?(\\d+S)?$");
+      Matcher m = p.matcher(duration);
+      if (m.matches()) {
+        for (int i=1; i < m.groupCount(); i++) {
+          String match = m.group(i);
+          if (match == null)
+            continue;
+          if (match.endsWith("y"))
+            millis += Long.parseLong(match.substring(0, match.length() - 1)) * Times.MS_PER_YEAR;
+          if (match.endsWith("m"))
+            millis += Long.parseLong(match.substring(0, match.length() - 1)) * Times.MS_PER_MONTH;
+          if (match.endsWith("w"))
+            millis += Long.parseLong(match.substring(0, match.length() - 1)) * Times.MS_PER_WEEK;
+          if (match.endsWith("d"))
+            millis += Long.parseLong(match.substring(0, match.length() - 1)) * Times.MS_PER_DAY;
+          if (match.endsWith("H"))
+            millis += Long.parseLong(match.substring(0, match.length() - 1)) * Times.MS_PER_HOUR;
+          if (match.endsWith("M"))
+            millis += Long.parseLong(match.substring(0, match.length() - 1)) * Times.MS_PER_MIN;
+          if (match.endsWith("S"))
+            millis += Long.parseLong(match.substring(0, match.length() - 1)) * Times.MS_PER_SECOND;
+        }
+      }
+    }
+    return millis;
   }
 
 }
