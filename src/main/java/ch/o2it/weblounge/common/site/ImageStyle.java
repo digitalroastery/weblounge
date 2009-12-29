@@ -20,15 +20,12 @@
 
 package ch.o2it.weblounge.common.site;
 
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
-
 /**
  * The <code>ImageStyle</code> defines a presentation style for images of a
  * certain size as well as the method to get from the original image version to
  * scaled ones.
  */
-public interface ImageStyle extends Localizable {
+public interface ImageStyle extends Composeable {
 
   /**
    * Sets the scaling mode for this image style. The scaling mode defines which
@@ -75,71 +72,6 @@ public interface ImageStyle extends Localizable {
    * @return the image width
    */
   int getWidth();
-
-  /**
-   * Set to <code>true</code> if this image style should available to the user
-   * when it comes to placing images on a page.
-   * 
-   * @param composeable
-   *          <code>true</code> if the image style might be selected by the user
-   */
-  void setComposeable(boolean composeable);
-
-  /**
-   * Returns <code>true</code> if the style is composeable. Non composeable
-   * style may be used internally by image galleries etc.
-   * 
-   * @return <code>true</code> if the style is composeable
-   */
-  boolean isComposeable();
-
-  /**
-   * Returns the style identifier.
-   * 
-   * @return the identifier
-   */
-  String getIdentifier();
-
-  /**
-   * Sets the name in the specified language.
-   * 
-   * @param name
-   *          the name
-   * @param language
-   *          the language
-   */
-  void setName(String name, Language language);
-
-  /**
-   * Returns the style name.
-   * 
-   * @return the style name
-   */
-  String getName();
-
-  /**
-   * Returns the style name in the required language. If not available, the name
-   * will be returned in the default language.
-   * 
-   * @param language
-   *          the required language
-   * @return the style name
-   */
-  String getName(Language language);
-
-  /**
-   * Returns the style name in the required language. If not available, either
-   * <code>null</code> or the name in a fallback language will be returned,
-   * depending on the value of <code>force</code>.
-   * 
-   * @param language
-   *          the required language
-   * @param force
-   *          <code>true</code> to force a <code>null</code> value rather then a
-   *          fallback language
-   * @return the style name
-   */
-  String getName(Language language, boolean force);
 
   /**
    * Returns an xml representation of this image style.
