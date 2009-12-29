@@ -400,6 +400,30 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#setRecheckTime(long)
+   */
+  public void setRecheckTime(long recheckTime) {
+    CacheHandle h = cacheHandles.peek();
+    if (h != null) {
+      h.setRecheck(recheckTime);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#setValidTime(long)
+   */
+  public void setValidTime(long validTime) {
+    CacheHandle h = cacheHandles.peek();
+    if (h != null) {
+      h.setExpires(validTime);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#invalidate()
    */
