@@ -45,6 +45,12 @@ public enum ScalingMode {
   Height,
 
   /**
+   * The image is scaled in such a way that the box defined by the image style's
+   * width and height is not overlapped.
+   */
+  Box,
+
+  /**
    * The image is scaled in such a way that the complete rectangle as defined by
    * the image style's width and height are covered.
    * <p>
@@ -81,6 +87,8 @@ public enum ScalingMode {
       return Width;
     else if (Height.toString().equalsIgnoreCase(value))
       return Height;
+    else if (Box.toString().equalsIgnoreCase(value))
+      return Box;
     else if (Fill.toString().equalsIgnoreCase(value))
       return Fill;
     else if (Cover.toString().equalsIgnoreCase(value))
