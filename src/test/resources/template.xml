@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template id="default" composeable="true">
+  <renderer>file://template/default.jsp</renderer>
+  <stage>boxes</stage>
+  <recheck>2d</recheck>
+  <valid>3w</valid>
+  <name language="de">Standard Vorlage</name>
+  <name language="en">Default template</name>
+</template>
