@@ -20,9 +20,8 @@
 
 package ch.o2it.weblounge.site.impl.handler;
 
-import static ch.o2it.weblounge.common.request.RequestFlavor.html;
+import static ch.o2it.weblounge.common.request.RequestFlavor.HTML;
 
-import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
@@ -87,7 +86,7 @@ public class PageRequestHandler implements RequestHandler {
     // TODO: Criteria would be loading the page from the repository
     // TODO: Think about performance, page lookup is expensive
     // TODO: Add support for XML and JSON
-    if (!html.equals(request.getFlavor())) {
+    if (!HTML.equals(request.getFlavor())) {
       log_.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
       return false;
     }
@@ -105,11 +104,11 @@ public class PageRequestHandler implements RequestHandler {
     // Check if the page is already part of the cache. If so, our task is
     // already done!
     if (request.getVersion() == Page.LIVE && action == null) {
-      CacheTagSet cacheTags = new CacheTagSet();
-      long validTime = Times.MS_PER_DAY;
-      long recheckTime = Times.MS_PER_HOUR;
+      long validTime = PageTemplate.DEFAULT_VALID_TIME;
+      long recheckTime = PageTemplate.DEFAULT_RECHECK_TIME;
 
       // Create the set of tags that identify the page
+      CacheTagSet cacheTags = new CacheTagSet();
       cacheTags.add(CacheTag.Url, url.getPath());
       cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
       cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
@@ -229,9 +228,12 @@ public class PageRequestHandler implements RequestHandler {
         for (String keyword : page.getSubjects()) {
           response.addTag("webl:keyword", keyword);
         }
+        
+        // Configure valid and recheck time according to the template
+        response.setRecheckTime(template.getRecheckTime());
+        response.setValidTime(template.getValidTime());
 
         log_.info("Rendering {} through {}", path, template);
-        template.configure(requestFlavor, null);
         template.render(request, response);
       } catch (Exception e) {
         String params = RequestSupport.getParameters(request);
@@ -248,8 +250,6 @@ public class PageRequestHandler implements RequestHandler {
           site.getLogger().error(msg, e);
         }
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      } finally {
-        template.cleanup();
       }
       return true;
     } catch (IOException e) {

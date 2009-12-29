@@ -28,6 +28,7 @@ import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
+import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -331,12 +332,13 @@ public final class ActionRequestHandler implements RequestHandler {
    * @return the target page
    */
   private Page getTargetPage(Action action, WebloungeRequest request) {
-    WebUrl target = null;
+    PageURI target = null;
     Page page = null;
     User user = request.getUser();
+    Site site = request.getSite();
     boolean targetForced = false;
+
     if (request.getParameter(Action.TARGET) != null) {
-      Site site = request.getSite();
       String targetUrl = request.getParameter(Action.TARGET);
       targetForced = true;
       try {
@@ -361,9 +363,8 @@ public final class ActionRequestHandler implements RequestHandler {
 
     // We are about to render the action output in the composer of the target
     // page. This is why we have to make sure that this target page exists,
-    // otherwhise
-    // the user will get a 404.
-    page = PageManager.getPage(target, user, SystemPermission.READ, request.getVersion());
+    // otherwise the user will get a 404.
+    page = site.getPage(target);
     if (page == null) {
       WebUrl oldTarget = target;
       target = request.getSite().getNavigation().getHomeUrl();

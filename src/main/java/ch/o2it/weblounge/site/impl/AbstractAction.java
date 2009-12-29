@@ -34,7 +34,6 @@ import ch.o2it.weblounge.common.site.ActionConfiguration;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.Include;
 import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.PageRendererConfiguation;
 import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.Renderer;
@@ -273,13 +272,13 @@ public abstract class AbstractAction implements Action {
   /**
    * Configures the request to use the given renderer.
    * 
-   * @param renderer
-   *          the renderer identifier
+   * @param template
+   *          the template
    * @param request
    *          the request
    */
-  protected void setRenderer(String renderer, WebloungeRequest request) {
-    request.setAttribute(Renderer.TEMPLATE, renderer);
+  protected void setTemplate(PageTemplate template, WebloungeRequest request) {
+    request.setAttribute(WebloungeRequest.REQUEST_TEMPLATE, template);
   }
 
   /**
@@ -296,18 +295,10 @@ public abstract class AbstractAction implements Action {
     if (composer == null)
       throw new IllegalArgumentException("Composer may not be null!");
     
-    String stage = PageRendererConfiguation.DEFAULT_STAGE;
-
-    // Is a template defined in the request?
-    String templateId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
-    PageTemplate template = null;
-    if (templateId != null) {
-      template = site.getTemplate(templateId);
-      if (template != null)
-        stage = template.getStage();
-      else
-        log_.warn("Action {} was told to use non-existing template {}", this, templateId);
-    }
+    String stage = PageTemplate.DEFAULT_STAGE;
+    PageTemplate template = (PageTemplate) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+    if (template != null)
+      stage = template.getStage();
     return composer.equalsIgnoreCase(stage);
   }
 
@@ -437,23 +428,15 @@ public abstract class AbstractAction implements Action {
       return;
     }
 
-    // Include renderer
+    // Add additional cache tags
+    if (renderer.getModule() != null)
+      response.addTag(CacheTag.Module, renderer.getModule());
+
+    // Include renderer in response
     try {
-
-      // Add additional cache tags
-      if (renderer.getModule() != null)
-        response.addTag(CacheTag.Module, renderer.getModule());
       response.addTag(CacheTag.Renderer, renderer.getIdentifier());
-
-      // Render
-      renderer.configure(request.getFlavor(), data);
       renderer.render(request, response);
-      renderer.cleanup();
-
     } finally {
-      Module m = renderer.getModule();
-      if (m != null)
-        m.returnRenderer(renderer);
       response.endResponsePart();
     }
     includes++;

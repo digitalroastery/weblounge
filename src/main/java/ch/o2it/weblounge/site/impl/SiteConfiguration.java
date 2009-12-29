@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule;
+import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
@@ -57,21 +57,8 @@ import javax.xml.xpath.XPathFactory;
  * <code>SiteConfiguration</code> represents the contents of the
  * <code>&lt;site&gt;</code> node from a site configuration file
  * <code>site.xml</code>.
- * <p>
- * A site configuration looks like this:
- * <p>
- * 
- * <pre>
- * 	&lt;site id=&quot;www&quot;&gt;
- * 		&lt;enable&gt;true&lt;/enable&gt;
- * 		&lt;description&gt;Main site&lt;/description&gt;
- * 		.
- * 		.
- * 		.
- * 	&lt;/site&gt;
- * </pre>
  */
-public class SiteConfiguration implements Customizable {
+public final class SiteConfiguration implements Customizable {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(SiteConfiguration.class);
@@ -118,9 +105,6 @@ public class SiteConfiguration implements Customizable {
   /** Site options */
   protected OptionsSupport options = null;
 
-  /** Site load factor */
-  protected int loadfactor = DEFAULT_LOADFACTOR;
-
   /** Number of versions to keep */
   protected int historysize = DEFAULT_HISTORYSIZE;
 
@@ -159,7 +143,6 @@ public class SiteConfiguration implements Customizable {
       readUrls(path, XPathHelper.select(config, "/site/urls", path));
       readAuthenticationModules(path, XPathHelper.select(config, "/site/authentication", path));
       readLanguages(path, XPathHelper.select(config, "/site/languages", path));
-      readPerformanceSettings(path, XPathHelper.select(config, "/site/performance", path));
       readLayouts(path, XPathHelper.select(config, "/site/layouts", path));
       readRenderers(path, XPathHelper.select(config, "/site/templates", path));
       readImagestyles(path, XPathHelper.select(config, "/site/imagestyles", path));
@@ -288,9 +271,6 @@ public class SiteConfiguration implements Customizable {
         log_.warn(msg);
       }
     }
-    // By default, add authentication for superuser login
-    // TODO: Move this to the site impl
-    authenticationModules.add(new AuthenticationModuleImpl(AdminLoginModule.class.getName(), "sufficient"));
   }
 
   /**
@@ -333,56 +313,6 @@ public class SiteConfiguration implements Customizable {
   }
 
   /**
-   * Reads the performance settings from the site configuration.
-   * 
-   * @param config
-   *          performance configuration node
-   * @param path
-   *          the XPath object used to parse the configuration
-   */
-  private void readPerformanceSettings(XPath path, Node config)
-      throws ConfigurationException {
-    if (config == null) {
-      log_.debug("No performance settings found");
-      return;
-    }
-
-    // Load factor
-    String factor = XPathHelper.valueOf(config, "loadfactor", path);
-    try {
-      loadfactor = Integer.parseInt(factor);
-      if (loadfactor < 1) {
-        String msg = "Error in site configuration: Loadfactor must be >= 1!";
-        log_.error(msg);
-        throw new ConfigurationException(msg);
-      }
-    } catch (NumberFormatException e) {
-      String msg = "Error in site configuration: Loadfactor must be a number >= 1!";
-      log_.error(msg);
-      throw new ConfigurationException(msg);
-    }
-
-    // History size
-    String size = XPathHelper.valueOf(config, "history", path);
-    if (size != null) {
-      try {
-        historysize = Integer.parseInt(size);
-        if (historysize < 0) {
-          String msg = "Error in site configuration: History size must be >= 0!";
-          log_.error(msg);
-          throw new ConfigurationException(msg);
-        }
-      } catch (NumberFormatException e) {
-        String msg = "Error in site configuration: Historysize must be a number >= 0!";
-        log_.error(msg);
-        throw new ConfigurationException(msg);
-      }
-    } else {
-      historysize = DEFAULT_HISTORYSIZE;
-    }
-  }
-
-  /**
    * Reads the urls that lead to this site from the configuration.
    * 
    * @param config
@@ -400,10 +330,10 @@ public class SiteConfiguration implements Customizable {
   }
 
   /**
-   * Reads the renderer definitions.
+   * Reads the template definitions.
    * 
    * @param config
-   *          renderers configuration node
+   *          template configuration node
    * @param path
    *          the XPath object used to parse the configuration
    */
@@ -413,73 +343,18 @@ public class SiteConfiguration implements Customizable {
       log_.debug("No renderer definitions found");
       return;
     }
-    RendererBundle defaultRenderer = null;
-    NodeList rendererNodes = XPathHelper.selectList(config, "renderer", path);
-    for (int i = 0; i < rendererNodes.getLength(); i++) {
-      Node node = rendererNodes.item(i);
-      String id = null;
-      RendererBundle bundle = null;
-      try {
-        id = XPathHelper.valueOf(node, "@id", path);
-        log_.debug("Reading renderer bundle '{}'", id);
-        RendererBundleConfiguration bundleConfig = new RendererBundleConfiguration(id, getFile());
-        bundleConfig.read(path, node);
-        bundle = new RendererBundle(id);
-        bundle.init(bundleConfig);
-        LanguageSupport.addDescriptions(path, node, languages.getDefaultLanguage(), bundle);
-        if (!bundle.supportsLanguage(languages.getDefaultLanguage()))
-          throw new ConfigurationException("Default language description is missing for renderer bundle '" + id + "'");
-
-        // Handle default renderer
-        if (defaultRenderer == null || bundleConfig.isDefault()) {
-          defaultRenderer = bundle;
-        }
-
-        // Read jsp renderer definitions
-        NodeList jspRenderers = XPathHelper.selectList(node, "jsp", path);
-        for (int j = 0; j < jspRenderers.getLength(); j++) {
-          Node jspNode = jspRenderers.item(j);
-          TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
-          rendererConfig.load(path, jspNode);
-          bundle.define(JSPRenderer.class, rendererConfig);
-        }
-
-        // Read xsl renderer definitions
-        NodeList xslRenderers = XPathHelper.selectList(node, "xsl", path);
-        for (int j = 0; j < xslRenderers.getLength(); j++) {
-          Node xslNode = xslRenderers.item(j);
-          TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
-          rendererConfig.load(path, xslNode);
-          bundle.define(XSLRenderer.class, rendererConfig);
-        }
-
-        // Read custom renderer definitions
-        NodeList customRenderers = XPathHelper.selectList(node, "custom", path);
-        for (int j = 0; j < customRenderers.getLength(); j++) {
-          Node customNode = customRenderers.item(j);
-          TemplateConfigurationImpl rendererConfig = new TemplateConfigurationImpl(bundleConfig);
-          rendererConfig.load(path, customNode);
-          try {
-            Class clazz = classLoader.loadClass(rendererConfig.getClassName());
-            bundle.define(clazz, rendererConfig);
-          } catch (ClassNotFoundException e) {
-            log_.error("Unable to load custom renderer, since class {} was not found", rendererConfig.getClassName(), e);
-          }
-        }
-        this.templates.put(id, bundle);
-      } catch (ConfigurationException e) {
-        log_.warn("Error when reading renderer bundle '{}'", id, e);
+    log_.debug("Configuring templates");
+    try {
+      NodeList templateNodes = XPathHelper.selectList(config, "template", path);
+      for (int i = 0; i < templateNodes.getLength(); i++) {
+        Node templateNode = templateNodes.item(i);
+        PageTemplate template = PageTemplateImpl.fromXml(templateNode, path);
+        templates.add(template);
       }
+    } catch (Exception e) {
+      log_.error("Configuration error when reading templates: {}", e.getMessage(), e);
     }
-
-    // Check if there is at least one renderer defined
-    if (defaultRenderer == null) {
-      String msg = "Site '" + identifier + "' does not define a default renderer!";
-      log_.warn(msg);
-      throw new ConfigurationException(msg);
-    }
-    this.templates.setDefault(defaultRenderer);
-    log_.info("Renderer '{}' is the default renderer", defaultRenderer);
+    log_.debug("Templates configured");
   }
 
   /**

@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -31,6 +32,7 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.ModuleConfiguration;
+import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.Renderer;
 
 import org.slf4j.Logger;
@@ -151,7 +153,6 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
       readRenderers(path, XPathHelper.select(config, "/module/renderers", path));
       readActions(path, XPathHelper.select(config, "/module/actions", path));
       readImagestyles(path, XPathHelper.select(config, "/module/imagestyles", path));
-      readJobs(path, XPathHelper.select(config, "/module/jobs", path));
       super.load(path, XPathHelper.select(config, "/module", path));
     } catch (ConfigurationException e) {
       throw e;
@@ -292,66 +293,31 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
   }
 
   /**
-   * Reads the renderer definitions.
+   * Reads the template definitions.
    * 
    * @param config
-   *          renderer configuration node
+   *          template configuration node
    * @param path
    *          the XPath object used to parse the configuration
    */
   private void readRenderers(XPath path, Node config)
       throws ConfigurationException {
     if (config == null) {
-      log_.debug("No renderer definitions found for module '{}'", identifier);
+      log_.debug("No renderer definitions found");
       return;
     }
-    NodeList bundleNodes = XPathHelper.selectList(config, "renderer", path);
-    for (int i = 0; i < bundleNodes.getLength(); i++) {
-      Node node = bundleNodes.item(i);
-      String id = null;
-      try {
-        id = XPathHelper.valueOf(node, "@id", path);
-        log_.debug("Reading renderer bundle '{}'", id);
-        RendererBundleConfiguration bundleConfig = new RendererBundleConfiguration(id, getFile());
-        bundleConfig.read(path, node);
-        LanguageSupport.addDescriptions(path, node, null, bundleConfig.getDescriptions());
-
-        // Read jsp renderer definitions
-        NodeList jspRenderers = XPathHelper.selectList(node, "jsp", path);
-        for (int j = 0; j < jspRenderers.getLength(); j++) {
-          Node jspNode = jspRenderers.item(j);
-          RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
-          rendererConfig.load(path, jspNode);
-          bundleConfig.define(JSPRenderer.class, rendererConfig);
-        }
-
-        // Read xsl renderer definitions
-        NodeList xslRenderers = XPathHelper.selectList(node, "xsl", path);
-        for (int j = 0; j < xslRenderers.getLength(); j++) {
-          Node xslNode = xslRenderers.item(j);
-          RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
-          rendererConfig.load(path, xslNode);
-          bundleConfig.define(XSLRenderer.class, rendererConfig);
-        }
-
-        // Read custom renderer definitions
-        NodeList customRenderers = XPathHelper.selectList(node, "custom", path);
-        for (int j = 0; j < customRenderers.getLength(); j++) {
-          Node customNode = customRenderers.item(j);
-          RendererConfigurationImpl rendererConfig = new RendererConfigurationImpl(bundleConfig);
-          rendererConfig.load(path, customNode);
-          try {
-            Class<?> clazz = classLoader.loadClass(rendererConfig.getClassName());
-            bundleConfig.define(clazz, rendererConfig);
-          } catch (ClassNotFoundException e) {
-            log_.error("Unable to load custom renderer, since class {} was not found!", rendererConfig.getClassName(), e);
-          }
-        }
-        renderers.put(id, bundleConfig);
-      } catch (Exception e) {
-        log_.warn("Error when reading renderer bundle '{}': {}", id, e.getMessage());
+    log_.debug("Configuring renderers");
+    try {
+      NodeList templateNodes = XPathHelper.selectList(config, "renderer", path);
+      for (int i = 0; i < templateNodes.getLength(); i++) {
+        Node templateNode = templateNodes.item(i);
+        PageletRenderer renderer = PageletRendererImpl.fromXml(templateNode, path);
+        renderers.put(renderer.getIdentifier(), renderer);
       }
+    } catch (Exception e) {
+      log_.error("Configuration error when reading renderers: {}", e.getMessage(), e);
     }
+    log_.debug("Renderers configured");
   }
 
   /**
