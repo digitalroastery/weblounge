@@ -20,11 +20,15 @@
 
 package ch.o2it.weblounge.common.impl.image;
 
-import static ch.o2it.weblounge.common.site.ScalingMode.*;
+import static ch.o2it.weblounge.common.site.ScalingMode.Box;
+import static ch.o2it.weblounge.common.site.ScalingMode.Cover;
+import static ch.o2it.weblounge.common.site.ScalingMode.Fill;
+import static ch.o2it.weblounge.common.site.ScalingMode.Height;
+import static ch.o2it.weblounge.common.site.ScalingMode.None;
+import static ch.o2it.weblounge.common.site.ScalingMode.Width;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
+import ch.o2it.weblounge.common.impl.page.GeneralComposeable;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.ImageStyle;
@@ -40,7 +44,7 @@ import javax.xml.xpath.XPathFactory;
  * of a certain size as well as the method to get from the original image
  * version to scaled ones.
  */
-public class ImageStyleImpl extends LocalizableObject implements ImageStyle {
+public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
   /** the image width */
   protected int width = -1;
@@ -48,17 +52,8 @@ public class ImageStyleImpl extends LocalizableObject implements ImageStyle {
   /** the image height */
   protected int height = -1;
 
-  /** the style identifier */
-  protected String identifier = null;
-
   /** the scaling mode */
   protected ScalingMode scalingMode = null;
-
-  /** composeable flag */
-  protected boolean composeable = true;
-
-  /** Name of this image style */
-  protected LocalizableContent<String> name = null;
 
   /**
    * Creates a new image style with the name as its identifier, width and
@@ -79,12 +74,10 @@ public class ImageStyleImpl extends LocalizableObject implements ImageStyle {
    */
   public ImageStyleImpl(String id, int width, int height, ScalingMode scaling,
       boolean composeable) {
-    this.identifier = id;
+    super(id);
     this.width = width;
     this.height = height;
     this.scalingMode = scaling;
-    this.composeable = composeable;
-    this.name = new LocalizableContent<String>(this);
   }
 
   /**
@@ -100,15 +93,6 @@ public class ImageStyleImpl extends LocalizableObject implements ImageStyle {
    */
   public ImageStyleImpl(String id, int width, int height) {
     this(id, width, height, None, true);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.ImageStyle#getIdentifier()
-   */
-  public String getIdentifier() {
-    return identifier;
   }
 
   /**
@@ -163,62 +147,6 @@ public class ImageStyleImpl extends LocalizableObject implements ImageStyle {
    */
   public int getWidth() {
     return width;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.ImageStyle#setName(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public void setName(String name, Language language) {
-    this.name.put(name, language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.ImageStyle#getName()
-   */
-  public String getName() {
-    return name.get();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.ImageStyle#getName(ch.o2it.weblounge.common.language.Language)
-   */
-  public String getName(Language language) {
-    return name.get(language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.ImageStyle#getName(ch.o2it.weblounge.common.language.Language,
-   *      boolean)
-   */
-  public String getName(Language language, boolean force) {
-    return name.get(language, force);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.ImageStyle#setComposeable(boolean)
-   */
-  public void setComposeable(boolean composeable) {
-    this.composeable = composeable;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.ImageStyle#isComposeable()
-   */
-  public boolean isComposeable() {
-    return composeable;
   }
 
   /**
@@ -290,6 +218,8 @@ public class ImageStyleImpl extends LocalizableObject implements ImageStyle {
       throw new IllegalStateException("Width scaling needs positive width");
     if (Height.equals(scalingMode) && height <= 0)
       throw new IllegalStateException("Height scaling needs positive height");
+    if (Box.equals(scalingMode) && (height <= 0 || width <= 0))
+      throw new IllegalStateException("Box scaling needs positive width and height");
     if (Cover.equals(scalingMode) && (width <= 0 || height <= 0))
       throw new IllegalStateException("Cover scaling needs positive width and height");
     if (Fill.equals(scalingMode) && (width <= 0 || height <= 0))
@@ -306,26 +236,9 @@ public class ImageStyleImpl extends LocalizableObject implements ImageStyle {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see java.lang.Object#hashCode()
+   *
+   * @see ch.o2it.weblounge.common.site.ImageStyle#toXml()
    */
-  public int hashCode() {
-    return identifier.hashCode();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  public boolean equals(Object o) {
-    if (o instanceof ImageStyle) {
-      ImageStyle style = (ImageStyle) o;
-      return style.getIdentifier().equals(identifier);
-    }
-    return false;
-  }
-
   public String toXml() {
     StringBuffer buf = new StringBuffer();
     buf.append("<imagestyle");
