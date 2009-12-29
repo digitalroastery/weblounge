@@ -25,6 +25,53 @@ package ch.o2it.weblounge.common.request;
  */
 public enum RequestFlavor {
 
-  html, xml, json;
-  
+  /**
+   * <code>HTML</code> or <code>XHTML</code> output as produced by Java server
+   * pages or actions by default.
+   */
+  HTML,
+
+  /**
+   * The <code>XML</code> flavor is produced for pages or other resources like
+   * user and group information.
+   */
+  XML,
+
+  /**
+   * <code>JSON</code> or <tt>JavaScript Object Notation</tt> is suited for data
+   * processing on the client side where the client usually is a web browser.
+   */
+  JSON;
+
+  /**
+   * Returns a lower case string of this flavor.
+   * 
+   * @return the flavor in lower case
+   */
+  public String toExtension() {
+    return this.toString().toLowerCase();
+  }
+
+  /**
+   * Returns a request flavor by matching <code>value</code> against the
+   * available flavors.
+   * 
+   * @param value
+   *          the value
+   * @return the request flavor
+   * @throws IllegalArgumentException
+   *           if <code>value</code> cannot be converted to a
+   *           <code>RequestFlavor</code>
+   */
+  public static RequestFlavor parseString(String value)
+      throws IllegalArgumentException {
+    if (HTML.toString().equalsIgnoreCase(value))
+      return HTML;
+    else if (XML.toString().equalsIgnoreCase(value))
+      return XML;
+    else if (JSON.toString().equalsIgnoreCase(value))
+      return JSON;
+    throw new IllegalArgumentException("Request flavor " + value + " is unknown");
+  }
+
 }
