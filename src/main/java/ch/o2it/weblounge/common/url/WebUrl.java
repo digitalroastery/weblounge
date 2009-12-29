@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.url;
 
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Site;
 
@@ -65,15 +66,27 @@ public interface WebUrl extends Url {
   String getLink(long version);
 
   /**
-   * Returns a link to the indicated flavored version of this url.
+   * Returns a link to the indicated version of this url.
+   * 
+   * @param language
+   *          the requested language
+   * @return the encoded url
+   * @see #getLanguage()
+   */
+  String getLink(Language language);
+
+  /**
+   * Returns a link to the indicated localized and flavored version of this url.
    * 
    * @param version
    *          the requested version
+   * @param language
+   *          the requested language
    * @param flavor
    *          the requested flavor
    * @return the encoded url
    */
-  String getLink(long version, String flavor);
+  String getLink(long version, Language langugae, String flavor);
 
   /**
    * Returns a link to the indicated flavored live version of this url.
@@ -96,11 +109,18 @@ public interface WebUrl extends Url {
   long getVersion();
 
   /**
+   * Returns the language version of this url.
+   * 
+   * @return the language
+   */
+  Language getLanguage();
+
+  /**
    * Returns the url flavor. For example, in case of "index.xml" the flavor will
    * be <code>XML</code>.
    * <p>
-   * It is good practice to use the enumeration at
-   * {@link RequestFlavor} when passing around and comparing flavors.
+   * It is good practice to use the enumeration at {@link RequestFlavor} when
+   * passing around and comparing flavors.
    * 
    * @return the url flavor
    */
