@@ -110,6 +110,22 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
   void endResponsePart() throws IllegalStateException;
 
   /**
+   * Sets the recheck time on the current response or response part.
+   * 
+   * @param recheckTime
+   *          the recheck time in milliseconds
+   */
+  void setRecheckTime(long recheckTime);
+
+  /**
+   * Sets the valid time on the current response or response part.
+   * 
+   * @param validTime
+   *          the valid time in milliseconds
+   */
+  void setValidTime(long validTime);
+
+  /**
    * Tells the cache to not cache this response. This method should be called in
    * case of any rendering error.
    */

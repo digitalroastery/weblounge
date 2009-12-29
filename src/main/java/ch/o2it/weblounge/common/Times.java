@@ -40,6 +40,9 @@ public interface Times {
   /** the number of milliseconds per week */
   public static final long MS_PER_WEEK = 7L * MS_PER_DAY;
 
+  /** the number of milliseconds per month */
+  public static final long MS_PER_MONTH = 30L * MS_PER_DAY;
+
   /** the number of milliseconds per year */
   public static final long MS_PER_YEAR = 365L * MS_PER_DAY;
 
