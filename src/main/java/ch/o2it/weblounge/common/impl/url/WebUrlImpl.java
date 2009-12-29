@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import static ch.o2it.weblounge.common.request.RequestFlavor.html;
-import static ch.o2it.weblounge.common.request.RequestFlavor.json;
-import static ch.o2it.weblounge.common.request.RequestFlavor.xml;
-
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.Env;
+import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.page.Page;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.Url;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -50,14 +50,20 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   /** The logging facility */
   private static Logger log_ = LoggerFactory.getLogger(WebUrlImpl.class);
 
-  /** Regular expression used to take urls apart */
-  private final static Pattern inspector = Pattern.compile("^(.*)/(work|original|index|[0-9]*)(_[a-zA-Z0-9]+)?\\.([a-zA-Z0-9]+)$");
+  /** Regular expression for /path/to/resource/work_de.html */
+  private final static Pattern pathInspector = Pattern.compile("^(.*)/(work|index|live|[0-9]*)(_[a-zA-Z]+)?\\.([a-zA-Z0-9]+)$");
+
+  /** Regular expression for /path/to/resource/work/de/html */
+  private final static Pattern segmentInspector = Pattern.compile("^(.*?)(/work|index|live|[0-9]*)?(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
 
   /** The associated site */
   protected Site site = null;
 
   /** The url version */
   protected long version = -1;
+
+  /** The language */
+  protected Language language = null;
 
   /** The link */
   private transient String link_ = null;
@@ -66,13 +72,16 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   protected String flavor = null;
 
   /**
-   * Constructor for a url. Since this constructor has package access, use
-   * <code>getUrl(<i>type</i>)</code> from the site navigation to obtain a
-   * reference to a concrete url instance.
-   * <p>
-   * This object supports multilingual titles. The default title language is set
-   * to the site default language and the version of this url is
-   * <code>LIVE</code>.
+   * Constructor for a url with the given path, a version of <code>LIVE</code>,
+   * a language matching the site default language and an <code>HTML</code>
+   * flavor, unless version, flavor and language are encoded in the url using
+   * either of these two schemes:
+   * <ul>
+   * <li>
+   * <code>path/to/resource/&lt;version&gt;_&lt;language&gt;.&lt;flavor&gt;</code>
+   * </li>
+   * <li><code>path/to/resource/version/language/flavor</code></li>
+   * </ul>
    * 
    * @param site
    *          the associated site
@@ -80,17 +89,21 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the url path
    */
   public WebUrlImpl(Site site, String path) {
-    this(site, path, Page.LIVE, html.toString());
+    super('/');
+    this.site = site;
+    this.path = analyzePath(path, '/');
   }
 
   /**
-   * Constructor for a url. Since this constructor has package access, use
-   * <code>getUrl(<i>type</i>)</code> from the site navigation to obtain a
-   * reference to a concrete url instance.
-   * <p>
-   * This object supports multilingual titles. The default title language is set
-   * to the site default language and the version of this url is
-   * <code>LIVE</code>.
+   * Constructor for a url with the given path, a version of <code>LIVE</code>
+   * and an <code>HTML</code> flavor, unless version, flavor or language are
+   * encoded in the url using either of these two schemes:
+   * <ul>
+   * <li>
+   * <code>path/to/resource/&lt;version&gt;_&lt;language&gt;.&lt;flavor&gt;</code>
+   * </li>
+   * <li><code>path/to/resource/version/language/flavor</code></li>
+   * </ul>
    * 
    * @param site
    *          the associated site
@@ -98,53 +111,60 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the url
    */
   public WebUrlImpl(Site site, Url url) {
-    this(site, url.getPath(), Page.LIVE, html.toString());
+    this(site, url.getPath());
   }
 
   /**
-   * Constructor for a url. Since this constructor has package access, use
-   * <code>getUrl(<i>type</i>)</code> from the site navigation to obtain a
-   * reference to a concrete url instance.
-   * <p>
-   * This object supports multilingual titles. The default title language is set
-   * to the site default language and the version of this url is
-   * <code>LIVE</code>.
+   * Constructor for a url with the given path added to <code>url</code>, a
+   * version of <code>LIVE</code> and an <code>HTML</code> flavor, unless
+   * version and/or flavor are encoded in the url using either of these two
+   * schemes:
+   * <ul>
+   * <li>
+   * <code>path/to/resource/&lt;version&gt;_&lt;language&gt;.&lt;flavor&gt;</code>
+   * </li>
+   * <li><code>path/to/resource/version/language/flavor</code></li>
+   * </ul>
    * 
    * @param site
    *          the associated site
    * @param url
    *          the url
+   * @param path
+   *          the path to append
    */
   public WebUrlImpl(Site site, Url url, String path) {
-    this(site, concat(url.getPath(), path, '/'), Page.LIVE, html.toString());
+    this(site, concat(url.getPath(), path, '/'));
   }
 
   /**
-   * Constructor for a url. Since this constructor has package access, use
-   * <code>getUrl(<i>type</i>)</code> from the site navigation to obtain a
-   * reference to a concrete url instance.
+   * Constructor for a url with the given path and version and an
+   * <code>HTML</code> flavor, unless the flavor is encoded in the url using
+   * either of these two schemes:
+   * <ul>
+   * <li>
+   * <code>path/to/resource/&lt;version&gt;_&lt;language&gt;.&lt;flavor&gt;</code>
+   * </li>
+   * <li><code>path/to/resource/version/language/flavor</code></li>
+   * </ul>
    * <p>
-   * This object supports multilingual titles. The default title language is set
-   * to the site default language.
+   * Note that even if the version is encoded in the url path, the one passed as
+   * the argument to this constructor will be used.
    * 
    * @param site
    *          the associated site
    * @param path
    *          the url path
    * @param version
-   *          the required version
+   *          the url version
    */
   public WebUrlImpl(Site site, String path, long version) {
-    this(site, path, version, html.toString());
+    this(site, path);
+    this.version = version;
   }
 
   /**
-   * Constructor for a url. Since this constructor has package access, use
-   * <code>getUrl(<i>type</i>)</code> from the site navigation to obtain a
-   * reference to a concrete url instance.
-   * <p>
-   * This object supports multilingual titles. The default title language is set
-   * to the site default language.
+   * Constructor for a url with the given path, version and flavor.
    * 
    * @param site
    *          the associated site
@@ -153,18 +173,13 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @param version
    *          the required version
    * @param flavor
-   *          the url flavor, e. g. <code>HTML</code>
+   *          the url flavor
    */
   public WebUrlImpl(Site site, String path, long version, String flavor) {
-    super('/');
+    super(path, '/');
     this.site = site;
-    this.path = inspect(path, '/');
-    if (this.version < 0)
-      this.version = version;
-    if (this.flavor == null)
-      this.flavor = flavor;
-    if (this.flavor == null)
-      throw new IllegalStateException("Flavor information missing from url");
+    this.version = version;
+    this.flavor = flavor;
   }
 
   /**
@@ -184,7 +199,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   public String getLink() {
     if (link_ == null) {
       try {
-        link_ = URLEncoder.encode(getLink(version, flavor), "UTF-8");
+        link_ = URLEncoder.encode(getLink(-1, null, null), "UTF-8");
       } catch (UnsupportedEncodingException e) {
         log_.error("Unexpected error while urlencoding link {}", link_, e);
       }
@@ -199,7 +214,16 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @see ch.o2it.weblounge.common.url.WebUrl#getLink(long)
    */
   public String getLink(long version) {
-    return getLink(version, flavor);
+    return getLink(version, null, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.url.WebUrl#getLink(ch.o2it.weblounge.common.language.Language)
+   */
+  public String getLink(Language language) {
+    return getLink(-1, language, null);
   }
 
   /**
@@ -208,24 +232,49 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @see ch.o2it.weblounge.common.url.WebUrl#getLink(java.lang.String)
    */
   public String getLink(String flavor) {
-    return getLink(version, flavor);
+    return getLink(-1, null, flavor);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.url.WebUrl#getLink(long, java.lang.String)
+   * @see ch.o2it.weblounge.common.url.WebUrl#getLink(long,
+   *      ch.o2it.weblounge.common.language.Language, java.lang.String)
    */
-  public String getLink(long version, String flavor) {
+  public String getLink(long version, Language language, String flavor) {
     StringBuffer selector = new StringBuffer();
-    if (version == Page.WORK) {
-      selector.append("work");
-    } else if (version == Page.LIVE) {
-      selector.append("index");
-    } else {
-      selector.append(Long.toString(version));
+    boolean hasVersion = false;
+    if (version >= 0 || this.version > 0 || language != null || this.language != null || flavor != null || this.flavor != null) {
+      if (version < 0)
+        version = this.version;
+      if (version == Page.LIVE)
+        selector.append("index");
+      else if (version == Page.WORK) {
+        selector.append("work");
+      } else if (version >= 0) {
+        selector.append(Long.toString(version));
+      } else {
+        selector.append("index");
+      }
+      hasVersion = true;
     }
-    selector.append(".").append(flavor);
+
+    // Language
+    if (language != null)
+      selector.append("_").append(language.getIdentifier());
+    else if (this.language != null) {
+      selector.append("_").append(this.language.getIdentifier());
+    }
+
+    // Flavor
+    if (flavor != null)
+      selector.append(".").append(flavor.toLowerCase());
+    else if (this.flavor != null) {
+      selector.append(".").append(this.flavor.toLowerCase());
+    } else if (hasVersion) {
+      selector.append(".").append(RequestFlavor.HTML.toExtension());
+    }
+
     return UrlSupport.concat(new String[] {
         Env.getMountpoint(),
         Env.getServletPath(),
@@ -252,6 +301,15 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.url.WebUrl#getLanguage()
+   */
+  public Language getLanguage() {
+    return language;
+  }
+
+  /**
    * Returns the hash code for this url. The method includes the super
    * implementation and adds sensitivity for the site and the url extension.
    * 
@@ -271,7 +329,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   public boolean equals(Object object) {
     if (object instanceof WebUrl) {
       WebUrl url = (WebUrl) object;
-      return (super.equals(object) && version == url.getVersion() && flavor.equals(url.getFlavor()) && site.equals(url.getSite()));
+      return (super.equals(object) && version == url.getVersion() && (language == null && url.getLanguage() == null || (language != null && url.getLanguage() != null && language.equals(url.getLanguage()))) && (flavor == null && url.getFlavor() == null || (flavor != null && url.getFlavor() != null && flavor.equals(url.getFlavor()))) && site.equals(url.getSite()));
     } else if (object instanceof Url) {
       return super.equals(object);
     }
@@ -279,7 +337,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   }
 
   /**
-   * Strips version and flavor from this url.
+   * Strips version and flavor from this url. Version and flavor can either be
+   * encoded as
+   * <code>path/to/resource/&lt;version&gt;_&lt;language&gt;.&lt;flavor&gt;</code>
+   * or as <code>path/to/resource/version/language/flavor</code>.
    * 
    * @param path
    *          the full path
@@ -287,38 +348,131 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          path separator character
    * @return the directory path
    */
-  protected String inspect(String path, char separator) {
-    Matcher m = inspector.matcher(path);
-    if (m.matches()) {
-      String v = m.group(2);
-      if ("".equals(v) || "index".equals(v)) {
+  protected String analyzePath(String path, char separator) {
+    path = trim(path);
+    Matcher pathMatcher = pathInspector.matcher(path);
+    if (pathMatcher.matches()) {
+
+      // Version
+      String v = pathMatcher.group(2);
+      if ("index".equals(v) || "live".equals(v)) {
         this.version = Page.LIVE;
       } else if ("work".equals(v)) {
         this.version = Page.WORK;
-      } else {
+      } else if (v != null && !"".equals(v)) {
         try {
           this.version = Long.parseLong(v);
         } catch (NumberFormatException e) {
           throw new IllegalArgumentException("Unable to extract version from url " + path);
         }
       }
-      String f = m.group(4);
-      this.flavor = "".equals(f) ? html.toString() : f;
-      return trim(m.group(1));
+
+      // Language
+      String l = pathMatcher.group(3);
+      if (l != null && !"".equals(l)) {
+        l = l.substring(1);
+        Language language = site.getLanguage(l);
+        if (language == null) {
+          throw new UnknownLanguageException(l);
+        }
+        this.language = language;
+      }
+
+      // Flavor
+      String f = pathMatcher.group(4);
+      if (f != null && !"".equals(f))
+        this.flavor = f.toLowerCase();
+      return trim(pathMatcher.group(1));
     }
 
-    // Make sure we've not been fooled
-    if (path.indexOf('.') > 0)
-      throw new IllegalArgumentException("Path is malformed: " + path);
+    // Try the segmented approach for /path/to/resource/work/de/html
+    Matcher segmentMatcher = segmentInspector.matcher(path);
+    if (segmentMatcher.matches()) {
+      int group = segmentMatcher.groupCount();
+      while (segmentMatcher.group(group) == null || "".equals(segmentMatcher.group(group)))
+        group--;
 
-    // Test for well-known flavors in the last path element
-    path = path.toLowerCase();
-    if (path.endsWith(html.toString()))
-      this.flavor = html.toString();
-    else if (path.endsWith(xml.toString()))
-      this.flavor = xml.toString();
-    else if (path.endsWith(json.toString()))
-      this.flavor = json.toString();
+      if (group < 2)
+        return trim(segmentMatcher.group(1));
+
+      // Test group for flavor
+      String f = segmentMatcher.group(group);
+      if (f == null || "".equals(f)) {
+        group--;
+      } else {
+        if (f.startsWith("/"))
+          f = f.substring(1);
+        try {
+          this.flavor = RequestFlavor.parseString(f).toExtension();
+          group--;
+        } catch (IllegalArgumentException e) {
+          log_.debug("Found non-standard flavor {}", f);
+        }
+      }
+
+      // Done?
+      if (group < 1)
+        return trim(segmentMatcher.group(1));
+
+      // Test group for language
+      String l = segmentMatcher.group(group);
+      if (l == null || "".equals(l)) {
+        group--;
+      } else {
+        if (l.startsWith("/"))
+          l = l.substring(1);
+        Language language = site.getLanguage(l);
+        if (language != null) {
+          this.language = language;
+          group--;
+        } else {
+          try {
+            language = LanguageSupport.getLanguage(l);
+            if (language != null) {
+              this.language = site.getDefaultLanguage();
+              group--;
+            }
+          } catch (UnknownLanguageException e) {
+            // Nothing to do, definitely not a language identifier
+          }
+        }
+      }
+
+      // Done?
+      if (group < 1)
+        return trim(segmentMatcher.group(1));
+
+      // Test group for version
+      String v = segmentMatcher.group(group);
+      if (v == null || "".equals(v))
+        return trim(segmentMatcher.group(1));
+
+      if (v.startsWith("/"))
+        v = v.substring(1);
+      if ("index".equals(v) || "live".equals(v)) {
+        this.version = Page.LIVE;
+        group--;
+      } else if ("work".equals(v)) {
+        this.version = Page.WORK;
+        group--;
+      } else {
+        try {
+          this.version = Long.parseLong(v);
+          group--;
+        } catch (NumberFormatException e) {
+          // Nothing to do, definitely not a version identifier
+        }
+      }
+
+      StringBuffer rest = new StringBuffer();
+      int i = 1;
+      while (i <= group) {
+        if (segmentMatcher.group(i) != null)
+          rest.append(segmentMatcher.group(i));
+        i++;
+      }
+      return trim(rest.toString());
+    }
     return trim(path);
   }
 

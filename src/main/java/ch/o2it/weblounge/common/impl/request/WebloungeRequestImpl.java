@@ -21,14 +21,11 @@
 package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.page.PageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.Guest;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -58,9 +55,6 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /** The language extraction regular expression */
   private static Pattern languageExtractor_ = Pattern.compile("_([a-zA-Z]+)\\.[\\w\\- ]+$");
-
-  /** Regular expression used to take urls apart */
-  private static Pattern urlAnalyzer_ = Pattern.compile("^(.*)(work|original|index)(_[a-zA-Z0-9]+)?\\.([a-zA-Z0-9]+)$");
 
   /** The request counter */
   private static long requestCounter_ = 0L;
@@ -185,19 +179,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     String uri = getRequestURI();
     String urlPath = uri.substring(urlPrefix.length() - 1);
-    String urlFlavor = RequestFlavor.html.toString();
-    long version = Page.LIVE;
     log_.trace("url prefix=" + urlPrefix + "; request uri=" + uri + "; url=" + urlPath);
 
-    // Version selection
-    Matcher m = urlAnalyzer_.matcher(urlPath);
-    if (m.matches()) {
-      urlPath = m.group(1);
-      version = PageUtils.getVersion(m.group(2));
-      urlFlavor = m.group(3);
-    }
-
-    this.url = new WebUrlImpl(site, urlPath, version, urlFlavor);
+    this.url = new WebUrlImpl(site, urlPath);
     this.requestedUrl = url;
     return url;
   }
