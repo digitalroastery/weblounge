@@ -23,6 +23,8 @@ package ch.o2it.weblounge.common.site;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
+import java.net.URL;
+
 /**
  * A <code>PageletRenderer</code> is used to render small pieces of content
  * within a <code>Page</code>.
@@ -30,18 +32,85 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 public interface PageletRenderer extends Renderer {
 
   /**
-   * Returns <code>true</code> if this renderer has an editor defined.
+   * Adds the link to the list of links that need to be included in the page's
+   * header section.
    * 
-   * @return <code>true</code> if there is an editor for this renderer
+   * @param link
+   *          the link
    */
-  boolean hasEditor();
+  void addLink(Include link);
 
   /**
-   * Returns <code>true</code> if this renderer is composeable.
+   * Removes the link from the list of links that need to be included in the
+   * page's header section.
    * 
-   * @return <code>true</code> if this renderer is composeable
+   * @param link
+   *          the link
    */
-  boolean isComposeable();
+  void removeLink(Include link);
+
+  /**
+   * Returns the &lt;link&gt; elements that have been defined for this renderer.
+   * 
+   * @return the links
+   */
+  Include[] getLinks();
+
+  /**
+   * Adds the script to the list of scripts that need to be included in the
+   * page's header section.
+   * 
+   * @param script
+   *          the script
+   */
+  void addScript(ScriptInclude script);
+
+  /**
+   * Removes the script from the list of scripts that need to be included in the
+   * page's header section.
+   * 
+   * @param script
+   *          the script
+   */
+  void removeScript(ScriptInclude script);
+
+  /**
+   * Returns the &lt;script&gt; elements that have been defined for this
+   * renderer.
+   * 
+   * @return the scripts
+   */
+  ScriptInclude[] getScripts();
+
+  /**
+   * Sets the module that defined this renderer.
+   * 
+   * @param module
+   *          the module
+   */
+  void setModule(Module module);
+
+  /**
+   * Returns the module that this renderer belongs to.
+   * 
+   * @return the module
+   */
+  Module getModule();
+
+  /**
+   * Sets the url to the editor.
+   * 
+   * @param editor
+   *          the editor
+   */
+  void setEditor(URL editor);
+
+  /**
+   * Returns the url to the editor or <code>null</code> if no editor is defined.
+   * 
+   * @return the url to the editor
+   */
+  URL getEditor();
 
   /**
    * Performs the actual rendering by showing the editor.
@@ -55,36 +124,5 @@ public interface PageletRenderer extends Renderer {
    */
   void renderAsEditor(WebloungeRequest request, WebloungeResponse response)
       throws RenderException;
-
-  /**
-   * Sets the associated site if this is a site related renderer configuration.
-   * 
-   * @param site
-   *          the associated site
-   */
-  void setSite(Site site);
-
-  /**
-   * Returns the associated site or <code>null</code> if no site has been set.
-   * 
-   * @return the site
-   */
-  Site getSite();
-
-  /**
-   * Sets the associated module if this is a module renderer configuration.
-   * 
-   * @param module
-   *          the associated module
-   */
-  void setModule(Module module);
-
-  /**
-   * Returns the associated module or <code>null</code> if no module has been
-   * set.
-   * 
-   * @return the module
-   */
-  Module getModule();
 
 }

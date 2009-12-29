@@ -21,93 +21,32 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
+import java.net.URL;
+
 /**
- * A <code>Renderer</code> is an object that is capable to render given
- * pageContent into a desired output format.
- * <p>
- * The lifecycle of a <code>Renderer</code> is as follows:
- * 
- * <ul>
- * <li>The renderer is created by the <code>RendererFactory</code> using
- * reflection</li>
- * <li>After instantiation it is initialized by calling the <code>init</code>
- * method
- * <li>The rendering process is prepared by setting the pageContent and
- * rendering method in <code>configure</code></li>
- * <li>Now the rendering itself takes place in the <code>render</code> method.
- * After that, the renderer is either collected by the garbage collector or is
- * pooled and restarts a rendering cycle by a call to the <code>configure</code>
- * method</li>
- * </ul>
- * </p>
+ * A <code>Renderer</code> is an object that is capable of rendering content
+ * into a desired output format, usually <code>HTML</code>.
  */
-public interface Renderer extends Localizable {
-
-  /** The template used for rendering */
-  String TEMPLATE = "template";
-
-  /** Rendering method identifier specifying HTML output */
-  String HTML = "html";
-
-  /** Rendering method identifier specifying XML output */
-  String XML = "xml";
+public interface Renderer extends Composeable {
 
   /** The default valid time for a renderer */
-  long VALID_TIME_DEFAULT = Times.MS_PER_WEEK;
+  long DEFAULT_VALID_TIME = Times.MS_PER_WEEK;
 
   /** The default recheck time for a renderer */
-  long RECHECK_TIME_DEFAULT = Times.MS_PER_DAY;
+  long DEFAULT_RECHECK_TIME = Times.MS_PER_DAY;
 
   /**
-   * Returns the renderer identifier.
+   * Returns the supported output flavors.
    * 
-   * @return the identifier
+   * @return the supported flavors
+   * @see #supportsFlavor(String)
+   * @see RequestFlavor
    */
-  String getIdentifier();
-
-  /**
-   * Returns the supported rendering methods. The meaning of methods is the
-   * possible output format of a renderer. Therefore, the methods usually
-   * include <tt>html</tt>, <tt>pdf</tt> and so on.
-   * 
-   * @return the supported methods
-   */
-  String[] methods();
-
-  /**
-   * Returns the module title in the given language or, if it doesn't exist in
-   * that language, in the site default language.
-   * 
-   * @param language
-   *          the language
-   * @return the title in the given language
-   */
-  String getTitle(Language language);
-
-  /**
-   * Initializes the renderer using the given configuration.
-   * 
-   * @param configuration
-   *          the renderer configuration
-   */
-  void init(RendererConfiguration configuration);
-
-  /**
-   * This method is called just before the call to
-   * {@link #render(WebloungeRequest, WebloungeResponse)} is made. Here, the
-   * desired rendering method is set, that is, the requested rendering result.
-   * 
-   * @param method
-   *          the quested rendering method
-   * @param data
-   *          the data to render
-   */
-  void configure(String method, Object data);
+  String[] getFlavors();
 
   /**
    * Returns <code>true</code> if the given flavor is supported by the renderer.
@@ -119,40 +58,36 @@ public interface Renderer extends Localizable {
   boolean supportsFlavor(String flavor);
 
   /**
-   * Performs the actual rendering.
+   * Sets the url of the actual renderer. This will usually be a file path to a
+   * java server page (JSP) file or an http link to an XML style sheet (XSL).
+   * 
+   * @param renderer
+   *          url to the renderer
+   */
+  void setRenderer(URL renderer);
+
+  /**
+   * Returns the file used to locate the concrete <code>JSP</code> or
+   * <code>XSL</code> file.
+   * 
+   * @return the renderer url
+   */
+  URL getRenderer();
+
+  /**
+   * Performs the rendering by including any renderer output in the response's
+   * output stream.
    * 
    * @param request
    *          the request object
    * @param response
-   *          the http servlet response object
+   *          the response object
    * @throws RenderException
-   *           if rendering fails
+   *           if the renderer is not able to process the request due to
+   *           resource limitations, configuration or authorization issues and
+   *           the like
    */
   void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException;
-
-  /**
-   * Returns the amount of time in milliseconds that output using this renderer
-   * will be valid.
-   * 
-   * @return the valid time
-   */
-  long getValidTime();
-
-  /**
-   * Returns the amount of time in milliseconds that output using this renderer
-   * is likely to still be valid. However, clients should check to make sure
-   * that this actually is the case.
-   * 
-   * @return the recheck time
-   */
-  long getRecheckTime();
-
-  /**
-   * This method is called after the rendering request has been accomplished by
-   * the renderer. Use this method to release any resources that might have been
-   * acquired.
-   */
-  void cleanup();
 
 }

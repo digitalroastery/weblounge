@@ -43,7 +43,7 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
  * has to provide a default constructor (no arguments), since action handlers
  * are created using reflection.
  */
-public interface Action {
+public interface Action extends Composeable {
 
   /** The target url */
   final static String TARGET = "target-url";
@@ -283,12 +283,5 @@ public interface Action {
    * @return the module
    */
   Module getModule();
-
-  /**
-   * Returns the action identifier.
-   * 
-   * @return the action identifier
-   */
-  String getIdentifier();
 
 }

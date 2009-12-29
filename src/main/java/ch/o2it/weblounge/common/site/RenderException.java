@@ -22,8 +22,8 @@ package ch.o2it.weblounge.common.site;
 
 /**
  * A <code>RendererException</code> is thrown if an exceptional state is reached
- * when executing a <code>Renderer</code> to create the output for either a
- * page or a single page name.
+ * when executing a <code>Renderer</code> to create the output for either a page
+ * or a single page name.
  */
 public class RenderException extends RuntimeException {
 
@@ -31,41 +31,47 @@ public class RenderException extends RuntimeException {
   private static final long serialVersionUID = -857423335304601456L;
 
   /** Renderer name, e. g. <code>XSLRenderer</code> */
-  private Renderer renderer_ = null;
-
-  /** Rendering method, e. g. <code>HTML</code>" */
-  private String method_ = null;
+  protected Renderer renderer = null;
 
   /**
-   * Creates a new <code>RendererException</code> providing the information
-   * passed by the parameters.
+   * Creates a new <code>RendererException</code> that has been thrown by the
+   * specified renderer.
    * 
    * @param renderer
-   *          the renderer, e. g. <code>XLSElementRenderer</code>
-   * @param method
-   *          the rendering output method, e. g. <code>HTML</code>
+   *          the renderer
    */
-  public RenderException(Renderer renderer, String method) {
-    renderer_ = renderer;
-    method_ = method;
+  public RenderException(Renderer renderer) {
+    this.renderer = renderer;
   }
 
   /**
-   * Creates a new <code>RendererException</code> providing the information
-   * passed by the parameters.
+   * Creates a new <code>RendererException</code> that has been thrown by the
+   * specified renderer.
    * 
    * @param renderer
-   *          the renderer, e. g. <code>XLSElementRenderer</code>
-   * @param method
-   *          the rendering output method, e. g. <code>HTML</code>
+   *          the renderer
    * @param t
    *          the exception caught when executing the renderer
    */
-  public RenderException(Renderer renderer, String method, Throwable t) {
+  public RenderException(Renderer renderer, Throwable t) {
     super(t);
-    renderer_ = renderer;
-    method_ = method;
+    this.renderer = renderer;
   }
+
+  /**
+   * Creates a new <code>RendererException</code> that has been thrown by the
+   * specified renderer.
+   * 
+   * @param renderer
+   *          the renderer
+   * @param message
+   *          the error message
+   */
+  public RenderException(Renderer renderer, String message) {
+    super(message);
+    this.renderer = renderer;
+  }
+
 
   /**
    * Returns the renderer that raised this exception.
@@ -73,16 +79,7 @@ public class RenderException extends RuntimeException {
    * @return the renderer
    */
   public Renderer getRenderer() {
-    return renderer_;
-  }
-
-  /**
-   * Returns the rendering method, e. g. <code>HTML</code>.
-   * 
-   * @return the rendering output method
-   */
-  public String getRenderingMethod() {
-    return method_;
+    return renderer;
   }
 
   /**

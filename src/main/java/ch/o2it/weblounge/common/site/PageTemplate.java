@@ -21,16 +21,31 @@
 package ch.o2it.weblounge.common.site;
 
 /**
- * A <code>PageTemplate</code> is a renderer that is used to render a whole page
- * rather than just a <code>Pagelet</code>, which is just a small part of it.
+ * A <code>PageTemplate</code> is a renderer that is used to render a whole
+ * page.
  */
 public interface PageTemplate extends Renderer {
 
+  /** Default name of the main composer */
+  String DEFAULT_STAGE = "main";
+
   /**
-   * Returns the stage, which is the identifier of a composer in that template
-   * that takes the main content as returned by an <code>Action</code>.
+   * Defines the main composer for this template, which will be used when
+   * calling
+   * {@link Action#startStage(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)}
+   * on action handler.
    * 
-   * @return the main composer
+   * @param stage
+   *          name of the main composer
+   */
+  void setStage(String stage);
+
+  /**
+   * Returns the stage, which is the identifier of a composer in the template
+   * that takes the main content when used by an <code>Action</code>.
+   * 
+   * @return name of the main composer
+   * @see
    */
   String getStage();
 
