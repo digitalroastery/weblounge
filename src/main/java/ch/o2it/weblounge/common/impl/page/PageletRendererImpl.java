@@ -188,6 +188,27 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.page.GeneralComposeable#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.page.GeneralComposeable#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object o) {
+    // This is to indicate that using the super implementation is sufficient
+    return super.equals(o);
+  }
+
+  /**
    * Initializes this pagelet renderer from an XML node that was generated using
    * {@link #toXml()}.
    * <p>
@@ -283,7 +304,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     buf.append(" id=\"").append(identifier).append("\"");
     buf.append(" composeable=\"").append(composeable).append("\"");
     buf.append(">");
-    
+
     buf.append("</renderer>");
     return buf.toString();
   }

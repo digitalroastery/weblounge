@@ -165,7 +165,6 @@ public class ConfigurationUtils {
     // Seconds
     if (millis > Times.MS_PER_SECOND) {
       v = millis / Times.MS_PER_SECOND;
-      millis -= v*Times.MS_PER_SECOND;
       result.append(v).append("S");
     }
 

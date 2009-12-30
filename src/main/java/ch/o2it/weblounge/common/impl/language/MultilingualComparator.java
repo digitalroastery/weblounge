@@ -23,12 +23,16 @@ package ch.o2it.weblounge.common.impl.language;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * Comparator specifically designed for <code>Multilingual</code> objects.
  */
-public class MultilingualComparator<Type extends Localizable> implements Comparator<Type> {
+public class MultilingualComparator<Type extends Localizable> implements Comparator<Type>, Serializable {
+
+  /** Serial version uid */
+  private static final long serialVersionUID = 1086161748432134590L;
 
   /** The language used for comparison */
   private Language l = null;

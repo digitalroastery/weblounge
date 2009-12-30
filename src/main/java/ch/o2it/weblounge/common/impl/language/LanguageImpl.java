@@ -31,6 +31,9 @@ import java.util.Locale;
  */
 public class LanguageImpl implements Language {
 
+  /** Serial version uid */
+  private static final long serialVersionUID = 9213260651821758529L;
+
   /** The backing locale */
   protected Locale locale = null;
 
@@ -50,48 +53,36 @@ public class LanguageImpl implements Language {
   }
 
   /**
-	 * 
-	 */
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.language.Language#getLocale()
+   */
   public Locale getLocale() {
     return locale;
   }
 
   /**
-   * Returns the name of this language in its own language, e.g
-   * <ul>
-   * <li><code>English</code> for English</li>
-   * <li><code>Deutsch</code> for German</li>
-   * <li><code>Français</code> for French</li>
-   * </ul>
-   * 
-   * @return the language name in its own language
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.language.Language#getDescription()
    */
   public String getDescription() {
     return locale.getDisplayLanguage();
   }
 
   /**
-   * Returns the name of this language in the specified language, e.g given that
-   * <code>language</code> were <code>English</code>, the output would be
-   * <ul>
-   * <li><code>English</code> for English</li>
-   * <li><code>German</code> for German</li>
-   * <li><code>French</code> for French</li>
-   * </ul>
-   * 
-   * @param language
-   *          the language version of this language
-   * @return the language name in the specified language
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.language.Language#getDescription(ch.o2it.weblounge.common.language.Language)
    */
   public String getDescription(Language language) {
     return locale.getDisplayLanguage(language.getLocale());
   }
 
   /**
-   * Returns the language's identifier, which corresponds to the systems
-   * internal name for this language.
-   * 
-   * @return the language identifier
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.language.Language#getIdentifier()
    */
   public String getIdentifier() {
     return locale.getLanguage();
@@ -107,13 +98,9 @@ public class LanguageImpl implements Language {
   }
 
   /**
-   * Returns true if <code>obj</code> is a language object representing the same
-   * language than this one.
-   * 
-   * @param obj
-   *          the object to test for equality
-   * @return true if <code>obj</code> represents the same language
-   * @see java.lang.Object#equals(Object)
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object obj) {
     if (obj instanceof Language) {
@@ -123,19 +110,18 @@ public class LanguageImpl implements Language {
   }
 
   /**
-   * Returns the hash code for the language which equals the database key,
-   * truncated to an <code>int</code>
-   * 
-   * @return the language hash code
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
     return locale.hashCode();
   }
 
   /**
-   * Returns a string representation of this language.
-   * 
-   * @return a string representation of this language
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
    */
   public String toString() {
     return locale.getDisplayLanguage();

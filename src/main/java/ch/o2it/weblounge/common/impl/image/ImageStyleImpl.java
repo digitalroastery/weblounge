@@ -148,7 +148,28 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   public int getWidth() {
     return width;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.page.GeneralComposeable#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.page.GeneralComposeable#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object o) {
+    // This is to indicate that using the super implementation is sufficient
+    return super.equals(o);
+  }
+  
   /**
    * Initializes this image style from an XML node that was generated using
    * {@link #toXml()}.

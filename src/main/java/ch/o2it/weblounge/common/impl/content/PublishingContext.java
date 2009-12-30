@@ -358,11 +358,9 @@ public class PublishingContext implements Cloneable {
 
     // End date
     if (endDate != null) {
-      if (endDate != null) {
-        b.append("<to>");
-        b.append(WebloungeDateFormat.formatStatic(endDate));
-        b.append("</to>");
-      }
+      b.append("<to>");
+      b.append(WebloungeDateFormat.formatStatic(endDate));
+      b.append("</to>");
     }
 
     b.append("</published>");

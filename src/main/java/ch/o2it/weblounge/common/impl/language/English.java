@@ -32,11 +32,11 @@ import java.util.Locale;
  */
 public final class English extends LanguageImpl {
 
-  /** The language identifier */
-  public final static String ID = "en";
+  /** Serial version uid */
+  private static final long serialVersionUID = 6926231984130068388L;
 
   /** The singleton instance of English */
-  private static Language language_ = null;
+  private static Language language = null;
 
   /**
    * Creates an instance of the English language.
@@ -51,10 +51,10 @@ public final class English extends LanguageImpl {
    * @return the only instance of this class
    */
   public static Language getInstance() {
-    if (language_ == null) {
-      language_ = new English();
+    if (language == null) {
+      language = new English();
     }
-    return language_;
+    return language;
   }
 
 }

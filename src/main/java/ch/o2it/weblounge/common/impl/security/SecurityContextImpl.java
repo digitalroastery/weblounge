@@ -57,7 +57,7 @@ import javax.xml.xpath.XPath;
  * 		&lt;/security&gt;
  * </pre>
  */
-public class SecurityContextImpl extends AbstractSecurityContext {
+public class SecurityContextImpl extends AbstractSecurityContext implements Cloneable {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(SecurityContextImpl.class);
