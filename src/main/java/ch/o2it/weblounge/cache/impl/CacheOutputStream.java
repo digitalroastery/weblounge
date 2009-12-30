@@ -230,12 +230,16 @@ final class CacheOutputStream extends ServletOutputStream {
       case 0:
         log.error("Cache inconsistency: no active elements in endOutput()");
         return;
-      default:
-        log.error("Cache inconsistency: too many active elements in endOutput()");
-        invalid = true;
       case 1:
         while (!hierarchy.empty())
           copyToCache(hierarchy.pop(), meta);
+        break;
+      default:
+        log.error("Cache inconsistency: too many active elements in endOutput()");
+        invalid = true;
+        while (!hierarchy.empty())
+          copyToCache(hierarchy.pop(), meta);
+        break;
     }
   }
 

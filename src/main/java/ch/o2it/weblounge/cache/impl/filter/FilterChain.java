@@ -23,62 +23,60 @@ package ch.o2it.weblounge.cache.impl.filter;
 import ch.o2it.weblounge.cache.StreamFilter;
 
 /**
- * <code>FilterChain</code> wraps a chain of {@link StreamFilter} objects.
- * It is itself a <code>StreamFilter</code> that filters the input stream by
- * passing it to each of the wrapped filters in turn. 
+ * <code>FilterChain</code> wraps a chain of {@link StreamFilter} objects. It is
+ * itself a <code>StreamFilter</code> that filters the input stream by passing
+ * it to each of the wrapped filters in turn.
  */
 public class FilterChain implements StreamFilter {
 
-	/** the wrapped filters */
-	private StreamFilter filters[] = null;
+  /** the wrapped filters */
+  private StreamFilter filters[] = null;
 
-	/** the content type */
-	private String contentType = null;
-	
-	/**
-	 * Creates a new <code>FilterChain</code>.
-	 * @param filters the wrapped filters.
-	 */
-	public FilterChain(StreamFilter filters[]) {
-		if (filters == null)
-			throw new NullPointerException("filters must not be null");
-		this.filters = filters;
-	}
-	
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#filter(java.lang.StringBuffer, java.lang.String)
-	 */
-	public StringBuffer filter(StringBuffer b, String contentType) {
-		this.contentType = contentType;
-		for (int i = 0; i < filters.length && b != null; i++)
-			b = filters[i].filter(b, contentType);
-		return b;
-	}
+  /**
+   * Creates a new <code>FilterChain</code>.
+   * 
+   * @param filters
+   *          the wrapped filters.
+   */
+  public FilterChain(StreamFilter filters[]) {
+    if (filters == null)
+      throw new NullPointerException("filters must not be null");
+    this.filters = filters;
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#flush()
-	 */
-	public StringBuffer flush() {
-		StringBuffer b = null, tmp = null;
-		for (int i = 0; i < filters.length; i++) {
-			if (b != null)
-				b = filters[i].filter(b, contentType);
-			tmp = filters[i].flush();
-			if (b != null)
-				if (tmp != null)
-					b.append(tmp);
-			else
-				b = tmp;
-		}
-		return b;
-	}
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.cache.StreamFilter#filter(java.lang.StringBuffer, java.lang.String)
+   */
+  public StringBuffer filter(StringBuffer b, String contentType) {
+    for (int i = 0; i < filters.length && b != null; i++)
+      b = filters[i].filter(b, contentType);
+    return b;
+  }
 
-	/**
-	 * @see ch.o2it.weblounge.api.request.StreamFilter#close()
-	 */
-	public void close() {
-		for (int i = 0; i < filters.length; i++)
-			filters[i].close();
-	}
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.cache.StreamFilter#flush()
+   */
+  public StringBuffer flush() {
+    StringBuffer b = new StringBuffer();
+    StringBuffer tmp = null;
+    for (int i = 0; i < filters.length; i++) {
+      tmp = filters[i].flush();
+      if (tmp != null)
+        b.append(tmp);
+    }
+    return b;
+  }
+
+  /**
+   * @see ch.o2it.weblounge.api.request.StreamFilter#close()
+   */
+  public void close() {
+    for (int i = 0; i < filters.length; i++)
+      filters[i].close();
+  }
 
 }

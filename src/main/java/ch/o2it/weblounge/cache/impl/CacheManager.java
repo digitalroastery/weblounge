@@ -122,7 +122,7 @@ public class CacheManager {
   private static Class<? extends StreamFilter> filters[];
 
   /** all output filters */
-  private static Map<String, Class<? extends StreamFilter>> allFilters;
+  private static Map<String, Class<? extends StreamFilter>> allFilters = new HashMap<String, Class<? extends StreamFilter>>();
 
   /** the logging facility provided by log4j */
   private static final Logger log = LoggerFactory.getLogger(CacheManager.class);
@@ -561,7 +561,10 @@ public class CacheManager {
         if (parent == p)
           return;
         if (parent.equals(p)) {
-          log.debug("Replacing parent {} of {} with {}", new Object[] {parent, hnd, parent});
+          log.debug("Replacing parent {} of {} with {}", new Object[] {
+              parent,
+              hnd,
+              parent });
           e.parents.remove(p);
           e.parents.add(parent);
           incStats(CACHE_MODIFY);
@@ -676,9 +679,6 @@ public class CacheManager {
   static void setFilters(String filter) {
     if (filter == null)
       return;
-    
-    if (allFilters == null)
-      allFilters = new HashMap<String, Class<? extends StreamFilter>>();
 
     StringTokenizer st = new StringTokenizer(filter, ",");
     List<Class<? extends StreamFilter>> l = new ArrayList<Class<? extends StreamFilter>>();
@@ -718,18 +718,18 @@ public class CacheManager {
     if (stat >= 0 && stat < NOF_COUNTERS)
       return stats[stat];
     switch (stat) {
-    case CACHE_SIZE:
-      return cacheSize;
-    case CACHE_MAX_SIZE:
-      return maxCacheSize;
-    case CACHE_TRANSACTION_ABORT:
-      return stats[CACHE_TRANSACTION_START] - stats[CACHE_TRANSACTION_COMPLETE];
-    case RESPONSE_GENERATED:
-      return stats[CACHE_TRANSACTION_COMPLETE] + stats[CACHE_TRANSACTION_SKIP];
-    case CACHE_ENTRIES:
-      return cache.size();
-    case CACHE_WAIT_ACTIVE:
-      return stats[CACHE_WAIT_START] - (stats[CACHE_WAIT_SUCCESS] + stats[CACHE_WAIT_FAIL]);
+      case CACHE_SIZE:
+        return cacheSize;
+      case CACHE_MAX_SIZE:
+        return maxCacheSize;
+      case CACHE_TRANSACTION_ABORT:
+        return stats[CACHE_TRANSACTION_START] - stats[CACHE_TRANSACTION_COMPLETE];
+      case RESPONSE_GENERATED:
+        return stats[CACHE_TRANSACTION_COMPLETE] + stats[CACHE_TRANSACTION_SKIP];
+      case CACHE_ENTRIES:
+        return cache.size();
+      case CACHE_WAIT_ACTIVE:
+        return stats[CACHE_WAIT_START] - (stats[CACHE_WAIT_SUCCESS] + stats[CACHE_WAIT_FAIL]);
     }
     return -1;
   }
@@ -787,7 +787,7 @@ public class CacheManager {
         Map.Entry<CacheHandle, CacheEntry> e = i.next();
         CacheHandle handle = e.getKey();
         Long typeCount = types.remove(handle.getClass());
-        typeCount = new Long(typeCount == null ? 1 : typeCount.longValue() + 1);
+        typeCount = Long.valueOf(typeCount == null ? 1 : typeCount.longValue() + 1);
         types.put(handle.getClass(), typeCount);
       }
       return types;
@@ -807,7 +807,7 @@ public class CacheManager {
         Map.Entry<CacheHandle, CacheEntry> e = i.next();
         CacheHandle handle = e.getKey();
         Long typeCount = types.remove(handle.getClass());
-        typeCount = new Long(typeCount == null ? 1 : typeCount.longValue() + 1);
+        typeCount = Long.valueOf(typeCount == null ? 1 : typeCount.longValue() + 1);
         types.put(handle.getClass(), typeCount);
         if (e.getValue().parents.size() != 0)
           continue;
@@ -816,10 +816,10 @@ public class CacheManager {
       }
 
       StringBuffer summary = new StringBuffer();
-      for (Class<? extends CacheHandle> c : types.keySet()) {
-        summary.append(c.getName());
+      for (Map.Entry<Class<? extends CacheHandle>, Long> entry : types.entrySet()) {
+        summary.append(entry.getKey().getName());
         summary.append(": ");
-        summary.append(types.get(c));
+        summary.append(entry.getValue());
         summary.append("\n");
       }
       summary.append("\n");
@@ -902,15 +902,26 @@ public class CacheManager {
     long m = time % 60;
     long h = time / 60;
     return MessageFormat.format((sig ? '-' : ' ') + "{0,number,000}:{1,number,00}:{2,number,00}", new Object[] {
-        new Long(h),
-        new Long(m),
-        new Long(s) });
+        Long.valueOf(h),
+        Long.valueOf(m),
+        Long.valueOf(s) });
   }
 
   /**
    * Represents a single entry in the cache.
    */
   public static class CacheEntry implements Comparable<CacheHandle> {
+
+    protected CacheHandle key;
+    protected List<CacheHandle> parents = new ArrayList<CacheHandle>(3);
+    protected List<CacheHandle> children;
+    protected long expires;
+    protected long recheck;
+    protected byte buf[];
+    protected long modified;
+    protected CacheEntry prev, next;
+    protected CachedResponseMetaInfo meta;
+
     protected CacheEntry(CacheHandle key, long expires, long recheck,
         long modified, byte buf[], CacheHandle parent,
         List<CacheHandle> children, CachedResponseMetaInfo meta) {
@@ -924,16 +935,6 @@ public class CacheManager {
       this.children = children;
       this.meta = meta;
     }
-
-    protected CacheHandle key;
-    protected List<CacheHandle> parents = new ArrayList<CacheHandle>(3);
-    protected List<CacheHandle> children;
-    protected long expires;
-    protected long recheck;
-    protected byte buf[];
-    protected long modified;
-    protected CacheEntry prev, next;
-    protected CachedResponseMetaInfo meta;
 
     protected CacheHandle getKey() {
       return key;
@@ -954,7 +955,35 @@ public class CacheManager {
       next.prev = this;
       lru.next = this;
     }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      return key.hashCode();
+    }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof CacheEntry) {
+        return key.equals(((CacheEntry)obj).getKey());
+      }
+      return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     public int compareTo(CacheHandle c) {
       return key.toString().compareTo(c.toString());
     }
@@ -965,6 +994,7 @@ public class CacheManager {
    * Holds the statistics for a specific cached element type.
    */
   public static class TypeStats {
+
     protected int hit;
     protected int miss;
     protected String name;

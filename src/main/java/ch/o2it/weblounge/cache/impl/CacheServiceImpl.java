@@ -170,15 +170,18 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (unwrapResponse(response) != null) {
       log_.warn("Response already wrapped!");
       return false;
+    } else if (!(response instanceof HttpServletResponseWrapper)) {
+      log_.warn("Cached response is not properly wrapped");
+      return false;
     }
-
+    
     /* start the cache transaction */
     HttpServletResponse resp = CacheManager.startCacheableResponse(handle, request, (HttpServletResponse) ((HttpServletResponseWrapper) response).getResponse());
     if (resp == null)
       return true;
 
     /* wrap the response */
-    ((HttpServletResponseWrapper) response).setResponse(resp);
+      ((HttpServletResponseWrapper) response).setResponse(resp);
 
     return false;
   }
