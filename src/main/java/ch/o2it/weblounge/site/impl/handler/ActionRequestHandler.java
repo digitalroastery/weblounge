@@ -25,11 +25,14 @@ import static ch.o2it.weblounge.common.impl.request.CacheTagImpl.*;
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
+import ch.o2it.weblounge.common.impl.site.PageRequestHandler;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.CacheTag;
+import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -40,7 +43,6 @@ import ch.o2it.weblounge.common.site.SiteLogger;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.PageManager;
-import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.site.impl.ActionHandlerBundle;
 import ch.o2it.weblounge.site.impl.ActionRegistry;
 
@@ -52,6 +54,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -107,7 +110,22 @@ public final class ActionRequestHandler implements RequestHandler {
    * @return the handler
    */
   public Action getHandlerForUrl(WebUrl url) {
-    return actions.getByUrl(url.getPath(), "html");
+    Iterator urls = mappings_.keySet().iterator();
+    while (urls.hasNext()) {
+      String mp = (String) urls.next();
+      if (url.equals(mp) || url.equals(mp + "/") || url.startsWith(mp + "?") || (!exactMatch && url.startsWith(mp + "/"))) {
+        ActionHandlerBundle bundle = (ActionHandlerBundle) mappings_.get(mp);
+        String ext = bundle.getExtension();
+        if (ext == null) {
+          return bundle;
+        } else if (ext != null && ext.equals("/*") && UrlSupport.isPrefix(mp, url)) {
+          return bundle;
+        } else if (ext != null && ext.equals("/**") && UrlSupport.isExtendedPrefix(mp, url)) {
+          return bundle;
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -309,14 +327,14 @@ public final class ActionRequestHandler implements RequestHandler {
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getIdentifier()
+   * @see ch.o2it.weblounge.common.request.api.request.RequestHandler#getIdentifier()
    */
   public String getIdentifier() {
     return "action";
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
+   * @see ch.o2it.weblounge.common.request.api.request.RequestHandler#getName()
    */
   public String getName() {
     return "action handler";

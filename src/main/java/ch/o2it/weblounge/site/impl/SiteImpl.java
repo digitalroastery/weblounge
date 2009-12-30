@@ -21,14 +21,13 @@
 package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.impl.security.DefaultAuthorizationProvider;
-import ch.o2it.weblounge.common.impl.security.SecurityManagerImpl;
+import ch.o2it.weblounge.common.impl.site.SiteConfiguration;
+import ch.o2it.weblounge.common.impl.site.SiteDispatcher;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.Env;
-import ch.o2it.weblounge.common.impl.util.classloader.SiteClassLoader;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.Layout;
+import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -44,15 +43,14 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteListener;
 import ch.o2it.weblounge.common.site.SiteLogger;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.SiteAdmin;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 import ch.o2it.weblounge.contentrepository.PageListener;
-import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.site.SiteService;
 
 import com.sun.corba.se.impl.activation.RepositoryImpl;
 import com.sun.corba.se.spi.activation.Repository;
+import com.sun.java.util.jar.pack.Attribute.Layout;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +61,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.spi.ServiceRegistry;
 

@@ -21,6 +21,8 @@
 package ch.o2it.weblounge.site.impl;
 
 import ch.o2it.weblounge.common.ConfigurationException;
+import ch.o2it.weblounge.common.impl.site.IncludeImpl;
+import ch.o2it.weblounge.common.impl.site.ScriptIncludeImpl;
 import ch.o2it.weblounge.common.impl.util.Arguments;
 import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
