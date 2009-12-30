@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.language;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
@@ -30,7 +31,7 @@ import java.util.Locale;
  * 
  * @see Locale
  */
-public interface Language extends Comparable<Language> {
+public interface Language extends Serializable, Comparable<Language> {
 
   /**
    * Returns the locale that is associated with the language.
