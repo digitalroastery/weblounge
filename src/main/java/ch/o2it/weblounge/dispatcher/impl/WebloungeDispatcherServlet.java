@@ -64,19 +64,19 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private static final String poweredBy = "Weblounge Content Mangement System";
 
   /** The response cache */
-  private ResponseCache cache = null;
+  private transient ResponseCache cache = null;
 
   /** The sites that are online */
-  private SiteTracker sites = null;
+  private transient SiteTracker sites = null;
 
   /** List of request listeners */
-  private static List<RequestListener> requestListeners;
+  private List<RequestListener> requestListeners;
 
   /** List of dispatcher listeners */
-  private static List<DispatchListener> dispatcher;
+  private List<DispatchListener> dispatcher;
 
   /** List of dispatcher listeners */
-  private static List<RequestHandler> requestHandler;
+  private List<RequestHandler> requestHandler;
 
   /**
    * Creates a new instance of the weblounge dispatcher servlet.
@@ -270,7 +270,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         if (t.getCause() != null) {
           Throwable o = t.getCause();
           if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
-            o = ((JasperException) o).getRootCause();
+            t = ((JasperException) o).getRootCause();
           } else {
             t = o.getCause();
           }
@@ -325,7 +325,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param listener
    *          the lister
    */
-  public static void addRequestListener(RequestListener listener) {
+  public void addRequestListener(RequestListener listener) {
     // TODO: Synchronize
     if (!requestListeners.contains(listener)) {
       requestListeners.add(listener);
@@ -338,7 +338,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param listener
    *          the listener to remove
    */
-  public static void removeRequestListener(RequestListener listener) {
+  public void removeRequestListener(RequestListener listener) {
     // TODO: Synchronize
     requestListeners.remove(listener);
   }
@@ -352,9 +352,9 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param listener
    *          the lister
    */
-  public static void addDispatchListener(DispatchListener listener) {
+  public void addDispatchListener(DispatchListener listener) {
     // TODO: Synchronize
-    if (!requestListeners.contains(listener)) {
+    if (!dispatcher.contains(listener)) {
       dispatcher.add(listener);
     }
   }
@@ -365,7 +365,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param listener
    *          the listener to remove
    */
-  public static void removeDispatchListener(DispatchListener listener) {
+  public void removeDispatchListener(DispatchListener listener) {
     // TODO: Synchronize
     dispatcher.remove(listener);
   }
@@ -378,7 +378,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param handler
    *          the request handler
    */
-  public static void addRequestHandler(RequestHandler handler) {
+  public void addRequestHandler(RequestHandler handler) {
     // TODO: Synchronize
     if (!requestHandler.contains(handler)) {
       requestHandler.add(handler);
@@ -391,7 +391,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param handler
    *          the request handler to remove
    */
-  public static void removeRequestHandler(RequestHandler handler) {
+  public void removeRequestHandler(RequestHandler handler) {
     // TODO: Synchronize
     requestHandler.remove(handler);
   }
