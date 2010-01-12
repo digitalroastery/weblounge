@@ -53,7 +53,7 @@ public class GeneralComposeableTest {
 
   /** Composeable flag */
   protected boolean isComposeable = true;
-  
+
   /** Renderer */
   protected static URL rendererURL = null;
 
@@ -77,7 +77,7 @@ public class GeneralComposeableTest {
 
   /** English name */
   protected String englishName = "Default template";
-  
+
   @BeforeClass
   public static void setUpClass() throws Exception {
     rendererURL = new URL("file://template/default.jsp");
@@ -94,7 +94,10 @@ public class GeneralComposeableTest {
 
   /**
    * Composeable setup has been moved here so that this test can easily be
-   * reused by subclasses. 
+   * reused by subclasses.
+   * 
+   * @throws Exception
+   *           if setup fails
    */
   protected void setUpComposeable() throws Exception {
     composeable.setDefaultLanguage(german);
