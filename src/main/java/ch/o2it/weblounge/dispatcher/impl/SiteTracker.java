@@ -70,7 +70,7 @@ public class SiteTracker extends ServiceTracker {
    * @return the site
    */
   Site getSiteByName(String serverName) {
-    Site site = (Site) sitesByServerName.get(serverName);
+    Site site = sitesByServerName.get(serverName);
     if (site != null)
       return site;
 
