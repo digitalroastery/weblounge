@@ -155,6 +155,8 @@ public class DispatchSupport {
    * 
    * @param msg
    *          the error message
+   * @param request
+   *          the servlet request
    * @param response
    *          the response object
    */
@@ -169,6 +171,8 @@ public class DispatchSupport {
    * 
    * @param msg
    *          the error message
+   * @param request
+   *          the servlet request
    * @param response
    *          the response object
    */
@@ -182,6 +186,8 @@ public class DispatchSupport {
    * 
    * @param msg
    *          the error message
+   * @param request
+   *          the servlet request
    * @param response
    *          the response object
    */
@@ -195,6 +201,8 @@ public class DispatchSupport {
    * 
    * @param msg
    *          the error message
+   * @param request
+   *          the servlet request
    * @param response
    *          the response object
    */
@@ -211,6 +219,8 @@ public class DispatchSupport {
    *          the http status code
    * @param msg
    *          the error message
+   * @param request
+   *          the servlet request
    * @param response
    *          the response object
    */
