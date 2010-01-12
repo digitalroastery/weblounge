@@ -30,6 +30,8 @@ import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.Renderer;
 
 import org.apache.jasper.JasperException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -49,6 +51,9 @@ import java.util.List;
  * implementation when overwriting methods.
  */
 public abstract class ActionSupport extends AbstractAction {
+
+  /** Logging facility */
+  protected final static Logger log_ = LoggerFactory.getLogger(ActionSupport.class);
 
   /** Request parameter name for information messages */
   public final static String INFOS = "webl:infos";
@@ -253,7 +258,7 @@ public abstract class ActionSupport extends AbstractAction {
       Renderer renderer) {
     if (renderer == null) {
       String msg = "Renderer to be included in action '" + this + "' on " + request.getUrl() + " was not found!";
-      getSite().getLogger().error(msg);
+      log_.error(msg);
       response.invalidate();
       return;
     }
@@ -266,12 +271,12 @@ public abstract class ActionSupport extends AbstractAction {
       if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
         Throwable rootCause = ((JasperException) o).getRootCause();
         msg += ": " + rootCause.getMessage();
-        getSite().getLogger().error(msg, rootCause);
+        log_.error(msg, rootCause);
       } else if (o != null) {
         msg += ": " + o.getMessage();
-        getSite().getLogger().error(msg, o);
+        log_.error(msg, o);
       } else {
-        getSite().getLogger().error(msg, e);
+        log_.error(msg, e);
       }
       response.invalidate();
     }
@@ -323,7 +328,7 @@ public abstract class ActionSupport extends AbstractAction {
           p = URLDecoder.decode(p, decoding);
         } catch (UnsupportedEncodingException e) {
           // The specified encoding is unknown
-          request.getSite().getLogger().error("Unknown encoding: " + e.getMessage(), e);
+          log_.error("Unknown encoding: " + e.getMessage(), e);
         } catch (IllegalArgumentException e) {
           // Tried decoding a string with a % inside, so obviously the parameter
           // was decoded already
