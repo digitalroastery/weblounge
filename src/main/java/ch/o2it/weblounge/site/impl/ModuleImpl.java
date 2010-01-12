@@ -29,6 +29,8 @@ import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Job;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleConfiguration;
+import ch.o2it.weblounge.common.site.ModuleListener;
+import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.site.impl.handler.ActionRequestHandler;

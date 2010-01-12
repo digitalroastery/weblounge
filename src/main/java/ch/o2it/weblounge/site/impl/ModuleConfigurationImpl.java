@@ -70,14 +70,17 @@ import javax.xml.xpath.XPath;
  */
 public final class ModuleConfigurationImpl extends OptionsSupport implements ModuleConfiguration {
 
+  /** Logging facility */
+  private final static Logger log_ = LoggerFactory.getLogger(ModuleConfigurationImpl.class.getName());
+
   /** Module identifier */
   String identifier = null;
 
-  /** The configuration file */
-  File file = null;
-
   /** Module description */
   protected LocalizableContent<String> description = null;
+
+  /** The configuration file */
+  File file = null;
 
   /** True if the module is enabled */
   boolean isEnabled = true;
@@ -103,10 +106,8 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
   /** The module class loader */
   ClassLoader classLoader = null;
 
-  // Logging
-
-  /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(ModuleConfigurationImpl.class.getName());
+  /** Site options */
+  protected OptionsSupport options = null;
 
   /**
    * Creates a new module configuration.
@@ -179,22 +180,7 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
    * @return the module description
    */
   public String getDescription(Language l) {
-    return descriptions.toString(l);
-  }
-
-  /**
-   * Returns <code>true</code> if <code>o</code> is a <code>ModuleConfiguration
-	 * </code> and matches this
-   * configuration in every aspect.
-   * 
-   * @return <code>true</code> if o is equal to this configuration
-   */
-  public boolean equals(Object o) {
-    if (o instanceof ModuleConfiguration) {
-      ModuleConfigurationImpl s = (ModuleConfigurationImpl) o;
-      return (identifier.equals(s.identifier) && descriptions.equals(s.descriptions) && isEnabled == s.isEnabled);
-    }
-    return false;
+    return description.toString(l);
   }
 
   /**
@@ -407,6 +393,43 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
         log_.error("Error when reading action bundle '{}' of module '{}': {}", new Object[] {id, identifier, e.getMessage(), e});
       }
     }
+  }
+
+  /**
+   * Reads the module options.
+   * 
+   * @param config
+   *          options configuration node
+   * @param path
+   *          the XPath object used to parse the configuration
+   */
+  private void readOptions(XPath path, Node config) {
+    options = OptionsSupport.load(path, XPathHelper.select(config, "/site", path));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return identifier.hashCode();
+  }
+
+  /**
+   * Returns <code>true</code> if <code>o</code> is a <code>ModuleConfiguration
+   * </code> and matches this
+   * configuration in every aspect.
+   * 
+   * @return <code>true</code> if o is equal to this configuration
+   */
+  public boolean equals(Object o) {
+    if (o instanceof ModuleConfiguration) {
+      ModuleConfigurationImpl s = (ModuleConfigurationImpl) o;
+      return (identifier.equals(s.identifier));
+    }
+    return false;
   }
 
   /**
