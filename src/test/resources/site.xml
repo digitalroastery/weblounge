@@ -30,14 +30,16 @@
   </security>
   <templates>
     <template id="default" composeable="true" default="true">
-      <url>template/default.jsp</url>
+      <renderer>file://template/default.jsp</renderer>
       <stage>boxes</stage>
-      <name language="de">Standard Layout</name>
-      <name language="en">Standard template</name>
+      <recheck>1d10m</recheck>
+      <valid>1w1d1h1m</valid>
+      <name language="de">Standard Vorlage</name>
+      <name language="en">Default template</name>
     </template>
     <template id="mobile" composeable="true">
       <class>ch.o2it.weblounge.common.impl.site.JSPTemplate</class>
-      <renderer>template/mobile.jsp</renderer>
+      <renderer>file://template/mobile.jsp</renderer>
       <name language="de">Mobile</name>
       <name language="en">Mobile</name>
     </template>
