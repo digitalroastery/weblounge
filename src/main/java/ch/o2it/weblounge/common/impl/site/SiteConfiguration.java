@@ -139,6 +139,7 @@ public final class SiteConfiguration implements Customizable {
     try {
       XPath path = XPathFactory.newInstance().newXPath();
       readMainSettings(path, XPathHelper.select(config, "/site", path));
+      readOptions(path, XPathHelper.select(config, "/site", path));
       readAdmin(path, XPathHelper.select(config, "/site/admin", path));
       readUrls(path, XPathHelper.select(config, "/site/urls", path));
       readAuthenticationModules(path, XPathHelper.select(config, "/site/authentication", path));
@@ -189,7 +190,6 @@ public final class SiteConfiguration implements Customizable {
       siteClass = SiteImpl.class.getCanonicalName();
     description = LanguageSupport.addDescriptions(config, "description", defaultLanguage, null, false);
     isEnabled = "true".equalsIgnoreCase(XPathHelper.valueOf(config, "enable", false, path));
-    options = OptionsSupport.load(path, XPathHelper.select(config, "/site", path));
   }
 
   /**
@@ -382,6 +382,18 @@ public final class SiteConfiguration implements Customizable {
       log_.error("Configuration error when reading image styles: {}", e.getMessage(), e);
     }
     log_.debug("Image styles configured");
+  }
+
+  /**
+   * Reads the site's contact information.
+   * 
+   * @param config
+   *          contact configuration node
+   * @param path
+   *          the XPath object used to parse the configuration
+   */
+  private void readOptions(XPath path, Node config) {
+    options = OptionsSupport.load(path, XPathHelper.select(config, "/site", path));
   }
 
   /**
