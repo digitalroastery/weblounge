@@ -172,10 +172,10 @@ public class StaticContentHandler implements RequestHandler, Times {
           if (e instanceof JasperException && ((JasperException) e).getRootCause() != null) {
             String msg = "Error while dispatching static request to " + pathInfo + ": ";
             msg += e.getMessage();
-            request.getSite().getLogger().error(msg, ((JasperException) e).getRootCause());
+            log.error(msg, ((JasperException) e).getRootCause());
           } else {
             String msg = "Error while dispatching static request " + pathInfo + ": ";
-            request.getSite().getLogger().error(msg, e);
+            log.error(msg, e);
           }
         }
         return true;
