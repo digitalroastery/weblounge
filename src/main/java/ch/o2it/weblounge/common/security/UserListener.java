@@ -20,26 +20,13 @@
 
 package ch.o2it.weblounge.common.security;
 
-import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 
 /**
- * This interface describes the callbacks that have to be provided by an
- * implementing class to get notified about user movements.
+ * A <code>UserListener</code> is notified about users logging into and out of a
+ * site.
  */
 public interface UserListener {
-
-  /**
-   * This method is called if the user moves from one url to another. Note that
-   * moving does not include calling actions. Only movements that are detected
-   * by the <code>SimpleRequestHandler</code> are noted.
-   * 
-   * @param user
-   *          the moving user
-   * @param url
-   *          the url that the user moved to
-   */
-  void userMoved(User user, WebUrl url);
 
   /**
    * This method is called if a user logs in.

@@ -50,6 +50,18 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   static final String MODULE_DIR = "module";
 
   /**
+   * Sets the site identifier.
+   * <p>
+   * <b>Note:</b> the site identifier will most probably be used in file paths,
+   * database table names and user ids so make sure it does not contain spaces
+   * or weird characters.
+   * 
+   * @param identifier
+   *          the site identifier
+   */
+  void setIdentifier(String identifier);
+
+  /**
    * Returns the site identifier.
    * 
    * @return the site identifier
@@ -57,13 +69,27 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   String getIdentifier();
 
   /**
+   * Sets the site description.
+   * 
+   * @param description
+   *          the description
+   */
+  void setDescription(String description);
+
+  /**
    * Returns the description of this site.
    * 
-   * @param l
-   *          the description language
    * @return the site description
    */
-  String getDescription(Language l);
+  String getDescription();
+
+  /**
+   * Set to <code>true</code> to enable this site, <code>false</code> otherwise.
+   * 
+   * @param enabled
+   *          the enabled state
+   */
+  void setEnabled(boolean enabled);
 
   /**
    * Returns <code>true</code> if the site is enabled.
@@ -71,13 +97,6 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @return <code>true</code> if the site is enabled
    */
   boolean isEnabled();
-
-  /**
-   * Returns the site's logging facility.
-   * 
-   * @return the site logger
-   */
-  SiteLogger getLogger();
 
   /**
    * Adds <code>listener</code> to the list of site listeners.
@@ -131,6 +150,22 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   Module[] getModules();
 
   /**
+   * Adds <code>template</code> to the list of templates.
+   * 
+   * @param template
+   *          the template to add
+   */
+  void addTemplate(PageTemplate template);
+
+  /**
+   * Removes <code>template</code> from the list of templates.
+   * 
+   * @param template
+   *          the template to remove
+   */
+  void removeTemplate(PageTemplate template);
+
+  /**
    * Returns this site's templates which keeps track of the defined renderer
    * bundles.
    * 
@@ -148,11 +183,19 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   PageTemplate getTemplate(String template);
 
   /**
-   * Returns the identifier of the default template for this site.
+   * Sets the default template.
    * 
-   * @return the site default template
+   * @param template
+   *          the template
    */
-  String getDefaultTemplate();
+  void setDefaultTemplate(PageTemplate template);
+
+  /**
+   * Returns the default template for this site.
+   * 
+   * @return the default template
+   */
+  PageTemplate getDefaultTemplate();
 
   /**
    * Returns this site's layouts which keeps track of the defined layouts.
@@ -271,6 +314,22 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   String getCollectionPath(String path);
 
   /**
+   * Adds <code>language</code> to the site languages.
+   * 
+   * @param language
+   *          the language to add
+   */
+  void addLanguage(Language language);
+
+  /**
+   * Removes <code>language</code> from the site languages.
+   * 
+   * @param language
+   *          the language to remove
+   */
+  void removeLanguage(Language language);
+
+  /**
    * Returns <code>true</code> <code>language</code> is supported by this site.
    * 
    * @param language
@@ -285,6 +344,14 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @return the site languages
    */
   Language[] getLanguages();
+
+  /**
+   * Sets the default language.
+   * 
+   * @param language
+   *          the default language
+   */
+  void setDefaultLanguage(Language language);
 
   /**
    * Returns the default language for this site.
@@ -323,13 +390,6 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   void stop();
 
   /**
-   * Returns the number of versions to keep of each page.
-   * 
-   * @return the history size
-   */
-  int getHistorySize();
-
-  /**
    * Returns the registered JAAS authentication modules. Note that the list is
    * ordered according to the appearance of each authentication module in the
    * site configuration.
@@ -337,6 +397,14 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @return the authentication modules
    */
   AuthenticationModule[] getAuthenticationModules();
+
+  /**
+   * Sets the site administrator.
+   * 
+   * @param administrator
+   *          the site administrator
+   */
+  void setAdministrator(WebloungeUser administrator);
 
   /**
    * Returns the administrator user.
