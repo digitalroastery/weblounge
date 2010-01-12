@@ -35,6 +35,7 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.PageTemplate;
+import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
@@ -104,8 +105,8 @@ public final class PageRequestHandler implements RequestHandler {
     // Check if the page is already part of the cache. If so, our task is
     // already done!
     if (request.getVersion() == Page.LIVE && action == null) {
-      long validTime = PageTemplate.DEFAULT_VALID_TIME;
-      long recheckTime = PageTemplate.DEFAULT_RECHECK_TIME;
+      long validTime = Renderer.DEFAULT_VALID_TIME;
+      long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
 
       // Create the set of tags that identify the page
       CacheTagSet cacheTags = new CacheTagSet();
@@ -242,12 +243,12 @@ public final class PageRequestHandler implements RequestHandler {
         if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
           Throwable rootCause = ((JasperException) o).getRootCause();
           msg += ": " + rootCause.getMessage();
-          site.getLogger().error(msg, rootCause);
+          log_.error(msg, rootCause);
         } else if (o != null) {
           msg += ": " + o.getMessage();
-          site.getLogger().error(msg, o);
+          log_.error(msg, o);
         } else {
-          site.getLogger().error(msg, e);
+          log_.error(msg, e);
         }
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
