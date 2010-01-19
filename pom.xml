@@ -20,6 +20,18 @@
       <version>3.0-SNAPSHOT</version>
     </dependency>
 
+    <!-- osgi support -->
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi_R4_core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi_R4_compendium</artifactId>
+    </dependency>
+
     <!-- thirdparty -->
 
     <dependency>
@@ -90,6 +102,19 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Import-Package>
+              ch.o2it.weblounge.common.*,
+              org.apache.commons.codec.binary,
+              org.apache.commons.codec.digest,
+              org.apache.commons.fileupload,
+              org.apache.commons.fileupload.disk,
+              org.apache.commons.fileupload.servlet,
+              org.apache.commons.lang,
+              org.apache.jasper,
+              org.json,
+              org.slf4j,
+              *;resolution=optional
+            </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.common.impl.content,
               ch.o2it.weblounge.common.impl.language,
