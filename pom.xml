@@ -36,6 +36,10 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Import-Package>
+              ch.o2it.weblounge.common.request,
+              javax.servlet
+            </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.dispatcher
             </Export-Package>
