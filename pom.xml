@@ -36,6 +36,9 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Import-Package>
+              ch.o2it.weblounge.common.request
+            </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.cache
             </Export-Package>
