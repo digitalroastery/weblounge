@@ -28,13 +28,17 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Import-Package>
+              javax.security.auth.login,
+              javax.servlet.http
+            </Import-Package>
             <Export-Package>
-                ch.o2it.weblounge.common,
+              ch.o2it.weblounge.common,
             	ch.o2it.weblounge.common.content,
             	ch.o2it.weblounge.common.language,
             	ch.o2it.weblounge.common.page,
             	ch.o2it.weblounge.common.request,
-                ch.o2it.weblounge.common.resource,
+              ch.o2it.weblounge.common.resource,
             	ch.o2it.weblounge.common.security,
             	ch.o2it.weblounge.common.site,
             	ch.o2it.weblounge.common.url,
