@@ -64,10 +64,10 @@ public class CacheServiceTracker extends ServiceTracker {
    */
   @Override
   public Object addingService(ServiceReference reference) {
-    log_.debug("Registering weblounge dispatcher with {}", reference.getBundle().getSymbolicName());
     ResponseCache cache = (ResponseCache) context.getService(reference);
+    log_.info("Enabling response caching through {}", cache.getClass().getName());
     dispatcher.setResponseCache(cache);
-    log_.info("Enabled response caching through {}", reference.getBundle().getSymbolicName());
+    log_.debug("Registering weblounge dispatcher with {}", cache.getClass().getName());
     return cache;
   }
 
@@ -91,7 +91,7 @@ public class CacheServiceTracker extends ServiceTracker {
    */
   @Override
   public void removedService(ServiceReference reference, Object service) {
-    log_.info("Response caching disabled ({} disappeared)", reference.getBundle().getSymbolicName());
+    log_.info("Response caching disabled ({} disappeared)", service.getClass().getName());
     dispatcher.setResponseCache(null);
     super.removedService(reference, service);
   }

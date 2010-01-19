@@ -77,7 +77,7 @@ public class HttpServiceTracker extends ServiceTracker {
       HttpContext httpContext = httpService.createDefaultHttpContext();
       Dictionary<?, ?> initParams = new Properties();
       httpService.registerServlet("/", dispatcher, initParams, httpContext);
-      log_.info("Weblounge dispatcher hooked up with {}", reference.getBundle().getSymbolicName());
+      log_.info("Weblounge dispatcher hooked up with {}", httpService.getClass().getName());
     } catch (ServletException e) {
       log_.error("Error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
       httpService = null;
@@ -108,7 +108,7 @@ public class HttpServiceTracker extends ServiceTracker {
    */
   @Override
   public void removedService(ServiceReference reference, Object service) {
-    log_.info("Weblounge dispatcher disconnected from {}", reference.getBundle().getSymbolicName());
+    log_.info("Weblounge dispatcher disconnected from {}", service.getClass().getName());
     ((HttpService) service).unregister("/");
     super.removedService(reference, service);
   }
