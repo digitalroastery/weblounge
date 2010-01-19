@@ -25,6 +25,12 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Import-Package>
+              ch.o2it.weblounge.common.language,
+              ch.o2it.weblounge.common.page,
+              ch.o2it.weblounge.common.security,
+              ch.o2it.weblounge.common.user
+            </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.contentrepository
             </Export-Package>
