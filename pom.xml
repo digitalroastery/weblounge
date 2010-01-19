@@ -38,7 +38,7 @@
       <version>3.0-SNAPSHOT</version>
     </dependency>
 
-	<!-- osgi support -->
+    <!-- osgi support -->
 
     <dependency>
       <groupId>org.osgi</groupId>
