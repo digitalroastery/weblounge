@@ -65,6 +65,11 @@
     </dependency>
 
     <dependency>
+      <groupId>quartz</groupId>
+      <artifactId>quartz</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>
@@ -111,9 +116,28 @@
               org.apache.commons.fileupload.servlet,
               org.apache.commons.lang,
               org.apache.jasper,
-              org.json,
+              org.quartz,
+              org.quartz.impl,
               org.slf4j,
-              *;resolution=optional
+              org.w3c.dom,
+              org.xml.sax,
+              org.xml.sax.helpers,
+              javax.security.auth,
+              javax.security.auth.callback,
+              javax.security.auth.login,
+              javax.security.auth.spi,
+              javax.servlet,
+              javax.servlet.http,
+              javax.swing.filechooser;resolution:=optional,
+              javax.xml.namespace,
+              javax.xml.parsers,
+              javax.xml.transform,
+              javax.xml.transform.dom,
+              javax.xml.transform.stream,
+              javax.xml.xpath,
+              org.osgi.framework,
+              org.osgi.service.component,
+              org.osgi.util.tracker,
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.common.impl.content,
@@ -122,11 +146,18 @@
               ch.o2it.weblounge.common.impl.request,
               ch.o2it.weblounge.common.impl.security,
               ch.o2it.weblounge.common.impl.security.jaas,
+              ch.o2it.weblounge.common.impl.site,
               ch.o2it.weblounge.common.impl.url,
               ch.o2it.weblounge.common.impl.user,
               ch.o2it.weblounge.common.impl.util,
               ch.o2it.weblounge.common.impl.util.*
             </Export-Package>
+            <Embed-Dependency>
+              json
+            </Embed-Dependency>
+            <Service-Component>
+              OSGI-INF/common.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
