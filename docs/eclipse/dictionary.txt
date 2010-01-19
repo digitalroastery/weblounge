@@ -31,3 +31,7 @@ français
 deutsch
 fallback
 dublin
+servlet
+cacheable
+iterable
+composeable

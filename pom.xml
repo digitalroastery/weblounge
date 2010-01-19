@@ -88,6 +88,7 @@
       </activation>
       <modules>
       <module>bootstrap</module>
+      <module>modules/weblounge-admin</module>
       <module>modules/weblounge-cache-api</module>
       <module>modules/weblounge-cache</module>
       <module>modules/weblounge-common-api</module>
@@ -415,7 +416,7 @@
         <artifactId>commons-codec</artifactId>
         <version>1.3</version>
       </dependency>
-  
+
       <dependency>
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
@@ -479,7 +480,19 @@
       <dependency>
         <groupId>org.apache.tomcat</groupId>
         <artifactId>jasper</artifactId>
-        <version>6.0.16</version>
+        <version>6.0.20</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>el-api</artifactId>
+        <version>6.0.20</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>jasper-el</artifactId>
+        <version>6.0.20</version>
       </dependency>
   
     </dependencies>
