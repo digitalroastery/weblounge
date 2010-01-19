@@ -39,6 +39,9 @@ import ch.o2it.weblounge.common.site.SiteListener;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
+import org.quartz.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +63,9 @@ public class SiteImpl implements Site {
 
   /** Logging facility */
   protected final static Logger log_ = LoggerFactory.getLogger(SiteImpl.class);
+  
+  /** Bundle property name of the site identifier */
+  public static final String PROP_IDENTIFIER = "site.identifier";
 
   /** Regular expression to test the validity of a site identifier */
   private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9-_.]*$";
@@ -103,6 +109,15 @@ public class SiteImpl implements Site {
   /** User listeners */
   private List<UserListener> userListeners = null;
 
+  /** The site dispatcher */
+  private SiteDispatcher dispatcher = null;
+
+  /** OSGi cron service tracker */
+  private CronServiceTracker cronServiceTracker = null;
+  
+  /** Quartz cron scheduler */
+  private Scheduler scheduler = null;
+
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to
    * enable the site.
@@ -110,6 +125,7 @@ public class SiteImpl implements Site {
   public SiteImpl() {
     languages = new HashMap<String, Language>();
     templates = new HashMap<String, PageTemplate>();
+    dispatcher = new SiteDispatcher(this, false);
   }
 
   /**
@@ -141,6 +157,10 @@ public class SiteImpl implements Site {
    */
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
+    if (enabled)
+      dispatcher.startDispatching();
+    else
+      dispatcher.stopDispatching();
   }
 
   /**
@@ -334,9 +354,9 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#dispatch(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
-  public void dispatch(WebloungeRequest request, WebloungeResponse response) {
-    // TODO Auto-generated method stub
-
+  public void dispatch(WebloungeRequest request, WebloungeResponse response)
+      throws IOException {
+    dispatcher.dispatch(request, response);
   }
 
   /**
@@ -597,8 +617,7 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#start()
    */
   public void start() {
-    // TODO Auto-generated method stub
-
+    dispatcher.startDispatching();
   }
 
   /**
@@ -607,8 +626,7 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#stop()
    */
   public void stop() {
-    // TODO Auto-generated method stub
-
+    dispatcher.stopDispatching();
   }
 
   /**
@@ -759,6 +777,79 @@ public class SiteImpl implements Site {
         listener.userLoggedOut(user);
       }
     }
+  }
+
+  /**
+   * This method is a callback from the service tracker that is started when
+   * this site is started. It is looking for an implementation of the Quartz
+   * scheduler.
+   * 
+   * @param daemon
+   */
+  void setScheduler(Scheduler scheduler) {
+    if (scheduler == null) {
+      // TODO: remove registered tasks
+    } else {
+      // TODO: add registered tasks
+    }
+    this.scheduler = scheduler;
+  }
+
+  /**
+   * Callback from the OSGi environment to activate the site. Subclasses should
+   * make sure to call this super implementation as it will assist in correctly
+   * setting up the site.
+   * <p>
+   * This method should be configured in the <tt>Dynamic Services</tt> section
+   * of your bundle.
+   * 
+   * @param context
+   *          the component context
+   */
+  public void activate(ComponentContext context) {
+    BundleContext bundleContext = context.getBundleContext();
+    
+    // Fix the site identifier
+    if (getIdentifier() == null) {
+      String identifier = (String)context.getProperties().get(PROP_IDENTIFIER);
+      if (identifier == null)
+        throw new IllegalStateException("Site needs an identifier");
+      setIdentifier(identifier);
+    }
+
+    log_.info("Site {} is starting", this);
+    log_.debug("Getting in line for cron services");
+
+    // Connect to the 
+    cronServiceTracker = new CronServiceTracker(bundleContext, this);
+    cronServiceTracker.open();
+  }
+
+  /**
+   * Callback from the OSGi environment to deactivate the site. Subclasses
+   * should make sure to call this super implementation as it will assist in
+   * correctly shutting down the site.
+   * <p>
+   * This method should be configured in the <tt>Dynamic Services</tt> section
+   * of your bundle.
+   * 
+   * @param context
+   *          the component context
+   */
+  public void deactivate(ComponentContext context) {
+    log_.info("Site {} is stopping", this);
+    log_.debug("Stopped looking for cron services");
+    cronServiceTracker.close();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return identifier;
   }
 
 }
