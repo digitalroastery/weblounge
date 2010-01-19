@@ -431,7 +431,7 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @param response
    *          the response to deliver
    */
-  void dispatch(WebloungeRequest request, WebloungeResponse response);
+  void dispatch(WebloungeRequest request, WebloungeResponse response) throws IOException;
 
   /**
    * Returns the page identified by the <code>uri</code>.
