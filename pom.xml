@@ -133,6 +133,9 @@
         <configuration>
           <instructions>
             <Bundle-Activator>ch.o2it.weblounge.dispatcher.impl.DispatcherServiceImpl</Bundle-Activator>
+            <Import-Package>
+              ch.o2it.weblounge.dispatcher
+            </Import-Package>
             <Export-Package>
           	  ch.o2it.weblounge.dispatcher.impl
             </Export-Package>
