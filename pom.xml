@@ -255,7 +255,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-Activator>ch.o2it.weblounge.contentrepository.impl.ContentRepositoryService</Bundle-Activator>
             <Embed-Dependency>
               jcr,
               jta,

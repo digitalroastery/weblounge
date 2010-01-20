@@ -29,10 +29,10 @@ import org.apache.jackrabbit.core.RepositoryImpl;
 import org.apache.jackrabbit.core.config.RepositoryConfig;
 import org.apache.jackrabbit.value.DateValue;
 import org.apache.jackrabbit.value.StringValue;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,7 @@ import javax.jcr.version.VersionHistory;
  * {@link PageRepository} and {@link ResourceRepository}, backed by the
  * <code>Jackrabbit content repository</code> implementation.
  */
-public class ContentRepositoryService implements PageRepository, ResourceRepository, ManagedService, BundleActivator {
+public class ContentRepositoryService implements PageRepository, ResourceRepository, ManagedService {
 
   /** Logging instance */
   private static final Logger log_ = LoggerFactory.getLogger(ContentRepositoryService.class);
@@ -120,8 +120,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     jcrHome = PathSupport.concat(new String[] {
         System.getProperty("java.io.tmpdir"),
         "weblounge",
-        "jackrabbit"
-    });
+        "jackrabbit" });
     jcrDbDriver = "org.apache.derby.jdbc.EmbeddedDriver";
     jcrDbUrl = "jdbc:derby:${wsp.home}/db;create=true";
     jcrDbUsername = null;
@@ -167,12 +166,17 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
   }
 
   /**
-   * {@inheritDoc}
+   * Callback from the OSGi environment to activate the service.
+   * <p>
+   * This method is configured in the <tt>Dynamic Services</tt> section of the
+   * bundle.
    * 
-   * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+   * @param context
+   *          the component context
    */
-  public void start(BundleContext context) throws Exception {
-    InputStream is = context.getBundle().getEntry(jcrConfigPath).openStream();
+  public void activate(ComponentContext context) throws Exception {
+    BundleContext bundleContext = context.getBundleContext();
+    InputStream is = bundleContext.getBundle().getEntry(jcrConfigPath).openStream();
     RepositoryConfig jcrConfig = RepositoryConfig.create(is, jcrHome);
     jcr = RepositoryImpl.create(jcrConfig);
 
@@ -205,20 +209,24 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
       Node n = it.nextNode();
       Property prop = n.getProperty("blogtitle");
       log_.debug("Found blog entry with title: {}", prop.getString());
-      
+
       VersionHistory history = n.getVersionHistory();
       if (history.getAllVersions().hasNext()) {
         log_.debug("Blog entry is versioned");
       }
-    }    
+    }
   }
 
   /**
-   * {@inheritDoc}
+   * Callback from the OSGi environment to deactivate the service.
+   * <p>
+   * This method is be configured in the <tt>Dynamic Services</tt> section of
+   * the bundle.
    * 
-   * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+   * @param context
+   *          the component context
    */
-  public void stop(BundleContext context) throws Exception {
+  public void stop(ComponentContext context) {
     if (jcr != null) {
       jcr.shutdown();
     }
@@ -328,7 +336,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
       log_.debug("fileNode path={}", fileNode.getPath());
       Node resNode;
       try {
-        resNode = (Node) fileNode.getNode("jcr:content");
+        resNode = fileNode.getNode("jcr:content");
         log_.debug("resource node exists: {}", resNode.getPath());
       } catch (PathNotFoundException e) {
         resNode = fileNode.addNode("jcr:content", "nt:resource");
