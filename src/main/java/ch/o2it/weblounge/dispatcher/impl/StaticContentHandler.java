@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
-import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -37,11 +36,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.regex.Pattern;
 
+import javax.activation.FileTypeMap;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -58,11 +58,29 @@ public class StaticContentHandler implements RequestHandler, Times {
   /** The logger */
   private static final Logger log = LoggerFactory.getLogger(StaticContentHandler.class);
 
+  /** The singleton instance */
+  private static StaticContentHandler instance = null;
+
+  /** The mime type definitions */
+  private static final FileTypeMap mimeTypes = FileTypeMap.getDefaultFileTypeMap();
+
   /** Path rules */
-  // TODO: Configure 
+  // TODO: Configure
   private static final PathRule url_rules[] = {
       new PathRule("^/(?:sites/[^/]+|shared)/module/[^/]+/[^/]+/", new String[] { "^/(?:sites/[^/]+|shared)/module/[^/]+/(?:lib|classes|conf|doc)/" }),
       new PathRule("^/(?:sites/[^/]+|shared)/[^/]+/", new String[] { "^/(?:sites/[^/]+|shared)/(?:lib|classes|module)/" }) };
+
+  /**
+   * Returns the singleton instance of this content handler.
+   * 
+   * @return the static content handler
+   */
+  static StaticContentHandler getInstance() {
+    if (instance == null) {
+      instance = new StaticContentHandler();
+    }
+    return instance;
+  }
 
   /**
    * {@inheritDoc}
@@ -92,13 +110,12 @@ public class StaticContentHandler implements RequestHandler, Times {
    * @param url
    *          the url to include
    */
-  public static void service(ServletRequest req, ServletResponse resp,
-      String url) {
-    HttpServletRequest request = null;
-    HttpServletResponse response = null;
+  public void service(ServletRequest req, ServletResponse resp, String url) {
+    WebloungeRequest request = null;
+    WebloungeResponse response = null;
     try {
-      request = (HttpServletRequest) req;
-      response = (HttpServletResponse) resp;
+      request = (WebloungeRequest) req;
+      response = (WebloungeResponse) resp;
     } catch (ClassCastException e) {
       log.error("Error casting request and response to Http objects", e);
       return;
@@ -116,32 +133,58 @@ public class StaticContentHandler implements RequestHandler, Times {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
-      // check the resource
-      String path = Env.getRealPath(url);
-      File file = new File(path);
-      if (!file.exists() || !file.canRead()) {
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        return;
-      }
-      if (!file.isFile()) {
+
+      URL contentRootURL = request.getSite().getStaticContentRoot();
+      String protocol = contentRootURL.getProtocol();
+      Http11ResponseType responseType = null;
+      InputStream is = null;
+
+      // Are we looking at a filesystem-based content root?
+      if ("file".equals(protocol)) {
+        File file = new File(contentRootURL.toExternalForm(), url);
+        if (!file.exists() || !file.canRead()) {
+          response.sendError(HttpServletResponse.SC_NOT_FOUND);
+          return;
+        }
+
         // we do not provide directory listings!
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        if (!file.isFile()) {
+          response.sendError(HttpServletResponse.SC_FORBIDDEN);
+          return;
+        }
+
+        /* analyze the HTTP request and generate headers */
+        responseType = Http11ProtocolHandler.analyzeRequest(request, file.lastModified(), MS_PER_DAY + System.currentTimeMillis(), file.length());
+        Http11ProtocolHandler.generateHeaders(response, responseType);
+
+        /* write the response */
+        is = new FileInputStream(file);
+      }
+
+      // Let's just try to open the stream from a web server
+      else if ("http".equals(protocol) || "https".equals(protocol)) {
+        try {
+          is = contentRootURL.openStream();
+        } catch (IOException e) {
+          response.sendError(HttpServletResponse.SC_NOT_FOUND);
+          return;
+        }
+      }
+
+      // We can't handle this type of urls.
+      else {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
-      log.debug("Serving file {}", path);
-      /* analyze the HTTP request */
-      Http11ResponseType responseType = Http11ProtocolHandler.analyzeRequest(request, file.lastModified(), MS_PER_DAY + System.currentTimeMillis(), file.length());
 
-      /* generate the headers */
-      Http11ProtocolHandler.generateHeaders(response, responseType);
+      // Set the content type
+      String contentType = mimeTypes.getContentType(contentRootURL.getFile());
+      if (contentType != null)
+        response.setContentType(contentType);
 
-      /* define the content type */
-      if (!Http11ProtocolHandler.isError(responseType))
-        response.setContentType(Env.getMimeType(file.getAbsolutePath()));
-
-      /* write the response */
-      InputStream is = new FileInputStream(file);
+      // Finally, start sending the response
       try {
+        log.debug("Serving {}", contentRootURL);
         Http11ProtocolHandler.generateResponse(response, responseType, is);
       } finally {
         is.close();

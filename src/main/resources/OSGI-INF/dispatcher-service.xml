@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component name="weblounge-dispatcher" immediate="true" name="Weblounge Dispatcher Service">
+<component immediate="true" start="activate" stop="deactivate" name="Weblounge Dispatcher Service">
   <implementation class="ch.o2it.weblounge.dispatcher.impl.DispatcherServiceImpl" />
   <property name="service.description" value="Weblounge Dispatcher Service" />
   <service>

@@ -21,10 +21,10 @@ package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.dispatcher.DispatcherService;
 
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ import java.util.Dictionary;
  * This means that by deactivating this service, no dispatching will be done in
  * weblounge and all sites will effectively be offline.
  */
-public class DispatcherServiceImpl implements DispatcherService, BundleActivator, ManagedService {
+public class DispatcherServiceImpl implements DispatcherService, ManagedService {
 
   /** Logging instance */
   private static final Logger log_ = LoggerFactory.getLogger(DispatcherServiceImpl.class);
@@ -62,37 +62,46 @@ public class DispatcherServiceImpl implements DispatcherService, BundleActivator
   }
 
   /**
-   * {@inheritDoc}
+   * Callback from the OSGi environment to activate the service.
+   * <p>
+   * This method is configured in the <tt>Dynamic Services</tt> section of the
+   * bundle.
    * 
-   * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+   * @param context
+   *          the component context
    */
-  public void start(BundleContext context) throws Exception {
+  public void activate(ComponentContext context) {
+    BundleContext bundleContext = context.getBundleContext();
     log_.debug("Activating weblounge dispatcher");
 
     // Start site service tracking
-    siteTracker = new SiteTracker(context);
+    siteTracker = new SiteTracker(bundleContext);
     siteTracker.open();
 
     // Create an http tracker and make sure it forwards to our servlet
     WebloungeDispatcherServlet dispatcher = new WebloungeDispatcherServlet(siteTracker);
     log_.trace("Start looking for http service implementations");
-    httpTracker = new HttpServiceTracker(context, dispatcher);
+    httpTracker = new HttpServiceTracker(bundleContext, dispatcher);
     httpTracker.open();
 
     // Start looking for a cache service
     log_.trace("Start looking for response cache service implementations");
-    cacheTracker = new CacheServiceTracker(context, dispatcher);
+    cacheTracker = new CacheServiceTracker(bundleContext, dispatcher);
     cacheTracker.open();
 
     log_.debug("Weblounge dispatcher activated");
   }
 
   /**
-   * {@inheritDoc}
+   * Callback from the OSGi environment to deactivate the service.
+   * <p>
+   * This method is configured in the <tt>Dynamic Services</tt> section of the
+   * bundle.
    * 
-   * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+   * @param context
+   *          the component context
    */
-  public void stop(BundleContext context) throws Exception {
+  public void stop(ComponentContext context) {
     log_.debug("Deactivating weblounge dispatcher");
 
     // Get rid of the http tracker

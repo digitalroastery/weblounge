@@ -63,51 +63,68 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+    </dependency>
+  
+    <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>jasper</artifactId>
     </dependency>
 
     <!-- supports jasper -->
+    <!-- 
     <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>catalina</artifactId>
-        <version>6.0.20</version>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>catalina</artifactId>
+      <version>6.0.20</version>
     </dependency>
+    -->
 
     <!-- supports catalina (see above) -->
+    <!-- 
     <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>annotations-api</artifactId>
-        <version>6.0.20</version>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>annotations-api</artifactId>
+      <version>6.0.20</version>
     </dependency>
+    -->
 
     <!-- supports jasper -->
+    <!-- 
     <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>el-api</artifactId>
-        <version>6.0.20</version>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>el-api</artifactId>
+      <version>6.0.20</version>
     </dependency>
+    -->
     
     <!-- supports jasper -->
+    <!-- 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>jasper-el</artifactId>
       <version>6.0.20</version>
     </dependency>
+    -->
     
     <!-- supports jasper -->
+    <!-- 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>jasper-jdt</artifactId>
       <version>6.0.20</version>
     </dependency>
+    -->
 
     <!-- supports japser -->
+    <!--
     <dependency>
         <groupId>org.apache.tomcat</groupId>
         <artifactId>jsp-api</artifactId>
         <version>6.0.20</version>
     </dependency>
+    -->
 
     <!-- testing -->
     
@@ -132,9 +149,24 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-Activator>ch.o2it.weblounge.dispatcher.impl.DispatcherServiceImpl</Bundle-Activator>
             <Import-Package>
-              ch.o2it.weblounge.dispatcher
+              ch.o2it.weblounge.common,
+              ch.o2it.weblounge.common.impl.request,
+              ch.o2it.weblounge.common.request,
+              ch.o2it.weblounge.common.site,
+              ch.o2it.weblounge.common.url,
+              ch.o2it.weblounge.dispatcher,
+              ch.o2it.weblounge.site,
+              org.slf4j,
+              javax.activation,
+              javax.servlet,
+              javax.servlet.http,
+              org.apache.jasper,
+              org.osgi.framework,
+              org.osgi.service.cm,
+              org.osgi.service.component,
+              org.osgi.service.http,
+              org.osgi.util.tracker
             </Import-Package>
             <Export-Package>
           	  ch.o2it.weblounge.dispatcher.impl
@@ -142,6 +174,7 @@
             <Service-Component>
               OSGI-INF/dispatcher-service.xml
             </Service-Component>
+            <!-- 
             <Embed-Dependency>
               jasper,
               catalina,
@@ -151,9 +184,11 @@
               jasper-jdt,
               jsp-api
             </Embed-Dependency>
+            -->
             <!-- 
               If pax-logging is installed, there is no need to include juli logger
             -->
+            <!--
             <Import-Package>
               !org.apache.juli.*,
               !org.apache.coyote,
@@ -163,6 +198,7 @@
               !org.eclipse.*,
               *
             </Import-Package>
+            -->
           </instructions>
         </configuration>
       </plugin>

@@ -43,7 +43,10 @@ public class DispatchSupport {
   private final static Logger log_ = LoggerFactory.getLogger(DispatchSupport.class);
 
   /** List of dispatcher listeners */
-  private static List<DispatchListener> dispatcher = new ArrayList<DispatchListener>();
+  private final static List<DispatchListener> dispatcher = new ArrayList<DispatchListener>();
+  
+  /** The static content handler */
+  private final static StaticContentHandler staticContentHandler = StaticContentHandler.getInstance();
 
   /**
    * Asks the client to do <code>HTTP</code> authentication by sending back the
@@ -104,7 +107,7 @@ public class DispatchSupport {
     // If we get here, then no dispatcher seems to be responsible for handling
     // the request.
     // In this case, we use the default mechanism for request forwarding:
-    StaticContentHandler.service(request, response, url);
+    staticContentHandler.service(request, response, url);
   }
 
   /**
@@ -146,7 +149,7 @@ public class DispatchSupport {
     // If we get here, then no dispatcher seems to be responsible for handling
     // the request.
     // In this case, we use the default mechanism for request forwarding:
-    StaticContentHandler.service(request, response, url);
+    staticContentHandler.service(request, response, url);
   }
 
   /**
