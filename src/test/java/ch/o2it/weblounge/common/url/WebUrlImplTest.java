@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
-import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Site;
@@ -205,11 +204,6 @@ public class WebUrlImplTest {
     EasyMock.expect(siteMock.getDefaultLanguage()).andReturn(english);
     EasyMock.replay(siteMock);
     otherSiteMock = EasyMock.createNiceMock(Site.class);
-    
-    // Env setup
-    // TODO: Remove
-    Env.set("system.uri", "/");
-    Env.set("system.servletpath", "/");
     
     liveUrl = new WebUrlImpl(siteMock, livePath);
     localizedLiveUrl = new WebUrlImpl(siteMock, localizedLivePath);

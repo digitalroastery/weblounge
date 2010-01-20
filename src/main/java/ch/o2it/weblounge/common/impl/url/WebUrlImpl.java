@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.common.impl.url;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.page.Page;
@@ -275,11 +274,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       selector.append(".").append(RequestFlavor.HTML.toExtension());
     }
 
-    return UrlSupport.concat(new String[] {
-        Env.getMountpoint(),
-        Env.getServletPath(),
-        path,
-        selector.toString() });
+    return UrlSupport.concat(path, selector.toString());
   }
 
   /**

@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
-import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.request.CacheTag;
@@ -217,9 +216,7 @@ public abstract class AbstractAction implements Action {
    * @return the action's path
    */
   public String getPath() {
-    return UrlSupport.concat(new String[] {
-        Env.getMountpoint(),
-        config.getMountpoint() });
+    return config.getMountpoint();
   }
 
   /**

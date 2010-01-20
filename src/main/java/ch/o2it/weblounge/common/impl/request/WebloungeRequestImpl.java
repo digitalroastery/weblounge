@@ -21,10 +21,8 @@
 package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.Guest;
-import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
@@ -168,20 +166,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   public WebUrl getUrl() {
     if (url != null)
       return url;
-
     if (site == null)
       throw new IllegalStateException("Site has not been set");
-
-    String urlPrefix = null;
-    String installPath = Env.getURI();
-    String servletPath = Env.getServletPath();
-    urlPrefix = UrlSupport.trim(UrlSupport.concat(installPath, servletPath));
-
-    String uri = getRequestURI();
-    String urlPath = uri.substring(urlPrefix.length() - 1);
-    log_.trace("url prefix=" + urlPrefix + "; request uri=" + uri + "; url=" + urlPath);
-
-    this.url = new WebUrlImpl(site, urlPath);
+    this.url = new WebUrlImpl(site, getRequestURI());
     this.requestedUrl = url;
     return url;
   }

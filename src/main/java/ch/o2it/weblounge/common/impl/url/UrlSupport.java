@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.site.Site;
 
 import java.io.File;
@@ -159,11 +158,7 @@ public class UrlSupport {
    * @return the link
    */
   public static String getLink(Site site, String path) {
-    String link = concat(new String[] {
-        Env.getURI(),
-        Env.getServletPath(),
-        path });
-    return link;
+    return path;
   }
 
   /**

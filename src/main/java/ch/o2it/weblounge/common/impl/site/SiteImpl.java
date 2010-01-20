@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -850,6 +851,16 @@ public class SiteImpl implements Site {
   @Override
   public String toString() {
     return identifier;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#getStaticContentRoot()
+   */
+  public URL getStaticContentRoot() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }
