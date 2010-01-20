@@ -101,6 +101,11 @@
             <Export-Package>
               ch.o2it.weblounge.cache.impl
             </Export-Package>
+            <Private-Package>
+              ch.o2it.weblounge.cache.impl.filter,
+              ch.o2it.weblounge.cache.impl.handle,
+              ch.o2it.weblounge.cache.impl.index
+            </Private-Package>
             <Service-Component>
               OSGI-INF/cache-service.xml
             </Service-Component>
