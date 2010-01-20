@@ -342,12 +342,10 @@
           <configuration>
           <instructions>
             <Bundle-Category>ch.o2it</Bundle-Category>
-            <Bundle-DocURL>http://o2it.ch/</Bundle-DocURL>
+            <Bundle-DocURL>http://digitalcafe.lighthouseapp.com/projects/35461/welcome</Bundle-DocURL>
             <Bundle-Vendor>O2 IT Engineering</Bundle-Vendor>
-            <!--
             <Bundle-Name>${pom.name}</Bundle-Name>
             <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-            -->
           </instructions>
           </configuration>
         </plugin>
@@ -378,7 +376,7 @@
         <version>2.5</version>
         <scope>provided</scope>
       </dependency>
-  
+
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>jsp-api</artifactId>
@@ -386,6 +384,12 @@
         <scope>provided</scope>
       </dependency>
   
+      <dependency>
+        <groupId>javax.activation</groupId>
+        <artifactId>activation</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
@@ -460,6 +464,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>jasper</artifactId>
+        <version>6.0.20</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
         <version>20090211</version>
@@ -476,25 +486,9 @@
         <artifactId>slf4j-simple</artifactId>
         <version>1.5.6</version>
       </dependency>
-    
-      <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>jasper</artifactId>
-        <version>6.0.20</version>
-      </dependency>
+      
+      
 
-      <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>el-api</artifactId>
-        <version>6.0.20</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.tomcat</groupId>
-        <artifactId>jasper-el</artifactId>
-        <version>6.0.20</version>
-      </dependency>
-  
     </dependencies>
   </dependencyManagement>
 
