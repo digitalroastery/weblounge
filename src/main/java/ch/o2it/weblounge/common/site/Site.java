@@ -36,6 +36,7 @@ import ch.o2it.weblounge.common.user.WebloungeUser;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 
 /**
  * The site interface defines the method that may be called on weblounge site
@@ -431,7 +432,8 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @param response
    *          the response to deliver
    */
-  void dispatch(WebloungeRequest request, WebloungeResponse response) throws IOException;
+  void dispatch(WebloungeRequest request, WebloungeResponse response)
+      throws IOException;
 
   /**
    * Returns the page identified by the <code>uri</code>.
@@ -467,5 +469,12 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @return the role
    */
   Group getGroup(String group, String context);
+
+  /**
+   * Returns the path to the root directory of the static content for this site.
+   * 
+   * @return the static content root path
+   */
+  URL getStaticContentRoot();
 
 }
