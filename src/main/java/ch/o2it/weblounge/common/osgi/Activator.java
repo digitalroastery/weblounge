@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl;
+package ch.o2it.weblounge.common.osgi;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
