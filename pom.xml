@@ -174,31 +174,6 @@
             <Service-Component>
               OSGI-INF/dispatcher-service.xml
             </Service-Component>
-            <!-- 
-            <Embed-Dependency>
-              jasper,
-              catalina,
-              annotations-api,
-              el-api,
-              jasper-el,
-              jasper-jdt,
-              jsp-api
-            </Embed-Dependency>
-            -->
-            <!-- 
-              If pax-logging is installed, there is no need to include juli logger
-            -->
-            <!--
-            <Import-Package>
-              !org.apache.juli.*,
-              !org.apache.coyote,
-              !org.apache.tomcat.jni,
-              !org.apache.tomcat.util.*,
-              !org.apache.tools.ant.*,
-              !org.eclipse.*,
-              *
-            </Import-Package>
-            -->
           </instructions>
         </configuration>
       </plugin>
