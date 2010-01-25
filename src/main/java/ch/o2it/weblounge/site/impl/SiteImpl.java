@@ -443,8 +443,8 @@ public class SiteImpl implements Site {
    * 
    * @return the site's server name
    */
-  public String getServername() {
-    String servername = getServerNames()[0];
+  public String getHostName() {
+    String servername = getHostNames()[0];
     if (servername.startsWith("*")) {
       servername = "www" + servername.substring(1);
     }
@@ -461,7 +461,7 @@ public class SiteImpl implements Site {
    */
   public String getLink() {
     String link = UrlSupport.concat(new String[] {
-        getServername(),
+        getHostName(),
         Env.getMountpoint() });
     if (link.endsWith("/")) {
       link = link.substring(0, link.length() - 1);
@@ -632,7 +632,7 @@ public class SiteImpl implements Site {
    * 
    * @return the registered server names
    */
-  public String[] getServerNames() {
+  public String[] getHostNames() {
     Object[] serverNames = new String[config_.urls.size()];
     return (String[]) config_.urls.toArray(serverNames);
   }
