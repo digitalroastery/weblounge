@@ -146,7 +146,7 @@ public class SiteTracker extends ServiceTracker {
   private void registerSite(Site site) throws ConfigurationException {
     synchronized (sites) {
       sites.add(site);
-      for (String name : site.getServerNames()) {
+      for (String name : site.getHostNames()) {
         if (sitesByServerName.get(name).equals(site))
           throw new ConfigurationException("Another site is already registered to " + name);
         sitesByServerName.put(name, site);
