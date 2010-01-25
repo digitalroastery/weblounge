@@ -49,4 +49,20 @@ public interface PageTemplate extends Renderer {
    */
   String getStage();
 
+  /**
+   * Sets the default page layout for this template.
+   * 
+   * @param layout
+   *          the default layout
+   */
+  void setDefaultLayout(String layout);
+
+  /**
+   * Returns the default page layout for this template or <code>null</code> if
+   * no default layout has been specified.
+   * 
+   * @return the default page layout
+   */
+  String getDefaultLayout();
+
 }

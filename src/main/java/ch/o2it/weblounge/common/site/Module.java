@@ -51,6 +51,34 @@ public interface Module extends Customizable {
   boolean isEnabled();
 
   /**
+   * Initializes this module by passing it a reference to the site that it will
+   * run in. Implementations should overwrite this method to do their
+   * initialization work.
+   * <p>
+   * Note that this method will be called <i>prior</i> to a call to
+   * {@link #start()}.
+   * 
+   * @param site
+   *          the site
+   * @throws ModuleException
+   *           if module initialization fails
+   */
+  void init(Site site) throws ModuleException;
+
+  /**
+   * Tells this module that it has been taken off duty and will no longer be
+   * part of the site. Implementations should overwrite this method to return
+   * resources and close any network connections they might be holding.
+   * <p>
+   * Note that this method will be called <i>after</i> a call to {@link #stop()}
+   * if the site that the module was running in has been started at all.
+   * 
+   * @throws ModuleException
+   *           if module initialization fails
+   */
+  void destroy() throws ModuleException;
+
+  /**
    * Returns the module's document base.
    * 
    * @return the module's document base
@@ -76,14 +104,24 @@ public interface Module extends Customizable {
   /**
    * Initializes and starts the module. This is done after configuration and
    * mainly registers and initializes the various module registries.
+   * 
+   * @throws ModuleException
+   *           if the module cannot be started
+   * @throws IllegalStateException
+   *           if the module is already running
    */
-  void start();
+  void start() throws ModuleException, IllegalStateException;
 
   /**
    * Method to shut down this module. This includes stopping the module services
    * and sending a <code>shutdown</code> event to registered module listeners.
+   * 
+   * @throws ModuleException
+   *           if the module cannot be stopped
+   * @throws IllegalStateException
+   *           if the module is already running
    */
-  void stop();
+  void stop() throws ModuleException, IllegalStateException;
 
   /**
    * Adds <code>listener</code> to the list of module listeners.

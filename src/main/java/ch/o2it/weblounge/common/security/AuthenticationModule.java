@@ -22,6 +22,8 @@ package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.Customizable;
 
+import javax.security.auth.spi.LoginModule;
+
 /**
  * An authentication module defines an authentication facility that can be
  * activated and deactivated by configuration means.
@@ -36,7 +38,7 @@ public interface AuthenticationModule extends Customizable {
    * 
    * @return the module class name
    */
-  String getModuleClass();
+  Class<? extends LoginModule> getModuleClass();
 
   /**
    * Returns the module's relevance. Please see the JAAS documentation on the

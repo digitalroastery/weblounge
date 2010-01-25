@@ -33,7 +33,6 @@ import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
@@ -42,7 +41,7 @@ import java.net.URL;
  * The site interface defines the method that may be called on weblounge site
  * objects.
  */
-public interface Site extends ModuleListener, RequestListener, Serializable {
+public interface Site extends RequestListener, Serializable {
 
   /** Site descriptor */
   static final String CONFIG_FILE = "site.xml";
@@ -116,6 +115,22 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   void removeSiteListener(SiteListener listener);
 
   /**
+   * Adds <code>listener</code> to the list of module listeners.
+   * 
+   * @param listener
+   *          the module listener
+   */
+  void addModuleListener(ModuleListener listener);
+
+  /**
+   * Removes <code>listener</code> from the list of module listeners.
+   * 
+   * @param listener
+   *          the module listener
+   */
+  void removeModuleListener(ModuleListener listener);
+
+  /**
    * Adds <code>listener</code> to the list of request listeners if it has not
    * already been registered.
    * 
@@ -131,6 +146,29 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    *          the listener to remove
    */
   void removeRequestListener(RequestListener listener);
+
+  /**
+   * Adds <code>module</code> to the set of modules.
+   * 
+   * @param module
+   *          the module
+   * @throws ModuleException
+   *           if the module cannot be properly initialized inside the site
+   */
+  void addModule(Module module) throws ModuleException;
+
+  /**
+   * Removes the module identified by <code>module</code> from the list of
+   * modules and returns it. If no such module was found, this method returns
+   * <code>null</code>.
+   * 
+   * @param module
+   *          the module identifier
+   * @return the module
+   * @throws ModuleException
+   *           if module cleanup fails
+   */
+  Module removeModule(String module) throws ModuleException;
 
   /**
    * Returns the site module with the given identifier or <code>null</code> if
@@ -199,6 +237,25 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   PageTemplate getDefaultTemplate();
 
   /**
+   * Adds <code>layout</code> to the set of page layouts.
+   * 
+   * @param layout
+   *          the new layout
+   */
+  void addLayout(PageLayout layout);
+
+  /**
+   * Removes the page layout with identifier <code>layout</code> from the set of
+   * layout and returns it. If no such layout was in the set, then this method
+   * returns <code>null</code>.
+   * 
+   * @param layout
+   *          the layout identifier
+   * @return the layout or <code>null</code>
+   */
+  PageLayout removeLayout(String layout);
+
+  /**
    * Returns this site's layouts which keeps track of the defined layouts.
    * 
    * @return the layouts
@@ -214,6 +271,25 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * @return the layout
    */
   PageLayout getLayout(String layoutId);
+
+  /**
+   * Adds <code>imagestyle</code> to the set of image styles.
+   * 
+   * @param imagestyle
+   *          the new image style
+   */
+  void addImageStyle(ImageStyle imagestyle);
+
+  /**
+   * Removes the image style with identifier <code>imagestyle</code> from the
+   * set of image styles and returns it. If no such style was in the set, then
+   * this method returns <code>null</code>.
+   * 
+   * @param imagestyle
+   *          the image style identifier
+   * @return the image style or <code>null</code>
+   */
+  ImageStyle removeImageStyle(String imagestyle);
 
   /**
    * Returns the image styles.
@@ -247,72 +323,56 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   void removeUserListener(UserListener listener);
 
   /**
-   * Returns the user with the given login name or <code>null</code> if no such
-   * user exists.
+   * Adds <code>hostname</code> to the list of hostnames. Note that the hostname
+   * that is added first will be considered the default hostname for this site.
    * 
-   * @param login
-   *          the user's login name
-   * @return the user
+   * @param hostname
+   *          the hostname to add
    */
-  WebloungeUser getUser(String login);
+  void addHostName(String hostname);
 
   /**
-   * Returns the real path on the server for a given virtual path.
+   * Removes <code>hostname</code> from the list of hostnames. The method
+   * returns <code>true</code> if the hostname was found and removed,
+   * <code>false</code> otherwise.
    * 
-   * @param path
-   *          the virtual (site-relative) path
-   * @return the real (physical) path on the server
+   * @param hostname
+   *          the hostname to remove
+   * @return <code>true</code> if the hostname was removed
    */
-  String getPhysicalPath(String path);
+  boolean removeHostname(String hostname);
 
   /**
-   * Returns the virtual path on the server relative to the web application.
-   * Using this path e. g. for a renderer <code>renderer/myjsp.jsp</code> will
-   * produce </code>/sites/mysite/renderer/myjsp.jsp</code>.
-   * 
-   * @param path
-   *          the virtual path relative to the site
-   * @param webapp
-   *          <code>true</code> to preprend the webapp url
-   * @return the virtual work path relative to the webapp
-   */
-  String getVirtualPath(String path, boolean webapp);
-
-  /**
-   * Returns the servername of this page. This method will return the complete
-   * hostname as found in the <code>&lt;name&gt;</code> section of
-   * <code>site.xml</code>.
+   * Returns the default hostname used to reach this site. This method will
+   * return the complete hostname as found in the <code>&lt;name&gt;</code>
+   * section of <code>site.xml</code>.
    * 
    * @return the site's server name
    */
-  String getServername();
+  String getHostName();
 
   /**
-   * Returns the absolute link which can be used to reach this page. This method
+   * Returns the server names that will lead to this site. A server name is the
+   * first part of a url. For example, in <tt>http://www.o2it.ch/weblounge</tt>,
+   * <tt>www.o2it.ch</code> is the server name.
+   * 
+   * @return the registered server names
+   */
+  String[] getHostNames();
+
+  /**
+   * Returns the absolute link which can be used to reach this site. This method
    * will return the complete hostname as found in the <code>&lt;name&gt;</code>
-   * section of <code>site.xml</code> concatenated with the weblounge
-   * mountpoint.
+   * section of <code>site.xml</code>
+   * <p>
+   * If the site is mounted to the server's root, then the output is equivalent
+   * to {@link #getHostName()}. If no hostnames have been configured, this
+   * method returns <code>/</code> to indicate the root url of the current
+   * server.
    * 
    * @return the absolute link to this site
    */
   String getLink();
-
-  /**
-   * Returns the path to the database collection for <code>path</code>, which is
-   * interpreted relative to the site's root collection.
-   * <p>
-   * For example, a service would request the collection path
-   * <code>myservice</code> which returns the database collection
-   * <code>/db/weblounge/sites/mysite/myservice</code>.
-   * <p>
-   * 
-   * TODO: Remove
-   * 
-   * @param path
-   *          the site relative path
-   * @return the collection path
-   */
-  String getCollectionPath(String path);
 
   /**
    * Adds <code>language</code> to the site languages.
@@ -372,23 +432,29 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   Language getLanguage(String languageId);
 
   /**
-   * Returns the server names that will lead to this site. A server name is the
-   * first part of a url. For example, in <tt>http://www.o2it.ch/weblounge</tt>,
-   * <tt>www.o2it.ch</code> is the server name.
-   * 
-   * @return the registered server names
-   */
-  String[] getServerNames();
-
-  /**
    * Starts this site.
+   * 
+   * @throws SiteException
+   *           if the site cannot be started properly
+   * @throws IllegalStateException
+   *           if the site is already running
    */
-  void start();
+  void start() throws SiteException, IllegalStateException;
 
   /**
    * Stops this site.
+   * 
+   * @throws IllegalStateException
+   *           if the site is already stopped
    */
-  void stop();
+  void stop() throws IllegalStateException;
+
+  /**
+   * Returns <code>true</code> if the site has been started.
+   * 
+   * @return <code>true</code> if the site is running
+   */
+  boolean isRunning();
 
   /**
    * Returns the registered JAAS authentication modules. Note that the list is
@@ -415,16 +481,6 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   WebloungeUser getAdministrator();
 
   /**
-   * Returns a reference to the site's work directory. This is usually located
-   * at <code>%WEBLOUNGE_HOME%/work/weblounge/sites/%sitename%</code>
-   * 
-   * TODO: Remove
-   * 
-   * @return the work directory
-   */
-  File getWorkDirectory();
-
-  /**
    * Dispatches the given request and writes output to the response.
    * 
    * @param request
@@ -436,19 +492,35 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
       throws IOException;
 
   /**
-   * Returns the page identified by the <code>uri</code>.
+   * Specifies the location to this site's static resources.
    * 
-   * @param uri
-   *          the page uri
-   * @return the page or <code>null</code> if the page doesn't exist
-   * @throws IOException
-   *           if the page cannot be read from its source
+   * @param root
+   *          the url to the static resources directory
    */
-  Page getPage(PageURI uri) throws IOException;
+  void setStaticContentRoot(URL root);
+
+  /**
+   * Returns the path to the root directory of the static content for this site.
+   * 
+   * @return the static content root path
+   */
+  URL getStaticContentRoot();
+
+  /**
+   * Returns the user with the given login name or <code>null</code> if no such
+   * user exists.
+   * 
+   * @param login
+   *          the user's login name
+   * @return the user
+   */
+  WebloungeUser getUser(String login);
 
   /**
    * Returns the role with the given identifier, defined in the specified
    * context or <code>null</code> if no such role was found.
+   * 
+   * TODO: Remove
    * 
    * @param role
    *          the role identifier
@@ -462,6 +534,8 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
    * Returns the group with the given identifier, defined in the specified
    * context or <code>null</code> if no such group was found.
    * 
+   * TODO: Remove
+   * 
    * @param group
    *          the group identifier
    * @param context
@@ -471,10 +545,16 @@ public interface Site extends ModuleListener, RequestListener, Serializable {
   Group getGroup(String group, String context);
 
   /**
-   * Returns the path to the root directory of the static content for this site.
+   * Returns the page identified by the <code>uri</code>.
    * 
-   * @return the static content root path
+   * TODO: Remove
+   * 
+   * @param uri
+   *          the page uri
+   * @return the page or <code>null</code> if the page doesn't exist
+   * @throws IOException
+   *           if the page cannot be read from its source
    */
-  URL getStaticContentRoot();
+  Page getPage(PageURI uri) throws IOException;
 
 }

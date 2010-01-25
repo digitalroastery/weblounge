@@ -30,6 +30,7 @@
           <instructions>
             <Import-Package>
               javax.security.auth.login,
+              javax.security.auth.spi,
               javax.servlet.http
             </Import-Package>
             <Export-Package>
