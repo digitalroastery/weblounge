@@ -35,3 +35,5 @@ servlet
 cacheable
 iterable
 composeable
+hostname
+hostnames

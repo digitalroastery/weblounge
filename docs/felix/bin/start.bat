@@ -9,6 +9,7 @@ REM # Make sure the following two path entries do *not* contain spaces
 
 REM # Felix home
 SET FELIX_HOME=C:\Libraries\felix-framework-2.0.0
+SET FELIX_LOGDIR=%FELIX_HOME%\logs
 
 REM # Maven home
 SET M2_REPO=C:\Users\johndoe\.m2\repository
@@ -23,7 +24,7 @@ REM ##
 
 SET MAVEN_OPTS=-DM2_REPO=%M2_REPO%
 SET FELIX_FILEINSTALL_OPTS=-Dfelix.fileinstall.dir=%FELIX_HOME%\load
-SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%FELIX_HOME%\conf
+SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%FELIX_HOME%\conf -Dweblounge.logdir=%FELIX_LOGDIR%
 SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
 
 REM # Clear felix cache dir

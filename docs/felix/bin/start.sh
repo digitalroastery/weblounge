@@ -4,6 +4,7 @@
 
 # Felix home
 FELIX="/Applications/Weblounge"
+FELIX_LOGDIR="$FELIX/logs"
 
 # Maven home
 M2_REPO="/Users/johndoe/.m2/repository"
@@ -18,7 +19,7 @@ DEBUG_SUSPEND="n"
 
 MAVEN_OPTS="-DM2_REPO=$M2_REPO"
 FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX/load"
-PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf"
+PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf -Dweblounge.logdir=$FELIX_LOGDIR"
 PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN"
 
 # Clear the felix cache directory
