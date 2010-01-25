@@ -41,6 +41,9 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   /** The stage composer */
   protected String stage = "boxes";
   
+  /** Default page layout */
+  protected String layout = "unrestricted";
+  
   /**
    * @throws java.lang.Exception
    */
@@ -50,6 +53,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
     composeable = template;
     setUpComposeable();
     template.setStage(stage);
+    template.setDefaultLayout(layout);
   }
 
   /**
@@ -97,4 +101,12 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
     assertEquals(rendererURL, template.getRenderer());
   }
 
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageTemplateImpl#getDefaultLayout()}.
+   */
+  @Test
+  public void testGetDefaultLayout() {
+    assertEquals(layout, template.getDefaultLayout());
+  }
+  
 }

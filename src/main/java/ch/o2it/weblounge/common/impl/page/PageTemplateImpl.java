@@ -46,6 +46,9 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /** Default composer for action output */
   protected String stage = DEFAULT_STAGE;
+  
+  /** Default page layout */
+  protected String layout = null;
 
   /**
    * Creates a new page template that is backed by a Java Server Page located at
@@ -77,6 +80,24 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   public String getStage() {
     return stage;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.PageTemplate#getDefaultLayout()
+   */
+  public String getDefaultLayout() {
+    return layout;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.PageTemplate#setDefaultLayout(java.lang.String)
+   */
+  public void setDefaultLayout(String layout) {
+    this.layout = layout;
   }
 
   /**
@@ -173,6 +194,11 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     if (stage != null)
       template.setStage(stage);
 
+    // Layout
+    String layout = XPathHelper.valueOf(node, "layout", xpath);
+    if (layout != null)
+      template.setDefaultLayout(layout);
+
     // Recheck time
     try {
       if (XPathHelper.valueOf(node, "recheck", xpath) != null) {
@@ -215,9 +241,13 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     // TODO: Handle relative paths
     buf.append("<renderer>").append(renderer.toExternalForm()).append("</renderer>");
 
-    // Renderer url
+    // State name
     if (stage != null && !DEFAULT_STAGE.equals(stage))
       buf.append("<stage>").append(stage).append("</stage>");
+
+    // Default page layout
+    if (layout != null)
+      buf.append("<layout>").append(layout).append("</layout>");
 
     // Recheck time
     if (recheckTime >= 0) {

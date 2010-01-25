@@ -40,7 +40,7 @@ import javax.xml.xpath.XPath;
 public final class AuthenticationModuleImpl implements AuthenticationModule {
 
   /** The login module's class name */
-  protected String className = null;
+  protected Class<? extends LoginModule> prototype = null;
 
   /** The module's relevance */
   protected Relevance relevance = null;
@@ -74,8 +74,8 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
   /**
    * @see ch.o2it.weblounge.common.security.AuthenticationModule#getModuleClass()
    */
-  public String getModuleClass() {
-    return className;
+  public Class<? extends LoginModule> getModuleClass() {
+    return prototype;
   }
 
   /**
@@ -96,7 +96,7 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
         String msg = "Class " + className + " does not implement the interface javax.security.auth.spi.LoginModule!";
         throw new ConfigurationException(msg);
       }
-      this.className = className;
+      this.prototype = c;
     } catch (ClassCastException e) {
       String msg = "Configured class " + className + " is not of type LoginModule";
       throw new ConfigurationException(msg, e);
@@ -123,14 +123,14 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
    */
   private void setRelevance(String relevance) {
     if (relevance == null) {
-      String msg = "Relevance value of login module " + className + " is null!";
+      String msg = "Relevance value of login module " + prototype.getName() + " is null!";
       throw new ConfigurationException(msg);
     }
     relevance = relevance.toLowerCase();
     try {
       this.relevance = Relevance.valueOf(relevance);
     } catch (IllegalArgumentException e) {
-      String msg = "Unknown relevance value for login module " + className + ": " + relevance;
+      String msg = "Unknown relevance value for login module " + prototype.getName() + ": " + relevance;
       throw new ConfigurationException(msg);
     }
   }

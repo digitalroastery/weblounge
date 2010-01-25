@@ -3,8 +3,9 @@
   <enable>true</enable>
   <description>Main site</description>
   <urls>
+  	<url>www.weblounge.org</url>
     <url>blog.nowhere.com</url>
-    <url>localhost</url>
+    <url>localhost:8080</url>
   </urls>
   <languages>
     <language default="true">de</language>
@@ -46,18 +47,18 @@
   </templates>
   <layouts/>
   <imagestyles>
-    <imagestyle id="portrait" composeable="false" default="true">
-      <scalingmode>fit</scalingmode>
+    <imagestyle id="portrait" composeable="true">
+      <scalingmode>box</scalingmode>
       <width>150</width>
       <height>200</height>
       <name language="de">Portraitbild</name>
       <name language="en">Portrait image</name>
     </imagestyle>
     <imagestyle id="highresolution" composeable="true">
-      <scalingmode>fit</scalingmode>
+      <scalingmode>box</scalingmode>
       <width>800</width>
       <height>600</height>
-      <name language="de">Hohe Aufloesung</name>
+      <name language="de">Hohe Auflösung</name>
       <name language="en">High resolution</name>
     </imagestyle>
   </imagestyles>

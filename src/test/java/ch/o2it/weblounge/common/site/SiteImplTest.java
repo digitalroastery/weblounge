@@ -20,13 +20,14 @@
 
 package ch.o2it.weblounge.common.site;
 
-import static org.junit.Assert.assertFalse;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
@@ -35,9 +36,12 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.DigestType;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -113,7 +117,25 @@ public class SiteImplTest {
 
   /** Mobile template English name */
   protected final String mobileTemplateNameEnglish = "Mobile";
+  
+  /** The site hostnames */
+  protected List<String> hostnames = new ArrayList<String>();
+  
+  /** Default hostname */
+  protected String defaultHostname = "www.weblounge.org";
 
+  /** Default hostname */
+  protected String fallbackHostname = "*.nowhere.com";
+
+  /** Default hostname */
+  protected String localhost = "localhost:8080";
+  
+  /** Portrait image style */
+  protected ImageStyle portraitImageStyle = null;
+
+  /** High resolution image style */
+  protected ImageStyle highresImageStyle = null;
+  
   /** The English language */
   protected final Language English = new LanguageImpl(new Locale("en"));
 
@@ -135,6 +157,11 @@ public class SiteImplTest {
     site.addTemplate(mobileTemplate);
     site.setDefaultLanguage(German);
     site.addLanguage(English);
+    site.addHostName(defaultHostname);
+    site.addHostName(fallbackHostname);
+    site.addHostName(localhost);
+    site.addImageStyle(portraitImageStyle);
+    site.addImageStyle(highresImageStyle);
   }
 
   /**
@@ -161,6 +188,14 @@ public class SiteImplTest {
     mobileTemplate.setComposeable(true);
     mobileTemplate.setName(mobileTemplateNameEnglish, English);
     mobileTemplate.setName(mobileTemplateNameGerman, German);
+    // Portrait image style
+    portraitImageStyle = new ImageStyleImpl("portrait", 150, 200, ScalingMode.Box, true);
+    portraitImageStyle.setName("Portraitbild", German);
+    portraitImageStyle.setName("Portrait image", English);
+    // Highresolution image style
+    highresImageStyle = new ImageStyleImpl("highresolution", 800, 600, ScalingMode.Box, true);
+    highresImageStyle.setName("Hohe Auflösung", German);
+    highresImageStyle.setName("High resolution", English);
   }
 
   /**
@@ -326,6 +361,100 @@ public class SiteImplTest {
   @Test
   public void testGetDefaultLanguage() {
     assertEquals(German, site.getDefaultLanguage());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeHostname(java.lang.String)}.
+   */
+  @Test
+  public void testRemoveHostname() {
+    site.removeHostname("test");
+    assertEquals(3, site.getHostNames().length);
+    site.removeHostname(defaultHostname);
+    assertEquals(2, site.getHostNames().length);
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getHostNames()}.
+   */
+  @Test
+  public void testGetHostNames() {
+    assertEquals(3, site.getHostNames().length);
+    assertEquals(defaultHostname, site.getHostNames()[0]);
+    assertEquals(fallbackHostname, site.getHostNames()[1]);
+    assertEquals(localhost, site.getHostNames()[2]);
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getHostName()}.
+   */
+  @Test
+  public void testGetHostName() {
+    assertEquals(defaultHostname, site.getHostName());
+    site.removeHostname(defaultHostname);
+    assertEquals(2, site.getHostNames().length);
+    assertEquals(fallbackHostname, site.getHostName());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLink()}.
+   */
+  @Test
+  public void testGetLink() {
+    assertEquals(defaultHostname, site.getLink());
+    site.removeHostname(defaultHostname);
+    site.removeHostname(fallbackHostname);
+    site.removeHostname(localhost);
+    assertEquals("/", site.getLink());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeImageStyle(java.lang.String)}.
+   */
+  @Test
+  public void testRemoveImageStyle() {
+    site.removeImageStyle(portraitImageStyle.getIdentifier());
+    assertEquals(1, site.getImageStyles().length);
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getImageStyle(java.lang.String)}.
+   */
+  @Test
+  public void testGetImageStyle() {
+    assertEquals(highresImageStyle, site.getImageStyle(highresImageStyle.getIdentifier()));
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getImageStyles()}.
+   */
+  @Test
+  public void testGetImageStyles() {
+    assertEquals(2, site.getImageStyles().length);
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeLayout(java.lang.String)}.
+   */
+  @Test @Ignore
+  public void testRemoveLayout() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLayout(java.lang.String)}.
+   */
+  @Test @Ignore
+  public void testGetLayout() {
+    fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLayouts()}.
+   */
+  @Test @Ignore
+  public void testGetLayouts() {
+    assertEquals(0, site.getLayouts().length);
   }
 
 }

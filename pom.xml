@@ -32,12 +32,6 @@
       <artifactId>osgi_R4_compendium</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.felix.karaf.shell</groupId>
-      <artifactId>org.apache.felix.karaf.shell.console</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
     <!-- thirdparty -->
 
     <dependency>
@@ -147,7 +141,6 @@
               javax.xml.transform.stream,
               javax.xml.xpath,
               org.osgi.framework,
-              org.osgi.service.command,
               org.osgi.service.component,
               org.osgi.util.tracker,
             </Import-Package>
@@ -167,10 +160,6 @@
             <Embed-Dependency>
               json
             </Embed-Dependency>
-            <Service-Component>
-              OSGI-INF/common-service.xml,
-              OSGI-INF/site-command.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
