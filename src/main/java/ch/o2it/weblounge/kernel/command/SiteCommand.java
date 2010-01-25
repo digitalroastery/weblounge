@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.kernel.command;
 
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.osgi.framework.BundleContext;
@@ -55,7 +56,6 @@ public class SiteCommand {
    * <li><code>site <id> stop</code></li>
    * <li><code>site <id> restart</code></li>
    * <li><code>site <id> info</code></li>
-   * <li><code>site <id> status</code></li>
    * </ul>
    * 
    * @param session
@@ -162,9 +162,68 @@ public class SiteCommand {
    *          the site
    */
   private void info(Site site) {
-    System.out.println(" identifier: " + site.getIdentifier());
+    info("identifier", site.getIdentifier());
     if (site.getDescription() != null)
-      System.out.println("description: " + site.getDescription());
+      info("description", site.getDescription());
+    info("running", (site.isRunning() ? "yes" : "no"));
+    
+    // Enabled
+    info("enabled", (site.isEnabled() ? "yes" : "no"));
+    
+    // Hostnames
+    if (site.getHostNames().length > 0)
+      info("host", site.getHostNames());
+    
+    // Languages
+    if (site.getLanguages().length > 0) {
+      StringBuffer buf = new StringBuffer();
+      for (Language language : site.getLanguages()) {
+        if (buf.length() > 0)
+          buf.append(", ");
+        buf.append(language);
+      }
+      info("languages", buf.toString());
+    }
+
+    // Default language
+    if (site.getDefaultLanguage() != null)
+      info("default language", site.getDefaultLanguage().toString());
+  }
+  
+  /**
+   * Returns a padded version of the text.
+   * 
+   * @param caption the caption
+   * @param info the information
+   */
+  private void info(String caption, String[] info) {
+    for (int i=0; i < info.length; i++) {
+      if (i == 0)
+        info(caption, info[i]);
+      else
+        info(null, info[i]);
+    }
+  }
+  
+  /**
+   * Returns a padded version of the text.
+   * 
+   * @param caption the caption
+   * @param info the information
+   */
+  private void info(String caption, String info) {
+    if (caption == null)
+      caption = "";
+    for (int i=0; i < (12 - caption.length()); i++)
+      System.out.print(" ");
+    if (!"".equals(caption)) {
+      System.out.print(caption);
+      System.out.print(": ");
+    } else {
+      System.out.print("  ");
+    }
+    System.out.print(info);
+    System.out.println();
   }
 
   /**
@@ -221,9 +280,10 @@ public class SiteCommand {
    * Prints the command usage to the commandline.
    */
   private void printUsage() {
-    System.out.println("Usage:");
-    System.out.println("  site list");
-    System.out.println("  site <id> start|stop|restart|status");
+    System.out.println("  Usage:");
+    System.out.println("    site list");
+    System.out.println("    site <id> start|stop|restart");
+    System.out.println("    site <id> info");
   }
 
   /**

@@ -74,6 +74,7 @@
           <instructions>
             <Import-Package>
               ch.o2it.weblounge.common.site,
+              ch.o2it.weblounge.common.language,
               org.quartz,
               org.quartz.impl,
               org.osgi.framework,
