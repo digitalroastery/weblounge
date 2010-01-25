@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="Weblounge Commons">
-  <implementation class="ch.o2it.weblounge.common.osgi.Activator" />
-  <property name="service.description" value="Weblounge Commons" />
-</scr:component>
