@@ -52,10 +52,11 @@ public class SiteCommand {
    * <ul>
    * <li><code>site list</code></li>
    * <li><code>site <id> start</code></li>
-   * <li><code>site <id> start</code></li>
    * <li><code>site <id> stop</code></li>
    * <li><code>site <id> restart</code></li>
-   * <li><code>site <id> info</code></li>
+   * <li><code>site <id> enable</code></li>
+   * <li><code>site <id> disable</code></li>
+   * <li><code>site <id> status</code></li>
    * </ul>
    * 
    * @param session
@@ -98,8 +99,12 @@ public class SiteCommand {
         stop(site);
       else if ("restart".equals(args[1]))
         restart(site);
-      else if ("info".equals(args[1]))
-        info(site);
+      else if ("enable".equals(args[1]))
+        enable(site);
+      else if ("disable".equals(args[1]))
+        disable(site);
+      else if ("status".equals(args[1]))
+        status(site);
       else {
         System.out.println("Unknown command: " + args[1]);
         return;
@@ -148,7 +153,10 @@ public class SiteCommand {
         Site site = sites.get(i);
         StringBuffer buf = new StringBuffer();
         buf.append("[ ").append(formatter.format(i + 1)).append(" ] ");
-        buf.append(site.isEnabled() ? "[ enabled  ] " : "[ disabled ] ");
+        if (site.isEnabled())
+          buf.append(site.isRunning() ? "[ started  ] " : "[ stopped  ] ");
+        else
+          buf.append(site.isEnabled() ? "[ enabled  ] " : "[ disabled ] ");
         buf.append(site.getDescription() != null ? site.getDescription() : site.getIdentifier());
         System.out.println(buf.toString());
       }
@@ -161,18 +169,20 @@ public class SiteCommand {
    * @param site
    *          the site
    */
-  private void info(Site site) {
-    info("identifier", site.getIdentifier());
+  private void status(Site site) {
+    status("identifier", site.getIdentifier());
     if (site.getDescription() != null)
-      info("description", site.getDescription());
-    info("running", (site.isRunning() ? "yes" : "no"));
+      status("description", site.getDescription());
     
     // Enabled
-    info("enabled", (site.isEnabled() ? "yes" : "no"));
-    
+    status("enabled", (site.isEnabled() ? "yes" : "no"));
+ 
+    // Started / Stopped
+    status("running", (site.isRunning() ? "yes" : "no"));
+
     // Hostnames
     if (site.getHostNames().length > 0)
-      info("host", site.getHostNames());
+      status("host", site.getHostNames());
     
     // Languages
     if (site.getLanguages().length > 0) {
@@ -182,12 +192,12 @@ public class SiteCommand {
           buf.append(", ");
         buf.append(language);
       }
-      info("languages", buf.toString());
+      status("languages", buf.toString());
     }
 
     // Default language
     if (site.getDefaultLanguage() != null)
-      info("default language", site.getDefaultLanguage().toString());
+      status("default language", site.getDefaultLanguage().toString());
   }
   
   /**
@@ -196,12 +206,12 @@ public class SiteCommand {
    * @param caption the caption
    * @param info the information
    */
-  private void info(String caption, String[] info) {
+  private void status(String caption, String[] info) {
     for (int i=0; i < info.length; i++) {
       if (i == 0)
-        info(caption, info[i]);
+        status(caption, info[i]);
       else
-        info(null, info[i]);
+        status(null, info[i]);
     }
   }
   
@@ -211,7 +221,7 @@ public class SiteCommand {
    * @param caption the caption
    * @param info the information
    */
-  private void info(String caption, String info) {
+  private void status(String caption, String info) {
     if (caption == null)
       caption = "";
     for (int i=0; i < (12 - caption.length()); i++)
@@ -236,7 +246,11 @@ public class SiteCommand {
     if (site.isRunning()) {
       System.out.println("Site " + site + " is already running");
       return;
+    } else if (!site.isEnabled()) {
+      System.out.println("Cannot start disabled site " + site);
+      return;
     }
+
     System.out.println("Starting site " + site);
     try {
       site.start();
@@ -270,10 +284,44 @@ public class SiteCommand {
     try {
       if (site.isRunning())
         site.stop();
+      if (!site.isEnabled()) {
+        System.out.println("Disabled site " + site + " cannot be started");
+        return;
+      }
       site.start();
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Enables the site.
+   * 
+   * @param site
+   *          the site to enable
+   */
+  private void enable(Site site) {
+    if (site.isEnabled()) {
+      System.out.println("Site " + site + " is already enabled");
+      return;
+    }
+    System.out.println("Enabling site " + site);
+    site.setEnabled(true);
+  }
+
+  /**
+   * Stops the site.
+   * 
+   * @param site
+   *          the site to stop
+   */
+  private void disable(Site site) {
+    if (!site.isEnabled()) {
+      System.out.println("Site " + site + " is already disable");
+      return;
+    }
+    System.out.println("Disabling site " + site);
+    site.setEnabled(false);
   }
 
   /**
@@ -282,8 +330,9 @@ public class SiteCommand {
   private void printUsage() {
     System.out.println("  Usage:");
     System.out.println("    site list");
+    System.out.println("    site <id> enable|disable");
     System.out.println("    site <id> start|stop|restart");
-    System.out.println("    site <id> info");
+    System.out.println("    site <id> status");
   }
 
   /**
