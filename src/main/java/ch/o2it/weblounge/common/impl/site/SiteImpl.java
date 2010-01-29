@@ -182,10 +182,8 @@ public class SiteImpl implements Site {
    */
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
-    if (enabled)
-      dispatcher.startDispatching();
-    else
-      dispatcher.stopDispatching();
+    if (running)
+      stop();
   }
 
   /**
@@ -690,9 +688,11 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#start()
    */
   public void start() throws SiteException, IllegalStateException {
-    log_.debug("Stopping site {}", this);
+    log_.debug("Starting site {}", this);
     if (running)
       throw new IllegalStateException("Site is already running");
+    if (!enabled)
+      throw new IllegalStateException("Cannot start a disabled site");
     
     // Start the site modules
     synchronized (modules) {
