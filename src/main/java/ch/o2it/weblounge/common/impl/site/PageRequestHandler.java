@@ -109,30 +109,14 @@ public final class PageRequestHandler implements RequestHandler {
       long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
 
       // Create the set of tags that identify the page
-      CacheTagSet cacheTags = new CacheTagSet();
-      cacheTags.add(CacheTag.Url, url.getPath());
-      cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
-      cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
-      cacheTags.add(CacheTag.User, request.getUser().getLogin());
-      cacheTags.add(CacheTag.Site, url.getSite().getIdentifier());
-      Enumeration<?> pe = request.getParameterNames();
-      int parameterCount = 0;
-      while (pe.hasMoreElements()) {
-        parameterCount++;
-        String key = pe.nextElement().toString();
-        String[] values = request.getParameterValues(key);
-        for (String value : values) {
-          cacheTags.add(key, value);
-        }
-      }
-      cacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
+      CacheTagSet cacheTags = createCacheTags(request);
 
       // Check if the page is already part of the cache
       if (response.startResponse(cacheTags, validTime, recheckTime)) {
         log_.debug("Page handler answered request for {} from cache", request.getUrl());
         return true;
       }
-      
+
       processingMode = Mode.Cached;
     } else if (Http11Constants.METHOD_HEAD.equals(requestMethod)) {
       // handle HEAD requests
@@ -151,16 +135,20 @@ public final class PageRequestHandler implements RequestHandler {
       Page page = null;
       PageURI pageURI = new PageURIImpl(request);
       Site site = request.getSite();
-      
+      String contentFlavor = request.getFlavor();
+
       // Load the page
       try {
         page = site.getPage(pageURI);
       } catch (IOException e) {
-        log_.error("Unable to load page {}: {}", new Object[] {pageURI, e.getMessage(), e});
+        log_.error("Unable to load page {}: {}", new Object[] {
+            pageURI,
+            e.getMessage(),
+            e });
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         return true;
       }
-      
+
       // Does it exist at all?
       if (page == null) {
         log_.debug("No page found for {}", pageURI);
@@ -174,47 +162,40 @@ public final class PageRequestHandler implements RequestHandler {
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
         return true;
       }
-      
+
       // Can the page be accessed by the current user?
       User user = request.getUser();
       try {
         // TODO: Check permission
-        //PagePermission p = new PagePermission(page, user);
-        //AccessController.checkPermission(p);
+        // PagePermission p = new PagePermission(page, user);
+        // AccessController.checkPermission(p);
       } catch (SecurityException e) {
         log_.warn("Accessed to page {} denied for user {}", pageURI, user);
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
         return true;
       }
-      
+
       // Store the page in the request
       request.setAttribute(WebloungeRequest.REQUEST_PAGE, page);
-      
-      // See if the request contains instructions regarding the template
-      // to be used
-      String requestFlavor = request.getFlavor();
-      String templateId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+
+      // Get hold of the page template
       PageTemplate template = null;
-      if (templateId != null) {
-        template = site.getTemplate(templateId);
-        if (template == null) {
-          log_.warn("Template {} specified by request was not found", templateId);
+      try {
+        template = getPageTemplate(page, request);
+      } catch (IllegalStateException e) {
+        log_.warn(e.getMessage());
+        try {
           response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          return true;
-        }
-      } else {
-        template = site.getTemplate(page.getTemplate());
-        if (template == null) {
-          log_.warn("Template {} specified by page was not found", templateId);
-          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          return true;
-        }
+        } catch (IOException e1) { /* never mind */ }
+        return true;
       }
 
-      // Did we find a template?
-      if (!template.supportsFlavor(requestFlavor)) {
-        log_.warn("Template {} does not support requested flavor {}", templateId, requestFlavor);
-        response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+      // Does the template support the requested flavor?
+      if (!template.supportsFlavor(contentFlavor)) {
+        log_.warn("Template {} does not support requested flavor {}", template, contentFlavor);
+        try {
+          response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+        } catch (IOException e) { /* never mind */ }
         return true;
       }
 
@@ -224,12 +205,12 @@ public final class PageRequestHandler implements RequestHandler {
       try {
 
         // Add additional cache tags
-        response.addTag("webl:template", templateId);
+        response.addTag("webl:template", template.getIdentifier());
         response.addTag("webl:pagetype", page.getType());
         for (String keyword : page.getSubjects()) {
           response.addTag("webl:keyword", keyword);
         }
-        
+
         // Configure valid and recheck time according to the template
         response.setRecheckTime(template.getRecheckTime());
         response.setValidTime(template.getValidTime());
@@ -257,17 +238,78 @@ public final class PageRequestHandler implements RequestHandler {
       log_.error("I/O exception while sending error status: {}", e.getMessage(), e);
       return true;
     } finally {
-      switch (processingMode) {
-        case Cached:
-          response.endResponsePart();
-          break;
-        case Head:
-          Http11Utils.endHeadResponse(response);
-          break;
-        default:
-          break;
+      if (action == null) {
+        switch (processingMode) {
+          case Cached:
+            response.endResponsePart();
+            break;
+          case Head:
+            Http11Utils.endHeadResponse(response);
+            break;
+          default:
+            break;
+        }
       }
     }
+  }
+
+  /**
+   * Returns the template that will be used to handle this request. If the
+   * template cannot be found or used for some reason, an
+   * {@link IllegalStateException} is thrown.
+   * 
+   * @param page
+   *          the page
+   * @param request
+   *          the request
+   * @return the template
+   * @throws IllegalStateException
+   *           if the template cannot be found
+   */
+  protected PageTemplate getPageTemplate(Page page, WebloungeRequest request) throws IllegalStateException {
+    Site site = request.getSite();
+    String templateId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+    PageTemplate template = null;
+    if (templateId != null) {
+      template = site.getTemplate(templateId);
+      if (template == null) {
+        throw new IllegalStateException("Page template " + templateId + " specified by request was not found");
+      }
+    } else {
+      template = site.getTemplate(page.getTemplate());
+      if (template == null) {
+        throw new IllegalStateException("Page template " + templateId + " specified by page " + page + " was not found");
+      }
+    }
+    return template;
+  }
+
+  /**
+   * Returns the primary set of cache tags for the given request.
+   * 
+   * @param request
+   *          the request
+   * @return the cache tags
+   */
+  protected CacheTagSet createCacheTags(WebloungeRequest request) {
+    CacheTagSet cacheTags = new CacheTagSet();
+    cacheTags.add(CacheTag.Url, request.getUrl().getPath());
+    cacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
+    cacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
+    cacheTags.add(CacheTag.User, request.getUser().getLogin());
+    cacheTags.add(CacheTag.Site, request.getSite().getIdentifier());
+    Enumeration<?> pe = request.getParameterNames();
+    int parameterCount = 0;
+    while (pe.hasMoreElements()) {
+      parameterCount++;
+      String key = pe.nextElement().toString();
+      String[] values = request.getParameterValues(key);
+      for (String value : values) {
+        cacheTags.add(key, value);
+      }
+    }
+    cacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
+    return cacheTags;
   }
 
   /**

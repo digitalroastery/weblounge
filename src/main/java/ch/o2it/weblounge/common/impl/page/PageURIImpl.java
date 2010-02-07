@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
  * Implementation of the {@link PageURI} interface.
@@ -63,6 +64,18 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    */
   public PageURIImpl(WebloungeRequest request) {
     this(request.getSite(), request.getUrl().getPath(), request.getVersion());
+  }
+
+  /**
+   * Creates a new {@link PageURI} from the given url, which is used to
+   * determine <code>site</code> and <code>path</code>. The uri will default to
+   * the live version.
+   * 
+   * @param url
+   *          the url
+   */
+  public PageURIImpl(WebUrl url) {
+    this(url.getSite(), url.getPath(), Page.LIVE);
   }
 
   /**
