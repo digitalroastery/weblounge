@@ -25,8 +25,6 @@ import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestListener;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
@@ -479,17 +477,6 @@ public interface Site extends RequestListener, Serializable {
    * @return the site administrator user
    */
   WebloungeUser getAdministrator();
-
-  /**
-   * Dispatches the given request and writes output to the response.
-   * 
-   * @param request
-   *          the request to dispatch
-   * @param response
-   *          the response to deliver
-   */
-  void dispatch(WebloungeRequest request, WebloungeResponse response)
-      throws IOException;
 
   /**
    * Specifies the location to this site's static resources.
