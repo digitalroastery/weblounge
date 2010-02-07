@@ -27,7 +27,6 @@ import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.Env;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -46,6 +45,7 @@ import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 import ch.o2it.weblounge.contentrepository.PageListener;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.site.SiteService;
 
 import com.sun.corba.se.impl.activation.RepositoryImpl;
