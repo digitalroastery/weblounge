@@ -21,6 +21,10 @@
 package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.page.Page;
+import ch.o2it.weblounge.common.page.PageURI;
+import ch.o2it.weblounge.common.page.SearchQuery;
+import ch.o2it.weblounge.common.page.SearchResult;
 import ch.o2it.weblounge.contentrepository.PageRepository;
 import ch.o2it.weblounge.contentrepository.ResourceRepository;
 
@@ -436,6 +440,56 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
     } catch (RepositoryException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#delete(ch.o2it.weblounge.common.page.PageURI, boolean)
+   */
+  public void delete(PageURI uri, boolean allRevisions) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#findPages(ch.o2it.weblounge.common.page.SearchQuery)
+   */
+  public SearchResult[] findPages(SearchQuery query) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#get(ch.o2it.weblounge.common.page.PageURI)
+   */
+  public Page get(PageURI uri) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#getVersions(ch.o2it.weblounge.common.page.PageURI)
+   */
+  public PageURI[] getVersions(PageURI uri) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#put(ch.o2it.weblounge.common.page.PageURI, ch.o2it.weblounge.common.page.Page)
+   */
+  public Page put(PageURI uri, Page page) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }
