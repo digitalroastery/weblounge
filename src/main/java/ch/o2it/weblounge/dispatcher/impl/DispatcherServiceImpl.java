@@ -20,6 +20,7 @@
 package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.dispatcher.DispatcherService;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -43,6 +44,9 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
 
   /** Logging instance */
   private static final Logger log_ = LoggerFactory.getLogger(DispatcherServiceImpl.class);
+
+  /** The main dispatcher servlet */
+  WebloungeDispatcherServlet dispatcher = null;
 
   /** Tracker for the http service */
   private HttpServiceTracker httpTracker = null;
@@ -79,7 +83,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     siteTracker.open();
 
     // Create an http tracker and make sure it forwards to our servlet
-    WebloungeDispatcherServlet dispatcher = new WebloungeDispatcherServlet(siteTracker);
+    dispatcher = new WebloungeDispatcherServlet(siteTracker);
     log_.trace("Start looking for http service implementations");
     httpTracker = new HttpServiceTracker(bundleContext, dispatcher);
     httpTracker.open();
@@ -117,6 +121,28 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     siteTracker = null;
 
     log_.debug("Weblounge dispatcher deactivated");
+  }
+
+  /**
+   * Registers the request handler with the main dispatcher servlet.
+   * 
+   * @param handler
+   *          the request handler
+   */
+  public void addRequestHandler(RequestHandler handler) {
+    log_.info("Registering {}", handler);
+    dispatcher.addRequestHandler(handler);
+  }
+
+  /**
+   * Removes the request handler from the main dispatcher servlet.
+   * 
+   * @param handler
+   *          the request handler
+   */
+  public void removeRequestHandler(RequestHandler handler) {
+    log_.info("Unregistering {}", handler);
+    dispatcher.removeRequestHandler(handler);
   }
 
 }

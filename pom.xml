@@ -151,10 +151,14 @@
           <instructions>
             <Import-Package>
               ch.o2it.weblounge.common,
+              ch.o2it.weblounge.common.impl.page,
               ch.o2it.weblounge.common.impl.request,
+              ch.o2it.weblounge.common.language,
+              ch.o2it.weblounge.common.page,
               ch.o2it.weblounge.common.request,
               ch.o2it.weblounge.common.site,
               ch.o2it.weblounge.common.url,
+              ch.o2it.weblounge.common.user,
               ch.o2it.weblounge.dispatcher,
               ch.o2it.weblounge.site,
               org.slf4j,
@@ -172,7 +176,9 @@
           	  ch.o2it.weblounge.dispatcher.impl
             </Export-Package>
             <Service-Component>
-              OSGI-INF/dispatcher-service.xml
+              OSGI-INF/dispatcher-service.xml,
+              OSGI-INF/action-requesthandler.xml,
+              OSGI-INF/page-requesthandler.xml
             </Service-Component>
           </instructions>
         </configuration>

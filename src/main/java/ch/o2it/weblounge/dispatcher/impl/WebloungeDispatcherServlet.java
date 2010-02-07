@@ -22,13 +22,13 @@ package ch.o2it.weblounge.dispatcher.impl;
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
-import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.ResponseCache;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.dispatcher.DispatchListener;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
@@ -70,13 +70,13 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private transient SiteTracker sites = null;
 
   /** List of request listeners */
-  private List<RequestListener> requestListeners;
+  private List<RequestListener> requestListeners = null;
 
   /** List of dispatcher listeners */
-  private List<DispatchListener> dispatcher;
+  private List<DispatchListener> dispatcher = null;
 
   /** List of dispatcher listeners */
-  private List<RequestHandler> requestHandler;
+  private List<RequestHandler> requestHandler = null;
 
   /**
    * Creates a new instance of the weblounge dispatcher servlet.
@@ -196,74 +196,52 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     log_.info("Serving {}", httpRequest.getRequestURI());
 
-    try {
-      // Wrap request and response
-      WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest);
-      WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
+    // Wrap request and response
+    WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest);
+    WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
 
-      // Ask the registered request handler if they are willing to handle
-      // the request. Otherwise, the site dispatcher will be called.
-      // TODO: Synchronize
-      for (RequestHandler handler : requestHandler) {
-        try {
-          log_.trace("Asking {} to serve {}", handler, request);
-          if (handler.service(request, response)) {
-            log_.debug("{} served request {}", handler, request);
-            return;
-          }
-        } catch (Throwable t) {
-          log_.error("Request handler {} failed to handle {}: {}", new Object[] {
-              handler,
-              request,
-              t.getMessage(),
-              t });
-        }
-      }
+    // Get the site dispatcher
+    Site site = getSiteByRequest(request);
 
-      // If preprocessing has failed, there is no need to waste additional
-      // time on this request
-      if (response.hasError()) {
-        log_.info("Request preprocessing failed on {}", request);
-        return;
-      }
+    // See if a site dispatcher was found, and if so, if it's enabled
+    if (site == null) {
+      log_.warn("No dispatcher found for {}", request);
+      DispatchSupport.sendUrlNotFound("Not found", request, response);
+      return;
+    } else if (!site.isEnabled()) {
+      log_.warn("Dispatcher for site {} is temporarily not available", site);
+      DispatchSupport.sendServiceUnavailable("Site is temporarily unavailable", request, response);
+      return;
+    }
 
-      // Get the site dispatcher
-      Site site = getSiteByRequest(request);
+    // Configure request and response objects
+    request.init(site);
+    response.setRequest(request);
+    response.setResponseCache(cache);
+    response.setHeader("X-Powered-By", poweredBy);
 
-      // See if a site dispatcher was found, and if so, if it's enabled
-      if (site == null) {
-        log_.warn("No dispatcher found for {}", request);
-        DispatchSupport.sendUrlNotFound("Not found", request, response);
-        return;
-      } else if (!site.isEnabled()) {
-        log_.warn("Dispatcher for site {} is temporarily not available", site);
-        DispatchSupport.sendServiceUnavailable("Site is temporarily unavailable", request, response);
-        return;
-      }
+    // Notify listeners about starting request
+    fireRequestStarted(request, response, site);
 
-      // We're all set. Let the site dispatcher do the work
+    // Ask the registered request handler if they are willing to handle
+    // the request. Otherwise, the site dispatcher will be called.
+    // TODO: Synchronize
+    for (RequestHandler handler : requestHandler) {
       try {
-
-        // Notify listeners about starting request
-        fireRequestStarted(request, response, site);
-
-        // Configure request and response objects
-        request.init(site);
-        response.setRequest(request);
-        response.setResponseCache(cache);
-        response.setHeader("X-Powered-By", poweredBy);
-
-        // Dispatch the request to the site
-        site.dispatch(request, response);
-        if (response.hasError()) {
-          log_.info("Request processing failed on {}", request);
-          fireRequestFailed(request, response, site);
+        log_.trace("Asking {} to serve {}", handler, request);
+        if (handler.service(request, response)) {
+          log_.debug("{} served request {}", handler, request);
+          
+          // Notify listeners about finished request
+          if (response.hasError()) {
+            log_.info("Request processing failed on {}", request);
+            fireRequestFailed(request, response, site);
+            return;
+          } else {
+            fireRequestDelivered(request, response, site);
+          }
           return;
         }
-
-        // Notify listeners about finished request
-        fireRequestDelivered(request, response, site);
-
       } catch (Throwable t) {
         response.invalidate();
         String params = RequestSupport.getParameters(request);
@@ -275,15 +253,16 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
             t = o.getCause();
           }
         }
-        log_.error("Error while renderering {} [{}]: {}", new Object[] {
-            request.getRequestURI(),
+        log_.error("Request handler {} failed to handle {} {}: {}", new Object[] {
+            handler,
+            request,
             params,
             t.getMessage(),
             t });
         DispatchSupport.sendInternalError(t.getMessage(), request, response);
+      } finally {
+        log_.debug("Finished processing of {}", httpRequest.getRequestURI());
       }
-    } finally {
-      log_.debug("Finished processing of {}", httpRequest.getRequestURI());
     }
   }
 

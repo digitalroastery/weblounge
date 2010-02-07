@@ -24,9 +24,9 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
-import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class StaticContentHandler implements RequestHandler, Times {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.RequestHandler#getIdentifier()
+   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getIdentifier()
    */
   public String getIdentifier() {
     return "static";
@@ -94,7 +94,7 @@ public class StaticContentHandler implements RequestHandler, Times {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.RequestHandler#getName()
+   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {
     return "Static content handler";
@@ -195,7 +195,7 @@ public class StaticContentHandler implements RequestHandler, Times {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.request.api.request.RequestHandler#service(ch.o2it.weblounge.api.request.WebloungeRequest,
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#service(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse)
    */
   public boolean service(WebloungeRequest request, WebloungeResponse response) {

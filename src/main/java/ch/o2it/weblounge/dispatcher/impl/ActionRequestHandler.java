@@ -24,11 +24,9 @@ import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
-import ch.o2it.weblounge.common.impl.site.PageRequestHandler;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.CacheTag;
-import ch.o2it.weblounge.common.request.RequestHandler;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
@@ -38,6 +36,7 @@ import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.UrlMatcher;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +145,7 @@ public final class ActionRequestHandler implements RequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.RequestHandler#service(ch.o2it.weblounge.common.request.WebloungeRequest,
+   * @see ch.o2it.weblounge.dispatcher.RequestHandler#service(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
@@ -451,17 +450,17 @@ public final class ActionRequestHandler implements RequestHandler {
   }
 
   /**
-   * @see ch.o2it.weblounge.common.request.api.request.RequestHandler#getIdentifier()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getIdentifier()
    */
   public String getIdentifier() {
     return "actionhandler";
   }
 
   /**
-   * @see ch.o2it.weblounge.common.request.api.request.RequestHandler#getName()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
    */
   public String getName() {
-    return "action handler";
+    return "action request handler";
   }
 
   /**
