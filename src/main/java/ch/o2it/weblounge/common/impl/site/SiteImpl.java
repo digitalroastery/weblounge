@@ -126,9 +126,6 @@ public class SiteImpl implements Site {
 
   /** User listeners */
   private List<UserListener> userListeners = null;
-
-  /** The site dispatcher */
-  private SiteDispatcher dispatcher = null;
   
   /** Root url to static content */
   protected URL staticContentRoot = null;
@@ -149,7 +146,6 @@ public class SiteImpl implements Site {
     layouts = new HashMap<String, PageLayout>();
     imagestyles = new HashMap<String, ImageStyle>();
     modules = new HashMap<String, Module>();
-    dispatcher = new SiteDispatcher(this, false);
     hostnames = new ArrayList<String>();
   }
 
@@ -369,17 +365,6 @@ public class SiteImpl implements Site {
    */
   public Language getDefaultLanguage() {
     return defaultLanguage;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#dispatch(ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse)
-   */
-  public void dispatch(WebloungeRequest request, WebloungeResponse response)
-      throws IOException {
-    dispatcher.dispatch(request, response);
   }
 
   /**
@@ -717,9 +702,6 @@ public class SiteImpl implements Site {
       }
     }
 
-    // Start the dispatcher
-    dispatcher.startDispatching();
-
     // Finally, mark this site as running
     running = true;
 
@@ -735,9 +717,6 @@ public class SiteImpl implements Site {
     log_.debug("Stopping site {}", this);
     if (!running)
       throw new IllegalStateException("Site is not running");
-    
-    // First of all, stop dispatching requests
-    dispatcher.stopDispatching();
     
     // Shutdown all of the modules
     synchronized (modules) {
