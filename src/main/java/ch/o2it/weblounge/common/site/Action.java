@@ -23,10 +23,11 @@ package ch.o2it.weblounge.common.site;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
- * An <code>Action</code> is executed, if a request to a url occurs, that
- * has this handler registered. <br>
+ * An <code>Action</code> is executed, if a request to a url occurs, that has
+ * this handler registered. <br>
  * What happens when the registered url is called is as follows: If a template
  * has been registered, then the request is forwarded to that template and
  * various callbacks are made to this handler while the template is being
@@ -39,9 +40,9 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
  * If no template definition is found, then the request is forwarded to the
  * template that was used to send the request (by clicking a link).
  * <p>
- * <b>Note:</b> A class that implements the <code>Action</code> interface
- * has to provide a default constructor (no arguments), since action handlers
- * are created using reflection.
+ * <b>Note:</b> A class that implements the <code>Action</code> interface has to
+ * provide a default constructor (no arguments), since action handlers are
+ * created using reflection.
  */
 public interface Action extends Composeable {
 
@@ -89,8 +90,7 @@ public interface Action extends Composeable {
    * recommended to write anything to the response object except for the case
    * that it is clear that the action cannot be executed, e. g. because the user
    * is not authorized. In this case, the method should send back the proper
-   * <code>HTTP</code> error code and throw the
-   * <code>ActionException</code>.
+   * <code>HTTP</code> error code and throw the <code>ActionException</code>.
    * 
    * @param request
    *          the weblounge request
@@ -106,8 +106,7 @@ public interface Action extends Composeable {
    *           if this handler refuses to handle the exception
    */
   void configure(WebloungeRequest request, WebloungeResponse response,
-      Page page, Renderer template, String method)
-      throws ActionException;
+      Page page, Renderer template, String method) throws ActionException;
 
   /**
    * This method is called by the target page and gives the action the
@@ -245,23 +244,34 @@ public interface Action extends Composeable {
       String composer, int position) throws ActionException;
 
   /**
-   * Returns <code>true</code> if the given method is supported by the action.
-   * The method is used to lookup a rendering method for a given action id.
+   * Returns the url that this action should be directed to by default. Return
+   * <code>null</code> if no redirection should be performed, the action will
+   * then be rendered on the site's home template.
    * 
-   * @param method
-   *          the method name
-   * @return <code>true</code> if the action supports the method
+   * @return the default url
    */
-  boolean provides(String method);
+  WebUrl getDefaultUrl();
 
   /**
-   * Returns the supported action methods. The meaning of methods is the
-   * possible output format of an action. Therefore, the methods usually include
-   * <tt>html</tt>, <tt>pdf</tt> and so on.
+   * Returns the supported content flavors. The meaning of these flavors are the
+   * possible output formats of an action. Common flavors include include
+   * <code>HTML</code>, <code>XML</code> or <code>JSON</code>.
    * 
-   * @return the supported methods
+   * @return the supported content flavors
    */
   String[] getFlavors();
+
+  /**
+   * Returns <code>true</code> if the action supports the given content flavor.
+   * Common flavors might be <code>HTML</code>, <code>XML</code> or
+   * <code>JSON</code>.
+   * 
+   * @param flavor
+   *          the flavor
+   * @return <code>true</code> if the action can create the requested content
+   *         flavor
+   */
+  boolean supportsFlavor(String flavor);
 
   /**
    * This method is called after the request has been processed by the action.

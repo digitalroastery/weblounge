@@ -20,16 +20,13 @@
 
 package ch.o2it.weblounge.common.request;
 
-
 /**
  * The <code>RequestHandler</code> class defines an interface for objects
- * capable of servicing <code>HttpServletRequests</code> targeting paths inside
+ * capable of servicing <code>HttpServletRequest</code>s targeting paths inside
  * the content management system.
  * <p>
  * If the system receives a request, it looks for the
- * <code>RequestHandler</code> that is registered with the target url. In most
- * cases, this will be the class <code>SimpleRequestHandler</code>, but more
- * special handlers may also apply.
+ * <code>RequestHandler</code> that is registered with the target url.
  */
 public interface RequestHandler {
 
