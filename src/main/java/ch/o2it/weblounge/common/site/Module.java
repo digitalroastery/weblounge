@@ -33,8 +33,17 @@ public interface Module extends Customizable {
   /** Module descriptor */
   public static final String CONFIG_FILE = "module.xml";
 
-  /** The default load factor */
-  public static final int DEFAULT_LOAD_FACTOR = 1;
+  /**
+   * Sets the module identifier.
+   * <p>
+   * <b>Note:</b> the identifier may be used in file paths, database table names
+   * and the like, so make sure it does not contain spaces or weird characters,
+   * i. e. it matches this regular expression: <code>^[a-zA-Z0-9-_.]*$</code>.
+   * 
+   * @param identifier
+   *          the module identifier
+   */
+  void setIdentifier(String identifier);
 
   /**
    * Returns the module name.
@@ -42,6 +51,14 @@ public interface Module extends Customizable {
    * @return the module identifier
    */
   String getIdentifier();
+
+  /**
+   * Enables or disables the module.
+   * 
+   * @param enabled
+   *          <code>true</code> to enable the module
+   */
+  void setEnabled(boolean enabled);
 
   /**
    * Returns <code>true</code> if the module is enabled.
@@ -67,32 +84,13 @@ public interface Module extends Customizable {
 
   /**
    * Tells this module that it has been taken off duty and will no longer be
-   * part of the site. Implementations should overwrite this method to return
-   * resources and close any network connections they might be holding.
+   * part of the site. Implementations should overwrite this method to properly
+   * dispose off resources they might be holding.
    * <p>
    * Note that this method will be called <i>after</i> a call to {@link #stop()}
    * if the site that the module was running in has been started at all.
-   * 
-   * @throws ModuleException
-   *           if module initialization fails
    */
-  void destroy() throws ModuleException;
-
-  /**
-   * Returns the module's document base.
-   * 
-   * @return the module's document base
-   */
-  String getPath();
-
-  /**
-   * Returns the module's load factor, which is <code>1</code> for normal
-   * modules This factor can be configured in the
-   * <code>&lt;performance&gt;</code> section of the module configuration.
-   * 
-   * @return the module's load factor
-   */
-  int getLoadFactor();
+  void destroy();
 
   /**
    * Returns the associated site.
@@ -102,26 +100,26 @@ public interface Module extends Customizable {
   Site getSite();
 
   /**
-   * Initializes and starts the module. This is done after configuration and
-   * mainly registers and initializes the various module registries.
+   * Starts the module. This includes starting the module services and sending a
+   * <code>moduleStarted</code> event to registered module listeners.
    * 
    * @throws ModuleException
    *           if the module cannot be started
-   * @throws IllegalStateException
-   *           if the module is already running
    */
-  void start() throws ModuleException, IllegalStateException;
+  void start() throws ModuleException;
 
   /**
-   * Method to shut down this module. This includes stopping the module services
-   * and sending a <code>shutdown</code> event to registered module listeners.
+   * Shuts down this module. This includes stopping the module services and
+   * sending a <code>moduleStopped</code> event to registered module listeners.
+   * <p>
+   * If the module throws a {@link ModuleException} while being stopped, the
+   * system makes sure it is not started again but rather disposed, and a new
+   * instance will be created afterwards.
    * 
    * @throws ModuleException
    *           if the module cannot be stopped
-   * @throws IllegalStateException
-   *           if the module is already running
    */
-  void stop() throws ModuleException, IllegalStateException;
+  void stop() throws ModuleException;
 
   /**
    * Adds <code>listener</code> to the list of module listeners.
@@ -140,129 +138,95 @@ public interface Module extends Customizable {
   void removeModuleListener(ModuleListener listener);
 
   /**
-   * Returns <code>true</code> if the module may be searched.
+   * Specifies whether the module can provide search results. If that is the
+   * case, the module will be included when a search is performed on the site.
    * 
-   * @return <code>true</code> if the module is searchable
+   * @param searchable
+   *          <code>true</code> if this module can be searched
+   */
+  void setSearchable(boolean searchable);
+
+  /**
+   * Returns <code>true</code> if the module can be searched.
+   * 
+   * @return <code>true</code> if the module can be searched
    */
   boolean isSearchable();
 
   /**
-   * Returns <code>true</code> if the module should be included in the default
-   * searched by default.
-   * 
-   * @return <code>true</code> if the module is searchable
-   */
-  boolean searchByDefault();
-
-  /**
-   * Returns the result of the search query.
+   * Returns the result of the search query or an empty array if the search did
+   * not yield any output.
    * 
    * @param query
    *          the search query
-   * @return the result set
+   * @return the search result
    */
   SearchResult[] search(String query);
 
   /**
-   * Returns this module's renderer registry which keeps track of the defined
-   * renderer bundles.
+   * Returns all of this module's renderers.
    * 
-   * @return the renderer registry
+   * @return the renderers
    */
   PageletRenderer[] getRenderers();
 
   /**
-   * Returns the module renderer identified by <code>renderer</code> or
-   * <code>null</code> if no such renderer is available.
+   * Returns the renderer identified by <code>id</code> or <code>null</code> if
+   * no renderer with this identifier exists.
    * 
-   * @param renderer
-   *          the renderer identifier
-   * @param method
-   *          the rendering method
-   * @return the renderer
-   */
-  PageletRenderer getRenderer(String renderer, String method);
-
-  /**
-   * Returns the module renderer identified by <code>renderer</code> or
-   * <code>null</code> if no such renderer is available. The renderer is
-   * returned for the default output method.
-   * 
-   * @param renderer
+   * @param id
    *          the renderer identifier
    * @return the renderer
    */
-  PageletRenderer getRenderer(String renderer);
+  PageletRenderer getRenderer(String id);
 
   /**
-   * Returns the renderer to the renderer pool. Returning the renderers is
-   * important, since otherwise, a new renderer instance has to be instantiated
-   * everytime it is needed, which is a costly operation and a waste of memory.
-   * 
-   * @param r
-   *          the renderer
-   */
-  void returnRenderer(PageletRenderer r);
-
-  /**
-   * Returns the image styles defined by this module.
+   * Returns all of the image styles defined by this module.
    * 
    * @return the image styles
    */
   ImageStyle[] getImageStyles();
 
   /**
-   * Returns the action identified by <code>action</code>.
+   * Returns the image style identified by <code>id</code> or <code>null</code>
+   * if no image style with this identifier exists.
    * 
-   * @param action
-   *          the action identifier
-   * @param method
-   *          the rendering method
-   * @return the action object
+   * @param id
+   *          the style identifier
+   * @return the image style
    */
-  Action getAction(String action, String method);
+  ImageStyle getImageStyle(String id);
 
   /**
-   * Returns the action handler to the registry.
-   * 
-   * @param handler
-   *          the action handler
-   */
-  void returnAction(Action handler);
-
-  /**
-   * Returns the action registry containing all registered actions.
+   * Returns a list of all actions.
    * 
    * @return the module actions
    */
   Action[] getActions();
 
   /**
-   * Returns the real path on the server for a given virtual path relative to
-   * the module's root directory.
+   * Returns the action identified by <code>id</code> or <code>null</code> if no
+   * action with this identifier exists.
    * 
-   * @param path
-   *          the virtual (module-relative) path
-   * @return the real (physical) path on the server
+   * @param action
+   *          the action identifier
+   * @return the action
    */
-  String getPhysicalPath(String path);
+  Action getAction(String action);
 
   /**
-   * Returns the virtual path on the server relative to the web application.
-   * Using this path e. g. for a renderer <code>jsp/myjsp.jsp</code> will
-   * produce </code>/sites/mysite/modules/mymodule/jsp/myjsp.jsp</code>.
+   * Sets the module title in the given language.
    * 
-   * @param path
-   *          the virtual path relative to the site
-   * @param webapp
-   *          <code>true</code> to preprend the webapp url
-   * @return the virtual work path relative to the webapp
+   * @param title
+   *          the module title
+   * @param language
+   *          the language
    */
-  String getVirtualPath(String path, boolean webapp);
+  void setTitle(String title, Language language);
 
   /**
-   * Returns the module title in the given language or, if it doesn't exist in
-   * that language, in the site default language.
+   * Returns the module title in the given language or, if it doesn't exist, in
+   * the site default language.
    * 
    * @param language
    *          the language

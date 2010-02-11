@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.site;
 
+import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageLayout;
@@ -39,7 +40,7 @@ import java.net.URL;
  * The site interface defines the method that may be called on weblounge site
  * objects.
  */
-public interface Site extends RequestListener, Serializable {
+public interface Site extends Customizable, RequestListener, Serializable {
 
   /** Site descriptor */
   static final String CONFIG_FILE = "site.xml";
@@ -50,9 +51,9 @@ public interface Site extends RequestListener, Serializable {
   /**
    * Sets the site identifier.
    * <p>
-   * <b>Note:</b> the site identifier will most probably be used in file paths,
-   * database table names and user ids so make sure it does not contain spaces
-   * or weird characters.
+   * <b>Note:</b> the identifier may be used in file paths, database table names
+   * and the like, so make sure it does not contain spaces or weird characters,
+   * i. e. it matches this regular expression: <code>^[a-zA-Z0-9-_.]*$</code>.
    * 
    * @param identifier
    *          the site identifier
@@ -111,22 +112,6 @@ public interface Site extends RequestListener, Serializable {
    *          the site listener
    */
   void removeSiteListener(SiteListener listener);
-
-  /**
-   * Adds <code>listener</code> to the list of module listeners.
-   * 
-   * @param listener
-   *          the module listener
-   */
-  void addModuleListener(ModuleListener listener);
-
-  /**
-   * Removes <code>listener</code> from the list of module listeners.
-   * 
-   * @param listener
-   *          the module listener
-   */
-  void removeModuleListener(ModuleListener listener);
 
   /**
    * Adds <code>listener</code> to the list of request listeners if it has not

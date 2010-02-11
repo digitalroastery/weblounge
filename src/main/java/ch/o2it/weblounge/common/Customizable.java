@@ -31,37 +31,49 @@ import java.util.Map;
 public interface Customizable {
 
   /**
+   * Sets option <code>name</code> to <code>value</code>. When the value is set
+   * to <code>null</code>, the option is removed.
+   * 
+   * @param name
+   *          the option name
+   * @param value
+   *          the option value
+   */
+  void setOption(String name, String value);
+
+  /**
+   * Removes the option with name <code>name</code>.
+   * 
+   * @param name
+   *          the option name
+   */
+  void removeOption(String name);
+
+  /**
    * Returns <code>true</code> if the the option with name <code>name</code> has
    * been configured.
    * 
    * @param name
    *          the option name
    * @return <code>true</code> if an option with that name exists
-   * @see #options()
+   * @see #getOptions()
    * @see #getOptionValue(java.lang.String)
    * @see #getOptionValue(java.lang.String, java.lang.String)
    */
   boolean hasOption(String name);
 
   /**
-   * Returns the names of the configured options.
-   * 
-   * @return the option names
-   */
-  String[] getOptionNames();
-
-  /**
    * Returns the option value for option <code>name</code> if it has been
    * configured, <code>null</code> otherwise.
    * <p>
    * If the option is a multiple value option (that is, if the option has been
-   * configured multiple times), this method returns the first value onyl. Use
+   * configured multiple times), this method returns the first value only. Use
    * {@link #getOptionValues(java.lang.String)} to get all option values.
    * 
    * @param name
    *          the option name
    * @return the option value
-   * @see #options()
+   * @see #getOptions()
    * @see #hasOption(java.lang.String)
    * @see #getOptionValue(java.lang.String, java.lang.String)
    */
@@ -76,7 +88,7 @@ public interface Customizable {
    * @param defaultValue
    *          the default value
    * @return the option value
-   * @see #options()
+   * @see #getOptions()
    * @see #hasOption(java.lang.String)
    * @see #getOptionValue(java.lang.String)
    */
@@ -89,7 +101,7 @@ public interface Customizable {
    * @param name
    *          the option name
    * @return the option values
-   * @see #options()
+   * @see #getOptions()
    * @see #hasOption(java.lang.String)
    * @see #getOptionValue(java.lang.String)
    */
@@ -100,6 +112,6 @@ public interface Customizable {
    * 
    * @return the options
    */
-  Map<String, List<String>> options();
+  Map<String, List<String>> getOptions();
 
 }
