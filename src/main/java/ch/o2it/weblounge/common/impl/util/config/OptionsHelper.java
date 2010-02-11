@@ -47,10 +47,40 @@ import javax.xml.xpath.XPath;
  *  &lt;/options&gt;
  * </pre>
  */
-public class OptionsSupport implements Customizable {
+public final class OptionsHelper implements Customizable {
 
   /** Options */
-  protected Map<String, List<String>> options = new HashMap<String, List<String>>();
+  private Map<String, List<String>> options = new HashMap<String, List<String>>();
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String, java.lang.String)
+   */
+  public void setOption(String name, String value) {
+    if (name == null)
+      throw new IllegalArgumentException("Option name must not be null");
+    if (value == null)
+      removeOption(name);
+    List<String> option = options.get(name);
+    if (option == null) {
+      option = new ArrayList<String>();
+      options.put(name, option);
+    }
+    if (!option.contains(value))
+      option.add(value);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.Customizable#removeOption(java.lang.String)
+   */
+  public void removeOption(String name) {
+    if (name == null)
+      throw new IllegalArgumentException("Option name must not be null");
+    options.remove(name);
+  }
 
   /**
    * Returns <code>true</code> if the the option with name <code>name</code> has
@@ -59,7 +89,7 @@ public class OptionsSupport implements Customizable {
    * @param name
    *          the option name
    * @return <code>true</code> if an option with that name exists
-   * @see #options()
+   * @see #getOptions()
    * @see #getOptionValue(java.lang.String)
    * @see #getOptionValue(java.lang.String, java.lang.String)
    */
@@ -67,15 +97,6 @@ public class OptionsSupport implements Customizable {
     return (options.keySet().contains(name));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.Customizable#getOptionNames()
-   */
-  public String[] getOptionNames() {
-    return options.keySet().toArray(new String[options.size()]);
-  }
-  
   /**
    * Returns the option value for option <code>name</code> if it has been
    * configured, <code>null</code> otherwise.
@@ -87,7 +108,7 @@ public class OptionsSupport implements Customizable {
    * @param name
    *          the option name
    * @return the option value
-   * @see #options()
+   * @see #getOptions()
    * @see #hasOption(java.lang.String)
    * @see #getOptionValue(java.lang.String, java.lang.String)
    */
@@ -108,7 +129,7 @@ public class OptionsSupport implements Customizable {
    * @param defaultValue
    *          the default value
    * @return the option value
-   * @see #options()
+   * @see #getOptions()
    * @see #hasOption(java.lang.String)
    * @see #getOptionValue(java.lang.String)
    */
@@ -124,7 +145,7 @@ public class OptionsSupport implements Customizable {
    * @param name
    *          the option name
    * @return the option values
-   * @see #options()
+   * @see #getOptions()
    * @see #hasOption(java.lang.String)
    * @see #getOptionValue(java.lang.String)
    */
@@ -141,7 +162,7 @@ public class OptionsSupport implements Customizable {
    * 
    * @return the options
    */
-  public Map<String, List<String>> options() {
+  public Map<String, List<String>> getOptions() {
     return options;
   }
 
@@ -155,9 +176,9 @@ public class OptionsSupport implements Customizable {
    * @throws ConfigurationException
    *           if the configuration data is incomplete or invalid
    */
-  public static OptionsSupport load(XPath path, Node config)
+  public static OptionsHelper load(XPath path, Node config)
       throws ConfigurationException {
-    OptionsSupport configurationBase = new OptionsSupport();
+    OptionsHelper configurationBase = new OptionsHelper();
 
     // No options available?
     if (path == null || config == null)
@@ -170,7 +191,7 @@ public class OptionsSupport implements Customizable {
       String name = XPathHelper.valueOf(option, "name", path);
       String value = XPathHelper.valueOf(option, "value", path);
       List<String> values = configurationBase.options.get(name);
-      if (values != null) {
+      if (values != null && !values.contains(value)) {
         values.add(value);
       } else {
         values = new ArrayList<String>();

@@ -144,8 +144,9 @@ public class IncludeImpl implements Include {
    * @see ch.o2it.weblounge.api.module.ModuleInclude#setModule(ch.o2it.weblounge.common.site.Module)
    */
   public void setModule(Module m) {
-    if (href == null)
-      href = m.getVirtualPath(href, true);
+//    if (href == null)
+//      href = m.getVirtualPath(href, true);
+    // TODO: Fix me
   }
 
   /**

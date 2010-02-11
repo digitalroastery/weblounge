@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageLayout;
@@ -34,7 +35,6 @@ import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleException;
-import ch.o2it.weblounge.common.site.ModuleListener;
 import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteException;
@@ -114,15 +114,15 @@ public class SiteImpl implements Site {
 
   /** Ordered list of site urls */
   protected List<String> hostnames = null;
+  
+  /** Option handling support */
+  protected OptionsHelper options = null;
 
   /** Request listeners */
   private List<RequestListener> requestListeners = null;
 
   /** Site listeners */
   private List<SiteListener> siteListeners = null;
-
-  /** Module listeners */
-  private List<ModuleListener> moduleListeners = null;
 
   /** User listeners */
   private List<UserListener> userListeners = null;
@@ -147,6 +147,7 @@ public class SiteImpl implements Site {
     imagestyles = new HashMap<String, ImageStyle>();
     modules = new HashMap<String, Module>();
     hostnames = new ArrayList<String>();
+    options = new OptionsHelper();
   }
 
   /**
@@ -618,32 +619,6 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.module.Module#addModuleListener(ch.o2it.weblounge.common.module.ModuleListener)
-   */
-  public void addModuleListener(ModuleListener listener) {
-    if (moduleListeners == null)
-      moduleListeners = new ArrayList<ModuleListener>();
-    synchronized (moduleListeners) {
-      moduleListeners.add(listener);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.module.Module#removeModuleListener(ch.o2it.weblounge.common.module.ModuleListener)
-   */
-  public void removeModuleListener(ModuleListener listener) {
-    if (moduleListeners != null) {
-      synchronized (moduleListeners) {
-        moduleListeners.remove(listener);
-      }
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.site.Site#addUserListener(ch.o2it.weblounge.common.security.UserListener)
    */
   public void addUserListener(UserListener listener) {
@@ -685,14 +660,12 @@ public class SiteImpl implements Site {
       for (Module module : modules.values()) {
         try {
           module.start();
-          fireModuleStarted(module);
           started.add(module);
         } catch (Exception e) {
           for (Module m : started) {
             try {
               log_.debug("Halting module {}", m);
               m.stop();
-              fireModuleStopped(m);
             } catch (Exception e2) {
               log_.error("Error stopping module {}", m, e2);
             }
@@ -704,8 +677,10 @@ public class SiteImpl implements Site {
 
     // Finally, mark this site as running
     running = true;
-
     log_.info("Site {} started", this);
+
+    // Tell listeners
+    fireSiteStarted();
   }
 
   /**
@@ -724,7 +699,6 @@ public class SiteImpl implements Site {
         try {
           log_.debug("Stopping module {}", module);
           module.stop();
-          fireModuleStopped(module);
         } catch (Exception e) {
           log_.error("Error stopping module {}", module, e);
         }
@@ -733,8 +707,10 @@ public class SiteImpl implements Site {
     
     // Finally, mark this site as stopped
     running = false;
-    
     log_.info("Site {} stopped", this);
+    
+    // Tell listeners
+    fireSiteStopped();
   }
 
   /**
@@ -877,35 +853,29 @@ public class SiteImpl implements Site {
   }
 
   /**
-   * Method to fire a <code>moduleStarted()</code> message to all registered
-   * <code>ModuleListener</code>s.
-   * 
-   * @param module
-   *          the module
+   * Method to fire a <code>siteStarted()</code> message to all registered
+   * <code>SiteListener</code>s.
    */
-  protected void fireModuleStarted(Module module) {
-    if (moduleListeners == null)
+  protected void fireSiteStarted() {
+    if (siteListeners == null)
       return;
-    synchronized (moduleListeners) {
-      for (ModuleListener listener : moduleListeners) {
-        listener.moduleStarted(module);
+    synchronized (siteListeners) {
+      for (SiteListener listener : siteListeners) {
+        listener.siteStarted(this);
       }
     }
   }
 
   /**
-   * Method to fire a <code>moduleStopped()</code> message to all registered
-   * <code>ModuleListener</code>s.
-   * 
-   * @param module
-   *          the module
+   * Method to fire a <code>siteStopped()</code> message to all registered
+   * <code>SiteListener</code>s.
    */
-  protected void fireModuleStopped(Module module) {
-    if (moduleListeners == null)
+  protected void fireSiteStopped() {
+    if (siteListeners == null)
       return;
-    synchronized (moduleListeners) {
-      for (ModuleListener listener : moduleListeners) {
-        listener.moduleStopped(module);
+    synchronized (siteListeners) {
+      for (SiteListener listener : siteListeners) {
+        listener.siteStopped(this);
       }
     }
   }
@@ -1033,6 +1003,70 @@ public class SiteImpl implements Site {
   public Page getPage(PageURI uri) throws IOException {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String, java.lang.String)
+   */
+  public void setOption(String name, String value) {
+    options.setOption(name, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.Customizable#removeOption(java.lang.String)
+   */
+  public void removeOption(String name) {
+    options.removeOption(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValue(java.lang.String)
+   */
+  public String getOptionValue(String name) {
+    return options.getOptionValue(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValue(java.lang.String,
+   *      java.lang.String)
+   */
+  public String getOptionValue(String name, String defaultValue) {
+    return options.getOptionValue(name, defaultValue);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValues(java.lang.String)
+   */
+  public String[] getOptionValues(String name) {
+    return options.getOptionValues(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#hasOption(java.lang.String)
+   */
+  public boolean hasOption(String name) {
+    return options.hasOption(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptions()
+   */
+  public Map<String, List<String>> getOptions() {
+    return options.getOptions();
   }
 
 }

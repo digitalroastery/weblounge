@@ -30,7 +30,7 @@ import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
+import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
@@ -103,7 +103,7 @@ public final class SiteConfiguration implements Customizable {
   protected List<ImageStyle> imagestyles = null;
 
   /** Site options */
-  protected OptionsSupport options = null;
+  protected OptionsHelper options = null;
 
   /** Number of versions to keep */
   protected int historysize = DEFAULT_HISTORYSIZE;
@@ -393,7 +393,7 @@ public final class SiteConfiguration implements Customizable {
    *          the XPath object used to parse the configuration
    */
   private void readOptions(XPath path, Node config) {
-    options = OptionsSupport.load(path, XPathHelper.select(config, "/site", path));
+    options = OptionsHelper.load(path, XPathHelper.select(config, "/site", path));
   }
 
   /**
@@ -416,6 +416,24 @@ public final class SiteConfiguration implements Customizable {
    */
   public int hashCode() {
     return identifier.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String, java.lang.String)
+   */
+  public void setOption(String name, String value) {
+    options.setOption(name, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.Customizable#removeOption(java.lang.String)
+   */
+  public void removeOption(String name) {
+    options.removeOption(name);
   }
 
   /**
@@ -458,19 +476,10 @@ public final class SiteConfiguration implements Customizable {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.Customizable#options()
+   * @see ch.o2it.weblounge.common.Customizable#getOptions()
    */
-  public Map<String, List<String>> options() {
-    return options.options();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.Customizable#getOptionNames()
-   */
-  public String[] getOptionNames() {
-    return options.getOptionNames();
+  public Map<String, List<String>> getOptions() {
+    return options.getOptions();
   }
 
 }

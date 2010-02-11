@@ -142,8 +142,9 @@ public class ScriptIncludeImpl implements ScriptInclude {
    * @see ch.o2it.weblounge.api.module.ModuleScript#setModule(ch.o2it.weblounge.common.site.Module)
    */
   public void setModule(Module m) {
-    if (href == null)
-      href = m.getVirtualPath(href, true);
+//    if (href == null)
+//      href = m.getVirtualPath(href, true);
+    // TODO: Fix me
   }
 
   /**

@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.impl.security.jaas;
 
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
+import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 
@@ -46,7 +46,7 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
   protected Relevance relevance = null;
 
   /** Module configuration */
-  protected OptionsSupport configuration = null;
+  protected OptionsHelper configuration = null;
   
   /**
    * Creates a new authentication module and throws various exceptions while
@@ -68,7 +68,7 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
   public AuthenticationModuleImpl(String classname, String relevance) {
     setClass(classname);
     setRelevance(relevance);
-    configuration = new OptionsSupport();
+    configuration = new OptionsHelper();
   }
 
   /**
@@ -144,19 +144,28 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
 
   /**
    * {@inheritDoc}
-   * @see ch.o2it.weblounge.common.security.AuthenticationModule#options()
+   *
+   * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String, java.lang.String)
    */
-  public Map<String, List<String>> options() {
-    return configuration.options();
+  public void setOption(String name, String value) {
+    configuration.setOption(name, value);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.Customizable#getOptionNames()
+   * @see ch.o2it.weblounge.common.Customizable#removeOption(java.lang.String)
    */
-  public String[] getOptionNames() {
-    return configuration.getOptionNames();
+  public void removeOption(String name) {
+    configuration.removeOption(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see ch.o2it.weblounge.common.security.AuthenticationModule#getOptions()
+   */
+  public Map<String, List<String>> getOptions() {
+    return configuration.getOptions();
   }
 
   /**
@@ -202,7 +211,7 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
   public void init(XPath path, Node config) throws ConfigurationException {
     setClass(XPathHelper.valueOf(config, "@class", path));
     setRelevance(XPathHelper.valueOf(config, "@relevance", path));
-    configuration = OptionsSupport.load(path, config);
+    configuration = OptionsHelper.load(path, config);
   }
 
 }
