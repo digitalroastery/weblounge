@@ -20,6 +20,11 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.impl.scheduler.FireOnceTrigger;
+import ch.o2it.weblounge.common.impl.scheduler.JobConfiguration;
+import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
+import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
+import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
@@ -28,6 +33,8 @@ import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.scheduler.Job;
+import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
@@ -44,13 +51,21 @@ import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +92,8 @@ public class SiteImpl implements Site {
   protected String identifier = null;
 
   /** Site enabled state */
-  protected boolean enabled = false;
-  
+  protected boolean enabled = true;
+
   /** Site running state */
   private boolean running = false;
 
@@ -114,7 +129,10 @@ public class SiteImpl implements Site {
 
   /** Ordered list of site urls */
   protected List<String> hostnames = null;
-  
+
+  /** Jobs */
+  protected Map<String, JobConfiguration> jobs = null;
+
   /** Option handling support */
   protected OptionsHelper options = null;
 
@@ -126,7 +144,7 @@ public class SiteImpl implements Site {
 
   /** User listeners */
   private List<UserListener> userListeners = null;
-  
+
   /** Root url to static content */
   protected URL staticContentRoot = null;
 
@@ -135,6 +153,9 @@ public class SiteImpl implements Site {
 
   /** Quartz cron scheduler */
   private Scheduler scheduler = null;
+  
+  /** Listener for the quartz scheduler */
+  private TriggerListener quartzTriggerListener = null;
 
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to
@@ -147,6 +168,7 @@ public class SiteImpl implements Site {
     imagestyles = new HashMap<String, ImageStyle>();
     modules = new HashMap<String, Module>();
     hostnames = new ArrayList<String>();
+    jobs = new HashMap<String, JobConfiguration>();
     options = new OptionsHelper();
   }
 
@@ -370,7 +392,7 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#setStaticContentRoot(java.net.URL)
    */
   public void setStaticContentRoot(URL root) {
@@ -378,7 +400,7 @@ public class SiteImpl implements Site {
       throw new IllegalStateException("Content root url must not be null");
     this.staticContentRoot = root;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -653,7 +675,7 @@ public class SiteImpl implements Site {
       throw new IllegalStateException("Site is already running");
     if (!enabled)
       throw new IllegalStateException("Cannot start a disabled site");
-    
+
     // Start the site modules
     synchronized (modules) {
       List<Module> started = new ArrayList<Module>(modules.size());
@@ -674,6 +696,13 @@ public class SiteImpl implements Site {
         }
       }
     }
+    
+    // Register jobs
+    synchronized (jobs) {
+      for (JobConfiguration job : jobs.values()) {
+        scheduleJob(job);
+      }
+    }
 
     // Finally, mark this site as running
     running = true;
@@ -692,6 +721,13 @@ public class SiteImpl implements Site {
     log_.debug("Stopping site {}", this);
     if (!running)
       throw new IllegalStateException("Site is not running");
+
+    // Stop jobs
+    synchronized (jobs) {
+      for (JobConfiguration job : jobs.values()) {
+        unscheduleJob(job);
+      }
+    }
     
     // Shutdown all of the modules
     synchronized (modules) {
@@ -704,24 +740,24 @@ public class SiteImpl implements Site {
         }
       }
     }
-    
+
     // Finally, mark this site as stopped
     running = false;
     log_.info("Site {} stopped", this);
-    
+
     // Tell listeners
     fireSiteStopped();
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#isRunning()
    */
   public boolean isRunning() {
     return running;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -895,17 +931,37 @@ public class SiteImpl implements Site {
   /**
    * This method is a callback from the service tracker that is started when
    * this site is started. It is looking for an implementation of the Quartz
-   * scheduler.
+   * scheduler. The configuration is expected to be <code>0..1</code>, so there
+   * should only be one scheduler instance at any given moment.
    * 
-   * @param daemon
+   * @param scheduler
+   *          the quartz scheduler
    */
   void setScheduler(Scheduler scheduler) {
-    if (scheduler == null) {
-      // TODO: remove registered tasks
-    } else {
-      // TODO: add registered tasks
-    }
     this.scheduler = scheduler;
+    this.quartzTriggerListener = new QuartzTriggerListener(this);
+    try {
+      this.scheduler.addTriggerListener(quartzTriggerListener);
+      if (running) {
+        synchronized (jobs) {
+          for (JobConfiguration job : jobs.values()) {
+            scheduleJob(job);
+          }
+        }
+      }
+    } catch (SchedulerException e) {
+      log_.error("Error adding trigger listener to quartz scheduler", e);
+    }
+  }
+
+  /**
+   * This method is a callback from the service tracker that is started when
+   * this site is started, indicating that the scheduler service is no longer
+   * available.
+   */
+  void removeScheduler() {
+    log_.info("Site " + this + " can no longer execute jobs (scheduler was taken down)");
+    this.quartzTriggerListener = null;
   }
 
   /**
@@ -930,12 +986,14 @@ public class SiteImpl implements Site {
       setIdentifier(identifier);
     }
 
-    log_.info("Site {} is starting", this);
-    log_.debug("Getting in line for cron services");
+    log_.debug("Initializing site {}", this);
+    log_.debug("Signing up for cron services");
 
     // Connect to the
     cronServiceTracker = new CronServiceTracker(bundleContext, this);
     cronServiceTracker.open();
+
+    log_.info("Site {} initialized", this);
   }
 
   /**
@@ -950,9 +1008,10 @@ public class SiteImpl implements Site {
    *          the component context
    */
   public void deactivate(ComponentContext context) {
-    log_.info("Site {} is stopping", this);
+    log_.debug("Taking down site {}", this);
     log_.debug("Stopped looking for cron services");
     cronServiceTracker.close();
+    log_.info("Site {} deactivated", this);
   }
 
   /**
@@ -967,8 +1026,9 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.Site#getGroup(java.lang.String, java.lang.String)
+   * 
+   * @see ch.o2it.weblounge.common.site.Site#getGroup(java.lang.String,
+   *      java.lang.String)
    */
   public Group getGroup(String group, String context) {
     // TODO Auto-generated method stub
@@ -977,8 +1037,9 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.Site#getRole(java.lang.String, java.lang.String)
+   * 
+   * @see ch.o2it.weblounge.common.site.Site#getRole(java.lang.String,
+   *      java.lang.String)
    */
   public Role getRole(String role, String context) {
     // TODO Auto-generated method stub
@@ -987,7 +1048,7 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#getUser(java.lang.String)
    */
   public WebloungeUser getUser(String login) {
@@ -1007,8 +1068,9 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String, java.lang.String)
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String,
+   *      java.lang.String)
    */
   public void setOption(String name, String value) {
     options.setOption(name, value);
@@ -1016,7 +1078,7 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.Customizable#removeOption(java.lang.String)
    */
   public void removeOption(String name) {
@@ -1067,6 +1129,109 @@ public class SiteImpl implements Site {
    */
   public Map<String, List<String>> getOptions() {
     return options.getOptions();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Site#addJob(java.lang.String,
+   *      ch.o2it.weblounge.common.scheduler.Job, java.util.Map)
+   */
+  public void addJob(String name, Class<? extends Job> job,
+      Dictionary<String, Serializable> config) {
+    addJob(name, job, config, new FireOnceTrigger());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Site#addJob(java.lang.String,
+   *      ch.o2it.weblounge.common.scheduler.Job, java.util.Map,
+   *      ch.o2it.weblounge.common.scheduler.JobTrigger)
+   */
+  public void addJob(String name, Class<? extends Job> job,
+      Dictionary<String, Serializable> config, JobTrigger trigger) {
+
+    JobConfiguration jobDetail = new JobConfiguration(name, job, config, trigger);
+    
+    // Register the job
+    synchronized (jobs) {
+      jobs.put(job.getName(), jobDetail);
+    }
+    
+    // Schedule it if this site is running
+    if (running) {
+      scheduleJob(jobDetail);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Site#removeJob(java.lang.String)
+   */
+  public void removeJob(String name) {
+    synchronized (jobs) {
+      jobs.remove(name);
+    }
+  }
+
+  /**
+   * Schedules the job with the Quartz job scheduler.
+   * 
+   * @param job
+   *          the job
+   */
+  private void scheduleJob(JobConfiguration job) {
+    if (scheduler == null)
+      return;
+    
+    // Throw the job at quartz
+    String groupName = "site " + this.getIdentifier();
+    String jobName = job.getName();
+    Class<?> jobClass = job.getJob().getClass();
+    JobTrigger trigger = job.getTrigger();
+    
+    synchronized (jobs) {
+      JobDetail quartzJob = new JobDetail(jobName, groupName, QuartzJob.class);
+      Trigger quartzTrigger = new QuartzJobTrigger(jobName, groupName, trigger);
+      JobDataMap jobData = new JobDataMap();
+      jobData.put(QuartzJob.CLASS, jobClass);
+      jobData.put(QuartzJob.CONTEXT, job.getContext());
+      quartzTrigger.addTriggerListener(quartzTriggerListener.getName());
+      try {
+        Date date = scheduler.scheduleJob(quartzJob, quartzTrigger);
+        log_.info("Job '{}' scheduled, first execution at {}", jobName, date);
+      } catch (SchedulerException e) {
+        log_.error("Error trying to schedule job {}: {}", new Object[] {
+            jobName,
+            e.getMessage(),
+            e });
+      }
+    }
+  }
+
+  /**
+   * Removes the job from the Quartz job scheduler.
+   * 
+   * @param job
+   *          the job
+   */
+  private void unscheduleJob(JobConfiguration job) {
+    if (scheduler == null)
+      return;
+
+    String groupName = "site " + this.getIdentifier();
+    String jobName = job.getName();
+    try {
+      if (scheduler.unscheduleJob(jobName, groupName))
+        log_.info("Unscheduled job {}", jobName);
+    } catch (SchedulerException e) {
+      log_.error("Error trying to schedule job {}: {}", new Object[] {
+          jobName,
+          e.getMessage(),
+          e });
+    }
   }
 
 }

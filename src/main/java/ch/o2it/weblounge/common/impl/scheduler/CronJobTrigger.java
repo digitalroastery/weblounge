@@ -18,9 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.site;
+package ch.o2it.weblounge.common.impl.scheduler;
 
-import ch.o2it.weblounge.common.site.JobTrigger;
+import ch.o2it.weblounge.common.scheduler.JobTrigger;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -110,7 +110,7 @@ public final class CronJobTrigger implements JobTrigger {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.JobTrigger#getNextExecution()
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecution()
    */
   public long getNextExecution() {
     if (nextExecution > System.currentTimeMillis())

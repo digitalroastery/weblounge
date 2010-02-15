@@ -90,7 +90,7 @@ public final class CronServiceTracker extends ServiceTracker {
   @Override
   public void removedService(ServiceReference reference, Object service) {
     log_.info("Cron daeomon disabled for site {} ({} disappeared)", site, service.getClass().getName());
-    site.setScheduler(null);
+    site.removeScheduler();
     super.removedService(reference, service);
   }
 

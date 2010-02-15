@@ -18,9 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.site;
+package ch.o2it.weblounge.common.impl.scheduler;
 
-import ch.o2it.weblounge.common.site.JobTrigger;
+import ch.o2it.weblounge.common.scheduler.JobTrigger;
 
 /**
  * This trigger will fire a job periodically. The next period starts when the
@@ -78,7 +78,7 @@ public class PeriodicJobTrigger implements JobTrigger {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.JobTrigger#getNextExecution()
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecution()
    */
   public long getNextExecution() {
     long now = System.currentTimeMillis();

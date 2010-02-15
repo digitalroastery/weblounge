@@ -149,6 +149,7 @@
               ch.o2it.weblounge.common.impl.language,
               ch.o2it.weblounge.common.impl.page,
               ch.o2it.weblounge.common.impl.request,
+              ch.o2it.weblounge.common.impl.scheduler,
               ch.o2it.weblounge.common.impl.security,
               ch.o2it.weblounge.common.impl.security.jaas,
               ch.o2it.weblounge.common.impl.site,
