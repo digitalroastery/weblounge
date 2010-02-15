@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.impl.site.IncludeImpl;
 import ch.o2it.weblounge.common.impl.site.ScriptIncludeImpl;
 import ch.o2it.weblounge.common.impl.util.Arguments;
-import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
+import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.site.ActionConfiguration;
 import ch.o2it.weblounge.common.site.Include;
@@ -49,7 +49,7 @@ import javax.xml.xpath.XPath;
  * handler instance. The configuration data is being read from the
  * <code>&lt;action&gt;</code> section of the <code>module.xml</code>.
  */
-public final class ActionConfigurationImpl extends OptionsSupport implements ActionConfiguration {
+public final class ActionConfigurationImpl extends OptionsHelper implements ActionConfiguration {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(ActionConfigurationImpl.class);

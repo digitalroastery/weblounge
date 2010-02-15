@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
-import ch.o2it.weblounge.common.impl.util.config.OptionsSupport;
+import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -68,7 +68,7 @@ import javax.xml.xpath.XPath;
  * 	&lt;/module&gt;
  * </pre>
  */
-public final class ModuleConfigurationImpl extends OptionsSupport implements ModuleConfiguration {
+public final class ModuleConfigurationImpl extends OptionsHelper implements ModuleConfiguration {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(ModuleConfigurationImpl.class.getName());
@@ -107,7 +107,7 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
   ClassLoader classLoader = null;
 
   /** Site options */
-  protected OptionsSupport options = null;
+  protected OptionsHelper options = null;
 
   /**
    * Creates a new module configuration.
@@ -404,7 +404,7 @@ public final class ModuleConfigurationImpl extends OptionsSupport implements Mod
    *          the XPath object used to parse the configuration
    */
   private void readOptions(XPath path, Node config) {
-    options = OptionsSupport.load(path, XPathHelper.select(config, "/site", path));
+    options = OptionsHelper.load(path, XPathHelper.select(config, "/site", path));
   }
 
   /**
