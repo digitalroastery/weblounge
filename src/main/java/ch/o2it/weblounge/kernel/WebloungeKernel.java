@@ -55,6 +55,7 @@ public class WebloungeKernel {
       log_.info("Starting cron scheduler");
       StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
       scheduler = schedulerFactory.getScheduler();
+      scheduler.start();
       bundleContext.registerService(Scheduler.class.getName(), scheduler, null);
     } catch (SchedulerException e) {
       log_.error("Error starting cron scheduler: {}", e.getMessage());
