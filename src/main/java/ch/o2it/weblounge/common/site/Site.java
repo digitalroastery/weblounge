@@ -26,6 +26,8 @@ import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestListener;
+import ch.o2it.weblounge.common.scheduler.Job;
+import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
@@ -35,6 +37,7 @@ import ch.o2it.weblounge.common.user.WebloungeUser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.Dictionary;
 
 /**
  * The site interface defines the method that may be called on weblounge site
@@ -285,9 +288,54 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * Returns the image style with the given identifier or <code>null</code> if
    * no such style is found.
    * 
+   * @param id
+   *          the style identifier
    * @return the image style
    */
   ImageStyle getImageStyle(String id);
+
+  /**
+   * Adds a job that is executed according to the schedule in
+   * <code>cronExpression</code>. Note that existing jobs with the same names
+   * will be canceled and replaced.
+   * <p>
+   * If your job implementation is thread safe and it makes sense to have the
+   * job executed in parallel (in case it is still running while the next
+   * execution is due), set <code>canRunConcurrently</code> to <code>true</code>.
+   * 
+   * @param name
+   *          the job name
+   * @param job
+   *          the job class
+   * @param config
+   *          the job configuration and context
+   * @param trigger
+   *          the job trigger
+   */
+  void addJob(String name, Class<? extends Job> job, Dictionary<String, Serializable> config,
+      JobTrigger trigger);
+
+  /**
+   * Adds a job that is fired immediately and only once. Note that existing jobs
+   * with the same names will be replaced.
+   * 
+   * @param name
+   *          the job name
+   * @param job
+   *          the job class
+   * @param config
+   *          the job configuration and context
+   */
+  void addJob(String name, Class<? extends Job> job, Dictionary<String, Serializable> config);
+
+  /**
+   * Removes the job from the job scheduler. Current executions of the job will
+   * be finished regardless.
+   * 
+   * @param name
+   *          the job name
+   */
+  void removeJob(String name);
 
   /**
    * Adds the listener to the list of user listeners.

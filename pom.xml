@@ -40,6 +40,7 @@
             	ch.o2it.weblounge.common.page,
             	ch.o2it.weblounge.common.request,
               ch.o2it.weblounge.common.resource,
+              ch.o2it.weblounge.common.scheduler,
             	ch.o2it.weblounge.common.security,
             	ch.o2it.weblounge.common.site,
             	ch.o2it.weblounge.common.url,

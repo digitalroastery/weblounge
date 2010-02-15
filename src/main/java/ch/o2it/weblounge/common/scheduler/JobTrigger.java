@@ -18,12 +18,27 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.site;
+package ch.o2it.weblounge.common.scheduler;
 
 /**
- * A job trigger indicates when a job needs to be triggered.
+ * A job trigger indicates when a job is fired. A job associated with a job
+ * trigger while be kept scheduled as long as {@link #getNextExecution()}
+ * returns a valid date or <code>0</code>, in which case the job will be fired
+ * once only.
  */
 public interface JobTrigger {
+
+  /**
+   * Value returned by {@link #getNextExecution()} indicating that the job
+   * should be triggered right now.
+   */
+  long ONCE = 0;
+
+  /**
+   * Value returned by {@link #getNextExecution()} indicating that the job
+   * should not be triggered at all.
+   */
+  long NEVER = -1;
 
   /**
    * Returns the next execution date and time in milliseconds.

@@ -18,27 +18,16 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.site;
+package ch.o2it.weblounge.common.scheduler;
 
+import java.io.Serializable;
 import java.util.Dictionary;
 
 /**
  * A <code>Job</code> provides an implementation of the work that needs to be
  * done as well as a list of triggers that determine when job execution is due.
- * 
- * @see JobTrigger
  */
 public interface Job {
-
-  /**
-   * Returns a number of triggers that define when this job is to be executed.
-   * Implementations should return an empty array if they want to configure the
-   * triggers later or <code>null</code> if the job should be executed once
-   * immediately.
-   * 
-   * @return the job execution triggers
-   */
-  JobTrigger[] getTriggers();
 
   /**
    * This method is called every time the job execution triggers fire. The
@@ -46,11 +35,13 @@ public interface Job {
    * data found at instantiation time as well as any data that previous
    * executions might have added to it.
    * 
+   * @param name
+   *          the job name
    * @param ctx
    *          the job context
    * @throws JobException
    *           if job execution fails
    */
-  void execute(Dictionary<?, ?> ctx) throws JobException;
+  void execute(String name, Dictionary<String, Serializable> ctx) throws JobException;
 
 }
