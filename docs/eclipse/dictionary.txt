@@ -37,3 +37,8 @@ iterable
 composeable
 hostname
 hostnames
+crontab
+homepage
+renderers
+searchable
+deactivate

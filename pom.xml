@@ -102,6 +102,7 @@
       <!--
       <module>modules/weblounge-site</module>
       -->
+      <module>modules/weblounge-test</module>
       <module>modules/weblounge-user-api</module>
       <module>modules/weblounge-user</module>
   
