@@ -18,31 +18,19 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.scheduler;
+package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.scheduler.JobTrigger;
-
-import java.util.Date;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
- * This trigger makes sure the job is triggered at the next possible moment.
- * After this one execution, the job will not be executed again.
+ * TODO: Comment ActionPool
  */
-public class FireOnceTrigger implements JobTrigger {
-  
-  /** Has this trigger been fired? */
-  protected boolean fired = false;
+public class ActionPool extends GenericKeyedObjectPool {
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecutionAfter(Date)
-   */
-  public Date getNextExecutionAfter(Date date) {
-    if (fired)
-      return null;
-    fired = true;
-    return date;
+  ActionPool(ActionPoolFactory factory) {
+    if (factory == null)
+      throw new IllegalArgumentException("Pool factory must not be null");
+    setFactory(factory);
   }
-
+  
 }

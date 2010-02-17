@@ -81,7 +81,7 @@ public final class QuartzTriggerListener implements TriggerListener {
     String jobName = ctx.getJobDetail().getName();
     Date nextExecution = ctx.getNextFireTime();
     if (nextExecution != null)
-      log_.info("Job {} finished, next execution scheduled for ", new Object[] {
+      log_.debug("Job {} finished, next execution scheduled for ", new Object[] {
           jobName,
           df.format(nextExecution) });
     else
@@ -115,7 +115,7 @@ public final class QuartzTriggerListener implements TriggerListener {
    *      org.quartz.JobExecutionContext)
    */
   public boolean vetoJobExecution(Trigger trigger, JobExecutionContext ctx) {
-    return site.isEnabled() && site.isRunning();
+    return !site.isEnabled() || !site.isRunning();
   }
 
 }

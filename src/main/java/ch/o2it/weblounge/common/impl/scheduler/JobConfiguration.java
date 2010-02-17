@@ -80,10 +80,6 @@ public class JobConfiguration {
       throw new IllegalArgumentException("Worker must not be null");
     if (trigger == null)
       throw new IllegalArgumentException("Trigger must not be null");
-    if (trigger.getNextExecution() < 0)
-      throw new IllegalArgumentException("Trigger does not provide execution date or time");
-    if (trigger.getNextExecution() > 0 && trigger.getNextExecution() < System.currentTimeMillis())
-      throw new IllegalArgumentException("Next trigger execution is in the past");
     this.name = name;
     this.worker = worker;
     this.trigger = trigger;

@@ -38,6 +38,43 @@ public class QuartzJobTrigger extends Trigger {
   /** Serial version uid */
   private static final long serialVersionUID = 3873501563763335486L;
 
+  /**
+   * <p>
+   * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
+   * situation, the <code>{@link QuartzJobTrigger}</code> wants to be fired now
+   * by <code>Scheduler</code>.
+   * </p>
+   * 
+   * <p>
+   * <i>NOTE:</i> This instruction should typically only be used for 'one-shot'
+   * (non-repeating) Triggers. If it is used on a trigger with a repeat count >
+   * 0 then it is equivalent to the instruction
+   * <code>{@link #MISFIRE_INSTRUCTION_RESCHEDULE}
+   * </code>.
+   * </p>
+   */
+  public static final int MISFIRE_INSTRUCTION_FIRE_NOW = 1;
+
+  /**
+   * <p>
+   * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
+   * situation, the <code>{@link QuartzJobTrigger}</code> wants to be
+   * re-scheduled. This does obey the <code>Trigger</code> end-time however, so
+   * if the next fire time is after the end-time the <code>Trigger</code> will
+   * not fire again.
+   * </p>
+   * 
+   * <p>
+   * <i>NOTE:</i> This instruction could cause the <code>Trigger</code> to go to
+   * the 'COMPLETE' state after rescheduling, if all the repeat-fire-times where
+   * missed.
+   * </p>
+   */
+  public static final int MISFIRE_INSTRUCTION_RESCHEDULE = 2;
+
+  /** Do not schedule past this year (used to prevent endless loops) */
+  private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
+
   /** Weblounge job trigger */
   private JobTrigger trigger = null;
 
@@ -49,9 +86,15 @@ public class QuartzJobTrigger extends Trigger {
 
   /** End date */
   private Date endTime = null;
-  
+
+  /** Time when the trigger should be fired next */
+  private Date nextFireTime = null;
+
   /** Time when the trigger was last fired */
-  private Date lastFireTime = null;
+  private Date previousFireTime = null;
+
+  /** Number of times that this trigger has been fired */
+  private int timesTriggered = 0;
 
   /**
    * Creates a new trigger that wraps the weblounge job trigger to be used by
@@ -68,42 +111,33 @@ public class QuartzJobTrigger extends Trigger {
     super(name, group);
     if (trigger == null)
       throw new IllegalArgumentException("Job trigger cannot be null");
-    init(trigger);
+    this.trigger = trigger;
+
+    // Initialize the settings
+    Date now = new Date();
+    this.startTime = trigger.getNextExecutionAfter(now);
+    this.endTime = startTime.equals(now) ? now : null;
+    this.mayFireAgain = endTime == null;
   }
 
   /**
-   * Initialized this trigger for use by the Quartz scheduler.
+   * Sets the next fire time.
    * 
-   * @param trigger
-   *          the weblounge trigger
+   * @param date
+   *          the date
    */
-  private void init(JobTrigger trigger) {
-    this.trigger = trigger;
-    if (trigger.getNextExecution() == 0) {
-      startTime = new Date();
-      endTime = startTime;
-      mayFireAgain = false;
-    } else {
-      startTime = new Date(trigger.getNextExecution());
-      endTime = null;
-      mayFireAgain = true;
-    }
+  public void setNextFireTime(Date date) {
+    this.nextFireTime = date;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.quartz.SimpleTrigger#getNextFireTime()
+   * @see org.quartz.QuartzJobTrigger#getNextFireTime()
    */
   @Override
   public Date getNextFireTime() {
-    long nextExecution = trigger.getNextExecution();
-    if (nextExecution == JobTrigger.NEVER) {
-      return null;
-    } else if (nextExecution == JobTrigger.ONCE) {
-      return new Date();
-    }
-    return new Date(nextExecution);
+    return nextFireTime;
   }
 
   /**
@@ -112,8 +146,24 @@ public class QuartzJobTrigger extends Trigger {
    * @see org.quartz.Trigger#computeFirstFireTime(org.quartz.Calendar)
    */
   @Override
-  public Date computeFirstFireTime(Calendar cal) {
-    return getNextFireTime();
+  public Date computeFirstFireTime(Calendar calendar) {
+    nextFireTime = getStartTime();
+
+    while (nextFireTime != null && calendar != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+      nextFireTime = getFireTimeAfter(nextFireTime);
+
+      if (nextFireTime == null)
+        break;
+
+      // avoid infinite loop
+      java.util.Calendar c = java.util.Calendar.getInstance();
+      c.setTime(nextFireTime);
+      if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+        return null;
+      }
+    }
+
+    return nextFireTime;
   }
 
   /**
@@ -123,11 +173,25 @@ public class QuartzJobTrigger extends Trigger {
    *      org.quartz.JobExecutionException)
    */
   @Override
-  public int executionComplete(JobExecutionContext ctx, JobExecutionException e) {
-    if (trigger.getNextExecution() <= 0)
-      return INSTRUCTION_DELETE_TRIGGER ;
-    else
+  public int executionComplete(JobExecutionContext context,
+      JobExecutionException result) {
+    if (result != null && result.refireImmediately()) {
+      return INSTRUCTION_RE_EXECUTE_JOB;
+    }
+
+    if (result != null && result.unscheduleFiringTrigger()) {
       return INSTRUCTION_SET_TRIGGER_COMPLETE;
+    }
+
+    if (result != null && result.unscheduleAllTriggers()) {
+      return INSTRUCTION_SET_ALL_JOB_TRIGGERS_COMPLETE;
+    }
+
+    if (!mayFireAgain()) {
+      return INSTRUCTION_DELETE_TRIGGER;
+    }
+
+    return INSTRUCTION_NOOP;
   }
 
   /**
@@ -157,8 +221,7 @@ public class QuartzJobTrigger extends Trigger {
    */
   @Override
   public Date getFireTimeAfter(Date date) {
-    // TODO Auto-generated method stub
-    return null;
+    return trigger.getNextExecutionAfter(date);
   }
 
   /**
@@ -168,7 +231,7 @@ public class QuartzJobTrigger extends Trigger {
    */
   @Override
   public Date getPreviousFireTime() {
-    return lastFireTime;
+    return previousFireTime;
   }
 
   /**
@@ -188,7 +251,7 @@ public class QuartzJobTrigger extends Trigger {
    */
   @Override
   public boolean mayFireAgain() {
-    return trigger.getNextExecution() > 0;
+    return mayFireAgain && getNextFireTime() != null;
   }
 
   /**
@@ -217,8 +280,25 @@ public class QuartzJobTrigger extends Trigger {
    * @see org.quartz.Trigger#triggered(org.quartz.Calendar)
    */
   @Override
-  public void triggered(Calendar cal) {
-    this.lastFireTime = new Date();
+  public void triggered(Calendar calendar) {
+    timesTriggered++;
+    previousFireTime = nextFireTime;
+    nextFireTime = getFireTimeAfter(nextFireTime);
+
+    // Make sure the next fire time is not explicitly excluded
+    while (nextFireTime != null && calendar != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+
+      nextFireTime = getFireTimeAfter(nextFireTime);
+      if (nextFireTime == null)
+        break;
+
+      // avoid infinite loop
+      java.util.Calendar c = java.util.Calendar.getInstance();
+      c.setTime(nextFireTime);
+      if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+        nextFireTime = null;
+      }
+    }
   }
 
   /**
@@ -227,9 +307,38 @@ public class QuartzJobTrigger extends Trigger {
    * @see org.quartz.Trigger#updateAfterMisfire(org.quartz.Calendar)
    */
   @Override
-  public void updateAfterMisfire(Calendar arg0) {
-    // TODO Auto-generated method stub
+  public void updateAfterMisfire(Calendar calendar) {
+    int instr = getMisfireInstruction();
+    if (instr == Trigger.MISFIRE_INSTRUCTION_SMART_POLICY) {
+      if (!mayFireAgain) {
+        instr = MISFIRE_INSTRUCTION_FIRE_NOW;
+      } else {
+        instr = MISFIRE_INSTRUCTION_RESCHEDULE;
+      }
+    } else if (instr == MISFIRE_INSTRUCTION_FIRE_NOW && mayFireAgain) {
+      instr = MISFIRE_INSTRUCTION_RESCHEDULE;
+    }
 
+    // Reschedule?
+    if (instr == MISFIRE_INSTRUCTION_FIRE_NOW) {
+      setNextFireTime(new Date());
+    } else if (instr == MISFIRE_INSTRUCTION_RESCHEDULE) {
+      Date newFireTime = getFireTimeAfter(new Date());
+      while (newFireTime != null && calendar != null && !calendar.isTimeIncluded(newFireTime.getTime())) {
+        newFireTime = getFireTimeAfter(newFireTime);
+
+        if (newFireTime == null)
+          break;
+
+        // avoid infinite loop
+        java.util.Calendar c = java.util.Calendar.getInstance();
+        c.setTime(newFireTime);
+        if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+          newFireTime = null;
+        }
+      }
+      setNextFireTime(newFireTime);
+    }
   }
 
   /**
@@ -238,9 +347,35 @@ public class QuartzJobTrigger extends Trigger {
    * @see org.quartz.Trigger#updateWithNewCalendar(org.quartz.Calendar, long)
    */
   @Override
-  public void updateWithNewCalendar(Calendar arg0, long arg1) {
-    // TODO Auto-generated method stub
+  public void updateWithNewCalendar(Calendar calendar, long misfireThreshold) {
+    nextFireTime = getFireTimeAfter(previousFireTime);
 
+    if (nextFireTime == null || calendar == null) {
+      return;
+    }
+
+    Date now = new Date();
+    while (nextFireTime != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
+
+      nextFireTime = getFireTimeAfter(nextFireTime);
+
+      if (nextFireTime == null)
+        break;
+
+      // avoid infinite loop
+      java.util.Calendar c = java.util.Calendar.getInstance();
+      c.setTime(nextFireTime);
+      if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
+        nextFireTime = null;
+      }
+
+      if (nextFireTime != null && nextFireTime.before(now)) {
+        long diff = now.getTime() - nextFireTime.getTime();
+        if (diff >= misfireThreshold) {
+          nextFireTime = getFireTimeAfter(nextFireTime);
+        }
+      }
+    }
   }
 
   /**
@@ -249,9 +384,23 @@ public class QuartzJobTrigger extends Trigger {
    * @see org.quartz.Trigger#validateMisfireInstruction(int)
    */
   @Override
-  protected boolean validateMisfireInstruction(int arg0) {
-    // TODO Auto-generated method stub
-    return false;
+  protected boolean validateMisfireInstruction(int misfireInstruction) {
+    if (misfireInstruction < MISFIRE_INSTRUCTION_SMART_POLICY) {
+      return false;
+    } else if (misfireInstruction > MISFIRE_INSTRUCTION_RESCHEDULE) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Get the number of times the <code>QuartzJobTrigger</code> has already
+   * fired.
+   * 
+   * @return the number of times that this trigger has been fired
+   */
+  public int getTimesTriggered() {
+    return timesTriggered;
   }
 
 }

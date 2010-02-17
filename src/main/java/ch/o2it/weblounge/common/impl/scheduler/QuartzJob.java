@@ -80,7 +80,7 @@ public class QuartzJob implements Job {
    */
   @SuppressWarnings("unchecked")
   private ch.o2it.weblounge.common.scheduler.Job createJobInstance(JobExecutionContext ctx) throws Exception {
-    Class<?> c = (Class<?>) ctx.get(CLASS);
+    Class<?> c = (Class<?>) ctx.getJobDetail().getJobDataMap().get(CLASS);
     if (c == null)
       throw new IllegalStateException("Lookup of job implementation failed");
     try {

@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.scheduler.JobTrigger;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -110,17 +111,18 @@ public final class CronJobTrigger implements JobTrigger {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecution()
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecutionAfter(Date)
    */
-  public long getNextExecution() {
-    if (nextExecution > System.currentTimeMillis())
-      return nextExecution;
+  public Date getNextExecutionAfter(Date date) {
+    if (nextExecution > date.getTime())
+      return new Date(nextExecution);
     else if (once) {
       once = false;
-      return 0;
+      return date;
     }
 
     Calendar c = Calendar.getInstance();
+    c.setTime(date);
 
     // Move to next full minute
     c.set(Calendar.MILLISECOND, 0);
@@ -148,7 +150,7 @@ public final class CronJobTrigger implements JobTrigger {
 
     // Cache the new value
     nextExecution = c.getTimeInMillis();
-    return nextExecution;
+    return new Date(nextExecution);
   }
 
   /**

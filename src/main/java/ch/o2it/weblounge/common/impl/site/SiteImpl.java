@@ -1189,16 +1189,23 @@ public class SiteImpl implements Site {
     // Throw the job at quartz
     String groupName = "site " + this.getIdentifier();
     String jobName = job.getName();
-    Class<?> jobClass = job.getJob().getClass();
+    Class<?> jobClass = job.getJob();
     JobTrigger trigger = job.getTrigger();
     
     synchronized (jobs) {
-      JobDetail quartzJob = new JobDetail(jobName, groupName, QuartzJob.class);
-      Trigger quartzTrigger = new QuartzJobTrigger(jobName, groupName, trigger);
+      
+      // Set up the job detail
       JobDataMap jobData = new JobDataMap();
       jobData.put(QuartzJob.CLASS, jobClass);
       jobData.put(QuartzJob.CONTEXT, job.getContext());
+      JobDetail quartzJob = new JobDetail(jobName, groupName, QuartzJob.class);
+      quartzJob.setJobDataMap(jobData);
+      
+      // Define the trigger
+      Trigger quartzTrigger = new QuartzJobTrigger(jobName, groupName, trigger);
       quartzTrigger.addTriggerListener(quartzTriggerListener.getName());
+      
+      // Schedule
       try {
         Date date = scheduler.scheduleJob(quartzJob, quartzTrigger);
         log_.info("Job '{}' scheduled, first execution at {}", jobName, date);

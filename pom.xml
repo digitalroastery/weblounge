@@ -120,6 +120,8 @@
               org.apache.commons.fileupload.disk,
               org.apache.commons.fileupload.servlet,
               org.apache.commons.lang,
+              org.apache.commons.pool,
+              org.apache.commons.pool.impl,
               org.apache.jasper,
               org.quartz,
               org.quartz.impl,

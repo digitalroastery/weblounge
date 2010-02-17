@@ -22,14 +22,19 @@ package ch.o2it.weblounge.common.impl.scheduler;
 
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
 
+import java.util.Date;
+
 /**
  * This trigger will fire a job periodically. The next period starts when the
  * job's last execution finished.
  */
 public class PeriodicJobTrigger implements JobTrigger {
 
-  /** The next execution time */
-  private long nextExecution = -1;
+  /** The start time */
+  private long startTime = -1;
+
+  /** The last execution time */
+  private long lastExecution = -1;
 
   /** The period in milliseconds */
   private long period = -1;
@@ -44,10 +49,7 @@ public class PeriodicJobTrigger implements JobTrigger {
    *           if the period is smaller are equal to zero
    */
   public PeriodicJobTrigger(long period) throws IllegalArgumentException {
-    if (period <= 1)
-      throw new IllegalArgumentException("Period needs to be a positive integer");
-    this.period = period;
-    this.nextExecution = System.currentTimeMillis() + period;
+    this(period, System.currentTimeMillis() + period);
   }
 
   /**
@@ -72,20 +74,23 @@ public class PeriodicJobTrigger implements JobTrigger {
     if (startTime < System.currentTimeMillis())
       throw new IllegalArgumentException("Start time must be in the future");
     this.period = period;
-    this.nextExecution = startTime;
+    this.startTime = startTime;
+    this.lastExecution = startTime - period;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecution()
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecutionAfter(Date)
    */
-  public long getNextExecution() {
-    long now = System.currentTimeMillis();
-    while (nextExecution < now) {
+  public Date getNextExecutionAfter(Date date) {
+    long now = Math.max(startTime, date.getTime());
+    long nextExecution = lastExecution;
+    while (nextExecution <= now) {
       nextExecution += period;
     }
-    return nextExecution;
+    lastExecution = nextExecution;
+    return new Date(nextExecution);
   }
 
   /**
