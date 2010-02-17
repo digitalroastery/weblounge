@@ -20,31 +20,25 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
+import java.util.Date;
+
 /**
  * A job trigger indicates when a job is fired. A job associated with a job
- * trigger while be kept scheduled as long as {@link #getNextExecution()}
- * returns a valid date or <code>0</code>, in which case the job will be fired
- * once only.
+ * trigger while be kept scheduled as long as
+ * {@link #getNextExecutionAfter(Date)} returns a valid date or <code>0</code>,
+ * in which case the job will be fired once only.
  */
 public interface JobTrigger {
 
   /**
-   * Value returned by {@link #getNextExecution()} indicating that the job
-   * should be triggered right now.
-   */
-  long ONCE = 0;
-
-  /**
-   * Value returned by {@link #getNextExecution()} indicating that the job
-   * should not be triggered at all.
-   */
-  long NEVER = -1;
-
-  /**
-   * Returns the next execution date and time in milliseconds.
+   * Returns the next execution date and time. If the job should no longer be
+   * executed, this method should return <code>null</code>. If it should be
+   * executed as soon as possible, <code>date</code> should be returned.
    * 
+   * @param date
+   *          the earliest possible execution date
    * @return the next execution date and time
    */
-  long getNextExecution();
+  Date getNextExecutionAfter(Date date);
 
 }
