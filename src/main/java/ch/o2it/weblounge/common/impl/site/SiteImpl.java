@@ -21,8 +21,8 @@
 package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.scheduler.FireOnceTrigger;
-import ch.o2it.weblounge.common.impl.scheduler.JobConfiguration;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
+import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
@@ -131,7 +131,7 @@ public class SiteImpl implements Site {
   protected List<String> hostnames = null;
 
   /** Jobs */
-  protected Map<String, JobConfiguration> jobs = null;
+  protected Map<String, QuartzJob> jobs = null;
 
   /** Option handling support */
   protected OptionsHelper options = null;
@@ -168,7 +168,7 @@ public class SiteImpl implements Site {
     imagestyles = new HashMap<String, ImageStyle>();
     modules = new HashMap<String, Module>();
     hostnames = new ArrayList<String>();
-    jobs = new HashMap<String, JobConfiguration>();
+    jobs = new HashMap<String, QuartzJob>();
     options = new OptionsHelper();
   }
 
@@ -699,7 +699,7 @@ public class SiteImpl implements Site {
     
     // Register jobs
     synchronized (jobs) {
-      for (JobConfiguration job : jobs.values()) {
+      for (QuartzJob job : jobs.values()) {
         scheduleJob(job);
       }
     }
@@ -724,7 +724,7 @@ public class SiteImpl implements Site {
 
     // Stop jobs
     synchronized (jobs) {
-      for (JobConfiguration job : jobs.values()) {
+      for (QuartzJob job : jobs.values()) {
         unscheduleJob(job);
       }
     }
@@ -944,7 +944,7 @@ public class SiteImpl implements Site {
       this.scheduler.addTriggerListener(quartzTriggerListener);
       if (running) {
         synchronized (jobs) {
-          for (JobConfiguration job : jobs.values()) {
+          for (QuartzJob job : jobs.values()) {
             scheduleJob(job);
           }
         }
@@ -1152,7 +1152,7 @@ public class SiteImpl implements Site {
   public void addJob(String name, Class<? extends Job> job,
       Dictionary<String, Serializable> config, JobTrigger trigger) {
 
-    JobConfiguration jobDetail = new JobConfiguration(name, job, config, trigger);
+    QuartzJob jobDetail = new QuartzJob(name, job, config, trigger);
     
     // Register the job
     synchronized (jobs) {
@@ -1182,7 +1182,7 @@ public class SiteImpl implements Site {
    * @param job
    *          the job
    */
-  private void scheduleJob(JobConfiguration job) {
+  private void scheduleJob(QuartzJob job) {
     if (scheduler == null)
       return;
     
@@ -1196,9 +1196,9 @@ public class SiteImpl implements Site {
       
       // Set up the job detail
       JobDataMap jobData = new JobDataMap();
-      jobData.put(QuartzJob.CLASS, jobClass);
-      jobData.put(QuartzJob.CONTEXT, job.getContext());
-      JobDetail quartzJob = new JobDetail(jobName, groupName, QuartzJob.class);
+      jobData.put(QuartzJobWorker.CLASS, jobClass);
+      jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
+      JobDetail quartzJob = new JobDetail(jobName, groupName, QuartzJobWorker.class);
       quartzJob.setJobDataMap(jobData);
       
       // Define the trigger
@@ -1224,7 +1224,7 @@ public class SiteImpl implements Site {
    * @param job
    *          the job
    */
-  private void unscheduleJob(JobConfiguration job) {
+  private void unscheduleJob(QuartzJob job) {
     if (scheduler == null)
       return;
 
