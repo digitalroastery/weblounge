@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.impl.scheduler.FireOnceTrigger;
+import ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
@@ -1139,7 +1139,7 @@ public class SiteImpl implements Site {
    */
   public void addJob(String name, Class<? extends Job> job,
       Dictionary<String, Serializable> config) {
-    addJob(name, job, config, new FireOnceTrigger());
+    addJob(name, job, config, new FireOnceJobTrigger());
   }
 
   /**

@@ -23,7 +23,7 @@ package ch.o2it.weblounge.common.scheduler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.impl.scheduler.FireOnceTrigger;
+import ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
@@ -138,7 +138,7 @@ public class QuartzJobWorkerTest {
   public void testExecuteOnce() throws Exception {
     
     // Set up and register the listener
-    trigger = new FireOnceTrigger();
+    trigger = new FireOnceJobTrigger();
     triggerListener = new TestTriggerListener(monitor, 1);
     scheduler.addTriggerListener(triggerListener);
     
@@ -204,7 +204,7 @@ public class QuartzJobWorkerTest {
   public void testExecuteVetoed() throws Exception {
     
     // Set up and register the listener
-    trigger = new FireOnceTrigger();
+    trigger = new FireOnceJobTrigger();
     triggerListener = new TestTriggerListener(monitor, 1);
     triggerListener.setVeto(true);
     scheduler.addTriggerListener(triggerListener);

@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.scheduler;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.scheduler.FireOnceTrigger;
+import ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 
 import org.junit.Before;
@@ -59,7 +59,7 @@ public class QuartzJobTest {
   public void setUp() throws Exception {
     jobClass = TestJob.class;
     jobContext = new Hashtable<String, Serializable>();
-    trigger = new FireOnceTrigger();
+    trigger = new FireOnceJobTrigger();
     quartzJob = new QuartzJob(jobName, jobClass, jobContext, trigger);
   }
 

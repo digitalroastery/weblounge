@@ -28,7 +28,7 @@ import java.util.Date;
  * This trigger makes sure the job is triggered at the next possible moment.
  * After this one execution, the job will not be executed again.
  */
-public class FireOnceTrigger implements JobTrigger {
+public class FireOnceJobTrigger implements JobTrigger {
   
   /** Has this trigger been fired? */
   protected boolean fired = false;
