@@ -41,4 +41,15 @@ public interface JobTrigger {
    */
   Date getNextExecutionAfter(Date date);
 
+  /**
+   * Callback by the scheduler indicating that the trigger has been fired on
+   * <code>date</code>.
+   * <p>
+   * Note that the callback doesn't imply anything regarding the success or
+   * failure of the execution of the job that was triggered.
+   * 
+   * @param date the firing date
+   */
+  void triggered(Date date);
+
 }
