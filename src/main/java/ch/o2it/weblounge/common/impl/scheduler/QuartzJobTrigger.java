@@ -25,7 +25,10 @@ import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import org.quartz.Calendar;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.Scheduler;
 import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -33,7 +36,7 @@ import java.util.Date;
  * The <code>QuartzJobTrigger</code> wraps the Weblounge <code>JobTrigger</code>
  * to be used by the quartz scheduler.
  */
-public class QuartzJobTrigger extends Trigger {
+public final class QuartzJobTrigger extends Trigger {
 
   /** Serial version uid */
   private static final long serialVersionUID = 3873501563763335486L;
@@ -75,6 +78,9 @@ public class QuartzJobTrigger extends Trigger {
   /** Do not schedule past this year (used to prevent endless loops) */
   private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
 
+  /** The logger */
+  private static final Logger log_ = LoggerFactory.getLogger(QuartzJobTrigger.class);
+  
   /** Weblounge job trigger */
   private JobTrigger trigger = null;
 
@@ -118,6 +124,15 @@ public class QuartzJobTrigger extends Trigger {
     this.startTime = trigger.getNextExecutionAfter(now);
     this.endTime = startTime.equals(now) ? now : null;
     this.mayFireAgain = endTime == null;
+  }
+
+  /**
+   * Returns the weblounge trigger.
+   * 
+   * @return the trigger
+   */
+  JobTrigger getOriginalTrigger() {
+    return trigger;
   }
 
   /**
@@ -221,7 +236,12 @@ public class QuartzJobTrigger extends Trigger {
    */
   @Override
   public Date getFireTimeAfter(Date date) {
-    return trigger.getNextExecutionAfter(date);
+    try {
+      return trigger.getNextExecutionAfter(date);
+    } catch (Exception e) {
+      log_.error("Job implementation threw exception when asked for next trigger date", e);
+      return null;
+    }
   }
 
   /**
@@ -281,10 +301,16 @@ public class QuartzJobTrigger extends Trigger {
    */
   @Override
   public void triggered(Calendar calendar) {
-    timesTriggered++;
-    previousFireTime = nextFireTime;
-    nextFireTime = getFireTimeAfter(nextFireTime);
-
+    try {
+      timesTriggered++;
+      previousFireTime = nextFireTime;
+      trigger.triggered(previousFireTime);
+    } catch (Exception e) {
+      log_.error("Job implementation threw exception on trigger callback", e);
+    } finally {
+      nextFireTime = getFireTimeAfter(nextFireTime);
+    }
+  
     // Make sure the next fire time is not explicitly excluded
     while (nextFireTime != null && calendar != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
 

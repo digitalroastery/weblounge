@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertTrue;
 
 import static org.junit.Assert.assertEquals;
@@ -38,7 +40,7 @@ public class FireOnceJobTriggerTest {
 
   /** The job trigger to test */
   protected FireOnceJobTrigger trigger = null;
-  
+
   /**
    * @throws java.lang.Exception
    */
@@ -53,8 +55,28 @@ public class FireOnceJobTriggerTest {
   @Test
   public void testGetNextExecutionAfter() {
     Date now = new Date();
+    Date then = new Date(now.getTime() + 60000L);
     assertEquals(now, trigger.getNextExecutionAfter(now));
+    assertEquals(then, trigger.getNextExecutionAfter(then));
+    trigger.triggered(now);
     assertTrue(trigger.getNextExecutionAfter(now) == null);
+    assertTrue(trigger.getNextExecutionAfter(then) == null);
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger#triggered(java.util.Date)}.
+   */
+  @Test
+  public void testTriggeredDate() {
+    Date now = new Date();
+    Date then = new Date(now.getTime() + 60000L);
+    try {
+      trigger.triggered(now); // Should pass
+      trigger.triggered(then); // Should fail
+      fail("Trigger should have thrown an exception");
+    } catch (IllegalStateException e) {
+      // expected
+    }
   }
 
 }

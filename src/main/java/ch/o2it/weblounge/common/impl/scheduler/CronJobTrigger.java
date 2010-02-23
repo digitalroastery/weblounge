@@ -154,6 +154,15 @@ public final class CronJobTrigger implements JobTrigger {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#triggered(java.util.Date)
+   */
+  public void triggered(Date date) {
+    // We don't care too much...
+  }
+  
+  /**
    * Initializes this cron job. By default, the job will never be executed.
    */
   private void init() {

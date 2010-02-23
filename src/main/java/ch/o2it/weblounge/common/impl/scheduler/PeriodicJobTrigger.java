@@ -36,14 +36,11 @@ public class PeriodicJobTrigger implements JobTrigger {
   /** The end time */
   private long endTime = -1;
 
-  /** The last execution time */
-  private long lastExecution = -1;
-
   /** Number of times to fire */
   private long repeatCount = -1;
 
   /** Number of times the trigger has been fired */
-  private long triggerCount = -1;
+  private long triggerCount = 0;
 
   /** The period in milliseconds */
   private long period = -1;
@@ -58,7 +55,7 @@ public class PeriodicJobTrigger implements JobTrigger {
    *           if the period is smaller are equal to zero
    */
   public PeriodicJobTrigger(long period) throws IllegalArgumentException {
-    this(period, System.currentTimeMillis(), -1);
+    this(period, new Date(), null);
   }
 
   /**
@@ -70,47 +67,65 @@ public class PeriodicJobTrigger implements JobTrigger {
    * @param period
    *          the period in milliseconds at which the job should be executed
    * @param startTime
-   *          the start time of the job in milliseconds
+   *          the start time of the job
    * @throws IllegalArgumentException
    *           if the period is smaller are equal to zero
-   * @throws IllegalArgumentException
-   *           if the start time is in the past
    */
-  public PeriodicJobTrigger(long period, long startTime)
+  public PeriodicJobTrigger(long period, Date startTime)
       throws IllegalArgumentException {
-    this(period, startTime, -1);
+    this(period, startTime, null, -1);
   }
 
   /**
    * Creates a new <code>PeriodicJob</code> with the given name and period. The
    * job starts execution at the given time and ends at or before
-   * <code>endTime</code>. If <code>endTime</code> is set to <code>-1</code>,
-   * this trigger will fire forever or until it has reached the repeat count
-   * set using <code>setRepeatCount()</code>.
+   * <code>endTime</code>. If <code>endTime</code> is set to <code>null</code>,
+   * this trigger will fire forever or until it has reached the repeat count set
+   * using <code>setRepeatCount()</code>.
    * 
    * @param name
    *          the name of the job
    * @param period
    *          the period in milliseconds at which the job should be executed
    * @param startTime
-   *          the start time of the job in milliseconds
+   *          the start time of the job
    * @param endTime
-   *          the end time of the job in milliseconds
+   *          the end time of the job
    * @throws IllegalArgumentException
    *           if the period is smaller are equal to zero
-   * @throws IllegalArgumentException
-   *           if the start time is in the past
    */
-  public PeriodicJobTrigger(long period, long startTime, long endTime)
-      throws IllegalArgumentException {
+  public PeriodicJobTrigger(long period, Date startTime, Date endTime) throws IllegalArgumentException {
+    this(period, startTime, endTime, -1);
+  }
+
+  /**
+   * Creates a new <code>PeriodicJob</code> with the given name and period. The
+   * job starts execution at the given time and ends at or before
+   * <code>endTime</code>. If <code>endTime</code> is set to <code>null</code>,
+   * this trigger will fire forever or until it has reached the repeat count set
+   * using <code>setRepeatCount()</code>.
+   * 
+   * @param name
+   *          the name of the job
+   * @param period
+   *          the period in milliseconds at which the job should be executed
+   * @param startTime
+   *          the start time of the job
+   * @param endTime
+   *          the end time of the job
+   * @param repeat
+   *          number of times that this trigger should be executed
+   * @throws IllegalArgumentException
+   *           if the period is smaller are equal to zero
+   */
+  public PeriodicJobTrigger(long period, Date startTime, Date endTime,
+      long repeat) throws IllegalArgumentException {
     if (period <= 1)
       throw new IllegalArgumentException("Period needs to be a positive integer");
-    if (startTime < System.currentTimeMillis())
-      throw new IllegalArgumentException("Start time must be in the future");
     this.period = period;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.lastExecution = startTime - period;
+    this.startTime = startTime != null ? startTime.getTime() : System.currentTimeMillis();
+    this.endTime = endTime != null ? endTime.getTime() : -1;
+    this.repeatCount = repeat;
   }
 
   /**
@@ -119,18 +134,29 @@ public class PeriodicJobTrigger implements JobTrigger {
    * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecutionAfter(Date)
    */
   public Date getNextExecutionAfter(Date date) {
-    if (endTime != -1 && date.getTime() > endTime)
+    if (endTime != -1 && date.getTime() >= endTime)
       return null;
     if (repeatCount != -1 && triggerCount >= repeatCount)
       return null;
-    long now = Math.max(startTime, date.getTime());
-    long nextExecution = lastExecution;
-    while (nextExecution <= now) {
-      nextExecution += period;
-    }
-    lastExecution = nextExecution;
-    triggerCount ++;
+    if (date.getTime() < startTime)
+      return new Date(startTime);
+
+    long triggerCount = (long) Math.floor((date.getTime() - startTime) / period);
+    long nextExecution = startTime + (triggerCount + 1) * period;
     return new Date(nextExecution);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#triggered(java.util.Date)
+   */
+  public void triggered(Date date) {
+    triggerCount++;
+    if (endTime > -1 && date.getTime() > date.getTime())
+      throw new IllegalStateException("Trigger was not supposed to be fired after " + new Date(endTime));
+    if (repeatCount > -1 && triggerCount > repeatCount)
+      throw new IllegalStateException("Trigger was not supposed to called more than " + repeatCount + " times");
   }
 
   /**

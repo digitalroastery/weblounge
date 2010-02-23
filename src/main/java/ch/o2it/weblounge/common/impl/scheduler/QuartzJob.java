@@ -31,7 +31,7 @@ import java.util.Hashtable;
 /**
  * Base implementation for jobs.
  */
-public class QuartzJob {
+public final class QuartzJob {
 
   /** The job name */
   protected String name = null;

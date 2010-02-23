@@ -31,7 +31,7 @@ import java.util.Date;
 public class FireOnceJobTrigger implements JobTrigger {
   
   /** Has this trigger been fired? */
-  protected boolean fired = false;
+  boolean fired = false;
 
   /**
    * {@inheritDoc}
@@ -41,8 +41,18 @@ public class FireOnceJobTrigger implements JobTrigger {
   public Date getNextExecutionAfter(Date date) {
     if (fired)
       return null;
-    fired = true;
     return date;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#triggered(java.util.Date)
+   */
+  public void triggered(Date date) {
+    if (fired)
+      throw new IllegalStateException("This trigger should be fired once only");
+    fired = true;
   }
 
 }
