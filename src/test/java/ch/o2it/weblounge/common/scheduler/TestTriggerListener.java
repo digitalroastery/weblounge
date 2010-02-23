@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
+import org.junit.Ignore;
 import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
@@ -27,6 +28,7 @@ import org.quartz.TriggerListener;
 /**
  * This listener keeps track of the work that the Quartz scheduler is doing.
  */
+@Ignore
 final class TestTriggerListener implements TriggerListener {
 
   /** The listener name */

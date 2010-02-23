@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
+import org.junit.Ignore;
+
 import java.io.Serializable;
 import java.util.Dictionary;
 
@@ -37,6 +39,7 @@ import java.util.Dictionary;
  * thrown as an example of a <code>RuntimeException</code> as opposed to the
  * checked <code>JobException</code>.
  */
+@Ignore
 public class TestJob implements Job {
 
   /** String constant identifying the number of executions */
