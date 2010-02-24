@@ -121,9 +121,8 @@ public final class QuartzJobTrigger extends Trigger {
 
     // Initialize the settings
     Date now = new Date();
-    this.startTime = trigger.getNextExecutionAfter(now);
-    this.endTime = startTime.equals(now) ? now : null;
-    this.mayFireAgain = endTime == null;
+    startTime = trigger.getNextExecutionAfter(now);
+    mayFireAgain = trigger.getNextExecutionAfter(startTime) != null;
   }
 
   /**
@@ -162,23 +161,24 @@ public final class QuartzJobTrigger extends Trigger {
    */
   @Override
   public Date computeFirstFireTime(Calendar calendar) {
-    nextFireTime = getStartTime();
+    Date firstFireTime = getStartTime();
 
-    while (nextFireTime != null && calendar != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
-      nextFireTime = getFireTimeAfter(nextFireTime);
+    while (firstFireTime != null && calendar != null && !calendar.isTimeIncluded(firstFireTime.getTime())) {
+      firstFireTime = getFireTimeAfter(firstFireTime);
 
-      if (nextFireTime == null)
+      if (firstFireTime == null)
         break;
 
       // avoid infinite loop
       java.util.Calendar c = java.util.Calendar.getInstance();
-      c.setTime(nextFireTime);
+      c.setTime(firstFireTime);
       if (c.get(java.util.Calendar.YEAR) > YEAR_TO_GIVEUP_SCHEDULING_AT) {
         return null;
       }
     }
 
-    return nextFireTime;
+    nextFireTime = (mayFireAgain) ? firstFireTime : null;
+    return firstFireTime;
   }
 
   /**

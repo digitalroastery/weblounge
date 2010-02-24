@@ -20,22 +20,28 @@
 
 package ch.o2it.weblounge.common.impl.scheduler;
 
+import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobException;
 
-import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Dictionary;
+import java.util.Hashtable;
 
 /**
  * Wrapper class that is passed to the Quartz scheduler and that will execute
  * whatever class is passed in the <code>JobExecutionContext</code> using the
  * <code>ch.o2it.weblounge.Job</code> key.
  */
-public class QuartzJobWorker implements Job {
+public class QuartzJobWorker implements org.quartz.Job {
+  
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(QuartzJobWorker.class);
 
   /** The class key */
   public final static String CLASS = "ch.o2it.weblounge.Job";
@@ -44,29 +50,36 @@ public class QuartzJobWorker implements Job {
   public final static String CONTEXT = "ch.o2it.weblounge.JobContext";
 
   /** The job instance */
-  private ch.o2it.weblounge.common.scheduler.Job jobInstance = null;
-  
-  private Dictionary<String, Serializable> jobContext = null;;
+  private Job jobInstance = null;
 
   /**
    * {@inheritDoc}
    * 
    * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
    */
+  @SuppressWarnings("unchecked")
   public void execute(JobExecutionContext ctx) throws JobExecutionException {
-    if (jobInstance == null) {
-      try {
-        jobInstance = createJobInstance(ctx);
-      } catch (Throwable t) {
-        throw new JobExecutionException("Lookup of job implementation failed");
-      }
-    }
-    
-    // Execute the job
     try {
+      if (jobInstance == null) {
+        jobInstance = createJobInstance(ctx);
+        logger.info("Created new quartz worker " + jobInstance + " with context " + ctx);
+      }
+
+      // Prepare the local job context
+      Dictionary<String, Serializable> jobContext = (Dictionary<String, Serializable>)ctx.getJobDetail().getJobDataMap().get(CONTEXT);
+      if (jobContext == null) {
+        logger.debug("Creating default job context");
+        jobContext = new Hashtable<String, Serializable>();
+        ctx.getJobDetail().getJobDataMap().put(CONTEXT, jobContext);
+      }
+      
+      // Execute the worker
       jobInstance.execute(ctx.getJobDetail().getName(), jobContext);
+      
     } catch (JobException e) {
       throw new JobExecutionException(e);
+    } catch (Throwable t) {
+      throw new JobExecutionException("Lookup of job implementation failed");
     }
   }
 
@@ -77,17 +90,16 @@ public class QuartzJobWorker implements Job {
    * @param ctx
    *          the job context
    * @return the job instance
-   * @throws Exception if creating an instance of the job fails
+   * @throws Exception
+   *           if creating an instance of the job fails
    */
-  @SuppressWarnings("unchecked")
-  private ch.o2it.weblounge.common.scheduler.Job createJobInstance(JobExecutionContext ctx) throws Exception {
+  private Job createJobInstance(JobExecutionContext ctx) throws Exception {
     JobDataMap jobData = ctx.getJobDetail().getJobDataMap();
     Class<?> c = (Class<?>) jobData.get(CLASS);
     if (c == null)
       throw new IllegalStateException("Lookup of job implementation failed");
     try {
-      jobInstance = (ch.o2it.weblounge.common.scheduler.Job) c.newInstance();
-      jobContext = (Dictionary<String, Serializable>)jobData.get(CONTEXT);
+      jobInstance = (Job) c.newInstance();
       return jobInstance;
     } catch (InstantiationException e) {
       throw new IllegalStateException("Error instantiating job implementation: " + e.getMessage());

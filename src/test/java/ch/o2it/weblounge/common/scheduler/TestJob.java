@@ -51,19 +51,17 @@ public class TestJob implements Job {
   /** Execution where a <code>ArithmeticException</code> will be thrown */
   public static final int ARITHMETIC_EXCEPTION_COUNT = 10;
 
-  /** Keep track of how often we have been called */
-  private int executions = 0;
+  /** The number of test job instances */
+  private static int instances = 0;
+
+  /** Current instance */
+  private int id = -1;
 
   /** The last context */
   private Dictionary<String, Serializable> lastContext = null;
 
-  /**
-   * Returns the number of times that this job has been called.
-   * 
-   * @return the number of executions
-   */
-  public int getExecutions() {
-    return executions;
+  public TestJob() {
+    id = ++instances;
   }
 
   /**
@@ -83,25 +81,35 @@ public class TestJob implements Job {
    */
   public void execute(String name, Dictionary<String, Serializable> ctx)
       throws JobException {
-    if (executions > 0) {
-      Integer storedInCtx = (Integer) ctx.get(CTX_EXECUTIONS);
-      if (storedInCtx == null)
-        throw new JobException(this, "Context does not contain previously stored value");
-      if (storedInCtx.intValue() != executions)
-        throw new JobException(this, "Context contain wrong value (" + storedInCtx + ", while expecting " + executions + ")");
-    }
+
+    int executions = 0;
+    Integer storedInCtx = (Integer) ctx.get(CTX_EXECUTIONS);
+    if (storedInCtx != null)
+      executions = storedInCtx.intValue();
 
     // Increase execution count
-    executions ++;
+    executions++;
+
+    System.out.println("Test job " + id + " execution " + executions);
 
     // Update the context
     lastContext = ctx;
     ctx.put(CTX_EXECUTIONS, Integer.valueOf(executions));
-    
+
     if (executions == JOB_EXCEPTION_COUNT)
       throw new JobException(this, "The third execution always triggers this exception");
     if (executions == ARITHMETIC_EXCEPTION_COUNT)
       throw new ArithmeticException("The tenth execution always triggers this exception");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Testjob " + id;
   }
 
 }

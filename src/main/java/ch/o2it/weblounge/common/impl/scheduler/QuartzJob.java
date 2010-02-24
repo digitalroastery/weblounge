@@ -25,7 +25,6 @@ import ch.o2it.weblounge.common.scheduler.JobTrigger;
 
 import java.io.Serializable;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 /**
@@ -43,7 +42,7 @@ public final class QuartzJob {
   protected JobTrigger trigger = null;
 
   /** Job context map */
-  protected final Dictionary<String, Serializable> ctx = new Hashtable<String, Serializable>();
+  protected Dictionary<String, Serializable> ctx = null;
 
   /**
    * Creates a new job.
@@ -83,13 +82,9 @@ public final class QuartzJob {
     this.name = name;
     this.worker = worker;
     this.trigger = trigger;
-    if (context != null) {
-      Enumeration<String> keys = context.keys();
-      while (keys.hasMoreElements()) {
-        String key = keys.nextElement();
-        ctx.put(key, context.get(key));
-      }
-    }
+    this.ctx = context;
+    if (this.ctx == null)
+      ctx = new Hashtable<String, Serializable>();
   }
 
   /**

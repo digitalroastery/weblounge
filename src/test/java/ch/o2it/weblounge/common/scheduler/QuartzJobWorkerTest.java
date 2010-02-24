@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
+import static org.junit.Assert.assertNotNull;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -51,9 +53,6 @@ import java.util.Hashtable;
  */
 public class QuartzJobWorkerTest {
 
-  /** The scheduler factory */
-  protected static StdSchedulerFactory schedulerFactory = null;
-
   /** The quartz scheduler */
   protected static Scheduler scheduler = null;
 
@@ -62,7 +61,7 @@ public class QuartzJobWorkerTest {
 
   /** Quartz job */
   protected QuartzJob quartzJob = null;
-  
+
   /** Name of the test job */
   protected String jobName = "testjob";
 
@@ -85,11 +84,11 @@ public class QuartzJobWorkerTest {
   protected TestTriggerListener triggerListener = null;
 
   /** The monitor */
-  protected final Object monitor = new Object();
+  protected static final Object monitor = new Object();
 
   @BeforeClass
   public static void setUpClass() throws Exception {
-    schedulerFactory = new StdSchedulerFactory();
+    StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
     scheduler = schedulerFactory.getScheduler();
     scheduler.start();
   }
@@ -114,7 +113,7 @@ public class QuartzJobWorkerTest {
     jobClass = TestJob.class;
     jobContext = new Hashtable<String, Serializable>();
   }
-  
+
   /**
    * Clean up after test method.
    * 
@@ -126,38 +125,47 @@ public class QuartzJobWorkerTest {
       scheduler.removeTriggerListener(triggerListener.getName());
     if (quartzJob != null)
       unscheduleJob(quartzJob);
+    assertEquals(0, scheduler.getGlobalTriggerListeners().size());
+    assertEquals(0, scheduler.getJobNames(schedulerGroup).length);
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker#execute(org.quartz.JobExecutionContext)}.
+   * {@link ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker#execute(org.quartz.JobExecutionContext)}
+   * .
    * 
    * @throws Exception
    */
   @Test
   public void testExecuteOnce() throws Exception {
-    
+
     // Set up and register the listener
     trigger = new FireOnceJobTrigger();
     triggerListener = new TestTriggerListener(monitor, 1);
     scheduler.addTriggerListener(triggerListener);
-    
+
     // Create the job
     quartzJob = new QuartzJob(jobName, jobClass, jobContext, trigger);
 
+    // Schedule
+    scheduleJob(quartzJob);
+    assertEquals(1, scheduler.getJobNames(schedulerGroup).length);
+    assertEquals(1, scheduler.getTriggersOfJob(jobName, schedulerGroup).length);
+
     synchronized (monitor) {
       try {
-        scheduleJob(quartzJob);
         monitor.wait(1000);
       } catch (InterruptedException e) {
         fail("Trigger was interrupted while waiting for notification: " + e.getMessage());
       }
     }
-    
+
     assertEquals(1, triggerListener.getFiredCount());
     assertEquals(1, triggerListener.getCompletedCount());
     assertEquals(0, triggerListener.getVetoedCount());
     assertEquals(0, triggerListener.getMisfiredCount());
+    assertNotNull(jobContext.get(TestJob.CTX_EXECUTIONS));
+    assertEquals(1, ((Integer)jobContext.get(TestJob.CTX_EXECUTIONS)));
   }
 
   /**
@@ -172,17 +180,21 @@ public class QuartzJobWorkerTest {
 
     // Set up and register the listener
     trigger = new PeriodicJobTrigger(period);
-    ((PeriodicJobTrigger)trigger).setRepeatCount(triggerCount);
+    ((PeriodicJobTrigger) trigger).setRepeatCount(triggerCount);
     triggerListener = new TestTriggerListener(monitor, triggerCount);
     scheduler.addTriggerListener(triggerListener);
-    
+
     // Create the job
     quartzJob = new QuartzJob(jobName, jobClass, jobContext, trigger);
+
+    // Schedule
     scheduleJob(quartzJob);
+    assertEquals(1, scheduler.getJobNames(schedulerGroup).length);
+    assertEquals(1, scheduler.getTriggersOfJob(jobName, schedulerGroup).length);
 
     synchronized (monitor) {
       try {
-        monitor.wait((triggerCount + 1)*period);
+        monitor.wait((triggerCount + 1) * period);
       } catch (InterruptedException e) {
         fail("Trigger was interrupted while waiting for notification: " + e.getMessage());
       }
@@ -192,26 +204,33 @@ public class QuartzJobWorkerTest {
     assertEquals(triggerCount, triggerListener.getCompletedCount());
     assertEquals(0, triggerListener.getVetoedCount());
     assertEquals(0, triggerListener.getMisfiredCount());
+    assertNotNull(jobContext.get(TestJob.CTX_EXECUTIONS));
+    assertEquals(triggerCount, ((Integer)jobContext.get(TestJob.CTX_EXECUTIONS)));
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker#execute(org.quartz.JobExecutionContext)}.
+   * {@link ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker#execute(org.quartz.JobExecutionContext)}
+   * .
    * 
    * @throws Exception
    */
   @Test
   public void testExecuteVetoed() throws Exception {
-    
+
     // Set up and register the listener
     trigger = new FireOnceJobTrigger();
     triggerListener = new TestTriggerListener(monitor, 1);
     triggerListener.setVeto(true);
     scheduler.addTriggerListener(triggerListener);
-    
+
     // Create the job
     quartzJob = new QuartzJob(jobName, jobClass, jobContext, trigger);
+
+    // Schedule
     scheduleJob(quartzJob);
+    assertEquals(1, scheduler.getJobNames(schedulerGroup).length);
+    assertEquals(1, scheduler.getTriggersOfJob(jobName, schedulerGroup).length);
 
     synchronized (monitor) {
       try {
@@ -220,11 +239,13 @@ public class QuartzJobWorkerTest {
         fail("Trigger was interrupted while waiting for notification: " + e.getMessage());
       }
     }
-    
+
     assertEquals(1, triggerListener.getFiredCount());
     assertEquals(0, triggerListener.getCompletedCount());
     assertEquals(1, triggerListener.getVetoedCount());
     assertEquals(0, triggerListener.getMisfiredCount());
+    assertNotNull(jobContext.get(TestJob.CTX_EXECUTIONS));
+    assertEquals(1, ((Integer)jobContext.get(TestJob.CTX_EXECUTIONS)));
   }
 
   /**
@@ -232,25 +253,28 @@ public class QuartzJobWorkerTest {
    * 
    * @param job
    *          the job
+   * @param trigger
+   *          the job trigger
    */
-  private Date scheduleJob(QuartzJob job) throws SchedulerException {
+  private Date scheduleJob(QuartzJob job)
+      throws SchedulerException {
     String jobName = job.getName();
-    Class<?> jobClass = job.getJob();
     JobTrigger trigger = job.getTrigger();
+    Class<?> jobClass = job.getJob();
 
     // Set up the job detail
     JobDataMap jobData = new JobDataMap();
     jobData.put(QuartzJobWorker.CLASS, jobClass);
     jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
-    JobDetail quartzJob = new JobDetail(jobName, schedulerGroup, QuartzJobWorker.class);
-    quartzJob.setJobDataMap(jobData);
+    JobDetail quartzJobDetail = new JobDetail(jobName, schedulerGroup, QuartzJobWorker.class);
+    quartzJobDetail.setJobDataMap(jobData);
 
     // Define the trigger
     Trigger quartzTrigger = new QuartzJobTrigger(jobName, schedulerGroup, trigger);
     quartzTrigger.addTriggerListener(triggerListener.getName());
 
     // Schedule
-    return scheduler.scheduleJob(quartzJob, quartzTrigger);
+    return scheduler.scheduleJob(quartzJobDetail, quartzTrigger);
   }
 
   /**

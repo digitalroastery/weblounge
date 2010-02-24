@@ -59,22 +59,6 @@ public class TestJobTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.scheduler.TestJob#getExecutions()}.
-   */
-  @Test
-  public void testGetExecutions() {
-    for (int i = 1; i < 3; i++) {
-      try {
-        job.execute(jobName, jobContext);
-        assertEquals(i, job.getExecutions());
-      } catch (JobException e) {
-        fail(e.getMessage());
-      }
-    }
-  }
-
-  /**
-   * Test method for
    * {@link ch.o2it.weblounge.common.scheduler.TestJob#getLastContext()}.
    */
   @Test

@@ -33,7 +33,8 @@ import java.util.Date;
  */
 public class FireOnceJobTrigger implements JobTrigger {
   
-  Logger logger = LoggerFactory.getLogger(FireOnceJobTrigger.class);
+  /** The logging facility */
+  private final static Logger logger = LoggerFactory.getLogger(FireOnceJobTrigger.class);
 
   /** First date that the trigger was asked for */
   protected Date fireDate = null;
@@ -50,7 +51,7 @@ public class FireOnceJobTrigger implements JobTrigger {
     if (fired) {
       logger.debug("Fired one-time job trigger {} was asked for additional fire dates", this);
       return null;
-    } else if (fireDate != null) {
+    } else if (fireDate != null && !fireDate.equals(date)) {
       logger.debug("One-time job trigger {} was asked for additional fire dates", this);
       return null;
     }
