@@ -57,7 +57,7 @@ public class FireOnceJobTriggerTest {
     Date now = new Date();
     Date then = new Date(now.getTime() + 60000L);
     assertEquals(now, trigger.getNextExecutionAfter(now));
-    assertEquals(then, trigger.getNextExecutionAfter(then));
+    assertTrue(trigger.getNextExecutionAfter(then) == null);
     trigger.triggered(now);
     assertTrue(trigger.getNextExecutionAfter(now) == null);
     assertTrue(trigger.getNextExecutionAfter(then) == null);
@@ -78,5 +78,5 @@ public class FireOnceJobTriggerTest {
       // expected
     }
   }
-
+  
 }

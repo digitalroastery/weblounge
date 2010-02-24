@@ -144,10 +144,10 @@ public class QuartzJobWorkerTest {
     
     // Create the job
     quartzJob = new QuartzJob(jobName, jobClass, jobContext, trigger);
-    scheduleJob(quartzJob);
 
     synchronized (monitor) {
       try {
+        scheduleJob(quartzJob);
         monitor.wait(1000);
       } catch (InterruptedException e) {
         fail("Trigger was interrupted while waiting for notification: " + e.getMessage());
