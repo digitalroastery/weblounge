@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
+import static org.junit.Assert.assertTrue;
+
 import static org.junit.Assert.assertNotNull;
 
 import static org.junit.Assert.assertEquals;
@@ -165,7 +167,7 @@ public class QuartzJobWorkerTest {
     assertEquals(0, triggerListener.getVetoedCount());
     assertEquals(0, triggerListener.getMisfiredCount());
     assertNotNull(jobContext.get(TestJob.CTX_EXECUTIONS));
-    assertEquals(1, ((Integer)jobContext.get(TestJob.CTX_EXECUTIONS)));
+    assertEquals(1, ((Integer)jobContext.get(TestJob.CTX_EXECUTIONS)).intValue());
   }
 
   /**
@@ -205,7 +207,7 @@ public class QuartzJobWorkerTest {
     assertEquals(0, triggerListener.getVetoedCount());
     assertEquals(0, triggerListener.getMisfiredCount());
     assertNotNull(jobContext.get(TestJob.CTX_EXECUTIONS));
-    assertEquals(triggerCount, ((Integer)jobContext.get(TestJob.CTX_EXECUTIONS)));
+    assertEquals(triggerCount, ((Integer)jobContext.get(TestJob.CTX_EXECUTIONS)).intValue());
   }
 
   /**
@@ -244,8 +246,7 @@ public class QuartzJobWorkerTest {
     assertEquals(0, triggerListener.getCompletedCount());
     assertEquals(1, triggerListener.getVetoedCount());
     assertEquals(0, triggerListener.getMisfiredCount());
-    assertNotNull(jobContext.get(TestJob.CTX_EXECUTIONS));
-    assertEquals(1, ((Integer)jobContext.get(TestJob.CTX_EXECUTIONS)));
+    assertTrue(jobContext.get(TestJob.CTX_EXECUTIONS) == null);
   }
 
   /**
