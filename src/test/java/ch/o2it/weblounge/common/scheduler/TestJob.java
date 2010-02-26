@@ -21,6 +21,8 @@
 package ch.o2it.weblounge.common.scheduler;
 
 import org.junit.Ignore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Dictionary;
@@ -42,6 +44,9 @@ import java.util.Dictionary;
 @Ignore
 public class TestJob implements Job {
 
+  /** Logging facility */
+  private final static Logger logger = LoggerFactory.getLogger(TestJob.class);
+  
   /** String constant identifying the number of executions */
   public static final String CTX_EXECUTIONS = "executions";
 
@@ -90,7 +95,7 @@ public class TestJob implements Job {
     // Increase execution count
     executions++;
 
-    System.out.println("Test job " + id + " execution " + executions);
+    logger.debug("Test job " + id + " execution " + executions);
 
     // Update the context
     lastContext = ctx;
