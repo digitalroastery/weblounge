@@ -202,5 +202,15 @@ public class PeriodicJobTrigger implements JobTrigger {
   public long getRepeatCount() {
     return repeatCount;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Periodic job trigger [period=" + period + " ms]";
+  }
 
 }
