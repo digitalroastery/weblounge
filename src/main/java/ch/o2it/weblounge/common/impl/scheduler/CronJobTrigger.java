@@ -48,6 +48,7 @@ public final class CronJobTrigger implements JobTrigger {
       "feb",
       "mar",
       "apr",
+      "may",
       "jun",
       "jul",
       "aug",
@@ -67,23 +68,20 @@ public final class CronJobTrigger implements JobTrigger {
       "sat",
       "sun" };
 
-  /** Constant for "always" */
-  public static final short ALWAYS = -1;
-
   /** The minutes on which to execute the job */
-  private short[] minutes;
+  private int[] minutes;
 
   /** The hours on which to execute the job */
-  private short[] hours;
+  private int[] hours;
 
   /** The month on which to execute the job */
-  private short[] months;
+  private int[] months;
 
   /** The days of month on which to execute the job */
-  private short[] daysOfMonth;
+  private int[] daysOfMonth;
 
   /** The days of week on which to execute the job */
-  private short[] daysOfWeek;
+  private int[] daysOfWeek;
 
   /** True if this job should be run once */
   private boolean once = false;
@@ -113,7 +111,7 @@ public final class CronJobTrigger implements JobTrigger {
       init();
       parse(entry);
     } catch (Exception e) {
-      throw new IllegalArgumentException("Cron schedule " + entry + " is malformed!", e);
+      throw new IllegalArgumentException("Cron schedule " + entry + " is malformed: " + e.getMessage(), e);
     }
   }
 
@@ -131,6 +129,7 @@ public final class CronJobTrigger implements JobTrigger {
     }
 
     Calendar c = Calendar.getInstance();
+    c.setFirstDayOfWeek(Calendar.SUNDAY);
     c.setTime(date);
     boolean configured = false;
 
@@ -150,15 +149,16 @@ public final class CronJobTrigger implements JobTrigger {
       configured = true;
     }
 
-    // days
-    while (!matches(c, Calendar.DAY_OF_MONTH, daysOfMonth, daysOfWeek)) {
-      c.add(Calendar.DAY_OF_MONTH, 1);
+    // months
+    while (!matches(c, Calendar.MONTH, months)) {
+      c.set(Calendar.DAY_OF_MONTH, 1);
+      c.add(Calendar.MONTH, 1);
       configured = true;
     }
 
-    // months
-    while (!matches(c, Calendar.MONTH, months)) {
-      c.add(Calendar.MONTH, 1);
+    // days and weekdays
+    while (!matches(c, daysOfMonth, daysOfWeek)) {
+      c.add(Calendar.DAY_OF_MONTH, 1);
       configured = true;
     }
 
@@ -182,11 +182,11 @@ public final class CronJobTrigger implements JobTrigger {
    * Initializes this cron job. By default, the job will never be executed.
    */
   private void init() {
-    setMinutes(new short[] { });
-    setHours(new short[] { });
-    setDaysOfMonth(new short[] { });
-    setMonths(new short[] { });
-    setDaysOfWeek(new short[] { });
+    setMinutes(new int[] { });
+    setHours(new int[] { });
+    setDaysOfMonth(new int[] { });
+    setMonths(new int[] { });
+    setDaysOfWeek(new int[] { });
   }
 
   /**
@@ -194,7 +194,7 @@ public final class CronJobTrigger implements JobTrigger {
    * 
    * @return the minutes
    */
-  public short[] getMinutes() {
+  public int[] getMinutes() {
     return minutes;
   }
 
@@ -204,9 +204,9 @@ public final class CronJobTrigger implements JobTrigger {
    * @param minutes
    *          the minutes
    */
-  public void setMinutes(short[] minutes) {
+  public void setMinutes(int[] minutes) {
     if (minutes == null)
-      minutes = new short[] {};
+      minutes = new int[] {};
     this.minutes = minutes;
   }
 
@@ -225,7 +225,7 @@ public final class CronJobTrigger implements JobTrigger {
    * 
    * @return the hours
    */
-  public short[] getHours() {
+  public int[] getHours() {
     return hours;
   }
 
@@ -235,9 +235,9 @@ public final class CronJobTrigger implements JobTrigger {
    * @param hours
    *          the hours
    */
-  public void setHours(short[] hours) {
+  public void setHours(int[] hours) {
     if (hours == null)
-      hours = new short[] {};
+      hours = new int[] {};
     this.hours = hours;
   }
 
@@ -256,7 +256,7 @@ public final class CronJobTrigger implements JobTrigger {
    * 
    * @return the months
    */
-  public short[] getMonths() {
+  public int[] getMonths() {
     return months;
   }
 
@@ -266,9 +266,9 @@ public final class CronJobTrigger implements JobTrigger {
    * @param months
    *          the months
    */
-  public void setMonths(short[] months) {
+  public void setMonths(int[] months) {
     if (months == null)
-      months = new short[] {};
+      months = new int[] {};
     this.months = months;
   }
 
@@ -287,7 +287,7 @@ public final class CronJobTrigger implements JobTrigger {
    * 
    * @return the days of month
    */
-  public short[] getDaysOfMonth() {
+  public int[] getDaysOfMonth() {
     return daysOfMonth;
   }
 
@@ -297,9 +297,9 @@ public final class CronJobTrigger implements JobTrigger {
    * @param daysOfMonth
    *          the days of month
    */
-  public void setDaysOfMonth(short[] daysOfMonth) {
+  public void setDaysOfMonth(int[] daysOfMonth) {
     if (daysOfMonth == null)
-      daysOfMonth = new short[] {};
+      daysOfMonth = new int[] {};
     this.daysOfMonth = daysOfMonth;
   }
 
@@ -318,7 +318,7 @@ public final class CronJobTrigger implements JobTrigger {
    * 
    * @return the days of week
    */
-  public short[] getDaysOfWeek() {
+  public int[] getDaysOfWeek() {
     return daysOfWeek;
   }
 
@@ -328,9 +328,9 @@ public final class CronJobTrigger implements JobTrigger {
    * @param daysOfWeek
    *          the days of week
    */
-  public void setDaysOfWeek(short[] daysOfWeek) {
+  public void setDaysOfWeek(int[] daysOfWeek) {
     if (daysOfWeek == null)
-      daysOfWeek = new short[] {};
+      daysOfWeek = new int[] {};
     this.daysOfWeek = daysOfWeek;
   }
 
@@ -356,14 +356,22 @@ public final class CronJobTrigger implements JobTrigger {
    *          the reference values
    * @return <code>true</code> if the calendar matches
    */
-  private static boolean matches(Calendar c, int field, short[] reference) {
+  private static boolean matches(Calendar c, int field, int[] reference) {
     if (reference.length == 0)
       return true;
-    if (reference.length == 1 && reference[0] == ALWAYS)
-      return true;
-    int offset = (field == Calendar.MONTH) ? 1 : 0;
-    for (int i = 0; i < reference.length; i++)
-      if (reference[i] == c.get(field) + offset)
+    int offset = 0;
+    switch (field) {
+      case Calendar.MONTH:
+        offset = 1;
+        break;
+      case Calendar.DAY_OF_WEEK:
+        offset = -1;
+        break;
+      default:
+        offset = 0;
+    }
+    for (int value : reference)
+      if (value == c.get(field) + offset)
         return true;
     return false;
   }
@@ -374,20 +382,18 @@ public final class CronJobTrigger implements JobTrigger {
    * 
    * @param c
    *          the calendar
-   * @param field
-   *          the calendar field
    * @param reference
    *          the reference values
    * @return <code>true</code> if the calendar matches
    */
-  private static boolean matches(Calendar c, int field, short[] days,
-      short[] weekdays) {
-    if (days.length == 0 || (days.length == 1 && days[0] == ALWAYS))
-      return matches(c, field, weekdays);
-    else if (weekdays.length == 0 || (weekdays.length == 1 && weekdays[0] == ALWAYS))
-      return matches(c, field, days);
+  private static boolean matches(Calendar c, int[] days,
+      int[] weekdays) {
+    if (days.length == 0)
+      return matches(c, Calendar.DAY_OF_WEEK, weekdays);
+    else if (weekdays.length == 0)
+      return matches(c, Calendar.DAY_OF_MONTH, days);
     else
-      return matches(c, field, days) || matches(c, field, weekdays);
+      return matches(c, Calendar.DAY_OF_MONTH, days) && matches(c, Calendar.DAY_OF_WEEK, weekdays);
   }
 
   /**
@@ -429,9 +435,9 @@ public final class CronJobTrigger implements JobTrigger {
    *          the field
    * @return the minutes
    */
-  private short[] parseMinutes(String str) {
+  private int[] parseMinutes(String str) {
     try {
-      return enumerate(str, (short) 0, (short) 59);
+      return enumerate(str, (int) 0, (int) 59);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing minutes: " + e.getMessage());
     }
@@ -445,9 +451,9 @@ public final class CronJobTrigger implements JobTrigger {
    *          the field
    * @return the hours
    */
-  private short[] parseHours(String str) {
+  private int[] parseHours(String str) {
     try {
-      return enumerate(str, (short) 0, (short) 23);
+      return enumerate(str, (int) 0, (int) 23);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing hours: " + e.getMessage());
     }
@@ -462,9 +468,9 @@ public final class CronJobTrigger implements JobTrigger {
    *          the field
    * @return the months
    */
-  private short[] parseMonths(String str) {
+  private int[] parseMonths(String str) {
     try {
-      return enumerate(str, (short) 1, (short) 12);
+      return enumerate(str, (int) 1, (int) 12);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing months: " + e.getMessage());
     }
@@ -478,9 +484,9 @@ public final class CronJobTrigger implements JobTrigger {
    *          the field
    * @return the days
    */
-  private short[] parseDaysOfMonth(String str) {
+  private int[] parseDaysOfMonth(String str) {
     try {
-      return enumerate(str, (short) 1, (short) 31);
+      return enumerate(str, (int) 1, (int) 31);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing days of month: " + e.getMessage());
     }
@@ -496,9 +502,9 @@ public final class CronJobTrigger implements JobTrigger {
    *          the field
    * @return the weekdays
    */
-  private short[] parseDaysOfWeek(String str) {
+  private int[] parseDaysOfWeek(String str) {
     try {
-      return enumerate(str.replaceAll("7", "0"), (short) 0, (short) 6);
+      return enumerate(str.replaceAll("7", "0"), (int) 0, (int) 6);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing days of week: " + e.getMessage());
     }
@@ -525,68 +531,70 @@ public final class CronJobTrigger implements JobTrigger {
       return;
     str = str.trim().toLowerCase();
 
-    // Set default values
-    short minute = 0;
-    short hour = 0;
-    short dayOfMonth = 1;
-    short month = 0;
-    short dayOfWeek = ALWAYS;
-
     if ("@restart".equals(str)) {
       once = true;
     } else if ("@yearly".equals(str) || "@annually".equals(str)) {
-      month = 1;
+      setMinutes(new int[] { 0 });
+      setHours(new int[] { 0 });
+      setDaysOfMonth(new int[] { 1 });
+      setMonths(new int[] { 1 });
+      setDaysOfWeek(new int[] { });
     } else if ("@monthly".equals(str)) {
-      month = ALWAYS;
+      setMinutes(new int[] { 0 });
+      setHours(new int[] { 0 });
+      setDaysOfMonth(new int[] { 1 });
+      setMonths(new int[] { });
+      setDaysOfWeek(new int[] { });
     } else if ("@weekly".equals(str)) {
-      dayOfMonth = ALWAYS;
-      month = ALWAYS;
-      dayOfWeek = 0;
+      setMinutes(new int[] { 0 });
+      setHours(new int[] { 0 });
+      setDaysOfMonth(new int[] { });
+      setMonths(new int[] { });
+      setDaysOfWeek(new int[] { 0 });
     } else if ("@daily".equals(str) || "@midnight".equals(str)) {
-      dayOfMonth = ALWAYS;
-      month = ALWAYS;
+      setMinutes(new int[] { 0 });
+      setHours(new int[] { 0 });
+      setDaysOfMonth(new int[] { });
+      setMonths(new int[] { });
+      setDaysOfWeek(new int[] { });
     } else if ("@hourly".equals(str)) {
-      hour = ALWAYS;
-      dayOfMonth = ALWAYS;
-      month = ALWAYS;
+      setMinutes(new int[] { 0 });
+      setHours(new int[] { });
+      setDaysOfMonth(new int[] { });
+      setMonths(new int[] { });
+      setDaysOfWeek(new int[] { });
     }
 
-    // Set the values
-    setMinutes(new short[] { minute });
-    setHours(new short[] { hour });
-    setDaysOfMonth(new short[] { dayOfMonth });
-    setMonths(new short[] { month });
-    setDaysOfWeek(new short[] { dayOfWeek });
   }
 
   /**
    * Takes a field part (that is, field entries split by ",") and extracts the
-   * short values.
+   * int values.
    */
-  private static short[] enumerate(String in, short min, short max) {
-    List<Short> result = new ArrayList<Short>();
+  private static int[] enumerate(String in, int min, int max) {
+    List<Integer> result = new ArrayList<Integer>();
 
     // a, b, c
     StringTokenizer tok = new StringTokenizer(in.trim(), ",");
     while (tok.hasMoreTokens()) {
 
       String str = tok.nextToken().trim();
-      short stepsize = 1;
-      short start = min;
-      short end = max;
+      int stepsize = 1;
+      int start = min;
+      int end = max;
 
       // Extract the step size, */2 or 7-10/2
       int stepdivider = str.indexOf('/');
       if (stepdivider > 0) {
         try {
-          stepsize = Short.parseShort(str.substring(stepdivider + 1));
+          stepsize = Integer.parseInt(str.substring(stepdivider + 1));
           if (!"*".equals(str.substring(0, str.indexOf('/'))))
             throw new IllegalArgumentException("Malformed stepsize expression '" + str + "', first argument should be *");
-          for (short i=0; i < max; i++) {
+          for (int i=0; i < max; i++) {
             if (i % stepsize == 0)
               result.add(i);
           }
-          return toShort(result);
+          return toIntArray(result);
         } catch (NumberFormatException e) {
           throw new IllegalArgumentException("Illegal stepsize in '" + str + "'");
         }
@@ -595,17 +603,17 @@ public final class CronJobTrigger implements JobTrigger {
       // *, 7-12, 13
       int hyphen = str.indexOf('-');
       if (str.startsWith("*")) {
-        return new short[] { ALWAYS };
+        return new int[] { };
       } else if (hyphen > 0) {
         try {
-          start = Short.parseShort(toNumber(str.substring(0, hyphen)));
-          end = Short.parseShort(toNumber(str.substring(hyphen + 1)));
+          start = Integer.parseInt(toNumber(str.substring(0, hyphen)));
+          end = Integer.parseInt(toNumber(str.substring(hyphen + 1)));
         } catch (NumberFormatException e) {
           throw new IllegalArgumentException("Invalid interval in '" + str + "'");
         }
       } else {
         try {
-          start = end = Short.parseShort(toNumber(str));
+          start = end = Integer.parseInt(toNumber(str));
         } catch (NumberFormatException e) {
           throw new IllegalArgumentException("Invalid number: '" + str + "'");
         }
@@ -618,12 +626,12 @@ public final class CronJobTrigger implements JobTrigger {
         throw new IllegalArgumentException("Value " + end + " in '" + in + "' is larger than the maximum of " + min);
 
       // Return the result
-      for (short i = start; i <= end; i += stepsize) {
-        result.add(new Short(i));
+      for (int i = start; i <= end; i += stepsize) {
+        result.add(new Integer(i));
       }
 
     }
-    return toShort(result);
+    return toIntArray(result);
   }
 
   /**
@@ -642,7 +650,7 @@ public final class CronJobTrigger implements JobTrigger {
       if (DAYS[i].equals(in))
         return Integer.toString(i);
     try {
-      Short.parseShort(in);
+      Integer.parseInt(in);
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("'" + in + "' is not a number!");
     }
@@ -650,15 +658,15 @@ public final class CronJobTrigger implements JobTrigger {
   }
 
   /**
-   * Returns an array of <code>short</code> values that are contained in the
+   * Returns an array of <code>int</code> values that are contained in the
    * <code>shorts</code> list.
    * 
    * @param shorts
-   *          the list of <code>short</code> values
-   * @return an array of <code>short</code> values.
+   *          the list of <code>int</code> values
+   * @return an array of <code>int</code> values.
    */
-  private static short[] toShort(List<Short> shorts) {
-    short[] array = new short[shorts.size()];
+  private static int[] toIntArray(List<Integer> shorts) {
+    int[] array = new int[shorts.size()];
     for (int i = 0; i < shorts.size(); i++)
       array[i] = shorts.get(i).shortValue();
     return array;
@@ -675,50 +683,18 @@ public final class CronJobTrigger implements JobTrigger {
     buf.append(" [");
     boolean detailsAdded = false;
     
-    // months
-    if (months.length > 0) {
+    // minutes
+    if (minutes.length > 0) {
       if (detailsAdded)
         buf.append(";");
-      buf.append("months=");
-      for (int i=0; i<months.length; i++) {
+      buf.append("minute=");
+      for (int i=0; i<minutes.length; i++) {
         if (i>0)
           buf.append(",");
-        if (months[i] == -1)
+        if (minutes[i] == -1)
           buf.append("*");
         else
-          buf.append(CronJobTrigger.MONTHS[months[i]]);
-      }
-      detailsAdded = true;
-    }
-
-    // days of month
-    if (daysOfMonth.length > 0) {
-      if (detailsAdded)
-        buf.append(";");
-      buf.append("day-of-month=");
-      for (int i=0; i<daysOfMonth.length; i++) {
-        if (i>0)
-          buf.append(",");
-        if (daysOfWeek[i] == -1)
-          buf.append("*");
-        else
-          buf.append(daysOfMonth[i]);
-      }
-      detailsAdded = true;
-    }
-
-    // days of week
-    if (daysOfWeek.length > 0) {
-      if (detailsAdded)
-        buf.append(";");
-      buf.append("day-of-week=");
-      for (int i=0; i<daysOfWeek.length; i++) {
-        if (i>0)
-          buf.append(",");
-        if (daysOfWeek[i] == -1)
-          buf.append("*");
-        else
-          buf.append(DAYS[daysOfWeek[i]]);
+          buf.append(minutes[i]);
       }
       detailsAdded = true;
     }
@@ -738,23 +714,55 @@ public final class CronJobTrigger implements JobTrigger {
       }
       detailsAdded = true;
     }
-    
-    // minutes
-    if (minutes.length > 0) {
+ 
+    // days of month
+    if (daysOfMonth.length > 0) {
       if (detailsAdded)
         buf.append(";");
-      buf.append("minute=");
-      for (int i=0; i<minutes.length; i++) {
+      buf.append("day-of-month=");
+      for (int i=0; i<daysOfMonth.length; i++) {
         if (i>0)
           buf.append(",");
-        if (minutes[i] == -1)
+        if (daysOfMonth[i] == -1)
           buf.append("*");
         else
-          buf.append(minutes[i]);
+          buf.append(daysOfMonth[i]);
       }
       detailsAdded = true;
     }
 
+    // months
+    if (months.length > 0) {
+      if (detailsAdded)
+        buf.append(";");
+      buf.append("months=");
+      for (int i=0; i<months.length; i++) {
+        if (i>0)
+          buf.append(",");
+        if (months[i] == -1)
+          buf.append("*");
+        else
+          buf.append(CronJobTrigger.MONTHS[months[i]]);
+      }
+      detailsAdded = true;
+    }
+
+    // days of week
+    if (daysOfWeek.length > 0) {
+      if (detailsAdded)
+        buf.append(";");
+      buf.append("day-of-week=");
+      for (int i=0; i<daysOfWeek.length; i++) {
+        if (i>0)
+          buf.append(",");
+        if (daysOfWeek[i] == -1)
+          buf.append("*");
+        else
+          buf.append(DAYS[daysOfWeek[i]]);
+      }
+      detailsAdded = true;
+    }
+    
     if (!detailsAdded)
       buf.append("never");
     buf.append("]");
