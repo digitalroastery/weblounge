@@ -36,50 +36,50 @@ import java.util.Date;
  */
 public class CronJobTriggerTest {
 
-  /** Trigger firing several times per year */
-  protected CronJobTrigger monthTrigger = null;
+  /** Trigger firing several times per minute */
+  protected CronJobTrigger minuteTrigger = null;
 
-  /** Trigger firing several times per month */
-  protected CronJobTrigger dayOfMonthTrigger = null;
+  /** Cron expression for the minutes trigger */
+  protected String minutesExpression = "1,27,34 * * * *";
 
-  /** Trigger firing several times per week */
-  protected CronJobTrigger dayOfWeekTrigger = null;
+  /** Minutes that the trigger will fire */
+  protected int[] minutes = new int[] { 1, 27, 34 };
 
   /** Trigger firing several times per hour */
   protected CronJobTrigger hourTrigger = null;
 
-  /** Trigger firing several times per minute */
-  protected CronJobTrigger minuteTrigger = null;
+  /** Cron expression for the hours trigger */
+  protected String hoursExpression = "0 4,23 * * *";
 
-  /** Months that the trigger will fire */
-  protected int[] months = new int[] { 1, 6, 11 };
+  /** Hours that the trigger will fire */
+  protected int[] hours = new int[] { 4, 23 };
 
-  /** Cron expression for the day of month trigger */
-  protected String monthExpression = "0 0 1 1,jun,11 *";
-
-  /** Days that the trigger will fire */
-  protected int[] daysOfMonth = new int[] { 2, 12, 26 };
+  /** Trigger firing several times per month */
+  protected CronJobTrigger dayOfMonthTrigger = null;
 
   /** Cron expression for the day of month trigger */
   protected String dayOfMonthExpression = "0 0 2,12,26 * *";
 
   /** Days that the trigger will fire */
-  protected int[] daysOfWeek = new int[] { 1, 5 };
+  protected int[] daysOfMonth = new int[] { 2, 12, 26 };
+
+  /** Trigger firing several times per year */
+  protected CronJobTrigger monthTrigger = null;
+
+  /** Cron expression for the day of month trigger */
+  protected String monthExpression = "0 0 1 1,jun,11 *";
+
+  /** Months that the trigger will fire */
+  protected int[] months = new int[] { 1, 6, 11 };
+
+  /** Trigger firing several times per week */
+  protected CronJobTrigger dayOfWeekTrigger = null;
 
   /** Cron expression for the day of week trigger */
   protected String dayOfWeekExpression = "0 0 * 1 mon,5";
 
-  /** Hours that the trigger will fire */
-  protected int[] hours = new int[] { 4, 23 };
-
-  /** Cron expression for the hours trigger */
-  protected String hoursExpression = "0 4,23 * * *";
-
-  /** Minutes that the trigger will fire */
-  protected int[] minutes = new int[] { 1, 27, 34 };
-
-  /** Cron expression for the minutes trigger */
-  protected String minutesExpression = "1,27,34 * * * *";
+  /** Days that the trigger will fire */
+  protected int[] daysOfWeek = new int[] { 1, 5 };
 
   /** Today */
   protected Date now = null;
@@ -240,7 +240,7 @@ public class CronJobTriggerTest {
     assertEquals(0, hourTrigger.getDaysOfMonth().length);
     assertEquals(3, dayOfMonthTrigger.getDaysOfMonth().length);
     assertEquals(1, monthTrigger.getDaysOfMonth().length);
-    assertEquals(1, dayOfWeekTrigger.getDaysOfMonth().length);
+    assertEquals(0, dayOfWeekTrigger.getDaysOfMonth().length);
 
     // Additional testing for the day of month trigger
     for (int i = 0; i < daysOfMonth.length; i++)

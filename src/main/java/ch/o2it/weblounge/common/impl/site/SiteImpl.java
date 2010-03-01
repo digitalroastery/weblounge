@@ -22,8 +22,8 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
-import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
+import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -1152,6 +1153,12 @@ public class SiteImpl implements Site {
   public void addJob(String name, Class<? extends Job> job,
       Dictionary<String, Serializable> config, JobTrigger trigger) {
 
+    // Add site to context
+    if (config == null)
+      config = new Hashtable<String, Serializable>();
+    config.put(Job.CTXT_SITE, this);
+    
+    // Create the job
     QuartzJob jobDetail = new QuartzJob(name, job, config, trigger);
     
     // Register the job
