@@ -332,7 +332,7 @@ public final class PageRequestHandler implements RequestHandler {
    * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
    */
   public String getName() {
-    return "Page request handler";
+    return "page request handler";
   }
 
   /**
