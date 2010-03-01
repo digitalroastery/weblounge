@@ -80,6 +80,18 @@
       <version>2.0.2</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.felix.gogo</groupId>
+      <artifactId>org.apache.felix.gogo.console</artifactId>
+      <version>0.2.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix.gogo</groupId>
+      <artifactId>org.apache.felix.gogo.runtime</artifactId>
+      <version>0.2.2</version>
+    </dependency>
+
     <!-- End Apache Felix -->
 
     <!-- Specs -->
