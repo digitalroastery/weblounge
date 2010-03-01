@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.test;
 
+import ch.o2it.weblounge.common.impl.scheduler.CronJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
 
@@ -50,6 +51,7 @@ public class TestSite extends SiteImpl {
    */
   public void activate(ComponentContext context) {
     super.activate(context);
+    addJob("startup", SiteStartupJob.class, null, new CronJobTrigger("@reboot"));
     addJob("greeter", GreeterJob.class, null, new PeriodicJobTrigger(60000));
   }
 
