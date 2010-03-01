@@ -62,7 +62,7 @@ public class QuartzJobWorker implements org.quartz.Job {
     try {
       if (jobInstance == null) {
         jobInstance = createJobInstance(ctx);
-        logger.info("Created new quartz worker " + jobInstance + " with context " + ctx);
+        logger.debug("Created new quartz worker " + jobInstance + " with context " + ctx);
       }
 
       // Prepare the local job context

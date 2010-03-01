@@ -437,7 +437,7 @@ public final class CronJobTrigger implements JobTrigger {
    */
   private int[] parseMinutes(String str) {
     try {
-      return enumerate(str, (int) 0, (int) 59);
+      return enumerate(str, 0, 59);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing minutes: " + e.getMessage());
     }
@@ -453,7 +453,7 @@ public final class CronJobTrigger implements JobTrigger {
    */
   private int[] parseHours(String str) {
     try {
-      return enumerate(str, (int) 0, (int) 23);
+      return enumerate(str, 0, 23);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing hours: " + e.getMessage());
     }
@@ -470,7 +470,7 @@ public final class CronJobTrigger implements JobTrigger {
    */
   private int[] parseMonths(String str) {
     try {
-      return enumerate(str, (int) 1, (int) 12);
+      return enumerate(str, 1, 12);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing months: " + e.getMessage());
     }
@@ -486,7 +486,7 @@ public final class CronJobTrigger implements JobTrigger {
    */
   private int[] parseDaysOfMonth(String str) {
     try {
-      return enumerate(str, (int) 1, (int) 31);
+      return enumerate(str, 1, 31);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing days of month: " + e.getMessage());
     }
@@ -504,7 +504,7 @@ public final class CronJobTrigger implements JobTrigger {
    */
   private int[] parseDaysOfWeek(String str) {
     try {
-      return enumerate(str.replaceAll("7", "0"), (int) 0, (int) 6);
+      return enumerate(str.replaceAll("7", "0"), 0, 6);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Error parsing days of week: " + e.getMessage());
     }
@@ -563,8 +563,9 @@ public final class CronJobTrigger implements JobTrigger {
       setDaysOfMonth(new int[] { });
       setMonths(new int[] { });
       setDaysOfWeek(new int[] { });
+    } else {
+      throw new IllegalArgumentException("Special value " + str + " is unknown");
     }
-
   }
 
   /**

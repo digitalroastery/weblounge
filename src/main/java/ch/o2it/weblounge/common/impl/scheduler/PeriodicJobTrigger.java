@@ -45,6 +45,12 @@ public class PeriodicJobTrigger implements JobTrigger {
   /** The period in milliseconds */
   private long period = -1;
 
+  /** Flag indicating whether to wait a period for the first execution */
+  private boolean startImmediately = false;
+  
+  /** True if this is the first execution */
+  private boolean firstExecution = true;
+
   /**
    * Creates a new <code>PeriodicJob</code> with the given name and period. The
    * job starts <code>period</code> milliseconds from now.
@@ -55,7 +61,23 @@ public class PeriodicJobTrigger implements JobTrigger {
    *           if the period is smaller are equal to zero
    */
   public PeriodicJobTrigger(long period) throws IllegalArgumentException {
-    this(period, new Date(), null);
+    this(period, new Date(), null, false);
+  }
+
+  /**
+   * Creates a new <code>PeriodicJob</code> with the given name and period. The
+   * job starts <code>period</code> milliseconds from now.
+   * 
+   * @param period
+   *          the period in milliseconds at which the job should be executed
+   * @param startImmediately
+   *          <code>true</code> if the first execution should be right now
+   * @throws IllegalArgumentException
+   *           if the period is smaller are equal to zero
+   */
+  public PeriodicJobTrigger(long period, boolean startImmediately)
+      throws IllegalArgumentException {
+    this(period, new Date(), null, startImmediately);
   }
 
   /**
@@ -73,7 +95,27 @@ public class PeriodicJobTrigger implements JobTrigger {
    */
   public PeriodicJobTrigger(long period, Date startTime)
       throws IllegalArgumentException {
-    this(period, startTime, null, -1);
+    this(period, startTime, null, -1, false);
+  }
+
+  /**
+   * Creates a new <code>PeriodicJob</code> with the given name and period. The
+   * job starts execution at the given time.
+   * 
+   * @param name
+   *          the name of the job
+   * @param period
+   *          the period in milliseconds at which the job should be executed
+   * @param startTime
+   *          the start time of the job
+   * @param startImmediately
+   *          <code>true</code> if the first execution should be right now
+   * @throws IllegalArgumentException
+   *           if the period is smaller are equal to zero
+   */
+  public PeriodicJobTrigger(long period, Date startTime,
+      boolean startImmediately) throws IllegalArgumentException {
+    this(period, startTime, null, -1, startImmediately);
   }
 
   /**
@@ -94,8 +136,34 @@ public class PeriodicJobTrigger implements JobTrigger {
    * @throws IllegalArgumentException
    *           if the period is smaller are equal to zero
    */
-  public PeriodicJobTrigger(long period, Date startTime, Date endTime) throws IllegalArgumentException {
-    this(period, startTime, endTime, -1);
+  public PeriodicJobTrigger(long period, Date startTime, Date endTime)
+      throws IllegalArgumentException {
+    this(period, startTime, endTime, -1, false);
+  }
+
+  /**
+   * Creates a new <code>PeriodicJob</code> with the given name and period. The
+   * job starts execution at the given time and ends at or before
+   * <code>endTime</code>. If <code>endTime</code> is set to <code>null</code>,
+   * this trigger will fire forever or until it has reached the repeat count set
+   * using <code>setRepeatCount()</code>.
+   * 
+   * @param name
+   *          the name of the job
+   * @param period
+   *          the period in milliseconds at which the job should be executed
+   * @param startTime
+   *          the start time of the job
+   * @param endTime
+   *          the end time of the job
+   * @param startImmediately
+   *          <code>true</code> if the first execution should be right now
+   * @throws IllegalArgumentException
+   *           if the period is smaller are equal to zero
+   */
+  public PeriodicJobTrigger(long period, Date startTime, Date endTime,
+      boolean startImmediately) throws IllegalArgumentException {
+    this(period, startTime, endTime, -1, startImmediately);
   }
 
   /**
@@ -120,12 +188,40 @@ public class PeriodicJobTrigger implements JobTrigger {
    */
   public PeriodicJobTrigger(long period, Date startTime, Date endTime,
       long repeat) throws IllegalArgumentException {
+    this(period, startTime, endTime, repeat, false);
+  }
+
+  /**
+   * Creates a new <code>PeriodicJob</code> with the given name and period. The
+   * job starts execution at the given time and ends at or before
+   * <code>endTime</code>. If <code>endTime</code> is set to <code>null</code>,
+   * this trigger will fire forever or until it has reached the repeat count set
+   * using <code>setRepeatCount()</code>.
+   * 
+   * @param name
+   *          the name of the job
+   * @param period
+   *          the period in milliseconds at which the job should be executed
+   * @param startTime
+   *          the start time of the job
+   * @param endTime
+   *          the end time of the job
+   * @param repeat
+   *          number of times that this trigger should be executed
+   * @param startImmediately
+   *          <code>true</code> if the first execution should be right now
+   * @throws IllegalArgumentException
+   *           if the period is smaller are equal to zero
+   */
+  public PeriodicJobTrigger(long period, Date startTime, Date endTime,
+      long repeat, boolean startImmediately) throws IllegalArgumentException {
     if (period <= 1)
       throw new IllegalArgumentException("Period needs to be a positive integer");
     this.period = period;
     this.startTime = startTime != null ? startTime.getTime() : System.currentTimeMillis();
     this.endTime = endTime != null ? endTime.getTime() : -1;
     this.repeatCount = repeat;
+    this.startImmediately = startImmediately;
   }
 
   /**
@@ -141,8 +237,13 @@ public class PeriodicJobTrigger implements JobTrigger {
     if (date.getTime() < startTime)
       return new Date(startTime);
 
+    long nextExecution = 0;
     long triggerCount = (long) Math.floor((date.getTime() - startTime) / period);
-    long nextExecution = startTime + (triggerCount + 1) * period;
+    if (triggerCount == 0 && startImmediately && firstExecution)
+      nextExecution = startTime;
+    else
+      nextExecution = startTime + (triggerCount + 1) * period;
+    firstExecution = false;
     return new Date(nextExecution);
   }
 
@@ -202,10 +303,33 @@ public class PeriodicJobTrigger implements JobTrigger {
   public long getRepeatCount() {
     return repeatCount;
   }
-  
+
+  /**
+   * Returns <code>true</code> if the first execution is right now rather than
+   * after the first period of time has passed.
+   * 
+   * @return the startImmediately <code>true</code> if the trigger fires right
+   *         now for the first time
+   */
+  public boolean getStartsImmediately() {
+    return startImmediately;
+  }
+
+  /**
+   * Sets the first trigger execution to either <code>now</code> or
+   * <code>now + period</code>.
+   * 
+   * @param startImmediately
+   *          <code>true</code> to execute the trigger right now for the first
+   *          time
+   */
+  public void setStartImmediately(boolean startImmediately) {
+    this.startImmediately = startImmediately;
+  }
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

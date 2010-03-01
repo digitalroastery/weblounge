@@ -349,6 +349,15 @@ public class CronJobTriggerTest {
   }
 
   /**
+   * Test method for <code>@restart</code>.
+   */
+  @Test
+  public void testRestart() {
+    CronJobTrigger rebootTrigger = new CronJobTrigger("@restart");
+    assertEquals(now, rebootTrigger.getNextExecutionAfter(now));
+  }
+
+  /**
    * Test method for <code>@yearly</code>, which is equivalent to
    * <code>0 0 1 1 *</code>.
    */

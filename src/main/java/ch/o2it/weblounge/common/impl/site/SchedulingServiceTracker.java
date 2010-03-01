@@ -32,10 +32,10 @@ import org.slf4j.LoggerFactory;
  * {@link Quartz} interface and registers and unregisters a site with the first
  * service implementation to come.
  */
-public final class CronServiceTracker extends ServiceTracker {
+public final class SchedulingServiceTracker extends ServiceTracker {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(CronServiceTracker.class);
+  private static final Logger log_ = LoggerFactory.getLogger(SchedulingServiceTracker.class);
 
   /** The tracking site */
   private SiteImpl site = null;
@@ -50,7 +50,7 @@ public final class CronServiceTracker extends ServiceTracker {
    * @param site
    *          the site
    */
-  CronServiceTracker(BundleContext context, SiteImpl site) {
+  SchedulingServiceTracker(BundleContext context, SiteImpl site) {
     super(context, Scheduler.class.getName(), null);
     this.site = site;
   }
@@ -63,7 +63,7 @@ public final class CronServiceTracker extends ServiceTracker {
   @Override
   public Object addingService(ServiceReference reference) {
     Scheduler scheduler = (Scheduler) context.getService(reference);
-    log_.info("Registering site {} with {}", site, scheduler.getClass().getName());
+    log_.debug("Registering site {} with {}", site, scheduler.getClass().getName());
     site.setScheduler(scheduler);
     log_.debug("Registered {} with site {}", scheduler, site);
     return scheduler;
@@ -89,7 +89,7 @@ public final class CronServiceTracker extends ServiceTracker {
    */
   @Override
   public void removedService(ServiceReference reference, Object service) {
-    log_.info("Cron daeomon disabled for site {} ({} disappeared)", site, service.getClass().getName());
+    log_.debug("Cron daeomon disabled for site {} ({} disappeared)", site, service.getClass().getName());
     site.removeScheduler();
     super.removedService(reference, service);
   }

@@ -122,7 +122,7 @@ public final class QuartzJobTrigger extends Trigger {
     // Initialize the settings
     Date now = new Date();
     startTime = trigger.getNextExecutionAfter(now);
-    mayFireAgain = trigger.getNextExecutionAfter(startTime) != null;
+    mayFireAgain = startTime != null || trigger.getNextExecutionAfter(startTime) != null;
   }
 
   /**

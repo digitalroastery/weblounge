@@ -150,7 +150,7 @@ public class SiteImpl implements Site {
   protected URL staticContentRoot = null;
 
   /** OSGi cron service tracker */
-  private CronServiceTracker cronServiceTracker = null;
+  private SchedulingServiceTracker schedulingServiceTracker = null;
 
   /** Quartz cron scheduler */
   private Scheduler scheduler = null;
@@ -670,7 +670,7 @@ public class SiteImpl implements Site {
    * 
    * @see ch.o2it.weblounge.common.site.Site#start()
    */
-  public void start() throws SiteException, IllegalStateException {
+  public synchronized void start() throws SiteException, IllegalStateException {
     log_.debug("Starting site {}", this);
     if (running)
       throw new IllegalStateException("Site is already running");
@@ -718,7 +718,7 @@ public class SiteImpl implements Site {
    * 
    * @see ch.o2it.weblounge.common.site.Site#stop()
    */
-  public void stop() throws IllegalStateException {
+  public synchronized void stop() throws IllegalStateException {
     log_.debug("Stopping site {}", this);
     if (!running)
       throw new IllegalStateException("Site is not running");
@@ -938,7 +938,7 @@ public class SiteImpl implements Site {
    * @param scheduler
    *          the quartz scheduler
    */
-  void setScheduler(Scheduler scheduler) {
+  synchronized void setScheduler(Scheduler scheduler) {
     this.scheduler = scheduler;
     this.quartzTriggerListener = new QuartzTriggerListener(this);
     try {
@@ -991,8 +991,8 @@ public class SiteImpl implements Site {
     log_.debug("Signing up for cron services");
 
     // Connect to the
-    cronServiceTracker = new CronServiceTracker(bundleContext, this);
-    cronServiceTracker.open();
+    schedulingServiceTracker = new SchedulingServiceTracker(bundleContext, this);
+    schedulingServiceTracker.open();
 
     log_.info("Site {} initialized", this);
   }
@@ -1011,7 +1011,7 @@ public class SiteImpl implements Site {
   public void deactivate(ComponentContext context) {
     log_.debug("Taking down site {}", this);
     log_.debug("Stopped looking for cron services");
-    cronServiceTracker.close();
+    schedulingServiceTracker.close();
     log_.info("Site {} deactivated", this);
   }
 
@@ -1215,7 +1215,8 @@ public class SiteImpl implements Site {
       // Schedule
       try {
         Date date = scheduler.scheduleJob(quartzJob, quartzTrigger);
-        log_.info("Job '{}' scheduled, first execution at {}", jobName, date);
+        String repeat = trigger.getNextExecutionAfter(date) != null ? " first" : "";
+        log_.info("Job '{}' scheduled,{} execution at {}", new Object[] { jobName, repeat, date });
       } catch (SchedulerException e) {
         log_.error("Error trying to schedule job {}: {}", new Object[] {
             jobName,

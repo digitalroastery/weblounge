@@ -85,7 +85,7 @@ public final class QuartzTriggerListener implements TriggerListener {
           jobName,
           df.format(nextExecution) });
     else
-      log_.info("Job {} finished", jobName);
+      log_.debug("Job {} finished", jobName);
   }
 
   /**
