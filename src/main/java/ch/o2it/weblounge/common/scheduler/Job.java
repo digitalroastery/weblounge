@@ -29,6 +29,9 @@ import java.util.Dictionary;
  */
 public interface Job {
 
+  /** For site and module jobs, the <code>Site</code> is part of the context */
+  String CTXT_SITE = "webl:site";
+
   /**
    * This method is called every time the job execution triggers fire. The
    * context dictionary passed to this method contains both the configuration
