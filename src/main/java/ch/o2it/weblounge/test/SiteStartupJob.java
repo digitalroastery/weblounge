@@ -50,6 +50,8 @@ public class SiteStartupJob implements Job {
     Site site = (Site)ctx.get(Job.CTXT_SITE);
     if (site != null)
       log_.info("Site " + site + " started");
+    else
+      log_.warn("Site not found in context");
   }
 
 }

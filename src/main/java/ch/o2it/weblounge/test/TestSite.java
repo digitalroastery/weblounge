@@ -51,8 +51,8 @@ public class TestSite extends SiteImpl {
    */
   public void activate(ComponentContext context) {
     super.activate(context);
-    addJob("startup", SiteStartupJob.class, null, new CronJobTrigger("@reboot"));
-    addJob("greeter", GreeterJob.class, null, new PeriodicJobTrigger(60000));
+    addJob("startup", SiteStartupJob.class, null, new CronJobTrigger("@restart"));
+    addJob("greeter", GreeterJob.class, null, new PeriodicJobTrigger(60000, true));
   }
 
   /**
@@ -66,6 +66,7 @@ public class TestSite extends SiteImpl {
    */
   public void deactivate(ComponentContext context) {
     super.deactivate(context);
+    removeJob("startup");
     removeJob("greeter");
   }
 

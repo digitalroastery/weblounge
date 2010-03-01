@@ -57,7 +57,6 @@ public class GreeterJob implements Job {
     hellos.put("german", "Hallo Welt, ich bin heute glücklich");
     hellos.put("greek", "Γεια σας κόσμο χαρά σήμερα");
     hellos.put("hebrew", "שלום אני שמח בעולם היום");
-    hellos.put("hindi", "नमस्ते दुनिया आज मैं खुश हूँ");
     hellos.put("italian", "Ciao, sono felice di oggi");
     hellos.put("japanese", "を今日は満足している");
     hellos.put("korean", "안녕하세요 오늘은 행복 해요");
@@ -86,7 +85,7 @@ public class GreeterJob implements Job {
     try {
       log_.info(new String(entry.getValue().getBytes("UTF-8")) + " (" + entry.getKey() + ")");
     } catch (UnsupportedEncodingException e) {
-      log_.error("Cant' believe that utf-8 should not be supported!", e);
+      log_.error("Cant' believe that utf-8 is not supported on this platform!", e);
     }
   }
 
