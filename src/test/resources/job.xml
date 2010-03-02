@@ -1,0 +1,11 @@
+<job id="testjob">
+  <name>Job title</name>
+  <class>ch.o2it.weblounge.common.scheduler.TestJob</class>
+  <schedule>0 0 * * 1</schedule>
+  <options>
+    <option>
+      <name>key</name>
+      <value>value</value>
+    </option>
+  </options>
+</job>

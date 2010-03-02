@@ -20,17 +20,28 @@
 
 package ch.o2it.weblounge.common.impl.scheduler;
 
+import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.Serializable;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Base implementation for jobs.
  */
 public final class QuartzJob {
+
+  /** The job identifier */
+  protected String identifier = null;
 
   /** The job name */
   protected String name = null;
@@ -47,23 +58,24 @@ public final class QuartzJob {
   /**
    * Creates a new job.
    * 
-   * @param name
-   *          job name
+   * @param identifier
+   *          job identifier
    * @param worker
    *          the job implementation
    * @param trigger
    *          the job trigger
    */
-  public QuartzJob(String name, Class<? extends Job> worker, JobTrigger trigger) {
-    this(name, worker, null, trigger);
+  public QuartzJob(String identifier, Class<? extends Job> worker,
+      JobTrigger trigger) {
+    this(identifier, worker, null, trigger);
   }
 
   /**
    * Creates a new job with an initial job context. That context will be passed
    * every time the {@link #execute(Dictionary)} method is triggered.
    * 
-   * @param name
-   *          job name
+   * @param identifier
+   *          job identifier
    * @param worker
    *          the job implementation
    * @param context
@@ -71,15 +83,15 @@ public final class QuartzJob {
    * @param trigger
    *          the job trigger
    */
-  public QuartzJob(String name, Class<? extends Job> worker,
+  public QuartzJob(String identifier, Class<? extends Job> worker,
       Dictionary<String, Serializable> context, JobTrigger trigger) {
-    if (name == null)
-      throw new IllegalArgumentException("Job name must not be null");
+    if (identifier == null)
+      throw new IllegalArgumentException("Job identifier must not be null");
     if (worker == null)
       throw new IllegalArgumentException("Worker must not be null");
     if (trigger == null)
       throw new IllegalArgumentException("Trigger must not be null");
-    this.name = name;
+    this.identifier = identifier;
     this.worker = worker;
     this.trigger = trigger;
     this.ctx = context;
@@ -88,20 +100,42 @@ public final class QuartzJob {
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the job identifier.
    * 
-   * @see ch.o2it.weblounge.common.scheduler.Job#setName(java.lang.String)
+   * @param identifier
+   *          the job identifier
+   * @throws IllegalArgumentException
+   *           if <code>identifier</code> is <code>null</code>
+   */
+  public void setIdentifier(String identifier) {
+    if (identifier == null)
+      throw new IllegalArgumentException("Job identifier must not be null");
+    this.identifier = identifier;
+  }
+
+  /**
+   * Returns the job identifier.
+   * 
+   * @return the job identifier
+   */
+  public String getIdentifier() {
+    return identifier;
+  }
+
+  /**
+   * Sets the job name.
+   * 
+   * @param name
+   *          the job name
    */
   public void setName(String name) {
-    if (name == null)
-      throw new IllegalArgumentException("Job name must not be null");
     this.name = name;
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the job name.
    * 
-   * @see ch.o2it.weblounge.common.scheduler.Job#getName()
+   * @return the job name
    */
   public String getName() {
     return name;
@@ -127,7 +161,7 @@ public final class QuartzJob {
   public Class<? extends Job> getJob() {
     return worker;
   }
-  
+
   /**
    * Returns the job context.
    * 
@@ -166,141 +200,161 @@ public final class QuartzJob {
    */
   @Override
   public String toString() {
-    if (name != null)
-      return name;
-    return super.toString();
+    StringBuffer buf = new StringBuffer(identifier);
+    buf.append(" [schedule=");
+    buf.append(trigger);
+    buf.append("; class=");
+    buf.append(worker.getClass().getName());
+    buf.append("]");
+    return buf.toString();
   }
 
   /**
-   * Initializes this cron job from an xml configuration node. Creates a new
-   * cron job from the given configuration node. A node is expected to look like
-   * this:
-   * 
-   * <pre>
-   *     &lt;job&gt;
-   *         &lt;name&gt;Job title&lt;/name&gt;
-   *         &lt;description&gt;Job title&lt;/description&gt;
-   *         &lt;class&gt;ch.o2it.weblounge.module.test.SampleCronJob&lt;/class&gt;
-   *         &lt;option&gt;
-   *             &lt;name&gt;opt&lt;/name&gt;
-   *             &lt;value&gt;optvalue&lt;/value&gt;
-   *         &lt;/option&gt;
-   *         &lt;minutes&gt;0&lt;/minutes&gt;
-   *         &lt;hours&gt;0&lt;/hours&gt;
-   *         &lt;days&gt;*&lt;/days&gt;
-   *         &lt;months&gt;*&lt;/months&gt;
-   *         &lt;weekdays&gt;1&lt;/weekdays&gt;
-   *     &lt;/job&gt;
-   * </pre>
+   * Initializes this job from an XML node that was generated using
+   * {@link #toXml()}.
    * <p>
-   * Fields that are left out are assumed to equal <code>*</code>.
-   * <p>
-   * Alternatively, the <code>minutes</code>, <code>hours</code>,
-   * <code>days</code>, <code>months</code> and <code>weekdays</code> may be
-   * replaced by a <code>&lt;schedule&gt;</code> tag, containing a crontab style
-   * configuration string:
+   * To speed things up, you might consider using the second signature that uses
+   * an existing <code>XPath</code> instance instead of creating a new one.
    * 
-   * <pre>
-   *     &lt;schedule&gt;0 0 * * 1&lt;/schedule&gt;
-   * </pre>
-   * 
-   * @param config
-   *          the configuration node
-   * @param path
-   *          the XPath object used to parse the configuration
-   * @throws ConfigurationException
-   *           if the configuration data is incomplete or invalid
+   * @param context
+   *          the job node
+   * @throws IllegalStateException
+   *           if the job cannot be parsed
+   * @see #fromXml(Node, XPath)
+   * @see #toXml()
    */
-  // public void init(XPath path, Node config) throws ConfigurationException {
-  // identifier = XPathHelper.valueOf(path, config, "@id");
-  // name = XPathHelper.valueOf(path, config, "name");
-  // description = XPathHelper.valueOf(path, config, "description");
-  //
-  // // Read options
-  // readOptions(path, config);
-  //
-  // // See if crontab - style entry has been given
-  // if (XPathHelper.select(path, config, "schedule") != null) {
-  // parse(XPathHelper.valueOf(path, config, "schedule"));
-  // configured = true;
-  // return;
-  // }
-  //
-  // // See if something has been configured
-  // boolean foundOne = false;
-  //
-  // // Minutes
-  // if (XPathHelper.select(path, config, "minutes") != null) {
-  // parseMinutes(XPathHelper.valueOf(path, config, "minutes"));
-  // foundOne = true;
-  // } else
-  // setMinutes(new short[] { ALLWAYS });
-  //
-  // // Hours
-  // if (XPathHelper.select(path, config, "hours") != null) {
-  // parseHours(XPathHelper.valueOf(path, config, "hours"));
-  // foundOne = true;
-  // } else
-  // setHours(new short[] { ALLWAYS });
-  //
-  // // Days
-  // if (XPathHelper.select(path, config, "days") != null) {
-  // parseDaysOfMonth(XPathHelper.valueOf(path, config, "days"));
-  // foundOne = true;
-  // } else
-  // setDaysOfMonth(new short[] { ALLWAYS });
-  //
-  // // Months
-  // if (XPathHelper.select(path, config, "months") != null) {
-  // parseMonths(XPathHelper.valueOf(path, config, "months"));
-  // foundOne = true;
-  // } else
-  // setMonths(new short[] { ALLWAYS });
-  //
-  // // Weekdays
-  // if (XPathHelper.select(path, config, "weekdays") != null) {
-  // parseDaysOfWeek(XPathHelper.valueOf(path, config, "weekdays"));
-  // foundOne = true;
-  // } else
-  // setDaysOfWeek(new short[] { ALLWAYS });
-  //
-  // // Did we find something?
-  // if (!foundOne)
-  // throw new ConfigurationException("No schedule has been defined for job '" +
-  // name + "'");
-  //
-  // configured = true;
-  // }
+  public static QuartzJob fromXml(Node context) throws IllegalStateException {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(context, xpath);
+  }
 
   /**
-   * Reads the job options from the configuration.
+   * Initializes this job from an XML node that was generated using
+   * {@link #toXml()}.
    * 
-   * @param config
-   *          job configuration node
-   * @param path
-   *          the XPath object used to parse the configuration
+   * @param context
+   *          the job node
+   * @param xpathProcessor
+   *          xpath processor to use
+   * @throws IllegalStateException
+   *           if the job cannot be parsed
+   * @see #toXml()
    */
-  // private void readOptions(XPath path, Node config) {
-  // NodeList nodes = XPathHelper.selectList(path, config, "options/option");
-  // for (int i = 0; i < nodes.getLength(); i++) {
-  // Node option = nodes.item(i);
-  // String name = XPathHelper.valueOf(path, option, "name/text()");
-  // String value = XPathHelper.valueOf(path, option, "value/text()");
-  // if (options.get(name) != null) {
-  // Object o = options.get(name);
-  // if (o instanceof ArrayList) {
-  // ((ArrayList) o).add(value);
-  // } else {
-  // List values = new ArrayList();
-  // values.add(o);
-  // values.add(value);
-  // options.remove(name);
-  // options.put(name, values);
-  // }
-  // } else {
-  // options.put(name, value);
-  // }
-  // }
-  // }
+  @SuppressWarnings("unchecked")
+  public static QuartzJob fromXml(Node config, XPath xPathProcessor)
+      throws IllegalStateException {
+
+    Node contextRoot = XPathHelper.select(config, "//job", xPathProcessor);
+    if (contextRoot == null)
+      return null;
+
+    CronJobTrigger jobTrigger = null;
+    Dictionary<String, Serializable> ctx = new Hashtable<String, Serializable>();
+
+    // Main attributes
+    String identifier = XPathHelper.valueOf(config, "@id", xPathProcessor);
+    String name = XPathHelper.valueOf(config, "name", xPathProcessor);
+
+    // Implementation class
+    String className = XPathHelper.valueOf(config, "class", xPathProcessor);
+    Class<Job> clazz;
+    try {
+      clazz = (Class<Job>) Class.forName(className);
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException();
+    }
+
+    // Read execution schedule
+    String schedule = XPathHelper.valueOf(config, "schedule", xPathProcessor);
+    if (schedule == null)
+      throw new IllegalStateException("No schedule has been defined for job '" + identifier + "'");
+    jobTrigger = new CronJobTrigger(schedule);
+
+    // Read options
+    NodeList nodes = XPathHelper.selectList(config, "options/option", xPathProcessor);
+    for (int i = 0; i < nodes.getLength(); i++) {
+      Node option = nodes.item(i);
+      String optionName = XPathHelper.valueOf(option, "name", xPathProcessor);
+      String value = XPathHelper.valueOf(option, "value", xPathProcessor);
+      ctx.put(optionName, value);
+    }
+
+    // Did we find something?
+
+    QuartzJob job = new QuartzJob(identifier, clazz, ctx, jobTrigger);
+    job.setName(name);
+    return job;
+  }
+
+  /**
+   * Returns an <code>XML</code> representation of the job, which will look
+   * similar to the following example:
+   * 
+   * <pre>
+   * &lt;job id=&quot;test&quot;&gt;
+   *     &lt;name&gt;Job title&lt;/name&gt;
+   *     &lt;description&gt;Job title&lt;/description&gt;
+   *     &lt;class&gt;ch.o2it.weblounge.module.test.SampleCronJob&lt;/class&gt;
+   *     &lt;schedule&gt;0 0 * * 1&lt;/schedule&gt;
+   *     &lt;option&gt;
+   *         &lt;name&gt;opt&lt;/name&gt;
+   *         &lt;value&gt;optvalue&lt;/value&gt;
+   *     &lt;/option&gt;
+   * &lt;/job&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>QuartzJob</code> from the serialized output of this method.
+   * 
+   * @return the <code>XML</code> representation of the context
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
+   */
+  public String toXml() {
+    StringBuffer b = new StringBuffer();
+    b.append("<job id=\"");
+    b.append(identifier);
+    b.append("\">");
+
+    // Name
+    if (name != null) {
+      b.append("<name>");
+      b.append(name);
+      b.append("</name>");
+    }
+
+    // Class
+    b.append("<class>");
+    b.append(worker.getName());
+    b.append("</class>");
+
+    // Schedule
+    if (!(trigger instanceof CronJobTrigger))
+      throw new IllegalStateException("Cannot serialize job trigger of type " + trigger.getClass().getName());
+    b.append("<schedule>");
+    b.append(((CronJobTrigger) trigger).getCronExpression());
+    b.append("</schedule>");
+
+    // Options
+    Enumeration<String> e = ctx.keys();
+    if (e.hasMoreElements()) {
+      b.append("<options>");
+      while (e.hasMoreElements()) {
+        String key = e.nextElement();
+        b.append("<option>");
+        b.append("<name>");
+        b.append(key);
+        b.append("</name>");
+        b.append("<value>");
+        b.append(ctx.get(key));
+        b.append("</value>");
+        b.append("</option>");
+      }
+      b.append("</options>");
+    }
+
+    b.append("</job>");
+    return b.toString();
+  }
 
 }

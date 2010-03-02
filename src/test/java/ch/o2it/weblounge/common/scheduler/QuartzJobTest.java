@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.scheduler;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger;
+import ch.o2it.weblounge.common.impl.scheduler.CronJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 
 import org.junit.Before;
@@ -37,17 +37,26 @@ import java.util.Hashtable;
  */
 public class QuartzJobTest {
 
-  /** The job worker */
-  protected Class<? extends Job> jobClass = null;
-
   /** Quartz job */
   protected QuartzJob quartzJob = null;
+
+  /** The job worker */
+  protected Class<? extends Job> jobClass = TestJob.class;
   
+  /** Identifier of the test job */
+  protected String jobIdentifier = "testjob";
+
   /** Name of the test job */
-  protected String jobName = "testjob";
+  protected String jobName = "Job title";
+  
+  /** Name of the job option */
+  protected String optionKey = "key";
+
+  /** Value of the job option */
+  protected String optionValue = "value";
 
   /** Job context */
-  protected Dictionary<String, Serializable> jobContext = null;
+  protected Dictionary<String, Serializable> jobContext = new Hashtable<String, Serializable>();
 
   /** Job trigger that fires every second */
   protected JobTrigger trigger = null;
@@ -57,10 +66,22 @@ public class QuartzJobTest {
    */
   @Before
   public void setUp() throws Exception {
-    jobClass = TestJob.class;
-    jobContext = new Hashtable<String, Serializable>();
-    trigger = new FireOnceJobTrigger();
-    quartzJob = new QuartzJob(jobName, jobClass, jobContext, trigger);
+    setupPreliminaries();
+    quartzJob = new QuartzJob(jobIdentifier, jobClass, jobContext, trigger);
+    quartzJob.setName(jobName);
+  }
+  
+  protected void setupPreliminaries() {
+    jobContext.put(optionKey, optionValue);
+    trigger = new CronJobTrigger("0 0 * * 1");
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.QuartzJob#getIdentifier()}.
+   */
+  @Test
+  public void testGetIdentifier() {
+    assertEquals(jobIdentifier, quartzJob.getIdentifier());
   }
 
   /**
