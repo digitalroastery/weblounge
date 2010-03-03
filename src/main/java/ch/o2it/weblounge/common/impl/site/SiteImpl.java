@@ -1195,7 +1195,7 @@ public class SiteImpl implements Site {
     
     // Throw the job at quartz
     String groupName = "site " + this.getIdentifier();
-    String jobName = job.getName();
+    String jobIdentifier = job.getIdentifier();
     Class<?> jobClass = job.getJob();
     JobTrigger trigger = job.getTrigger();
     
@@ -1205,21 +1205,21 @@ public class SiteImpl implements Site {
       JobDataMap jobData = new JobDataMap();
       jobData.put(QuartzJobWorker.CLASS, jobClass);
       jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
-      JobDetail quartzJob = new JobDetail(jobName, groupName, QuartzJobWorker.class);
+      JobDetail quartzJob = new JobDetail(jobIdentifier, groupName, QuartzJobWorker.class);
       quartzJob.setJobDataMap(jobData);
       
       // Define the trigger
-      Trigger quartzTrigger = new QuartzJobTrigger(jobName, groupName, trigger);
+      Trigger quartzTrigger = new QuartzJobTrigger(jobIdentifier, groupName, trigger);
       quartzTrigger.addTriggerListener(quartzTriggerListener.getName());
       
       // Schedule
       try {
         Date date = scheduler.scheduleJob(quartzJob, quartzTrigger);
         String repeat = trigger.getNextExecutionAfter(date) != null ? " first" : "";
-        log_.info("Job '{}' scheduled,{} execution at {}", new Object[] { jobName, repeat, date });
+        log_.info("Job '{}' scheduled,{} execution at {}", new Object[] { jobIdentifier, repeat, date });
       } catch (SchedulerException e) {
         log_.error("Error trying to schedule job {}: {}", new Object[] {
-            jobName,
+            jobIdentifier,
             e.getMessage(),
             e });
       }
@@ -1237,13 +1237,13 @@ public class SiteImpl implements Site {
       return;
 
     String groupName = "site " + this.getIdentifier();
-    String jobName = job.getName();
+    String jobIdentifier = job.getIdentifier();
     try {
-      if (scheduler.unscheduleJob(jobName, groupName))
-        log_.info("Unscheduled job {}", jobName);
+      if (scheduler.unscheduleJob(jobIdentifier, groupName))
+        log_.info("Unscheduled job {}", jobIdentifier);
     } catch (SchedulerException e) {
       log_.error("Error trying to schedule job {}: {}", new Object[] {
-          jobName,
+          jobIdentifier,
           e.getMessage(),
           e });
     }
