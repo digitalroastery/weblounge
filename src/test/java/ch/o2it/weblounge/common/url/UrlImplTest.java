@@ -131,7 +131,6 @@ public class UrlImplTest {
   @Test
   public void testEqualsObject() {
     assertTrue(defaultUrl.equals(new UrlImpl(defaultUrlPath)));
-    assertTrue(defaultUrl.equals(new UrlImpl(defaultFilePath, filePathSeparator)));
     assertTrue(defaultUrl.equals(new UrlImpl("/test/")));
     assertFalse(defaultUrl.equals(new UrlImpl("/test/a")));
   }
