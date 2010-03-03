@@ -71,7 +71,7 @@ public class LocalizableContentTest extends LocalizableObjectTest {
   @Test
   public void testValues() {
     assertEquals(2, content.values().size());
-    assertTrue(content.values().contains(englishLocale.getDisplayLanguage()));
+    assertTrue(content.values().contains(englishLocale.getDisplayLanguage(englishLocale)));
   }
 
   /**
@@ -91,8 +91,8 @@ public class LocalizableContentTest extends LocalizableObjectTest {
    */
   @Test
   public void testGet() {
-    assertEquals(englishLocale.getDisplayLanguage(), content.get());
-    assertEquals(englishLocale.getDisplayLanguage(), content.get(italian));
+    assertEquals(englishLocale.getDisplayLanguage(englishLocale), content.get());
+    assertEquals(englishLocale.getDisplayLanguage(englishLocale), content.get(italian));
     assertTrue(content.get(italian, true) == null);
   }
 
@@ -102,7 +102,7 @@ public class LocalizableContentTest extends LocalizableObjectTest {
   @Test
   public void testGetLanguage() {
     assertEquals(english, content.getLanguage());
-    assertEquals(englishLocale.getDisplayLanguage(), content.get(italian));
+    assertEquals(englishLocale.getDisplayLanguage(englishLocale), content.get(italian));
   }
 
   /**
@@ -110,7 +110,7 @@ public class LocalizableContentTest extends LocalizableObjectTest {
    */
   @Test
   public void testGetLanguageBoolean() {
-    assertEquals(englishLocale.getDisplayLanguage(), content.get(italian, false));
+    assertEquals(englishLocale.getDisplayLanguage(englishLocale), content.get(italian, false));
     assertTrue(content.get(italian, true) == null);
   }
 
