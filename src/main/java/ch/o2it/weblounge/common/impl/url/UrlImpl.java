@@ -209,7 +209,8 @@ public class UrlImpl implements Url {
       throw new IllegalArgumentException("Url cannot be null");
     url = url.trim();
     String separator = Character.toString(separatorChar);
-    url = url.replaceAll(separator + separator, separator);
+    // TODO: this fails if the separator is the windows file separator
+    //url = url.replaceAll(separator + separator, separator);
     if (url.endsWith(separator) || url.equals(separator))
       return url;
     int index = url.lastIndexOf(separator);
@@ -243,7 +244,7 @@ public class UrlImpl implements Url {
 
   /**
    * Returns the <code>String</code> representation of this object, which is
-   * equal to the url's path as returned by {@ link #getPath()}.
+   * equal to the url's path as returned by {@link #getPath()}.
    * 
    * @return the path
    * @see java.lang.Object#toString()
