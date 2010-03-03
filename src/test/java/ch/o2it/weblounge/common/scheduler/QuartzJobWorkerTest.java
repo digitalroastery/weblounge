@@ -259,7 +259,7 @@ public class QuartzJobWorkerTest {
    */
   private Date scheduleJob(QuartzJob job)
       throws SchedulerException {
-    String jobName = job.getName();
+    String jobIdentifier = job.getIdentifier();
     JobTrigger trigger = job.getTrigger();
     Class<?> jobClass = job.getJob();
 
@@ -267,11 +267,11 @@ public class QuartzJobWorkerTest {
     JobDataMap jobData = new JobDataMap();
     jobData.put(QuartzJobWorker.CLASS, jobClass);
     jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
-    JobDetail quartzJobDetail = new JobDetail(jobName, schedulerGroup, QuartzJobWorker.class);
+    JobDetail quartzJobDetail = new JobDetail(jobIdentifier, schedulerGroup, QuartzJobWorker.class);
     quartzJobDetail.setJobDataMap(jobData);
 
     // Define the trigger
-    Trigger quartzTrigger = new QuartzJobTrigger(jobName, schedulerGroup, trigger);
+    Trigger quartzTrigger = new QuartzJobTrigger(jobIdentifier, schedulerGroup, trigger);
     quartzTrigger.addTriggerListener(triggerListener.getName());
 
     // Schedule
@@ -285,8 +285,8 @@ public class QuartzJobWorkerTest {
    *          the job
    */
   private void unscheduleJob(QuartzJob job) throws SchedulerException {
-    String jobName = job.getName();
-    scheduler.unscheduleJob(jobName, schedulerGroup);
+    String jobIdentifier = job.getIdentifier();
+    scheduler.unscheduleJob(jobIdentifier, schedulerGroup);
   }
 
 }
