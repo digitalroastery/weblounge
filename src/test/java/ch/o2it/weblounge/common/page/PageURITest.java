@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.junit.Before;
@@ -119,7 +119,7 @@ public class PageURITest {
    */
   @Test
   public void testGetPath() {
-    assertEquals(PathSupport.trim(defaultPath), simpleURI.getPath());
+    assertEquals(UrlSupport.trim(defaultPath), simpleURI.getPath());
   }
 
   /**
