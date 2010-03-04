@@ -52,7 +52,7 @@ public class TestSite extends SiteImpl {
   public void activate(ComponentContext context) {
     super.activate(context);
     addJob("startup", SiteStartupJob.class, null, new CronJobTrigger("@restart"));
-    addJob("greeter", GreeterJob.class, null, new PeriodicJobTrigger(60000, true));
+    addJob("greeter", GreeterJob.class, null, new PeriodicJobTrigger(60000));
   }
 
   /**
