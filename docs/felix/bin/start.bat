@@ -29,7 +29,7 @@ SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
 
 REM # Clear felix cache dir
 SET FELIX_CACHE=%FELIX_HOME%\felix-cache
-del /FQ %FELIX_CACHE%
+del /F /Q %FELIX_CACHE%
 
 REM # Create the debug config
 SET DEBUG_OPTS=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=%DEBUG_PORT%,server=y,suspend=%DEBUG_SUSPEND%
