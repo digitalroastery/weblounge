@@ -86,19 +86,21 @@ public interface Site extends Customizable, RequestListener, Serializable {
   String getDescription();
 
   /**
-   * Set to <code>true</code> to enable this site, <code>false</code> otherwise.
+   * Set to <code>true</code> to automatically start this site,
+   * <code>false</code> otherwise.
    * 
-   * @param enabled
-   *          the enabled state
+   * @param autostart
+   *          <code>true</code> to automatically start the site
    */
-  void setEnabled(boolean enabled);
+  void setAutoStart(boolean autostart);
 
   /**
-   * Returns <code>true</code> if the site is enabled.
+   * Returns <code>true</code> if the site is automatically started at system
+   * startup.
    * 
-   * @return <code>true</code> if the site is enabled
+   * @return <code>true</code> if the site is automatically started
    */
-  boolean isEnabled();
+  boolean isStartedAutomatically();
 
   /**
    * Adds <code>listener</code> to the list of site listeners.
@@ -312,8 +314,8 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @param trigger
    *          the job trigger
    */
-  void addJob(String name, Class<? extends Job> job, Dictionary<String, Serializable> config,
-      JobTrigger trigger);
+  void addJob(String name, Class<? extends Job> job,
+      Dictionary<String, Serializable> config, JobTrigger trigger);
 
   /**
    * Adds a job that is fired immediately and only once. Note that existing jobs
@@ -326,7 +328,8 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @param config
    *          the job configuration and context
    */
-  void addJob(String name, Class<? extends Job> job, Dictionary<String, Serializable> config);
+  void addJob(String name, Class<? extends Job> job,
+      Dictionary<String, Serializable> config);
 
   /**
    * Removes the job from the job scheduler. Current executions of the job will
