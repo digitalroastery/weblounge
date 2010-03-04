@@ -28,9 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The <code>CronServiceTracker</code> watches OSGi services that implement the
- * {@link Quartz} interface and registers and unregisters a site with the first
- * service implementation to come.
+ * The <code>SchedulingServiceTracker</code> watches OSGi services that
+ * implement the {@link Quartz} interface and registers and unregisters a site
+ * with the first service implementation to come.
  */
 public final class SchedulingServiceTracker extends ServiceTracker {
 
@@ -41,9 +41,9 @@ public final class SchedulingServiceTracker extends ServiceTracker {
   private SiteImpl site = null;
 
   /**
-   * Creates a new <code>CronServiceTracker</code> that will, upon an appearing
-   * <code>CronServiceTracker</code> implementation, register the cron service
-   * with the site.
+   * Creates a new <code>SchedulingServiceTracker</code> that will, upon an
+   * appearing <code>SchedulingService</code> implementation, register
+   * the scheduling service with the site.
    * 
    * @param context
    *          the bundle context

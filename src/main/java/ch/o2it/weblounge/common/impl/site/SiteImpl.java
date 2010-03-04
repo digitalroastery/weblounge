@@ -93,7 +93,7 @@ public class SiteImpl implements Site {
   protected String identifier = null;
 
   /** Site enabled state */
-  protected boolean enabled = true;
+  protected boolean autoStart = true;
 
   /** Site running state */
   private boolean running = false;
@@ -149,10 +149,10 @@ public class SiteImpl implements Site {
   /** Root url to static content */
   protected URL staticContentRoot = null;
 
-  /** OSGi cron service tracker */
+  /** Scheduling service tracker */
   private SchedulingServiceTracker schedulingServiceTracker = null;
 
-  /** Quartz cron scheduler */
+  /** Quartz scheduler */
   private Scheduler scheduler = null;
   
   /** Listener for the quartz scheduler */
@@ -201,10 +201,10 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#setEnabled(boolean)
+   * @see ch.o2it.weblounge.common.site.Site#setAutoStart(boolean)
    */
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
+  public void setAutoStart(boolean enabled) {
+    this.autoStart = enabled;
     if (running)
       stop();
   }
@@ -212,10 +212,10 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#isEnabled()
+   * @see ch.o2it.weblounge.common.site.Site#isStartedAutomatically()
    */
-  public boolean isEnabled() {
-    return enabled;
+  public boolean isStartedAutomatically() {
+    return autoStart;
   }
 
   /**
@@ -677,8 +677,6 @@ public class SiteImpl implements Site {
     log_.debug("Starting site {}", this);
     if (running)
       throw new IllegalStateException("Site is already running");
-    if (!enabled)
-      throw new IllegalStateException("Cannot start a disabled site");
 
     // Start the site modules
     synchronized (modules) {
@@ -992,7 +990,7 @@ public class SiteImpl implements Site {
     }
 
     log_.debug("Initializing site {}", this);
-    log_.debug("Signing up for cron services");
+    log_.debug("Signing up for a job scheduling services");
 
     // Connect to the
     schedulingServiceTracker = new SchedulingServiceTracker(bundleContext, this);
@@ -1016,7 +1014,7 @@ public class SiteImpl implements Site {
     try {
       isShutdownInProgress = true;
       log_.debug("Taking down site {}", this);
-      log_.debug("Stopped looking for cron services");
+      log_.debug("Stopped looking for a job scheduling services");
       schedulingServiceTracker.close();
       log_.info("Site {} deactivated", this);
     } finally {

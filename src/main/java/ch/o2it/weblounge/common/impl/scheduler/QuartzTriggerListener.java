@@ -115,7 +115,7 @@ public final class QuartzTriggerListener implements TriggerListener {
    *      org.quartz.JobExecutionContext)
    */
   public boolean vetoJobExecution(Trigger trigger, JobExecutionContext ctx) {
-    return !site.isEnabled() || !site.isRunning();
+    return !site.isStartedAutomatically() || !site.isRunning();
   }
 
 }

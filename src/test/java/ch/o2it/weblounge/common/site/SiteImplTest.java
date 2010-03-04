@@ -150,7 +150,7 @@ public class SiteImplTest {
     setupPrerequisites();
     site = new SiteImpl();
     site.setIdentifier(identifier);
-    site.setEnabled(enabled);
+    site.setAutoStart(enabled);
     site.setDescription(description);
     site.setAdministrator(administrator);
     site.setDefaultTemplate(defaultTemplate);
@@ -224,11 +224,11 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#isEnabled()}.
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#isStartedAutomatically()}.
    */
   @Test
   public void testIsEnabled() {
-    assertEquals(enabled, site.isEnabled());
+    assertEquals(enabled, site.isStartedAutomatically());
   }
 
   /**
