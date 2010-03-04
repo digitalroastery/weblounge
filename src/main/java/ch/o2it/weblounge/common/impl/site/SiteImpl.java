@@ -157,6 +157,9 @@ public class SiteImpl implements Site {
   
   /** Listener for the quartz scheduler */
   private TriggerListener quartzTriggerListener = null;
+  
+  /** Flag to tell whether we are currently shutting down */
+  private boolean isShutdownInProgress = false;
 
   /**
    * Creates a new site that is initially disabled. Use {@link #setEnabled()} to
@@ -961,7 +964,8 @@ public class SiteImpl implements Site {
    * available.
    */
   void removeScheduler() {
-    log_.info("Site " + this + " can no longer execute jobs (scheduler was taken down)");
+    if (!isShutdownInProgress)
+      log_.info("Site " + this + " can no longer execute jobs (scheduler was taken down)");
     this.quartzTriggerListener = null;
   }
 
@@ -1009,10 +1013,15 @@ public class SiteImpl implements Site {
    *          the component context
    */
   public void deactivate(ComponentContext context) {
-    log_.debug("Taking down site {}", this);
-    log_.debug("Stopped looking for cron services");
-    schedulingServiceTracker.close();
-    log_.info("Site {} deactivated", this);
+    try {
+      isShutdownInProgress = true;
+      log_.debug("Taking down site {}", this);
+      log_.debug("Stopped looking for cron services");
+      schedulingServiceTracker.close();
+      log_.info("Site {} deactivated", this);
+    } finally {
+      isShutdownInProgress = false;
+    }
   }
 
   /**

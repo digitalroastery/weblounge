@@ -77,7 +77,7 @@ public final class SchedulingServiceTracker extends ServiceTracker {
    */
   @Override
   public void modifiedService(ServiceReference reference, Object service) {
-    log_.info("Cron daemon was modified");
+    log_.info("Job scheduler was modified");
     super.modifiedService(reference, service);
   }
 
@@ -89,7 +89,7 @@ public final class SchedulingServiceTracker extends ServiceTracker {
    */
   @Override
   public void removedService(ServiceReference reference, Object service) {
-    log_.debug("Cron daeomon disabled for site {} ({} disappeared)", site, service.getClass().getName());
+    log_.debug("Job scheduler disabled for site {}", site);
     site.removeScheduler();
     super.removedService(reference, service);
   }
