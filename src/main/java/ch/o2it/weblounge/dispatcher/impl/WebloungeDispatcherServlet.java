@@ -208,7 +208,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       log_.warn("No dispatcher found for {}", request);
       DispatchSupport.sendUrlNotFound("Not found", request, response);
       return;
-    } else if (!site.isEnabled()) {
+    } else if (!site.isStartedAutomatically()) {
       log_.warn("Dispatcher for site {} is temporarily not available", site);
       DispatchSupport.sendServiceUnavailable("Site is temporarily unavailable", request, response);
       return;
@@ -289,7 +289,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    */
   private Site getSiteByRequest(HttpServletRequest request) {
     Site site = sites.getSiteByName(request.getServerName());
-    if (site != null && !site.isEnabled()) {
+    if (site != null && !site.isStartedAutomatically()) {
       log_.debug("Ignoring request for disabled site {}", site);
       return null;
     }
