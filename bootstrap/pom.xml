@@ -17,15 +17,15 @@
     
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi_R4_core</artifactId>
-      <version>1.0</version>
+      <artifactId>org.osgi.core</artifactId>
+      <version>4.0.0</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>osgi_R4_compendium</artifactId>
-      <version>1.0</version>
+      <artifactId>org.osgi.compendium</artifactId>
+      <version>4.1.0</version>
     </dependency>
 
     <!-- End OSGi -->
@@ -40,14 +40,8 @@
 
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.foundation</artifactId>
-      <version>1.2.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.scr</artifactId>
-      <version>1.2.0</version>
+      <version>1.4.0</version>
     </dependency>
 
     <dependency>
@@ -59,13 +53,13 @@
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.eventadmin</artifactId>
-      <version>1.0.0</version>
+      <version>1.2.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
-      <version>2.0.4</version>
+      <version>2.0.8</version>
     </dependency>
 
     <dependency>
@@ -77,19 +71,7 @@
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.webconsole</artifactId>
-      <version>2.0.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix.gogo</groupId>
-      <artifactId>org.apache.felix.gogo.console</artifactId>
-      <version>0.2.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix.gogo</groupId>
-      <artifactId>org.apache.felix.gogo.runtime</artifactId>
-      <version>0.2.2</version>
+      <version>2.0.6</version>
     </dependency>
 
     <!-- End Apache Felix -->
