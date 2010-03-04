@@ -20,6 +20,9 @@
 
 package ch.o2it.weblounge.kernel;
 
+import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.site.SiteException;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.quartz.Scheduler;
@@ -36,7 +39,7 @@ public class WebloungeKernel {
 
   /** Logger */
   private static final Logger log_ = LoggerFactory.getLogger(WebloungeKernel.class);
-  
+
   /** The weblounge scheduler */
   private Scheduler scheduler = null;
 
@@ -52,19 +55,19 @@ public class WebloungeKernel {
 
     // Start and register the quartz scheduler
     try {
-      log_.info("Starting cron scheduler");
+      log_.info("Starting job scheduler");
       StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
       scheduler = schedulerFactory.getScheduler();
       scheduler.start();
       bundleContext.registerService(Scheduler.class.getName(), scheduler, null);
     } catch (SchedulerException e) {
-      log_.error("Error starting cron scheduler: {}", e.getMessage());
+      log_.error("Error starting job scheduler: {}", e.getMessage());
       throw e;
     }
   }
 
   /**
-   * Callback from the OSGi environment to deactivate the site.
+   * Callback from the OSGi environment to deactivate the bundle.
    * 
    * @param context
    *          the component context
@@ -72,7 +75,35 @@ public class WebloungeKernel {
   public void deactivate(ComponentContext context) throws Exception {
     log_.info("Stopping common weblounge services", this);
     scheduler.shutdown();
-    log_.info("Cron daemon stopped");
+    log_.info("Job scheduler stopped");
   }
-  
+
+  /**
+   * Callback from the OSGi environment when a new site is activated.
+   * 
+   * @param site
+   *          the site
+   */
+  public void addSite(Site site) {
+    if (site.isStartedAutomatically())
+      try {
+        log_.debug("Starting site '{}'", site);
+        site.start();
+      } catch (IllegalStateException e) {
+        log_.error("Site '{}' could not be started: {}", e.getMessage(), e);
+      } catch (SiteException e) {
+        log_.error("Site '{}' could not be started: {}", e.getMessage(), e);
+      }
+  }
+
+  /**
+   * Callback from the OSGi environment when a site is deactivated.
+   * 
+   * @param site
+   *          the site
+   */
+  public void removeSite(Site site) {
+    // Nothing to do
+  }
+
 }

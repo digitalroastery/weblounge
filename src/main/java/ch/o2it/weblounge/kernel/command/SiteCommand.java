@@ -99,10 +99,6 @@ public class SiteCommand {
         stop(site);
       else if ("restart".equals(args[1]))
         restart(site);
-      else if ("enable".equals(args[1]))
-        enable(site);
-      else if ("disable".equals(args[1]))
-        disable(site);
       else if ("status".equals(args[1]))
         status(site);
       else {
@@ -153,10 +149,7 @@ public class SiteCommand {
         Site site = sites.get(i);
         StringBuffer buf = new StringBuffer();
         buf.append("[ ").append(formatter.format(i + 1)).append(" ] ");
-        if (site.isEnabled())
-          buf.append(site.isRunning() ? "[ started  ] " : "[ stopped  ] ");
-        else
-          buf.append(site.isEnabled() ? "[ enabled  ] " : "[ disabled ] ");
+        buf.append(site.isRunning() ? "[ started  ] " : "[ stopped  ] ");
         buf.append(site.getDescription() != null ? site.getDescription() : site.getIdentifier());
         System.out.println(buf.toString());
       }
@@ -175,7 +168,7 @@ public class SiteCommand {
       status("description", site.getDescription());
     
     // Enabled
-    status("enabled", (site.isEnabled() ? "yes" : "no"));
+    status("autostart", (site.isStartedAutomatically() ? "yes" : "no"));
  
     // Started / Stopped
     status("running", (site.isRunning() ? "yes" : "no"));
@@ -246,9 +239,6 @@ public class SiteCommand {
     if (site.isRunning()) {
       System.out.println("Site " + site + " is already running");
       return;
-    } else if (!site.isEnabled()) {
-      System.out.println("Cannot start disabled site " + site);
-      return;
     }
 
     System.out.println("Starting site " + site);
@@ -284,7 +274,7 @@ public class SiteCommand {
     try {
       if (site.isRunning())
         site.stop();
-      if (!site.isEnabled()) {
+      if (!site.isStartedAutomatically()) {
         System.out.println("Disabled site " + site + " cannot be started");
         return;
       }
@@ -292,36 +282,6 @@ public class SiteCommand {
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-
-  /**
-   * Enables the site.
-   * 
-   * @param site
-   *          the site to enable
-   */
-  private void enable(Site site) {
-    if (site.isEnabled()) {
-      System.out.println("Site " + site + " is already enabled");
-      return;
-    }
-    System.out.println("Enabling site " + site);
-    site.setEnabled(true);
-  }
-
-  /**
-   * Stops the site.
-   * 
-   * @param site
-   *          the site to stop
-   */
-  private void disable(Site site) {
-    if (!site.isEnabled()) {
-      System.out.println("Site " + site + " is already disable");
-      return;
-    }
-    System.out.println("Disabling site " + site);
-    site.setEnabled(false);
   }
 
   /**
