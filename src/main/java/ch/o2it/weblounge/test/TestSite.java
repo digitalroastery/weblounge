@@ -38,7 +38,9 @@ public class TestSite extends SiteImpl {
   /**
    * Creates a new test site implementation.
    */
-  public TestSite() { }
+  public TestSite() {
+    setAutoStart(false);
+  }
 
   /**
    * Callback from the OSGi environment to activate the site.
