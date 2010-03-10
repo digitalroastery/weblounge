@@ -22,13 +22,35 @@ package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
+import ch.o2it.weblounge.common.page.PageInclude;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This interface defines common methods and fields for composeable objects like
- * templates, pagelets and images. They share having a name, being composeable
- * or not and
+ * templates, pagelets, actions and images.
+ * <p>
+ * A <code>Composeable</code> is an object that is being rendered as a response
+ * or a part of a response to a request. When the Composeable represents a
+ * response part only, it might want to place include instructions into the
+ * <code>&lt;head&gt;</code> section of the enclosing <code>HTML</code> page. To
+ * do this, it just needs to return these includes in {@link #getIncludes()} and
+ * {@link #getScripts()}.
+ * <p>
+ * Composeables are usually used to display content to the user. Often, this
+ * content might become invalid and needs to be recalculated in some way. The
+ * composeable can indicate this to the system by returning proper values in
+ * {@link #getValidTime()} and {@link #getRecheckTime()}.
  */
 public interface Composeable extends Localizable {
+
+  /**
+   * Sets the composeable identifier.
+   * 
+   * @param identifier
+   *          the identifier
+   */
+  void setIdentifier(String identifier);
 
   /**
    * Returns the composeable identifier.
@@ -105,7 +127,9 @@ public interface Composeable extends Localizable {
 
   /**
    * Returns the amount of time in milliseconds that output using this
-   * composeable will be valid.
+   * composeable will be valid. When this time has been exceeded, content
+   * generated using this composeable should be removed from any cache systems
+   * and be regenerated.
    * 
    * @return the valid time
    */
@@ -116,7 +140,8 @@ public interface Composeable extends Localizable {
    * represented by this composeable will be valid. After that time, clients
    * need to check back and make sure it is still unmodified and valid.
    * 
-   * @param time the recheck time
+   * @param time
+   *          the recheck time
    */
   void setRecheckTime(long time);
 
@@ -128,5 +153,32 @@ public interface Composeable extends Localizable {
    * @return the recheck time
    */
   long getRecheckTime();
+
+  /**
+   * Adds a link or script to the list of includes.
+   * 
+   * @param include
+   *          the include
+   */
+  void addInclude(PageInclude include);
+
+  /**
+   * Removes a link or a script from the list of includes.
+   * 
+   * @param include
+   *          the include
+   */
+  void removeInclude(PageInclude include);
+
+  /**
+   * Returns the &lt;link&gt; or &lt;script&gt; elements that have been defined
+   * for this action. They will be set as attributes in the
+   * {@link HttpServletRequest}, where they are available to the page renderer
+   * so that they can be included in the page's <code>&lt;head&gt;</code>
+   * section.
+   * 
+   * @return the includes
+   */
+  PageInclude[] getIncludes();
 
 }

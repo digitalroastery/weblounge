@@ -46,7 +46,7 @@ public interface Renderer extends Composeable {
    * @see #supportsFlavor(String)
    * @see RequestFlavor
    */
-  String[] getFlavors();
+  RequestFlavor[] getFlavors();
 
   /**
    * Returns <code>true</code> if the given flavor is supported by the renderer.
@@ -55,7 +55,7 @@ public interface Renderer extends Composeable {
    *          the flavor name
    * @return <code>true</code> if the renderer supports the rendering method
    */
-  boolean supportsFlavor(String flavor);
+  boolean supportsFlavor(RequestFlavor flavor);
 
   /**
    * Sets the url of the actual renderer. This will usually be a file path to a

@@ -118,12 +118,9 @@ public interface WebUrl extends Url {
   /**
    * Returns the url flavor. For example, in case of "index.xml" the flavor will
    * be <code>XML</code>.
-   * <p>
-   * It is good practice to use the enumeration at {@link RequestFlavor} when
-   * passing around and comparing flavors.
    * 
    * @return the url flavor
    */
-  String getFlavor();
+  RequestFlavor getFlavor();
 
 }

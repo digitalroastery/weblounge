@@ -23,6 +23,7 @@ package ch.o2it.weblounge.common.site;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.SearchResult;
+import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
  * The module interface defines the method that may be called on weblounge
@@ -98,6 +99,14 @@ public interface Module extends Customizable {
    * @return the associated site
    */
   Site getSite();
+
+  /**
+   * Returns the url that is used to link to elements inside the module, e. g.
+   * scripts, style definitions or images.
+   * 
+   * @return the module url
+   */
+  WebUrl getUrl();
 
   /**
    * Starts the module. This includes starting the module services and sending a

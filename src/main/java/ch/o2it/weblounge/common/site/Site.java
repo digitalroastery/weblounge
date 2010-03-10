@@ -32,6 +32,7 @@ import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
+import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import java.io.IOException;
@@ -406,7 +407,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * 
    * @return the absolute link to this site
    */
-  String getLink();
+  WebUrl getUrl();
 
   /**
    * Adds <code>language</code> to the site languages.

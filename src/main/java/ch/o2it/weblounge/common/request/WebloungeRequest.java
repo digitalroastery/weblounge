@@ -118,6 +118,6 @@ public interface WebloungeRequest extends HttpServletRequest {
    * 
    * @return the requested output method
    */
-  String getFlavor();
+  RequestFlavor getFlavor();
 
 }

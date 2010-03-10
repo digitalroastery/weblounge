@@ -20,7 +20,10 @@
 
 package ch.o2it.weblounge.common.site;
 
+import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.page.Page;
+import ch.o2it.weblounge.common.page.PageURI;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -44,16 +47,16 @@ import ch.o2it.weblounge.common.url.WebUrl;
  * provide a default constructor (no arguments), since action handlers are
  * created using reflection.
  */
-public interface Action extends Composeable {
+public interface Action extends Composeable, Customizable {
 
   /** The target url */
   final static String TARGET = "target-url";
 
-  /** Constant indicating that the current page should be evaluated */
-  final static int EVAL_PAGE = 0;
+  /** Constant indicating that the current request should be evaluated */
+  final static int EVAL_REQUEST = 0;
 
-  /** Constant indicating that the current page should not be evaluated */
-  final static int SKIP_PAGE = 1;
+  /** Constant indicating that the current request should not be evaluated */
+  final static int SKIP_REQUEST = 1;
 
   /** Constant indicating that the includes should be evaluated */
   final static int EVAL_INCLUDES = 0;
@@ -79,64 +82,70 @@ public interface Action extends Composeable {
   /** Constant indicating that the action will be forwarded to a url */
   final static int METHOD_URL = 1;
 
+  /** the default valid time is 60 minutes */
+  long DEFAULT_VALID_TIME = 60L * 60L * 1000L;
+
+  /** the default recheck time is 1 minute */
+  long DEFAULT_RECHECK_TIME = 60L * 1000L;
+
   /**
    * This method is called just before the call to <code>startPage()</code> is
    * made. Here, the desired rendering method is passed, as well as the request
    * and the response object.
    * <p>
-   * The intention of the call to this method is, that actions may prepare
-   * itself for the call to <code>startPage()</code> by extracting state
-   * information from the request, opening database connections etc. It is not
-   * recommended to write anything to the response object except for the case
-   * that it is clear that the action cannot be executed, e. g. because the user
-   * is not authorized. In this case, the method should send back the proper
-   * <code>HTTP</code> error code and throw the <code>ActionException</code>.
+   * The intention of this method is that actions may prepare themselves for the
+   * subsequent calls to <code>startPage()</code> by extracting state
+   * information from the request, opening database connections etc.
+   * <p>
+   * It is not recommended to write anything to the response object yet, except
+   * for the case that it is obvious that the action cannot be executed, e. g.
+   * because the user is not authorized. In this case, the method should send
+   * back the proper <code>HTTP</code> error code and throw an
+   * {@link ActionException}.
    * 
    * @param request
    *          the weblounge request
    * @param response
    *          the weblounge response
-   * @param page
-   *          the underlying page
-   * @param template
-   *          the template used to render the request
-   * @param method
-   *          the quested output method
+   * @param flavor
+   *          the quested output flavor
    * @throws ActionException
    *           if this handler refuses to handle the exception
    */
   void configure(WebloungeRequest request, WebloungeResponse response,
-      Page page, Renderer template, String method) throws ActionException;
+      RequestFlavor flavor) throws ActionException;
 
   /**
-   * This method is called by the target page and gives the action the
+   * This method is called by the request handler page and gives the action the
    * possibility to either completely take control over what is returned to the
-   * user or to have the template render the page. <br>
+   * user or to have the template render the page. This is also the perfect
+   * place to write <code>HTTP</code> headers to the response.
+   * <p>
    * However, there are a few callbacks that are performed by the resulting page
    * to give the action implementation a chance to modify certain elements on
    * the page, namely either the whole page or composer contents. before any
    * output is written to the response object. Implementing classes may return
    * one out of two values:
    * <ul>
-   * <li><code>EVAL_PAGE</code> to have the page displayed as usual</li>
-   * <li><code>SKIP_PAGE</code> to skip any content on this page</li>
+   * <li><code>EVAL_REQUEST</code> to have the page displayed as usual</li>
+   * <li><code>SKIP_REQUEST</code> to skip any content on this page</li>
    * </ul>
-   * If <code>SKIP_PAGE</code> is returned, then the action is responsible for
-   * writing any output to the response object, since control of rendering is
-   * transferred completely. <br>
-   * If <code>EVAL_PAGE</code> is returned, the page will control the rendering
-   * of the page, and the action may only change the output of the composers or
-   * pagelets.
+   * If <code>SKIP_REQUEST</code> is returned, then the action is responsible
+   * for writing any output to the response object, since control of rendering
+   * is transferred completely. <br>
+   * If <code>EVAL_REQUEST</code> is returned, the page will control the
+   * rendering of the page, and the action may only change the output of the
+   * composers or pagelets.
    * 
    * @param request
    *          the servlet request
    * @param response
    *          the servlet response
-   * @return either <code>EVAL_PAGE</code> or <code>SKIP_PAGE</code> depending
-   *         on whether the action wants to render the page on its own or have
-   *         the template do the rendering.
+   * @return either <code>EVAL_REQUEST</code> or <code>SKIP_REQUEST</code>
+   *         depending on whether the action wants to continue rendering the
+   *         page or have the template do the rendering.
    */
-  int startPage(WebloungeRequest request, WebloungeResponse response)
+  int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
   /**
@@ -244,22 +253,20 @@ public interface Action extends Composeable {
       String composer, int position) throws ActionException;
 
   /**
-   * Returns the url that this action should be directed to by default. Return
-   * <code>null</code> if no redirection should be performed, the action will
-   * then be rendered on the site's home template.
+   * Returns the url to this action.
    * 
-   * @return the default url
+   * @return the action url
    */
-  WebUrl getDefaultUrl();
+  WebUrl getUrl();
 
   /**
-   * Returns the supported content flavors. The meaning of these flavors are the
+   * Returns the supported content flavors. The meaning of flavors are the
    * possible output formats of an action. Common flavors include include
    * <code>HTML</code>, <code>XML</code> or <code>JSON</code>.
    * 
    * @return the supported content flavors
    */
-  String[] getFlavors();
+  RequestFlavor[] getFlavors();
 
   /**
    * Returns <code>true</code> if the action supports the given content flavor.
@@ -271,7 +278,88 @@ public interface Action extends Composeable {
    * @return <code>true</code> if the action can create the requested content
    *         flavor
    */
-  boolean supportsFlavor(String flavor);
+  boolean supportsFlavor(RequestFlavor flavor);
+
+  /**
+   * Sets the action mountpoint.
+   * 
+   * @param path
+   *          the mountpoint
+   */
+  void setPath(String path);
+
+  /**
+   * Returns the mountpoint used to call the action. The path is interpreted
+   * relative to the site root.
+   * <p>
+   * The extension can either be empty, <code>/*</code> or <code>/**</code>,
+   * depending on whether to match only the mountpoint (e. g. <code>/news</code>
+   * ), to match the mountpoint and any direct children (e. g.
+   * <code>/news/today</code>) or the mountpoint and any subsequent urls.
+   * 
+   * @return the action mountpoint
+   */
+  String getPath();
+
+  /**
+   * Sets the uri of the page that is used to render the action.
+   * 
+   * @param uri
+   *          the page uri
+   */
+  void setPageURI(PageURI uri);
+
+  /**
+   * Returns the uri of the page that is used to deliver the initial content for
+   * this action or <code>null</code> if no page has been set.
+   * 
+   * @return the page uri
+   */
+  PageURI getPageURI();
+
+  /**
+   * Sets the page that is used to render the action. This method is called
+   * right before the action is executed by a call to
+   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
+   * .
+   * 
+   * @param page
+   *          the page
+   */
+  void setPage(Page page);
+
+  /**
+   * Returns the page that is used to deliver the initial content for this
+   * action or <code>null</code> if no page has been set. In any case, the page
+   * will be set prior to a call to
+   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
+   * .
+   * 
+   * @return the page
+   */
+  Page getPage();
+
+  /**
+   * Sets the page template that is used to render the action content. This
+   * method is called right before the action is executed by a call to
+   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
+   * .
+   * 
+   * @param template
+   *          the page template
+   */
+  void setTemplate(PageTemplate template);
+
+  /**
+   * Returns the page template that is used to render the action content or
+   * <code>null</code> if no template has been specified. In any case, the
+   * template will be set prior to a call to
+   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
+   * .
+   * 
+   * @return the page template
+   */
+  PageTemplate getTemplate();
 
   /**
    * This method is called after the request has been processed by the action.
@@ -280,11 +368,29 @@ public interface Action extends Composeable {
   void cleanup();
 
   /**
+   * This method is used at initialization time and sets the site that was used
+   * to define this action.
+   * 
+   * @param site
+   *          the site
+   */
+  void setSite(Site site);
+
+  /**
    * Returns the associated site or <code>null</code> if no site has been set.
    * 
    * @return the site
    */
   Site getSite();
+
+  /**
+   * This method is used at initialization time and sets the module that was
+   * used to define this action.
+   * 
+   * @param module
+   *          the module
+   */
+  void setModule(Module module);
 
   /**
    * Returns the associated module or <code>null</code> if no module has been
