@@ -173,14 +173,17 @@ public class UrlSupport {
   }
 
   /**
-   * Removes any occurence of double separators ("//") and replaces it with "/".
+   * Removes any occurrence of double separators ("//") and replaces it with
+   * "/".
    * 
    * @param path
    *          the path to check
    * @return the corrected path
    */
   private static String removeDoubleSeparator(String path) {
-    int index = 0;
+    int protocolIndex = path.indexOf("://");
+    protocolIndex += protocolIndex == -1 ? 0 : 3;
+    int index = Math.max(0, protocolIndex);
     while ((index = path.indexOf("//", index)) != -1) {
       path = path.substring(0, index) + path.substring(index + 1);
     }
