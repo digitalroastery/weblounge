@@ -69,9 +69,9 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
    */
   @Test
   public void testRemoveFlavor() {
-    template.removeFlavor(RequestFlavor.XML.toString());
+    template.removeFlavor(RequestFlavor.XML);
     assertEquals(1, template.getFlavors().length);
-    template.removeFlavor(RequestFlavor.HTML.toString());
+    template.removeFlavor(RequestFlavor.HTML);
     assertEquals(0, template.getFlavors().length);
   }
 
@@ -81,7 +81,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   @Test
   public void testGetFlavors() {
     assertEquals(1, template.getFlavors().length);
-    assertEquals(RequestFlavor.HTML, RequestFlavor.parseString(template.getFlavors()[0]));
+    assertEquals(RequestFlavor.HTML, template.getFlavors()[0]);
   }
 
   /**
@@ -89,8 +89,8 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
    */
   @Test
   public void testSupportsFlavor() {
-    assertTrue(template.supportsFlavor(RequestFlavor.HTML.toString()));
-    assertFalse(template.supportsFlavor(RequestFlavor.XML.toString()));
+    assertTrue(template.supportsFlavor(RequestFlavor.HTML));
+    assertFalse(template.supportsFlavor(RequestFlavor.XML));
   }
 
   /**

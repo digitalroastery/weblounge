@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionException;
@@ -28,7 +28,6 @@ import ch.o2it.weblounge.common.site.ActionException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,17 +35,6 @@ import java.util.List;
  * <code>Ajax</code> responses.
  */
 public abstract class AbstractAjaxAction extends ActionSupport {
-
-  /**
-   * Method that is called when the handler can start sending the response.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param response
-   *          the weblounge response
-   */
-  public abstract void startAjaxResponse(WebloungeRequest request,
-      WebloungeResponse response);
 
   /**
    * This method prepares the action handler for the next upcoming request by
@@ -67,13 +55,8 @@ public abstract class AbstractAjaxAction extends ActionSupport {
    *      WebloungeResponse, String)
    */
   public final void configure(WebloungeRequest request,
-      WebloungeResponse response, String method) {
+      WebloungeResponse response, RequestFlavor method) {
     super.configure(request, response, method);
-    response.setHeader("Expires", "Mon, 4 Jun 2007 00:00:00 GMT");
-    response.setHeader("Last-Modified", WebloungeDateFormat.formatStatic(new Date()));
-    response.setHeader("Cache-Control", "no-cache, must-revalidate");
-    response.setHeader("Pragma", "no-cache");
-    startAjaxResponse(request, response);
   }
 
   /**
@@ -84,111 +67,29 @@ public abstract class AbstractAjaxAction extends ActionSupport {
    *          the servlet request
    * @param response
    *          the servlet response
-   * @return either <code>EVAL_PAGE</code> or <code>SKIP_PAGE</code> depending
+   * @return either <code>EVAL_REQUEST</code> or <code>SKIP_REQUEST</code> depending
    *         on whether the action wants to render the page on its own or have
    *         the template do the rendering.
    * @see ch.o2it.weblounge.common.site.Action.module.ActionHandler#startPage(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse)
    */
-  public final int startPage(WebloungeRequest request,
+  public final int startResponse(WebloungeRequest request,
       WebloungeResponse response) throws ActionException {
-    return SKIP_PAGE;
+    response.setHeader("Content-Type", "text/json; charset=utf-8");
+    startAjaxResponse(request, response);
+    return SKIP_REQUEST;
   }
 
   /**
-   * This method is called by the target page and gives the action the
-   * possibility to either replace the includes in the page header, add more
-   * includes to the existing ones or have the page handle the includes.
-   * 
-   * Implementing classes may return one out of two values:
-   * <ul>
-   * <li><code>EVAL_INCLUDES</code> to have the page handle the includes</li>
-   * <li><code>SKIP_INCLUDES</code> to skip any includes by this page</li>
-   * </ul>
-   * If <code>SKIP_INCLUDES</code> is returned, then the action is responsible
-   * for writing any output to the response object, since control of rendering
-   * is transferred completely. <br>
-   * If <code>EVAL_INCLUDES</code> is returned, the page will control the adding
-   * of includes, while the action may still add some itself.
-   * 
-   * <b>Note</b> This callback will only be performed if the page contains a
-   * &lt;webl:inlcudes/&gt; tag in the header section.
+   * Method that is called when the handler can start sending the response.
    * 
    * @param request
-   *          the servlet request
+   *          the weblounge request
    * @param response
-   *          the servlet response
-   * @return either <code>EVAL_INCLUDES</code> or <code>SKIP_INCLUDES</code>
+   *          the weblounge response
    */
-  public final int startIncludes(WebloungeRequest request,
-      WebloungeResponse response) throws ActionException {
-    return SKIP_INCLUDES;
-  }
-
-  /**
-   * This method always returns <code>true</code> and therefore leaves rendering
-   * to the composer.
-   * 
-   * @param request
-   *          the request object
-   * @param response
-   *          the response object
-   * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
-   *         depending on whether the action wants to render the composer on its
-   *         own or have the template do the rendering.
-   * @see ch.o2it.weblounge.common.site.Action.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest,
-   *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
-   */
-  public final int startStage(WebloungeRequest request,
-      WebloungeResponse response) throws ActionException {
-    return SKIP_COMPOSER;
-  }
-
-  /**
-   * This method always returns <code>true</code> and therefore leaves rendering
-   * to the composer.
-   * 
-   * @param request
-   *          the request object
-   * @param response
-   *          the response object
-   * @param composer
-   *          the composer identifier
-   * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
-   *         depending on whether the action wants to render the composer on its
-   *         own or have the template do the rendering.
-   * @see ch.o2it.weblounge.common.site.Action.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest,
-   *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
-   */
-  public final int startComposer(WebloungeRequest request,
-      WebloungeResponse response, String composer) throws ActionException {
-    return SKIP_COMPOSER;
-  }
-
-  /**
-   * This method always returns <code>true</code> and therefore leaves rendering
-   * to the pagelet.
-   * 
-   * @param request
-   *          the request object
-   * @param response
-   *          the response object
-   * @param composer
-   *          the composer identifier
-   * @param position
-   *          the pagelet position
-   * @return either <code>EVAL_PAGELET</code> or <code>SKIP_PAGELET</code>
-   *         depending on whether the action wants to render the pagelet on its
-   *         own or have the template do the rendering.
-   * @see ch.o2it.weblounge.common.site.Action.module.ActionHandler#startPagelet(ch.o2it.weblounge.api.request.WebloungeRequest,
-   *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String,
-   *      int)
-   */
-  public final int startPagelet(WebloungeRequest request,
-      WebloungeResponse response, String composer, int position)
-      throws ActionException {
-    return SKIP_PAGELET;
-  }
+  public abstract void startAjaxResponse(WebloungeRequest request,
+      WebloungeResponse response);
 
   /**
    * This method is called when the request is finished and the action handler

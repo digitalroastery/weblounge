@@ -24,7 +24,12 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.page.PageInclude;
 import ch.o2it.weblounge.common.site.Composeable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Base implementation for composeable objects like page templates or images.
@@ -45,6 +50,17 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
 
   /** Name of this composeable */
   protected LocalizableContent<String> name = null;
+  
+  /** Includes */
+  protected List<PageInclude> includes = null;
+
+  /**
+   * Creates a new composeable instance with a recheck time of a day and a valid
+   * time of a week.
+   */
+  protected GeneralComposeable() {
+    this(null, Times.MS_PER_DAY, Times.MS_PER_WEEK);
+  }
 
   /**
    * Creates a new composeable instance with a recheck time of a day and a valid
@@ -71,8 +87,6 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
    */
   protected GeneralComposeable(String identifier, long recheckTime,
       long validTime) {
-    if (identifier == null)
-      throw new IllegalArgumentException("Identifier must not be null");
     if (recheckTime < 0)
       throw new IllegalArgumentException("Recheck time must be greater than or equal to zero");
     if (validTime < 0)
@@ -81,6 +95,17 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
     this.name = new LocalizableContent<String>(this);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Composeable#setIdentifier(java.lang.String)
+   */
+  public void setIdentifier(String identifier) {
+    if (identifier == null)
+      throw new IllegalArgumentException("Identifier cannot be null");
+    this.identifier = identifier;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -188,10 +213,61 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Composeable#setLinks(ch.o2it.weblounge.common.page.PageInclude[])
+   */
+  public void setLinks(PageInclude[] links) {
+    if (links != null) {
+      if (includes == null)
+        includes = new ArrayList<PageInclude>();
+      includes.addAll(Arrays.asList(links));
+    } else {
+      includes = null;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Composeable#addInclude(ch.o2it.weblounge.common.page.PageInclude)
+   */
+  public void addInclude(PageInclude include) {
+    if (includes == null)
+      includes = new ArrayList<PageInclude>();
+    includes.add(include);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Composeable#removeInclude(ch.o2it.weblounge.common.page.PageInclude)
+   */
+  public void removeInclude(PageInclude include) {
+    if (includes == null)
+      return;
+    includes.remove(include);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Composeable#getIncludes()
+   */
+  public PageInclude[] getIncludes() {
+    if (includes != null) {
+      return includes.toArray(new PageInclude[includes.size()]);
+    }
+    return new PageInclude[] {};
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
+    if (identifier == null)
+      throw new IllegalStateException("Composeable object need an identifier");
     return identifier.hashCode();
   }
 
@@ -201,6 +277,8 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object o) {
+    if (identifier == null)
+      throw new IllegalStateException("Composeable object need an identifier");
     if (o instanceof Composeable) {
       Composeable c = (Composeable) o;
       return c.getIdentifier().equals(identifier);

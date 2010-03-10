@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
+import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
@@ -46,6 +47,7 @@ import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteException;
 import ch.o2it.weblounge.common.site.SiteListener;
+import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
@@ -88,6 +90,9 @@ public class SiteImpl implements Site {
 
   /** Regular expression to test the validity of a site identifier */
   private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9-_.]*$";
+  
+  /** The default hostname */
+  private static final String DEFAULT_HOSTNAME = "localhost";
 
   /** The site identifier */
   protected String identifier = null;
@@ -98,6 +103,9 @@ public class SiteImpl implements Site {
   /** Site running state */
   private boolean running = false;
 
+  /** Url of this site */
+  private WebUrl url = null;
+  
   /** Site description */
   protected String description = null;
 
@@ -502,6 +510,7 @@ public class SiteImpl implements Site {
   public void addHostName(String hostname) {
     if (hostname == null)
       throw new IllegalArgumentException("Hostname must not be null");
+    url = null;
     hostnames.add(hostname);
   }
 
@@ -513,6 +522,7 @@ public class SiteImpl implements Site {
   public boolean removeHostname(String hostname) {
     if (hostname == null)
       throw new IllegalArgumentException("Hostname must not be null");
+    url = null;
     return hostnames.remove(hostname);
   }
 
@@ -531,17 +541,19 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#getHostName()
    */
   public String getHostName() {
-    return hostnames.size() > 0 ? hostnames.get(0) : null;
+    return hostnames.size() > 0 ? hostnames.get(0) : DEFAULT_HOSTNAME;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#getLink()
+   * @see ch.o2it.weblounge.common.site.Site#getUrl()
    */
-  public String getLink() {
-    String hostname = getHostName();
-    return hostname != null ? hostname : "/";
+  public WebUrl getUrl() {
+    if (url != null)
+      return url;
+    url = new WebUrlImpl(this, getHostName());
+    return url;
   }
 
   /**

@@ -68,7 +68,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   private transient String link_ = null;
 
   /** The url flavor */
-  protected String flavor = null;
+  protected RequestFlavor flavor = null;
 
   /**
    * Constructor for a url with the given path, a version of <code>LIVE</code>,
@@ -174,7 +174,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @param flavor
    *          the url flavor
    */
-  public WebUrlImpl(Site site, String path, long version, String flavor) {
+  public WebUrlImpl(Site site, String path, long version, RequestFlavor flavor) {
     super(path, '/');
     this.site = site;
     this.version = version;
@@ -269,7 +269,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     if (flavor != null)
       selector.append(".").append(flavor.toLowerCase());
     else if (this.flavor != null) {
-      selector.append(".").append(this.flavor.toLowerCase());
+      selector.append(".").append(this.flavor.toExtension());
     } else if (hasVersion) {
       selector.append(".").append(RequestFlavor.HTML.toExtension());
     }
@@ -282,7 +282,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * 
    * @see ch.o2it.weblounge.common.url.WebUrl#getFlavor()
    */
-  public String getFlavor() {
+  public RequestFlavor getFlavor() {
     return flavor;
   }
 
@@ -376,7 +376,11 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       // Flavor
       String f = pathMatcher.group(4);
       if (f != null && !"".equals(f))
-        this.flavor = f.toLowerCase();
+        try {
+          this.flavor = RequestFlavor.parseString(f);
+        } catch (IllegalArgumentException e) {
+          log_.debug("Found unknwon request flavor {}", f);
+        }
       return trim(pathMatcher.group(1));
     }
 
@@ -398,10 +402,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
         if (f.startsWith("/"))
           f = f.substring(1);
         try {
-          this.flavor = RequestFlavor.parseString(f).toExtension();
+          this.flavor = RequestFlavor.parseString(f);
           group--;
         } catch (IllegalArgumentException e) {
-          log_.debug("Found non-standard flavor {}", f);
+          log_.debug("Found unknwon request flavor {}", f);
         }
       }
 

@@ -58,7 +58,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
   protected URL renderer = null;
 
   /** The supported flavors */
-  protected Set<String> flavors = new HashSet<String>();
+  protected Set<RequestFlavor> flavors = new HashSet<RequestFlavor>();
 
   /** Size of the temporary buffer */
   private static final int BUFFER_SIZE = 8 * 1024;
@@ -89,7 +89,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    *          the supported flavor
    * @see RequestFlavor
    */
-  public void addFlavor(String flavor) {
+  public void addFlavor(RequestFlavor flavor) {
     if (flavor == null)
       throw new IllegalArgumentException("Flavor must not be null");
     flavors.add(flavor);
@@ -101,7 +101,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    * @param flavor
    *          the flavor
    */
-  public void removeFlavor(String flavor) {
+  public void removeFlavor(RequestFlavor flavor) {
     if (flavor == null)
       throw new IllegalArgumentException("Flavor must not be null");
     flavors.remove(flavor);
@@ -109,11 +109,11 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Composeable#getFlavors()
+   *
+   * @see ch.o2it.weblounge.common.site.Renderer#getFlavors()
    */
-  public String[] getFlavors() {
-    return flavors.toArray(new String[flavors.size()]);
+  public RequestFlavor[] getFlavors() {
+    return flavors.toArray(new RequestFlavor[flavors.size()]);
   }
 
   /**
@@ -121,7 +121,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    * 
    * @see ch.o2it.weblounge.common.site.Composeable#supportsFlavor(java.lang.String)
    */
-  public boolean supportsFlavor(String flavor) {
+  public boolean supportsFlavor(RequestFlavor flavor) {
     return flavors.contains(flavor);
   }
 

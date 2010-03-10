@@ -21,6 +21,8 @@
 package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.SearchResult;
@@ -31,6 +33,7 @@ import ch.o2it.weblounge.common.site.ModuleException;
 import ch.o2it.weblounge.common.site.ModuleListener;
 import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.url.WebUrl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +58,9 @@ public class ModuleImpl implements Module {
 
   /** The module identifier */
   protected String identifier = null;
+  
+  /** The url that is used to reach module assets */
+  protected WebUrl url = null;
 
   /** Module enabled state */
   protected boolean enabled = false;
@@ -117,6 +123,24 @@ public class ModuleImpl implements Module {
    */
   public String getIdentifier() {
     return identifier;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#getUrl()
+   */
+  public WebUrl getUrl() {
+    if (url != null)
+      return url;
+    if (site == null)
+      throw new IllegalStateException("Site has not yet been set");
+    url = new WebUrlImpl(site, UrlSupport.concat(new String[] {
+        site.getUrl().getPath(),
+        "module",
+        identifier
+    }));
+    return url;
   }
 
   /**

@@ -20,17 +20,17 @@
 
 package ch.o2it.weblounge.common.page;
 
-import static org.junit.Assert.assertFalse;
-
-import static org.junit.Assert.assertTrue;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.page.GeneralComposeable;
+import ch.o2it.weblounge.common.impl.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
+import ch.o2it.weblounge.common.impl.page.ScriptImpl;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.junit.Before;
@@ -77,6 +77,12 @@ public class GeneralComposeableTest {
 
   /** English name */
   protected String englishName = "Default template";
+  
+  /** Cascading stylesheet include */
+  protected PageInclude css = new LinkImpl("http://localhost/css.css");
+
+  /** Javascript include */
+  protected Script javascript = new ScriptImpl("http://localhost/javascript.js");
 
   @BeforeClass
   public static void setUpClass() throws Exception {
@@ -106,6 +112,8 @@ public class GeneralComposeableTest {
     composeable.setRecheckTime(recheckTime);
     composeable.setValidTime(validTime);
     composeable.setComposeable(isComposeable);
+    composeable.addInclude(css);
+    composeable.addInclude(javascript);
   }
 
   /**
@@ -179,6 +187,16 @@ public class GeneralComposeableTest {
   @Test
   public void testGetValidTime() {
     assertEquals(validTime, composeable.getValidTime());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeabl#getIncludes()
+   * .
+   */
+  @Test
+  public void testGetIncludes() {
+    assertEquals(2, composeable.getIncludes().length);
   }
 
   /**

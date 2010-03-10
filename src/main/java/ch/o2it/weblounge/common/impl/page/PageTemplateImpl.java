@@ -24,6 +24,9 @@ import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.page.Link;
+import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -31,6 +34,7 @@ import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.RenderException;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -61,7 +65,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   public PageTemplateImpl(String identifier, URL url) {
     super(identifier, url);
-    addFlavor(RequestFlavor.HTML.toString());
+    addFlavor(RequestFlavor.HTML);
   }
 
   /**
@@ -222,6 +226,18 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     // Names
     LanguageSupport.addDescriptions(node, "name", null, template.name, false);
 
+    // scripts
+    NodeList scripts = XPathHelper.selectList(node, "//includes/script", xpath);
+    for (int i = 0; i < scripts.getLength(); i++) {
+      template.addInclude(ScriptImpl.fromXml(scripts.item(i)));
+    }
+
+    // links
+    NodeList includes = XPathHelper.selectList(node, "//includes/link", xpath);
+    for (int i = 0; i < includes.getLength(); i++) {
+      template.addInclude(LinkImpl.fromXml(includes.item(i)));
+    }
+
     return template;
   }
 
@@ -270,6 +286,20 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       buf.append("</name>");
     }
 
+    // Includes
+    if (getIncludes().length > 0) {
+      buf.append("<includes>");
+      for (PageInclude include : getIncludes()) {
+        if (include instanceof Link)
+          buf.append(include.toXml());
+      }
+      for (PageInclude include : getIncludes()) {
+        if (include instanceof Script)
+          buf.append(include.toXml());
+      }
+      buf.append("</includes>");
+    }
+    
     buf.append("</template>");
     return buf.toString();
   }

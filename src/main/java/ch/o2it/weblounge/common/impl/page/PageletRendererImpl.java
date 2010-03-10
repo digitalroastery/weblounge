@@ -22,14 +22,14 @@ package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
+import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Include;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.RenderException;
-import ch.o2it.weblounge.common.site.ScriptInclude;
 
 import org.w3c.dom.Node;
 
@@ -51,10 +51,10 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   protected URL editor = null;
 
   /** Links that need to be included in the header */
-  protected Set<Include> links = null;
+  protected Set<PageInclude> links = null;
 
   /** Scripts that need to be included in the header */
-  protected Set<ScriptInclude> scripts = null;
+  protected Set<Script> scripts = null;
 
   /** The defining module */
   protected Module module = null;
@@ -70,9 +70,9 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public PageletRendererImpl(String identifier, URL url) {
     super(identifier, url);
-    addFlavor(RequestFlavor.HTML.toString());
-    links = new HashSet<Include>();
-    scripts = new HashSet<ScriptInclude>();
+    addFlavor(RequestFlavor.HTML);
+    links = new HashSet<PageInclude>();
+    scripts = new HashSet<Script>();
   }
 
   /**
@@ -96,45 +96,45 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#addLink(ch.o2it.weblounge.common.site.Include)
+   * @see ch.o2it.weblounge.common.site.PageletRenderer#addInclude(ch.o2it.weblounge.common.page.PageInclude)
    */
-  public void addLink(Include link) {
+  public void addInclude(PageInclude link) {
     links.add(link);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#removeLink(ch.o2it.weblounge.common.site.Include)
+   * @see ch.o2it.weblounge.common.site.PageletRenderer#removeInclude(ch.o2it.weblounge.common.page.PageInclude)
    */
-  public void removeLink(Include link) {
+  public void removeInclude(PageInclude link) {
     links.remove(link);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#getLinks()
+   * @see ch.o2it.weblounge.common.site.PageletRenderer#getIncludes()
    */
-  public Include[] getLinks() {
-    return links.toArray(new Include[links.size()]);
+  public PageInclude[] getIncludes() {
+    return links.toArray(new PageInclude[links.size()]);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#addScript(ch.o2it.weblounge.common.site.ScriptInclude)
+   * @see ch.o2it.weblounge.common.site.PageletRenderer#addScript(ch.o2it.weblounge.common.page.Script)
    */
-  public void addScript(ScriptInclude script) {
+  public void addScript(Script script) {
     scripts.add(script);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#removeScript(ch.o2it.weblounge.common.site.ScriptInclude)
+   * @see ch.o2it.weblounge.common.site.PageletRenderer#removeScript(ch.o2it.weblounge.common.page.Script)
    */
-  public void removeScript(ScriptInclude script) {
+  public void removeScript(Script script) {
     scripts.remove(script);
   }
 
@@ -143,8 +143,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * 
    * @see ch.o2it.weblounge.common.site.PageletRenderer#getScripts()
    */
-  public ScriptInclude[] getScripts() {
-    return scripts.toArray(new ScriptInclude[scripts.size()]);
+  public Script[] getScripts() {
+    return scripts.toArray(new Script[scripts.size()]);
   }
 
   /**

@@ -20,17 +20,81 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import ch.o2it.weblounge.common.site.Action;
+import ch.o2it.weblounge.common.site.ActionConfiguration;
+import ch.o2it.weblounge.common.site.Site;
+
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * TODO: Comment ActionPool
+ * Object pool for {@link Action} instances.
  */
-public class ActionPool extends GenericKeyedObjectPool {
+public class ActionPool extends GenericObjectPool {
 
-  ActionPool(ActionPoolFactory factory) {
-    if (factory == null)
-      throw new IllegalArgumentException("Pool factory must not be null");
-    setFactory(factory);
+  /** Logging facility */
+  private final static Logger log_ = LoggerFactory.getLogger(ActionPool.class);
+
+  /**
+   * Creates a new pool which will manage {@link Action} instances that are
+   * created according to <code>configuration</code>.
+   * 
+   * @param configuration
+   *          the action configuration
+   * @param the
+   *          associated site
+   */
+  public ActionPool(ActionConfiguration configuration, Site site) {
+    if (configuration == null)
+      throw new IllegalArgumentException("Action configuration must not be null");
+    setFactory(new ActionPoolFactory(configuration, site));
+    setTestOnBorrow(false);
+    setTestOnReturn(false);
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.apache.commons.pool.impl.GenericObjectPool#borrowObject()
+   */
+  @Override
+  public Object borrowObject() throws Exception {
+    Action action = (Action) super.borrowObject();
+    log_.debug("Received request to borrow action '{}', {} remaining", action.getIdentifier(), this.getNumIdle());
+    log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
+        action.getIdentifier(),
+        this.getNumActive(),
+        this.getNumIdle() });
+    return action;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.apache.commons.pool.impl.GenericObjectPool#returnObject(java.lang.Object)
+   */
+  @Override
+  public void returnObject(Object obj) throws Exception {
+    Action action = (Action) super.borrowObject();
+    log_.debug("Borrowed action '{}' returned to pool", action.getIdentifier());
+    log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
+        action.getIdentifier(),
+        this.getNumActive(),
+        this.getNumIdle() });
+    super.returnObject(obj);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.apache.commons.pool.impl.GenericObjectPool#invalidateObject(java.lang.Object)
+   */
+  @Override
+  public void invalidateObject(Object obj) throws Exception {
+    Action action = (Action) super.borrowObject();
+    log_.debug("Invalidating action '{}'", action.getIdentifier());
+    super.invalidateObject(obj);
+  }
+
 }

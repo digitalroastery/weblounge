@@ -397,15 +397,15 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLink()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getUrl()}.
    */
   @Test
-  public void testGetLink() {
-    assertEquals(defaultHostname, site.getLink());
+  public void testGetUrl() {
+    assertEquals(defaultHostname, site.getUrl().getPath());
     site.removeHostname(defaultHostname);
     site.removeHostname(fallbackHostname);
     site.removeHostname(localhost);
-    assertEquals("/", site.getLink());
+    assertEquals("localhost/", site.getUrl().getPath());
   }
 
   /**

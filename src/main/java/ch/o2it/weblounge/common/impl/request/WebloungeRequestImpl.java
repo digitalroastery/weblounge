@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.Guest;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -234,7 +235,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    *
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getFlavor()
    */
-  public String getFlavor() {
+  public RequestFlavor getFlavor() {
     if (url != null)
       return url.getFlavor();
     return getUrl().getFlavor();

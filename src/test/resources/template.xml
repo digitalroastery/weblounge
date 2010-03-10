@@ -7,4 +7,8 @@
   <valid>3w</valid>
   <name language="de">Standard Vorlage</name>
   <name language="en">Default template</name>
+  <includes>
+    <link href="http://localhost/css.css"/>
+    <script src="http://localhost/javascript.js"/>
+  </includes>
 </template>

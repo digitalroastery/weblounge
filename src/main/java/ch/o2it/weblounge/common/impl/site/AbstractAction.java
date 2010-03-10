@@ -20,24 +20,28 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.impl.page.GeneralComposeable;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
+import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.Page;
+import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.ActionConfiguration;
 import ch.o2it.weblounge.common.site.ActionException;
-import ch.o2it.weblounge.common.site.Include;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.Renderer;
-import ch.o2it.weblounge.common.site.ScriptInclude;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 
 import org.apache.commons.fileupload.FileItem;
@@ -51,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is the default implementation for a <code>ActionHandler</code>.
@@ -60,19 +65,38 @@ import java.util.List;
  * Be aware of the fact that action handlers are pooled, so make sure to
  * implement the <code>cleanup</code> method to clear any state information from
  * this handler instance.
- * 
- * TODO: Integrate with pooling api
  */
-public abstract class AbstractAction implements Action {
+public abstract class AbstractAction extends GeneralComposeable implements Action {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(AbstractAction.class);
 
-  /** The action configuration */
-  protected ActionConfiguration config = null;
+  /** The action mountpoint */
+  protected String mountpoint = null;
 
-  /** The requested rendering method */
-  protected String method = null;
+  /** The default path to render on */
+  protected String targetPath = null;
+
+  /** The page uri, deducted from targetPath */
+  protected PageURI pageURI = null;
+
+  /** The page template id */
+  protected String templateId = null;
+
+  /** The page template */
+  protected PageTemplate template = null;
+
+  /** The list of flavors */
+  protected List<RequestFlavor> flavors = new ArrayList<RequestFlavor>();
+
+  /** The action name */
+  protected LocalizableContent<String> name = new LocalizableContent<String>();
+
+  /** Options support */
+  protected OptionsHelper options = new OptionsHelper();
+
+  /** The requested output flavor */
+  protected RequestFlavor flavor = null;
 
   /** The parent site */
   protected Site site = null;
@@ -84,7 +108,7 @@ public abstract class AbstractAction implements Action {
   protected List<FileItem> files = null;
 
   /** The number of includes */
-  protected int includes = 0;
+  protected int includeCount = 0;
 
   /** The underlying page */
   protected Page page = null;
@@ -97,39 +121,12 @@ public abstract class AbstractAction implements Action {
 
   /** The current response object */
   protected WebloungeResponse response = null;
-
+  
   /**
-   * Returns the action configuration.
-   * 
-   * @return the configuration
+   * Default constructor.
    */
-  public ActionConfiguration getConfiguration() {
-    return config;
-  }
-
-  /**
-   * Sets the action handler configuration, which will be available to
-   * subclasses via the instance member <code>config</code>.
-   * 
-   * @see ch.o2it.weblounge.common.site.Action.module.ActionHandler#init(ch.o2it.weblounge.common.site.api.module.ActionConfiguration)
-   */
-  public void init(ActionConfiguration config) {
-    this.config = config;
-    for (Include l : config.getLinks())
-      if (l instanceof IncludeImpl)
-        ((IncludeImpl) l).setModule(module);
-    for (ScriptInclude s : config.getScripts())
-      if (s instanceof ScriptIncludeImpl)
-        ((ScriptIncludeImpl) s).setModule(module);
-  }
-
-  /**
-   * Returns the action identifier.
-   * 
-   * @return the action identifier
-   */
-  public String getIdentifier() {
-    return config.getIdentifier();
+  public AbstractAction() {
+    flavors.add(RequestFlavor.HTML);
   }
 
   /**
@@ -152,15 +149,6 @@ public abstract class AbstractAction implements Action {
   }
 
   /**
-   * Returns the parent module with the given identifier.
-   * 
-   * @return the module
-   */
-  public Module getModule(String module) {
-    return this.module.getSite().getModule(module);
-  }
-
-  /**
    * Sets the associated site if this is a site related renderer configuration.
    * 
    * @param site
@@ -168,6 +156,10 @@ public abstract class AbstractAction implements Action {
    */
   public void setSite(Site site) {
     this.site = site;
+    if (targetPath != null)
+      this.pageURI = new PageURIImpl(site, targetPath);
+    if (templateId != null)
+      this.template = site.getTemplate(templateId);
   }
 
   /**
@@ -203,20 +195,47 @@ public abstract class AbstractAction implements Action {
    * 
    * @return the action's link
    */
-  public String getLink() {
-    return UrlSupport.concat(new String[] {
-        module.getSite().getLink(),
-        config.getMountpoint() });
+  public WebUrl getUrl() {
+    return new WebUrlImpl(
+        site, UrlSupport.concat(new String[] {
+        site.getUrl().getPath(),
+        mountpoint }));
   }
 
   /**
-   * Returns the path relative to the server root, including the weblounge mount
-   * point.
+   * {@inheritDoc}
    * 
-   * @return the action's path
+   * @see ch.o2it.weblounge.common.site.Action#setPath(java.lang.String)
+   */
+  public void setPath(String path) {
+    this.mountpoint = path;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#getPath()
    */
   public String getPath() {
-    return config.getMountpoint();
+    return mountpoint;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Action#setPageURI(ch.o2it.weblounge.common.page.PageURI)
+   */
+  public void setPageURI(PageURI uri) {
+    this.pageURI = uri;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Action#getPageURI()
+   */
+  public PageURI getPageURI() {
+    return pageURI;
   }
 
   /**
@@ -230,7 +249,7 @@ public abstract class AbstractAction implements Action {
    * @return the path extension relative to the action's mount point
    */
   public String getRequestedUrlExtension(WebloungeRequest request) {
-    return request.getRequestedUrl().getPath().substring(config.getMountpoint().length());
+    return request.getRequestedUrl().getPath().substring(mountpoint.length());
   }
 
   /**
@@ -244,38 +263,34 @@ public abstract class AbstractAction implements Action {
    * @return the path extension relative to the action's mount point
    */
   public String getUrlExtension(WebloungeRequest request) {
-    return request.getUrl().getPath().substring(config.getMountpoint().length());
+    return request.getUrl().getPath().substring(mountpoint.length());
   }
 
   /**
-   * Sets the method that is requested upon the next run.
+   * {@inheritDoc}
    * 
-   * @param method
-   *          the rendering method
+   * @see ch.o2it.weblounge.common.site.Action#setTemplate(ch.o2it.weblounge.common.site.PageTemplate)
    */
-  protected void setMethod(String method) {
-    this.method = method;
+  public void setTemplate(PageTemplate template) {
+    this.template = template;
   }
 
   /**
-   * Returns the requested rendering method.
+   * {@inheritDoc}
    * 
-   * @return the rendering method
+   * @see ch.o2it.weblounge.common.site.Action#getTemplate()
    */
-  protected String getMethod() {
-    return method;
+  public PageTemplate getTemplate() {
+    return template;
   }
 
   /**
-   * Configures the request to use the given renderer.
+   * Returns the requested output flavor.
    * 
-   * @param template
-   *          the template
-   * @param request
-   *          the request
+   * @return the output flavor
    */
-  protected void setTemplate(PageTemplate template, WebloungeRequest request) {
-    request.setAttribute(WebloungeRequest.REQUEST_TEMPLATE, template);
+  protected RequestFlavor getFlavor() {
+    return flavor;
   }
 
   /**
@@ -291,7 +306,7 @@ public abstract class AbstractAction implements Action {
   protected boolean isStage(String composer, WebloungeRequest request) {
     if (composer == null)
       throw new IllegalArgumentException("Composer may not be null!");
-    
+
     String stage = PageTemplate.DEFAULT_STAGE;
     PageTemplate template = (PageTemplate) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
     if (template != null)
@@ -300,25 +315,86 @@ public abstract class AbstractAction implements Action {
   }
 
   /**
-   * Returns <code>true</code> if the given method is supported by the action.
-   * The method is used to lookup a rendering method for a given action id.
-   * 
-   * @param method
-   *          the method name
-   * @return <code>true</code> if the action supports the rendering method
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Action#getFlavors()
    */
-  public boolean provides(String method) {
-    return config.provides(method);
+  public RequestFlavor[] getFlavors() {
+    return flavors.toArray(new RequestFlavor[flavors.size()]);
   }
 
   /**
-   * Returns the supported flavors of this action. Common flavors are defined in
-   * {@link RequestFlavor}, but you are free to define your own.
+   * {@inheritDoc}
    * 
-   * @return the supported flavors
+   * @see ch.o2it.weblounge.common.site.Action#supportsFlavor(java.lang.String)
    */
-  public String[] getFlavors() {
-    return config.methods();
+  public boolean supportsFlavor(RequestFlavor flavor) {
+    return flavors.contains(flavor);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#setOption(java.lang.String,
+   *      java.lang.String)
+   */
+  public void setOption(String key, String value) {
+    options.setOption(key, value);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValue(java.lang.String)
+   */
+  public String getOptionValue(String name) {
+    return options.getOptionValue(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValue(java.lang.String,
+   *      java.lang.String)
+   */
+  public String getOptionValue(String name, String defaultValue) {
+    return options.getOptionValue(name, defaultValue);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptionValues(java.lang.String)
+   */
+  public String[] getOptionValues(String name) {
+    return options.getOptionValues(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#getOptions()
+   */
+  public Map<String, List<String>> getOptions() {
+    return options.getOptions();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#hasOption(java.lang.String)
+   */
+  public boolean hasOption(String name) {
+    return options.hasOption(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#removeOption(java.lang.String)
+   */
+  public void removeOption(String name) {
+    options.removeOption(name);
   }
 
   /**
@@ -327,11 +403,12 @@ public abstract class AbstractAction implements Action {
    */
   @SuppressWarnings("unchecked")
   public void configure(WebloungeRequest request, WebloungeResponse response,
-      String method) {
-    includes = 0;
+      RequestFlavor flavor) {
+
+    this.includeCount = 0;
     this.request = request;
     this.response = response;
-    this.method = method;
+    this.flavor = flavor;
 
     // Check if we have a file upload request
     if (ServletFileUpload.isMultipartContent(request)) {
@@ -436,7 +513,7 @@ public abstract class AbstractAction implements Action {
     } finally {
       response.endResponsePart();
     }
-    includes++;
+    includeCount++;
   }
 
   /**
@@ -539,15 +616,15 @@ public abstract class AbstractAction implements Action {
     log_.debug("Including renderer {}", renderer);
     include(request, response, r, data);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-    return config.getIdentifier().hashCode();
+    return identifier.hashCode();
   }
 
   /**
@@ -561,7 +638,7 @@ public abstract class AbstractAction implements Action {
   public boolean equals(Object o) {
     if (o != null && o instanceof AbstractAction) {
       AbstractAction h = (AbstractAction) o;
-      return this.config == h.config;
+      return module.equals(h.getModule()) && identifier.equals(h.identifier);
     }
     return false;
   }
@@ -580,11 +657,9 @@ public abstract class AbstractAction implements Action {
    */
   public void returned() {
     cleanup();
-    site = null;
-    module = null;
-    method = null;
+    flavor = null;
     files = null;
-    includes = 0;
+    includeCount = 0;
     page = null;
     renderer = null;
     request = null;
@@ -605,32 +680,6 @@ public abstract class AbstractAction implements Action {
   }
 
   /**
-   * Returns <code>s</code> if <code>s</code> is not <code>null</code>.
-   * otherwise, the replacement is returned.
-   * 
-   * @param s
-   *          the original text
-   * @param replacement
-   *          the replacement
-   * @return <code>s</code> or <code>replacement</code>
-   */
-  protected static String replaceNull(String s, String replacement) {
-    return (s == null || s.trim().equals("")) ? replacement : s;
-  }
-
-  /**
-   * Returns <code>s</code> if <code>s</code> is not the empty string.
-   * otherwise, <code>null</code> is returned.
-   * 
-   * @param s
-   *          the original text
-   * @return <code>s</code> or <code>null</code>
-   */
-  protected static String emptyToNull(String s) {
-    return (s != null && s.trim().equals("")) ? null : s;
-  }
-
-  /**
    * Returns a string representation of this action, which consists of the
    * action identifier and the configured method.
    * 
@@ -638,7 +687,7 @@ public abstract class AbstractAction implements Action {
    */
   @Override
   public String toString() {
-    return getModule().getIdentifier() + "/" + config.getIdentifier() + ((method != null) ? " (" + method + ")" : "");
+    return getModule().getIdentifier() + "/" + identifier;
   }
 
 }

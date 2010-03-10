@@ -432,13 +432,13 @@ public class WebUrlImplTest {
   @Test
   public void testGetFlavor() {
     assertTrue(liveUrl.getFlavor() == null);
-    assertEquals(RequestFlavor.JSON, RequestFlavor.parseString(flavoredSegmentedLiveUrl.getFlavor()));
-    assertEquals(RequestFlavor.JSON, RequestFlavor.parseString(new WebUrlImpl(siteMock, "/test/json").getFlavor()));
-    assertEquals(RequestFlavor.JSON, RequestFlavor.parseString(new WebUrlImpl(siteMock, "/test/work/json").getFlavor()));
-    assertEquals(RequestFlavor.JSON, RequestFlavor.parseString(new WebUrlImpl(siteMock, "/test/de/json").getFlavor()));
-    assertEquals(RequestFlavor.JSON, RequestFlavor.parseString(new WebUrlImpl(siteMock, "/test/work/de/json").getFlavor()));
-    assertEquals(RequestFlavor.JSON, RequestFlavor.parseString(new WebUrlImpl(siteMock, "/test/JSON").getFlavor()));
-    assertEquals(RequestFlavor.JSON, RequestFlavor.parseString(new WebUrlImpl(siteMock, "/test/json/").getFlavor()));
+    assertEquals(RequestFlavor.JSON, flavoredSegmentedLiveUrl.getFlavor());
+    assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/json").getFlavor());
+    assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/work/json").getFlavor());
+    assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/de/json").getFlavor());
+    assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/work/de/json").getFlavor());
+    assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/JSON").getFlavor());
+    assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/json/").getFlavor());
   }
 
 }

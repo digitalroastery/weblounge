@@ -23,9 +23,9 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.impl.util.I18n;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.ActionConfiguration;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.Renderer;
 
@@ -50,7 +50,7 @@ import java.util.List;
  * this handler instance and as usual, don't forget to call the super
  * implementation when overwriting methods.
  */
-public abstract class ActionSupport extends AbstractAction {
+public class ActionSupport extends AbstractAction {
 
   /** Logging facility */
   protected final static Logger log_ = LoggerFactory.getLogger(ActionSupport.class);
@@ -85,27 +85,29 @@ public abstract class ActionSupport extends AbstractAction {
    * desired output method.
    * <p>
    * It is not recommended that subclasses use this method to write anything to
-   * the response. The call serves the single purpose acquire ressources and set
+   * the response. The call serves the single purpose acquire resources and set
    * up for the call to <code>startPage</code>.
    * 
    * @param request
    *          the weblounge request
    * @param response
    *          the weblounge response
-   * @param method
+   * @param flavor
    *          the output method
-   * @see ch.o2it.weblounge.api.module.ActionHandler#configure(WebloungeRequest,
-   *      WebloungeResponse, String)
+   * @see ch.o2it.weblounge.common.site.Action#configure(ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse,
+   *      ch.o2it.weblounge.common.page.Page,
+   *      ch.o2it.weblounge.common.site.Renderer, java.lang.String)
    */
   public void configure(WebloungeRequest request, WebloungeResponse response,
-      String method) {
-    super.configure(request, response, method);
+      RequestFlavor flavor) {
+    super.configure(request, response, flavor);
     loadUrlExtensionValues(request);
   }
 
   /**
-   * This method always returns <code>true</code> and therefore leaves rendering
-   * to the page.
+   * This method always returns {@link Action#EVAL_REQUEST} and therefore leaves
+   * rendering to the page.
    * 
    * @param request
    *          the servlet request
@@ -117,9 +119,9 @@ public abstract class ActionSupport extends AbstractAction {
    * @see ch.o2it.weblounge.api.module.ActionHandler#startPage(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse)
    */
-  public int startPage(WebloungeRequest request, WebloungeResponse response)
+  public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
-    return EVAL_PAGE;
+    return EVAL_REQUEST;
   }
 
   /**
@@ -214,21 +216,6 @@ public abstract class ActionSupport extends AbstractAction {
   public int startPagelet(WebloungeRequest request, WebloungeResponse response,
       String composer, int position) throws ActionException {
     return EVAL_PAGELET;
-  }
-
-  /**
-   * This method is called when the action handler is instantiated. Since the
-   * configuration is available using the protected member variable
-   * <code>config</code>, this implementation has been made <code>final</code>.
-   * 
-   * NOTE: subclasses MUST always call super.init(ActionConfiguration)
-   * 
-   * @param configuration
-   *          the action handler configuration
-   * @see ch.o2it.weblounge.api.module.ActionHandler#init(ch.o2it.weblounge.api.module.ActionConfiguration)
-   */
-  public void init(ActionConfiguration configuration) {
-    super.config = configuration;
   }
 
   /**
@@ -961,16 +948,18 @@ public abstract class ActionSupport extends AbstractAction {
   }
 
   /**
-   * Loads parameters provided via the url extension (ex. action/param1/param2)
+   * Loads parameters provided via the url extension (e. g.
+   * action/param1/param2)
    * 
    * @param request
-   *          request to gather valus from.
+   *          request to gather values from.
    */
   private void loadUrlExtensionValues(WebloungeRequest request) {
     // load parameter values from url extension
     urlparams = new ArrayList<String>();
     String[] params = getRequestedUrlExtension(request).split("/");
-    // first param is empty (becaus of leading slash), therefor start with index
+    // first param is empty (because of leading slash), therefore start with
+    // index
     // 1
     for (int i = 1; i < params.length; i++) {
       urlparams.add(params[i]);
@@ -978,7 +967,10 @@ public abstract class ActionSupport extends AbstractAction {
   }
 
   /**
-   * Returns a collection with all the parameters provided via the url extension
+   * Returns a collection with all the parameters provided via the url
+   * extension.
+   * 
+   * TODO: Hide this in general getParameter()
    * 
    * @return a <code>List<String></code> object with all the parameters
    */
@@ -987,8 +979,10 @@ public abstract class ActionSupport extends AbstractAction {
   }
 
   /**
-   * Returns true, if there is an url paramter at the specified position,
-   * otherwise, false is returned
+   * Returns true, if there is an url parameter at the specified position,
+   * otherwise, false is returned.
+   * 
+   * TODO: Hide this in general getParameter()
    * 
    * @param i
    *          position of the parameter in the url extension
@@ -1003,7 +997,9 @@ public abstract class ActionSupport extends AbstractAction {
   }
 
   /**
-   * Returns a parameter value which was provided via the url extension
+   * Returns a parameter value which was provided via the url extension.
+   * 
+   * TODO: Hide this in general getParameter()
    * 
    * @param i
    *          position of the parameter in the url extension

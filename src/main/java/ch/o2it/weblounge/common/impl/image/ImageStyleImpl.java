@@ -74,7 +74,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    */
   public ImageStyleImpl(String id, int width, int height, ScalingMode scaling,
       boolean composeable) {
-    super(id);
+    this.identifier = id;
     this.width = width;
     this.height = height;
     this.scalingMode = scaling;
