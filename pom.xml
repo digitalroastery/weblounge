@@ -153,6 +153,8 @@
               ch.o2it.weblounge.common,
               ch.o2it.weblounge.common.impl.page,
               ch.o2it.weblounge.common.impl.request,
+              ch.o2it.weblounge.common.impl.site, 
+              ch.o2it.weblounge.common.impl.util,
               ch.o2it.weblounge.common.language,
               ch.o2it.weblounge.common.page,
               ch.o2it.weblounge.common.request,

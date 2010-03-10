@@ -30,6 +30,7 @@ import ch.o2it.weblounge.common.impl.request.RequestSupport;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.CacheTag;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
@@ -135,7 +136,7 @@ public final class PageRequestHandler implements RequestHandler {
       Page page = null;
       PageURI pageURI = new PageURIImpl(request);
       Site site = request.getSite();
-      String contentFlavor = request.getFlavor();
+      RequestFlavor contentFlavor = request.getFlavor();
 
       // Load the page
       try {

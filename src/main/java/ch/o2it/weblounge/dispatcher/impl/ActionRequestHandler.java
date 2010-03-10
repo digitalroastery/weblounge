@@ -24,9 +24,12 @@ import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
+import ch.o2it.weblounge.common.impl.site.ActionPool;
+import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.CacheTag;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
@@ -45,6 +48,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -65,17 +69,17 @@ public final class ActionRequestHandler implements RequestHandler {
   private final static Logger log_ = LoggerFactory.getLogger(ActionRequestHandler.class);
 
   /** The registered actions */
-  private Map<UrlMatcher, ActionConfiguration> actions = null;
+  private Map<UrlMatcher, ActionPool> actions = null;
 
   /** Known urls */
-  private Map<WebUrl, ActionConfiguration> urlCache = null;
+  private Map<WebUrl, ActionPool> urlCache = null;
 
   /**
    * Creates a new action request handler.
    */
   public ActionRequestHandler() {
-    actions = new HashMap<UrlMatcher, ActionConfiguration>();
-    urlCache = new HashMap<WebUrl, ActionConfiguration>();
+    actions = new HashMap<UrlMatcher, ActionPool>();
+    urlCache = new HashMap<WebUrl, ActionPool>();
   }
 
   /**
@@ -83,12 +87,25 @@ public final class ActionRequestHandler implements RequestHandler {
    * 
    * @param handler
    *          the action handler
+   * @param site
+   *          the site
+   * @param matcher
+   *          the url matcher
    */
-  public void registerAction(ActionConfiguration definition, UrlMatcher url) {
+  public void registerAction(ActionConfiguration definition, Site site,
+      UrlMatcher matcher) {
+    if (definition == null)
+      throw new IllegalArgumentException("Action configuration cannot be null");
+    if (site == null)
+      throw new IllegalArgumentException("Site cannot be null");
+    if (matcher == null)
+      throw new IllegalArgumentException("Url matcher cannot be null");
+
     synchronized (actions) {
-      actions.put(url, definition);
+      ActionPool pool = new ActionPool(definition, site);
+      actions.put(matcher, pool);
     }
-    log_.debug("Action handler '{}' registered for {}", definition, url);
+    log_.debug("Action handler '{}' registered for {}", definition, matcher);
   }
 
   /**
@@ -105,9 +122,9 @@ public final class ActionRequestHandler implements RequestHandler {
 
     // Find the actions and the namespaces that it was registered under
     synchronized (actions) {
-      Iterator<Map.Entry<UrlMatcher, ActionConfiguration>> actionIterator = actions.entrySet().iterator();
+      Iterator<Map.Entry<UrlMatcher, ActionPool>> actionIterator = actions.entrySet().iterator();
       while (actionIterator.hasNext()) {
-        Map.Entry<UrlMatcher, ActionConfiguration> entry = actionIterator.next();
+        Map.Entry<UrlMatcher, ActionPool> entry = actionIterator.next();
         if (entry.getValue().equals(definition)) {
           UrlMatcher matcher = entry.getKey();
           matchers.add(matcher);
@@ -150,7 +167,7 @@ public final class ActionRequestHandler implements RequestHandler {
    */
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
     WebUrl url = request.getUrl();
-    String contentFlavor = request.getFlavor();
+    RequestFlavor contentFlavor = request.getFlavor();
     Mode processingMode = Mode.Default;
 
     // Try to get hold of an action handler
@@ -188,6 +205,9 @@ public final class ActionRequestHandler implements RequestHandler {
     try {
       page = getTargetPage(action, request);
       // TODO: Check access rights with action handler configuration
+      // TODO: If there is no page, create a virtual one with either the
+      // default template or the template specified in the configuration
+      // or the request
       if (page == null) {
         log_.error("No page available to serve action {}", action);
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -206,7 +226,8 @@ public final class ActionRequestHandler implements RequestHandler {
       log_.warn(e.getMessage());
       try {
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      } catch (IOException e1) { /* never mind */ }
+      } catch (IOException e1) { /* never mind */
+      }
     }
 
     // Check if the page is already part of the cache. If so, our task is
@@ -230,9 +251,10 @@ public final class ActionRequestHandler implements RequestHandler {
       Http11Utils.startHeadResponse(response);
       processingMode = Mode.Head;
     } else if (request.getVersion() == Page.WORK) {
+      response.setHeader("Expires", "0");
+      response.setHeader("Last-Modified", WebloungeDateFormat.formatStatic(new Date()));
       response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
       response.setHeader("Pragma", "no-cache");
-      response.setHeader("Expires", "0");
     }
 
     // Finally, let's get some work done!
@@ -240,8 +262,10 @@ public final class ActionRequestHandler implements RequestHandler {
       log_.debug("Action handler {} will handle {}", action, url);
       request.setAttribute(WebloungeRequest.REQUEST_ACTION, action);
       request.setAttribute(WebloungeRequest.REQUEST_PAGE, page);
-      action.configure(request, response, page, template, contentFlavor);
-      if (action.startPage(request, response) == Action.EVAL_PAGE) {
+      action.setTemplate(template);
+      action.setPage(page);
+      action.configure(request, response, contentFlavor);
+      if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         PageRequestHandler.getInstance().service(request, response);
       }
     } catch (Throwable e) {
@@ -318,7 +342,8 @@ public final class ActionRequestHandler implements RequestHandler {
    * @throws IllegalStateException
    *           if the template cannot be found
    */
-  protected PageTemplate getPageTemplate(Page page, WebloungeRequest request) throws IllegalStateException {
+  protected PageTemplate getPageTemplate(Page page, WebloungeRequest request)
+      throws IllegalStateException {
     Site site = request.getSite();
     String templateId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
     PageTemplate template = null;
@@ -345,12 +370,12 @@ public final class ActionRequestHandler implements RequestHandler {
    * @return the handler
    */
   protected Action getActionForUrl(WebUrl url) {
-    ActionConfiguration actionDefinition = urlCache.get(url);
+    ActionPool actionDefinition = urlCache.get(url);
 
     // Nothing is in the cache, let's see if this is simply the first time
     // that this action is being called
     if (actionDefinition == null) {
-      for (Entry<UrlMatcher, ActionConfiguration> entry : actions.entrySet()) {
+      for (Entry<UrlMatcher, ActionPool> entry : actions.entrySet()) {
         if (entry.getKey().matches(url)) {
           actionDefinition = entry.getValue();
           break;
@@ -417,8 +442,8 @@ public final class ActionRequestHandler implements RequestHandler {
     }
 
     // Check the action configuration
-    else if (action.getDefaultUrl() != null) {
-      target = new PageURIImpl(action.getDefaultUrl());
+    else if (action.getPageURI() != null) {
+      target = action.getPageURI();
       targetForced = true;
     }
 
