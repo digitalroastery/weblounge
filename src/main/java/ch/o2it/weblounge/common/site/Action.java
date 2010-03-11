@@ -148,6 +148,12 @@ public interface Action extends Composeable, Customizable {
   int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
+  void startXMLResponse(WebloungeRequest request, WebloungeResponse response)
+      throws ActionException;
+
+  void startJSONResponse(WebloungeRequest request, WebloungeResponse response)
+      throws ActionException;
+
   /**
    * This method is called by the target page and gives the action the
    * possibility to either replace the includes in the page header, add more
@@ -415,8 +421,8 @@ public interface Action extends Composeable, Customizable {
    * resources and this callback indicates that the action was taken out of the
    * pool of currently idle instances.
    * <p>
-   * <b>Note:</b> Subclasses need to make sure to call the super implementation in
-   * order to not interfere with their ancestor's implementation.
+   * <b>Note:</b> Subclasses need to make sure to call the super implementation
+   * in order to not interfere with their ancestor's implementation.
    */
   void activate();
 
@@ -425,8 +431,8 @@ public interface Action extends Composeable, Customizable {
    * currently idle actions. Use this callback to release any resources that the
    * action might be holding to up until now.
    * <p>
-   * <b>Note:</b> Subclasses need to make sure to call the super implementation in
-   * order to not interfere with their ancestor's implementation.
+   * <b>Note:</b> Subclasses need to make sure to call the super implementation
+   * in order to not interfere with their ancestor's implementation.
    */
   void passivate();
 

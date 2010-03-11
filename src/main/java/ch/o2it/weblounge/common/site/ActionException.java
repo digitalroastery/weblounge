@@ -21,81 +21,47 @@
 package ch.o2it.weblounge.common.site;
 
 /**
- * A <code>ActionException</code> is thrown if an exceptional state is
- * reached when executing an <code>Action</code> to create the output for
- * either a page or a single page element.
+ * A <code>ActionException</code> is thrown if an exceptional state is reached
+ * when executing an <code>Action</code> to create the output for either a page
+ * or a single page element.
  */
-public class ActionException extends RuntimeException {
+public class ActionException extends Exception {
 
   /** Serial version id */
   private static final long serialVersionUID = 1L;
 
-  /** Action name, e. g. <code>XSLAction</code> */
-  private Action handler_ = null;
-
-  /** Rendering method, e. g. <code>HTML</code>" */
-  private String method_ = null;
-
-  /** The exception that lead to this one */
-  private Throwable exception_ = null;
-
   /**
-   * Creates a new <code>ActionException</code> providing the information
-   * passed by the parameters.
+   * Creates a new <code>ActionException</code> with the given error message.
    * 
-   * @param handler
-   *          the handler, e. g. <code>XLSElementAction</code>
-   * @param method
-   *          the output method, e. g. <code>HTML</code>
+   * @param message
+   *          the error message
    */
-  public ActionException(Action handler, String method) {
-    handler_ = handler;
-    method_ = method;
+  public ActionException(String message) {
+    super(message);
   }
 
   /**
-   * Creates a new <code>ActionException</code> providing the information
-   * passed by the parameters.
+   * Creates a new <code>ActionException</code> originating from
+   * <code>cause</code>.
    * 
-   * @param handler
-   *          the handler, e. g. <code>XLSElementAction</code>
-   * @param method
-   *          the output method, e. g. <code>HTML</code>
-   * @param t
-   *          the exception caught when executing the renderer
+   * @param cause
+   *          the original error
    */
-  public ActionException(Action handler, String method,
-      Throwable t) {
-    this(handler, method);
-    exception_ = t;
+  public ActionException(Throwable cause) {
+    super(cause);
   }
 
   /**
-   * Returns the handler that raised this exception.
+   * Creates a new <code>ActionException</code> with the given error message and
+   * the indicated original reason.
    * 
-   * @return the handler
+   * @param message
+   *          the error message
+   * @param cause
+   *          the original error
    */
-  public Action getAction() {
-    return handler_;
-  }
-
-  /**
-   * Returns the output method, e. g. <code>HTML</code>.
-   * 
-   * @return the output method
-   */
-  public String getRenderingMethod() {
-    return method_;
-  }
-
-  /**
-   * Returns the exception that lead to this <code>ActionException</code>
-   * .
-   * 
-   * @return the reason for this exception
-   */
-  public Throwable getReason() {
-    return exception_;
+  public ActionException(String message, Throwable cause) {
+    super(message, cause);
   }
 
 }
