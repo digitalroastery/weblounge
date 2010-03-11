@@ -47,6 +47,11 @@
     <!-- thirdparty -->
 
     <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -79,11 +84,20 @@
         <configuration>
           <instructions>
             <Import-Package>
+              ch.o2it.weblounge.common.request,
               ch.o2it.weblounge.common.scheduler,
               ch.o2it.weblounge.common.site,
+              ch.o2it.weblounge.common.impl.request,
               ch.o2it.weblounge.common.impl.scheduler,
               ch.o2it.weblounge.common.impl.site,
+              javax.servlet,
+              javax.xml.parsers,
+              javax.xml.transform,
+              javax.xml.transform.dom,
+              javax.xml.transform.stream,
+              org.json,
               org.slf4j,
+              org.w3c.dom,
               org.osgi.service.component
             </Import-Package>
             <Service-Component>

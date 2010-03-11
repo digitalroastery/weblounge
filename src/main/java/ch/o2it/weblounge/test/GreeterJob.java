@@ -26,11 +26,14 @@ import ch.o2it.weblounge.common.scheduler.JobException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Map.Entry;
 
 /**
  * Test job that will print a friendly greeting to <code>System.out</code>.
@@ -39,36 +42,25 @@ import java.util.Map;
 public class GreeterJob implements Job {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(GreeterJob.class);
+  protected final static Logger logger = LoggerFactory.getLogger(GreeterJob.class);
+
+  /** Name of the properties file that defines the greetings */
+  public static final String GREETING_PROPS = "greetings.properties";
 
   /** Hello world in many languages */
   protected static Map.Entry<String, String>[] greetings = null;
 
   static {
     Map<String, String> hellos = new HashMap<String, String>();
-    hellos.put("arabic", "مرحبا أنا أشعر بالسعادة العالم اليوم");
-    hellos.put("bulgarian", "Здравейте аз съм щастлив света днес");
-    hellos.put("croation", "Hello world ja sam danas sretan");
-    hellos.put("czech", "hello world Jsem rád, dnes");
-    hellos.put("danish", "hello world Jeg er glad for i dag");
-    hellos.put("dutch", "hello world Ik ben blij vandaag");
-    hellos.put("finish", "Hello world Olen onnellinen tänään");
-    hellos.put("french", "Bonjour, je suis heureux aujourd'hui");
-    hellos.put("german", "Hallo Welt, ich bin heute glücklich");
-    hellos.put("greek", "Γεια σας κόσμο χαρά σήμερα");
-    hellos.put("hebrew", "שלום אני שמח בעולם היום");
-    hellos.put("italian", "Ciao, sono felice di oggi");
-    hellos.put("japanese", "を今日は満足している");
-    hellos.put("korean", "안녕하세요 오늘은 행복 해요");
-    hellos.put("norwegian", "hello world i am glad i dag");
-    hellos.put("polish", "Hello I am happy dzisiejszym świecie");
-    hellos.put("portugese", "Olá mundo eu estou feliz hoje");
-    hellos.put("romanian", "Eu salut lume sunt fericit astăzi");
-    hellos.put("russian", "Здравствуйте, я рада Мир сегодня");
-    hellos.put("spanish", "Me complace saludar el mundo de hoy");
-    hellos.put("swedish", "Hallå världen Jag är glad idag");
-    hellos.put("swiss german", "Hoi zäme, ich bi guet z'wäg");
-    hellos.put("english", "hello world i am happy today");
+    Properties props = new Properties();
+    try {
+      props.load(GreeterAction.class.getResourceAsStream(GREETING_PROPS));
+      for (Entry<Object, Object> entry : props.entrySet()) {
+        hellos.put((String)entry.getKey(), (String)entry.getValue());
+      }
+    } catch (IOException e) {
+      logger.error("Error loading greetings from {}", GREETING_PROPS, e);
+    }
     greetings = hellos.entrySet().toArray(new Map.Entry[hellos.size()]);
   }
 
@@ -83,9 +75,9 @@ public class GreeterJob implements Job {
     int index = (int) ((greetings.length - 1)* Math.random());
     Map.Entry<String, String> entry = greetings[index];
     try {
-      log_.info(new String(entry.getValue().getBytes("UTF-8")) + " (" + entry.getKey() + ")");
+      logger.info(new String(entry.getValue().getBytes("UTF-8")) + " (" + entry.getKey() + ")");
     } catch (UnsupportedEncodingException e) {
-      log_.error("Cant' believe that utf-8 is not supported on this platform!", e);
+      logger.error("Cant' believe that utf-8 is not supported on this platform!", e);
     }
   }
 
