@@ -19,7 +19,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.common.impl.request.RequestSupport;
+import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.request.RequestListener;
@@ -244,7 +244,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         }
       } catch (Throwable t) {
         response.invalidate();
-        String params = RequestSupport.getParameters(request);
+        String params = RequestUtils.getParameters(request);
         if (t.getCause() != null) {
           Throwable o = t.getCause();
           if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {

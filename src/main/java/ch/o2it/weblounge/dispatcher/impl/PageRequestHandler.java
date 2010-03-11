@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
-import ch.o2it.weblounge.common.impl.request.RequestSupport;
+import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.CacheTag;
@@ -219,7 +219,7 @@ public final class PageRequestHandler implements RequestHandler {
         log_.info("Rendering {} through {}", path, template);
         template.render(request, response);
       } catch (Exception e) {
-        String params = RequestSupport.getParameters(request);
+        String params = RequestUtils.getParameters(request);
         String msg = "Error rendering template '" + template + "' on '" + path + "' " + params;
         Throwable o = e.getCause();
         if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
