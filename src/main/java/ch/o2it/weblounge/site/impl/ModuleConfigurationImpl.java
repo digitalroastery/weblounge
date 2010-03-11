@@ -154,7 +154,7 @@ public final class ModuleConfigurationImpl extends OptionsHelper implements Modu
       readRenderers(path, XPathHelper.select(config, "/module/renderers", path));
       readActions(path, XPathHelper.select(config, "/module/actions", path));
       readImagestyles(path, XPathHelper.select(config, "/module/imagestyles", path));
-      super.load(path, XPathHelper.select(config, "/module", path));
+      super.fromXml(path, XPathHelper.select(config, "/module", path));
     } catch (ConfigurationException e) {
       throw e;
     } catch (Exception e) {
@@ -404,7 +404,7 @@ public final class ModuleConfigurationImpl extends OptionsHelper implements Modu
    *          the XPath object used to parse the configuration
    */
   private void readOptions(XPath path, Node config) {
-    options = OptionsHelper.load(path, XPathHelper.select(config, "/site", path));
+    options = OptionsHelper.fromXml(path, XPathHelper.select(config, "/site", path));
   }
 
   /**
