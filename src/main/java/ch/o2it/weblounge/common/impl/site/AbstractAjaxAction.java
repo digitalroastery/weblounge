@@ -55,7 +55,7 @@ public abstract class AbstractAjaxAction extends ActionSupport {
    *      WebloungeResponse, String)
    */
   public final void configure(WebloungeRequest request,
-      WebloungeResponse response, RequestFlavor method) {
+      WebloungeResponse response, RequestFlavor method) throws ActionException {
     super.configure(request, response, method);
   }
 

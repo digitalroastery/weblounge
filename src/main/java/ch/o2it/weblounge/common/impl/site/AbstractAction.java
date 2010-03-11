@@ -132,6 +132,27 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Action#startResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   */
+  public int startResponse(WebloungeRequest request, WebloungeResponse response)
+      throws ActionException {
+    switch (flavor) {
+      case HTML:
+        response.setHeader("Content-Type", "text/html; charset=utf-8");
+        break;
+      case XML:
+        response.setHeader("Content-Type", "text/xml; charset=utf-8");
+        break;
+      case JSON:
+        response.setHeader("Content-Type", "text/json; charset=utf-8");
+        break;
+    }
+    return EVAL_REQUEST;
+  }
+  
+  /**
    * Sets the parent module.
    * 
    * @param module
@@ -422,7 +443,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    */
   @SuppressWarnings("unchecked")
   public void configure(WebloungeRequest request, WebloungeResponse response,
-      RequestFlavor flavor) {
+      RequestFlavor flavor) throws ActionException {
 
     this.includeCount = 0;
     this.request = request;
@@ -484,10 +505,10 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    *           if the passed renderer is <code>null</code>
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      PageletRenderer renderer, Object data) {
+      PageletRenderer renderer, Object data) throws ActionException  {
     if (renderer == null) {
       String msg = "The renderer passed to include in action '" + this + "' was <null>!";
-      throw new ActionException(this, "html", new IllegalArgumentException(msg));
+      throw new ActionException(new IllegalArgumentException(msg));
     }
 
     // Prepare caching
@@ -549,7 +570,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    *           if the passed renderer cannot be found.
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      String renderer) {
+      String renderer) throws ActionException  {
     include(request, response, getModule(), renderer, null);
   }
 
@@ -569,7 +590,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    *           if the passed renderer cannot be found.
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      String renderer, Object data) {
+      String renderer, Object data) throws ActionException {
     include(request, response, getModule(), renderer, data);
   }
 
@@ -591,15 +612,15 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    *           if the passed renderer cannot be found.
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      String module, String renderer, Object data) {
+      String module, String renderer, Object data) throws ActionException {
     if (module == null)
-      throw new ActionException(this, "html", new IllegalArgumentException("Module is null!"));
+      throw new ActionException(new IllegalArgumentException("Module is null!"));
     if (renderer == null)
-      throw new ActionException(this, "html", new IllegalArgumentException("Renderer is null!"));
+      throw new ActionException(new IllegalArgumentException("Renderer is null!"));
     Module m = getSite().getModule(module);
     if (m == null) {
       String msg = "Trying to include renderer from unknown module '" + module + "'";
-      throw new ActionException(this, "html", new IllegalArgumentException(msg));
+      throw new ActionException(new IllegalArgumentException(msg));
     }
     include(request, response, m, renderer, data);
   }
@@ -622,15 +643,15 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    *           if the passed renderer cannot be found.
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      Module module, String renderer, Object data) {
+      Module module, String renderer, Object data) throws ActionException {
     if (module == null)
-      throw new ActionException(this, "html", new IllegalArgumentException("Module is null!"));
+      throw new ActionException(new IllegalArgumentException("Module is null!"));
     if (renderer == null)
-      throw new ActionException(this, "html", new IllegalArgumentException("Renderer is null!"));
+      throw new ActionException(new IllegalArgumentException("Renderer is null!"));
     PageletRenderer r = module.getRenderer(renderer);
     if (r == null) {
       String msg = "Trying to include unknown renderer '" + renderer + "'";
-      throw new ActionException(this, "html", new IllegalArgumentException(msg));
+      throw new ActionException(new IllegalArgumentException(msg));
     }
     log_.debug("Including renderer {}", renderer);
     include(request, response, r, data);
