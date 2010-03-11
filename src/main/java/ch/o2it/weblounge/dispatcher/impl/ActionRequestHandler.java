@@ -281,7 +281,7 @@ public final class ActionRequestHandler implements RequestHandler {
       request.removeAttribute(WebloungeRequest.REQUEST_ACTION);
       request.removeAttribute(WebloungeRequest.REQUEST_PAGE);
 
-      action.cleanup();
+      action.passivate();
 
       switch (processingMode) {
         case Cached:
