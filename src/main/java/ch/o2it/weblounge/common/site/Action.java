@@ -260,6 +260,22 @@ public interface Action extends Composeable, Customizable {
   WebUrl getUrl();
 
   /**
+   * Adds the given flavor to the list of supported flavors.
+   * 
+   * @param flavor
+   *          the flavor to add
+   */
+  void addFlavor(RequestFlavor flavor);
+
+  /**
+   * Removes the given flavor from the list of supported flavors.
+   * 
+   * @param flavor
+   *          the flavor to remove
+   */
+  void removeFlavor(RequestFlavor flavor);
+
+  /**
    * Returns the supported content flavors. The meaning of flavors are the
    * possible output formats of an action. Common flavors include include
    * <code>HTML</code>, <code>XML</code> or <code>JSON</code>.
@@ -362,12 +378,6 @@ public interface Action extends Composeable, Customizable {
   PageTemplate getTemplate();
 
   /**
-   * This method is called after the request has been processed by the action.
-   * Use this method to release any resources that might have been acquired.
-   */
-  void cleanup();
-
-  /**
    * This method is used at initialization time and sets the site that was used
    * to define this action.
    * 
@@ -399,5 +409,25 @@ public interface Action extends Composeable, Customizable {
    * @return the module
    */
   Module getModule();
+
+  /**
+   * Notifies the action that it is about to be used. Actions are pooled
+   * resources and this callback indicates that the action was taken out of the
+   * pool of currently idle instances.
+   * <p>
+   * <b>Note:</b> Subclasses need to make sure to call the super implementation in
+   * order to not interfere with their ancestor's implementation.
+   */
+  void activate();
+
+  /**
+   * Notifies the action that it is about to be put back into the pool of
+   * currently idle actions. Use this callback to release any resources that the
+   * action might be holding to up until now.
+   * <p>
+   * <b>Note:</b> Subclasses need to make sure to call the super implementation in
+   * order to not interfere with their ancestor's implementation.
+   */
+  void passivate();
 
 }

@@ -23,8 +23,9 @@ package ch.o2it.weblounge.common.site;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * The action configuration stores configuration information about an action
@@ -47,7 +48,7 @@ public interface ActionConfiguration extends Customizable {
    * 
    * @return the supported content flavors
    */
-  List<String> getFlavors();
+  Set<RequestFlavor> getFlavors();
 
   /**
    * Returns the mountpoint used to call the action. The mountpoint is
@@ -107,7 +108,7 @@ public interface ActionConfiguration extends Customizable {
    * 
    * @return the includes
    */
-  List<PageInclude> getIncludes();
+  Set<PageInclude> getIncludes();
 
   /**
    * Returns the action name in one or more languages.
