@@ -20,41 +20,87 @@
 
 package ch.o2it.weblounge.common.site;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import ch.o2it.weblounge.common.impl.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl;
+import ch.o2it.weblounge.common.page.Link;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Test case for {@link ActionConfigurationImpl}.
  */
-@Ignore
 public class ActionConfigurationImplTest {
   
   /** The action configuration that is being tested */
-  protected ActionConfigurationImpl action = null;
+  protected ActionConfigurationImpl config = null;
+  
+  /** Action identifier */
+  protected String identifier = "myaction";
+  
+  /** The action implementation */
+  protected Class<? extends Action> actionClass = TestAction.class;
+  
+  /** Stylesheet */
+  protected Link link = new LinkImpl("http://localhost/css/stylesheet.css", "text/css");
+
+  /** Stylesheet */
+  protected Link otherLink = new LinkImpl("http://localhost/css/stylesheet2.css", "text/css");
+
+  /** Javascript */
+  protected Link script = new LinkImpl("http://localhost/scripts/script.js", "javascript");
+  
+  /** The mountpoint */
+  protected String mountpoint = "/test/";
+
+  /** Recheck time */
+  protected long recheckTime = 0;
+
+  /** Valid time */
+  protected long validTime = 60000;
+  
+  /** URI of the testpage */
+  protected String pageURI = "/testpage/";
+
+  /** Identifier of the template */
+  protected String template = "testtemplate";
+  
+  /** Name of the option key */
+  protected String optionKey = "key";
+  
+  /** Option value */
+  protected String optionValue = "value";
 
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
-    action = new ActionConfigurationImpl();
+    config = new ActionConfigurationImpl();
+    config.setIdentifier(identifier);
+    config.setActionClass(actionClass);
+    config.addInclude(link);
+    config.addFlavor(RequestFlavor.HTML);
+    config.addInclude(script);
+    config.setMountpoint(mountpoint);
+    config.setRecheckTime(recheckTime);
+    config.setValidTime(validTime);
+    config.setPageURI(pageURI);
+    config.setTemplate(template);
+    config.setOption(optionKey, optionValue);
   }
   
-  protected void setupPrerequisites() {
-    
-  }
-
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl#getActionClass()}.
    */
   @Test
   public void testGetActionClass() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(actionClass, config.getActionClass());
   }
 
   /**
@@ -62,23 +108,26 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetIdentifier() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(identifier, config.getIdentifier());
   }
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl#getIncludes()}.
    */
   @Test
-  public void testGetLinks() {
-    fail("Not yet implemented"); // TODO
+  public void testGetIncludes() {
+    assertEquals(2, config.getIncludes().size());
   }
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl#addInclude(ch.o2it.weblounge.common.site.Include)}.
    */
   @Test
-  public void testAddLink() {
-    fail("Not yet implemented"); // TODO
+  public void testAddInclude() {
+    config.addInclude(link);
+    assertEquals(2, config.getIncludes().size());
+    config.addInclude(otherLink);
+    assertEquals(3, config.getIncludes().size());
   }
 
   /**
@@ -86,7 +135,9 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetMountpoint() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(mountpoint, config.getMountpoint());
+    config.setMountpoint("/test");
+    assertEquals("/test/", config.getMountpoint());
   }
 
   /**
@@ -94,31 +145,25 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetRecheckTime() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl#getScripts()}.
-   */
-  @Test
-  public void testGetScripts() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl#addScript(ch.o2it.weblounge.common.site.ScriptInclude)}.
-   */
-  @Test
-  public void testAddScript() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(recheckTime, config.getRecheckTime());
   }
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl#getPageURI()}.
    */
   @Test
-  public void testGetTargetUrl() {
-    fail("Not yet implemented"); // TODO
+  public void testGetPageURI() {
+    assertEquals(pageURI, config.getPageURI());
+    config.setPageURI("/testpage");
+    assertEquals("/testpage/", config.getPageURI());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl#getTemplate()}.
+   */
+  @Test
+  public void testGetTemplate() {
+    assertEquals(template, config.getTemplate());
   }
 
   /**
@@ -126,7 +171,7 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetValidTime() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(validTime, config.getValidTime());
   }
 
   /**
@@ -134,7 +179,8 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetFlavors() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(1, config.getFlavors().size());
+    assertEquals(RequestFlavor.HTML, config.getFlavors().iterator().next());
   }
 
   /**
@@ -142,7 +188,10 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testAddFlavor() {
-    fail("Not yet implemented"); // TODO
+    config.addFlavor(RequestFlavor.HTML);
+    assertEquals(1, config.getFlavors().size());
+    config.addFlavor(RequestFlavor.XML);
+    assertEquals(2, config.getFlavors().size());
   }
 
   /**
@@ -150,7 +199,8 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetOptionValueString() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(optionValue, config.getOptionValue(optionKey));
+    assertTrue(config.getOptionValue("test") == null);
   }
 
   /**
@@ -158,7 +208,8 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetOptionValueStringString() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(optionValue, config.getOptionValue(optionKey, "abc"));
+    assertEquals(optionValue, config.getOptionValue("abc", optionValue));
   }
 
   /**
@@ -166,7 +217,12 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetOptionValues() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(1, config.getOptionValues(optionKey).length);
+    assertEquals(0, config.getOptionValues("test").length);
+    config.setOption(optionKey, optionValue);
+    assertEquals(1, config.getOptionValues(optionKey).length);
+    config.setOption(optionKey, "abc");
+    assertEquals(2, config.getOptionValues(optionKey).length);
   }
 
   /**
@@ -174,7 +230,7 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testGetOptions() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(1, config.getOptions().size());
   }
 
   /**
@@ -182,7 +238,8 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testHasOption() {
-    fail("Not yet implemented"); // TODO
+    assertTrue(config.hasOption(optionKey));
+    assertFalse(config.hasOption("test"));
   }
 
   /**
@@ -190,7 +247,8 @@ public class ActionConfigurationImplTest {
    */
   @Test
   public void testRemoveOption() {
-    fail("Not yet implemented"); // TODO
+    config.removeOption(optionKey);
+    assertFalse(config.hasOption(optionKey));
   }
 
 }

@@ -189,7 +189,7 @@ public final class PageReader extends WebloungeContentReader {
     // read the page url
     if ("page".equals(raw)) {
       context_ = ParserContext.Page;
-      page.uri.id = attrs.getValue("id");
+      ((PageURIImpl)page.uri).id = attrs.getValue("id");
     }
 
     // in the header

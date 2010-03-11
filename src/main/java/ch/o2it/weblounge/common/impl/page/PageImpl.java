@@ -53,7 +53,7 @@ import java.util.Map;
 public class PageImpl extends LocalizableObject implements Page {
 
   /** The uri */
-  protected PageURIImpl uri = null;
+  protected PageURI uri = null;
 
   /** PageHeader type */
   protected String type = null;
@@ -115,7 +115,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * @param uri
    *          the page uri
    */
-  public PageImpl(PageURIImpl uri) {
+  public PageImpl(PageURI uri) {
     super(uri.getSite().getDefaultLanguage());
     this.uri = uri;
     this.creationCtx = new CreationContext();
@@ -944,9 +944,9 @@ public class PageImpl extends LocalizableObject implements Page {
     StringBuffer b = new StringBuffer();
 
     b.append("<page id=\"");
-    b.append(uri.id);
+    b.append(uri.getId());
     b.append("\" version=\"");
-    b.append(PageUtils.getVersionString(uri.version));
+    b.append(PageUtils.getVersionString(uri.getVersion()));
     b.append("\">");
 
     // Add header

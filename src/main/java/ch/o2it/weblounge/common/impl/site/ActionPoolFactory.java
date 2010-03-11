@@ -101,7 +101,7 @@ public class ActionPoolFactory extends BasePoolableObjectFactory {
     Action action = (Action) obj;
     log_.debug("Destroying action '{}'", action.getIdentifier());
     try {
-      action.cleanup();
+      action.passivate();
     } catch (Throwable t) {
       log_.error("Error destroying action: {}", t.getMessage(), t);
     }
@@ -130,7 +130,7 @@ public class ActionPoolFactory extends BasePoolableObjectFactory {
     Action action = (Action) obj;
     log_.debug("Passivating action '{}'", action.getIdentifier());
     try {
-      action.cleanup();
+      action.passivate();
     } catch (Throwable t) {
       log_.error("Error destroying action: {}", t.getMessage(), t);
     }

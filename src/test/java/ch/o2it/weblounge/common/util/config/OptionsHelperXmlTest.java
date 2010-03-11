@@ -18,13 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.site;
+package ch.o2it.weblounge.common.util.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl;
+import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,12 +37,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Test case for the xml serialization of the {@link ActionConfigurationImp}.
+ * Test case for the xml capabilities of {@link OptionsHelper}.
  */
-public class ActionConfigurationImplXmlTest extends ActionConfigurationImplTest {
+public class OptionsHelperXmlTest extends OptionsHelperTest {
 
   /** Name of the test file */
-  protected String testFile = "/action.xml";
+  protected String testFile = "/options.xml";
 
   /**
    * @throws java.lang.Exception
@@ -53,17 +53,18 @@ public class ActionConfigurationImplXmlTest extends ActionConfigurationImplTest 
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    config = ActionConfigurationImpl.fromXml(doc.getFirstChild());
+    options = OptionsHelper.fromXml(doc.getFirstChild());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ActionConfigurationImpl#toXml()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.LinkImpl#toXml()}.
    */
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromFile(testFile);
     try {
-      assertEquals(testXml, new String(config.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(options.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

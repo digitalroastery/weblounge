@@ -53,7 +53,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   private final static Pattern pathInspector = Pattern.compile("^(.*)/(work|index|live|[0-9]*)(_[a-zA-Z]+)?\\.([a-zA-Z0-9]+)$");
 
   /** Regular expression for /path/to/resource/work/de/html */
-  private final static Pattern segmentInspector = Pattern.compile("^(.*?)(/work|index|live|[0-9]*)?(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
+  private final static Pattern segmentInspector = Pattern.compile("^(.*://)?(.*?)(/work|index|live|[0-9]*)?(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
 
   /** The associated site */
   protected Site site = null;
@@ -388,11 +388,15 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     Matcher segmentMatcher = segmentInspector.matcher(path);
     if (segmentMatcher.matches()) {
       int group = segmentMatcher.groupCount();
+      
       while (segmentMatcher.group(group) == null || "".equals(segmentMatcher.group(group)))
         group--;
 
-      if (group < 2)
-        return trim(segmentMatcher.group(1));
+      if (group < 3) {
+        String protocol = segmentMatcher.group(1);
+        String url = segmentMatcher.group(2);
+        return trim(protocol != null ? protocol + url : url);
+      }
 
       // Test group for flavor
       String f = segmentMatcher.group(group);
@@ -410,8 +414,11 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       }
 
       // Done?
-      if (group < 1)
-        return trim(segmentMatcher.group(1));
+      if (group < 3) {
+        String protocol = segmentMatcher.group(1);
+        String url = segmentMatcher.group(2);
+        return trim(protocol != null ? protocol + url : url);
+      }
 
       // Test group for language
       String l = segmentMatcher.group(group);
@@ -438,13 +445,19 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       }
 
       // Done?
-      if (group < 1)
-        return trim(segmentMatcher.group(1));
+      if (group < 3) {
+        String protocol = segmentMatcher.group(1);
+        String url = segmentMatcher.group(2);
+        return trim(protocol != null ? protocol + url : url);
+      }
 
       // Test group for version
       String v = segmentMatcher.group(group);
-      if (v == null || "".equals(v))
-        return trim(segmentMatcher.group(1));
+      if (v == null || "".equals(v)) {
+        String protocol = segmentMatcher.group(1);
+        String url = segmentMatcher.group(2);
+        return trim(protocol != null ? protocol + url : url);
+      }
 
       if (v.startsWith("/"))
         v = v.substring(1);

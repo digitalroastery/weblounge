@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.page.PageInclude;
 import ch.o2it.weblounge.common.page.Script;
@@ -268,7 +269,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     // Recheck time
     try {
       if (XPathHelper.valueOf(node, "recheck", xpath) != null) {
-        long recheckTime = Long.parseLong(XPathHelper.valueOf(node, "recheck", xpath));
+        long recheckTime = ConfigurationUtils.parseDuration(XPathHelper.valueOf(node, "recheck", xpath));
         template.setRecheckTime(recheckTime);
       }
     } catch (NumberFormatException e) {
@@ -278,8 +279,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     // Valid time
     try {
       if (XPathHelper.valueOf(node, "valid", xpath) != null) {
-        long validTime = Long.parseLong(XPathHelper.valueOf(node, "recheck", xpath));
-        template.setRecheckTime(validTime);
+        long validTime = ConfigurationUtils.parseDuration(XPathHelper.valueOf(node, "valid", xpath));
+        template.setValidTime(validTime);
       }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Invalid valid time in page template definition");

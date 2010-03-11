@@ -53,9 +53,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is the default implementation for a <code>ActionHandler</code>.
@@ -87,7 +89,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
   protected PageTemplate template = null;
 
   /** The list of flavors */
-  protected List<RequestFlavor> flavors = new ArrayList<RequestFlavor>();
+  protected Set<RequestFlavor> flavors = new HashSet<RequestFlavor>();
 
   /** The action name */
   protected LocalizableContent<String> name = new LocalizableContent<String>();
@@ -121,7 +123,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /** The current response object */
   protected WebloungeResponse response = null;
-  
+
   /**
    * Default constructor.
    */
@@ -196,8 +198,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    * @return the action's link
    */
   public WebUrl getUrl() {
-    return new WebUrlImpl(
-        site, UrlSupport.concat(new String[] {
+    return new WebUrlImpl(site, UrlSupport.concat(new String[] {
         site.getUrl().getPath(),
         mountpoint }));
   }
@@ -208,7 +209,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    * @see ch.o2it.weblounge.common.site.Action#setPath(java.lang.String)
    */
   public void setPath(String path) {
-    this.mountpoint = path;
+    this.mountpoint = UrlSupport.trim(path);
   }
 
   /**
@@ -222,7 +223,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Action#setPageURI(ch.o2it.weblounge.common.page.PageURI)
    */
   public void setPageURI(PageURI uri) {
@@ -231,7 +232,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Action#getPageURI()
    */
   public PageURI getPageURI() {
@@ -244,11 +245,11 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    * this method will return <code>/a</code>. For the mount point itself, the
    * method will return <code>/</code>.
    * 
-   * @param request
-   *          the request
    * @return the path extension relative to the action's mount point
    */
-  public String getRequestedUrlExtension(WebloungeRequest request) {
+  protected String getRequestedUrlExtension() {
+    if (request == null)
+      throw new IllegalStateException("Request has not started");
     return request.getRequestedUrl().getPath().substring(mountpoint.length());
   }
 
@@ -258,11 +259,11 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    * method will return <code>/a</code>. For the mount point itself, the method
    * will return <code>/</code>.
    * 
-   * @param request
-   *          the request
    * @return the path extension relative to the action's mount point
    */
-  public String getUrlExtension(WebloungeRequest request) {
+  protected String getUrlExtension() {
+    if (request == null)
+      throw new IllegalStateException("Request has not started");
     return request.getUrl().getPath().substring(mountpoint.length());
   }
 
@@ -316,7 +317,25 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#addFlavor(ch.o2it.weblounge.common.request.RequestFlavor)
+   */
+  public void addFlavor(RequestFlavor flavor) {
+    flavors.add(flavor);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#removeFlavor(ch.o2it.weblounge.common.request.RequestFlavor)
+   */
+  public void removeFlavor(RequestFlavor flavor) {
+    flavors.remove(flavor);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.site.Action#getFlavors()
    */
   public RequestFlavor[] getFlavors() {
@@ -644,19 +663,19 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
   }
 
   /**
-   * @see ch.o2it.weblounge.common.core.util.pool.Lease#leased()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#activate()
    */
-  public void leased() {
+  public void activate() {
   }
 
   /**
-   * This method clears all member variables except for the action
-   * configuration, site and module which are only set once.
+   * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.core.util.pool.Lease#passivate()
+   * @see ch.o2it.weblounge.common.site.Action#passivate()
    */
-  public void returned() {
-    cleanup();
+  public void passivate() {
     flavor = null;
     files = null;
     includeCount = 0;
@@ -664,19 +683,6 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
     renderer = null;
     request = null;
     response = null;
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.core.util.pool.Lease#dispose()
-   */
-  public boolean dispose() {
-    return false;
-  }
-
-  /**
-   * @see ch.o2it.weblounge.common.core.util.pool.Lease#retired()
-   */
-  public void retired() {
   }
 
   /**

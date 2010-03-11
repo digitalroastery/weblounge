@@ -393,7 +393,7 @@ public final class SiteConfiguration implements Customizable {
    *          the XPath object used to parse the configuration
    */
   private void readOptions(XPath path, Node config) {
-    options = OptionsHelper.load(path, XPathHelper.select(config, "/site", path));
+    options = OptionsHelper.fromXml(XPathHelper.select(config, "/site", path), path);
   }
 
   /**

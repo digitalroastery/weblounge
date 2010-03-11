@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.util.config;
 
-import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 
@@ -28,11 +27,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * This class may be used as a utility to hold configuration data of the
@@ -54,26 +55,29 @@ public final class OptionsHelper implements Customizable {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String, java.lang.String)
+   * 
+   * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String,
+   *      java.lang.String)
    */
   public void setOption(String name, String value) {
     if (name == null)
       throw new IllegalArgumentException("Option name must not be null");
     if (value == null)
       removeOption(name);
-    List<String> option = options.get(name);
-    if (option == null) {
-      option = new ArrayList<String>();
-      options.put(name, option);
+    List<String> values = options.get(name);
+    if (values == null) {
+      values = new ArrayList<String>();
+      options.put(name, values);
     }
-    if (!option.contains(value))
-      option.add(value);
+    if (!values.contains(value)) {
+      values.add(value);
+      Collections.sort(values);
+    }
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.Customizable#removeOption(java.lang.String)
    */
   public void removeOption(String name) {
@@ -140,7 +144,7 @@ public final class OptionsHelper implements Customizable {
 
   /**
    * Returns the option values for option <code>name</code> if it has been
-   * configured, <code>null</code> otherwise.
+   * configured, or an empty list otherwise.
    * 
    * @param name
    *          the option name
@@ -152,9 +156,9 @@ public final class OptionsHelper implements Customizable {
   public String[] getOptionValues(String name) {
     List<String> optionList = options.get(name);
     if (optionList != null) {
-      return optionList.toArray(new String[] {});
+      return optionList.toArray(new String[optionList.size()]);
     }
-    return null;
+    return new String[] {};
   }
 
   /**
@@ -167,39 +171,111 @@ public final class OptionsHelper implements Customizable {
   }
 
   /**
-   * Initializes this object from an xml configuration node.
+   * Initializes the options from an XML node that was generated using
+   * {@link #toXml()}.
+   * <p>
+   * To speed things up, you might consider using the second signature that uses
+   * an existing <code>XPath</code> instance instead of creating a new one.
    * 
    * @param config
-   *          the configuration node
-   * @param path
-   *          the XPath object used to parse the configuration
-   * @throws ConfigurationException
-   *           if the configuration data is incomplete or invalid
+   *          the options node
+   * @throws IllegalStateException
+   *           if the options cannot be parsed
+   * @see #fromXml(Node, XPath)
+   * @see #toXml()
    */
-  public static OptionsHelper load(XPath path, Node config)
-      throws ConfigurationException {
+  public static OptionsHelper fromXml(Node config) throws IllegalStateException {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(config, xpath);
+  }
+
+  /**
+   * Initializes the options from an XML node that was generated using
+   * {@link #toXml()}.
+   * 
+   * @param config
+   *          the options node
+   * @param xpathProcessor
+   *          xpath processor to use
+   * @throws IllegalStateException
+   *           if the options cannot be parsed
+   * @see #toXml()
+   */
+  public static OptionsHelper fromXml(Node config, XPath xpathProcessor)
+      throws IllegalStateException {
+
     OptionsHelper configurationBase = new OptionsHelper();
 
-    // No options available?
-    if (path == null || config == null)
-      return null;
-
     // Read the options
-    NodeList nodes = XPathHelper.selectList(config, "options/option", path);
+    NodeList nodes = XPathHelper.selectList(config, "//options/option", xpathProcessor);
     for (int i = 0; i < nodes.getLength(); i++) {
       Node option = nodes.item(i);
-      String name = XPathHelper.valueOf(option, "name", path);
-      String value = XPathHelper.valueOf(option, "value", path);
-      List<String> values = configurationBase.options.get(name);
-      if (values != null && !values.contains(value)) {
-        values.add(value);
-      } else {
-        values = new ArrayList<String>();
-        values.add(value);
-        configurationBase.options.put(name, values);
+      String name = XPathHelper.valueOf(option, "name", xpathProcessor);
+      NodeList valueNodes = XPathHelper.selectList(option, "value", xpathProcessor);
+      for (int j = 0; j < valueNodes.getLength(); j++) {
+        String value = valueNodes.item(j).getFirstChild().getNodeValue();
+        List<String> values = configurationBase.options.get(name);
+        if (values != null && !values.contains(value)) {
+          values.add(value);
+          Collections.sort(values);
+        } else {
+          values = new ArrayList<String>();
+          values.add(value);
+          configurationBase.options.put(name, values);
+        }
       }
     }
     return configurationBase;
+
+  }
+
+  /**
+   * Returns an <code>XML</code> representation of the options, that will look
+   * similar to the following example:
+   * 
+   * <pre>
+   * &lt;options&gt;
+   *   &lt;option&gt;
+   *     &lt;name&gt;key&lt;/name&gt;
+   *     &lt;value&gt;value&lt;/value&gt;
+   *   &lt;/option&gt;
+   *   &lt;option&gt;
+   *     &lt;name&gt;multikey&lt;/name&gt;
+   *     &lt;value&gt;value&lt;/value&gt;
+   *     &lt;value&gt;othervalue&lt;/value&gt;
+   *   &lt;/option&gt;
+   * &lt;/options&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>ActionConfiguration</code> from the serialized output of this method.
+   * 
+   * @return the <code>XML</code> representation of the options
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
+   */
+  public String toXml() {
+    StringBuffer b = new StringBuffer();
+    if (options.size() == 0)
+      return b.toString();
+
+    b.append("<options>");
+    List<String> keys = new ArrayList<String>();
+    keys.addAll(options.keySet());
+    Collections.sort(keys);
+    for (String key : keys) {
+      b.append("<option>");
+      b.append("<name>").append(key).append("</name>");
+      List<String> values = options.get(key);
+      Collections.sort(values);
+      for (String value : values)
+        b.append("<value>").append(value).append("</value>");
+      b.append("</option>");
+    }
+
+    b.append("</options>");
+
+    return b.toString();
   }
 
 }

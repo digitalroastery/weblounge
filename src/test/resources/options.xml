@@ -1,0 +1,11 @@
+<options>
+  <option>
+    <name>key</name>
+    <value>value</value>
+  </option>
+  <option>
+    <name>multikey</name>
+    <value>othervalue</value>
+    <value>value</value>
+  </option>
+</options>

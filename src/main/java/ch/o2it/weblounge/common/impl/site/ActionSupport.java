@@ -219,13 +219,13 @@ public class ActionSupport extends AbstractAction {
   }
 
   /**
-   * This method is called when the request is finished and the action handler
-   * is no longer needed. Use this method to release any resources that have
-   * been acquired to process the request.
-   * 
-   * @see ch.o2it.weblounge.api.module.ActionHandler#cleanup()
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.site.AbstractAction#passivate()
    */
-  public void cleanup() {
+  @Override
+  public void passivate() {
+    super.passivate();
     infoMessages = null;
     warningMessages = null;
     errorMessages = null;
@@ -957,7 +957,7 @@ public class ActionSupport extends AbstractAction {
   private void loadUrlExtensionValues(WebloungeRequest request) {
     // load parameter values from url extension
     urlparams = new ArrayList<String>();
-    String[] params = getRequestedUrlExtension(request).split("/");
+    String[] params = getRequestedUrlExtension().split("/");
     // first param is empty (because of leading slash), therefore start with
     // index
     // 1

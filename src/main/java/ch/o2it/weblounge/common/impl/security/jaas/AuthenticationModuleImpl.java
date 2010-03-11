@@ -205,13 +205,13 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
    * 
    * @param config
    *          the configuration node
-   * @param path
+   * @param xpathProcessor
    *          the XPath object used to parse the configuration
    */
-  public void init(XPath path, Node config) throws ConfigurationException {
-    setClass(XPathHelper.valueOf(config, "@class", path));
-    setRelevance(XPathHelper.valueOf(config, "@relevance", path));
-    configuration = OptionsHelper.load(path, config);
+  public void init(XPath xpathProcessor, Node config) throws ConfigurationException {
+    setClass(XPathHelper.valueOf(config, "@class", xpathProcessor));
+    setRelevance(XPathHelper.valueOf(config, "@relevance", xpathProcessor));
+    configuration = OptionsHelper.fromXml(config, xpathProcessor);
   }
 
 }

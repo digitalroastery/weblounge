@@ -123,51 +123,58 @@ public class ConfigurationUtils {
     // Years
     if (millis > Times.MS_PER_YEAR) {
       v = millis / Times.MS_PER_YEAR;
-      millis -= v*Times.MS_PER_YEAR;
+      millis -= v * Times.MS_PER_YEAR;
       result.append(v).append("y");
     }
 
     // Months
     if (millis > Times.MS_PER_MONTH) {
       v = millis / Times.MS_PER_MONTH;
-      millis -= v*Times.MS_PER_MONTH;
+      millis -= v * Times.MS_PER_MONTH;
       result.append(v).append("m");
     }
 
     // Weeks
     if (millis > Times.MS_PER_WEEK) {
       v = millis / Times.MS_PER_WEEK;
-      millis -= v*Times.MS_PER_WEEK;
+      millis -= v * Times.MS_PER_WEEK;
       result.append(v).append("w");
     }
 
     // Days
     if (millis > Times.MS_PER_DAY) {
       v = millis / Times.MS_PER_DAY;
-      millis -= v*Times.MS_PER_DAY;
+      millis -= v * Times.MS_PER_DAY;
       result.append(v).append("d");
     }
 
     // Hours
     if (millis > Times.MS_PER_HOUR) {
       v = millis / Times.MS_PER_HOUR;
-      millis -= v*Times.MS_PER_HOUR;
+      millis -= v * Times.MS_PER_HOUR;
       result.append(v).append("H");
     }
 
     // Minutes
     if (millis > Times.MS_PER_MIN) {
       v = millis / Times.MS_PER_MIN;
-      millis -= v*Times.MS_PER_MIN;
+      millis -= v * Times.MS_PER_MIN;
       result.append(v).append("M");
     }
 
     // Seconds
     if (millis > Times.MS_PER_SECOND) {
       v = millis / Times.MS_PER_SECOND;
+      millis -= v * Times.MS_PER_SECOND;
       result.append(v).append("S");
     }
 
+    // Cleanup
+    if (millis > 0)
+      result.append(millis);
+    else if (result.length() == 0)
+      result.append("0");
+    
     return result.toString();
   }
 
@@ -187,7 +194,8 @@ public class ConfigurationUtils {
    * Therefore, an example representing 1 week, 3 days and 25 minutes would
    * result in <code>1w3d25m</code>.
    * 
-   * @param duration the duration either in milliseconds or encoded
+   * @param duration
+   *          the duration either in milliseconds or encoded
    * @return the duration in milliseconds
    */
   public static long parseDuration(String duration) {
@@ -197,10 +205,10 @@ public class ConfigurationUtils {
     try {
       return Long.parseLong(duration);
     } catch (NumberFormatException e) {
-      Pattern p = Pattern.compile("^(\\d+y)?(\\d+m)?(\\d+w)?(\\d+d)?(\\d+H)?(\\d+M)?(\\d+S)?$");
+      Pattern p = Pattern.compile("^([\\d]+y)?([\\d]+m)?([\\d]+w)?([\\d]+d)?([\\d]+H)?([\\d]+M)?([\\d]+S)?$");
       Matcher m = p.matcher(duration);
       if (m.matches()) {
-        for (int i=1; i < m.groupCount(); i++) {
+        for (int i = 1; i <= m.groupCount(); i++) {
           String match = m.group(i);
           if (match == null)
             continue;

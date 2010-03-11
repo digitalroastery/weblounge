@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.page.ScriptImpl;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -32,15 +33,17 @@ import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.page.Link;
 import ch.o2it.weblounge.common.page.PageInclude;
 import ch.o2it.weblounge.common.page.Script;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionConfiguration;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -72,10 +75,10 @@ public class ActionConfigurationImpl implements ActionConfiguration {
   private long validTime = Action.DEFAULT_VALID_TIME;
 
   /** The list of includes */
-  private List<PageInclude> includes = new ArrayList<PageInclude>();;
+  private Set<PageInclude> includes = new HashSet<PageInclude>();;
 
   /** The list of flavors */
-  private List<String> flavors = new ArrayList<String>();
+  private Set<RequestFlavor> flavors = new HashSet<RequestFlavor>();
 
   /** The action name */
   private LocalizableContent<String> name = new LocalizableContent<String>();
@@ -99,7 +102,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    *          the action class
    */
   public void setActionClass(Class<? extends Action> actionClass) {
-    actionClass = null;
+    this.actionClass = actionClass;
   }
 
   /**
@@ -126,7 +129,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    * 
    * @see ch.o2it.weblounge.common.site.ActionConfiguration#getIncludes()
    */
-  public List<PageInclude> getIncludes() {
+  public Set<PageInclude> getIncludes() {
     return includes;
   }
 
@@ -156,7 +159,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    *          the mountpoint
    */
   public void setMountpoint(String mountpoint) {
-    this.mountpoint = mountpoint;
+    this.mountpoint = UrlSupport.trim(mountpoint);
   }
 
   /**
@@ -194,7 +197,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    *          the target url
    */
   public void setPageURI(String uri) {
-    this.pageURI = uri;
+    this.pageURI = UrlSupport.trim(uri);
   }
 
   /**
@@ -240,7 +243,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    * 
    * @see ch.o2it.weblounge.common.site.ActionConfiguration#getFlavors()
    */
-  public List<String> getFlavors() {
+  public Set<RequestFlavor> getFlavors() {
     return flavors;
   }
 
@@ -250,7 +253,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    * @param flavor
    *          the flavor
    */
-  public void addFlavor(String flavor) {
+  public void addFlavor(RequestFlavor flavor) {
     flavors.add(flavor);
   }
 
@@ -298,7 +301,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    * @see ch.o2it.weblounge.common.Customizable#getOptionValues(java.lang.String)
    */
   public String[] getOptionValues(String name) {
-    return getOptionValues(name);
+    return options.getOptionValues(name);
   }
 
   /**
@@ -307,7 +310,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    * @see ch.o2it.weblounge.common.Customizable#getOptions()
    */
   public Map<String, List<String>> getOptions() {
-    return getOptions();
+    return options.getOptions();
   }
 
   /**
@@ -383,7 +386,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
     action.setIdentifier(identifier);
 
     // class
-    String className = XPathHelper.valueOf(config, "//class", xpathProcessor);
+    String className = XPathHelper.valueOf(config, "class", xpathProcessor);
     if (className == null)
       throw new IllegalStateException("Action '" + identifier + " has no implementation class");
     try {
@@ -394,54 +397,54 @@ public class ActionConfigurationImpl implements ActionConfiguration {
     }
 
     // mountpoint
-    String mountpoint = XPathHelper.valueOf(config, "//mountpoint", xpathProcessor);
+    String mountpoint = XPathHelper.valueOf(config, "mountpoint", xpathProcessor);
     if (mountpoint == null)
       throw new IllegalStateException("Action '" + identifier + " has no mountpoint");
     action.setMountpoint(mountpoint);
     // TODO: handle /, /*
 
     // content url
-    String targetUrl = XPathHelper.valueOf(config, "//page", xpathProcessor);
+    String targetUrl = XPathHelper.valueOf(config, "page", xpathProcessor);
     action.setPageURI(targetUrl);
 
     // template
-    String targetTemplate = XPathHelper.valueOf(config, "//template", xpathProcessor);
+    String targetTemplate = XPathHelper.valueOf(config, "template", xpathProcessor);
     action.setTemplate(targetTemplate);
 
     // recheck time
-    String recheck = XPathHelper.valueOf(config, "//recheck", xpathProcessor);
+    String recheck = XPathHelper.valueOf(config, "recheck", xpathProcessor);
     if (recheck != null) {
       try {
-        action.setRecheckTime(Long.parseLong(recheck));
+        action.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
       } catch (NumberFormatException e) {
         throw new IllegalStateException("The recheck time '" + recheck + "' is malformed", e);
       }
     }
 
     // valid time
-    String valid = XPathHelper.valueOf(config, "//valid", xpathProcessor);
+    String valid = XPathHelper.valueOf(config, "valid", xpathProcessor);
     if (valid != null) {
       try {
-        action.setValidTime(Long.parseLong(valid));
+        action.setValidTime(ConfigurationUtils.parseDuration(valid));
       } catch (NumberFormatException e) {
         throw new IllegalStateException("The valid time '" + recheck + "' is malformed", e);
       }
     }
 
     // scripts
-    NodeList scripts = XPathHelper.selectList(config, "//includes/script", xpathProcessor);
+    NodeList scripts = XPathHelper.selectList(config, "includes/script", xpathProcessor);
     for (int i = 0; i < scripts.getLength(); i++) {
       action.addInclude(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
-    NodeList includes = XPathHelper.selectList(config, "//includes/link", xpathProcessor);
+    NodeList includes = XPathHelper.selectList(config, "includes/link", xpathProcessor);
     for (int i = 0; i < includes.getLength(); i++) {
       action.addInclude(LinkImpl.fromXml(includes.item(i)));
     }
 
     // name
-    NodeList names = XPathHelper.selectList(config, "//name", xpathProcessor);
+    NodeList names = XPathHelper.selectList(config, "name", xpathProcessor);
     for (int i = 0; i < names.getLength(); i++) {
       Node localiziation = names.item(i);
       String language = XPathHelper.valueOf(localiziation, "@language", xpathProcessor);
@@ -449,9 +452,16 @@ public class ActionConfigurationImpl implements ActionConfiguration {
         throw new IllegalStateException("Found action name without language");
       String name = XPathHelper.valueOf(localiziation, "//name", xpathProcessor);
       if (name == null)
-        throw new IllegalStateException("Found action name without language");
+        throw new IllegalStateException("Found empty action name");
       action.setName(name, LanguageSupport.getLanguage(language));
     }
+    
+    // flavor
+    // TODO: Make this dynamic/configurable?
+    action.addFlavor(RequestFlavor.HTML);
+    
+    // options
+    action.options = OptionsHelper.fromXml(config, xpathProcessor);
 
     return action;
   }
@@ -527,6 +537,9 @@ public class ActionConfigurationImpl implements ActionConfiguration {
       }
       b.append("</includes>");
     }
+    
+    // Options
+    b.append(options.toXml());
 
     b.append("</action>");
     return b.toString();
