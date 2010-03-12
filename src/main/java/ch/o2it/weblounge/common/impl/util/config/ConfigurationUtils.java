@@ -116,7 +116,57 @@ public class ConfigurationUtils {
    *          the duration in milliseconds
    * @return the duration as a human readable string
    */
+  public static String toHumanReadableDuration(long millis) {
+    return toDuration(millis, true);
+  }
+
+  /**
+   * Returns the string representation of the given duration in milliseconds.
+   * The string follows the pattern <code>ymwdHMS</code>, with the following
+   * meanings:
+   * <ul>
+   * <li><b>y</b> - years</li>
+   * <li><b>m</b> - months</li>
+   * <li><b>w</b> - weeks</li>
+   * <li><b>d</b> - days</li>
+   * <li><b>H</b> - hours</li>
+   * <li><b>M</b> - minutes</li>
+   * <li><b>S</b> - seconds</li>
+   * </ul>
+   * Therefore, an example representing 1 week, 3 days and 25 minutes would
+   * result in <code>1w3d25M</code>.
+   * 
+   * @param millis
+   *          the duration in milliseconds
+   * @return the duration as a human readable string
+   */
   public static String toDuration(long millis) {
+    return toDuration(millis, false);
+  }
+
+  /**
+   * Returns the string representation of the given duration in milliseconds.
+   * The string follows the pattern <code>ymwdHMS</code>, with the following
+   * meanings:
+   * <ul>
+   * <li><b>y</b> - years</li>
+   * <li><b>m</b> - months</li>
+   * <li><b>w</b> - weeks</li>
+   * <li><b>d</b> - days</li>
+   * <li><b>H</b> - hours</li>
+   * <li><b>M</b> - minutes</li>
+   * <li><b>S</b> - seconds</li>
+   * </ul>
+   * Therefore, an example representing 1 week, 3 days and 25 minutes would
+   * result in <code>1w3d25M</code>.
+   * 
+   * @param millis
+   *          the duration in milliseconds
+   * @param humanReadable
+   *          <code>true</code> to generate human readable output
+   * @return the duration as a human readable string
+   */
+  private static String toDuration(long millis, boolean humanReadable) {
     StringBuffer result = new StringBuffer();
     long v = 0;
 
@@ -124,57 +174,58 @@ public class ConfigurationUtils {
     if (millis > Times.MS_PER_YEAR) {
       v = millis / Times.MS_PER_YEAR;
       millis -= v * Times.MS_PER_YEAR;
-      result.append(v).append("y");
+      result.append(v).append(humanReadable? " years " : "y");
     }
 
     // Months
     if (millis > Times.MS_PER_MONTH) {
       v = millis / Times.MS_PER_MONTH;
       millis -= v * Times.MS_PER_MONTH;
-      result.append(v).append("m");
+      result.append(v).append(humanReadable? " months " : "m");
     }
 
     // Weeks
     if (millis > Times.MS_PER_WEEK) {
       v = millis / Times.MS_PER_WEEK;
       millis -= v * Times.MS_PER_WEEK;
-      result.append(v).append("w");
+      result.append(v).append(humanReadable? " weeks " : "w");
     }
 
     // Days
     if (millis > Times.MS_PER_DAY) {
       v = millis / Times.MS_PER_DAY;
       millis -= v * Times.MS_PER_DAY;
-      result.append(v).append("d");
+      result.append(v).append(humanReadable? " days " : "d");
     }
 
     // Hours
     if (millis > Times.MS_PER_HOUR) {
       v = millis / Times.MS_PER_HOUR;
       millis -= v * Times.MS_PER_HOUR;
-      result.append(v).append("H");
+      result.append(v).append(humanReadable? " hours " : "H");
     }
 
     // Minutes
     if (millis > Times.MS_PER_MIN) {
       v = millis / Times.MS_PER_MIN;
       millis -= v * Times.MS_PER_MIN;
-      result.append(v).append("M");
+      result.append(v).append(humanReadable? " minutes " : "M");
     }
 
     // Seconds
     if (millis > Times.MS_PER_SECOND) {
       v = millis / Times.MS_PER_SECOND;
       millis -= v * Times.MS_PER_SECOND;
-      result.append(v).append("S");
+      result.append(v).append(humanReadable? " seconds " : "S");
     }
 
     // Cleanup
-    if (millis > 0)
+    if (millis > 0) {
       result.append(millis);
-    else if (result.length() == 0)
+      result.append(v).append(humanReadable? " milliseconds " : "");
+    } else if (result.length() == 0)
       result.append("0");
-    
+
     return result.toString();
   }
 
