@@ -272,13 +272,12 @@ public class SiteCommand {
    */
   private void restart(Site site) {
     try {
-      if (site.isRunning())
+      if (site.isRunning()) {
         site.stop();
-      if (!site.isStartedAutomatically()) {
-        System.out.println("Disabled site " + site + " cannot be started");
-        return;
+        site.start();
+      } else if (site.isStartedAutomatically()) {
+        site.start();
       }
-      site.start();
     } catch (Exception e) {
       e.printStackTrace();
     }

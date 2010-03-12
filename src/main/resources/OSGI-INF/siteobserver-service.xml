@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component immediate="true" start="activate" stop="deactivate" name="Weblounge Site Observer Service">
+  <implementation class="ch.o2it.weblounge.kernel.SiteObserverService" />
+  <property name="service.description" value="Weblounge Site Observer Service" />
+  <reference name="site" interface="ch.o2it.weblounge.common.site.Site" cardinality="0..n" policy="dynamic" bind="addSite" unbind="removeSite" />
+  <reference name="actionrequesthandler" interface="ch.o2it.weblounge.dispatcher.ActionRequestHandler" cardinality="0..1" policy="dynamic" bind="addActionRequestHandler" unbind="removeActionRequestHandler" />
+</component>

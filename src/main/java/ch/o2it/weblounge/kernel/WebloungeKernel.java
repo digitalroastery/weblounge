@@ -20,9 +20,6 @@
 
 package ch.o2it.weblounge.kernel;
 
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.site.SiteException;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.quartz.Scheduler;
@@ -76,34 +73,6 @@ public class WebloungeKernel {
     log_.info("Stopping common weblounge services", this);
     scheduler.shutdown();
     log_.info("Job scheduler stopped");
-  }
-
-  /**
-   * Callback from the OSGi environment when a new site is activated.
-   * 
-   * @param site
-   *          the site
-   */
-  public void addSite(Site site) {
-    if (site.isStartedAutomatically())
-      try {
-        log_.debug("Starting site '{}'", site);
-        site.start();
-      } catch (IllegalStateException e) {
-        log_.error("Site '{}' could not be started: {}", e.getMessage(), e);
-      } catch (SiteException e) {
-        log_.error("Site '{}' could not be started: {}", e.getMessage(), e);
-      }
-  }
-
-  /**
-   * Callback from the OSGi environment when a site is deactivated.
-   * 
-   * @param site
-   *          the site
-   */
-  public void removeSite(Site site) {
-    // Nothing to do
   }
 
 }
