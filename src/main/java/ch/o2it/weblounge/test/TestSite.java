@@ -40,6 +40,7 @@ public class TestSite extends SiteImpl {
    */
   public TestSite() {
     setAutoStart(false);
+    addHostName("localhost");
   }
 
   /**
@@ -51,10 +52,12 @@ public class TestSite extends SiteImpl {
    * @param context
    *          the component context
    */
-  public void activate(ComponentContext context) {
+  @Override
+  public void activate(ComponentContext context) throws Exception {
     super.activate(context);
     addJob("startup", SiteStartupJob.class, null, new CronJobTrigger("@restart"));
     addJob("greeter", GreeterJob.class, null, new PeriodicJobTrigger(60000));
+    addModule(new TestModule());
   }
 
   /**
@@ -66,7 +69,8 @@ public class TestSite extends SiteImpl {
    * @param context
    *          the component context
    */
-  public void deactivate(ComponentContext context) {
+  @Override
+  public void deactivate(ComponentContext context) throws Exception {
     super.deactivate(context);
     removeJob("startup");
     removeJob("greeter");

@@ -52,11 +52,19 @@ public class GreeterAction extends ActionSupport {
   public static final String LANGUAGE_PARAM = "language";
 
   /** Name of the properties file that defines the greetings */
-  public static final String GREETING_PROPS = "greetings.properties";
+  public static final String GREETING_PROPS = "/greetings.properties";
 
   /** The greetings */
   protected Map<String, String> greetings = new HashMap<String, String>();
 
+  /**
+   * Creates a new instace of the the <code>GreeterAction</code>.
+   */
+  public GreeterAction() {
+    addFlavor(RequestFlavor.XML);
+    addFlavor(RequestFlavor.JSON);
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -101,7 +109,7 @@ public class GreeterAction extends ActionSupport {
       for (Map.Entry<String, String> greeting : greetings.entrySet()) {
         Element greetingNode = doc.createElement("greeting");
         greetingNode.setAttribute("language", greeting.getKey());
-        greetingNode.setNodeValue(greeting.getValue());
+        greetingNode.appendChild(doc.createTextNode(greeting.getValue()));
         root.appendChild(greetingNode);
       }
       TransformerFactory factory = TransformerFactory.newInstance();
@@ -136,7 +144,6 @@ public class GreeterAction extends ActionSupport {
   @Override
   public void passivate() {
     super.passivate();
-    log_.info("Preparing greeter for idle state");
     greetings.clear();
   }
 

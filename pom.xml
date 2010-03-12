@@ -83,6 +83,9 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Embed-Dependency>
+              json
+            </Embed-Dependency>
             <Import-Package>
               ch.o2it.weblounge.common.request,
               ch.o2it.weblounge.common.scheduler,
@@ -95,7 +98,6 @@
               javax.xml.transform,
               javax.xml.transform.dom,
               javax.xml.transform.stream,
-              org.json,
               org.slf4j,
               org.w3c.dom,
               org.osgi.service.component
