@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component immediate="true" name="Weblounge Page Request Handler">
-  <implementation class="ch.o2it.weblounge.dispatcher.impl.PageRequestHandler" />
+  <implementation class="ch.o2it.weblounge.dispatcher.impl.PageRequestHandlerImpl" />
   <property name="service.description" value="Weblounge Page Request Handler" />
   <service>
     <provide interface="ch.o2it.weblounge.dispatcher.RequestHandler" />
+    <provide interface="ch.o2it.weblounge.dispatcher.PageRequestHandler" />
   </service>
 </component>

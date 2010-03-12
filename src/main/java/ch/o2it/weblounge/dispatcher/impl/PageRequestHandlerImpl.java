@@ -39,6 +39,7 @@ import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.dispatcher.PageRequestHandler;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 
 import org.apache.jasper.JasperException;
@@ -55,13 +56,13 @@ import javax.servlet.http.HttpServletResponse;
  * mapped to a certain template. The request handler will verify access rights
  * and then simply forward the request to the template handler.
  */
-public final class PageRequestHandler implements RequestHandler {
+public final class PageRequestHandlerImpl implements PageRequestHandler {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(PageRequestHandler.class);
+  protected final static Logger log_ = LoggerFactory.getLogger(PageRequestHandlerImpl.class);
 
   /** The singleton handler instance */
-  private final static PageRequestHandler handler = new PageRequestHandler();
+  private final static PageRequestHandlerImpl handler = new PageRequestHandlerImpl();
 
   /**
    * Handles the request for a simple url available somewhere in the system. The

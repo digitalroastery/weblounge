@@ -21,7 +21,6 @@ package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.site.SiteService;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -53,7 +52,7 @@ public class SiteTracker extends ServiceTracker {
    * Creates a site tracker.
    */
   SiteTracker(BundleContext context) {
-    super(context, SiteService.class.getName(), null);
+    super(context, Site.class.getName(), null);
     sites = new ArrayList<Site>();
     sitesByServerName = new HashMap<String, Site>();
   }
@@ -96,10 +95,9 @@ public class SiteTracker extends ServiceTracker {
    * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
    */
   public Object addingService(ServiceReference reference) {
-    SiteService service = (SiteService) super.addingService(reference);
-    Site site = service.getSite();
+    Site site = (Site) super.addingService(reference);
     registerSite(site);
-    log_.info("Site {} started", site);
+    log_.debug("Site {} registered", site);
     return super.addingService(reference);
   }
 
@@ -110,13 +108,12 @@ public class SiteTracker extends ServiceTracker {
    *      java.lang.Object)
    */
   public void modifiedService(ServiceReference reference, Object service) {
-    SiteService s = (SiteService) service;
-    Site site = s.getSite();
+    Site site = (Site) service;
     log_.debug("Site {} modified", site);
-    log_.info("Restarting site {}", site);
+    log_.debug("Unregistering site {}", site);
     unregisterSite(site);
     registerSite(site);
-    log_.info("Site {} started", site);
+    log_.debug("Site {} registered", site);
   }
 
   /**
@@ -126,11 +123,10 @@ public class SiteTracker extends ServiceTracker {
    *      java.lang.Object)
    */
   public void removedService(ServiceReference reference, Object service) {
-    SiteService s = (SiteService) service;
-    Site site = s.getSite();
+    Site site = (Site) service;
     unregisterSite(site);
     super.removedService(reference, service);
-    log_.info("Site {} stopped", site);
+    log_.debug("Site {} unregistered", site);
   }
 
   /**
@@ -147,7 +143,7 @@ public class SiteTracker extends ServiceTracker {
     synchronized (sites) {
       sites.add(site);
       for (String name : site.getHostNames()) {
-        if (sitesByServerName.get(name).equals(site))
+        if (site.equals(sitesByServerName.get(name)))
           throw new ConfigurationException("Another site is already registered to " + name);
         sitesByServerName.put(name, site);
       }
