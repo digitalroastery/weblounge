@@ -148,9 +148,23 @@ public interface Action extends Composeable, Customizable {
   int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
+  /**
+   * TODO: Comment me!
+   * 
+   * @param request
+   * @param response
+   * @throws ActionException
+   */
   void startXMLResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
+  /**
+   * TODO: Comment me!
+   * 
+   * @param request
+   * @param response
+   * @throws ActionException
+   */
   void startJSONResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
