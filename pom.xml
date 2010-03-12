@@ -44,6 +44,12 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.felix.karaf.shell</groupId>
+      <artifactId>org.apache.felix.karaf.shell.console</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
     <!-- thirdparty -->
 
     <dependency>
@@ -93,6 +99,8 @@
               ch.o2it.weblounge.common.impl.request,
               ch.o2it.weblounge.common.impl.scheduler,
               ch.o2it.weblounge.common.impl.site,
+			  ch.o2it.weblounge.common.impl.util,
+			  ch.o2it.weblounge.common.impl.util.config,
               javax.servlet,
               javax.xml.parsers,
               javax.xml.transform,
@@ -100,10 +108,13 @@
               javax.xml.transform.stream,
               org.slf4j,
               org.w3c.dom,
-              org.osgi.service.component
+			  org.osgi.service.command,
+              org.osgi.service.component,
+			  org.osgi.framework
             </Import-Package>
             <Service-Component>
-              OSGI-INF/site.xml
+              OSGI-INF/site.xml,
+              OSGI-INF/test-command.xml
             </Service-Component>
           </instructions>
         </configuration>

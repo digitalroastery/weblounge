@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test;
+package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobException;

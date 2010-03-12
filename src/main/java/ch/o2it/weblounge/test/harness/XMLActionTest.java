@@ -18,37 +18,33 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test;
+package ch.o2it.weblounge.test.harness;
 
-import ch.o2it.weblounge.common.impl.site.ModuleImpl;
-import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Test implementation of the {@link Module} interface.
+ * Integration test to test <code>XML</code> action output.
  */
-public class TestModule extends ModuleImpl implements Module {
+public class XMLActionTest extends IntegrationTestBase {
+
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(XMLActionTest.class);
 
   /**
-   * Creates a new test module.
+   * Creates a new instance of the xml action test.
    */
-  public TestModule() {
-    setIdentifier("test");
+  public XMLActionTest() {
+    super("XML Action Test");
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.site.ModuleImpl#getActions()
+   * 
+   * @see ch.o2it.weblounge.test.harness.IntegrationTest#execute()
    */
-  @Override
-  public Action[] getActions() {
-    Action action = new GreeterAction();
-    action.setIdentifier("greeter");
-    action.setPath("greeting");
-    action.setModule(this);
-    action.setSite(getSite());
-    return new Action[] { action };
+  public void execute() throws Exception {
+    logger.info("Preparing test of greeter action's xml output");
   }
-  
+
 }

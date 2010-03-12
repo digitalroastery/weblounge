@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test;
+package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.common.impl.scheduler.CronJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger;
@@ -39,8 +39,9 @@ public class TestSite extends SiteImpl {
    * Creates a new test site implementation.
    */
   public TestSite() {
-    setAutoStart(false);
+    setAutoStart(true);
     addHostName("localhost");
+    setDescription("Weblounge Test Site");
   }
 
   /**

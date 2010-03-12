@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" immediate="true" name="Weblounge Test Site">
-  <implementation class="ch.o2it.weblounge.test.TestSite" />
+  <implementation class="ch.o2it.weblounge.test.site.TestSite" />
   <property name="service.description" value="Weblounge Test Site" />
   <property name="site.identifier" value="weblounge-test" />
   <service>

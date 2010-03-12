@@ -18,40 +18,33 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test;
-
-import ch.o2it.weblounge.common.scheduler.Job;
-import ch.o2it.weblounge.common.scheduler.JobException;
-import ch.o2it.weblounge.common.site.Site;
+package ch.o2it.weblounge.test.harness;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.Dictionary;
-
 /**
- * Test job that will print a friendly greeting to <code>System.out</code> at
- * site startup.
+ * Integration test to test JSON action output.
  */
-public class SiteStartupJob implements Job {
+public class JSONActionTest extends IntegrationTestBase {
 
-  /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(SiteStartupJob.class);
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(JSONActionTest.class);
+
+  /**
+   * Creates a new instance of the json action test.
+   */
+  public JSONActionTest() {
+    super("JSON Action Test");
+  }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.scheduler.Job#execute(java.lang.String,
-   *      java.util.Dictionary)
+   *
+   * @see ch.o2it.weblounge.test.harness.IntegrationTest#execute()
    */
-  public void execute(String name, Dictionary<String, Serializable> ctx)
-      throws JobException {
-    Site site = (Site)ctx.get(Job.CTXT_SITE);
-    if (site != null)
-      log_.info("Site " + site + " started");
-    else
-      log_.warn("Site not found in context");
+  public void execute() throws Exception {
+    logger.info("Preparing test of greeter action's json output");
   }
-
+  
 }
