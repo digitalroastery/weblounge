@@ -135,6 +135,8 @@ public final class CronJobTrigger implements JobTrigger {
    * @see ch.o2it.weblounge.common.scheduler.JobTrigger#getNextExecutionAfter(Date)
    */
   public Date getNextExecutionAfter(Date date) {
+    if (date == null)
+      return null;
     if (nextExecution > date.getTime())
       return new Date(nextExecution);
     else if (once) {

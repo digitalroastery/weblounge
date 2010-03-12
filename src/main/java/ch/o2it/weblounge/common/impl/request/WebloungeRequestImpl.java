@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
+import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.Guest;
@@ -141,6 +142,12 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (language == null) {
       language = site.getDefaultLanguage();
       log_.trace("Selected default site language " + language);
+    }
+
+    // Wow, that's really a configuration disaster!
+    if (language == null) {
+      language = new LanguageImpl(Locale.getDefault());
+      log_.trace("Selected default system language " + language);
     }
 
     getSession().setAttribute(SESSION_LANGUAGE, language);

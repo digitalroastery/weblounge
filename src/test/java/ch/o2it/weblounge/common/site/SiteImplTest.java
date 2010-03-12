@@ -227,7 +227,7 @@ public class SiteImplTest {
    * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#isStartedAutomatically()}.
    */
   @Test
-  public void testIsEnabled() {
+  public void testIsStartedAutomatically() {
     assertEquals(enabled, site.isStartedAutomatically());
   }
 

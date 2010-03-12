@@ -138,17 +138,6 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    */
   public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
-    switch (flavor) {
-      case HTML:
-        response.setHeader("Content-Type", "text/html; charset=utf-8");
-        break;
-      case XML:
-        response.setHeader("Content-Type", "text/xml; charset=utf-8");
-        break;
-      case JSON:
-        response.setHeader("Content-Type", "text/json; charset=utf-8");
-        break;
-    }
     return EVAL_REQUEST;
   }
   

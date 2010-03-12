@@ -21,8 +21,6 @@
 package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.ActionConfiguration;
-import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.slf4j.Logger;
@@ -31,24 +29,26 @@ import org.slf4j.LoggerFactory;
 /**
  * Object pool for {@link Action} instances.
  */
-public class ActionPool extends GenericObjectPool {
+public final class ActionPool extends GenericObjectPool {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(ActionPool.class);
+  
+  /** The action name */
+  private String actionName = null;
 
   /**
    * Creates a new pool which will manage {@link Action} instances that are
    * created according to <code>configuration</code>.
    * 
-   * @param configuration
-   *          the action configuration
-   * @param the
-   *          associated site
+   * @param action
+   *          the action
    */
-  public ActionPool(ActionConfiguration configuration, Site site) {
-    if (configuration == null)
+  public ActionPool(Action action) {
+    if (action == null)
       throw new IllegalArgumentException("Action configuration must not be null");
-    setFactory(new ActionPoolFactory(configuration, site));
+    actionName = action.toString();
+    setFactory(new ActionPoolFactory(action));
     setTestOnBorrow(false);
     setTestOnReturn(false);
   }
@@ -95,6 +95,16 @@ public class ActionPool extends GenericObjectPool {
     Action action = (Action) super.borrowObject();
     log_.debug("Invalidating action '{}'", action.getIdentifier());
     super.invalidateObject(obj);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "action pool [" + actionName + "]";
   }
 
 }

@@ -23,9 +23,8 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.ActionConfiguration;
-import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.slf4j.Logger;
@@ -38,29 +37,23 @@ import java.util.Map;
  * The action pool factory will create action objects according to the action
  * configuration that is passed in at construction time.
  */
-public class ActionPoolFactory extends BasePoolableObjectFactory {
+public final class ActionPoolFactory extends BasePoolableObjectFactory {
 
   /** Logging facility */
   private final static Logger log_ = LoggerFactory.getLogger(ActionPoolFactory.class);
 
-  /** The action configuration */
-  protected ActionConfiguration configuration = null;
+  /** The action blueprint */
+  protected Action blueprint = null;
   
-  /** The site */
-  protected Site site = null;
-
   /**
    * Creates a new action pool factory that will create action objects for the
    * given site according to the configuration.
    * 
-   * @param configuration
+   * @param sample
    *          the action configuration
-   * @param site
-   *          the site
    */
-  public ActionPoolFactory(ActionConfiguration configuration, Site site) {
-    this.configuration = configuration;
-    this.site = site;
+  public ActionPoolFactory(Action sample) {
+    this.blueprint = sample;
   }
 
   /**
@@ -70,24 +63,53 @@ public class ActionPoolFactory extends BasePoolableObjectFactory {
    */
   @Override
   public Object makeObject() throws Exception {
-    log_.debug("Creating new action '{}'", configuration.getIdentifier());
-    Class<? extends Action> actionClass = configuration.getActionClass();
-    Action action = actionClass.newInstance();
-    action.setIdentifier(configuration.getIdentifier());
-    for (PageInclude include : configuration.getIncludes())
+    log_.debug("Creating new action '{}'", blueprint.getIdentifier());
+    
+    Action action = blueprint.getClass().newInstance();
+    
+    // Identifier
+    action.setIdentifier(blueprint.getIdentifier());
+
+    // Path
+    action.setPath(blueprint.getPath());
+
+    // Includes
+    for (PageInclude include : blueprint.getIncludes()) {
       action.addInclude(include);
-    action.setPath(configuration.getMountpoint());
-    for (Map.Entry<String, List<String>> option : configuration.getOptions().entrySet())
+    }
+
+    // Options
+    for (Map.Entry<String, List<String>> option : blueprint.getOptions().entrySet()) {
       for (String value : option.getValue())
         action.setOption(option.getKey(), value);
-    action.setRecheckTime(configuration.getRecheckTime());
-    if (configuration.getPageURI() != null)
-      action.setPageURI(new PageURIImpl(site, configuration.getPageURI()));
-    action.setTemplate(site.getTemplate(configuration.getTemplate()));
-    action.setValidTime(configuration.getValidTime());
-    for (Language l : configuration.getName().languages()) {
-      action.setName(configuration.getName().toString(l), l);
     }
+    
+    // Recheck time
+    action.setRecheckTime(blueprint.getRecheckTime());
+
+    // Valid time
+    action.setValidTime(blueprint.getValidTime());
+
+    // Page URI
+    if (blueprint.getPageURI() != null) {
+      PageURI uri = blueprint.getPageURI();
+      action.setPageURI(new PageURIImpl(uri.getSite(), uri.getPath()));
+    }
+
+    // Page template
+    action.setTemplate(blueprint.getTemplate());
+    
+    // Names
+    for (Language l : blueprint.languages()) {
+      action.setName(blueprint.getName(l), l);
+    }
+    
+    // Module
+    action.setModule(blueprint.getModule());
+    
+    // Site
+    action.setSite(blueprint.getSite());
+
     return action;
   }
 
@@ -135,6 +157,16 @@ public class ActionPoolFactory extends BasePoolableObjectFactory {
       log_.error("Error destroying action: {}", t.getMessage(), t);
     }
     super.passivateObject(obj);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "action pool factory [" + blueprint + "]";
   }
 
 }

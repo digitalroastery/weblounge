@@ -706,7 +706,8 @@ public class SiteImpl implements Site {
               log_.error("Error stopping module {}", m, e2);
             }
           }
-          throw new SiteException(this, "Error starting module " + module, e);
+          // TODO: Stop everything that has been started so far
+          throw new SiteException(this, "Error starting module '" + module + "'", e);
         }
       }
     }
@@ -714,7 +715,12 @@ public class SiteImpl implements Site {
     // Register jobs
     synchronized (jobs) {
       for (QuartzJob job : jobs.values()) {
-        scheduleJob(job);
+        try {
+          scheduleJob(job);
+        } catch (Exception e) {
+          // TODO: Stop everything that has been started so far
+          throw new SiteException(this, "Error starting job '" + job + "'", e);
+        }
       }
     }
 
@@ -990,7 +996,7 @@ public class SiteImpl implements Site {
    * @param context
    *          the component context
    */
-  public void activate(ComponentContext context) {
+  public void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
 
     // Fix the site identifier
@@ -1022,7 +1028,7 @@ public class SiteImpl implements Site {
    * @param context
    *          the component context
    */
-  public void deactivate(ComponentContext context) {
+  public void deactivate(ComponentContext context) throws Exception {
     try {
       isShutdownInProgress = true;
       log_.debug("Taking down site {}", this);
@@ -1259,7 +1265,7 @@ public class SiteImpl implements Site {
     String jobIdentifier = job.getIdentifier();
     try {
       if (scheduler.unscheduleJob(jobIdentifier, groupName))
-        log_.info("Unscheduled job {}", jobIdentifier);
+        log_.info("Job '{}' unscheduled", jobIdentifier);
     } catch (SchedulerException e) {
       log_.error("Error trying to schedule job {}: {}", new Object[] {
           jobIdentifier,

@@ -63,7 +63,7 @@ public class ModuleImpl implements Module {
   protected WebUrl url = null;
 
   /** Module enabled state */
-  protected boolean enabled = false;
+  protected boolean enabled = true;
 
   /** Module running state */
   private boolean running = false;
@@ -334,7 +334,7 @@ public class ModuleImpl implements Module {
 
     // Finally, mark this module as running
     running = true;
-    log_.info("Module {} started", this);
+    log_.info("Module '{}' started", this);
 
     // Tell listeners
     fireModuleStarted();
@@ -346,15 +346,15 @@ public class ModuleImpl implements Module {
    * @see ch.o2it.weblounge.common.site.Module#stop()
    */
   public void stop() throws ModuleException {
-    log_.debug("Stopping site {}", this);
+    log_.debug("Stopping module {}", this);
     if (!running)
-      throw new IllegalStateException("Site is not running");
+      throw new IllegalStateException("Module is not running");
 
     // TODO: Implement module shutdown
 
     // Finally, mark this module as stopped
     running = false;
-    log_.info("Module {} stopped", this);
+    log_.info("Module '{}' stopped", this);
 
     // Tell listeners
     fireModuleStopped();
