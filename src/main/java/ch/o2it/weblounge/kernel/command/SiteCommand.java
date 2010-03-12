@@ -135,22 +135,21 @@ public class SiteCommand {
       for (int i=0; i < digits; i++) format.append("#");
       DecimalFormat formatter = new DecimalFormat(format.toString());
       
-      // Print the header
-      StringBuffer header = new StringBuffer();
-      for (int i=0; i < digits; i++)
-        header.append(" ");
-      header.append("Id    ");
-      header.append(" State     ");
-      header.append(" Name ");
-      System.out.println(header.toString());
-      
       // Display the site list
       for (int i=0; i < sites.size(); i++) {
         Site site = sites.get(i);
         StringBuffer buf = new StringBuffer();
         buf.append("[ ").append(formatter.format(i + 1)).append(" ] ");
-        buf.append(site.isRunning() ? "[ started  ] " : "[ stopped  ] ");
+        while (buf.length() < 8)
+          buf.append(" ");
         buf.append(site.getDescription() != null ? site.getDescription() : site.getIdentifier());
+        buf.append(" ");
+        int descriptionLength = buf.length();
+        for (int j=0; j < 64-descriptionLength; j++)
+          buf.append(".");
+        buf.append(site.isRunning() ? " STARTED " : " STOPPED");
+        while (buf.length() < 22)
+          buf.append(" ");
         System.out.println(buf.toString());
       }
     }
@@ -328,14 +327,14 @@ public class SiteCommand {
   }
 
   /**
-   * Callback from the OSGi environment to activate the bundle.
+   * Callback from the OSGi environment to activate the commands.
    * 
    * @param context
    *          the component context
    */
   public void activate(ComponentContext context) {
     BundleContext bundleContext = context.getBundleContext();
-    log_.info("Registering site shell commands");
+    log_.info("Registering site commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
     commands.put(CommandProcessor.COMMAND_SCOPE, "weblounge");
     commands.put(CommandProcessor.COMMAND_FUNCTION, new String[] {
