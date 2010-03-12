@@ -38,6 +38,7 @@
           <instructions>
             <Import-Package>
               ch.o2it.weblounge.common.request,
+              ch.o2it.weblounge.common.site,
               javax.servlet
             </Import-Package>
             <Export-Package>
