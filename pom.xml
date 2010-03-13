@@ -53,6 +53,11 @@
     <!-- thirdparty -->
 
     <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>
@@ -60,6 +65,30 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.jcip</groupId>
+      <artifactId>jcip-annotations</artifactId>
+      <version>1.0</version>
     </dependency>
 
     <dependency>
@@ -72,6 +101,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -89,8 +119,21 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Private-Package>
+              net.jcip.annotations.*,
+              org.apache.commons.*,
+              org.junit.*,
+              org.json.*,
+              ch.o2it.weblounge.test.harness,
+              ch.o2it.weblounge.test.util
+            </Private-Package>
             <Embed-Dependency>
-              json
+              httpclient,
+              httpcore,
+              httpmime,
+              jcip-annotations,
+              json,
+              junit
             </Embed-Dependency>
             <Import-Package>
               ch.o2it.weblounge.common.request,
@@ -99,18 +142,22 @@
               ch.o2it.weblounge.common.impl.request,
               ch.o2it.weblounge.common.impl.scheduler,
               ch.o2it.weblounge.common.impl.site,
+              ch.o2it.weblounge.common.impl.url, 
 			  ch.o2it.weblounge.common.impl.util,
 			  ch.o2it.weblounge.common.impl.util.config,
+              ch.o2it.weblounge.common.impl.util.xml,
               javax.servlet,
               javax.xml.parsers,
               javax.xml.transform,
               javax.xml.transform.dom,
               javax.xml.transform.stream,
+              org.apache.commons.io,
               org.slf4j,
               org.w3c.dom,
 			  org.osgi.service.command,
               org.osgi.service.component,
-			  org.osgi.framework
+			  org.osgi.framework,
+              *;resolution:=optional
             </Import-Package>
             <Service-Component>
               OSGI-INF/site.xml,

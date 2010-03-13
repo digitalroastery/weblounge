@@ -44,9 +44,9 @@ public abstract class IntegrationTestBase implements IntegrationTest {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.test.harness.IntegrationTest#execute()
+   * @see ch.o2it.weblounge.test.harness.IntegrationTest#execute(java.lang.String)
    */
-  public abstract void execute() throws Exception;
+  public abstract void execute(String serverUrl) throws Exception;
 
   /**
    * {@inheritDoc}

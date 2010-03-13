@@ -26,15 +26,18 @@ import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionException;
+import ch.o2it.weblounge.test.util.TestSiteUtils;
 
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -50,9 +53,6 @@ public class GreeterAction extends ActionSupport {
 
   /** Name of the language parameter */
   public static final String LANGUAGE_PARAM = "language";
-
-  /** Name of the properties file that defines the greetings */
-  public static final String GREETING_PROPS = "/greetings.properties";
 
   /** The greetings */
   protected Map<String, String> greetings = new HashMap<String, String>();
@@ -76,20 +76,17 @@ public class GreeterAction extends ActionSupport {
   public void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException {
     super.configure(request, response, flavor);
+    Map<String, String> allGreetings = TestSiteUtils.loadGreetings();
     try {
-      Properties props = new Properties();
-      props.load(GreeterAction.class.getResourceAsStream(GREETING_PROPS));
       String language = RequestUtils.getRequiredParameter(request, LANGUAGE_PARAM);
-      String greeting = props.getProperty(language);
+      String greeting = allGreetings.get(language);
       if (greeting == null)
         // TODO: How do we indicate a 404 instead of 500? Different exceptions?
         // Like this, a json action could not return an empty resultset
         throw new ActionException("Unfortunately, we are not fluent in " + language);
       greetings.put(language, greeting);
     } catch (IllegalStateException e) {
-      throw new ActionException("Language parameter was not specified");
-    } catch (IOException e) {
-      throw new ActionException("Error reading greetings from properties " + GREETING_PROPS);
+      throw new ActionException("Language parameter '" + LANGUAGE_PARAM + "' was not specified");
     }
   }
 
@@ -129,10 +126,13 @@ public class GreeterAction extends ActionSupport {
   public void startJSONResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
     try {
-      JSONObject json = new JSONObject(greetings);
-      response.getOutputStream().print(json.toString());
+      JSONObject json = new JSONObject();
+      json.put("greetings", greetings);
+      IOUtils.copy(new StringReader(json.toString()), response.getOutputStream(), "UTF-8");
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
+    } catch (JSONException e) {
+      throw new ActionException("Unable to create json response", e);
     }
   }
 

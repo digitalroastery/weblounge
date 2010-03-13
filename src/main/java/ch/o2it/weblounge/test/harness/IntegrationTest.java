@@ -28,11 +28,13 @@ public interface IntegrationTest {
   /**
    * Runs the integration test.
    * 
+   * @param serverUrl
+   *          address of the server
    * @throws Exception
    *           if the test fails
    */
-  void execute() throws Exception;
-  
+  void execute(String serverUrl) throws Exception;
+
   /**
    * Returns the name of this test
    * 

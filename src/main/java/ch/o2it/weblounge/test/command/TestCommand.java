@@ -80,7 +80,7 @@ public final class TestCommand {
         IntegrationTest test = null;
         if (test == null) {
           try {
-            test = tests.get(Integer.parseInt(id));
+            test = tests.get(Integer.parseInt(id) - 1);
             List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
             tests.add(test);
             executeAll(tests);
@@ -173,6 +173,7 @@ public final class TestCommand {
       
     // Print the summary
     log_.info(" ");
+    log_.info(" ");
     log_.info("------------------------------------------------------------------------");
     log_.info("Test Summary:");
     log_.info("------------------------------------------------------------------------");
@@ -191,6 +192,7 @@ public final class TestCommand {
       }
       log_.info(buf.toString());
     }
+    log_.info("------------------------------------------------------------------------");
     log_.info("------------------------------------------------------------------------");
     if (failed.size() == 0)
       log_.info("SUCCESS: " + succeeded.size() + " TEST" + (succeeded.size() > 1 ? "S" : "") + " PASSED");
@@ -215,11 +217,11 @@ public final class TestCommand {
     log_.info("Running test '" + test + "'");
     log_.info("------------------------------------------------------------------------");
     try {
-      test.execute();
+      test.execute("http://localhost:8080");
       log_.info("Test '" + test + "' succeeded");
       return true;
-    } catch (Exception e) {
-      log_.warn("Test '" + test + "' failed: {}", e.getMessage(), e);
+    } catch (Throwable t) {
+      log_.warn("Test '" + test + "' failed: {}", t.getMessage(), t);
       return false;
     }
   }

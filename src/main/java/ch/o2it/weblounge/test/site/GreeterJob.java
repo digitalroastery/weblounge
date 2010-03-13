@@ -22,18 +22,15 @@ package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobException;
+import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Map.Entry;
 
 /**
  * Test job that will print a friendly greeting to <code>System.out</code>.
@@ -44,23 +41,11 @@ public class GreeterJob implements Job {
   /** Logging facility */
   protected final static Logger logger = LoggerFactory.getLogger(GreeterJob.class);
 
-  /** Name of the properties file that defines the greetings */
-  public static final String GREETING_PROPS = "greetings.properties";
-
   /** Hello world in many languages */
   protected static Map.Entry<String, String>[] greetings = null;
 
   static {
-    Map<String, String> hellos = new HashMap<String, String>();
-    Properties props = new Properties();
-    try {
-      props.load(GreeterAction.class.getResourceAsStream(GREETING_PROPS));
-      for (Entry<Object, Object> entry : props.entrySet()) {
-        hellos.put((String)entry.getKey(), (String)entry.getValue());
-      }
-    } catch (IOException e) {
-      logger.error("Error loading greetings from {}", GREETING_PROPS, e);
-    }
+    Map<String, String> hellos = TestSiteUtils.loadGreetings();
     greetings = hellos.entrySet().toArray(new Map.Entry[hellos.size()]);
   }
 
