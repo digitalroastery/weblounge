@@ -189,7 +189,7 @@ public final class SiteConfiguration implements Customizable {
     if (siteClass == null)
       siteClass = SiteImpl.class.getCanonicalName();
     description = LanguageSupport.addDescriptions(config, "description", defaultLanguage, null, false);
-    isEnabled = "true".equalsIgnoreCase(XPathHelper.valueOf(config, "enable", false, path));
+    isEnabled = "true".equalsIgnoreCase(XPathHelper.valueOf(config, "enable", path));
   }
 
   /**

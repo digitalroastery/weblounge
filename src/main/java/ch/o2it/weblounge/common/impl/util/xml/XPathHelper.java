@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Utility class to handle and simplify XPath queries.
@@ -39,9 +40,31 @@ public class XPathHelper {
 
   /**
    * Returns the query result or <code>null</code>.
+   * <p>
+   * <b>Note:</b> This signature creates a new <code>XPath</code> processor on
+   * every call, which is probably fine for testing but not favorable when it
+   * comes to production use, since creating an <code>XPath</code> processor is
+   * resource intensive.
+   * 
    * @param node
    *          the context node
    * @param xpath
+   *          the xpath expression
+   * 
+   * @return the selected string or <code>null</code> if the query didn't yield
+   *         a result
+   */
+  public static String valueOf(Node node, String xpathExpression) {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return valueOf(node, xpathExpression, null, xpath);
+  }
+
+  /**
+   * Returns the query result or <code>null</code>.
+   * 
+   * @param node
+   *          the context node
+   * @param xpathExpression
    *          the xpath expression
    * @param processor
    *          the xpath engine
@@ -49,15 +72,40 @@ public class XPathHelper {
    * @return the selected string or <code>null</code> if the query didn't yield
    *         a result
    */
-  public static String valueOf(Node node, String xpath, XPath processor) {
-    return valueOf(node, xpath, true, processor);
+  public static String valueOf(Node node, String xpathExpression, XPath processor) {
+    return valueOf(node, xpathExpression, null, processor);
   }
 
   /**
    * Returns the query result or <code>null</code>.
+   * <p>
+   * <b>Note:</b> This signature creates a new <code>XPath</code> processor on
+   * every call, which is probably fine for testing but not favorable when it
+   * comes to production use, since creating an <code>XPath</code> processor is
+   * resource intensive.
+   * 
    * @param node
    *          the context node
-   * @param xpath
+   * @param xpathExpression
+   *          the xpath expression
+   * @param defaultValue
+   *          the default value
+   * 
+   * @return the selected string or <code>defaultValue</code> if the query
+   *         didn't yield a result
+   */
+  public static String valueOf(Node node, String xpathExpression,
+      String defaultValue) {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return valueOf(node, xpathExpression, defaultValue, xpath);
+  }
+
+  /**
+   * Returns the query result or <code>null</code>.
+   * 
+   * @param node
+   *          the context node
+   * @param xpathExpression
    *          the xpath expression
    * @param defaultValue
    *          the default value
@@ -67,45 +115,55 @@ public class XPathHelper {
    * @return the selected string or <code>defaultValue</code> if the query
    *         didn't yield a result
    */
-  public static String valueOf(Node node, String xpath, String defaultValue,
-      XPath processor) {
-    String value = valueOf(node, xpath, true, processor);
-    return (value != null) ? value : defaultValue;
+  public static String valueOf(Node node, String xpathExpression,
+      String defaultValue, XPath processor) {
+
+    if (node == null || processor == null)
+      return null;
+
+    try {
+      String value = processor.evaluate(xpathExpression, node);
+      return (value != null) ? value : defaultValue;
+    } catch (XPathExpressionException e) {
+      log_.warn("Error when selecting '{}' from {}", new Object[] {
+          xpathExpression,
+          node,
+          e });
+      return null;
+    }
   }
 
   /**
-   * Returns the query result.
+   * Returns the query result as a <code>Node</code> or <code>null</code> if the
+   * xpath expression doesn't yield a resulting node.
+   * <p>
+   * <b>Note:</b> This signature creates a new <code>XPath</code> processor on
+   * every call, which is probably fine for testing but not favorable when it
+   * comes to production use, since creating an <code>XPath</code> processor is
+   * resource intensive.
+   * 
    * @param node
    *          the context node
-   * @param xpath
+   * @param xpathExpression
    *          the xpath expression
-   * @param nullable
-   *          if <code>null</code> should be returned or the empty string in
-   *          case of no search result
-   * @param processor
-   *          the xpath engine
-   * 
-   * @return the selected string or <code>null</code> / "" if the query didn't
-   *         yield a result
+   * @return the selected node
    */
-  public static String valueOf(Node node, String xpath, boolean nullable,
-      XPath processor) {
-    if (node == null || processor == null) {
-      return nullable ? null : "";
-    }
-    try {
-      String value = processor.evaluate(xpath, node);
-      return nullable && value.length() == 0 ? null : value;
-    } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '{}' from {}", new Object[] {xpath, node, e});
-      return nullable ? null : "";
-    }
+  public static Node select(Node node, String xpathExpression) {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return select(node, xpathExpression, xpath);
   }
 
   /**
-   * Returns the query result as a <code>Node</code> or <code>null</code>.
+   * Returns the query result as a <code>Node</code> or <code>null</code> if the
+   * xpath expression doesn't yield a resulting node.
    * 
-   * @return the selected string
+   * @param node
+   *          the context node
+   * @param xpathExpression
+   *          the xpath expression
+   * @param processor
+   *          the xpath processor
+   * @return the selected node
    */
   public static Node select(Node node, String xpath, XPath processor) {
     if (node == null || processor == null) {
@@ -114,15 +172,45 @@ public class XPathHelper {
     try {
       return (Node) processor.evaluate(xpath, node, XPathConstants.NODE);
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '{}' from {}", new Object[] {xpath, node, e});
+      log_.warn("Error when selecting '{}' from {}", new Object[] {
+          xpath,
+          node,
+          e });
       return null;
     }
   }
 
   /**
-   * Returns the query result or <code>null</code>.
+   * Returns the query result as a <code>NodeList</code> or <code>null</code> if
+   * the xpath expression doesn't yield a result set.
+   * <p>
+   * <b>Note:</b> This signature creates a new <code>XPath</code> processor on
+   * every call, which is probably fine for testing but not favorable when it
+   * comes to production use, since creating an <code>XPath</code> processor is
+   * resource intensive.
    * 
-   * @return the selected node list
+   * @param node
+   *          the context node
+   * @param xpathExpression
+   *          the xpath expression
+   * @return the selected node
+   */
+  public static NodeList selectList(Node node, String xpathExpression) {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return selectList(node, xpathExpression, xpath);
+  }
+
+  /**
+   * Returns the query result as a <code>NodeList</code> or <code>null</code> if
+   * the xpath expression doesn't yield a result set.
+   * 
+   * @param node
+   *          the context node
+   * @param xpathExpression
+   *          the xpath expression
+   * @param processor
+   *          the xpath processor
+   * @return the selected node
    */
   public static NodeList selectList(Node node, String xpath, XPath processor) {
     if (node == null || processor == null) {
@@ -131,7 +219,10 @@ public class XPathHelper {
     try {
       return (NodeList) processor.evaluate(xpath, node, XPathConstants.NODESET);
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '{}' from {}", new Object[] {xpath, node, e});
+      log_.warn("Error when selecting '{}' from {}", new Object[] {
+          xpath,
+          node,
+          e });
       return null;
     }
   }
