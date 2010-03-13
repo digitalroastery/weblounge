@@ -194,7 +194,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   protected void service(HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) throws ServletException, IOException {
 
-    log_.info("Serving {}", httpRequest.getRequestURI());
+    log_.debug("Serving {}", httpRequest.getRequestURI());
 
     // Wrap request and response
     WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest);
