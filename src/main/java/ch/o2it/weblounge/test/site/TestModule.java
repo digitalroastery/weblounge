@@ -27,7 +27,7 @@ import ch.o2it.weblounge.common.site.Module;
 /**
  * Test implementation of the {@link Module} interface.
  */
-public class TestModule extends ModuleImpl implements Module {
+public class TestModule extends ModuleImpl {
 
   /**
    * Creates a new test module.

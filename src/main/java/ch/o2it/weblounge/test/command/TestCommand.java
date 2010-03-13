@@ -78,19 +78,17 @@ public final class TestCommand {
 
         // Look up the test
         IntegrationTest test = null;
-        if (test == null) {
-          try {
-            test = tests.get(Integer.parseInt(id) - 1);
-            List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
-            tests.add(test);
-            executeAll(tests);
-          } catch (NumberFormatException e) {
-            System.out.println("Unknown test: " + id);
-            return;
-          } catch (IndexOutOfBoundsException e) {
-            System.out.println("Unknown test: " + id + " Please choose between [1.." + tests.size() + "]");
-            return;
-          }
+        try {
+          test = tests.get(Integer.parseInt(id) - 1);
+          List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+          tests.add(test);
+          executeAll(tests);
+        } catch (NumberFormatException e) {
+          System.out.println("Unknown test: " + id);
+          return;
+        } catch (IndexOutOfBoundsException e) {
+          System.out.println("Unknown test: " + id + " Please choose between [1.." + tests.size() + "]");
+          return;
         }
       }
     } else {
@@ -186,9 +184,9 @@ public final class TestCommand {
           buf.append(".");
         buf.append(" SUCCESS");
       } else {
-        for (int i = 0; i < 65 - testNameLenght; i++)
+        for (int i = 0; i < 64 - testNameLenght; i++)
           buf.append(".");
-        buf.append(" FAILED");
+        buf.append(" FAILURE");
       }
       log_.info(buf.toString());
     }
