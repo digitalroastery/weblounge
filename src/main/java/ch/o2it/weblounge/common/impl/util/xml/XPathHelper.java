@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.util.xml;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -122,7 +123,7 @@ public class XPathHelper {
       return null;
 
     try {
-      String value = processor.evaluate(xpathExpression, node);
+      String value = StringUtils.trimToNull(processor.evaluate(xpathExpression, node));
       return (value != null) ? value : defaultValue;
     } catch (XPathExpressionException e) {
       log_.warn("Error when selecting '{}' from {}", new Object[] {

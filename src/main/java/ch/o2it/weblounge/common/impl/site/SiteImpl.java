@@ -726,7 +726,7 @@ public class SiteImpl implements Site {
 
     // Finally, mark this site as running
     running = true;
-    log_.info("Site {} started", this);
+    log_.info("Site '{}' started", this);
 
     // Tell listeners
     fireSiteStarted();
@@ -738,7 +738,7 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#stop()
    */
   public synchronized void stop() throws IllegalStateException {
-    log_.debug("Stopping site {}", this);
+    log_.debug("Stopping site '{}'", this);
     if (!running)
       throw new IllegalStateException("Site is not running");
 
@@ -763,7 +763,7 @@ public class SiteImpl implements Site {
 
     // Finally, mark this site as stopped
     running = false;
-    log_.info("Site {} stopped", this);
+    log_.info("Site '{}' stopped", this);
 
     // Tell listeners
     fireSiteStopped();
@@ -1007,14 +1007,14 @@ public class SiteImpl implements Site {
       setIdentifier(identifier);
     }
 
-    log_.debug("Initializing site {}", this);
+    log_.debug("Initializing site '{}'", this);
     log_.debug("Signing up for a job scheduling services");
 
     // Connect to the
     schedulingServiceTracker = new SchedulingServiceTracker(bundleContext, this);
     schedulingServiceTracker.open();
 
-    log_.info("Site {} initialized", this);
+    log_.info("Site '{}' initialized", this);
   }
 
   /**
@@ -1031,10 +1031,10 @@ public class SiteImpl implements Site {
   public void deactivate(ComponentContext context) throws Exception {
     try {
       isShutdownInProgress = true;
-      log_.debug("Taking down site {}", this);
+      log_.debug("Taking down site '{}'", this);
       log_.debug("Stopped looking for a job scheduling services");
       schedulingServiceTracker.close();
-      log_.info("Site {} deactivated", this);
+      log_.info("Site '{}' deactivated", this);
     } finally {
       isShutdownInProgress = false;
     }
