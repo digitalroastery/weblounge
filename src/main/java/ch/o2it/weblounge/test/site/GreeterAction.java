@@ -101,6 +101,7 @@ public class GreeterAction extends ActionSupport {
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       Document doc = docBuilder.newDocument();
+      doc.setXmlStandalone(true);
       Element root = doc.createElement("greetings");
       doc.appendChild(root);
       for (Map.Entry<String, String> greeting : greetings.entrySet()) {

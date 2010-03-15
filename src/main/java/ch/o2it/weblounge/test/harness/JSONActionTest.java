@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Integration test to test JSON action output.
@@ -55,27 +56,30 @@ public class JSONActionTest extends IntegrationTestBase {
    * @see ch.o2it.weblounge.test.harness.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
-    logger.info("Preparing test of greeter action's json output");
+    logger.info("Preparing test of greeter action");
 
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();
-    String language = "english";
-    String greeting = greetings.get(language);
+    Set<String> languages = greetings.keySet();
 
     // Prepare the request
-    HttpGet request = new HttpGet(UrlSupport.concat(serverUrl, "greeting/json"));
-    String[][] params = new String[][] {{"language", language}};
-
-    // Send and the request and examine the response
-    logger.info("Sending request to {}", request.getURI());
-    HttpClient httpClient = new DefaultHttpClient();
-    try {
-      HttpResponse response = TestSiteUtils.request(httpClient, request, params);
-      Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-      JSONObject json = TestSiteUtils.parseJSONResponse(response);
-      Assert.assertEquals(greeting, json.getJSONObject("greetings").getString(language));    
-    } finally {
-      httpClient.getConnectionManager().shutdown();
+    logger.info("Testing greeter action's json output");
+    for (String language : languages) {
+      String greeting = greetings.get(language);
+      HttpGet request = new HttpGet(UrlSupport.concat(serverUrl, "greeting/json"));
+      String[][] params = new String[][] {{"language", language}};
+  
+      // Send and the request and examine the response
+      logger.debug("Sending request to {}", request.getURI());
+      HttpClient httpClient = new DefaultHttpClient();
+      try {
+        HttpResponse response = TestSiteUtils.request(httpClient, request, params);
+        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+        JSONObject json = TestSiteUtils.parseJSONResponse(response);
+        Assert.assertEquals(greeting, json.getJSONObject("greetings").getString(language));    
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
     }
   }
   
