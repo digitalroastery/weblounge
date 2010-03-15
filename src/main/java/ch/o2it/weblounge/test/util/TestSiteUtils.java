@@ -22,7 +22,6 @@ package ch.o2it.weblounge.test.util;
 
 import ch.o2it.weblounge.test.site.GreeterAction;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -126,11 +125,10 @@ public class TestSiteUtils {
    */
   public static Document parseXMLResponse(HttpResponse response)
       throws Exception {
-    String responseXml = EntityUtils.toString(response.getEntity());
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
     DocumentBuilder builder = factory.newDocumentBuilder();
-    return builder.parse(IOUtils.toInputStream(responseXml));
+    return builder.parse(response.getEntity().getContent());
   }
 
   /**
