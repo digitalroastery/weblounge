@@ -149,18 +149,15 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     Action action = null;
     try {
       action = getActionForUrl(url);
+      if (action == null) {
+        log_.debug("No action found to handle {}", url);
+        return false;
+      }
     } catch (Exception e) {
       try {
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      } catch (IOException e2) { /* never mind */
-      }
+      } catch (IOException e2) { /* never mind */ }
       return true;
-    }
-
-    // Are we responsible?
-    if (action == null) {
-      log_.debug("No action found to handle {}", url);
-      return false;
     }
 
     // Check the request method. We won't handle just everything
