@@ -243,9 +243,12 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getFlavor()
    */
   public RequestFlavor getFlavor() {
+    RequestFlavor flavor = null;
     if (url != null)
-      return url.getFlavor();
-    return getUrl().getFlavor();
+      flavor = url.getFlavor();
+    else
+      flavor = getUrl().getFlavor();
+    return flavor != null ? flavor : RequestFlavor.HTML;
   }
 
   /**

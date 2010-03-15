@@ -36,6 +36,9 @@ public final class ActionPool extends GenericObjectPool {
   
   /** The action name */
   private String actionName = null;
+  
+  /** The last reported limit */
+  private int reportedLimit = 0;
 
   /**
    * Creates a new pool which will manage {@link Action} instances that are
@@ -51,6 +54,7 @@ public final class ActionPool extends GenericObjectPool {
     setFactory(new ActionPoolFactory(action));
     setTestOnBorrow(false);
     setTestOnReturn(false);
+    setMaxActive(-1);
   }
 
   /**
@@ -62,10 +66,19 @@ public final class ActionPool extends GenericObjectPool {
   public Object borrowObject() throws Exception {
     Action action = (Action) super.borrowObject();
     log_.debug("Received request to borrow action '{}', {} remaining", action.getIdentifier(), this.getNumIdle());
-    log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
-        action.getIdentifier(),
-        this.getNumActive(),
-        this.getNumIdle() });
+
+    if (getNumActive() > reportedLimit + 10) {
+      reportedLimit += 10;
+      log_.info("Action pool '{}' grew above {}", new Object[] {
+          action,
+          reportedLimit }
+      );
+    } else {
+      log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
+          action,
+          this.getNumActive(),
+          this.getNumIdle() });
+    }
     return action;
   }
 
@@ -82,6 +95,18 @@ public final class ActionPool extends GenericObjectPool {
         action.getIdentifier(),
         this.getNumActive(),
         this.getNumIdle() });
+    if (getNumActive() < reportedLimit - 10) {
+      reportedLimit -= 10;
+      log_.info("Action pool '{}' dropped below {}", new Object[] {
+          action,
+          reportedLimit }
+      );
+    } else {
+      log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
+          action,
+          this.getNumActive(),
+          this.getNumIdle() });
+    }
     super.returnObject(obj);
   }
 
