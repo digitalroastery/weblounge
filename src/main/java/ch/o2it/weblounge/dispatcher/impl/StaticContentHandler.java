@@ -210,7 +210,7 @@ public class StaticContentHandler implements RequestHandler, Times {
           return false;
         try {
           log.trace("Handling request {}", request.getUrl());
-          DispatchSupport.forward(request, response, pathInfo);
+          DispatchUtils.forward(request, response, pathInfo);
         } catch (Exception e) {
           if (e instanceof JasperException && ((JasperException) e).getRootCause() != null) {
             String msg = "Error while dispatching static request to " + pathInfo + ": ";

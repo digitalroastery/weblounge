@@ -206,11 +206,11 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // See if a site dispatcher was found, and if so, if it's enabled
     if (site == null) {
       log_.warn("No dispatcher found for {}", request);
-      DispatchSupport.sendUrlNotFound("Not found", request, response);
+      DispatchUtils.sendNotFound("Not found", request, response);
       return;
     } else if (!site.isRunning()) {
       log_.warn("Dispatcher for site {} is temporarily not available", site);
-      DispatchSupport.sendServiceUnavailable("Site is temporarily unavailable", request, response);
+      DispatchUtils.sendServiceUnavailable("Site is temporarily unavailable", request, response);
       return;
     }
 
@@ -259,7 +259,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
             params,
             t.getMessage(),
             t });
-        DispatchSupport.sendInternalError(t.getMessage(), request, response);
+        DispatchUtils.sendInternalError(t.getMessage(), request, response);
       } finally {
         log_.debug("Finished processing of {}", httpRequest.getRequestURI());
       }

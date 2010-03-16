@@ -146,97 +146,101 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     Mode processingMode = Mode.Default;
 
     // Try to get hold of an action handler
+    ActionPool pool = null;
     Action action = null;
     try {
-      action = getActionForUrl(url);
+      pool = getActionForUrl(url);
+      action = (Action)pool.borrowObject();
       if (action == null) {
         log_.debug("No action found to handle {}", url);
         return false;
       }
     } catch (Exception e) {
-      try {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      } catch (IOException e2) { /* never mind */ }
+      DispatchUtils.sendInternalError(request, response);
       return true;
     }
 
-    // Check the request method. We won't handle just everything
-    String requestMethod = request.getMethod();
-    if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
-      log_.debug("Actions are not supposed to handle {} requests", requestMethod);
-      try {
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-      } catch (IOException e) { /* never mind */
-      }
-      return true;
-    }
-
-    // Is the requested content flavor supported?
-    if (!action.supportsFlavor(contentFlavor)) {
-      log_.warn("Content flavor {} is not supported by action {}", contentFlavor, action);
-      try {
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-      } catch (IOException e) { /* never mind */
-      }
-      return true;
-    }
-
-    // Check if the page is already part of the cache. If so, our task is
-    // already done!
-    if (request.getVersion() == Page.LIVE) {
-      long validTime = Renderer.DEFAULT_VALID_TIME;
-      long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
-
-      // Create the set of tags that identify the request output
-      CacheTagSet cacheTags = createCacheTags(request, action);
-
-      // Check if the page is already part of the cache
-      if (response.startResponse(cacheTags, validTime, recheckTime)) {
-        log_.debug("Page handler answered request for {} from cache", request.getUrl());
+    // Make sure to return the action no matter what
+    try {
+    
+      // Check the request method. We won't handle just everything
+      String requestMethod = request.getMethod();
+      if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
+        log_.debug("Actions are not supposed to handle {} requests", requestMethod);
+        DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
         return true;
       }
+  
+      // Is the requested content flavor supported?
+      if (!action.supportsFlavor(contentFlavor)) {
+        log_.warn("Content flavor {} is not supported by action {}", contentFlavor, action);
+        DispatchUtils.sendNotFound(request, response);
+        return true;
+      }
+  
+      // Check if the page is already part of the cache. If so, our task is
+      // already done!
+      if (request.getVersion() == Page.LIVE) {
+        long validTime = Renderer.DEFAULT_VALID_TIME;
+        long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
+  
+        // Create the set of tags that identify the request output
+        CacheTagSet cacheTags = createCacheTags(request, action);
+  
+        // Check if the page is already part of the cache
+        if (response.startResponse(cacheTags, validTime, recheckTime)) {
+          log_.debug("Page handler answered request for {} from cache", request.getUrl());
+          return true;
+        }
+  
+        processingMode = Mode.Cached;
+      } else if (Http11Constants.METHOD_HEAD.equals(request.getMethod())) {
+        // handle HEAD requests
+        Http11Utils.startHeadResponse(response);
+        processingMode = Mode.Head;
+      } else if (request.getVersion() == Page.WORK) {
+        response.setHeader("Expires", "0");
+        response.setHeader("Last-Modified", WebloungeDateFormat.formatStatic(new Date()));
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
+        response.setHeader("Pragma", "no-cache");
+      }
+  
+      log_.debug("Action handler {} will handle {}", action, url);
+  
+      // Call the service method depending on the flavor
+      switch (contentFlavor) {
+        case HTML:
+          serveHTML(action, request, response);
+          break;
+        case XML:
+          serveXML(action, request, response);
+          break;
+        case JSON:
+          serveJSON(action, request, response);
+          break;
+      }
+  
+      // Finish cache handling
+      switch (processingMode) {
+        case Cached:
+          response.endResponsePart();
+          break;
+        case Head:
+          Http11Utils.endHeadResponse(response);
+          break;
+        default:
+          break;
+      }
 
-      processingMode = Mode.Cached;
-    } else if (Http11Constants.METHOD_HEAD.equals(request.getMethod())) {
-      // handle HEAD requests
-      Http11Utils.startHeadResponse(response);
-      processingMode = Mode.Head;
-    } else if (request.getVersion() == Page.WORK) {
-      response.setHeader("Expires", "0");
-      response.setHeader("Last-Modified", WebloungeDateFormat.formatStatic(new Date()));
-      response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
-      response.setHeader("Pragma", "no-cache");
+    // Return the action
+    } finally {
+      try {
+        //action.passivate();
+        pool.returnObject(action);
+      } catch (Exception e) {
+        log_.error("Error returning action {} to pool: {}", new Object[] {action, e.getMessage(), e});
+      }
     }
-
-    log_.debug("Action handler {} will handle {}", action, url);
-
-    // Call the service method depending on the flavor
-    switch (contentFlavor) {
-      case HTML:
-        serveHTML(action, request, response);
-        break;
-      case XML:
-        serveXML(action, request, response);
-        break;
-      case JSON:
-        serveJSON(action, request, response);
-        break;
-    }
-
-    // Finish cache handling
-    switch (processingMode) {
-      case Cached:
-        response.endResponsePart();
-        break;
-      case Head:
-        Http11Utils.endHeadResponse(response);
-        break;
-      default:
-        break;
-    }
-
-    // TODO: Return action to pool
-    action.passivate();
 
     return true;
   }
@@ -435,7 +439,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    *          the url
    * @return the handler
    */
-  protected Action getActionForUrl(WebUrl url) throws Exception {
+  protected ActionPool getActionForUrl(WebUrl url) {
     ActionPool actionPool = urlCache.get(url);
 
     // Nothing is in the cache, let's see if this is simply the first time
@@ -461,7 +465,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // Get an action worker and return it
     // TODO: Instantiate the action
 
-    return (Action) actionPool.borrowObject();
+    return actionPool;
   }
 
   /**

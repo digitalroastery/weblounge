@@ -37,14 +37,14 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Utility class for error reporting using <code>HttpServletResponse</code>.
  */
-public class DispatchSupport {
+public class DispatchUtils {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(DispatchSupport.class);
+  private final static Logger log_ = LoggerFactory.getLogger(DispatchUtils.class);
 
   /** List of dispatcher listeners */
   private final static List<DispatchListener> dispatcher = new ArrayList<DispatchListener>();
-  
+
   /** The static content handler */
   private final static StaticContentHandler staticContentHandler = StaticContentHandler.getInstance();
 
@@ -156,6 +156,20 @@ public class DispatchSupport {
    * Sends a <code>500 - Internal server error</code> message back to the
    * client.
    * 
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendInternalError(WebloungeRequest request,
+      WebloungeResponse response) {
+    sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, null, request, response);
+  }
+
+  /**
+   * Sends a <code>500 - Internal server error</code> message back to the
+   * client.
+   * 
    * @param msg
    *          the error message
    * @param request
@@ -166,6 +180,20 @@ public class DispatchSupport {
   public static void sendInternalError(String msg, WebloungeRequest request,
       WebloungeResponse response) {
     sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg, request, response);
+  }
+
+  /**
+   * Sends a <code>503 - Service Unavailable error</code> message back to the
+   * client.
+   * 
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendServiceUnavailable(WebloungeRequest request,
+      WebloungeResponse response) {
+    sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, null, request, response);
   }
 
   /**
@@ -187,6 +215,19 @@ public class DispatchSupport {
   /**
    * Sends a <code>404 - Url not found</code> message back to the client.
    * 
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendNotFound(WebloungeRequest request,
+      WebloungeResponse response) {
+    sendError(HttpServletResponse.SC_NOT_FOUND, null, request, response);
+  }
+
+  /**
+   * Sends a <code>404 - Url not found</code> message back to the client.
+   * 
    * @param msg
    *          the error message
    * @param request
@@ -194,9 +235,22 @@ public class DispatchSupport {
    * @param response
    *          the response object
    */
-  public static void sendUrlNotFound(String msg, WebloungeRequest request,
+  public static void sendNotFound(String msg, WebloungeRequest request,
       WebloungeResponse response) {
     sendError(HttpServletResponse.SC_NOT_FOUND, msg, request, response);
+  }
+
+  /**
+   * Sends a <code>403 - Forbidden</code> message back to the client.
+   * 
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendAccessDenied(WebloungeRequest request,
+      WebloungeResponse response) {
+    sendError(HttpServletResponse.SC_FORBIDDEN, null, request, response);
   }
 
   /**
@@ -212,6 +266,24 @@ public class DispatchSupport {
   public static void sendAccessDenied(String msg, WebloungeRequest request,
       WebloungeResponse response) {
     sendError(HttpServletResponse.SC_FORBIDDEN, msg, request, response);
+  }
+
+  /**
+   * Sends an error message with code <code>status</code> and the according
+   * error message as the http response.
+   * 
+   * @param status
+   *          the http status code
+   * @param msg
+   *          the error message
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendError(int status, WebloungeRequest request,
+      WebloungeResponse response) {
+    sendError(status, null, request, response);
   }
 
   /**
