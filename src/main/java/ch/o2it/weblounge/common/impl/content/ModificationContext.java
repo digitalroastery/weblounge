@@ -226,7 +226,7 @@ public class ModificationContext implements Cloneable {
   public static ModificationContext fromXml(Node context, XPath xpath)
       throws IllegalStateException {
 
-    Node contextRoot = XPathHelper.select(context, "//modified", xpath);
+    Node contextRoot = XPathHelper.select(context, "/modified", xpath);
     if (contextRoot == null)
       return null;
 

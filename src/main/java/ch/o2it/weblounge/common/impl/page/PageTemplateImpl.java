@@ -227,13 +227,13 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     LanguageSupport.addDescriptions(node, "name", null, template.name, false);
 
     // scripts
-    NodeList scripts = XPathHelper.selectList(node, "//includes/script", xpath);
+    NodeList scripts = XPathHelper.selectList(node, "includes/script", xpath);
     for (int i = 0; i < scripts.getLength(); i++) {
       template.addInclude(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
-    NodeList includes = XPathHelper.selectList(node, "//includes/link", xpath);
+    NodeList includes = XPathHelper.selectList(node, "includes/link", xpath);
     for (int i = 0; i < includes.getLength(); i++) {
       template.addInclude(LinkImpl.fromXml(includes.item(i)));
     }

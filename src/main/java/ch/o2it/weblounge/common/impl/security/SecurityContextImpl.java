@@ -400,7 +400,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
     permissions_ = null;
 
     // Read permissions
-    NodeList permissions = XPathHelper.selectList(context, "//security/permission", path);
+    NodeList permissions = XPathHelper.selectList(context, "/security/permission", path);
     for (int i = 0; i < permissions.getLength(); i++) {
       Node p = permissions.item(i);
       String id = XPathHelper.valueOf(p, "@id", path);

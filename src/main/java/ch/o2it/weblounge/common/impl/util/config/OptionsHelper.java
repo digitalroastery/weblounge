@@ -191,7 +191,8 @@ public final class OptionsHelper implements Customizable {
 
   /**
    * Initializes the options from an XML node that was generated using
-   * {@link #toXml()}.
+   * {@link #toXml()}. This method expects a <code>&lt;properties&gt;</code>
+   * node as the input to <code>config</code>.
    * 
    * @param config
    *          the options node
@@ -207,7 +208,7 @@ public final class OptionsHelper implements Customizable {
     OptionsHelper configurationBase = new OptionsHelper();
 
     // Read the options
-    NodeList nodes = XPathHelper.selectList(config, "//options/option", xpathProcessor);
+    NodeList nodes = XPathHelper.selectList(config, "option", xpathProcessor);
     for (int i = 0; i < nodes.getLength(); i++) {
       Node option = nodes.item(i);
       String name = XPathHelper.valueOf(option, "name", xpathProcessor);

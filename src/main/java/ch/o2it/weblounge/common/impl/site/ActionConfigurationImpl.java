@@ -450,7 +450,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
       String language = XPathHelper.valueOf(localiziation, "@language", xpathProcessor);
       if (language == null)
         throw new IllegalStateException("Found action name without language");
-      String name = XPathHelper.valueOf(localiziation, "//name", xpathProcessor);
+      String name = XPathHelper.valueOf(localiziation, "text()", xpathProcessor);
       if (name == null)
         throw new IllegalStateException("Found empty action name");
       action.setName(name, LanguageSupport.getLanguage(language));
@@ -461,7 +461,8 @@ public class ActionConfigurationImpl implements ActionConfiguration {
     action.addFlavor(RequestFlavor.HTML);
     
     // options
-    action.options = OptionsHelper.fromXml(config, xpathProcessor);
+    Node optionsNode = XPathHelper.select(config, "options", xpathProcessor);
+    action.options = OptionsHelper.fromXml(optionsNode, xpathProcessor);
 
     return action;
   }

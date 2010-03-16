@@ -285,19 +285,19 @@ public class PublishingContext implements Cloneable {
       throws IllegalStateException {
 
     // Look up the root node
-    Node contextRoot = XPathHelper.select(context, "//published", xpathProcessor);
+    Node contextRoot = XPathHelper.select(context, "/published", xpathProcessor);
     if (contextRoot == null)
       return null;
 
     PublishingContext ctx = new PublishingContext();
 
     // Publisher
-    Node publisher = XPathHelper.select(contextRoot, "//published/user", xpathProcessor);
+    Node publisher = XPathHelper.select(contextRoot, "/published/user", xpathProcessor);
     if (publisher != null)
       ctx.setPublisher(UserImpl.fromXml(publisher, xpathProcessor));
 
     // Start date
-    String startDate = XPathHelper.valueOf(contextRoot, "//published/from", xpathProcessor);
+    String startDate = XPathHelper.valueOf(contextRoot, "/published/from", xpathProcessor);
     if (startDate != null) {
       try {
         ctx.setPublishFrom(WebloungeDateFormat.parseStatic(startDate));
@@ -307,7 +307,7 @@ public class PublishingContext implements Cloneable {
     }
 
     // End date
-    String endDate = XPathHelper.valueOf(contextRoot, "//published/to", xpathProcessor);
+    String endDate = XPathHelper.valueOf(contextRoot, "/published/to", xpathProcessor);
     if (endDate != null) {
       try {
         ctx.setPublishTo(WebloungeDateFormat.parseStatic(endDate));

@@ -244,7 +244,7 @@ public final class QuartzJob {
   public static QuartzJob fromXml(Node config, XPath xPathProcessor)
       throws IllegalStateException {
 
-    Node contextRoot = XPathHelper.select(config, "//job", xPathProcessor);
+    Node contextRoot = XPathHelper.select(config, "/job", xPathProcessor);
     if (contextRoot == null)
       return null;
 

@@ -181,19 +181,19 @@ public class CreationContext implements Cloneable {
   public static CreationContext fromXml(Node context, XPath xpathProcessor)
       throws IllegalStateException {
 
-    Node contextRoot = XPathHelper.select(context, "//created", xpathProcessor);
+    Node contextRoot = XPathHelper.select(context, "/created", xpathProcessor);
     if (contextRoot == null)
       return null;
 
     CreationContext ctx = new CreationContext();
 
     // Creator
-    Node creator = XPathHelper.select(contextRoot, "//created/user", xpathProcessor);
+    Node creator = XPathHelper.select(contextRoot, "/created/user", xpathProcessor);
     if (creator != null)
       ctx.setCreator(UserImpl.fromXml(creator, xpathProcessor));
 
     // Creation date
-    String date = XPathHelper.valueOf(contextRoot, "//created/date", xpathProcessor);
+    String date = XPathHelper.valueOf(contextRoot, "/created/date", xpathProcessor);
     if (date != null)
       try {
         ctx.setCreationDate(WebloungeDateFormat.parseStatic(date));

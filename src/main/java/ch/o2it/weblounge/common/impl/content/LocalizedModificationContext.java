@@ -441,7 +441,7 @@ public class LocalizedModificationContext extends LocalizableObject implements C
    */
   public static LocalizedModificationContext fromXml(Node context, XPath xpath)
       throws IllegalStateException {
-    NodeList locales = XPathHelper.selectList(context, "//locale", xpath);
+    NodeList locales = XPathHelper.selectList(context, "locale", xpath);
     if (locales == null)
       return null;
 
