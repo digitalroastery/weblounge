@@ -116,9 +116,9 @@ public interface Action extends Composeable, Customizable {
       RequestFlavor flavor) throws ActionException;
 
   /**
-   * This method is called by the request handler page and gives the action the
-   * possibility to either completely take control over what is returned to the
-   * user or to have the template render the page. This is also the perfect
+   * This method is called by the action request handler and gives the action
+   * the possibility to either completely take control over what is returned to
+   * the user or to have the template render the page. This is also the perfect
    * place to write <code>HTTP</code> headers to the response.
    * <p>
    * However, there are a few callbacks that are performed by the resulting page
@@ -145,25 +145,53 @@ public interface Action extends Composeable, Customizable {
    *         depending on whether the action wants to continue rendering the
    *         page or have the template do the rendering.
    */
-  int startResponse(WebloungeRequest request, WebloungeResponse response)
+  int startHTMLResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
   /**
-   * TODO: Comment me!
+   * This method is called by the {@link ActionRequestHandler} if and only if
+   * <ol>
+   * <li>the action supports the {@link RequestFlavor#XML} request flavor</li>
+   * <li>the user specifies that same flavor in his request</li>
+   * <li>the action returns {@link #EVAL_REQUEST} upon the preceding call to
+   * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}</li>
+   * </ol>
+   * <p>
+   * Implementers should use this method to set all relevant <code>HTTP</code>
+   * headers (other than <code>Content-Type", "text/xml; charset=utf-8</code>,
+   * which is set by the request handler itself) and write the <code>XML</code>
+   * data to the response.
    * 
    * @param request
+   *          the servlet request
    * @param response
+   *          the servlet response
    * @throws ActionException
+   *           if generating the <code>XML</code> response results in an error
    */
   void startXMLResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
   /**
-   * TODO: Comment me!
+   * This method is called by the {@link ActionRequestHandler} if and only if
+   * <ol>
+   * <li>the action supports the {@link RequestFlavor#JSON} request flavor</li>
+   * <li>the user specifies that same flavor in his request</li>
+   * <li>the action returns {@link #EVAL_REQUEST} upon the preceding call to
+   * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}</li>
+   * </ol>
+   * <p>
+   * Implementers should use this method to set all relevant <code>HTTP</code>
+   * headers (other than <code>Content-Type", "text/json; charset=utf-8</code>,
+   * which is set by the request handler itself) and write the <code>JSON</code>
+   * data to the response.
    * 
    * @param request
+   *          the servlet request
    * @param response
+   *          the servlet response
    * @throws ActionException
+   *           if generating the <code>JSON</code> response results in an error
    */
   void startJSONResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
@@ -172,7 +200,10 @@ public interface Action extends Composeable, Customizable {
    * This method is called by the target page and gives the action the
    * possibility to either replace the includes in the page header, add more
    * includes to the existing ones or have the page handle the includes.
-   * 
+   * <p>
+   * Note that this callback relies on the existence of the corresponding
+   * tag in the <code>&lt;head&gt;</code> section of the page template.
+   * <p>
    * Implementing classes may return one out of two values:
    * <ul>
    * <li><code>EVAL_INCLUDES</code> to have the page handle the includes</li>
@@ -193,7 +224,7 @@ public interface Action extends Composeable, Customizable {
    *          the servlet response
    * @return either <code>EVAL_INCLUDES</code> or <code>SKIP_INCLUDES</code>
    */
-  int startIncludes(WebloungeRequest request, WebloungeResponse response)
+  int startPageIncludes(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
   /**
