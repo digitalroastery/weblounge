@@ -334,7 +334,7 @@ public class SiteCommand {
    */
   public void activate(ComponentContext context) {
     BundleContext bundleContext = context.getBundleContext();
-    log_.info("Registering site commands");
+    log_.debug("Registering site commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
     commands.put(CommandProcessor.COMMAND_SCOPE, "weblounge");
     commands.put(CommandProcessor.COMMAND_FUNCTION, new String[] {
