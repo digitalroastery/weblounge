@@ -114,7 +114,7 @@ public class ActionSupport extends AbstractAction {
    * @see ch.o2it.weblounge.api.module.ActionHandler#startPage(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse)
    */
-  public int startResponse(WebloungeRequest request, WebloungeResponse response)
+  public int startHTMLResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
     return EVAL_REQUEST;
   }
@@ -162,7 +162,7 @@ public class ActionSupport extends AbstractAction {
    *          the servlet response
    * @return either <code>EVAL_INCLUDES</code> or <code>SKIP_INCLUDES</code>
    */
-  public int startIncludes(WebloungeRequest request, WebloungeResponse response)
+  public int startPageIncludes(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
     return EVAL_INCLUDES;
   }

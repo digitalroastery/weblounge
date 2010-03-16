@@ -73,7 +73,7 @@ public abstract class AbstractAjaxAction extends ActionSupport {
    * @see ch.o2it.weblounge.common.site.Action.module.ActionHandler#startPage(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse)
    */
-  public final int startResponse(WebloungeRequest request,
+  public final int startHTMLResponse(WebloungeRequest request,
       WebloungeResponse response) throws ActionException {
     response.setHeader("Content-Type", "text/json; charset=utf-8");
     startAjaxResponse(request, response);

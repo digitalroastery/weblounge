@@ -134,9 +134,9 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.Action#startResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   * @see ch.o2it.weblounge.common.site.Action#startHTMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
    */
-  public int startResponse(WebloungeRequest request, WebloungeResponse response)
+  public int startHTMLResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
     return EVAL_REQUEST;
   }
