@@ -77,7 +77,7 @@ public class XMLActionTest extends IntegrationTestBase {
         HttpResponse response = TestSiteUtils.request(httpClient, request, params);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         Document xml = TestSiteUtils.parseXMLResponse(response);
-        String xpath = "//greeting[@language=\"" + language + "\"]/text()";
+        String xpath = "/greetings/greeting[@language=\"" + language + "\"]/text()";
         Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));    
       } finally {
         httpClient.getConnectionManager().shutdown();
