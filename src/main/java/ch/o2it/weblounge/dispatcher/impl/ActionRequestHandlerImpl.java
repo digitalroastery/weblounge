@@ -160,7 +160,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       return true;
     }
 
-    // Make sure to return the action no matter what
+    // Make sure the action is returned to the pool no matter what
     try {
     
       // Check the request method. We won't handle just everything
@@ -189,7 +189,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   
         // Check if the page is already part of the cache
         if (response.startResponse(cacheTags, validTime, recheckTime)) {
-          log_.debug("Page handler answered request for {} from cache", request.getUrl());
+          log_.debug("Action handler answered request for {} from cache", request.getUrl());
           return true;
         }
   
@@ -223,7 +223,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // Finish cache handling
       switch (processingMode) {
         case Cached:
-          response.endResponsePart();
+          response.endResponse();
           break;
         case Head:
           Http11Utils.endHeadResponse(response);
@@ -270,11 +270,12 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // or the request
       if (page == null) {
         log_.error("No page available to serve action {}", action);
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        DispatchUtils.sendNotFound(request, response);
         return;
       }
     } catch (IOException e) {
       log_.error("Error loading target page for action {} at {}", action, url);
+      DispatchUtils.sendInternalError(request, response);
       return;
     }
 
@@ -284,31 +285,28 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       template = getPageTemplate(page, request);
     } catch (IllegalStateException e) {
       log_.warn(e.getMessage());
-      try {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      } catch (IOException e1) { /* never mind */
-      }
+      DispatchUtils.sendInternalError(request, response);
     }
 
     // Finally, let's get some work done!
     try {
-      log_.debug("Action handler {} will handle {}", action, url);
       request.setAttribute(WebloungeRequest.REQUEST_ACTION, action);
       request.setAttribute(WebloungeRequest.REQUEST_PAGE, page);
+
+      // Prepare the action
       action.setTemplate(template);
       action.setPage(page);
       action.configure(request, response, RequestFlavor.HTML);
+      
+      // Have the content delivered
       response.setHeader("Content-Type", "text/html; charset=utf-8");
-      if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
+      if (action.startHTMLResponse(request, response) == Action.EVAL_REQUEST) {
         PageRequestHandlerImpl.getInstance().service(request, response);
       }
     } catch (Throwable e) {
       log_.error("Error processing action '{}' for {}", action, request.getUrl());
       log_.error(e.getMessage(), e);
-      try {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      } catch (IOException e1) { /* never mind */
-      }
+      DispatchUtils.sendInternalError(request, response);
     } finally {
       request.removeAttribute(WebloungeRequest.REQUEST_ACTION);
       request.removeAttribute(WebloungeRequest.REQUEST_PAGE);
