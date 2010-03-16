@@ -139,6 +139,11 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
   public void activateObject(Object obj) throws Exception {
     Action action = (Action) obj;
     log_.debug("Activating action '{}'", action.getIdentifier());
+    try {
+      action.passivate();
+    } catch (Throwable t) {
+      log_.error("Error destroying action: {}", t.getMessage(), t);
+    }
     super.activateObject(obj);
   }
 

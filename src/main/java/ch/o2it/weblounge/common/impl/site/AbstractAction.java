@@ -678,6 +678,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    * @see ch.o2it.weblounge.common.site.Action#activate()
    */
   public void activate() {
+    log_.trace("Activating action {}", this);
   }
 
   /**
@@ -686,6 +687,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    * @see ch.o2it.weblounge.common.site.Action#passivate()
    */
   public void passivate() {
+    log_.trace("Passivating action {}", this);
     flavor = null;
     files = null;
     includeCount = 0;
