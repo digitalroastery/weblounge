@@ -232,7 +232,7 @@ public final class TestCommand {
    */
   public void activate(ComponentContext context) {
     BundleContext bundleContext = context.getBundleContext();
-    log_.info("Registering test commands");
+    log_.debug("Registering test commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
     commands.put(CommandProcessor.COMMAND_SCOPE, "weblounge");
     commands.put(CommandProcessor.COMMAND_FUNCTION, new String[] {
