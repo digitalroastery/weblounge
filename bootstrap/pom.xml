@@ -155,7 +155,12 @@
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-service</artifactId>
-      <version>0.6.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-jsp</artifactId>
+      <version>0.7.1</version>
     </dependency>
 
     <!-- End Pax -->
