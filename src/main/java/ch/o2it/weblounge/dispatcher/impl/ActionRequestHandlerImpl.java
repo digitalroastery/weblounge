@@ -150,7 +150,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     Action action = null;
     try {
       pool = getActionForUrl(url);
-      action = (Action)pool.borrowObject();
+      action = (Action) pool.borrowObject();
       if (action == null) {
         log_.debug("No action found to handle {}", url);
         return false;
@@ -162,7 +162,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
     // Make sure the action is returned to the pool no matter what
     try {
-    
+
       // Check the request method. We won't handle just everything
       String requestMethod = request.getMethod();
       if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
@@ -170,29 +170,29 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
         return true;
       }
-  
+
       // Is the requested content flavor supported?
       if (!action.supportsFlavor(contentFlavor)) {
         log_.warn("Content flavor {} is not supported by action {}", contentFlavor, action);
         DispatchUtils.sendNotFound(request, response);
         return true;
       }
-  
+
       // Check if the page is already part of the cache. If so, our task is
       // already done!
       if (request.getVersion() == Page.LIVE) {
         long validTime = Renderer.DEFAULT_VALID_TIME;
         long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
-  
+
         // Create the set of tags that identify the request output
         CacheTagSet cacheTags = createCacheTags(request, action);
-  
+
         // Check if the page is already part of the cache
         if (response.startResponse(cacheTags, validTime, recheckTime)) {
           log_.debug("Action handler answered request for {} from cache", request.getUrl());
           return true;
         }
-  
+
         processingMode = Mode.Cached;
       } else if (Http11Constants.METHOD_HEAD.equals(request.getMethod())) {
         // handle HEAD requests
@@ -204,9 +204,9 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
         response.setHeader("Pragma", "no-cache");
       }
-  
+
       log_.debug("Action handler {} will handle {}", action, url);
-  
+
       // Call the service method depending on the flavor
       switch (contentFlavor) {
         case HTML:
@@ -219,7 +219,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           serveJSON(action, request, response);
           break;
       }
-  
+
       // Finish cache handling
       switch (processingMode) {
         case Cached:
@@ -232,13 +232,16 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           break;
       }
 
-    // Return the action
+      // Return the action
     } finally {
       try {
-        //action.passivate();
+        // action.passivate();
         pool.returnObject(action);
       } catch (Exception e) {
-        log_.error("Error returning action {} to pool: {}", new Object[] {action, e.getMessage(), e});
+        log_.error("Error returning action {} to pool: {}", new Object[] {
+            action,
+            e.getMessage(),
+            e });
       }
     }
 
@@ -257,7 +260,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    */
   private void serveHTML(Action action, WebloungeRequest request,
       WebloungeResponse response) {
-    
+
     WebUrl url = request.getUrl();
 
     // Load the target page used to render the action
@@ -265,14 +268,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     try {
       page = getTargetPage(action, request);
       // TODO: Check access rights with action handler configuration
-      // TODO: If there is no page, create a virtual one with either the
-      // default template or the template specified in the configuration
-      // or the request
-      if (page == null) {
-        log_.error("No page available to serve action {}", action);
-        DispatchUtils.sendNotFound(request, response);
-        return;
-      }
     } catch (IOException e) {
       log_.error("Error loading target page for action {} at {}", action, url);
       DispatchUtils.sendInternalError(request, response);
@@ -297,10 +292,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       action.setTemplate(template);
       action.setPage(page);
       action.configure(request, response, RequestFlavor.HTML);
-      
+
       // Have the content delivered
       response.setHeader("Content-Type", "text/html; charset=utf-8");
-      if (action.startHTMLResponse(request, response) == Action.EVAL_REQUEST) {
+      if (action.startHTMLResponse(request, response) == Action.EVAL_REQUEST && page != null) {
         PageRequestHandlerImpl.getInstance().service(request, response);
       }
     } catch (Throwable e) {
@@ -398,9 +393,9 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   }
 
   /**
-   * Returns the template that will be used to handle this request. If the
-   * template cannot be found or used for some reason, an
-   * {@link IllegalStateException} is thrown.
+   * Returns the template that will be used to handle this request. If a
+   * template was specified in the request but cannot be found or used for some
+   * reason, an {@link IllegalStateException} is thrown.
    * 
    * @param page
    *          the page
@@ -420,7 +415,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       if (template == null) {
         throw new IllegalStateException("Page template " + templateId + " specified by request was not found");
       }
-    } else {
+    } else if (page != null) {
       template = site.getTemplate(page.getTemplate());
       if (template == null) {
         throw new IllegalStateException("Page template " + templateId + " specified by page " + page + " was not found");
@@ -534,7 +529,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       target = new PageURIImpl(site, "/");
       page = site.getPage(target);
       if (page == null) {
-        log_.warn("Site {} has no homepage as fallback to render actions", site);
+        log_.debug("Site {} has no homepage as fallback to render actions", site);
         return null;
       }
     }

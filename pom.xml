@@ -68,6 +68,11 @@
     </dependency>
   
     <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-service</artifactId>
+    </dependency>
+  
+    <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>jasper</artifactId>
     </dependency>
@@ -165,6 +170,7 @@
               ch.o2it.weblounge.dispatcher,
               ch.o2it.weblounge.site,
               org.slf4j,
+              org.ops4j.pax.web.service;resolution:=optional,
               javax.activation,
               javax.servlet,
               javax.servlet.http,

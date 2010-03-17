@@ -19,6 +19,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import org.ops4j.pax.web.service.WebContainer;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpContext;
@@ -45,6 +46,9 @@ public class HttpServiceTracker extends ServiceTracker {
 
   /** Main dispatcher */
   private WebloungeDispatcherServlet dispatcher = null;
+  
+  /** Default http context */
+  private HttpContext httpContext = null;
 
   /**
    * Creates a new HTTP service tracker that will, upon an appearing http
@@ -74,10 +78,19 @@ public class HttpServiceTracker extends ServiceTracker {
     try {
       log_.debug("Registering weblounge dispatcher with http service {}", reference.getBundle().getSymbolicName());
       httpService = (HttpService) context.getService(reference);
-      HttpContext httpContext = httpService.createDefaultHttpContext();
+      httpContext = httpService.createDefaultHttpContext();
       Dictionary<?, ?> initParams = new Properties();
       httpService.registerServlet("/", dispatcher, initParams, httpContext);
       log_.info("Weblounge dispatcher hooked up with {}", httpService.getClass().getName());
+
+      // See if we can also register for jsp support
+      if (httpService instanceof WebContainer) {
+        WebContainer paxWebContainer = (WebContainer)httpService;
+        paxWebContainer.registerJsps(new String[] { "*.jsp" }, httpContext);
+        log_.info("Weblounge dispatcher successfully set up for java server pages (jsp)");
+      } else {
+        log_.error("JSP support is not available (pax-web-service and/or pax-web-jsp seems to be missing)");
+      }
     } catch (ServletException e) {
       log_.error("Error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
       httpService = null;
@@ -110,6 +123,9 @@ public class HttpServiceTracker extends ServiceTracker {
   public void removedService(ServiceReference reference, Object service) {
     log_.info("Weblounge dispatcher disconnected from {}", service.getClass().getName());
     ((HttpService) service).unregister("/");
+    if (service instanceof WebContainer) {
+      ((WebContainer)service).unregisterJsps(httpContext);
+    }
     super.removedService(reference, service);
   }
 
