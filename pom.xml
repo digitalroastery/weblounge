@@ -147,6 +147,8 @@
 			  ch.o2it.weblounge.common.impl.util.config,
               ch.o2it.weblounge.common.impl.util.xml,
               javax.servlet,
+              javax.servlet.jsp,
+              javax.servlet.jsp.tagext,
               javax.xml.parsers,
               javax.xml.transform,
               javax.xml.transform.dom,

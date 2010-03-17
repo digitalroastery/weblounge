@@ -58,9 +58,10 @@ public class GreeterAction extends ActionSupport {
   protected Map<String, String> greetings = new HashMap<String, String>();
 
   /**
-   * Creates a new instace of the the <code>GreeterAction</code>.
+   * Creates a new instance of the the <code>GreeterAction</code>.
    */
   public GreeterAction() {
+    addFlavor(RequestFlavor.HTML);
     addFlavor(RequestFlavor.XML);
     addFlavor(RequestFlavor.JSON);
   }
@@ -90,6 +91,21 @@ public class GreeterAction extends ActionSupport {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.site.ActionSupport#startHTMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   */
+  @Override
+  public int startHTMLResponse(WebloungeRequest request, WebloungeResponse response) throws ActionException {
+    try {
+      IOUtils.copy(GreeterAction.class.getResourceAsStream("/template.jsp"), response.getOutputStream());
+    } catch (IOException e) {
+      throw new ActionException(e);
+    }
+    return SKIP_REQUEST;
+  }
+  
   /**
    * {@inheritDoc}
    *
