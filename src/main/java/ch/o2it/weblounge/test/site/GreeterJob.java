@@ -62,7 +62,8 @@ public class GreeterJob implements Job {
     try {
       logger.info(new String(entry.getValue().getBytes("UTF-8")) + " (" + entry.getKey() + ")");
     } catch (UnsupportedEncodingException e) {
-      logger.error("Cant' believe that utf-8 is not supported on this platform!", e);
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
   }
 

@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +64,10 @@ public class TestSiteUtils {
   /**
    * Loads the greetings from <code>/greetings.properties</code> into a
    * <code>Map</code> and returns them.
+   * <p>
+   * Note that we need to do a conversion from the <code>ISO-LATIN-1</code>
+   * (which is assumed by the <code>Properties</code> implementation) to
+   * <code>UTF-8</code>.
    * 
    * @return the greetings
    * @throws Exception
@@ -74,7 +79,13 @@ public class TestSiteUtils {
       Properties props = new Properties();
       props.load(GreeterAction.class.getResourceAsStream(GREETING_PROPS));
       for (Entry<Object, Object> entry : props.entrySet()) {
-        greetings.put((String) entry.getKey(), (String) entry.getValue());
+        try {
+          String isoLatin1Value = entry.getValue().toString();
+          String utf8Value = new String(isoLatin1Value.getBytes("ISO-8859-1"), "UTF-8");
+          greetings.put((String) entry.getKey(), utf8Value);
+        } catch (UnsupportedEncodingException e) {
+          logger.error("I can't believe the platform does not support encoding {}", e.getMessage());
+        }
       }
     } catch (IOException e) {
       logger.error("Error reading greetings from " + GREETING_PROPS, e);
@@ -94,8 +105,8 @@ public class TestSiteUtils {
    * @throws Exception
    *           if the request fails
    */
-  public static HttpResponse request(HttpClient httpClient, HttpUriRequest request,
-      String[][] params) throws Exception {
+  public static HttpResponse request(HttpClient httpClient,
+      HttpUriRequest request, String[][] params) throws Exception {
     if (params != null) {
       if (request instanceof HttpGet) {
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();

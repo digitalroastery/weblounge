@@ -29,6 +29,7 @@ import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -94,21 +95,6 @@ public class GreeterAction extends ActionSupport {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.impl.site.ActionSupport#startHTMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
-   */
-  @Override
-  public int startHTMLResponse(WebloungeRequest request, WebloungeResponse response) throws ActionException {
-    try {
-      IOUtils.copy(GreeterAction.class.getResourceAsStream("/template.jsp"), response.getOutputStream());
-    } catch (IOException e) {
-      throw new ActionException(e);
-    }
-    return SKIP_REQUEST;
-  }
-  
-  /**
-   * {@inheritDoc}
-   *
    * @see ch.o2it.weblounge.common.site.Action#startXMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   @Override
@@ -153,6 +139,24 @@ public class GreeterAction extends ActionSupport {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.site.ActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   */
+  @Override
+  public int startStage(WebloungeRequest request, WebloungeResponse response)
+      throws ActionException {
+    try {
+      String language = greetings.keySet().iterator().next();
+      String htmlGreeting = StringEscapeUtils.escapeHtml(greetings.get(language));
+      IOUtils.write("<H1>" + htmlGreeting + "</H1>", response.getOutputStream(), "UTF-8");
+      return SKIP_COMPOSER;
+    } catch (IOException e) {
+      throw new ActionException("Unable to send json response", e);
+    }
+  }
+  
   /**
    * {@inheritDoc}
    * 
