@@ -140,7 +140,7 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
     Action action = (Action) obj;
     log_.debug("Activating action '{}'", action.getIdentifier());
     try {
-      action.passivate();
+      action.activate();
     } catch (Throwable t) {
       log_.error("Error destroying action: {}", t.getMessage(), t);
     }

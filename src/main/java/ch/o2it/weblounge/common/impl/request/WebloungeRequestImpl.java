@@ -263,7 +263,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     this.site = site;
 
     // Update the request counter
-    id = "[" + requestCounter_ + "]";
+    id = Long.toString(requestCounter_);
     if (requestCounter_ == Long.MAX_VALUE)
       requestCounter_ = 0L;
     else
@@ -345,7 +345,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    */
   public String toString() {
     if (url != null)
-      return url + " [" + id + "]";
+      return url + " (" + id + ")";
     else
       return getRequestURI();
   }

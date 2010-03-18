@@ -162,7 +162,7 @@ public class ActionSupport extends AbstractAction {
    *          the servlet response
    * @return either <code>EVAL_INCLUDES</code> or <code>SKIP_INCLUDES</code>
    */
-  public int startPageIncludes(WebloungeRequest request, WebloungeResponse response)
+  public int startHTMLIncludes(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
     return EVAL_INCLUDES;
   }

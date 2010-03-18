@@ -274,7 +274,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       selector.append(".").append(RequestFlavor.HTML.toExtension());
     }
 
-    return UrlSupport.concat(path, selector.toString());
+    if (selector.length() > 0)
+      return UrlSupport.concat(path, selector.toString());
+    else
+      return path;
   }
 
   /**

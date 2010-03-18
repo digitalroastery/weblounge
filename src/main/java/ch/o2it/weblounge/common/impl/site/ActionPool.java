@@ -89,7 +89,8 @@ public final class ActionPool extends GenericObjectPool {
    */
   @Override
   public void returnObject(Object obj) throws Exception {
-    Action action = (Action) super.borrowObject();
+    super.returnObject(obj);
+    Action action = (Action)obj;
     log_.debug("Borrowed action '{}' returned to pool", action.getIdentifier());
     log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
         action.getIdentifier(),
@@ -107,7 +108,6 @@ public final class ActionPool extends GenericObjectPool {
           this.getNumActive(),
           this.getNumIdle() });
     }
-    super.returnObject(obj);
   }
 
   /**

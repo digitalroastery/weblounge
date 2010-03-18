@@ -78,10 +78,10 @@ public class UrlSupport {
    * @return the concatenated url of the two arguments
    */
   public static String concat(String prefix, String suffix, boolean close) {
-    if (prefix == null)
-      throw new IllegalArgumentException("Prefix cannot be null");
-    if (suffix == null)
-      throw new IllegalArgumentException("Suffix cannot be null");
+    if ("".equals(prefix) || prefix == null)
+      throw new IllegalArgumentException("Prefix cannot be null or empty");
+    if ("".equals(suffix) || suffix == null)
+      throw new IllegalArgumentException("Suffix cannot be null or empty");
 
     prefix = checkSeparator(prefix);
     suffix = checkSeparator(suffix);
