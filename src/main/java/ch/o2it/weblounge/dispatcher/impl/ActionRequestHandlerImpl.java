@@ -304,10 +304,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         } else {
           log_.trace("Rendering action '{}' on empty page", action);
           response.getOutputStream().println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
-          response.getOutputStream().println("<HTML>\n\t<HEAD>\n\t\t");
+          response.getOutputStream().println("<HTML>\n\t<HEAD>");
           // TODO: Call to startHTMLHeaders();
           action.startHTMLIncludes(request, response);
-          response.getOutputStream().println("\t</HEAD>\n\t<BODY>\n\t\t");
+          response.getOutputStream().println("\t</HEAD>\n\t<BODY>");
           action.startStage(request, response);
           response.getOutputStream().print("\n\t</BODY>\n</HTML>");
           response.flushBuffer();
