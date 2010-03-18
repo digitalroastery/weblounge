@@ -224,7 +224,7 @@ public interface Action extends Composeable, Customizable {
    *          the servlet response
    * @return either <code>EVAL_INCLUDES</code> or <code>SKIP_INCLUDES</code>
    */
-  int startPageIncludes(WebloungeRequest request, WebloungeResponse response)
+  int startHTMLIncludes(WebloungeRequest request, WebloungeResponse response)
       throws ActionException;
 
   /**
