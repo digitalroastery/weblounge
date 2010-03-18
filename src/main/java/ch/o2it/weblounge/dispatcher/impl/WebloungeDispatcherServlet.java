@@ -224,7 +224,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     fireRequestStarted(request, response, site);
 
     // Ask the registered request handler if they are willing to handle
-    // the request. Otherwise, the site dispatcher will be called.
+    // the request.
     // TODO: Synchronize
     for (RequestHandler handler : requestHandler) {
       try {
@@ -236,7 +236,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
           if (response.hasError()) {
             log_.info("Request processing failed on {}", request);
             fireRequestFailed(request, response, site);
-            return;
           } else {
             fireRequestDelivered(request, response, site);
           }
@@ -264,6 +263,11 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         log_.debug("Finished processing of {}", httpRequest.getRequestURI());
       }
     }
+    
+    // Apparently, nobody felt responsible for this request
+    log_.debug("No handler found to handle {}", request);
+    DispatchUtils.sendNotFound(request, response);
+    fireRequestFailed(request, response, site);
   }
 
   /**

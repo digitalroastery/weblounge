@@ -145,16 +145,18 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     RequestFlavor contentFlavor = request.getFlavor();
     Mode processingMode = Mode.Default;
 
-    // Try to get hold of an action handler
+    // Try to get hold of an action pool
     ActionPool pool = null;
+    pool = getActionForUrl(url);
+    if (pool == null) {
+      log_.debug("No action found to handle {}", url);
+      return false;
+    }
+
+    // Match! Let's try to get an actual action from that pool
     Action action = null;
     try {
-      pool = getActionForUrl(url);
       action = (Action) pool.borrowObject();
-      if (action == null) {
-        log_.debug("No action found to handle {}", url);
-        return false;
-      }
     } catch (Exception e) {
       DispatchUtils.sendInternalError(request, response);
       return true;
@@ -295,8 +297,21 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
       // Have the content delivered
       response.setHeader("Content-Type", "text/html; charset=utf-8");
-      if (action.startHTMLResponse(request, response) == Action.EVAL_REQUEST && page != null) {
-        PageRequestHandlerImpl.getInstance().service(request, response);
+      if (action.startHTMLResponse(request, response) == Action.EVAL_REQUEST) {
+        if (page != null) {
+          log_.trace("Rendering action '{}' on page {}", action, page);
+          PageRequestHandlerImpl.getInstance().service(request, response);
+        } else {
+          log_.trace("Rendering action '{}' on empty page", action);
+          response.getOutputStream().println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
+          response.getOutputStream().println("<HTML>\n\t<HEAD>\n\t\t");
+          // TODO: Call to startHTMLHeaders();
+          action.startHTMLIncludes(request, response);
+          response.getOutputStream().println("\t</HEAD>\n\t<BODY>\n\t\t");
+          action.startStage(request, response);
+          response.getOutputStream().print("\n\t</BODY>\n</HTML>");
+          response.flushBuffer();
+        }
       }
     } catch (Throwable e) {
       log_.error("Error processing action '{}' for {}", action, request.getUrl());

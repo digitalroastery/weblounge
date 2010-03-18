@@ -154,8 +154,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       // Does it exist at all?
       if (page == null) {
         log_.debug("No page found for {}", pageURI);
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        return true;
+        return false;
       }
 
       // Is it published?
