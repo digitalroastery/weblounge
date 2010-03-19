@@ -52,9 +52,9 @@ import java.util.List;
  * <p>
  * <b>Note:</b> Be aware of the fact that actions are pooled, so make sure to
  * implement the <code>activate()</code> and <code>passivate()</code> method
- * accordingly and of course to include the respective super implementations.
+ * accordingly and include the respective super implementations.
  */
-public class HTMLActionSupport extends AbstractAction implements HTMLAction {
+public class HTMLActionSupport extends AbstractActionSupport implements HTMLAction {
 
   /** Logging facility */
   protected final static Logger log_ = LoggerFactory.getLogger(HTMLActionSupport.class);
@@ -204,14 +204,12 @@ public class HTMLActionSupport extends AbstractAction implements HTMLAction {
   }
 
   /**
-   * This method simply sets the content type on the response to
+   * This implementation always returns {@link Action#EVAL_REQUEST} and simply
+   * sets the content type on the response to
    * <code>text/html;charset=utf-8</code>. This means that subclasses should
    * either overwrite this method to specify a different encoding or make sure
    * that everything that is written to the response is encoded to
    * <code>utf-8</code>.
-   * <p>
-   * This method always returns {@link Action#EVAL_REQUEST} and therefore leaves
-   * rendering to the page.
    * 
    * @param request
    *          the servlet request
@@ -219,7 +217,6 @@ public class HTMLActionSupport extends AbstractAction implements HTMLAction {
    *          the servlet response
    * @return {@link Action#EVAL_REQUEST}
    */
-  @Override
   public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
     response.setContentType("text/html;charset=utf-8");

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.site.AbstractAction;
+import ch.o2it.weblounge.common.impl.site.AbstractActionSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.page.Link;
@@ -38,12 +38,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test case for {@link AbstractAction}.
+ * Test case for {@link AbstractActionSupport}.
  */
 public class AbstractActionTest {
 
   /** The action to test */
-  protected AbstractAction action = new TestAction();
+  protected AbstractActionSupport action = new TestAction();
 
   /** Action identifier */
   protected String identifier = "myaction";
@@ -126,7 +126,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getModule()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getModule()}.
    */
   @Test
   public void testGetModule() {
@@ -135,7 +135,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getSite()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -144,7 +144,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getUrl()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getUrl()}.
    */
   @Test
   public void testGetUrl() {
@@ -153,7 +153,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getPath()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getPath()}.
    */
   @Test
   public void testGetPath() {
@@ -164,7 +164,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getFlavors()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getFlavors()}.
    */
   @Test
   public void testGetFlavors() {
@@ -174,7 +174,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#supportsFlavor(ch.o2it.weblounge.common.request.RequestFlavor)}
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#supportsFlavor(ch.o2it.weblounge.common.request.RequestFlavor)}
    * .
    */
   @Test
@@ -185,7 +185,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValue(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getOptionValue(java.lang.String)}
    * .
    */
   @Test
@@ -196,7 +196,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValue(java.lang.String, java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getOptionValue(java.lang.String, java.lang.String)}
    * .
    */
   @Test
@@ -207,7 +207,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValues(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getOptionValues(java.lang.String)}
    * .
    */
   @Test
@@ -222,7 +222,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptions()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getOptions()}.
    */
   @Test
   public void testGetOptions() {
@@ -231,7 +231,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#hasOption(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#hasOption(java.lang.String)}
    * .
    */
   @Test
@@ -242,7 +242,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#removeOption(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#removeOption(java.lang.String)}
    * .
    */
   @Test
@@ -253,7 +253,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#activate()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#activate()}.
    * <p>
    * Nothing to test, since implementation is empty
    */
@@ -264,7 +264,7 @@ public class AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#passivate()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#passivate()}.
    */
   @Test
   public void testPassivate() {

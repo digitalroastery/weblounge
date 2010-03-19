@@ -56,16 +56,19 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class is the default implementation for an <code>Action</code>.
+ * This class is the default implementation for an <code>Action</code>. Its main
+ * two methods
+ * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)} and
+ * {@link #startResponse(WebloungeRequest, WebloungeResponse)} 
  * <p>
  * <b>Note:</b> Be aware of the fact that actions are pooled, so make sure to
  * implement the <code>activate()</code> and <code>passivate()</code> method
  * accordingly and of course to include the respective super implementations.
  */
-public abstract class AbstractAction extends GeneralComposeable implements Action {
+public abstract class AbstractActionSupport extends GeneralComposeable implements Action {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(AbstractAction.class);
+  private final static Logger log_ = LoggerFactory.getLogger(AbstractActionSupport.class);
 
   /** The action mountpoint */
   protected String mountpoint = null;
@@ -90,7 +93,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /** Map containing uploaded files */
   protected List<FileItem> files = null;
-  
+
   /** Parameter collection extracted from the url extension */
   private List<String> urlparams = new ArrayList<String>();
 
@@ -106,7 +109,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
   /**
    * Default constructor.
    */
-  public AbstractAction() {
+  public AbstractActionSupport() {
   }
 
   /**
@@ -115,10 +118,8 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    * @see ch.o2it.weblounge.common.site.Action#startResponse(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
-  public int startResponse(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException {
-    return EVAL_REQUEST;
-  }
+  public abstract int startResponse(WebloungeRequest request, WebloungeResponse response)
+      throws ActionException;
 
   /**
    * Sets the parent module.
@@ -251,7 +252,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
     else
       return null;
   }
-  
+
   /**
    * Returns the extension part of the requested url. For example, if an action
    * is mounted to <code>/test</code> and the url is <code>/test/a</code> then
@@ -423,7 +424,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
     this.request = request;
     this.response = response;
     this.flavor = flavor;
-    
+
     loadUrlExtensionValues(request);
 
     // Check if we have a file upload request
@@ -652,8 +653,8 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    */
   @Override
   public boolean equals(Object o) {
-    if (o != null && o instanceof AbstractAction) {
-      AbstractAction h = (AbstractAction) o;
+    if (o != null && o instanceof AbstractActionSupport) {
+      AbstractActionSupport h = (AbstractActionSupport) o;
       return module.equals(h.getModule()) && identifier.equals(h.identifier);
     }
     return false;

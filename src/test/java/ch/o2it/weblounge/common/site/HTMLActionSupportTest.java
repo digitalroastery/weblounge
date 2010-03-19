@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNull;
 import ch.o2it.weblounge.common.impl.page.PageImpl;
 import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.site.AbstractAction;
+import ch.o2it.weblounge.common.impl.site.AbstractActionSupport;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
@@ -41,7 +41,7 @@ import org.junit.Test;
 import java.net.URL;
 
 /**
- * Test case for {@link AbstractAction}.
+ * Test case for {@link AbstractActionSupport}.
  */
 public class HTMLActionSupportTest extends AbstractActionTest {
 
@@ -101,7 +101,7 @@ public class HTMLActionSupportTest extends AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getPage()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getPage()}.
    */
   @Test
   public void testGetPage() {
@@ -111,7 +111,7 @@ public class HTMLActionSupportTest extends AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getPageURI()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getPageURI()}.
    */
   @Test
   public void testGetPageURI() {
@@ -122,7 +122,7 @@ public class HTMLActionSupportTest extends AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getTemplate()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getTemplate()}.
    */
   @Test
   public void testGetTemplate() {
@@ -131,7 +131,7 @@ public class HTMLActionSupportTest extends AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#passivate()}.
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#passivate()}.
    */
   @Test
   public void testPassivate() {
