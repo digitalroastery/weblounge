@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.page.HTMLInclude;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 
 import java.util.Set;
@@ -108,7 +108,7 @@ public interface ActionConfiguration extends Customizable {
    * 
    * @return the includes
    */
-  Set<PageInclude> getIncludes();
+  Set<HTMLInclude> getIncludes();
 
   /**
    * Returns the action name in one or more languages.

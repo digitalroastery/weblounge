@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2010 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -21,19 +21,13 @@
 package ch.o2it.weblounge.common.page;
 
 /**
- * This interface describes elements that are included in the &lt;head&gt;
- * section of an <code>HTML</code> page, namely &lt;link&gt; and &lt;script&gt;.
+ * Base interface for <code>HTMLHeadElement</code> representing includes into
+ * the page, such as the <code>&lt;link&gt;</code> or
+ * <code>&lt;script&gt;</code> element.
  */
-public interface PageInclude {
+public interface HTMLInclude extends HTMLHeadElement {
 
   /** Returns the <code>href</code> attribute */
   String getHref();
   
-  /**
-   * Returns the xml representation of this script.
-   * 
-   * @return the xml representation
-   */
-  String toXml();
-
 }

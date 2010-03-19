@@ -90,4 +90,11 @@ public interface Renderer extends Composeable {
   void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException;
 
+  /**
+   * Returns a serialized version of this renderer.
+   * 
+   * @return the renderer
+   */
+  String toXml();
+
 }

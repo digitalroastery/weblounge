@@ -21,66 +21,42 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Customizable;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.url.WebUrl;
 
+import java.io.IOException;
+
 /**
- * An <code>Action</code> is executed, if a request to a url occurs, that has
- * this handler registered. <br>
- * What happens when the registered url is called is as follows: If a template
- * has been registered, then the request is forwarded to that template and
- * various callbacks are made to this handler while the template is being
- * rendered. These callback are:
- * <ul>
- * <li>startPage</li>
- * <li>startComposer</li>
- * <li>startPagelet</li>
- * </ul>
- * If no template definition is found, then the request is forwarded to the
- * template that was used to send the request (by clicking a link).
+ * An <code>Action</code> is java code that can be mounted to a specific url and
+ * that will be executed if these conditions hold:
+ * <ol>
+ * <li>The request is directly targeted at the action's mountpoint</li>
+ * <li>The action supports the requested flavor</li>
+ * </ol>
  * <p>
- * <b>Note:</b> A class that implements the <code>Action</code> interface has to
+ * Once a request hits the mountpoint of an action, the action is then called in
+ * this order:
+ * <ol>
+ * <li>{@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}</li>
+ * <li>{@link #startResponse(WebloungeRequest, WebloungeResponse)}</li>
+ * </ol>
+ * By implementing an extended interface such as {@link HTMLAction},
+ * {@link XMLAction} or {@link JSONAction}, more sophisticated patterns for
+ * request handling and output generation are supported.
+ * <p>
+ * <b>Note:</b> A class that implements the <code>Action</code> interface must
  * provide a default constructor (no arguments), since action handlers are
  * created using reflection.
  */
 public interface Action extends Composeable, Customizable {
 
-  /** The target url */
-  final static String TARGET = "target-url";
-
   /** Constant indicating that the current request should be evaluated */
-  final static int EVAL_REQUEST = 0;
+  int EVAL_REQUEST = 0;
 
   /** Constant indicating that the current request should not be evaluated */
-  final static int SKIP_REQUEST = 1;
-
-  /** Constant indicating that the includes should be evaluated */
-  final static int EVAL_INCLUDES = 0;
-
-  /** Constant indicating that the includes should not be evaluated */
-  final static int SKIP_INCLUDES = 1;
-
-  /** Constant indicating that the current composer should be evaluated */
-  final static int EVAL_COMPOSER = 0;
-
-  /** Constant indicating that the current composer should not be evaluated */
-  final static int SKIP_COMPOSER = 1;
-
-  /** Constant indicating that the current pagelet should be evaluated */
-  final static int EVAL_PAGELET = 0;
-
-  /** Constant indicating that the current pagelet should not be evaluated */
-  final static int SKIP_PAGELET = 1;
-
-  /** Constant indicating that the action will be forwarded to a template */
-  final static int METHOD_TEMPLATE = 0;
-
-  /** Constant indicating that the action will be forwarded to a url */
-  final static int METHOD_URL = 1;
+  int SKIP_REQUEST = 1;
 
   /** the default valid time is 60 minutes */
   long DEFAULT_VALID_TIME = 60L * 60L * 1000L;
@@ -89,19 +65,17 @@ public interface Action extends Composeable, Customizable {
   long DEFAULT_RECHECK_TIME = 60L * 1000L;
 
   /**
-   * This method is called just before the call to <code>startPage()</code> is
-   * made. Here, the desired rendering method is passed, as well as the request
-   * and the response object.
+   * This method is the first call to an action once a request is dispatched to
+   * it. Here, the requested flavor is passed as well as the request and the
+   * response object in order to allow the action to validate the request and
+   * prepare data that it might need to satisfy subsequent calls regarding the
+   * processing of the request.
    * <p>
-   * The intention of this method is that actions may prepare themselves for the
-   * subsequent calls to <code>startPage()</code> by extracting state
-   * information from the request, opening database connections etc.
-   * <p>
-   * It is not recommended to write anything to the response object yet, except
-   * for the case that it is obvious that the action cannot be executed, e. g.
-   * because the user is not authorized. In this case, the method should send
-   * back the proper <code>HTTP</code> error code and throw an
-   * {@link ActionException}.
+   * <b>Note:</b> It is not recommended to write anything to the response object
+   * yet, except for the case that it is obvious that the action cannot be
+   * executed, e. g. because the user is not authorized. In this case, the
+   * method should send back the proper <code>HTTP</code> error code and throw
+   * an {@link ActionException}.
    * 
    * @param request
    *          the weblounge request
@@ -110,198 +84,45 @@ public interface Action extends Composeable, Customizable {
    * @param flavor
    *          the quested output flavor
    * @throws ActionException
-   *           if this handler refuses to handle the exception
+   *           if this action cannot handle the request
    */
   void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException;
 
   /**
-   * This method is called by the action request handler and gives the action
-   * the possibility to either completely take control over what is returned to
-   * the user or to have the template render the page. This is also the perfect
-   * place to write <code>HTTP</code> headers to the response.
+   * This method is called after the action was able to validate the request and
+   * prepare for further request processing in
+   * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)} and
+   * is considered the perfect place to write <code>HTTP</code> headers such as
+   * the content type to the response.
    * <p>
-   * However, there are a few callbacks that are performed by the resulting page
-   * to give the action implementation a chance to modify certain elements on
-   * the page, namely either the whole page or composer contents. before any
-   * output is written to the response object. Implementing classes may return
-   * one out of two values:
-   * <ul>
-   * <li><code>EVAL_REQUEST</code> to have the page displayed as usual</li>
-   * <li><code>SKIP_REQUEST</code> to skip any content on this page</li>
-   * </ul>
-   * If <code>SKIP_REQUEST</code> is returned, then the action is responsible
-   * for writing any output to the response object, since control of rendering
-   * is transferred completely. <br>
-   * If <code>EVAL_REQUEST</code> is returned, the page will control the
-   * rendering of the page, and the action may only change the output of the
-   * composers or pagelets.
+   * The action now has two choices: it can either completely take over control
+   * in serving the request by writing everything to the response and then
+   * returning {@link #SKIP_REQUEST}. Or it could just write the necessary
+   * <code>HTTP</code> headers to the response and then return
+   * {@link #EVAL_REQUEST}, in which case the action request handler will
+   * continue with the callback protocol depending on the actual type of the
+   * action (<code>HTMLAction</code>, <code>XMLAction</code> or
+   * <code>JSONAction</code>).
+   * <p>
+   * <b>Note:</b> the action request handler that is calling this action will
+   * already take care of those <code>HTTP</code> headers that deal with
+   * caching. If you would like to influence this behavior, make sure to
+   * implement <code>getRecheckTime()</code> accordingly rather than setting the
+   * headers yourself.
    * 
    * @param request
    *          the servlet request
    * @param response
    *          the servlet response
    * @return either <code>EVAL_REQUEST</code> or <code>SKIP_REQUEST</code>
-   *         depending on whether the action wants to continue rendering the
-   *         page or have the template do the rendering.
-   */
-  int startHTMLResponse(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException;
-
-  /**
-   * This method is called by the {@link ActionRequestHandler} if and only if
-   * <ol>
-   * <li>the action supports the {@link RequestFlavor#XML} request flavor</li>
-   * <li>the user specifies that same flavor in his request</li>
-   * <li>the action returns {@link #EVAL_REQUEST} upon the preceding call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}</li>
-   * </ol>
-   * <p>
-   * Implementers should use this method to set all relevant <code>HTTP</code>
-   * headers (other than <code>Content-Type", "text/xml; charset=utf-8</code>,
-   * which is set by the request handler itself) and write the <code>XML</code>
-   * data to the response.
-   * 
-   * @param request
-   *          the servlet request
-   * @param response
-   *          the servlet response
+   * @throws IOException
+   *           if writing to the response fails
    * @throws ActionException
-   *           if generating the <code>XML</code> response results in an error
+   *           if a processing error occurs while handling the request
    */
-  void startXMLResponse(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException;
-
-  /**
-   * This method is called by the {@link ActionRequestHandler} if and only if
-   * <ol>
-   * <li>the action supports the {@link RequestFlavor#JSON} request flavor</li>
-   * <li>the user specifies that same flavor in his request</li>
-   * <li>the action returns {@link #EVAL_REQUEST} upon the preceding call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}</li>
-   * </ol>
-   * <p>
-   * Implementers should use this method to set all relevant <code>HTTP</code>
-   * headers (other than <code>Content-Type", "text/json; charset=utf-8</code>,
-   * which is set by the request handler itself) and write the <code>JSON</code>
-   * data to the response.
-   * 
-   * @param request
-   *          the servlet request
-   * @param response
-   *          the servlet response
-   * @throws ActionException
-   *           if generating the <code>JSON</code> response results in an error
-   */
-  void startJSONResponse(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException;
-
-  /**
-   * This method is called by the target page and gives the action the
-   * possibility to either replace the includes in the page header, add more
-   * includes to the existing ones or have the page handle the includes.
-   * <p>
-   * Note that this callback relies on the existence of the corresponding
-   * tag in the <code>&lt;head&gt;</code> section of the page template.
-   * <p>
-   * Implementing classes may return one out of two values:
-   * <ul>
-   * <li><code>EVAL_INCLUDES</code> to have the page handle the includes</li>
-   * <li><code>SKIP_INCLUDES</code> to skip any includes by this page</li>
-   * </ul>
-   * If <code>SKIP_INCLUDES</code> is returned, then the action is responsible
-   * for writing any output to the response object, since control of rendering
-   * is transferred completely. <br>
-   * If <code>EVAL_INCLUDES</code> is returned, the page will control the adding
-   * of includes, while the action may still add some itself.
-   * 
-   * <b>Note</b> This callback will only be performed if the page contains a
-   * &lt;webl:inlcudes/&gt; tag in the header section.
-   * 
-   * @param request
-   *          the servlet request
-   * @param response
-   *          the servlet response
-   * @return either <code>EVAL_INCLUDES</code> or <code>SKIP_INCLUDES</code>
-   */
-  int startHTMLIncludes(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException;
-
-  /**
-   * This method is called when the rendering of the composer with the given
-   * composer identifier starts. Again, the action has the possibility to have
-   * the page render the composer or to do it on its own. <br>
-   * The valid return codes for this method are:
-   * <ul>
-   * <li><code>EVAL_COMPOSER</code> to display the composer as usual</li>
-   * <li><code>SKIP_COMPOSER</code> to skip any content on this composer</li>
-   * </ul>
-   * 
-   * @param request
-   *          the request object
-   * @param response
-   *          the response object
-   * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
-   *         depending on whether the action wants to render the composer on its
-   *         own or have the template do the rendering.
-   * @throws ActionException
-   *           if rendering fails
-   */
-  int startStage(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException;
-
-  /**
-   * This method is called when the rendering of the composer with the given
-   * composer identifier starts. Again, the action has the possibility to have
-   * the page render the composer or to do it on its own. <br>
-   * The valid return codes for this method are:
-   * <ul>
-   * <li><code>EVAL_COMPOSER</code> to display the composer as usual</li>
-   * <li><code>SKIP_COMPOSER</code> to skip any content on this composer</li>
-   * </ul>
-   * 
-   * @param request
-   *          the request object
-   * @param response
-   *          the response object
-   * @param composer
-   *          the composer identifier
-   * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
-   *         depending on whether the action wants to render the composer on its
-   *         own or have the template do the rendering.
-   * @throws ActionException
-   *           if rendering fails
-   */
-  int startComposer(WebloungeRequest request, WebloungeResponse response,
-      String composer) throws ActionException;
-
-  /**
-   * This method is called when the rendering of the composer with the given
-   * composer identifier starts. Again, the action has the possibility to have
-   * the page render the composer or to do it on its own. <br>
-   * The valid return codes for this method are:
-   * <ul>
-   * <li><code>EVAL_PAGELET</code> to display the pagelet as specified by the
-   * template</li>
-   * <li><code>SKIP_PAGELET</code> to have the pagelet rendered by this method</li>
-   * </ul>
-   * 
-   * @param request
-   *          the request object
-   * @param response
-   *          the response object
-   * @param composer
-   *          the composer identifier
-   * @param position
-   *          the pagelet position within the composer
-   * @return either <code>EVAL_PAGELET</code> or <code>SKIP_PAGELET</code>
-   *         depending on whether the action wants to render the pagelet on its
-   *         own or have the template do the rendering.
-   * @throws ActionException
-   *           if rendering fails
-   */
-  int startPagelet(WebloungeRequest request, WebloungeResponse response,
-      String composer, int position) throws ActionException;
+  int startResponse(WebloungeRequest request, WebloungeResponse response)
+      throws IOException, ActionException;
 
   /**
    * Returns the url to this action.
@@ -367,66 +188,6 @@ public interface Action extends Composeable, Customizable {
    * @return the action mountpoint
    */
   String getPath();
-
-  /**
-   * Sets the uri of the page that is used to render the action.
-   * 
-   * @param uri
-   *          the page uri
-   */
-  void setPageURI(PageURI uri);
-
-  /**
-   * Returns the uri of the page that is used to deliver the initial content for
-   * this action or <code>null</code> if no page has been set.
-   * 
-   * @return the page uri
-   */
-  PageURI getPageURI();
-
-  /**
-   * Sets the page that is used to render the action. This method is called
-   * right before the action is executed by a call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
-   * .
-   * 
-   * @param page
-   *          the page
-   */
-  void setPage(Page page);
-
-  /**
-   * Returns the page that is used to deliver the initial content for this
-   * action or <code>null</code> if no page has been set. In any case, the page
-   * will be set prior to a call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
-   * .
-   * 
-   * @return the page
-   */
-  Page getPage();
-
-  /**
-   * Sets the page template that is used to render the action content. This
-   * method is called right before the action is executed by a call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
-   * .
-   * 
-   * @param template
-   *          the page template
-   */
-  void setTemplate(PageTemplate template);
-
-  /**
-   * Returns the page template that is used to render the action content or
-   * <code>null</code> if no template has been specified. In any case, the
-   * template will be set prior to a call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
-   * .
-   * 
-   * @return the page template
-   */
-  PageTemplate getTemplate();
 
   /**
    * This method is used at initialization time and sets the site that was used

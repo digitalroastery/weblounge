@@ -25,7 +25,7 @@ package ch.o2it.weblounge.common.page;
  * &lt;head&gt; section of an html page. Relative paths are interpreted to be
  * relative to the weblounge folder <code>shared</code>.
  */
-public interface Script extends PageInclude {
+public interface Script extends HTMLInclude {
 
   /** The default script <code>type</code> */
   String TYPE_JAVASCRIPT = "text/javascript";

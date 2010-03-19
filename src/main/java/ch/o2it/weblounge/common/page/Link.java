@@ -24,7 +24,7 @@ package ch.o2it.weblounge.common.page;
  * This class encapsulates the information to include a link element within the
  * &lt;head&gt; section of an <code>HTML</code> page.
  */
-public interface Link extends PageInclude {
+public interface Link extends HTMLInclude {
 
   /** The default link <code>type</code> */
   String TYPE_CSS = "text/css";

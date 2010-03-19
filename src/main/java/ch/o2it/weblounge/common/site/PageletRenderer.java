@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.site;
 
-import ch.o2it.weblounge.common.page.PageInclude;
-import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
@@ -32,57 +30,6 @@ import java.net.URL;
  * within a <code>Page</code>.
  */
 public interface PageletRenderer extends Renderer {
-
-  /**
-   * Adds the link to the list of links that need to be included in the page's
-   * header section.
-   * 
-   * @param link
-   *          the link
-   */
-  void addInclude(PageInclude link);
-
-  /**
-   * Removes the link from the list of links that need to be included in the
-   * page's header section.
-   * 
-   * @param link
-   *          the link
-   */
-  void removeInclude(PageInclude link);
-
-  /**
-   * Returns the &lt;link&gt; elements that have been defined for this renderer.
-   * 
-   * @return the links
-   */
-  PageInclude[] getIncludes();
-
-  /**
-   * Adds the script to the list of scripts that need to be included in the
-   * page's header section.
-   * 
-   * @param script
-   *          the script
-   */
-  void addScript(Script script);
-
-  /**
-   * Removes the script from the list of scripts that need to be included in the
-   * page's header section.
-   * 
-   * @param script
-   *          the script
-   */
-  void removeScript(Script script);
-
-  /**
-   * Returns the &lt;script&gt; elements that have been defined for this
-   * renderer.
-   * 
-   * @return the scripts
-   */
-  Script[] getScripts();
 
   /**
    * Sets the module that defined this renderer.

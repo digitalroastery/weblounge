@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.page.HTMLInclude;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -160,7 +160,7 @@ public interface Composeable extends Localizable {
    * @param include
    *          the include
    */
-  void addInclude(PageInclude include);
+  void addInclude(HTMLInclude include);
 
   /**
    * Removes a link or a script from the list of includes.
@@ -168,7 +168,7 @@ public interface Composeable extends Localizable {
    * @param include
    *          the include
    */
-  void removeInclude(PageInclude include);
+  void removeInclude(HTMLInclude include);
 
   /**
    * Returns the &lt;link&gt; or &lt;script&gt; elements that have been defined
@@ -179,6 +179,6 @@ public interface Composeable extends Localizable {
    * 
    * @return the includes
    */
-  PageInclude[] getIncludes();
+  HTMLInclude[] getIncludes();
 
 }
