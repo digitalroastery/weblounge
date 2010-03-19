@@ -24,6 +24,9 @@ import ch.o2it.weblounge.common.impl.site.ModuleImpl;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Module;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Test implementation of the {@link Module} interface.
  */
@@ -43,12 +46,33 @@ public class TestModule extends ModuleImpl {
    */
   @Override
   public Action[] getActions() {
-    Action action = new GreeterAction();
-    action.setIdentifier("greeter");
-    action.setPath("greeting");
-    action.setModule(this);
-    action.setSite(getSite());
-    return new Action[] { action };
+    List<Action> actions = new ArrayList<Action>();
+    
+    // HTML greeter action
+    Action greeterHTMLAction = new GreeterAction();
+    greeterHTMLAction.setIdentifier("htmlgreeter");
+    greeterHTMLAction.setPath("greeting");
+    greeterHTMLAction.setModule(this);
+    greeterHTMLAction.setSite(getSite());
+    actions.add(greeterHTMLAction);
+
+    // XML greeter action
+    Action greeterXMLAction = new GreeterAction();
+    greeterXMLAction.setIdentifier("xmlgreeter");
+    greeterXMLAction.setPath("greeting");
+    greeterXMLAction.setModule(this);
+    greeterXMLAction.setSite(getSite());
+    actions.add(greeterXMLAction);
+
+    // XML greeter action
+    Action greeterJSONAction = new GreeterAction();
+    greeterJSONAction.setIdentifier("jsongreeter");
+    greeterJSONAction.setPath("greeting");
+    greeterJSONAction.setModule(this);
+    greeterJSONAction.setSite(getSite());
+    actions.add(greeterJSONAction);
+
+    return actions.toArray(new Action[actions.size()]);
   }
   
 }

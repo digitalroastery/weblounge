@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
-import ch.o2it.weblounge.common.impl.site.ActionSupport;
+import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -30,47 +30,26 @@ import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Simple test action that is able to render a greeting on the site template.
  */
-public class GreeterAction extends ActionSupport {
+public class GreeterAction extends HTMLActionSupport {
 
   /** Name of the language parameter */
   public static final String LANGUAGE_PARAM = "language";
 
   /** The greetings */
   protected Map<String, String> greetings = new HashMap<String, String>();
-
-  /**
-   * Creates a new instance of the the <code>GreeterAction</code>.
-   */
-  public GreeterAction() {
-    addFlavor(RequestFlavor.HTML);
-    addFlavor(RequestFlavor.XML);
-    addFlavor(RequestFlavor.JSON);
-  }
   
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.site.ActionSupport#configure(ch.o2it.weblounge.common.request.WebloungeRequest,
+   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#configure(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse,
    *      ch.o2it.weblounge.common.request.RequestFlavor)
    */
@@ -95,54 +74,7 @@ public class GreeterAction extends ActionSupport {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.Action#startXMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
-   */
-  @Override
-  public void startXMLResponse(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException {
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      Document doc = docBuilder.newDocument();
-      doc.setXmlStandalone(true);
-      Element root = doc.createElement("greetings");
-      doc.appendChild(root);
-      for (Map.Entry<String, String> greeting : greetings.entrySet()) {
-        Element greetingNode = doc.createElement("greeting");
-        greetingNode.setAttribute("language", greeting.getKey());
-        greetingNode.appendChild(doc.createTextNode(greeting.getValue()));
-        root.appendChild(greetingNode);
-      }
-      TransformerFactory factory = TransformerFactory.newInstance();
-      Transformer transformer = factory.newTransformer();
-      transformer.transform(new DOMSource(doc), new StreamResult(response.getOutputStream()));
-    } catch (Exception e) {
-      throw new ActionException("Unable to create and send xml response", e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.Action#startJSONResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
-   */
-  @Override
-  public void startJSONResponse(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException {
-    try {
-      JSONObject json = new JSONObject();
-      json.put("greetings", greetings);
-      IOUtils.copy(new StringReader(json.toString()), response.getOutputStream(), "UTF-8");
-    } catch (IOException e) {
-      throw new ActionException("Unable to send json response", e);
-    } catch (JSONException e) {
-      throw new ActionException("Unable to create json response", e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.site.ActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   @Override
   public int startStage(WebloungeRequest request, WebloungeResponse response)
@@ -160,7 +92,7 @@ public class GreeterAction extends ActionSupport {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.site.ActionSupport#passivate()
+   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#passivate()
    */
   @Override
   public void passivate() {
