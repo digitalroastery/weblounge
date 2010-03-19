@@ -22,6 +22,7 @@ package ch.o2it.weblounge.test.command;
 
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.test.harness.HTMLActionTest;
 import ch.o2it.weblounge.test.harness.IntegrationTest;
 import ch.o2it.weblounge.test.harness.JSONActionTest;
 import ch.o2it.weblounge.test.harness.XMLActionTest;
@@ -241,8 +242,9 @@ public final class TestCommand {
     bundleContext.registerService(getClass().getName(), this, commands);
 
     // Load the tests
-    tests.add(new JSONActionTest());
+    tests.add(new HTMLActionTest());
     tests.add(new XMLActionTest());
+    tests.add(new JSONActionTest());
   }
 
 }
