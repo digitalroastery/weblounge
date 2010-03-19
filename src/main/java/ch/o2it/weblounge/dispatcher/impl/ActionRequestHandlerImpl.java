@@ -34,9 +34,13 @@ import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
+import ch.o2it.weblounge.common.site.ActionException;
+import ch.o2it.weblounge.common.site.HTMLAction;
+import ch.o2it.weblounge.common.site.JSONAction;
 import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.site.XMLAction;
 import ch.o2it.weblounge.common.url.UrlMatcher;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.dispatcher.ActionRequestHandler;
@@ -142,7 +146,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    */
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
     WebUrl url = request.getUrl();
-    RequestFlavor contentFlavor = request.getFlavor();
+    RequestFlavor flavor = request.getFlavor();
     Mode processingMode = Mode.Default;
 
     // Try to get hold of an action pool
@@ -170,13 +174,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
         log_.debug("Actions are not supposed to handle {} requests", requestMethod);
         DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
-        return true;
-      }
-
-      // Is the requested content flavor supported?
-      if (!action.supportsFlavor(contentFlavor)) {
-        log_.warn("Content flavor {} is not supported by action {}", contentFlavor, action);
-        DispatchUtils.sendNotFound(request, response);
         return true;
       }
 
@@ -210,14 +207,20 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       log_.debug("Action handler {} will handle {}", action, url);
 
       // Call the service method depending on the flavor
-      switch (contentFlavor) {
+      switch (flavor) {
         case HTML:
+          if (!action.supportsFlavor(flavor) && !(action instanceof HTMLAction))
+            return false;
           serveHTML(action, request, response);
           break;
         case XML:
+          if (!action.supportsFlavor(flavor) && !(action instanceof XMLAction))
+            return false;
           serveXML(action, request, response);
           break;
         case JSON:
+          if (!action.supportsFlavor(flavor) && !(action instanceof JSONAction))
+            return false;
           serveJSON(action, request, response);
           break;
       }
@@ -262,7 +265,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    */
   private void serveHTML(Action action, WebloungeRequest request,
       WebloungeResponse response) {
-
+    
     WebUrl url = request.getUrl();
 
     // Load the target page used to render the action
@@ -291,13 +294,16 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       request.setAttribute(WebloungeRequest.REQUEST_PAGE, page);
 
       // Prepare the action
-      action.setTemplate(template);
-      action.setPage(page);
+      if (action instanceof HTMLAction) {
+        ((HTMLAction)action).setTemplate(template);
+        ((HTMLAction)action).setPage(page);
+      }
+      
+      // Have the action validate the request
       action.configure(request, response, RequestFlavor.HTML);
 
       // Have the content delivered
-      response.setHeader("Content-Type", "text/html; charset=utf-8");
-      if (action.startHTMLResponse(request, response) == Action.EVAL_REQUEST) {
+      if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (page != null) {
           log_.trace("Rendering action '{}' on page {}", action, page);
           PageRequestHandlerImpl.getInstance().service(request, response);
@@ -305,14 +311,22 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           log_.trace("Rendering action '{}' on empty page", action);
           response.getOutputStream().println("<!DOCTYPE HTML>");
           response.getOutputStream().println("<HTML>\n\t<HEAD>");
-          // TODO: Call to startHTMLHeaders();
-          action.startHTMLIncludes(request, response);
+          if (action instanceof HTMLAction) {
+            ((HTMLAction)action).startHeader(request, response);
+          }
           response.getOutputStream().println("\t</HEAD>\n\t<BODY>");
-          action.startStage(request, response);
+          if (action instanceof HTMLAction) {
+            ((HTMLAction)action).startStage(request, response);
+          }
           response.getOutputStream().print("\n\t</BODY>\n</HTML>");
           response.flushBuffer();
         }
       }
+    } catch (IOException e) {
+      log_.debug("Error writing action output to client: {}", e.getMessage());
+    } catch (ActionException e) {
+      log_.error("Error processing action '{}' for {}: {}", new Object[] { action, request.getUrl(), e.getMessage() });
+      DispatchUtils.sendInternalError(request, response);
     } catch (Throwable e) {
       log_.error("Error processing action '{}' for {}", action, request.getUrl());
       log_.error(e.getMessage(), e);
@@ -337,15 +351,20 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       WebloungeResponse response) {
     try {
       action.configure(request, response, RequestFlavor.XML);
-      response.setHeader("Content-Type", "text/xml; charset=utf-8");
-      action.startXMLResponse(request, response);
+      if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
+        if (action instanceof XMLAction) {
+          ((XMLAction)action).startXML(request, response);
+        }
+      }
+    } catch (IOException e) {
+      log_.debug("Error writing action output to client: {}", e.getMessage());
+    } catch (ActionException e) {
+      log_.error("Error processing action '{}' for {}: {}", new Object[] { action, request.getUrl(), e.getMessage() });
+      DispatchUtils.sendInternalError(request, response);
     } catch (Throwable e) {
       log_.error("Error processing action '{}' for {}", action, request.getUrl());
       log_.error(e.getMessage(), e);
-      try {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      } catch (IOException e1) { /* never mind */
-      }
+      DispatchUtils.sendInternalError(request, response);
     }
   }
 
@@ -363,15 +382,20 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       WebloungeResponse response) {
     try {
       action.configure(request, response, RequestFlavor.JSON);
-      response.setHeader("Content-Type", "text/json; charset=utf-8");
-      action.startJSONResponse(request, response);
+      if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
+        if (action instanceof JSONAction) {
+          ((JSONAction)action).startJSON(request, response);
+        }
+      }
+    } catch (IOException e) {
+      log_.debug("Error writing action output to client: {}", e.getMessage());
+    } catch (ActionException e) {
+      log_.error("Error processing action '{}' for {}: {}", new Object[] { action, request.getUrl(), e.getMessage() });
+      DispatchUtils.sendInternalError(request, response);
     } catch (Throwable e) {
       log_.error("Error processing action '{}' for {}", action, request.getUrl());
       log_.error(e.getMessage(), e);
-      try {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      } catch (IOException e1) { /* never mind */
-      }
+      DispatchUtils.sendInternalError(request, response);
     }
   }
 
@@ -503,8 +527,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     boolean targetForced = false;
 
     // Check if a target-page parameter was passed
-    if (request.getParameter(Action.TARGET) != null) {
-      String targetUrl = request.getParameter(Action.TARGET);
+    if (request.getParameter(HTMLAction.TARGET) != null) {
+      String targetUrl = request.getParameter(HTMLAction.TARGET);
       targetForced = true;
       try {
         String decocedTargetUrl = null;
@@ -520,13 +544,16 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     }
 
     // Check the action configuration
-    else if (action.getPageURI() != null) {
-      target = action.getPageURI();
-      targetForced = true;
+    else if (action instanceof HTMLAction) {
+      HTMLAction htmlAction = (HTMLAction)action;
+      if (htmlAction.getPageURI() != null) {
+        target = htmlAction.getPageURI();
+        targetForced = true;
+      }
     }
 
     // Nothing found, let's choose the site's homepage
-    else {
+    if (target == null) {
       target = new PageURIImpl(site, "/");
     }
 
