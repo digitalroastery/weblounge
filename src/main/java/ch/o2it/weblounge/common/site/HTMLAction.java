@@ -36,8 +36,6 @@ import java.io.IOException;
  * <li>The action supports the {@link RequestFlavor#HTML} request flavor</li>
  * <li>The client specifies that same flavor in his request</li>
  * </ol>
- * The second condition is automatically satisfied by implementing the
- * <code>HTMLAction</code> interface.
  * <p>
  * Once a request hits the mountpoint of an action, the action can then be
  * called in various ways, depending on whether it is rendered using a template

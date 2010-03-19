@@ -123,4 +123,42 @@ public interface WebUrl extends Url {
    */
   RequestFlavor getFlavor();
 
+  /**
+   * Returns a normalized version of this url. A normalized version is defined
+   * by these properties:
+   * <ul>
+   * <li>It does not contain a protocol</li>
+   * <li>It starts with the site's main hostname as returned by
+   * {@link ch.o2it.weblounge.common.site.Site#getHostName()}</li>
+   * <li>It contains the requested version as a url extension</li>
+   * <li>It contains the request flavor as a url extension</li>
+   * </ul>
+   * For example, a normalized version of the url defined by
+   * <code>http://www.test.com/foo/work.html</code> would look like
+   * <code>www.test.com/foo/work/html</code>
+   * 
+   * @return the normalized version of the url
+   */
+  String normalize();
+
+  /**
+   * Returns a normalized version of this url.
+   * <p>
+   * By specifying the parameters <code>includeVersion</code>,
+   * <code>includeLanguage</code> and <code>includeFlavor</code>, the version,
+   * language and flavor of that normalization can be left out.
+   * 
+   * @param includeVersion
+   *          <code>true</code> to include the version
+   * @param includeLanguage
+   *          <code>true</code> to include the language
+   * @param includeFlavor
+   *          <code>true</code> to include the flavor
+   * 
+   * @return the normalized version of the url
+   * @see #normalize()
+   */
+  String normalize(boolean includeVersion, boolean includeLanguage,
+      boolean includeFlavor);
+
 }
