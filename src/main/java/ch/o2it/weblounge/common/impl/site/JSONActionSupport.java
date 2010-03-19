@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
@@ -39,6 +40,14 @@ import java.io.IOException;
  * accordingly and include the respective super implementations.
  */
 public class JSONActionSupport extends AbstractActionSupport implements JSONAction {
+
+  /**
+   * Creates a new action implementation that directly supports the generation
+   * of <code>JSON</code> data.
+   */
+  public JSONActionSupport() {
+    addFlavor(RequestFlavor.JSON);
+  }
 
   /**
    * This implementation always returns {@link Action#EVAL_REQUEST} and simply

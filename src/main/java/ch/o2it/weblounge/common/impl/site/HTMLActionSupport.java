@@ -95,6 +95,10 @@ public class HTMLActionSupport extends AbstractActionSupport implements HTMLActi
   /** The error messages */
   protected List<String> errorMessages = null;
 
+  /**
+   * Creates a new action implementation that directly supports the generation
+   * of <code>HTML</code> pages.
+   */
   public HTMLActionSupport() {
     flavors.add(RequestFlavor.HTML);
   }

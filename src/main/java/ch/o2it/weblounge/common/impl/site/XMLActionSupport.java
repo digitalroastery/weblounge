@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
@@ -39,6 +40,14 @@ import java.io.IOException;
  * accordingly and include the respective super implementations.
  */
 public class XMLActionSupport extends AbstractActionSupport implements XMLAction {
+
+  /**
+   * Creates a new action implementation that directly supports the generation
+   * of <code>XML</code> data.
+   */
+  public XMLActionSupport() {
+    addFlavor(RequestFlavor.XML);
+  }
 
   /**
    * This implementation always returns {@link Action#EVAL_REQUEST} and simply
