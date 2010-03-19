@@ -25,6 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
@@ -38,7 +39,7 @@ import org.junit.Test;
  * Test cases for the web url implementation.
  */
 public class WebUrlImplTest {
-  
+
   /** Url instance pointing to JSON output of the document's live version */
   protected WebUrlImpl liveUrl = null;
 
@@ -102,6 +103,9 @@ public class WebUrlImplTest {
   /** Url instance pointing to JSON output of the document's version 17 */
   protected WebUrlImpl flavoredLocalizedSegmentedVersionedUrl = null;
 
+  /** Site hostname */
+  protected String hostname = "www.test.com";
+
   /** Default url path */
   protected String livePath = "/test/";
 
@@ -124,7 +128,7 @@ public class WebUrlImplTest {
   protected String localizedSegmentedLivePath = "/test/de/";
 
   /** JSON path to live version */
-  protected String flavoredLocalizedSegmentedLivePath = "/test/de/json";
+  protected String flavoredLocalizedSegmentedLivePath = "/test/de/json/";
 
   /** JSON path to work version */
   protected String workPath = "/test/work.html";
@@ -179,7 +183,7 @@ public class WebUrlImplTest {
 
   /** The German language */
   protected Language german = LanguageSupport.getLanguage("de");
-  
+
   /** The French language */
   protected Language french = LanguageSupport.getLanguage("fr");
 
@@ -189,22 +193,12 @@ public class WebUrlImplTest {
   @Before
   public void setUp() throws Exception {
     siteMock = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
-    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german);
+    EasyMock.expect(siteMock.getLanguage("de")).andReturn(german).anyTimes();
     EasyMock.expect(siteMock.getDefaultLanguage()).andReturn(english);
+    EasyMock.expect(siteMock.getHostName()).andReturn(hostname).anyTimes();
     EasyMock.replay(siteMock);
     otherSiteMock = EasyMock.createNiceMock(Site.class);
-    
+
     liveUrl = new WebUrlImpl(siteMock, livePath);
     localizedLiveUrl = new WebUrlImpl(siteMock, localizedLivePath);
     flavoredLiveUrl = new WebUrlImpl(siteMock, flavoredLivePath);
@@ -229,7 +223,9 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#equals(java.lang.Object)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#equals(java.lang.Object)}
+   * .
    */
   @Test
   public void testEqualsObject() {
@@ -242,7 +238,8 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getSite()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -251,7 +248,8 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink()}.
    */
   @Test
   public void testGetPath() {
@@ -279,7 +277,8 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink()}.
    */
   @Test
   public void testGetLink() {
@@ -307,7 +306,9 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink(ch.o2it.weblounge.common.language.Language)}
+   * .
    */
   @Test
   public void testGetLinkLanguage() {
@@ -336,7 +337,9 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink(java.lang.String)}
+   * .
    */
   @Test
   public void testGetLinkString() {
@@ -365,7 +368,8 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink(long)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink(long)}.
    */
   @Test
   public void testGetLinkLong() {
@@ -395,7 +399,9 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink(long, ch.o2it.weblounge.common.language.Language, java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getLink(long, ch.o2it.weblounge.common.language.Language, java.lang.String)}
+   * .
    */
   @Test
   public void testGetLinkStringLanguageLong() {
@@ -427,11 +433,12 @@ public class WebUrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getFlavor()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#getFlavor()}.
    */
   @Test
   public void testGetFlavor() {
-    assertTrue(liveUrl.getFlavor() == null);
+    assertEquals(RequestFlavor.HTML, liveUrl.getFlavor());
     assertEquals(RequestFlavor.JSON, flavoredSegmentedLiveUrl.getFlavor());
     assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/json").getFlavor());
     assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/work/json").getFlavor());
@@ -439,6 +446,57 @@ public class WebUrlImplTest {
     assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/work/de/json").getFlavor());
     assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/JSON").getFlavor());
     assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/json/").getFlavor());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean)}
+   * .
+   */
+  @Test
+  public void testNormalize() {
+    assertEquals(UrlSupport.concat(hostname, segmentedLivePath), liveUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, flavoredSegmentedLivePath), flavoredSegmentedLiveUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, localizedSegmentedLivePath), localizedSegmentedLiveUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, flavoredLocalizedSegmentedLivePath), flavoredLocalizedSegmentedLiveUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, flavoredSegmentedWorkPath), flavoredSegmentedWorkUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, localizedSegmentedWorkPath), localizedSegmentedWorkUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, flavoredLocalizedSegmentedWorkPath), flavoredLocalizedSegmentedWorkUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, flavoredSegmentedVersionedPath), flavoredSegmentedVersionedUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, localizedSegmentedVersionedPath), localizedSegmentedVersionedUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, flavoredLocalizedSegmentedVersionedPath), flavoredLocalizedSegmentedVersionedUrl.normalize());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean)}
+   * .
+   */
+  @Test
+  public void testNormalizeBooleanBooleanBoolean() {
+    WebUrl url = flavoredLocalizedVersionedUrl;
+    String fullUrl = UrlSupport.concat(hostname, flavoredLocalizedSegmentedVersionedPath);
+    assertEquals(fullUrl, url.normalize(true, true, true));
+
+    // Everything
+    assertTrue(url.normalize(true, true, true).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(true, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+
+    // Everything but the version
+    assertTrue(url.normalize(false, true, true).indexOf(Long.toString(url.getVersion())) < 0);
+    assertTrue(url.normalize(false, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(false, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+
+    // Everything but the language
+    assertTrue(url.normalize(true, false, true).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, false, true).indexOf(url.getLanguage().getIdentifier().toString()) == -1);
+    assertTrue(url.normalize(true, false, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+
+    // Everything but the flavor
+    assertTrue(url.normalize(true, true, false).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, true, false).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(true, true, false).indexOf(url.getFlavor().toString().toLowerCase()) == -1);
   }
 
 }

@@ -55,6 +55,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   /** Regular expression for /path/to/resource/work/de/html */
   private final static Pattern segmentInspector = Pattern.compile("^(.*://)?(.*?)(/work|index|live|[0-9]*)?(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
 
+  /** The default request flavor */
+  private RequestFlavor defaultFlavor = RequestFlavor.HTML;
+  
   /** The associated site */
   protected Site site = null;
 
@@ -282,11 +285,59 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.url.WebUrl#normalize()
+   */
+  public String normalize() {
+    return normalize(true, true, true);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.url.WebUrl#normalize(boolean, boolean, boolean)
+   */
+  public String normalize(boolean includeVersion, boolean includeLanguage,
+      boolean includeFlavor) {
+    StringBuffer buf = new StringBuffer();
+    
+    // Site
+    buf.append(site.getHostName());
+
+    // Path
+    buf.append(separatorChar).append(path);
+    
+    // Version
+    if (includeVersion && version >= 0) {
+      buf.append(separatorChar);
+      if (version == Page.LIVE)
+        buf.append("live");
+      else if (version == Page.WORK)
+        buf.append("work");
+      else if (version >= 0)
+        buf.append(Long.toString(version));
+    }
+    
+    // Language
+    if (includeLanguage && language != null) {
+      buf.append(separatorChar).append(language.getIdentifier());
+    }
+    
+    // Flavor
+    if (includeFlavor && flavor != null) {
+      buf.append(separatorChar).append(flavor.toString().toLowerCase());
+    }
+
+    return UrlSupport.trim(buf.toString());
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.url.WebUrl#getFlavor()
    */
   public RequestFlavor getFlavor() {
-    return flavor;
+    return flavor != null ? flavor : defaultFlavor;
   }
 
   /**
@@ -327,7 +378,17 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   public boolean equals(Object object) {
     if (object instanceof WebUrl) {
       WebUrl url = (WebUrl) object;
-      return (super.equals(object) && version == url.getVersion() && (language == null && url.getLanguage() == null || (language != null && url.getLanguage() != null && language.equals(url.getLanguage()))) && (flavor == null && url.getFlavor() == null || (flavor != null && url.getFlavor() != null && flavor.equals(url.getFlavor()))) && site.equals(url.getSite()));
+      if (!super.equals(object))
+        return false;
+      if (version != url.getVersion())
+        return false;
+      if (language == null && url.getLanguage() != null || (language != null && !language.equals(url.getLanguage())))
+        return false;
+      if (!getFlavor().equals(url.getFlavor()))
+        return false;
+      if (!site.equals(url.getSite()))
+        return false;
+      return true;
     } else if (object instanceof Url) {
       return super.equals(object);
     }

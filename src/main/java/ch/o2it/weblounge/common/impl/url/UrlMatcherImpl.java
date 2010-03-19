@@ -20,10 +20,15 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.UrlMatcher;
 import ch.o2it.weblounge.common.url.WebUrl;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Simple implementation of a <code>UrlMatcher</code> which compares a given
@@ -36,11 +41,14 @@ public class UrlMatcherImpl implements UrlMatcher {
   protected Site site = null;
   
   /** The mountpoint */
-  protected String url = null;
+  protected String path = null;
 
   /** The url extension */
   protected String extension = null;
-
+  
+  /** The request flavors */
+  protected Set<RequestFlavor> flavors = new HashSet<RequestFlavor>();
+  
   /**
    * Creates a matcher for the given action by taking it's mountpoint and path
    * extension.
@@ -50,7 +58,8 @@ public class UrlMatcherImpl implements UrlMatcher {
    */
   public UrlMatcherImpl(Action action) {
     site = action.getSite();
-    url = UrlSupport.trim(UrlSupport.concat("/", action.getPath()));
+    path = UrlSupport.trim(UrlSupport.concat("/", action.getPath()));
+    flavors.addAll(Arrays.asList(action.getFlavors()));
     // TODO: take extension into account
   }
 
@@ -62,7 +71,9 @@ public class UrlMatcherImpl implements UrlMatcher {
   public boolean matches(WebUrl url) {
     if (!site.equals(url.getSite()))
       return false;
-    if (!url.getPath().startsWith(this.url))
+    if (!url.getPath().startsWith(this.path))
+      return false;
+    if (!flavors.contains(url.getFlavor()))
       return false;
     return true;
   }
@@ -74,7 +85,7 @@ public class UrlMatcherImpl implements UrlMatcher {
    */
   @Override
   public int hashCode() {
-    return url.hashCode();
+    return path.hashCode();
   }
   
   /**
@@ -86,8 +97,14 @@ public class UrlMatcherImpl implements UrlMatcher {
   public boolean equals(Object obj) {
     if (obj instanceof UrlMatcherImpl) {
       UrlMatcherImpl m = (UrlMatcherImpl)obj;
+      if (!flavors.equals(m.flavors))
+        return false;
+      if (!site.equals(m.site))
+         return false;
+      if (!path.equals(m.path))
+        return false;
       // TODO: Check extension
-      return site.equals(m.site) && url.equals(m.url);
+      return true;
     }
     return false;
   }
@@ -100,7 +117,7 @@ public class UrlMatcherImpl implements UrlMatcher {
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer(site.getHostName());
-    buf.append("/").append(url);
+    buf.append("/").append(path);
     if (extension != null)
       buf.append(extension);
     return buf.toString();

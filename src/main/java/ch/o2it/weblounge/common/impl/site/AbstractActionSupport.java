@@ -348,6 +348,13 @@ public abstract class AbstractActionSupport extends GeneralComposeable implement
   }
 
   /**
+   * Removes all flavors.
+   */
+  protected void clearFlavors() {
+    flavors.clear();
+  }
+  
+  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.site.Action#setOption(java.lang.String,

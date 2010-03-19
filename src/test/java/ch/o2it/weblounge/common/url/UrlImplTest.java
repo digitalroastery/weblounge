@@ -78,16 +78,6 @@ public class UrlImplTest {
   @Test
   public void testUrlImplStringChar() {
     try {
-      new UrlImpl("test", '/');
-      fail("UrlImpl accepted relative url");
-    } catch (IllegalArgumentException e) { /* this is intended */ }
-
-    try {
-      new UrlImpl(null);
-      fail("UrlImpl accepted null url");
-    } catch (IllegalArgumentException e) { /* this is intended */ }
-
-    try {
       new UrlImpl(null);
       fail("UrlImpl accepted null url");
     } catch (IllegalArgumentException e) { /* this is intended */ }

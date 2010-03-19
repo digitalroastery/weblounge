@@ -135,6 +135,7 @@ public class UrlSupport {
       throw new IllegalArgumentException("Url cannot be null");
 
     url = checkSeparator(url);
+    url = removeDoubleSeparator(url);
     url = url.trim();
 
     if (url.endsWith("/") || (url.length() == 1))

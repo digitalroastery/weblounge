@@ -75,7 +75,7 @@ public class UrlImpl implements Url {
     if (path == null)
       throw new IllegalArgumentException("Url path cannot be null");
     if (path.length() == 0 || path.charAt(0) != separator)
-      throw new IllegalArgumentException("Url path must be absolute");
+      path  = separator + path;
     this.separatorChar = separator;
     this.path = trim(path);
     if (!this.path.startsWith(Character.toString(separator)))

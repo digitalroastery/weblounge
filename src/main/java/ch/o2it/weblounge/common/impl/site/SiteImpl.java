@@ -981,7 +981,7 @@ public class SiteImpl implements Site {
    */
   void removeScheduler() {
     if (!isShutdownInProgress)
-      log_.info("Site " + this + " can no longer execute jobs (scheduler was taken down)");
+      log_.info("Site '{}' can no longer execute jobs (scheduler was taken down)", this);
     this.quartzTriggerListener = null;
   }
 
