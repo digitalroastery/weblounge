@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.test.site;
 
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionException;
@@ -38,9 +39,19 @@ import java.io.StringReader;
 public class GreeterJSONAction extends GreeterAction implements JSONAction {
 
   /**
+   * Creates an extension of the <code>GreeterAction</code> that can handle
+   * <code>JSON</code> requests.
+   */
+  public GreeterJSONAction() {
+    clearFlavors();
+    addFlavor(RequestFlavor.JSON);
+  }
+
+  /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.JSONAction#startJSON(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   * 
+   * @see ch.o2it.weblounge.common.site.JSONAction#startJSON(ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public void startJSON(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {

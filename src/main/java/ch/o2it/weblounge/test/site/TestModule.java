@@ -50,23 +50,23 @@ public class TestModule extends ModuleImpl {
     
     // HTML greeter action
     Action greeterHTMLAction = new GreeterAction();
-    greeterHTMLAction.setIdentifier("htmlgreeter");
+    greeterHTMLAction.setIdentifier("greeter.html");
     greeterHTMLAction.setPath("greeting");
     greeterHTMLAction.setModule(this);
     greeterHTMLAction.setSite(getSite());
     actions.add(greeterHTMLAction);
 
     // XML greeter action
-    Action greeterXMLAction = new GreeterAction();
-    greeterXMLAction.setIdentifier("xmlgreeter");
+    Action greeterXMLAction = new GreeterXMLAction();
+    greeterXMLAction.setIdentifier("greeter.xml");
     greeterXMLAction.setPath("greeting");
     greeterXMLAction.setModule(this);
     greeterXMLAction.setSite(getSite());
     actions.add(greeterXMLAction);
 
     // XML greeter action
-    Action greeterJSONAction = new GreeterAction();
-    greeterJSONAction.setIdentifier("jsongreeter");
+    Action greeterJSONAction = new GreeterJSONAction();
+    greeterJSONAction.setIdentifier("greeter.json");
     greeterJSONAction.setPath("greeting");
     greeterJSONAction.setModule(this);
     greeterJSONAction.setSite(getSite());

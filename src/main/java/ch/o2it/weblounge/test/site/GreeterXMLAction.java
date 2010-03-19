@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.test.site;
 
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionException;
@@ -42,6 +43,15 @@ import javax.xml.transform.stream.StreamResult;
  * Simple test action that is able to render a greeting on the site template.
  */
 public class GreeterXMLAction extends GreeterAction implements XMLAction {
+
+  /**
+   * Creates an extension of the <code>GreeterAction</code> that can handle
+   * <code>XML</code> requests.
+   */
+  public GreeterXMLAction() {
+    clearFlavors();
+    addFlavor(RequestFlavor.XML);
+  }
 
   /**
    * {@inheritDoc}
