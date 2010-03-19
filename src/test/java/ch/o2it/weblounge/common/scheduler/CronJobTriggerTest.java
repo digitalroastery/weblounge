@@ -154,7 +154,7 @@ public class CronJobTriggerTest {
   }
 
   /**
-   * Moves the calendar to the future by increasing the given field until it
+   * Moves the calendar into the future by increasing the given field until it
    * reaches the next matching value.
    * 
    * @param c
@@ -167,11 +167,17 @@ public class CronJobTriggerTest {
    */
   private Date rollUp(Calendar c, int field, int[] fieldValues) {
     boolean matches = false;
+    
     c.setFirstDayOfWeek(Calendar.SUNDAY);
     c.setFirstDayOfWeek(Calendar.SUNDAY);
     c.set(Calendar.MILLISECOND, 0);
     c.set(Calendar.SECOND, 0);
+    
     int offset = 0;
+    Calendar now = Calendar.getInstance();
+    now.set(Calendar.MILLISECOND, 0);
+    now.set(Calendar.SECOND, 0);
+    
     switch (field) {
       case Calendar.MONTH:
         offset = 1;
@@ -185,8 +191,9 @@ public class CronJobTriggerTest {
     while (!matches) {
       for (int i : fieldValues) {
         int calendarValue = c.get(field) + offset;
-        if (i == calendarValue)
-          matches = true;
+        if (i == calendarValue) {
+          matches = c.after(now);
+        }
       }
       if (!matches)
         c.add(field, 1);
