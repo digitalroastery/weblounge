@@ -79,7 +79,7 @@ public class GeneralComposeableTest {
   protected String englishName = "Default template";
   
   /** Cascading stylesheet include */
-  protected PageInclude css = new LinkImpl("http://localhost/css.css");
+  protected Link css = new LinkImpl("http://localhost/css.css");
 
   /** Javascript include */
   protected Script javascript = new ScriptImpl("http://localhost/javascript.js");

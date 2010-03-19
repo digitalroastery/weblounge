@@ -133,7 +133,7 @@ public class LinkImpl implements Link {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageInclude#getHref()
+   * @see ch.o2it.weblounge.common.page.HTMLHeadElement#getHref()
    */
   public String getHref() {
     return href;
@@ -281,7 +281,7 @@ public class LinkImpl implements Link {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageInclude#toXml()
+   * @see ch.o2it.weblounge.common.page.HTMLHeadElement#toXml()
    */
   public String toXml() {
     StringBuilder sb = new StringBuilder("<link ");

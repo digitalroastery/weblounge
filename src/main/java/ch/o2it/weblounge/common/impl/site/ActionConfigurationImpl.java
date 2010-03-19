@@ -30,8 +30,9 @@ import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
+import ch.o2it.weblounge.common.page.HTMLHeadElement;
+import ch.o2it.weblounge.common.page.HTMLInclude;
 import ch.o2it.weblounge.common.page.Link;
-import ch.o2it.weblounge.common.page.PageInclude;
 import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Action;
@@ -75,7 +76,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
   private long validTime = Action.DEFAULT_VALID_TIME;
 
   /** The list of includes */
-  private Set<PageInclude> includes = new HashSet<PageInclude>();;
+  private Set<HTMLInclude> includes = new HashSet<HTMLInclude>();;
 
   /** The list of flavors */
   private Set<RequestFlavor> flavors = new HashSet<RequestFlavor>();
@@ -129,7 +130,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    * 
    * @see ch.o2it.weblounge.common.site.ActionConfiguration#getIncludes()
    */
-  public Set<PageInclude> getIncludes() {
+  public Set<HTMLInclude> getIncludes() {
     return includes;
   }
 
@@ -139,7 +140,7 @@ public class ActionConfigurationImpl implements ActionConfiguration {
    * @param include
    *          the include
    */
-  public void addInclude(PageInclude include) {
+  public void addInclude(HTMLInclude include) {
     includes.add(include);
   }
 
@@ -528,11 +529,11 @@ public class ActionConfigurationImpl implements ActionConfiguration {
     // Includes
     if (includes.size() > 0) {
       b.append("<includes>");
-      for (PageInclude include : getIncludes()) {
+      for (HTMLHeadElement include : getIncludes()) {
         if (include instanceof Link)
           b.append(include.toXml());
       }
-      for (PageInclude include : getIncludes()) {
+      for (HTMLHeadElement include : getIncludes()) {
         if (include instanceof Script)
           b.append(include.toXml());
       }

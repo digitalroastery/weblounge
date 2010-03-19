@@ -23,7 +23,9 @@ package ch.o2it.weblounge.common.impl.page;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.page.HTMLInclude;
+import ch.o2it.weblounge.common.page.Link;
 import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -33,11 +35,10 @@ import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.RenderException;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -50,12 +51,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
   /** The editor url */
   protected URL editor = null;
-
-  /** Links that need to be included in the header */
-  protected Set<PageInclude> links = null;
-
-  /** Scripts that need to be included in the header */
-  protected Set<Script> scripts = null;
 
   /** The defining module */
   protected Module module = null;
@@ -72,8 +67,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   public PageletRendererImpl(String identifier, URL url) {
     super(identifier, url);
     addFlavor(RequestFlavor.HTML);
-    links = new HashSet<PageInclude>();
-    scripts = new HashSet<Script>();
   }
 
   /**
@@ -92,60 +85,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public Module getModule() {
     return module;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#addInclude(ch.o2it.weblounge.common.page.PageInclude)
-   */
-  public void addInclude(PageInclude link) {
-    links.add(link);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#removeInclude(ch.o2it.weblounge.common.page.PageInclude)
-   */
-  public void removeInclude(PageInclude link) {
-    links.remove(link);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#getIncludes()
-   */
-  public PageInclude[] getIncludes() {
-    return links.toArray(new PageInclude[links.size()]);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#addScript(ch.o2it.weblounge.common.page.Script)
-   */
-  public void addScript(Script script) {
-    scripts.add(script);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#removeScript(ch.o2it.weblounge.common.page.Script)
-   */
-  public void removeScript(Script script) {
-    scripts.remove(script);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.PageletRenderer#getScripts()
-   */
-  public Script[] getScripts() {
-    return scripts.toArray(new Script[scripts.size()]);
   }
 
   /**
@@ -286,10 +225,20 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       throw new IllegalStateException("Invalid valid time in page template definition");
     }
 
-    // TODO: Links, Scripts
-
     // Names
     LanguageSupport.addDescriptions(node, "name", null, template.name, false);
+
+    // scripts
+    NodeList scripts = XPathHelper.selectList(node, "includes/script", xpath);
+    for (int i = 0; i < scripts.getLength(); i++) {
+      template.addInclude(ScriptImpl.fromXml(scripts.item(i)));
+    }
+
+    // links
+    NodeList includes = XPathHelper.selectList(node, "includes/link", xpath);
+    for (int i = 0; i < includes.getLength(); i++) {
+      template.addInclude(LinkImpl.fromXml(includes.item(i)));
+    }
 
     return template;
   }
@@ -299,12 +248,51 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * 
    * @return the xml representation
    */
-  String toXml() {
+  public String toXml() {
     StringBuffer buf = new StringBuffer();
     buf.append("<renderer id=\"");
     buf.append(" id=\"").append(identifier).append("\"");
     buf.append(" composeable=\"").append(composeable).append("\"");
     buf.append(">");
+
+    // Renderer url
+    // TODO: Handle relative paths
+    buf.append("<renderer>").append(renderer.toExternalForm()).append("</renderer>");
+
+    // Recheck time
+    if (recheckTime >= 0) {
+      buf.append("<recheck>");
+      buf.append(ConfigurationUtils.toDuration(recheckTime));
+      buf.append("</recheck>");
+    }
+
+    // Valid time
+    if (validTime >= 0) {
+      buf.append("<valid>");
+      buf.append(ConfigurationUtils.toDuration(validTime));
+      buf.append("</valid>");
+    }
+
+    // Names
+    for (Language l : name.languages()) {
+      buf.append("<name language=\"").append(l.getIdentifier()).append("\">");
+      buf.append(name.get(l));
+      buf.append("</name>");
+    }
+
+    // Includes
+    if (getIncludes().length > 0) {
+      buf.append("<includes>");
+      for (HTMLInclude include : getIncludes()) {
+        if (include instanceof Link)
+          buf.append(include.toXml());
+      }
+      for (HTMLInclude include : getIncludes()) {
+        if (include instanceof Script)
+          buf.append(include.toXml());
+      }
+      buf.append("</includes>");
+    }
 
     buf.append("</renderer>");
     return buf.toString();

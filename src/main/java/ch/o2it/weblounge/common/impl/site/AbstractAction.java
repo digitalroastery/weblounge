@@ -22,14 +22,11 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.page.GeneralComposeable;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -39,7 +36,6 @@ import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.PageletRenderer;
-import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
@@ -60,13 +56,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class is the default implementation for a <code>ActionHandler</code>.
- * The implementations of the various <code>startXYZ</code> methods are
- * implemented such that they leave it to the target page to render the stuff.
+ * This class is the default implementation for an <code>Action</code>.
  * <p>
- * Be aware of the fact that action handlers are pooled, so make sure to
- * implement the <code>cleanup</code> method to clear any state information from
- * this handler instance.
+ * <b>Note:</b> Be aware of the fact that actions are pooled, so make sure to
+ * implement the <code>activate()</code> and <code>passivate()</code> method
+ * accordingly and of course to include the respective super implementations.
  */
 public abstract class AbstractAction extends GeneralComposeable implements Action {
 
@@ -75,18 +69,6 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /** The action mountpoint */
   protected String mountpoint = null;
-
-  /** The default path to render on */
-  protected String targetPath = null;
-
-  /** The page uri, deducted from targetPath */
-  protected PageURI pageURI = null;
-
-  /** The page template id */
-  protected String templateId = null;
-
-  /** The page template */
-  protected PageTemplate template = null;
 
   /** The list of flavors */
   protected Set<RequestFlavor> flavors = new HashSet<RequestFlavor>();
@@ -108,15 +90,12 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /** Map containing uploaded files */
   protected List<FileItem> files = null;
+  
+  /** Parameter collection extracted from the url extension */
+  private List<String> urlparams = new ArrayList<String>();
 
   /** The number of includes */
   protected int includeCount = 0;
-
-  /** The underlying page */
-  protected Page page = null;
-
-  /** The renderer used for this request */
-  protected Renderer renderer = null;
 
   /** The current request object */
   protected WebloungeRequest request = null;
@@ -128,19 +107,19 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    * Default constructor.
    */
   public AbstractAction() {
-    flavors.add(RequestFlavor.HTML);
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.Action#startHTMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#startResponse(ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
-  public int startHTMLResponse(WebloungeRequest request, WebloungeResponse response)
+  public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
     return EVAL_REQUEST;
   }
-  
+
   /**
    * Sets the parent module.
    * 
@@ -168,10 +147,6 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    */
   public void setSite(Site site) {
     this.site = site;
-    if (targetPath != null)
-      this.pageURI = new PageURIImpl(site, targetPath);
-    if (templateId != null)
-      this.template = site.getTemplate(templateId);
   }
 
   /**
@@ -181,25 +156,6 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    */
   public Site getSite() {
     return site;
-  }
-
-  /**
-   * Sets the page that is used to do the action's rendering.
-   * 
-   * @param page
-   *          the page
-   */
-  public void setPage(Page page) {
-    this.page = page;
-  }
-
-  /**
-   * Returns the page that is used to do the action's rendering.
-   * 
-   * @return the target page
-   */
-  public Page getPage() {
-    return page;
   }
 
   /**
@@ -232,23 +188,70 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
   }
 
   /**
-   * {@inheritDoc}
+   * Loads parameters provided via the url extension (e. g.
+   * action/param1/param2)
    * 
-   * @see ch.o2it.weblounge.common.site.Action#setPageURI(ch.o2it.weblounge.common.page.PageURI)
+   * @param request
+   *          request to gather values from.
    */
-  public void setPageURI(PageURI uri) {
-    this.pageURI = uri;
+  private void loadUrlExtensionValues(WebloungeRequest request) {
+    // load parameter values from url extension
+    urlparams = new ArrayList<String>();
+    String[] params = getRequestedUrlExtension().split("/");
+    // first param is empty (because of leading slash), therefore start with
+    // index
+    // 1
+    for (int i = 1; i < params.length; i++) {
+      urlparams.add(params[i]);
+    }
   }
 
   /**
-   * {@inheritDoc}
+   * Returns a collection with all the parameters provided via the url
+   * extension.
    * 
-   * @see ch.o2it.weblounge.common.site.Action#getPageURI()
+   * TODO: Hide this in general getParameter()
+   * 
+   * @return a <code>List<String></code> object with all the parameters
    */
-  public PageURI getPageURI() {
-    return pageURI;
+  public List<String> getUrlParameters() {
+    return this.urlparams;
   }
 
+  /**
+   * Returns true, if there is an url parameter at the specified position,
+   * otherwise, false is returned.
+   * 
+   * TODO: Hide this in general getParameter()
+   * 
+   * @param i
+   *          position of the parameter in the url extension
+   * @return true if parameter is present, otherwise false
+   */
+  public boolean isUrlParameterPresent(int i) {
+    String param = getUrlParameter(i);
+    if (param == null || param.length() == 0)
+      return false;
+    else
+      return true;
+  }
+
+  /**
+   * Returns a parameter value which was provided via the url extension.
+   * 
+   * TODO: Hide this in general getParameter()
+   * 
+   * @param i
+   *          position of the parameter in the url extension
+   * @return a <code>String</code> object with the requested parameter value
+   */
+  public String getUrlParameter(int i) {
+    if (i < getUrlParameters().size())
+      return this.getUrlParameters().get(i);
+    else
+      return null;
+  }
+  
   /**
    * Returns the extension part of the requested url. For example, if an action
    * is mounted to <code>/test</code> and the url is <code>/test/a</code> then
@@ -275,24 +278,6 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
     if (request == null)
       throw new IllegalStateException("Request has not started");
     return request.getUrl().getPath().substring(mountpoint.length());
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Action#setTemplate(ch.o2it.weblounge.common.site.PageTemplate)
-   */
-  public void setTemplate(PageTemplate template) {
-    this.template = template;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Action#getTemplate()
-   */
-  public PageTemplate getTemplate() {
-    return template;
   }
 
   /**
@@ -438,6 +423,8 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
     this.request = request;
     this.response = response;
     this.flavor = flavor;
+    
+    loadUrlExtensionValues(request);
 
     // Check if we have a file upload request
     if (ServletFileUpload.isMultipartContent(request)) {
@@ -494,7 +481,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    *           if the passed renderer is <code>null</code>
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      PageletRenderer renderer, Object data) throws ActionException  {
+      PageletRenderer renderer, Object data) throws ActionException {
     if (renderer == null) {
       String msg = "The renderer passed to include in action '" + this + "' was <null>!";
       throw new ActionException(new IllegalArgumentException(msg));
@@ -559,7 +546,7 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
    *           if the passed renderer cannot be found.
    */
   protected void include(WebloungeRequest request, WebloungeResponse response,
-      String renderer) throws ActionException  {
+      String renderer) throws ActionException {
     include(request, response, getModule(), renderer, null);
   }
 
@@ -674,6 +661,9 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /**
    * {@inheritDoc}
+   * <p>
+   * When overwriting this method, please make sure to call
+   * <code>super.activate()</code> as well.
    * 
    * @see ch.o2it.weblounge.common.site.Action#activate()
    */
@@ -683,6 +673,9 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
 
   /**
    * {@inheritDoc}
+   * <p>
+   * When overwriting this method, please make sure to call
+   * <code>super.passivate()</code> as well.
    * 
    * @see ch.o2it.weblounge.common.site.Action#passivate()
    */
@@ -691,8 +684,6 @@ public abstract class AbstractAction extends GeneralComposeable implements Actio
     flavor = null;
     files = null;
     includeCount = 0;
-    page = null;
-    renderer = null;
     request = null;
     response = null;
   }

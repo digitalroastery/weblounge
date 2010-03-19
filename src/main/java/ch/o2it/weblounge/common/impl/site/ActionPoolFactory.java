@@ -22,9 +22,10 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.page.HTMLInclude;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.site.Action;
+import ch.o2it.weblounge.common.site.HTMLAction;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.slf4j.Logger;
@@ -74,7 +75,7 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
     action.setPath(blueprint.getPath());
 
     // Includes
-    for (PageInclude include : blueprint.getIncludes()) {
+    for (HTMLInclude include : blueprint.getIncludes()) {
       action.addInclude(include);
     }
 
@@ -90,14 +91,20 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
     // Valid time
     action.setValidTime(blueprint.getValidTime());
 
-    // Page URI
-    if (blueprint.getPageURI() != null) {
-      PageURI uri = blueprint.getPageURI();
-      action.setPageURI(new PageURIImpl(uri.getSite(), uri.getPath()));
-    }
+    // Are we looking at an html action?
+    if (blueprint instanceof HTMLAction) {
+      HTMLAction htmlBlueprint = (HTMLAction)action;
+      HTMLAction htmlAction = (HTMLAction)action;
 
-    // Page template
-    action.setTemplate(blueprint.getTemplate());
+      // Page URI
+      if (htmlBlueprint.getPageURI() != null) {
+        PageURI uri = htmlBlueprint.getPageURI();
+        htmlAction.setPageURI(new PageURIImpl(uri.getSite(), uri.getPath()));
+      }
+  
+      // Page template
+      htmlAction.setTemplate(htmlBlueprint.getTemplate());
+    }
     
     // Names
     for (Language l : blueprint.languages()) {

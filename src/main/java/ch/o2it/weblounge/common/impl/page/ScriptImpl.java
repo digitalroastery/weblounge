@@ -124,7 +124,7 @@ public class ScriptImpl implements Script {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.page.PageInclude#getHref()
+   * @see ch.o2it.weblounge.common.page.HTMLHeadElement#getHref()
    */
   public String getHref() {
     return href;

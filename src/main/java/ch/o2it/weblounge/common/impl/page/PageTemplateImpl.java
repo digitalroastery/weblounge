@@ -24,8 +24,8 @@ import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.page.HTMLInclude;
 import ch.o2it.weblounge.common.page.Link;
-import ch.o2it.weblounge.common.page.PageInclude;
 import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -289,11 +289,11 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     // Includes
     if (getIncludes().length > 0) {
       buf.append("<includes>");
-      for (PageInclude include : getIncludes()) {
+      for (HTMLInclude include : getIncludes()) {
         if (include instanceof Link)
           buf.append(include.toXml());
       }
-      for (PageInclude include : getIncludes()) {
+      for (HTMLInclude include : getIncludes()) {
         if (include instanceof Script)
           buf.append(include.toXml());
       }

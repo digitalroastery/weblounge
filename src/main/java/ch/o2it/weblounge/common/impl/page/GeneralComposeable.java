@@ -24,11 +24,10 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.PageInclude;
+import ch.o2it.weblounge.common.page.HTMLInclude;
 import ch.o2it.weblounge.common.site.Composeable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -52,7 +51,7 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
   protected LocalizableContent<String> name = null;
   
   /** Includes */
-  protected List<PageInclude> includes = null;
+  protected List<HTMLInclude> includes = null;
 
   /**
    * Creates a new composeable instance with a recheck time of a day and a valid
@@ -214,35 +213,20 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.Composeable#setLinks(ch.o2it.weblounge.common.page.PageInclude[])
+   * @see ch.o2it.weblounge.common.site.Composeable#addInclude(ch.o2it.weblounge.common.page.HTMLInclude)
    */
-  public void setLinks(PageInclude[] links) {
-    if (links != null) {
-      if (includes == null)
-        includes = new ArrayList<PageInclude>();
-      includes.addAll(Arrays.asList(links));
-    } else {
-      includes = null;
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.Composeable#addInclude(ch.o2it.weblounge.common.page.PageInclude)
-   */
-  public void addInclude(PageInclude include) {
+  public void addInclude(HTMLInclude include) {
     if (includes == null)
-      includes = new ArrayList<PageInclude>();
+      includes = new ArrayList<HTMLInclude>();
     includes.add(include);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.Composeable#removeInclude(ch.o2it.weblounge.common.page.PageInclude)
+   * @see ch.o2it.weblounge.common.site.Composeable#removeInclude(ch.o2it.weblounge.common.page.HTMLInclude)
    */
-  public void removeInclude(PageInclude include) {
+  public void removeInclude(HTMLInclude include) {
     if (includes == null)
       return;
     includes.remove(include);
@@ -253,11 +237,11 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
    *
    * @see ch.o2it.weblounge.common.site.Composeable#getIncludes()
    */
-  public PageInclude[] getIncludes() {
+  public HTMLInclude[] getIncludes() {
     if (includes != null) {
-      return includes.toArray(new PageInclude[includes.size()]);
+      return includes.toArray(new HTMLInclude[includes.size()]);
     }
-    return new PageInclude[] {};
+    return new HTMLInclude[] {};
   }
 
   /**

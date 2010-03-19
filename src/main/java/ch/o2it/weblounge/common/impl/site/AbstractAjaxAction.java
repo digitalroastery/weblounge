@@ -34,7 +34,7 @@ import java.util.List;
  * This support implementation provides special methods for encoding
  * <code>Ajax</code> responses.
  */
-public abstract class AbstractAjaxAction extends ActionSupport {
+public abstract class AbstractAjaxAction extends HTMLActionSupport {
 
   /**
    * This method prepares the action handler for the next upcoming request by
@@ -73,7 +73,7 @@ public abstract class AbstractAjaxAction extends ActionSupport {
    * @see ch.o2it.weblounge.common.site.Action.module.ActionHandler#startPage(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse)
    */
-  public final int startHTMLResponse(WebloungeRequest request,
+  public final int startResponse(WebloungeRequest request,
       WebloungeResponse response) throws ActionException {
     response.setHeader("Content-Type", "text/json; charset=utf-8");
     startAjaxResponse(request, response);

@@ -23,19 +23,13 @@ package ch.o2it.weblounge.common.site;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.page.PageImpl;
-import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.site.AbstractAction;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.page.Link;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -43,22 +37,20 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.URL;
-
 /**
  * Test case for {@link AbstractAction}.
  */
 public class AbstractActionTest {
-  
+
   /** The action to test */
   protected AbstractAction action = new TestAction();
-  
+
   /** Action identifier */
   protected String identifier = "myaction";
-  
+
   /** The action implementation */
   protected Class<? extends Action> actionClass = TestAction.class;
-  
+
   /** Stylesheet */
   protected Link link = new LinkImpl("http://localhost/css/stylesheet.css", "text/css");
 
@@ -67,7 +59,7 @@ public class AbstractActionTest {
 
   /** Javascript */
   protected Link script = new LinkImpl("http://localhost/scripts/script.js", "javascript");
-  
+
   /** The mountpoint */
   protected String mountpoint = "/test/";
 
@@ -76,37 +68,22 @@ public class AbstractActionTest {
 
   /** Valid time */
   protected long validTime = 60000;
-  
-  /** URI of the testpage */
-  protected String pageURIPath = "/testpage/";
 
   /** The full mountpoint */
   protected WebUrl actionUrl = null;
-  
-  /** The page uri */
-  protected PageURI pageURI = null;
-  
-  /** The page */
-  protected Page page = null;
-  
-  /** Identifier of the template */
-  protected String template = "testtemplate";
-
-  /** The page template */
-  protected PageTemplate pageTemplate = null;
 
   /** Name of the option key */
   protected String optionKey = "key";
-  
+
   /** Option value */
   protected String optionValue = "value";
-  
+
   /** Main url of the site */
   protected String siteUrl = "http://localhost/";
 
   /** The mock site */
   protected Site site = null;
-  
+
   /** The mock module */
   protected Module module = null;
 
@@ -123,37 +100,33 @@ public class AbstractActionTest {
     action.setPath(mountpoint);
     action.setRecheckTime(recheckTime);
     action.setValidTime(validTime);
-    action.setPageURI(pageURI);
-    action.setTemplate(site.getTemplate(template));
     action.setOption(optionKey, optionValue);
     action.setSite(site);
     action.setModule(module);
-    action.setPage(page);
   }
-  
+
   /**
    * Sets up mock objects.
+   * 
+   * @throws Exception
+   *           if setting up the preliminaries fails
    */
   protected void setUpPreliminaries() throws Exception {
-    pageTemplate = new PageTemplateImpl(template, new URL("file:///template.jsp"));
-
     // site
     site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getTemplate(template)).andReturn(pageTemplate);
     EasyMock.expect(site.getUrl()).andReturn(new WebUrlImpl(site, siteUrl));
     EasyMock.replay(site);
-    
+
     // module
     module = EasyMock.createNiceMock(Module.class);
     EasyMock.replay(module);
-    
-    pageURI = new PageURIImpl(site, pageURIPath);
-    page = new PageImpl(pageURI);
+
     actionUrl = new WebUrlImpl(site, UrlSupport.concat(siteUrl, mountpoint));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getModule()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getModule()}.
    */
   @Test
   public void testGetModule() {
@@ -161,7 +134,8 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getSite()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -169,16 +143,8 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getPage()}.
-   */
-  @Test
-  public void testGetPage() {
-    assertEquals(page, action.getPage());
-    assertEquals(page.getURI(), pageURI);
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getUrl()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getUrl()}.
    */
   @Test
   public void testGetUrl() {
@@ -186,7 +152,8 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getPath()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getPath()}.
    */
   @Test
   public void testGetPath() {
@@ -196,25 +163,8 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getPageURI()}.
-   */
-  @Test
-  public void testGetPageURI() {
-    assertEquals(pageURI, action.getPageURI());
-    action.setPageURI(new PageURIImpl(site, "/testpage"));
-    assertEquals(new PageURIImpl(site, "/testpage/"), action.getPageURI());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getTemplate()}.
-   */
-  @Test
-  public void testGetTemplate() {
-    assertEquals(pageTemplate, action.getTemplate());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getFlavors()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getFlavors()}.
    */
   @Test
   public void testGetFlavors() {
@@ -223,7 +173,9 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#supportsFlavor(ch.o2it.weblounge.common.request.RequestFlavor)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#supportsFlavor(ch.o2it.weblounge.common.request.RequestFlavor)}
+   * .
    */
   @Test
   public void testSupportsFlavor() {
@@ -232,7 +184,9 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValue(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValue(java.lang.String)}
+   * .
    */
   @Test
   public void testGetOptionValueString() {
@@ -241,7 +195,9 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValue(java.lang.String, java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValue(java.lang.String, java.lang.String)}
+   * .
    */
   @Test
   public void testGetOptionValueStringString() {
@@ -250,7 +206,9 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValues(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptionValues(java.lang.String)}
+   * .
    */
   @Test
   public void testGetOptionValues() {
@@ -263,7 +221,8 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptions()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#getOptions()}.
    */
   @Test
   public void testGetOptions() {
@@ -271,7 +230,9 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#hasOption(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#hasOption(java.lang.String)}
+   * .
    */
   @Test
   public void testHasOption() {
@@ -280,7 +241,9 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#removeOption(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#removeOption(java.lang.String)}
+   * .
    */
   @Test
   public void testRemoveOption() {
@@ -289,7 +252,8 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#activate()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#activate()}.
    * <p>
    * Nothing to test, since implementation is empty
    */
@@ -299,12 +263,13 @@ public class AbstractActionTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.AbstractAction#passivate()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.AbstractAction#passivate()}.
    */
   @Test
   public void testPassivate() {
     action.passivate();
-    
+
     // These things should still be set
     assertNotNull(action.getSite());
     assertNotNull(action.getModule());
@@ -313,12 +278,7 @@ public class AbstractActionTest {
     assertEquals(actionUrl, action.getUrl());
     assertEquals(recheckTime, action.getRecheckTime());
     assertEquals(validTime, action.getValidTime());
-    assertEquals(pageURI, action.getPageURI());
-    assertNotNull(template, action.getTemplate());
     assertEquals(1, action.getOptions().size());
-    
-    // These should have gone away
-    assertNull(action.getPage());
   }
 
 }

@@ -20,38 +20,62 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.util.I18n;
+import ch.o2it.weblounge.common.page.HTMLInclude;
+import ch.o2it.weblounge.common.page.Page;
+import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
+import ch.o2it.weblounge.common.site.HTMLAction;
+import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.Renderer;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class provides a default implementation for an
- * <code>ActionHandler</code>. The implementations of the various
- * <code>startXYZ</code> methods are implemented such that they leave the
- * rendering completely to the target page.
+ * This class is the default implementation for an <code>HTMLAction</code>. The
+ * implementations of the various <code>startXYZ</code> methods are implemented
+ * such that they leave it to the target page to render the stuff.
  * <p>
- * Be aware of the fact that action handlers are pooled, so make sure to
- * implement the <code>cleanup</code> method to clear any state information from
- * this handler instance and as usual, don't forget to call the super
- * implementation when overwriting methods.
+ * <b>Note:</b> Be aware of the fact that actions are pooled, so make sure to
+ * implement the <code>activate()</code> and <code>passivate()</code> method
+ * accordingly and of course to include the respective super implementations.
  */
-public class ActionSupport extends AbstractAction {
+public class HTMLActionSupport extends AbstractAction implements HTMLAction {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(ActionSupport.class);
+  protected final static Logger log_ = LoggerFactory.getLogger(HTMLActionSupport.class);
+
+  /** The default path to render on */
+  protected String targetPath = null;
+
+  /** The page uri, deducted from targetPath */
+  protected PageURI pageURI = null;
+
+  /** The page template id */
+  protected String templateId = null;
+
+  /** The page template */
+  protected PageTemplate template = null;
+
+  /** The underlying page */
+  protected Page page = null;
+
+  /** The renderer used for this request */
+  protected Renderer renderer = null;
 
   /** Request parameter name for information messages */
   public final static String INFOS = "webl:infos";
@@ -71,36 +95,121 @@ public class ActionSupport extends AbstractAction {
   /** The error messages */
   protected List<String> errorMessages = null;
 
-  /** Parameter collection extracted from the url extension */
-  private List<String> urlparams = new ArrayList<String>();
-
-  /**
-   * This method prepares the action handler for the next upcoming request by
-   * passing it the request and response for first analysis as well as the
-   * desired output method.
-   * <p>
-   * It is not recommended that subclasses use this method to write anything to
-   * the response. The call serves the single purpose acquire resources and set
-   * up for the call to <code>startPage</code>.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param response
-   *          the weblounge response
-   * @param flavor
-   *          the output method
-   * @see ch.o2it.weblounge.common.site.Action#configure(ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse,
-   *      ch.o2it.weblounge.common.page.Page,
-   *      ch.o2it.weblounge.common.site.Renderer, java.lang.String)
-   */
-  public void configure(WebloungeRequest request, WebloungeResponse response,
-      RequestFlavor flavor) throws ActionException {
-    super.configure(request, response, flavor);
-    loadUrlExtensionValues(request);
+  public HTMLActionSupport() {
+    flavors.add(RequestFlavor.HTML);
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#passivate()
+   */
+  public void passivate() {
+    super.passivate();
+    page = null;
+    renderer = null;
+    infoMessages = null;
+    warningMessages = null;
+    errorMessages = null;
+  }
+
+  /**
+   * Sets the associated site if this is a site related renderer configuration.
+   * 
+   * @param site
+   *          the associated site
+   */
+  public void setSite(Site site) {
+    super.setSite(site);
+    if (targetPath != null)
+      this.pageURI = new PageURIImpl(site, targetPath);
+    if (templateId != null)
+      this.template = site.getTemplate(templateId);
+  }
+
+  /**
+   * Sets the page that is used to do the action's rendering.
+   * 
+   * @param page
+   *          the page
+   */
+  public void setPage(Page page) {
+    this.page = page;
+  }
+
+  /**
+   * Returns the page that is used to do the action's rendering.
+   * 
+   * @return the target page
+   */
+  public Page getPage() {
+    return page;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#setPageURI(ch.o2it.weblounge.common.page.PageURI)
+   */
+  public void setPageURI(PageURI uri) {
+    this.pageURI = uri;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#getPageURI()
+   */
+  public PageURI getPageURI() {
+    return pageURI;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#setTemplate(ch.o2it.weblounge.common.site.PageTemplate)
+   */
+  public void setTemplate(PageTemplate template) {
+    this.template = template;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#getTemplate()
+   */
+  public PageTemplate getTemplate() {
+    return template;
+  }
+
+  /**
+   * Returns <code>true</code> if <code>composer</code> equals the stage of the
+   * current renderer.
+   * 
+   * @param composer
+   *          the composer to test
+   * @param request
+   *          the request
+   * @return <code>true</code> if <code>composer</code> is the main stage
+   */
+  protected boolean isStage(String composer, WebloungeRequest request) {
+    if (composer == null)
+      throw new IllegalArgumentException("Composer may not be null!");
+
+    String stage = PageTemplate.DEFAULT_STAGE;
+    PageTemplate template = (PageTemplate) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+    if (template != null)
+      stage = template.getStage();
+    return composer.equalsIgnoreCase(stage);
+  }
+
+  /**
+   * This method simply sets the content type on the response to
+   * <code>text/html;charset=utf-8</code>. This means that subclasses should
+   * either overwrite this method to specify a different encoding or make sure
+   * that everything that is written to the response is encoded to
+   * <code>utf-8</code>.
+   * <p>
    * This method always returns {@link Action#EVAL_REQUEST} and therefore leaves
    * rendering to the page.
    * 
@@ -108,68 +217,38 @@ public class ActionSupport extends AbstractAction {
    *          the servlet request
    * @param response
    *          the servlet response
-   * @return either <code>EVAL_PAGE</code> or <code>SKIP_PAGE</code> depending
-   *         on whether the action wants to render the page on its own or have
-   *         the template do the rendering.
-   * @see ch.o2it.weblounge.api.module.ActionHandler#startPage(ch.o2it.weblounge.api.request.WebloungeRequest,
-   *      ch.o2it.weblounge.api.request.WebloungeResponse)
+   * @return {@link Action#EVAL_REQUEST}
    */
-  public int startHTMLResponse(WebloungeRequest request, WebloungeResponse response)
+  @Override
+  public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
+    response.setContentType("text/html;charset=utf-8");
     return EVAL_REQUEST;
   }
 
   /**
-   * This default implementation writes nothing to the output.
-   *
-   * @see ch.o2it.weblounge.common.site.Action#startXMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   * {@inheritDoc}
+   * <p>
+   * This implementation asks the action to return the include headers
+   * <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code> by calling
+   * {@link #getIncludes()} and writes them to the response.
+   * 
+   * @see ch.o2it.weblounge.common.site.HTMLAction#startHeader(ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
-  public void startXMLResponse(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException {
+  public void startHeader(WebloungeRequest request, WebloungeResponse response)
+      throws IOException, ActionException {
+    for (HTMLInclude include : getIncludes()) {
+      response.getOutputStream().println(include.toXml());
+    }
   }
 
   /**
-   * This default implementation writes nothing to the output.
-   *
-   * @see ch.o2it.weblounge.common.site.Action#startJSONResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
-   */
-  public void startJSONResponse(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException {
-  }
-
-  /**
-   * This method is called by the target page and gives the action the
-   * possibility to either replace the includes in the page header, add more
-   * includes to the existing ones or have the page handle the includes.
-   * 
-   * Implementing classes may return one out of two values:
-   * <ul>
-   * <li><code>EVAL_INCLUDES</code> to have the page handle the includes</li>
-   * <li><code>SKIP_INCLUDES</code> to skip any includes by this page</li>
-   * </ul>
-   * If <code>SKIP_INCLUDES</code> is returned, then the action is responsible
-   * for writing any output to the response object, since control of rendering
-   * is transferred completely. <br>
-   * If <code>EVAL_INCLUDES</code> is returned, the page will control the adding
-   * of includes, while the action may still add some itself.
-   * 
-   * <b>Note</b> This callback will only be performed if the page contains a
-   * &lt;webl:inlcudes/&gt; tag in the header section.
-   * 
-   * @param request
-   *          the servlet request
-   * @param response
-   *          the servlet response
-   * @return either <code>EVAL_INCLUDES</code> or <code>SKIP_INCLUDES</code>
-   */
-  public int startHTMLIncludes(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException {
-    return EVAL_INCLUDES;
-  }
-
-  /**
-   * This method always returns <code>true</code> and therefore leaves rendering
-   * to the composer.
+   * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
+   * leaves rendering to the actual content of the composer. This means that if
+   * this action is rendered on an existing page, a call to
+   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, int)} for
+   * each of them will be issued.
    * 
    * @param request
    *          the request object
@@ -177,39 +256,41 @@ public class ActionSupport extends AbstractAction {
    *          the response object
    * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
    *         depending on whether the action wants to render the composer on its
-   *         own or have the template do the rendering.
+   *         own or have the composer content do the rendering.
    * @see ch.o2it.weblounge.api.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
    */
   public int startStage(WebloungeRequest request, WebloungeResponse response)
-      throws ActionException {
+      throws IOException, ActionException {
     return EVAL_COMPOSER;
   }
 
   /**
-   * This method always returns <code>true</code> and therefore leaves rendering
-   * to the composer.
+   * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
+   * leaves rendering to the actual content of the composer. This means that if
+   * this action is rendered on an existing page, a call to
+   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, int)} for
+   * each of them will be issued.
    * 
    * @param request
    *          the request object
    * @param response
    *          the response object
-   * @param composer
-   *          the composer identifier
    * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
    *         depending on whether the action wants to render the composer on its
-   *         own or have the template do the rendering.
+   *         own or have the composer content do the rendering.
    * @see ch.o2it.weblounge.api.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
    */
   public int startComposer(WebloungeRequest request,
-      WebloungeResponse response, String composer) throws ActionException {
+      WebloungeResponse response, String composer) throws IOException,
+      ActionException {
     return EVAL_COMPOSER;
   }
 
   /**
-   * This method always returns <code>true</code> and therefore leaves rendering
-   * to the pagelet.
+   * This method always returns {@link HTMLAction#EVAL_PAGELET} and therefore
+   * leaves rendering to the pagelet.
    * 
    * @param request
    *          the request object
@@ -220,28 +301,15 @@ public class ActionSupport extends AbstractAction {
    * @param position
    *          the pagelet position
    * @return either <code>EVAL_PAGELET</code> or <code>SKIP_PAGELET</code>
-   *         depending on whether the action wants to render the pagelet on its
-   *         own or have the template do the rendering.
+   *         depending on whether the action wants to render the pagelet itself
+   *         or have the pagelet do the rendering.
    * @see ch.o2it.weblounge.api.module.ActionHandler#startPagelet(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String,
    *      int)
    */
   public int startPagelet(WebloungeRequest request, WebloungeResponse response,
-      String composer, int position) throws ActionException {
+      String composer, int position) throws IOException, ActionException {
     return EVAL_PAGELET;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.site.AbstractAction#passivate()
-   */
-  @Override
-  public void passivate() {
-    super.passivate();
-    infoMessages = null;
-    warningMessages = null;
-    errorMessages = null;
   }
 
   /**
@@ -426,71 +494,6 @@ public class ActionSupport extends AbstractAction {
    */
   protected boolean hasErrors() {
     return errorMessages == null || errorMessages.size() == 0;
-  }
-
-  /**
-   * Loads parameters provided via the url extension (e. g.
-   * action/param1/param2)
-   * 
-   * @param request
-   *          request to gather values from.
-   */
-  private void loadUrlExtensionValues(WebloungeRequest request) {
-    // load parameter values from url extension
-    urlparams = new ArrayList<String>();
-    String[] params = getRequestedUrlExtension().split("/");
-    // first param is empty (because of leading slash), therefore start with
-    // index
-    // 1
-    for (int i = 1; i < params.length; i++) {
-      urlparams.add(params[i]);
-    }
-  }
-
-  /**
-   * Returns a collection with all the parameters provided via the url
-   * extension.
-   * 
-   * TODO: Hide this in general getParameter()
-   * 
-   * @return a <code>List<String></code> object with all the parameters
-   */
-  public List<String> getUrlParameters() {
-    return this.urlparams;
-  }
-
-  /**
-   * Returns true, if there is an url parameter at the specified position,
-   * otherwise, false is returned.
-   * 
-   * TODO: Hide this in general getParameter()
-   * 
-   * @param i
-   *          position of the parameter in the url extension
-   * @return true if parameter is present, otherwise false
-   */
-  public boolean isUrlParameterPresent(int i) {
-    String param = getUrlParameter(i);
-    if (param == null || param.length() == 0)
-      return false;
-    else
-      return true;
-  }
-
-  /**
-   * Returns a parameter value which was provided via the url extension.
-   * 
-   * TODO: Hide this in general getParameter()
-   * 
-   * @param i
-   *          position of the parameter in the url extension
-   * @return a <code>String</code> object with the requested parameter value
-   */
-  public String getUrlParameter(int i) {
-    if (i < getUrlParameters().size())
-      return this.getUrlParameters().get(i);
-    else
-      return null;
   }
 
 }

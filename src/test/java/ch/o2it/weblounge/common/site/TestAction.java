@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.site;
 
-import ch.o2it.weblounge.common.impl.site.ActionSupport;
+import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
 
 import org.junit.Ignore;
 
@@ -28,6 +28,6 @@ import org.junit.Ignore;
  * Test implementation of an action.
  */
 @Ignore
-public class TestAction extends ActionSupport {
+public class TestAction extends HTMLActionSupport {
 
 }
