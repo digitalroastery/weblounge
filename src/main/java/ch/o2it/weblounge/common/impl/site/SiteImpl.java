@@ -90,7 +90,7 @@ public class SiteImpl implements Site {
 
   /** Regular expression to test the validity of a site identifier */
   private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9-_.]*$";
-  
+
   /** The default hostname */
   private static final String DEFAULT_HOSTNAME = "localhost";
 
@@ -105,7 +105,7 @@ public class SiteImpl implements Site {
 
   /** Url of this site */
   private WebUrl url = null;
-  
+
   /** Site description */
   protected String description = null;
 
@@ -162,10 +162,10 @@ public class SiteImpl implements Site {
 
   /** Quartz scheduler */
   private Scheduler scheduler = null;
-  
+
   /** Listener for the quartz scheduler */
   private TriggerListener quartzTriggerListener = null;
-  
+
   /** Flag to tell whether we are currently shutting down */
   private boolean isShutdownInProgress = false;
 
@@ -711,7 +711,7 @@ public class SiteImpl implements Site {
         }
       }
     }
-    
+
     // Register jobs
     synchronized (jobs) {
       for (QuartzJob job : jobs.values()) {
@@ -748,7 +748,7 @@ public class SiteImpl implements Site {
         unscheduleJob(job);
       }
     }
-    
+
     // Shutdown all of the modules
     synchronized (modules) {
       for (Module module : modules.values()) {
@@ -995,6 +995,8 @@ public class SiteImpl implements Site {
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if the site activation fails
    */
   public void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
@@ -1027,6 +1029,8 @@ public class SiteImpl implements Site {
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if the site deactivation fails
    */
   public void deactivate(ComponentContext context) throws Exception {
     try {
@@ -1182,15 +1186,15 @@ public class SiteImpl implements Site {
     if (config == null)
       config = new Hashtable<String, Serializable>();
     config.put(Job.CTXT_SITE, this);
-    
+
     // Create the job
     QuartzJob jobDetail = new QuartzJob(name, job, config, trigger);
-    
+
     // Register the job
     synchronized (jobs) {
       jobs.put(job.getName(), jobDetail);
     }
-    
+
     // Schedule it if this site is running
     if (running) {
       scheduleJob(jobDetail);
@@ -1217,31 +1221,34 @@ public class SiteImpl implements Site {
   private void scheduleJob(QuartzJob job) {
     if (scheduler == null)
       return;
-    
+
     // Throw the job at quartz
     String groupName = "site " + this.getIdentifier();
     String jobIdentifier = job.getIdentifier();
     Class<?> jobClass = job.getJob();
     JobTrigger trigger = job.getTrigger();
-    
+
     synchronized (jobs) {
-      
+
       // Set up the job detail
       JobDataMap jobData = new JobDataMap();
       jobData.put(QuartzJobWorker.CLASS, jobClass);
       jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
       JobDetail quartzJob = new JobDetail(jobIdentifier, groupName, QuartzJobWorker.class);
       quartzJob.setJobDataMap(jobData);
-      
+
       // Define the trigger
       Trigger quartzTrigger = new QuartzJobTrigger(jobIdentifier, groupName, trigger);
       quartzTrigger.addTriggerListener(quartzTriggerListener.getName());
-      
+
       // Schedule
       try {
         Date date = scheduler.scheduleJob(quartzJob, quartzTrigger);
         String repeat = trigger.getNextExecutionAfter(date) != null ? " first" : "";
-        log_.info("Job '{}' scheduled,{} execution at {}", new Object[] { jobIdentifier, repeat, date });
+        log_.info("Job '{}' scheduled,{} execution at {}", new Object[] {
+            jobIdentifier,
+            repeat,
+            date });
       } catch (SchedulerException e) {
         log_.error("Error trying to schedule job {}: {}", new Object[] {
             jobIdentifier,
