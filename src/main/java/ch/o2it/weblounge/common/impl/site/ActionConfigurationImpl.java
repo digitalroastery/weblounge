@@ -418,7 +418,9 @@ public class ActionConfigurationImpl implements ActionConfiguration {
       try {
         action.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The recheck time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The action recheck time '" + recheck + "' is malformed", e);
+      } catch (IllegalArgumentException e) {
+        throw new IllegalStateException("The action recheck time '" + recheck + "' is malformed", e);
       }
     }
 
@@ -428,7 +430,9 @@ public class ActionConfigurationImpl implements ActionConfiguration {
       try {
         action.setValidTime(ConfigurationUtils.parseDuration(valid));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The action valid time '" + recheck + "' is malformed", e);
+      } catch (IllegalArgumentException e) {
+        throw new IllegalStateException("The action valid time '" + recheck + "' is malformed", e);
       }
     }
 

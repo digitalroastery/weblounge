@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.request.RequestFlavor;
+import ch.o2it.weblounge.common.site.PageTemplate;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,7 @@ import org.junit.Test;
 public class PageTemplateImplTest extends GeneralComposeableTest {
   
   /** The page template under test */
-  protected PageTemplateImpl template = null;
+  protected PageTemplate template = null;
   
   /** The stage composer */
   protected String stage = "boxes";
@@ -50,7 +51,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   @Before
   public void setUp() throws Exception {
     template = new PageTemplateImpl(identifier, rendererURL);    
-    composeable = template;
+    composeable = (PageTemplateImpl)template;
     setUpComposeable();
     template.setStage(stage);
     template.setDefaultLayout(layout);

@@ -104,8 +104,14 @@ public class CronJobTriggerTest {
    */
   @Test
   public void testCronJobTrigger() {
+    Date now = new Date();
     CronJobTrigger emptyTrigger = new CronJobTrigger();
-    assertTrue(emptyTrigger.getNextExecutionAfter(now) == null);
+    Calendar c = Calendar.getInstance();
+    c.set(Calendar.SECOND, 0);
+    c.set(Calendar.MILLISECOND, 0);
+    c.add(Calendar.MINUTE, 1);
+    Date triggerDate = c.getTime();
+    assertEquals(triggerDate, emptyTrigger.getNextExecutionAfter(now));
   }
 
   /**

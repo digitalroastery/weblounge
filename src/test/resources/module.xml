@@ -1,0 +1,65 @@
+<module id="testmodule">
+  <enable>true</enable>
+  <name language="en">Test module</name>
+  <name language="de">Testmodul</name>
+  <pagelets>
+    <pagelet id="renderer" composeable="true">
+      <renderer>file://renderer/renderer.jsp</renderer>
+      <editor>file://renderer/editor.jsp</editor>
+      <recheck>1d10m</recheck>
+      <valid>1w1d1h1m</valid>
+      <name language="de">Pagelet renderer</name>
+      <name language="en">Darstellungselement</name>
+    </pagelet>
+  </pagelets>
+  <imagestyles>
+    <imagestyle id="modulestyle" composeable="true">
+      <scalingmode>box</scalingmode>
+      <width>150</width>
+      <height>200</height>
+      <name language="de">Modulbild</name>
+      <name language="en">Module image</name>
+    </imagestyle>
+  </imagestyles>
+  <actions>
+    <action id="myaction">
+      <class>ch.o2it.weblounge.common.site.TestAction</class>
+      <mountpoint>/test/</mountpoint>
+      <page>/testpage/</page>
+      <template>testtemplate</template>
+      <recheck>0</recheck>
+      <valid>60S</valid>
+      <name language="de">Test</name>
+      <name language="en">Test</name>
+      <includes>
+        <link href="http://localhost/css/stylesheet.css" type="text/css"/>
+        <script src="http://localhost/scripts/script.js" type="javascript"/>
+      </includes>
+      <options>
+        <option>
+          <name>key</name>
+          <value>value</value>
+        </option>
+      </options>
+    </action>
+  </actions>
+  <jobs>
+    <job id="testjob">
+      <name>Job title</name>
+      <class>ch.o2it.weblounge.common.scheduler.TestJob</class>
+      <schedule>0 0 * * 1</schedule>
+      <options>
+        <option>
+          <name>key</name>
+          <value>value</value>
+        </option>
+      </options>
+    </job>
+  </jobs>
+  <options>
+    <option>
+      <name>media.url</name>
+      <value>http://media.swissunihockey.ch/dev</value>
+    </option>
+  </options>
+</module>

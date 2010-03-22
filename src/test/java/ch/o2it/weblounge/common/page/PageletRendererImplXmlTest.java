@@ -21,14 +21,12 @@
 package ch.o2it.weblounge.common.page;
 
 import static org.junit.Assert.assertEquals;
-
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -41,7 +39,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 /**
  * Test case for the xml capabilities of {@link PageletRendererImpl}.
  */
-@Ignore
 public class PageletRendererImplXmlTest extends PageletRendererImplTest {
 
   /** Name of the test file */
@@ -52,6 +49,7 @@ public class PageletRendererImplXmlTest extends PageletRendererImplTest {
    */
   @Before
   public void setUp() throws Exception {
+    setUpPreliminaries();
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);

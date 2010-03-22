@@ -20,77 +20,183 @@
 
 package ch.o2it.weblounge.common.page;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
+import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.PageletRenderer;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.net.URL;
+import java.util.Locale;
 
 /**
  * Test case for {@link PageletRendererImpl}.
  */
-@Ignore
 public class PageletRendererImplTest {
-  
+
   /** The renderer to test */
   protected PageletRenderer renderer = null;
+
+  /** The renderer identifier */
+  protected String identifier = "renderer";
+  
+  /** The composeable state */
+  protected boolean composeable = true;
+
+  /** The renderer path */
+  protected String rendererPath = "file://renderer/renderer.jsp";
+
+  /** The renderer url */
+  protected URL rendererUrl = null;
+
+  /** The editor path */
+  protected String editorPath = "file://renderer/editor.jsp";
+
+  /** The editor url */
+  protected URL editorUrl = null;
+
+  /** The recheck time */
+  protected long recheckTime = Times.MS_PER_DAY + 10 * Times.MS_PER_MIN;
+
+  /** The valid time */
+  protected long validTime = Times.MS_PER_WEEK + 2 * Times.MS_PER_DAY + Times.MS_PER_HOUR;
+
+  /** English pagelet name */
+  protected String englishName = "Pagelet renderer";
+
+  /** German pagelet name */
+  protected String germanName = "Darstellungselement";
+
+  /** English */
+  protected Language english = new LanguageImpl(new Locale("en"));
+
+  /** German */
+  protected Language german = new LanguageImpl(new Locale("de"));
+
+  /** Cascading stylesheet include */
+  protected Link css = new LinkImpl("http://localhost/css.css");
 
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
+    setUpPreliminaries();
+    renderer = new PageletRendererImpl(identifier, rendererUrl);
+    renderer.setEditor(editorUrl);
+    renderer.setRecheckTime(recheckTime);
+    renderer.setValidTime(validTime);
+    renderer.setComposeable(composeable);
+    renderer.setName(germanName, german);
+    renderer.setName(englishName, english);
+    renderer.addInclude(css);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#setModule(ch.o2it.weblounge.common.site.Module)}.
+   * sets up everything else.
+   * 
+   * @throws Exception
+   *           if setup fails
+   */
+  protected void setUpPreliminaries() throws Exception {
+    rendererUrl = new URL(rendererPath);
+    editorUrl = new URL(editorPath);
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getIdentifier()}
+   * .
    */
   @Test
-  public void testSetModule() {
-    fail("Not yet implemented"); // TODO
+  public void testGetIdentifier() {
+    assertEquals(identifier, renderer.getIdentifier());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#getModule()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getName()}.
    */
   @Test
-  public void testGetModule() {
-    fail("Not yet implemented"); // TODO
+  public void testGetName() {
+    assertEquals(germanName, renderer.getName());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#setEditor(java.net.URL)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language)}
+   * .
    */
   @Test
-  public void testSetEditor() {
-    fail("Not yet implemented"); // TODO
+  public void testGetNameLanguage() {
+    assertEquals(germanName, renderer.getName(german));
+    assertEquals(englishName, renderer.getName(english));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#getEditor()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#isComposeable()}
+   * .
+   */
+  @Test
+  public void testIsComposeable() {
+    assertEquals(composeable, renderer.isComposeable());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getRecheckTime()}
+   * .
+   */
+  @Test
+  public void testGetRecheckTime() {
+    assertEquals(recheckTime, renderer.getRecheckTime());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getValidTime()}
+   * .
+   */
+  @Test
+  public void testGetValidTime() {
+    assertEquals(validTime, renderer.getValidTime());
+  }
+  
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#getEditor()}.
    */
   @Test
   public void testGetEditor() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(editorUrl, renderer.getEditor());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#render(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#render(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)}
+   * .
    */
   @Test
   public void testRender() {
-    fail("Not yet implemented"); // TODO
+    assertEquals(rendererUrl, renderer.getRenderer());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#renderAsEditor(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeabl#getIncludes()
+   * .
    */
   @Test
-  public void testRenderAsEditor() {
-    fail("Not yet implemented"); // TODO
+  public void testGetIncludes() {
+    assertEquals(1, renderer.getIncludes().length);
+    assertEquals(css, renderer.getIncludes()[0]);
   }
 
 }

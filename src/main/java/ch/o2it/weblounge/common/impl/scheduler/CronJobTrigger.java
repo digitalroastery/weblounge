@@ -147,39 +147,35 @@ public final class CronJobTrigger implements JobTrigger {
     Calendar c = Calendar.getInstance();
     c.setFirstDayOfWeek(Calendar.SUNDAY);
     c.setTime(date);
-    boolean configured = false;
 
     // Move to next full minute
     c.set(Calendar.MILLISECOND, 0);
     c.add(Calendar.SECOND, 60 - c.get(Calendar.SECOND));
+    
+    // We are looking for the next possibility *after* date
+    if (c.getTime().equals(date))
+      c.add(Calendar.MINUTE, 1);
 
     // minutes
     while (!matches(c, Calendar.MINUTE, minutes)) {
       c.add(Calendar.MINUTE, 1);
-      configured = true;
     }
 
     // hours
     while (!matches(c, Calendar.HOUR_OF_DAY, hours)) {
       c.add(Calendar.HOUR_OF_DAY, 1);
-      configured = true;
     }
 
     // months
     while (!matches(c, Calendar.MONTH, months)) {
       c.set(Calendar.DAY_OF_MONTH, 1);
       c.add(Calendar.MONTH, 1);
-      configured = true;
     }
 
     // days and weekdays
     while (!matches(c, daysOfMonth, daysOfWeek)) {
       c.add(Calendar.DAY_OF_MONTH, 1);
-      configured = true;
     }
-
-    if (!configured)
-      return null;
 
     // Cache the new value
     return new Date(c.getTimeInMillis());

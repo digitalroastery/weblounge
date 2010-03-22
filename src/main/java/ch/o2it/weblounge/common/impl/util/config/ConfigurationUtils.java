@@ -171,58 +171,58 @@ public class ConfigurationUtils {
     long v = 0;
 
     // Years
-    if (millis > Times.MS_PER_YEAR) {
+    if (millis >= Times.MS_PER_YEAR) {
       v = millis / Times.MS_PER_YEAR;
       millis -= v * Times.MS_PER_YEAR;
-      result.append(v).append(humanReadable? " years " : "y");
+      result.append(v).append(humanReadable ? " years " : "y");
     }
 
     // Months
-    if (millis > Times.MS_PER_MONTH) {
+    if (millis >= Times.MS_PER_MONTH) {
       v = millis / Times.MS_PER_MONTH;
       millis -= v * Times.MS_PER_MONTH;
-      result.append(v).append(humanReadable? " months " : "m");
+      result.append(v).append(humanReadable ? " months " : "m");
     }
 
     // Weeks
-    if (millis > Times.MS_PER_WEEK) {
+    if (millis >= Times.MS_PER_WEEK) {
       v = millis / Times.MS_PER_WEEK;
       millis -= v * Times.MS_PER_WEEK;
-      result.append(v).append(humanReadable? " weeks " : "w");
+      result.append(v).append(humanReadable ? " weeks " : "w");
     }
 
     // Days
-    if (millis > Times.MS_PER_DAY) {
+    if (millis >= Times.MS_PER_DAY) {
       v = millis / Times.MS_PER_DAY;
       millis -= v * Times.MS_PER_DAY;
-      result.append(v).append(humanReadable? " days " : "d");
+      result.append(v).append(humanReadable ? " days " : "d");
     }
 
     // Hours
-    if (millis > Times.MS_PER_HOUR) {
+    if (millis >= Times.MS_PER_HOUR) {
       v = millis / Times.MS_PER_HOUR;
       millis -= v * Times.MS_PER_HOUR;
-      result.append(v).append(humanReadable? " hours " : "H");
+      result.append(v).append(humanReadable ? " hours " : "H");
     }
 
     // Minutes
-    if (millis > Times.MS_PER_MIN) {
+    if (millis >= Times.MS_PER_MIN) {
       v = millis / Times.MS_PER_MIN;
       millis -= v * Times.MS_PER_MIN;
-      result.append(v).append(humanReadable? " minutes " : "M");
+      result.append(v).append(humanReadable ? " minutes " : "M");
     }
 
     // Seconds
-    if (millis > Times.MS_PER_SECOND) {
+    if (millis >= Times.MS_PER_SECOND) {
       v = millis / Times.MS_PER_SECOND;
       millis -= v * Times.MS_PER_SECOND;
-      result.append(v).append(humanReadable? " seconds " : "S");
+      result.append(v).append(humanReadable ? " seconds " : "S");
     }
 
     // Cleanup
     if (millis > 0) {
       result.append(millis);
-      result.append(v).append(humanReadable? " milliseconds " : "");
+      result.append(v).append(humanReadable ? " milliseconds " : "");
     } else if (result.length() == 0)
       result.append("0");
 
@@ -248,8 +248,10 @@ public class ConfigurationUtils {
    * @param duration
    *          the duration either in milliseconds or encoded
    * @return the duration in milliseconds
+   * @throws IllegalArgumentException
+   *           if the duration cannot be parsed
    */
-  public static long parseDuration(String duration) {
+  public static long parseDuration(String duration) throws IllegalArgumentException {
     if (duration == null)
       return 0;
     long millis = 0;
@@ -278,6 +280,8 @@ public class ConfigurationUtils {
           if (match.endsWith("S"))
             millis += Long.parseLong(match.substring(0, match.length() - 1)) * Times.MS_PER_SECOND;
         }
+      } else {
+        throw new IllegalArgumentException("Unknown duration format: " + duration);
       }
     }
     return millis;

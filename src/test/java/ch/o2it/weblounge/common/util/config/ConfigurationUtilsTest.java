@@ -90,8 +90,19 @@ public class ConfigurationUtilsTest {
    */
   @Test
   public void testToDuration() {
-    String d = ConfigurationUtils.toDuration(durationInMillis);
-    assertEquals(duration, d);
+    assertEquals(duration, ConfigurationUtils.toDuration(durationInMillis));
+    assertEquals("1y", ConfigurationUtils.toDuration(Times.MS_PER_YEAR));
+    assertEquals("2y", ConfigurationUtils.toDuration(2*Times.MS_PER_YEAR));
+    assertEquals("1m", ConfigurationUtils.toDuration(Times.MS_PER_MONTH));
+    assertEquals("2m", ConfigurationUtils.toDuration(2*Times.MS_PER_MONTH));
+    assertEquals("1w", ConfigurationUtils.toDuration(Times.MS_PER_WEEK));
+    assertEquals("2w", ConfigurationUtils.toDuration(2*Times.MS_PER_WEEK));
+    assertEquals("1d", ConfigurationUtils.toDuration(Times.MS_PER_DAY));
+    assertEquals("2d", ConfigurationUtils.toDuration(2*Times.MS_PER_DAY));
+    assertEquals("1H", ConfigurationUtils.toDuration(Times.MS_PER_HOUR));
+    assertEquals("2H", ConfigurationUtils.toDuration(2*Times.MS_PER_HOUR));
+    assertEquals("1M", ConfigurationUtils.toDuration(Times.MS_PER_MIN));
+    assertEquals("2M", ConfigurationUtils.toDuration(2*Times.MS_PER_MIN));
   }
 
   /**
@@ -101,6 +112,18 @@ public class ConfigurationUtilsTest {
   public void testParseDuration() {
     long m = ConfigurationUtils.parseDuration(duration);
     assertEquals(durationInMillis, m);
+    assertEquals(Times.MS_PER_YEAR, ConfigurationUtils.parseDuration("1y"));
+    assertEquals(2*Times.MS_PER_YEAR, ConfigurationUtils.parseDuration("2y"));
+    assertEquals(Times.MS_PER_MONTH, ConfigurationUtils.parseDuration("1m"));
+    assertEquals(2*Times.MS_PER_MONTH, ConfigurationUtils.parseDuration("2m"));
+    assertEquals(Times.MS_PER_WEEK, ConfigurationUtils.parseDuration("1w"));
+    assertEquals(2*Times.MS_PER_WEEK, ConfigurationUtils.parseDuration("2w"));
+    assertEquals(Times.MS_PER_DAY, ConfigurationUtils.parseDuration("1d"));
+    assertEquals(2*Times.MS_PER_DAY, ConfigurationUtils.parseDuration("2d"));
+    assertEquals(Times.MS_PER_HOUR, ConfigurationUtils.parseDuration("1H"));
+    assertEquals(2*Times.MS_PER_HOUR, ConfigurationUtils.parseDuration("2H"));
+    assertEquals(Times.MS_PER_MIN, ConfigurationUtils.parseDuration("1M"));
+    assertEquals(2*Times.MS_PER_MIN, ConfigurationUtils.parseDuration("2M"));
   }
 
 }

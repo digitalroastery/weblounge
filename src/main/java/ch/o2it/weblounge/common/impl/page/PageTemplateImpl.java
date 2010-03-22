@@ -150,7 +150,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
-  public static PageTemplateImpl fromXml(Node node)
+  public static PageTemplate fromXml(Node node)
       throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(node, xpath);
@@ -169,7 +169,8 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    * @see #fromXml(Node)
    * @see #toXml()
    */
-  public static PageTemplateImpl fromXml(Node node, XPath xpath)
+  @SuppressWarnings("unchecked")
+  public static PageTemplate fromXml(Node node, XPath xpath)
       throws IllegalStateException {
 
     // Identifier
@@ -177,7 +178,10 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     if (id == null)
       throw new IllegalStateException("Missing id in page template definition");
 
-    // Url
+    // Class
+    String className = XPathHelper.valueOf(node, "class", xpath);
+      
+    // Renderer url
     URL rendererUrl = null;
     if (XPathHelper.valueOf(node, "renderer", xpath) == null)
       throw new IllegalStateException("Missing renderer in page template definition");
@@ -188,7 +192,24 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     }
 
     // Create the page template
-    PageTemplateImpl template = new PageTemplateImpl(id, rendererUrl);
+    PageTemplate template = null;
+    if (className != null) {
+      Class<? extends PageTemplate> c = null;
+      try {
+        c = (Class<? extends PageTemplate>)Class.forName(className);
+        template = c.newInstance();
+        template.setIdentifier(id);
+        template.setRenderer(rendererUrl);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Pagelet renderer implementation " + className + " not found", e);
+      } catch (InstantiationException e) {
+        throw new IllegalStateException("Error instantiating pagelet renderer " + className, e);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("Access violation instantiating pagelet renderer " + className, e);
+      }
+    } else {
+      template = new PageTemplateImpl(id, rendererUrl); 
+    }
 
     // Composeable
     template.setComposeable("true".equals(XPathHelper.valueOf(node, "@composeable", xpath)));
@@ -203,28 +224,42 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     if (layout != null)
       template.setDefaultLayout(layout);
 
-    // Recheck time
-    try {
-      if (XPathHelper.valueOf(node, "recheck", xpath) != null) {
-        long recheckTime = ConfigurationUtils.parseDuration((XPathHelper.valueOf(node, "recheck", xpath)));
-        template.setRecheckTime(recheckTime);
+    // recheck time
+    String recheck = XPathHelper.valueOf(node, "recheck", xpath);
+    if (recheck != null) {
+      try {
+        template.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
+      } catch (NumberFormatException e) {
+        throw new IllegalStateException("The page template valid time '" + recheck + "' is malformed", e);
+      } catch (IllegalArgumentException e) {
+        throw new IllegalStateException("The page template valid time '" + recheck + "' is malformed", e);
       }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Invalid recheck time in page template definition");
     }
 
-    // Valid time
-    try {
-      if (XPathHelper.valueOf(node, "valid", xpath) != null) {
-        long validTime = ConfigurationUtils.parseDuration(XPathHelper.valueOf(node, "valid", xpath));
-        template.setValidTime(validTime);
+    // valid time
+    String valid = XPathHelper.valueOf(node, "valid", xpath);
+    if (valid != null) {
+      try {
+        template.setValidTime(ConfigurationUtils.parseDuration(valid));
+      } catch (NumberFormatException e) {
+        throw new IllegalStateException("The page template valid time '" + valid + "' is malformed", e);
+      } catch (IllegalArgumentException e) {
+        throw new IllegalStateException("The page template valid time '" + valid + "' is malformed", e);
       }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Invalid valid time in page template definition");
     }
 
-    // Names
-    LanguageSupport.addDescriptions(node, "name", null, template.name, false);
+    // name
+    NodeList names = XPathHelper.selectList(node, "name", xpath);
+    for (int i = 0; i < names.getLength(); i++) {
+      Node localiziation = names.item(i);
+      String language = XPathHelper.valueOf(localiziation, "@language", xpath);
+      if (language == null)
+        throw new IllegalStateException("Found page template name without language");
+      String name = XPathHelper.valueOf(localiziation, "text()", xpath);
+      if (name == null)
+        throw new IllegalStateException("Found empty page template name");
+      template.setName(name, LanguageSupport.getLanguage(language));
+    }
 
     // scripts
     NodeList scripts = XPathHelper.selectList(node, "includes/script", xpath);
@@ -253,6 +288,10 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     buf.append(" composeable=\"").append(composeable).append("\"");
     buf.append(">");
 
+    // Renderer class
+    if (!this.getClass().equals(PageTemplateImpl.class))
+      buf.append("<class>").append(getClass().getName()).append("</class>");
+    
     // Renderer url
     // TODO: Handle relative paths
     buf.append("<renderer>").append(renderer.toExternalForm()).append("</renderer>");

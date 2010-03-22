@@ -20,14 +20,12 @@
 
 package ch.o2it.weblounge.common.site;
 
-import ch.o2it.weblounge.common.TestUtils;
+import ch.o2it.weblounge.common.impl.site.SiteImpl;
 
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 
 /**
- * TODO: Comment SiteImplXmlTest
+ * Test case for the xml capabilities of {@link SiteImpl}.
  */
 @Ignore
 public class SiteImplXmlTest extends SiteImplTest {
@@ -38,24 +36,27 @@ public class SiteImplXmlTest extends SiteImplTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
-  public void setUp() throws Exception {
-    setupPrerequisites();
-//    URL testSite = this.getClass().getResource(testFile);
-//    site = SiteImpl.fromXml(testSite);
-  }
+//  @Before
+//  public void setUp() throws Exception {
+//    setupPrerequisites();
+//    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+//    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+//    URL testContext = this.getClass().getResource(testFile);
+//    Document doc = docBuilder.parse(testContext.openStream());
+//    site = SiteImpl.fromXml(doc.getFirstChild());
+//  }
   
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#toXml()}.
    */
-  @Test
-  public void testToXml() {
-    String testXml = TestUtils.loadXmlFromFile(testFile);
+//  @Test
+//  public void testToXml() {
+//    String testXml = TestUtils.loadXmlFromFile(testFile);
 //    try {
 //      assertEquals(testXml, new String(site.toXml().getBytes("UTF-8")));
 //    } catch (UnsupportedEncodingException e) {
 //      fail("Encoding to utf-8 failed");
 //    }
-  }
+//  }
 
 }

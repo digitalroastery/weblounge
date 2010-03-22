@@ -5,7 +5,7 @@
   <page>/testpage/</page>
   <template>testtemplate</template>
   <recheck>0</recheck>
-  <valid>60S</valid>
+  <valid>1M</valid>
   <name language="de">Test</name>
   <name language="en">Test</name>
   <includes>

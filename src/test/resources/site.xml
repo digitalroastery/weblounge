@@ -40,7 +40,7 @@
     </template>
     <template id="mobile" composeable="true">
       <class>ch.o2it.weblounge.common.impl.site.JSPTemplate</class>
-      <renderer>file://template/mobile.jsp</renderer>
+    	<renderer>file://template/mobile.jsp</renderer>
       <name language="de">Mobile</name>
       <name language="en">Mobile</name>
     </template>

@@ -56,7 +56,7 @@ public class PageTemplateImplXmlTest extends PageTemplateImplTest {
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
     template = PageTemplateImpl.fromXml(doc.getFirstChild());
-    composeable = template;
+    composeable = (PageTemplateImpl)template;
   }
 
   /**
