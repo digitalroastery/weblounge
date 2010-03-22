@@ -40,6 +40,22 @@ public interface Renderer extends Composeable {
   long DEFAULT_RECHECK_TIME = Times.MS_PER_DAY;
 
   /**
+   * Adds a flavor to the list of supported flavors.
+   * 
+   * @param flavor
+   *          the flavor to add
+   */
+  void addFlavor(RequestFlavor flavor);
+
+  /**
+   * Adds a flavor to the list of supported flavors.
+   * 
+   * @param flavor
+   *          the flavor to add
+   */
+  void removeFlavor(RequestFlavor flavor);
+
+  /**
    * Returns the supported output flavors.
    * 
    * @return the supported flavors
