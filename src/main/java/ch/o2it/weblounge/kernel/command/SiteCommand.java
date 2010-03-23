@@ -142,7 +142,7 @@ public class SiteCommand {
         buf.append("[ ").append(formatter.format(i + 1)).append(" ] ");
         while (buf.length() < 8)
           buf.append(" ");
-        buf.append(site.getDescription() != null ? site.getDescription() : site.getIdentifier());
+        buf.append(site.getName() != null ? site.getName() : site.getIdentifier());
         buf.append(" ");
         int descriptionLength = buf.length();
         for (int j=0; j < 64-descriptionLength; j++)
@@ -163,8 +163,8 @@ public class SiteCommand {
    */
   private void status(Site site) {
     status("identifier", site.getIdentifier());
-    if (site.getDescription() != null)
-      status("description", site.getDescription());
+    if (site.getName() != null)
+      status("description", site.getName());
     
     // Enabled
     status("autostart", (site.isStartedAutomatically() ? "yes" : "no"));
