@@ -41,7 +41,7 @@ public class TestSite extends SiteImpl {
   public TestSite() {
     setAutoStart(true);
     addHostName("localhost");
-    setDescription("Weblounge Test Site");
+    setName("Weblounge Test Site");
   }
 
   /**
