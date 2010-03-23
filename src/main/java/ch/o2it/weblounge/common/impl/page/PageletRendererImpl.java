@@ -58,6 +58,14 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * Creates a new page template that is backed by a Java Server Page located at
    * <code>url</code>.
+   */
+  public PageletRendererImpl() {
+    addFlavor(RequestFlavor.HTML);
+  }
+
+  /**
+   * Creates a new page template that is backed by a Java Server Page located at
+   * <code>url</code>.
    * 
    * @param identifier
    *          the template identifier
@@ -220,7 +228,9 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
         throw new IllegalStateException("Access violation instantiating pagelet renderer " + className, e);
       }
     } else {
-      renderer = new PageletRendererImpl(id, rendererUrl);
+      renderer = new PageletRendererImpl();
+      renderer.setIdentifier(id);
+      renderer.setRenderer(rendererUrl);
     }
     
     // Composeable

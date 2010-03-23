@@ -81,8 +81,8 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   }
 
   /**
-   * Creates a new composeable image style width, height and a default scaling
-   * mode of {@link ScalingMode#None}.
+   * Creates a new composeable image style with width, height and a default
+   * scaling mode of {@link ScalingMode#None}.
    * 
    * @param id
    *          the style identifier
@@ -93,6 +93,13 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    */
   public ImageStyleImpl(String id, int width, int height) {
     this(id, width, height, None, true);
+  }
+
+  /**
+   * Creates a new composeable image style.
+   */
+  public ImageStyleImpl() {
+    this(null, -1, -1, None, true);
   }
 
   /**
@@ -148,10 +155,10 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   public int getWidth() {
     return width;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.page.GeneralComposeable#hashCode()
    */
   @Override
@@ -161,7 +168,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.page.GeneralComposeable#equals(java.lang.Object)
    */
   @Override
@@ -169,7 +176,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     // This is to indicate that using the super implementation is sufficient
     return super.equals(o);
   }
-  
+
   /**
    * Initializes this image style from an XML node that was generated using
    * {@link #toXml()}.
@@ -257,7 +264,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.ImageStyle#toXml()
    */
   public String toXml() {

@@ -18,13 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.site;
+package ch.o2it.weblounge.common.security;
 
 import static org.junit.Assert.assertEquals;
+
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.site.SiteImpl;
+import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,34 +38,37 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * Test case for the xml capabilities of {@link SiteImpl}.
+ * Test case for the <code>XML</code> capabilities of
+ * {@link AuthenticationModuleImpl}.
  */
-public class SiteImplXmlTest extends SiteImplTest {
+public class AuthenticationModuleImplXmlTest extends AuthenticationModuleImplTest {
+
 
   /** Name of the test file */
-  protected String testFile = "/site.xml";
-  
+  protected String testFile = "/authenticationmodule.xml";
+
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
-    setupPrerequisites();
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    site = SiteImpl.fromXml(doc.getFirstChild());
+    module = AuthenticationModuleImpl.fromXml(doc.getFirstChild());
   }
-  
+
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#toXml()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModule#toXml()}
+   * .
    */
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromFile(testFile);
     try {
-      assertEquals(testXml, new String(site.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(module.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

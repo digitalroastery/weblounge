@@ -51,35 +51,11 @@ public class AdminLoginModule extends AbstractLoginModule {
     if (callbackHandler instanceof HttpAuthCallback) {
       site = ((HttpAuthCallback) callbackHandler).getRequest().getSite();
       WebloungeUser siteadmin = site.getAdministrator();
-      WebloungeUser sysadmin = WebloungeAdminImpl.getInstance();
 
       // Test for site admin
-      if (siteadmin.getLogin().equals(username) && !sysadmin.getLogin().equals(username)) {
+      if (siteadmin.getLogin().equals(username)) {
         if (Arrays.equals(siteadmin.getPassword(), password)) {
           user = siteadmin;
-          return true;
-        } else {
-          throw new FailedLoginException("Wrong password");
-        }
-      }
-
-      // Test for weblounge super user
-      else if (sysadmin.getLogin().equals(username) && !siteadmin.getLogin().equals(username)) {
-        if (Arrays.equals(sysadmin.getPassword(), password)) {
-          user = sysadmin;
-          return true;
-        } else {
-          throw new FailedLoginException("Wrong password");
-        }
-      }
-
-      // Special case where siteadmin has same login name than sysadmin
-      else if (sysadmin.getLogin().equals(username) && siteadmin.getLogin().equals(username)) {
-        if (Arrays.equals(siteadmin.getPassword(), password)) {
-          user = siteadmin;
-          return true;
-        } else if (Arrays.equals(sysadmin.getPassword(), password)) {
-          user = sysadmin;
           return true;
         } else {
           throw new FailedLoginException("Wrong password");

@@ -20,14 +20,21 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
+import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
+import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
+import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.PageURI;
@@ -40,7 +47,6 @@ import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
-import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleException;
 import ch.o2it.weblounge.common.site.PageTemplate;
@@ -61,6 +67,8 @@ import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -73,6 +81,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Default implementation of a site.
@@ -91,9 +102,6 @@ public class SiteImpl implements Site {
   /** Regular expression to test the validity of a site identifier */
   private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9-_.]*$";
 
-  /** The default hostname */
-  private static final String DEFAULT_HOSTNAME = "localhost";
-
   /** The site identifier */
   protected String identifier = null;
 
@@ -107,7 +115,7 @@ public class SiteImpl implements Site {
   private WebUrl url = null;
 
   /** Site description */
-  protected String description = null;
+  protected String name = null;
 
   /** Site administrator */
   protected WebloungeUser administrator = null;
@@ -130,17 +138,20 @@ public class SiteImpl implements Site {
   /** The default page template */
   protected PageLayout defaultLayout = null;
 
-  /** Image styles */
-  protected Map<String, ImageStyle> imagestyles = null;
-
   /** Modules */
   protected Map<String, Module> modules = null;
 
+  /** The default hostname */
+  protected String defaultHostname = "localhost";
+  
   /** Ordered list of site urls */
   protected List<String> hostnames = null;
 
   /** Jobs */
   protected Map<String, QuartzJob> jobs = null;
+
+  /** Authentication modules */
+  protected List<AuthenticationModule> authenticationModules = null;
 
   /** Option handling support */
   protected OptionsHelper options = null;
@@ -165,7 +176,7 @@ public class SiteImpl implements Site {
 
   /** Listener for the quartz scheduler */
   private TriggerListener quartzTriggerListener = null;
-
+  
   /** Flag to tell whether we are currently shutting down */
   private boolean isShutdownInProgress = false;
 
@@ -177,10 +188,10 @@ public class SiteImpl implements Site {
     languages = new HashMap<String, Language>();
     templates = new HashMap<String, PageTemplate>();
     layouts = new HashMap<String, PageLayout>();
-    imagestyles = new HashMap<String, ImageStyle>();
     modules = new HashMap<String, Module>();
     hostnames = new ArrayList<String>();
     jobs = new HashMap<String, QuartzJob>();
+    authenticationModules = new ArrayList<AuthenticationModule>();
     options = new OptionsHelper();
   }
 
@@ -229,19 +240,19 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#setDescription(java.lang.String)
+   * @see ch.o2it.weblounge.common.site.Site#setName(java.lang.String)
    */
-  public void setDescription(String description) {
-    this.description = description;
+  public void setName(String description) {
+    this.name = description;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#getDescription()
+   * @see ch.o2it.weblounge.common.site.Site#getName()
    */
-  public String getDescription() {
-    return description;
+  public String getName() {
+    return name;
   }
 
   /**
@@ -388,8 +399,7 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#setDefaultLanguage(ch.o2it.weblounge.common.language.Language)
    */
   public void setDefaultLanguage(Language language) {
-    if (language != null)
-      languages.put(language.getIdentifier(), language);
+    addLanguage(language);
     defaultLanguage = language;
   }
 
@@ -420,46 +430,6 @@ public class SiteImpl implements Site {
    */
   public URL getStaticContentRoot() {
     return staticContentRoot;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#addImageStyle(ch.o2it.weblounge.common.site.ImageStyle)
-   */
-  public void addImageStyle(ImageStyle imagestyle) {
-    if (imagestyle == null)
-      throw new IllegalStateException("Imagestyle must not be null");
-    imagestyles.put(imagestyle.getIdentifier(), imagestyle);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#removeImageStyle(java.lang.String)
-   */
-  public ImageStyle removeImageStyle(String imagestyle) {
-    if (imagestyle == null)
-      throw new IllegalStateException("Imagestyle must not be null");
-    return imagestyles.remove(imagestyle);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#getImageStyle(java.lang.String)
-   */
-  public ImageStyle getImageStyle(String imagestyle) {
-    return imagestyles.get(imagestyle);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#getImageStyles()
-   */
-  public ImageStyle[] getImageStyles() {
-    return imagestyles.values().toArray(new ImageStyle[imagestyles.size()]);
   }
 
   /**
@@ -504,13 +474,24 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#setDefaultHostname(java.lang.String)
+   */
+  public void setDefaultHostname(String hostname) {
+    defaultHostname = hostname;
+    url = null;
+    if (hostname != null)
+      addHostName(hostname);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.site.Site#addHostName(java.lang.String)
    */
   public void addHostName(String hostname) {
     if (hostname == null)
       throw new IllegalArgumentException("Hostname must not be null");
-    url = null;
     hostnames.add(hostname);
   }
 
@@ -522,6 +503,8 @@ public class SiteImpl implements Site {
   public boolean removeHostname(String hostname) {
     if (hostname == null)
       throw new IllegalArgumentException("Hostname must not be null");
+    if (hostname.equals(defaultHostname))
+      defaultHostname = null;
     url = null;
     return hostnames.remove(hostname);
   }
@@ -541,9 +524,37 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#getHostName()
    */
   public String getHostName() {
-    return hostnames.size() > 0 ? hostnames.get(0) : DEFAULT_HOSTNAME;
+    return defaultHostname;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#addAuthenticationModule(ch.o2it.weblounge.common.security.AuthenticationModule)
+   */
+  public void addAuthenticationModule(AuthenticationModule module) {
+    if (!authenticationModules.contains(module))
+      authenticationModules.add(module);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#removeAuthenticationModule(ch.o2it.weblounge.common.security.AuthenticationModule)
+   */
+  public void removeAuthenticationModule(AuthenticationModule module) {
+    authenticationModules.remove(module);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#getLoginModules()
+   */
+  public AuthenticationModule[] getAuthenticationModules() {
+    return authenticationModules.toArray(new AuthenticationModule[authenticationModules.size()]);
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -552,7 +563,9 @@ public class SiteImpl implements Site {
   public WebUrl getUrl() {
     if (url != null)
       return url;
-    url = new WebUrlImpl(this, getHostName());
+    if (defaultHostname == null)
+      return null;
+    url = new WebUrlImpl(this, defaultHostname);
     return url;
   }
 
@@ -936,16 +949,6 @@ public class SiteImpl implements Site {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#getAuthenticationModules()
-   */
-  public AuthenticationModule[] getAuthenticationModules() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
   /* -------------------------------- OSGi -------------------------------- */
 
   /**
@@ -1279,6 +1282,228 @@ public class SiteImpl implements Site {
           e.getMessage(),
           e });
     }
+  }
+
+  /**
+   * Initializes this site from an XML node that was generated using
+   * {@link #toXml()}.
+   * <p>
+   * To speed things up, you might consider using the second signature that uses
+   * an existing <code>XPath</code> instance instead of creating a new one.
+   * 
+   * @param config
+   *          the site node
+   * @throws IllegalStateException
+   *           if the site cannot be parsed
+   * @see #fromXml(Node, XPath)
+   * @see #toXml()
+   */
+  public static Site fromXml(Node config) throws IllegalStateException {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(config, xpath);
+  }
+
+  /**
+   * Initializes this site from an XML node that was generated using
+   * {@link #toXml()}.
+   * 
+   * @param config
+   *          the site node
+   * @param xpathProcessor
+   *          xpath processor to use
+   * @throws IllegalStateException
+   *           if the site cannot be parsed
+   * @see #toXml()
+   */
+  @SuppressWarnings("unchecked")
+  public static Site fromXml(Node config, XPath xpathProcessor)
+      throws IllegalStateException {
+
+    // identifier
+    String identifier = XPathHelper.valueOf(config, "@id", xpathProcessor);
+    if (identifier == null)
+      throw new IllegalStateException("Unable to create sites without identifier");
+
+    // class
+    Site site = null;
+    String className = XPathHelper.valueOf(config, "class", xpathProcessor);
+    if (className != null) {
+      try {
+        Class<? extends Site> c = (Class<? extends Site>) Class.forName(className);
+        site = c.newInstance();
+        site.setIdentifier(identifier);
+      } catch (Exception e) {
+        throw new IllegalStateException("Unable to instantiate class " + className + " for site '" + identifier + ": " + e.getMessage(), e);
+      }
+    } else {
+      site = new SiteImpl();
+      site.setIdentifier(identifier);
+    }
+
+    // name
+    String name = XPathHelper.valueOf(config, "name", xpathProcessor);
+    if (name == null)
+      throw new IllegalStateException("Site '" + identifier + " has no name");
+    site.setName(name);
+    
+    // domains
+    NodeList urlNodes = XPathHelper.selectList(config, "domains/url", xpathProcessor);
+    if (urlNodes.getLength() == 0)
+      throw new IllegalStateException("Site '" + identifier + " has no hostname");
+    for (int i = 0; i < urlNodes.getLength(); i++) {
+      String url = urlNodes.item(i).getFirstChild().getNodeValue();
+      if (ConfigurationUtils.isDefault(urlNodes.item(i)))
+        site.setDefaultHostname(url);
+      else
+        site.addHostName(url);
+    }
+    
+    // languages
+    NodeList languageNodes = XPathHelper.selectList(config, "languages/language", xpathProcessor);
+    if (languageNodes.getLength() == 0)
+      throw new IllegalStateException("Site '" + identifier + " has no languages");
+    for (int i = 0; i < languageNodes.getLength(); i++) {
+      Node languageNode = languageNodes.item(i);
+      Node defaultAttribute = languageNode.getAttributes().getNamedItem("default");
+      String languageId = languageNode.getFirstChild().getNodeValue();
+      try {
+        Language language = LanguageSupport.getLanguage(languageId);
+        if (ConfigurationUtils.isTrue(defaultAttribute))
+          site.setDefaultLanguage(language);
+        else
+          site.addLanguage(language);
+      } catch (UnknownLanguageException e) {
+        throw new IllegalStateException("Site '" + identifier + "' defines unknown language: " + languageId);
+      }
+    }
+    
+    // templates
+    NodeList templateNodes = XPathHelper.selectList(config, "templates/template", xpathProcessor);
+    for (int i = 0; i < templateNodes.getLength(); i++) {
+      PageTemplate template = PageTemplateImpl.fromXml(templateNodes.item(i), xpathProcessor);
+      boolean isDefault = ConfigurationUtils.isDefault(templateNodes.item(i));
+      if (isDefault)
+        site.setDefaultTemplate(template);
+      else
+        site.addTemplate(template);
+    }
+
+    // administrator
+    Node adminNode = XPathHelper.select(config, "security/administrator", xpathProcessor);
+    if (adminNode != null) {
+      site.setAdministrator(WebloungeAdminImpl.fromXml(adminNode, site, xpathProcessor));
+    }
+
+    // login modules
+    NodeList loginModuleNodes = XPathHelper.selectList(config, "security/authentication/loginmodule", xpathProcessor);
+    for (int i = 0; i < loginModuleNodes.getLength(); i++) {
+      AuthenticationModule module = AuthenticationModuleImpl.fromXml(loginModuleNodes.item(i), xpathProcessor);
+      site.addAuthenticationModule(module);
+    }
+
+    // options
+    NodeList optionNodes = XPathHelper.selectList(config, "options/option", xpathProcessor);
+    for (int i = 0; i < optionNodes.getLength(); i++) {
+      Node option = optionNodes.item(i);
+      String optionName = XPathHelper.valueOf(option, "name", xpathProcessor);
+      String value = XPathHelper.valueOf(option, "value", xpathProcessor);
+      site.setOption(optionName, value);
+    }
+
+    return site;
+  }
+
+  /**
+   * Returns an <code>XML</code> representation of the site, which will look
+   * similar to the following example:
+   * 
+   * <pre>
+   * &lt;site id="mysite"&gt;
+   * TODO: Finish example
+   * &lt;/site&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>Site</code> from the serialized output of this method.
+   * 
+   * @return the <code>XML</code> representation of the site
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
+   */
+  public String toXml() {
+    StringBuffer b = new StringBuffer();
+    b.append("<site id=\"");
+    b.append(identifier);
+    b.append("\">");
+
+    // autostart
+    b.append("<autostart>").append(autoStart).append("</autostart>");
+
+    // name
+    b.append("<name>").append(name).append("</name>");
+
+    // class
+    if (!this.getClass().equals(SiteImpl.class))
+      b.append("<class>").append(this.getClass().getName()).append("</class>");
+
+    // security
+    if (administrator != null || authenticationModules.size() > 0) {
+      b.append("<security>");
+      if (administrator != null)
+        b.append(administrator.toXml());
+      
+      if (authenticationModules.size() > 0) {
+        b.append("<authentication>");
+        for (AuthenticationModule module : authenticationModules) {
+          b.append(module.toXml());
+        }
+        b.append("</authentication>");
+      }
+      b.append("</security>");
+    }
+
+    // hostnames
+    if (hostnames.size() > 0) {
+      b.append("<domains>");
+      for (String hostname : hostnames) {
+        b.append("<url");
+        if (hostname.equals(defaultHostname))
+          b.append(" default=\"true\"");
+        b.append(">");
+        b.append(hostname);
+        b.append("</url>");
+      }
+      b.append("</domains>");
+    }
+    
+    // templates
+    if (templates.size() > 0) {
+      b.append("<templates>");
+      for (PageTemplate template : templates.values()) {
+        b.append(template.toXml());
+      }
+      b.append("</templates>");
+    }
+
+    // languages
+    if (languages.size() > 0) {
+      b.append("<languages>");
+      for (Language language : languages.values()) {
+        b.append("<language");
+        if (language.equals(defaultLanguage))
+          b.append(" default=\"true\"");
+        b.append(">");
+        b.append(language.getIdentifier());
+        b.append("</language>");
+      }
+      b.append("</languages>");
+    }
+    
+    // Options
+    b.append(options.toXml());
+
+    b.append("</site>");
+    return b.toString();
   }
 
 }

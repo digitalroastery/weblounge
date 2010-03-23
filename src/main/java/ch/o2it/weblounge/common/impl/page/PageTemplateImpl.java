@@ -50,9 +50,19 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /** Default composer for action output */
   protected String stage = DEFAULT_STAGE;
-  
+
   /** Default page layout */
   protected String layout = null;
+  
+  /** Is this the default template? */
+  protected boolean isDefault = false;
+
+  /**
+   * Creates a new page template.
+   */
+  public PageTemplateImpl() {
+    addFlavor(RequestFlavor.HTML);
+  }
 
   /**
    * Creates a new page template that is backed by a Java Server Page located at
@@ -88,7 +98,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.PageTemplate#getDefaultLayout()
    */
   public String getDefaultLayout() {
@@ -97,13 +107,31 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.PageTemplate#setDefaultLayout(java.lang.String)
    */
   public void setDefaultLayout(String layout) {
     this.layout = layout;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.PageTemplate#setDefault(boolean)
+   */
+  public void setDefault(boolean v) {
+    isDefault = v;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.PageTemplate#isDefault()
+   */
+  public boolean isDefault() {
+    return isDefault;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -117,7 +145,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.page.GeneralComposeable#hashCode()
    */
   @Override
@@ -127,7 +155,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.page.GeneralComposeable#equals(java.lang.Object)
    */
   @Override
@@ -135,7 +163,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     // This is to indicate that using the super implementation is sufficient
     return super.equals(o);
   }
-  
+
   /**
    * Initializes this page template from an XML node that was generated using
    * {@link #toXml()}.
@@ -150,8 +178,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
-  public static PageTemplate fromXml(Node node)
-      throws IllegalStateException {
+  public static PageTemplate fromXml(Node node) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(node, xpath);
   }
@@ -180,7 +207,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
     // Class
     String className = XPathHelper.valueOf(node, "class", xpath);
-      
+
     // Renderer url
     URL rendererUrl = null;
     if (XPathHelper.valueOf(node, "renderer", xpath) == null)
@@ -196,7 +223,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     if (className != null) {
       Class<? extends PageTemplate> c = null;
       try {
-        c = (Class<? extends PageTemplate>)Class.forName(className);
+        c = (Class<? extends PageTemplate>) Class.forName(className);
         template = c.newInstance();
         template.setIdentifier(id);
         template.setRenderer(rendererUrl);
@@ -208,11 +235,14 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
         throw new IllegalStateException("Access violation instantiating pagelet renderer " + className, e);
       }
     } else {
-      template = new PageTemplateImpl(id, rendererUrl); 
+      template = new PageTemplateImpl(id, rendererUrl);
     }
 
     // Composeable
-    template.setComposeable("true".equals(XPathHelper.valueOf(node, "@composeable", xpath)));
+    template.setComposeable(ConfigurationUtils.isTrue(XPathHelper.valueOf(node, "@composeable", xpath)));
+
+    // Default
+    template.setDefault(ConfigurationUtils.isTrue(XPathHelper.valueOf(node, "@default", xpath)));
 
     // Stage
     String stage = XPathHelper.valueOf(node, "stage", xpath);
@@ -286,12 +316,14 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     buf.append("<template");
     buf.append(" id=\"").append(identifier).append("\"");
     buf.append(" composeable=\"").append(composeable).append("\"");
+    if (isDefault)
+      buf.append(" default=\"true\"");
     buf.append(">");
 
     // Renderer class
     if (!this.getClass().equals(PageTemplateImpl.class))
       buf.append("<class>").append(getClass().getName()).append("</class>");
-    
+
     // Renderer url
     // TODO: Handle relative paths
     buf.append("<renderer>").append(renderer.toExternalForm()).append("</renderer>");
@@ -338,7 +370,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       }
       buf.append("</includes>");
     }
-    
+
     buf.append("</template>");
     return buf.toString();
   }

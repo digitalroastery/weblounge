@@ -88,7 +88,9 @@ public class PageletRendererImplTest {
   @Before
   public void setUp() throws Exception {
     setUpPreliminaries();
-    renderer = new PageletRendererImpl(identifier, rendererUrl);
+    renderer = new PageletRendererImpl();
+    renderer.setIdentifier(identifier);
+    renderer.setRenderer(rendererUrl);
     renderer.setEditor(editorUrl);
     renderer.setRecheckTime(recheckTime);
     renderer.setValidTime(validTime);

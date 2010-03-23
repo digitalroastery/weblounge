@@ -69,6 +69,14 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
   /**
    * Creates a renderer with a recheck time of one day and a valid time of one
    * week.
+   */
+  public AbstractRenderer() {
+    super(Times.MS_PER_DAY, Times.MS_PER_WEEK);
+  }
+
+  /**
+   * Creates a renderer with a recheck time of one day and a valid time of one
+   * week.
    * 
    * @param identifier
    *          the renderer identifier

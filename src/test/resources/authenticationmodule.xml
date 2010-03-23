@@ -1,0 +1,10 @@
+<loginmodule>
+  <class>ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule</class>
+  <relevance>sufficient</relevance>
+  <options>
+    <option>
+      <name>key</name>
+      <value>value</value>
+    </option>
+  </options>
+</loginmodule>

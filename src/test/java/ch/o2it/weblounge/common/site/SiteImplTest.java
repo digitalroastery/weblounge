@@ -27,13 +27,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
+import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
+import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
 import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.DigestType;
+import ch.o2it.weblounge.common.security.AuthenticationModule.Relevance;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -50,7 +53,7 @@ import java.util.Locale;
 public class SiteImplTest {
 
   /** The site instance under test */
-  protected SiteImpl site = null;
+  protected Site site = null;
 
   /** Site identifier */
   protected final String identifier = "dev";
@@ -59,7 +62,7 @@ public class SiteImplTest {
   protected final boolean enabled = true;
 
   /** Site description */
-  protected final String description = "Main Site";
+  protected final String name = "Main site";
 
   /** Site administrator */
   protected WebloungeUserImpl administrator = null;
@@ -81,9 +84,9 @@ public class SiteImplTest {
 
   /** Default template id */
   protected final String defaultTemplateId = "default";
-  
+
   /** Default template recheck time */
-  protected final long defaultTemplateRecheckTime = Times.MS_PER_DAY + 10*Times.MS_PER_MIN;
+  protected final long defaultTemplateRecheckTime = Times.MS_PER_DAY + 10 * Times.MS_PER_MIN;
 
   /** Default template valid time */
   protected final long defaultTemplateValidTime = Times.MS_PER_WEEK + Times.MS_PER_DAY + Times.MS_PER_HOUR + Times.MS_PER_MIN;;
@@ -111,16 +114,16 @@ public class SiteImplTest {
 
   /** Mobile template class name */
   protected final String mobileTemplateClass = "ch.o2it.weblounge.common.impl.site.JSPTemplate";
-  
+
   /** Mobile template German name */
   protected final String mobileTemplateNameGerman = "Mobile";
 
   /** Mobile template English name */
   protected final String mobileTemplateNameEnglish = "Mobile";
-  
+
   /** The site hostnames */
   protected List<String> hostnames = new ArrayList<String>();
-  
+
   /** Default hostname */
   protected String defaultHostname = "www.weblounge.org";
 
@@ -129,18 +132,27 @@ public class SiteImplTest {
 
   /** Default hostname */
   protected String localhost = "localhost:8080";
-  
+
   /** Portrait image style */
   protected ImageStyle portraitImageStyle = null;
 
   /** High resolution image style */
   protected ImageStyle highresImageStyle = null;
-  
+
   /** The English language */
   protected final Language English = new LanguageImpl(new Locale("en"));
 
   /** The German language */
   protected final Language German = new LanguageImpl(new Locale("de"));
+  
+  /** The admin login module */
+  protected AuthenticationModule adminAuthenticationModule = null;
+  
+  /** The admin login module implementation */ 
+  protected String adminLoginModuleClass = "ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule";
+
+  /** The admin login module relevance */ 
+  protected Relevance adminLoginModuleRelevance = Relevance.sufficient;
 
   /**
    * @throws java.lang.Exception
@@ -151,17 +163,16 @@ public class SiteImplTest {
     site = new SiteImpl();
     site.setIdentifier(identifier);
     site.setAutoStart(enabled);
-    site.setDescription(description);
+    site.setName(name);
     site.setAdministrator(administrator);
     site.setDefaultTemplate(defaultTemplate);
     site.addTemplate(mobileTemplate);
     site.setDefaultLanguage(German);
     site.addLanguage(English);
-    site.addHostName(defaultHostname);
+    site.setDefaultHostname(defaultHostname);
     site.addHostName(fallbackHostname);
     site.addHostName(localhost);
-    site.addImageStyle(portraitImageStyle);
-    site.addImageStyle(highresImageStyle);
+    site.addAuthenticationModule(adminAuthenticationModule);
   }
 
   /**
@@ -171,10 +182,10 @@ public class SiteImplTest {
    */
   protected void setupPrerequisites() throws Exception {
     // Administrator
-    administrator = new WebloungeUserImpl(administratorLogin);
+    administrator = new WebloungeAdminImpl(administratorLogin);
     administrator.setName(administratorName);
     administrator.setEmail(administratorEmail);
-    administrator.setPassword(administratorPassword.getBytes(), DigestType.md5);
+    administrator.setPassword(administratorPassword.getBytes(), DigestType.plain);
     // Default template
     defaultTemplate = new PageTemplateImpl(defaultTemplateId, new URL(defaultTemplateUrl));
     defaultTemplate.setRecheckTime(defaultTemplateRecheckTime);
@@ -188,14 +199,8 @@ public class SiteImplTest {
     mobileTemplate.setComposeable(true);
     mobileTemplate.setName(mobileTemplateNameEnglish, English);
     mobileTemplate.setName(mobileTemplateNameGerman, German);
-    // Portrait image style
-    portraitImageStyle = new ImageStyleImpl("portrait", 150, 200, ScalingMode.Box, true);
-    portraitImageStyle.setName("Portraitbild", German);
-    portraitImageStyle.setName("Portrait image", English);
-    // Highresolution image style
-    highresImageStyle = new ImageStyleImpl("highresolution", 800, 600, ScalingMode.Box, true);
-    highresImageStyle.setName("Hohe Auflösung", German);
-    highresImageStyle.setName("High resolution", English);
+    // Amin login module
+    adminAuthenticationModule = new AuthenticationModuleImpl(adminLoginModuleClass, adminLoginModuleRelevance);
   }
 
   /**
@@ -224,7 +229,8 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#isStartedAutomatically()}.
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#isStartedAutomatically()}
+   * .
    */
   @Test
   public void testIsStartedAutomatically() {
@@ -233,16 +239,32 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getDescription(ch.o2it.weblounge.common.language.Language)}
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getAdministrator()} .
+   */
+  @Test
+  public void testGetAdministrator() {
+    assertEquals(administrator, site.getAdministrator());
+    assertEquals(administratorName, site.getAdministrator().getName());
+    assertEquals(administratorEmail, site.getAdministrator().getEmail());
+    assertEquals(administratorLogin, site.getAdministrator().getLogin());
+    assertTrue(site.getAdministrator().canLogin());
+    assertTrue(site.getAdministrator().checkPassword(administratorPassword));
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getName(ch.o2it.weblounge.common.language.Language)}
    * .
    */
   @Test
-  public void testGetDescription() {
-    assertEquals(description, site.getDescription());
+  public void testGetName() {
+    assertEquals(name, site.getName());
   }
-  
+
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#addTemplate(ch.o2it.weblounge.common.site.PageTemplate)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#addTemplate(ch.o2it.weblounge.common.site.PageTemplate)}
+   * .
    */
   @Test
   public void testAddTemplate() throws Exception {
@@ -253,7 +275,9 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeTemplate(ch.o2it.weblounge.common.site.PageTemplate)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeTemplate(ch.o2it.weblounge.common.site.PageTemplate)}
+   * .
    */
   @Test
   public void testRemoveTemplate() {
@@ -263,7 +287,9 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getTemplate(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getTemplate(java.lang.String)}
+   * .
    */
   @Test
   public void testGetTemplate() throws Exception {
@@ -276,7 +302,7 @@ public class SiteImplTest {
     assertEquals(defaultTemplateStage, d.getStage());
     assertEquals(defaultTemplateNameEnglish, d.getName(English));
     assertEquals(defaultTemplateNameGerman, d.getName(German));
-    
+
     PageTemplate m = site.getTemplate(mobileTemplateId);
     assertNotNull(m);
     assertEquals(mobileTemplateId, m.getIdentifier());
@@ -291,7 +317,8 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getTemplates()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getTemplates()}.
    */
   @Test
   public void testGetTemplates() {
@@ -300,15 +327,18 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getDefaultTemplate()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getDefaultTemplate()}.
    */
   @Test
   public void testGetDefaultTemplate() {
     assertEquals(defaultTemplate, site.getDefaultTemplate());
   }
-  
+
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#addLanguage(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#addLanguage(ch.o2it.weblounge.common.language.Language)}
+   * .
    */
   @Test
   public void testAddLanguage() {
@@ -319,7 +349,9 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeLanguage(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeLanguage(ch.o2it.weblounge.common.language.Language)}
+   * .
    */
   @Test
   public void testRemoveLanguage() {
@@ -329,7 +361,9 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLanguage(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLanguage(java.lang.String)}
+   * .
    */
   @Test
   public void testGetLanguage() {
@@ -338,7 +372,8 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLanguages()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLanguages()}.
    */
   @Test
   public void testGetLanguages() {
@@ -346,7 +381,9 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#supportsLanguage(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#supportsLanguage(ch.o2it.weblounge.common.language.Language)}
+   * .
    */
   @Test
   public void testSupportsLanguage() {
@@ -356,7 +393,8 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getDefaultLanguage()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getDefaultLanguage()}.
    */
   @Test
   public void testGetDefaultLanguage() {
@@ -364,7 +402,9 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeHostname(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeHostname(java.lang.String)}
+   * .
    */
   @Test
   public void testRemoveHostname() {
@@ -375,7 +415,8 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getHostNames()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getHostNames()}.
    */
   @Test
   public void testGetHostNames() {
@@ -386,18 +427,20 @@ public class SiteImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getHostName()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getHostName()}.
    */
   @Test
   public void testGetHostName() {
     assertEquals(defaultHostname, site.getHostName());
     site.removeHostname(defaultHostname);
     assertEquals(2, site.getHostNames().length);
-    assertEquals(fallbackHostname, site.getHostName());
+    assertTrue(site.getHostName() == null);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getUrl()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getUrl()}.
    */
   @Test
   public void testGetUrl() {
@@ -405,56 +448,59 @@ public class SiteImplTest {
     site.removeHostname(defaultHostname);
     site.removeHostname(fallbackHostname);
     site.removeHostname(localhost);
-    assertEquals("localhost/", site.getUrl().getPath());
+    assertTrue(site.getUrl() == null);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeImageStyle(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeLayout(java.lang.String)}
+   * .
    */
   @Test
-  public void testRemoveImageStyle() {
-    site.removeImageStyle(portraitImageStyle.getIdentifier());
-    assertEquals(1, site.getImageStyles().length);
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getImageStyle(java.lang.String)}.
-   */
-  @Test
-  public void testGetImageStyle() {
-    assertEquals(highresImageStyle, site.getImageStyle(highresImageStyle.getIdentifier()));
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getImageStyles()}.
-   */
-  @Test
-  public void testGetImageStyles() {
-    assertEquals(2, site.getImageStyles().length);
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeLayout(java.lang.String)}.
-   */
-  @Test @Ignore
+  @Ignore
   public void testRemoveLayout() {
     fail("Not yet implemented"); // TODO
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLayout(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLayout(java.lang.String)}
+   * .
    */
-  @Test @Ignore
+  @Test
+  @Ignore
   public void testGetLayout() {
     fail("Not yet implemented"); // TODO
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLayouts()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getLayouts()}.
    */
-  @Test @Ignore
+  @Test
+  @Ignore
   public void testGetLayouts() {
     assertEquals(0, site.getLayouts().length);
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeAuthenticationModule(javax.security.auth.spi.AuthenticationModule)}
+   * .
+   */
+  @Test
+  public void testRemoveAuthenticationModule() {
+    site.removeAuthenticationModule(adminAuthenticationModule);
+    assertEquals(0, site.getAuthenticationModules().length);
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getAuthenticationModules()}.
+   */
+  @Test
+  public void testGetAuthenticationModules() {
+    assertEquals(1, site.getAuthenticationModules().length);
   }
 
 }

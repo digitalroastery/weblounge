@@ -391,33 +391,37 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   public static WebloungeUserImpl fromXml(Node userNode, Site site, XPath xpath)
       throws IllegalStateException {
 
-    Node rootNode = XPathHelper.select(userNode, "/user", xpath);
-    if (rootNode == null)
+    if (userNode == null)
       return null;
 
-    String login = XPathHelper.valueOf(rootNode, "@id", xpath);
+    String login = XPathHelper.valueOf(userNode, "@id", xpath);
     WebloungeUserImpl user = new WebloungeUserImpl(login);
 
-    String realm = XPathHelper.valueOf(rootNode, "@realm", xpath);
+    String realm = XPathHelper.valueOf(userNode, "@realm", xpath);
     if (realm != null)
       user.realm = realm;
-    user.enabled = ConfigurationUtils.isTrue(XPathHelper.valueOf(rootNode, "@enabled", xpath));
-    user.firstName = XPathHelper.valueOf(rootNode, "profile/firstname", xpath);
-    user.lastName = XPathHelper.valueOf(rootNode, "profile/lastname", xpath);
-    user.initials = XPathHelper.valueOf(rootNode, "profile/initials", xpath);
-    user.email = XPathHelper.valueOf(rootNode, "profile/email", xpath);
-    String language = XPathHelper.valueOf(rootNode, "profile/language", xpath);
+    user.enabled = ConfigurationUtils.isTrue(XPathHelper.valueOf(userNode, "@enabled", xpath));
+    String name = XPathHelper.valueOf(userNode, "profile/name", xpath);
+    if (name != null) {
+      user.name = XPathHelper.valueOf(userNode, "profile/name", xpath);
+    } else {
+      user.firstName = XPathHelper.valueOf(userNode, "profile/firstname", xpath);
+      user.lastName = XPathHelper.valueOf(userNode, "profile/lastname", xpath);
+    }
+    user.initials = XPathHelper.valueOf(userNode, "profile/initials", xpath);
+    user.email = XPathHelper.valueOf(userNode, "profile/email", xpath);
+    String language = XPathHelper.valueOf(userNode, "profile/language", xpath);
     if (language != null) {
       Language l = LanguageSupport.getLanguage(language);
       user.language = (l != null) ? l : site.getDefaultLanguage();
     }
 
     // Password
-    String password = XPathHelper.valueOf(rootNode, "security/password", xpath);
+    String password = XPathHelper.valueOf(userNode, "security/password", xpath);
     if (password != null) {
       String digestType = null;
       try {
-        digestType = XPathHelper.valueOf(rootNode, "security/password/@type", xpath);
+        digestType = XPathHelper.valueOf(userNode, "security/password/@type", xpath);
         user.passwordDigestType = DigestType.valueOf(digestType);
         user.password = password.getBytes();
       } catch (Exception e) {
@@ -426,12 +430,12 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     }
 
     // Challenge / Response
-    user.challenge = XPathHelper.valueOf(rootNode, "security/challenge", xpath);
-    String response = XPathHelper.valueOf(rootNode, "security/response", xpath);
+    user.challenge = XPathHelper.valueOf(userNode, "security/challenge", xpath);
+    String response = XPathHelper.valueOf(userNode, "security/response", xpath);
     if (response != null) {
       String digestType = null;
       try {
-        digestType = XPathHelper.valueOf(rootNode, "security/response/@type", xpath);
+        digestType = XPathHelper.valueOf(userNode, "security/response/@type", xpath);
         user.responseDigestType = DigestType.valueOf(digestType);
         user.response = response.getBytes();
       } catch (Exception e) {
@@ -440,17 +444,18 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     }
 
     // Last login
-    String lastLogin = XPathHelper.valueOf(rootNode, "security/lastlogin/date", xpath);
+    String lastLogin = XPathHelper.valueOf(userNode, "security/lastlogin/date", xpath);
     try {
-      user.lastLogin = WebloungeDateFormat.parseStatic(lastLogin);
-      user.lastLoginSource = XPathHelper.valueOf(rootNode, "security/lastlogin/ip", xpath);
+      if (lastLogin != null)
+        user.lastLogin = WebloungeDateFormat.parseStatic(lastLogin);
+      user.lastLoginSource = XPathHelper.valueOf(userNode, "security/lastlogin/ip", xpath);
     } catch (ParseException e) {
       // It's not important. Let's log and then forget about it
       log_.error("Unable to parse last login date '{}'", lastLogin, e);
     }
 
     // Roles
-    NodeList roles = XPathHelper.selectList(rootNode, "security/roles/role", xpath);
+    NodeList roles = XPathHelper.selectList(userNode, "security/roles/role", xpath);
     if (roles != null) {
       for (int i = 0; i < roles.getLength(); i++) {
         Node roleNode = roles.item(i);
@@ -465,7 +470,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     }
 
     // Groups
-    NodeList groups = XPathHelper.selectList(rootNode, "security/groups/group", xpath);
+    NodeList groups = XPathHelper.selectList(userNode, "security/groups/group", xpath);
     if (groups != null) {
       for (int i = 0; i < groups.getLength(); i++) {
         Node groupNode = groups.item(i);
@@ -480,7 +485,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     }
 
     // Properties
-    NodeList properties = XPathHelper.selectList(rootNode, "properties/property", xpath);
+    NodeList properties = XPathHelper.selectList(userNode, "properties/property", xpath);
     if (properties != null) {
       for (int i = 0; i < properties.getLength(); i++) {
         String key = XPathHelper.valueOf(properties.item(i), "name", xpath);

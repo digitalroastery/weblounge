@@ -189,6 +189,26 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#addAction(ch.o2it.weblounge.common.site.Action)
+   */
+  public void addAction(Action action) {
+    actions.put(action.getIdentifier(), action);
+    action.setModule(this);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#removeAction(ch.o2it.weblounge.common.site.Action)
+   */
+  public void removeAction(Action action) {
+    actions.remove(action.getIdentifier());
+    action.setModule(null);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.site.Module#getAction(java.lang.String)
    */
@@ -207,6 +227,24 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#addImageStyle(ch.o2it.weblounge.common.site.ImageStyle)
+   */
+  public void addImageStyle(ImageStyle imagestyle) {
+    imagestyles.put(imagestyle.getIdentifier(), imagestyle);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#removeImageStyle(ch.o2it.weblounge.common.site.ImageStyle)
+   */
+  public void removeImageStyle(ImageStyle imagestyle) {
+    imagestyles.remove(imagestyle.getIdentifier());
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.site.Module#getImageStyles()
    */
@@ -223,6 +261,26 @@ public class ModuleImpl implements Module {
     return imagestyles.get(id);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#addRenderer(ch.o2it.weblounge.common.site.PageletRenderer)
+   */
+  public void addRenderer(PageletRenderer renderer) {
+    renderers.put(renderer.getIdentifier(), renderer);
+    renderer.setModule(this);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#removeRenderer(ch.o2it.weblounge.common.site.PageletRenderer)
+   */
+  public void removeRenderer(PageletRenderer renderer) {
+    renderers.remove(renderer.getIdentifier());
+    renderer.setModule(null);
+  }
+  
   /**
    * {@inheritDoc}
    * 

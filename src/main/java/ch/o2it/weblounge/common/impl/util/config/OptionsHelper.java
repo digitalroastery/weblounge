@@ -205,6 +205,9 @@ public final class OptionsHelper implements Customizable {
   public static OptionsHelper fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
 
+    if (config == null)
+      return new OptionsHelper();
+    
     OptionsHelper configurationBase = new OptionsHelper();
 
     // Read the options

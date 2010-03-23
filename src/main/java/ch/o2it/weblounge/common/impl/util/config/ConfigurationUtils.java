@@ -22,6 +22,8 @@ package ch.o2it.weblounge.common.impl.util.config;
 
 import ch.o2it.weblounge.common.Times;
 
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -52,6 +54,49 @@ public class ConfigurationUtils {
       values.add(tok.nextToken());
     }
     return values.toArray(new String[values.size()]);
+  }
+
+  /**
+   * Returns <code>true</code> if the node contains an attribute named
+   * <tt>default</tt> with a value that corresponds to any of:
+   * <ul>
+   * <li>true</li>
+   * <li>on</li>
+   * <li>yes</li>
+   * </ul>
+   * 
+   * @param value
+   *          the value to test
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>true</code>
+   */
+  public static boolean isDefault(Node node) {
+    if (node == null)
+      return false;
+    Node defaultAttribute = node.getAttributes().getNamedItem("default");
+    if (defaultAttribute == null || defaultAttribute.getNodeValue() == null)
+      return false;
+    return isTrue(defaultAttribute.getNodeValue());
+  }
+
+  /**
+   * Returns <code>true</code> if the lowercased and trimmed value is not
+   * <code>null</code> and corresponds to any of:
+   * <ul>
+   * <li>true</li>
+   * <li>on</li>
+   * <li>yes</li>
+   * </ul>
+   * 
+   * @param value
+   *          the value to test
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>true</code>
+   */
+  public static boolean isTrue(Node node) {
+    if (node == null || node.getNodeValue() == null)
+      return false;
+    return isTrue(node.getNodeValue());
   }
 
   /**
@@ -251,7 +296,8 @@ public class ConfigurationUtils {
    * @throws IllegalArgumentException
    *           if the duration cannot be parsed
    */
-  public static long parseDuration(String duration) throws IllegalArgumentException {
+  public static long parseDuration(String duration)
+      throws IllegalArgumentException {
     if (duration == null)
       return 0;
     long millis = 0;

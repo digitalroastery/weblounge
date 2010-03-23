@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -36,18 +35,13 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   /** Name of the site administrator */
   protected String adminName = null;
   
-  @BeforeClass
-  public static void setUpClass() {
-    new WebloungeAdminImpl(login);
-  }
-  
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
     setUpPrerequisites();
-    user = WebloungeAdminImpl.getInstance();
+    user = new WebloungeAdminImpl(login);
     realm = User.SystemRealm;
     adminName = "Weblounge Administrator";
     setUpUser();

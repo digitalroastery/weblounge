@@ -75,6 +75,20 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
   /**
    * Creates a new composeable instance with the given recheck and valid time.
    * 
+   * @param recheckTime
+   *          recheck time in milliseconds
+   * @param validTime
+   *          valid time in milliseconds
+   * @see #setRecheckTime()
+   * @see #setValidTime()
+   */
+  protected GeneralComposeable(long recheckTime, long validTime) {
+    this(null, recheckTime, validTime);
+  }
+
+  /**
+   * Creates a new composeable instance with the given recheck and valid time.
+   * 
    * @param identifier
    *          the identifier
    * @param recheckTime

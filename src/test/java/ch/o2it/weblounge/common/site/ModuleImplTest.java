@@ -26,7 +26,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.site.ModuleImpl;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.language.Language;
@@ -41,22 +43,22 @@ import java.util.Locale;
  * Test cases for {@link ModuleImpl}
  */
 public class ModuleImplTest {
-  
+
   /** The module to test */
   protected ModuleImpl module = null;
-  
+
   /** The hosting site */
   protected Site site = null;
-  
+
   /** Module identifier */
   protected String identifier = "test-module";
- 
+
   /** Enabled flag */
   protected boolean enabled = true;
 
   /** Searchable flag */
   protected boolean searchable = true;
-  
+
   /** Name of the simple option */
   protected String simpleOptionName = "simple";
 
@@ -67,7 +69,7 @@ public class ModuleImplTest {
   protected String complexOptionName = "complex";
 
   /** Value of the complex option */
-  protected String[] complexOptionValue = new String[] { "complex",  "value" };
+  protected String[] complexOptionValue = new String[] { "complex", "value" };
 
   /** English title */
   protected String englishTitle = "Test module";
@@ -83,7 +85,24 @@ public class ModuleImplTest {
 
   /** The Italian language */
   protected final Language Italian = new LanguageImpl(new Locale("it"));
-
+  
+  /** The test action */
+  protected Action action = null;
+  
+  /** The action identifier */
+  protected String actionIdentifier = "myaction";
+  
+  /** The pagelet renderer */
+  protected PageletRenderer renderer = null;
+  
+  /** The pagelet renderer identifier */
+  protected String rendererIdentifier = "renderer";
+  
+  /** The image style */
+  protected ImageStyle imageStyle = null;
+  
+  protected String imageStyleIdentifier = "modulestyle";
+  
   /**
    * Sets up the test bed.
    * 
@@ -91,6 +110,7 @@ public class ModuleImplTest {
    */
   @Before
   public void setUp() throws Exception {
+    setUpPreliminaries();
     module = new ModuleImpl();
     module.setIdentifier(identifier);
     module.setTitle(englishTitle, English);
@@ -102,8 +122,26 @@ public class ModuleImplTest {
       module.setOption(complexOptionName, o);
     }
     module.init(site);
+    module.addAction(action);
+    module.addRenderer(renderer);
+    module.addImageStyle(imageStyle);
   }
-  
+
+  /**
+   * Sets up preliminary items.
+   * 
+   * @throws Exception
+   *           if setup fails
+   */
+  protected void setUpPreliminaries() throws Exception {
+    action = new TestAction();
+    action.setIdentifier(actionIdentifier);
+    renderer = new PageletRendererImpl();
+    renderer.setIdentifier(rendererIdentifier);
+    imageStyle = new ImageStyleImpl();
+    imageStyle.setIdentifier(imageStyleIdentifier);
+  }
+
   /**
    * Clears the test bed.
    * 
@@ -113,7 +151,7 @@ public class ModuleImplTest {
   public void tearDown() throws Exception {
     module.destroy();
   }
-  
+
   /**
    * Sets up preliminary data structures.
    * 
@@ -124,7 +162,9 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#setIdentifier(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#setIdentifier(java.lang.String)}
+   * .
    */
   @Test
   public void testSetIdentifier() {
@@ -137,7 +177,8 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getIdentifier()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getIdentifier()}.
    */
   @Test
   public void testGetIdentifier() {
@@ -145,58 +186,68 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getAction(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getAction(java.lang.String)}
+   * .
    */
   @Test
   public void testGetAction() {
-    // TODO: Improve test by adding actions first
+    assertEquals(action, module.getAction(actionIdentifier));
     assertTrue(module.getAction("test") == null);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getActions()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getActions()}.
    */
   @Test
   public void testGetActions() {
-    assertTrue(module.getActions().length == 0);
+    assertTrue(module.getActions().length == 1);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getImageStyles()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getImageStyles()}.
    */
   @Test
   public void testGetImageStyles() {
-    assertTrue(module.getImageStyles().length == 0);
+    assertTrue(module.getImageStyles().length == 1);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getImageStyle(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getImageStyle(java.lang.String)}
+   * .
    */
   @Test
   public void testGetImageStyle() {
-    // TODO: Improve test by adding image styles first
+    assertEquals(imageStyle, module.getImageStyle(imageStyleIdentifier));
     assertTrue(module.getImageStyle("test") == null);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getRenderer(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getRenderer(java.lang.String)}
+   * .
    */
   @Test
   public void testGetRenderer() {
-    // TODO: Improve test by adding renderer first
+    assertEquals(renderer, module.getRenderer(rendererIdentifier));
     assertTrue(module.getRenderer("test") == null);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getRenderers()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getRenderers()}.
    */
   @Test
   public void testGetRenderers() {
-    assertTrue(module.getRenderers().length == 0);
+    assertTrue(module.getRenderers().length == 1);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getSite()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -204,7 +255,9 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getTitle(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getTitle(ch.o2it.weblounge.common.language.Language)}
+   * .
    */
   @Test
   public void testGetTitle() {
@@ -214,7 +267,8 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#isEnabled()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#isEnabled()}.
    */
   @Test
   public void testIsEnabled() {
@@ -222,7 +276,8 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#isSearchable()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#isSearchable()}.
    */
   @Test
   public void testIsSearchable() {
@@ -230,7 +285,9 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#search(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#search(java.lang.String)}
+   * .
    */
   @Test
   public void testSearch() {
@@ -238,7 +295,8 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#start()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#start()}.
    */
   @Test
   public void testStart() {
@@ -248,7 +306,7 @@ public class ModuleImplTest {
     } catch (ModuleException e) {
       fail(e.getMessage());
     }
-    
+
     // Test disabled module
     try {
       module.setEnabled(false);
@@ -272,7 +330,8 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#stop()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#stop()}.
    */
   @Test
   public void testStop() {
@@ -282,7 +341,7 @@ public class ModuleImplTest {
     } catch (ModuleException e) {
       fail(e.getMessage());
     }
-    
+
     // Test stopped module
     try {
       module.stop();
@@ -290,11 +349,13 @@ public class ModuleImplTest {
       fail(e.getMessage());
     } catch (IllegalStateException e) {
       // This is expected
-    } 
+    }
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#removeOption(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#removeOption(java.lang.String)}
+   * .
    */
   @Test
   public void testRemoveOption() {
@@ -304,7 +365,9 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getOptionValue(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getOptionValue(java.lang.String)}
+   * .
    */
   @Test
   public void testGetOptionValueString() {
@@ -313,7 +376,9 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getOptionValue(java.lang.String, java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getOptionValue(java.lang.String, java.lang.String)}
+   * .
    */
   @Test
   public void testGetOptionValueStringString() {
@@ -323,7 +388,9 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getOptionValues(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getOptionValues(java.lang.String)}
+   * .
    */
   @Test
   public void testGetOptionValues() {
@@ -332,7 +399,9 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#hasOption(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#hasOption(java.lang.String)}
+   * .
    */
   @Test
   public void testHasOption() {
@@ -342,7 +411,8 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getOptions()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getOptions()}.
    */
   @Test
   public void testGetOptions() {
@@ -350,7 +420,9 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#equals(java.lang.Object)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#equals(java.lang.Object)}
+   * .
    */
   @Test
   public void testEqualsObject() {
@@ -358,7 +430,8 @@ public class ModuleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#toString()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#toString()}.
    */
   @Test
   public void testToString() {

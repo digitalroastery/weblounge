@@ -10,6 +10,9 @@
       <valid>1w1d1h1m</valid>
       <name language="de">Pagelet renderer</name>
       <name language="en">Darstellungselement</name>
+      <includes>
+        <link href="http://localhost/css/stylesheet.css" type="text/css"/>
+      </includes>
     </pagelet>
   </pagelets>
   <imagestyles>
