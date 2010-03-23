@@ -173,6 +173,22 @@ public interface Module extends Customizable {
   SearchResult[] search(String query);
 
   /**
+   * Adds the renderer to the set of renderers.
+   * 
+   * @param renderer
+   *          the renderer to add
+   */
+  void addRenderer(PageletRenderer renderer);
+
+  /**
+   * Removes the renderer from the set of renderers.
+   * 
+   * @param renderer
+   *          the renderer to remove
+   */
+  void removeRenderer(PageletRenderer renderer);
+
+  /**
    * Returns all of this module's renderers.
    * 
    * @return the renderers
@@ -190,6 +206,22 @@ public interface Module extends Customizable {
   PageletRenderer getRenderer(String id);
 
   /**
+   * Adds the image style to the set of image styles.
+   * 
+   * @param imagestyle
+   *          the image style to add
+   */
+  void addImageStyle(ImageStyle imagestyle);
+
+  /**
+   * Removes the image style from the set of image styles.
+   * 
+   * @param imagestyle
+   *          the image style to remove
+   */
+  void removeImageStyle(ImageStyle imagestyle);
+
+  /**
    * Returns all of the image styles defined by this module.
    * 
    * @return the image styles
@@ -205,6 +237,22 @@ public interface Module extends Customizable {
    * @return the image style
    */
   ImageStyle getImageStyle(String id);
+
+  /**
+   * Adds the action to the set of actions.
+   * 
+   * @param action
+   *          the action to add
+   */
+  void addAction(Action action);
+
+  /**
+   * Removes the action from the set of actions.
+   * 
+   * @param action
+   *          the action to remove
+   */
+  void removeAction(Action action);
 
   /**
    * Returns a list of all actions.

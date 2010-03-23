@@ -65,4 +65,19 @@ public interface PageTemplate extends Renderer {
    */
   String getDefaultLayout();
 
+  /**
+   * Makes this the default template.
+   * 
+   * @param v
+   *          <code>true</code> to make this the default template
+   */
+  void setDefault(boolean v);
+
+  /**
+   * Returns <code>true</code> if this is the default template.
+   * 
+   * @return <code>true</code> if this is the default template
+   */
+  boolean isDefault();
+
 }

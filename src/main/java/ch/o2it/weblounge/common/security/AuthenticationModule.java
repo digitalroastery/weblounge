@@ -22,7 +22,9 @@ package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.Customizable;
 
-import javax.security.auth.spi.LoginModule;
+import org.w3c.dom.Node;
+
+import javax.xml.xpath.XPath;
 
 /**
  * An authentication module defines an authentication facility that can be
@@ -38,7 +40,7 @@ public interface AuthenticationModule extends Customizable {
    * 
    * @return the module class name
    */
-  Class<? extends LoginModule> getModuleClass();
+  String getModuleClass();
 
   /**
    * Returns the module's relevance. Please see the JAAS documentation on the
@@ -53,5 +55,23 @@ public interface AuthenticationModule extends Customizable {
    * @return the module's relevance_
    */
   Relevance getRelevance();
+
+  /**
+   * Returns an <code>XML</code> representation of the authentication module,
+   * which will look similar to the following example:
+   * 
+   * <pre>
+   * &lt;loginmodule class="ch.o2it.weblounge.MyLoginModule" relevance="sufficient"/&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>AuthenticationModule</code> from the serialized output of this
+   * method.
+   * 
+   * @return the <code>XML</code> representation of the authentication module
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
+   */
+  String toXml();
 
 }

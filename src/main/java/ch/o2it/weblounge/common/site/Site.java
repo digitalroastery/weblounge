@@ -72,19 +72,19 @@ public interface Site extends Customizable, RequestListener, Serializable {
   String getIdentifier();
 
   /**
-   * Sets the site description.
+   * Sets the site name.
    * 
-   * @param description
-   *          the description
+   * @param name
+   *          the name
    */
-  void setDescription(String description);
+  void setName(String name);
 
   /**
-   * Returns the description of this site.
+   * Returns the site name.
    * 
-   * @return the site description
+   * @return the site name
    */
-  String getDescription();
+  String getName();
 
   /**
    * Set to <code>true</code> to automatically start this site,
@@ -262,42 +262,6 @@ public interface Site extends Customizable, RequestListener, Serializable {
   PageLayout getLayout(String layoutId);
 
   /**
-   * Adds <code>imagestyle</code> to the set of image styles.
-   * 
-   * @param imagestyle
-   *          the new image style
-   */
-  void addImageStyle(ImageStyle imagestyle);
-
-  /**
-   * Removes the image style with identifier <code>imagestyle</code> from the
-   * set of image styles and returns it. If no such style was in the set, then
-   * this method returns <code>null</code>.
-   * 
-   * @param imagestyle
-   *          the image style identifier
-   * @return the image style or <code>null</code>
-   */
-  ImageStyle removeImageStyle(String imagestyle);
-
-  /**
-   * Returns the image styles.
-   * 
-   * @return the image styles
-   */
-  ImageStyle[] getImageStyles();
-
-  /**
-   * Returns the image style with the given identifier or <code>null</code> if
-   * no such style is found.
-   * 
-   * @param id
-   *          the style identifier
-   * @return the image style
-   */
-  ImageStyle getImageStyle(String id);
-
-  /**
    * Adds a job that is executed according to the schedule in
    * <code>cronExpression</code>. Note that existing jobs with the same names
    * will be canceled and replaced.
@@ -342,6 +306,30 @@ public interface Site extends Customizable, RequestListener, Serializable {
   void removeJob(String name);
 
   /**
+   * Adds <code>module</code> to the ordered set of authentication modules.
+   * 
+   * @param login
+   *          module the new authentication module
+   */
+  void addAuthenticationModule(AuthenticationModule module);
+
+  /**
+   * Removes the login module from the set of authentication modules.
+   * 
+   * @param module
+   *          the authentication module
+   */
+  void removeAuthenticationModule(AuthenticationModule module);
+
+  /**
+   * Returns this site's authentication modules which define who can log into
+   * this site.
+   * 
+   * @return the authentication modules
+   */
+  AuthenticationModule[] getAuthenticationModules();
+
+  /**
    * Adds the listener to the list of user listeners.
    * 
    * @param listener
@@ -356,6 +344,15 @@ public interface Site extends Customizable, RequestListener, Serializable {
    *          the listener to remove
    */
   void removeUserListener(UserListener listener);
+
+  /**
+   * Sets a default hostname for the site. This hostname is used when links are
+   * being generated for the site.
+   * 
+   * @param hostname
+   *          the default hostname
+   */
+  void setDefaultHostname(String hostname);
 
   /**
    * Adds <code>hostname</code> to the list of hostnames. Note that the hostname
@@ -492,15 +489,6 @@ public interface Site extends Customizable, RequestListener, Serializable {
   boolean isRunning();
 
   /**
-   * Returns the registered JAAS authentication modules. Note that the list is
-   * ordered according to the appearance of each authentication module in the
-   * site configuration.
-   * 
-   * @return the authentication modules
-   */
-  AuthenticationModule[] getAuthenticationModules();
-
-  /**
    * Sets the site administrator.
    * 
    * @param administrator
@@ -580,5 +568,19 @@ public interface Site extends Customizable, RequestListener, Serializable {
    *           if the page cannot be read from its source
    */
   Page getPage(PageURI uri) throws IOException;
+
+  /**
+   * Returns an <code>XML</code> representation of the site, which will look
+   * similar to the following example:
+   * 
+   * <pre>
+   * &lt;site id="mysite"&gt;
+   * TODO: Finish example
+   * &lt;/site&gt;
+   * </pre>
+   * 
+   * @return the <code>XML</code> representation of the site
+   */
+  String toXml();
 
 }
