@@ -23,7 +23,12 @@ package ch.o2it.weblounge.common.site;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.SearchResult;
+import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.url.WebUrl;
+
+import org.w3c.dom.Node;
+
+import javax.xml.xpath.XPath;
 
 /**
  * The module interface defines the method that may be called on weblounge
@@ -81,7 +86,7 @@ public interface Module extends Customizable {
    * @throws ModuleException
    *           if module initialization fails
    */
-  void init(Site site) throws ModuleException;
+  void setSite(Site site) throws ModuleException;
 
   /**
    * Tells this module that it has been taken off duty and will no longer be
@@ -272,23 +277,75 @@ public interface Module extends Customizable {
   Action getAction(String action);
 
   /**
-   * Sets the module title in the given language.
+   * Adds the job to the set of jobs.
    * 
-   * @param title
-   *          the module title
+   * @param job
+   *          the job to add
+   */
+  void addJob(Job job);
+
+  /**
+   * Removes the job from the set of jobs.
+   * 
+   * @param job
+   *          the job to remove
+   */
+  void removeJob(Job job);
+
+  /**
+   * Returns all of this module's jobs.
+   * 
+   * @return the jobs
+   */
+  Job[] getJobs();
+
+  /**
+   * Returns the job identified by <code>id</code> or <code>null</code> if
+   * no job with this identifier exists.
+   * 
+   * @param id
+   *          the job identifier
+   * @return the job
+   */
+  Job getJob(String id);
+  
+  /**
+   * Sets the module name in the given language.
+   * 
+   * @param name
+   *          the module name
    * @param language
    *          the language
    */
-  void setTitle(String title, Language language);
+  void setName(String name, Language language);
 
   /**
-   * Returns the module title in the given language or, if it doesn't exist, in
+   * Returns the module name in the given language or, if it doesn't exist, in
    * the site default language.
    * 
    * @param language
    *          the language
-   * @return the title in the given language
+   * @return the name in the given language
    */
-  String getTitle(Language language);
+  String getName(Language language);
+
+  /**
+   * Returns an <code>XML</code> representation of the module, which will look
+   * similar to the following example:
+   * 
+   * <pre>
+   * &lt;module id="mymodule"&gt;
+   * TODO: Finish example
+   * &lt;/module&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>Module</code> from the serialized output of this method.
+   * 
+   * @return the <code>XML</code> representation of the module
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
+   */
+  String toXml();
 
 }

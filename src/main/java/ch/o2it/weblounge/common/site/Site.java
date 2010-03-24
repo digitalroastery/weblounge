@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageLayout;
 import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestListener;
-import ch.o2it.weblounge.common.scheduler.Job;
+import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
@@ -279,7 +279,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @param trigger
    *          the job trigger
    */
-  void addJob(String name, Class<? extends Job> job,
+  void addJob(String name, Class<? extends JobWorker> job,
       Dictionary<String, Serializable> config, JobTrigger trigger);
 
   /**
@@ -293,7 +293,7 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @param config
    *          the job configuration and context
    */
-  void addJob(String name, Class<? extends Job> job,
+  void addJob(String name, Class<? extends JobWorker> job,
       Dictionary<String, Serializable> config);
 
   /**

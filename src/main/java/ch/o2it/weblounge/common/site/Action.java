@@ -26,7 +26,11 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.url.WebUrl;
 
+import org.w3c.dom.Node;
+
 import java.io.IOException;
+
+import javax.xml.xpath.XPath;
 
 /**
  * An <code>Action</code> is java code that can be mounted to a specific url and
@@ -241,5 +245,24 @@ public interface Action extends Composeable, Customizable {
    * in order to not interfere with their ancestor's implementation.
    */
   void passivate();
+  
+  /**
+   * Returns an <code>XML</code> representation of the action configuration,
+   * that will look similar to the following example:
+   * 
+   * <pre>
+   * &lt;action id="myaction"&gt;
+   * TODO: Finish example
+   * &lt;/action&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>ActionConfiguration</code> from the serialized output of this method.
+   * 
+   * @return the <code>XML</code> representation of the action configuration
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
+   */
+  String toXml();
 
 }

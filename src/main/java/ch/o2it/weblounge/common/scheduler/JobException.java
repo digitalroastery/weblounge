@@ -29,7 +29,7 @@ public class JobException extends Exception {
   private static final long serialVersionUID = -8028700443165899080L;
 
   /** The job that caused this exception */
-  protected Job job = null;
+  protected JobWorker job = null;
 
   /**
    * Creates a new exception that was thrown while executing <code>job</code>.
@@ -41,7 +41,7 @@ public class JobException extends Exception {
    * @param message
    *          error message
    */
-  public JobException(Job job, String message) {
+  public JobException(JobWorker job, String message) {
     this(job, message, null);
   }
 
@@ -54,7 +54,7 @@ public class JobException extends Exception {
    * @param cause
    *          the original exception
    */
-  public JobException(Job job, Throwable cause) {
+  public JobException(JobWorker job, Throwable cause) {
     this(job, null, cause);
   }
 
@@ -70,7 +70,7 @@ public class JobException extends Exception {
    * @param cause
    *          the original exception
    */
-  public JobException(Job job, String message, Throwable cause) {
+  public JobException(JobWorker job, String message, Throwable cause) {
     super(message, cause);
     this.job = job;
   }
@@ -80,7 +80,7 @@ public class JobException extends Exception {
    * 
    * @return the failing job
    */
-  public Job getJob() {
+  public JobWorker getJob() {
     return job;
   }
 

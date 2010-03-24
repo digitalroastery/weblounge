@@ -20,31 +20,102 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
-import java.io.Serializable;
-import java.util.Dictionary;
+import org.w3c.dom.Node;
+
+import javax.xml.xpath.XPath;
 
 /**
- * A <code>Job</code> provides an implementation of the work that needs to be
- * done as well as a list of triggers that determine when job execution is due.
+ * A job object contains a worker implementation containing the logic to get
+ * work done as well as information on when to trigger the job.
  */
 public interface Job {
 
-  /** For site and module jobs, the <code>Site</code> is part of the context */
-  String CTXT_SITE = "webl:site";
+  /**
+   * Sets the job identifier.
+   * 
+   * @param identifier
+   *          the job identifier
+   * @throws IllegalArgumentException
+   *           if <code>identifier</code> is <code>null</code>
+   */
+  void setIdentifier(String identifier);
 
   /**
-   * This method is called every time the job execution triggers fire. The
-   * context dictionary passed to this method contains both the configuration
-   * data found at instantiation time as well as any data that previous
-   * executions might have added to it.
+   * Returns the job identifier.
+   * 
+   * @return the job identifier
+   */
+  String getIdentifier();
+
+  /**
+   * Sets the job name.
    * 
    * @param name
    *          the job name
-   * @param ctx
-   *          the job context
-   * @throws JobException
-   *           if job execution fails
    */
-  void execute(String name, Dictionary<String, Serializable> ctx) throws JobException;
+  void setName(String name);
+
+  /**
+   * Returns the job name.
+   * 
+   * @return the job name
+   */
+  String getName();
+
+  /**
+   * Sets the job implementation.
+   * 
+   * @param job
+   *          the job
+   */
+  void setWorker(Class<JobWorker> job);
+
+  /**
+   * Returns the job implementation.
+   * 
+   * @return the job
+   */
+  Class<? extends JobWorker> getWorker();
+
+  /**
+   * Adds a new trigger to the list of triggers.
+   * 
+   * @param trigger
+   *          the trigger to add
+   */
+  void setTrigger(JobTrigger trigger);
+
+  /**
+   * Returns the job trigger.
+   * 
+   * @return the trigger
+   */
+  JobTrigger getTrigger();
+
+  /**
+   * Returns an <code>XML</code> representation of the job, which will look
+   * similar to the following example:
+   * 
+   * <pre>
+   * &lt;job id=&quot;test&quot;&gt;
+   *     &lt;name&gt;Job title&lt;/name&gt;
+   *     &lt;description&gt;Job title&lt;/description&gt;
+   *     &lt;class&gt;ch.o2it.weblounge.module.test.SampleCronJob&lt;/class&gt;
+   *     &lt;schedule&gt;0 0 * * 1&lt;/schedule&gt;
+   *     &lt;option&gt;
+   *         &lt;name&gt;opt&lt;/name&gt;
+   *         &lt;value&gt;optvalue&lt;/value&gt;
+   *     &lt;/option&gt;
+   * &lt;/job&gt;
+   * </pre>
+   * 
+   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * <code>QuartzJob</code> from the serialized output of this method.
+   * 
+   * @return the <code>XML</code> representation of the context
+   * @see #fromXml(Node)
+   * @see #fromXml(Node, XPath)
+   */
+  String toXml();
 
 }
