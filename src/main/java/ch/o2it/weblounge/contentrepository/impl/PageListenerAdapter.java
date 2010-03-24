@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
-import ch.o2it.weblounge.common.page.PageLayout;
-import ch.o2it.weblounge.common.page.PageURI;
-import ch.o2it.weblounge.common.site.Renderer;
+import ch.o2it.weblounge.common.content.PageLayout;
+import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.PageListener;
 
@@ -149,8 +149,8 @@ public class PageListenerAdapter implements PageListener {
    * @param user
    *          the editing user
    * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageRendererChanged(ch.o2it.weblounge.api.url.WebUrl,
-   *      ch.o2it.weblounge.common.site.Renderer.renderer.Renderer,
-   *      ch.o2it.weblounge.common.site.Renderer.renderer.Renderer,
+   *      ch.o2it.weblounge.common.Renderer.renderer.Renderer,
+   *      ch.o2it.weblounge.common.Renderer.renderer.Renderer,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageRendererChanged(PageURI url, Renderer newRenderer,
@@ -169,8 +169,8 @@ public class PageListenerAdapter implements PageListener {
    * @param user
    *          the editing user
    * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageLayoutChanged(ch.o2it.weblounge.api.url.WebUrl,
-   *      ch.o2it.weblounge.PageLayout.content.Layout,
-   *      ch.o2it.weblounge.PageLayout.content.Layout,
+   *      ch.o2it.weblounge.common.PageLayout.content.Layout,
+   *      ch.o2it.weblounge.common.PageLayout.content.Layout,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageLayoutChanged(PageURI uri, PageLayout newLayout, PageLayout oldLayout,

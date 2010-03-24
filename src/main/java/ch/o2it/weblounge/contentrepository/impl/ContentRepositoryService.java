@@ -20,11 +20,11 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageURI;
-import ch.o2it.weblounge.common.page.SearchQuery;
-import ch.o2it.weblounge.common.page.SearchResult;
 import ch.o2it.weblounge.contentrepository.PageRepository;
 import ch.o2it.weblounge.contentrepository.ResourceRepository;
 
@@ -445,7 +445,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.PageRepository#delete(ch.o2it.weblounge.common.page.PageURI, boolean)
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#delete(ch.o2it.weblounge.common.content.PageURI, boolean)
    */
   public void delete(PageURI uri, boolean allRevisions) {
     // TODO Auto-generated method stub
@@ -455,7 +455,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.PageRepository#findPages(ch.o2it.weblounge.common.page.SearchQuery)
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#findPages(ch.o2it.weblounge.common.content.SearchQuery)
    */
   public SearchResult[] findPages(SearchQuery query) {
     // TODO Auto-generated method stub
@@ -465,7 +465,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.PageRepository#get(ch.o2it.weblounge.common.page.PageURI)
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#get(ch.o2it.weblounge.common.content.PageURI)
    */
   public Page get(PageURI uri) {
     // TODO Auto-generated method stub
@@ -475,7 +475,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.PageRepository#getVersions(ch.o2it.weblounge.common.page.PageURI)
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#getVersions(ch.o2it.weblounge.common.content.PageURI)
    */
   public PageURI[] getVersions(PageURI uri) {
     // TODO Auto-generated method stub
@@ -485,7 +485,7 @@ public class ContentRepositoryService implements PageRepository, ResourceReposit
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.PageRepository#put(ch.o2it.weblounge.common.page.PageURI, ch.o2it.weblounge.common.page.Page)
+   * @see ch.o2it.weblounge.contentrepository.PageRepository#put(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.content.Page)
    */
   public Page put(PageURI uri, Page page) {
     // TODO Auto-generated method stub
