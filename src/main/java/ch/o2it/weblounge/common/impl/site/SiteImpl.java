@@ -41,8 +41,9 @@ import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.scheduler.JobWorker;
+import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
+import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
@@ -710,29 +711,16 @@ public class SiteImpl implements Site {
         try {
           module.start();
           started.add(module);
-        } catch (Exception e) {
-          for (Module m : started) {
-            try {
-              log_.debug("Halting module {}", m);
-              m.stop();
-            } catch (Exception e2) {
-              log_.error("Error stopping module {}", m, e2);
-            }
+          
+          // start jobs
+          for (Job job : module.getJobs()) {
+            scheduleJob(job);
           }
-          // TODO: Stop everything that has been started so far
-          throw new SiteException(this, "Error starting module '" + module + "'", e);
-        }
-      }
-    }
-
-    // Register jobs
-    synchronized (jobs) {
-      for (QuartzJob job : jobs.values()) {
-        try {
-          scheduleJob(job);
+          
+          // actions are being registered automatically
+          
         } catch (Exception e) {
-          // TODO: Stop everything that has been started so far
-          throw new SiteException(this, "Error starting job '" + job + "'", e);
+          log_.error("Error starting module '{}'", module, e);
         }
       }
     }
@@ -761,6 +749,8 @@ public class SiteImpl implements Site {
         unscheduleJob(job);
       }
     }
+    
+    // actions are being unregistered automatically
 
     // Shutdown all of the modules
     synchronized (modules) {
@@ -1221,7 +1211,7 @@ public class SiteImpl implements Site {
    * @param job
    *          the job
    */
-  private void scheduleJob(QuartzJob job) {
+  private void scheduleJob(Job job) {
     if (scheduler == null)
       return;
 

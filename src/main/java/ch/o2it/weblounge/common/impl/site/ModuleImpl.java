@@ -444,8 +444,6 @@ public class ModuleImpl implements Module {
     if (!enabled)
       throw new IllegalStateException("Cannot start a disabled module");
 
-    // TODO: Implement module start
-
     // Finally, mark this module as running
     running = true;
     log_.info("Module '{}' started", this);
@@ -463,8 +461,6 @@ public class ModuleImpl implements Module {
     log_.debug("Stopping module {}", this);
     if (!running)
       throw new IllegalStateException("Module is not running");
-
-    // TODO: Implement module shutdown
 
     // Finally, mark this module as stopped
     running = false;
