@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.scheduler;
 
-import ch.o2it.weblounge.common.scheduler.Job;
+import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.scheduler.JobException;
 
 import org.quartz.JobDataMap;
@@ -50,7 +50,7 @@ public class QuartzJobWorker implements org.quartz.Job {
   public final static String CONTEXT = "ch.o2it.weblounge.JobContext";
 
   /** The job instance */
-  private Job jobInstance = null;
+  private JobWorker jobInstance = null;
 
   /**
    * {@inheritDoc}
@@ -93,13 +93,13 @@ public class QuartzJobWorker implements org.quartz.Job {
    * @throws Exception
    *           if creating an instance of the job fails
    */
-  private Job createJobInstance(JobExecutionContext ctx) throws Exception {
+  private JobWorker createJobInstance(JobExecutionContext ctx) throws Exception {
     JobDataMap jobData = ctx.getJobDetail().getJobDataMap();
     Class<?> c = (Class<?>) jobData.get(CLASS);
     if (c == null)
       throw new IllegalStateException("Lookup of job implementation failed");
     try {
-      jobInstance = (Job) c.newInstance();
+      jobInstance = (JobWorker) c.newInstance();
       return jobInstance;
     } catch (InstantiationException e) {
       throw new IllegalStateException("Error instantiating job implementation: " + e.getMessage());

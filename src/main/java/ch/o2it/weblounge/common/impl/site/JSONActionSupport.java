@@ -39,7 +39,7 @@ import java.io.IOException;
  * implement the <code>activate()</code> and <code>passivate()</code> method
  * accordingly and include the respective super implementations.
  */
-public class JSONActionSupport extends AbstractActionSupport implements JSONAction {
+public class JSONActionSupport extends ActionSupport implements JSONAction {
 
   /**
    * Creates a new action implementation that directly supports the generation

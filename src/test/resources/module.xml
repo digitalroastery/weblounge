@@ -1,13 +1,13 @@
 <module id="testmodule">
   <enable>true</enable>
-  <name language="en">Test module</name>
   <name language="de">Testmodul</name>
+  <name language="en">Test module</name>
   <pagelets>
     <pagelet id="renderer" composeable="true">
       <renderer>file://renderer/renderer.jsp</renderer>
       <editor>file://renderer/editor.jsp</editor>
-      <recheck>1d10m</recheck>
-      <valid>1w1d1h1m</valid>
+      <recheck>1d10M</recheck>
+      <valid>1w1d1H1M</valid>
       <name language="de">Pagelet renderer</name>
       <name language="en">Darstellungselement</name>
       <includes>
@@ -15,15 +15,6 @@
       </includes>
     </pagelet>
   </pagelets>
-  <imagestyles>
-    <imagestyle id="modulestyle" composeable="true">
-      <scalingmode>box</scalingmode>
-      <width>150</width>
-      <height>200</height>
-      <name language="de">Modulbild</name>
-      <name language="en">Module image</name>
-    </imagestyle>
-  </imagestyles>
   <actions>
     <action id="myaction">
       <class>ch.o2it.weblounge.common.site.TestAction</class>
@@ -31,7 +22,7 @@
       <page>/testpage/</page>
       <template>testtemplate</template>
       <recheck>0</recheck>
-      <valid>60S</valid>
+      <valid>1M</valid>
       <name language="de">Test</name>
       <name language="en">Test</name>
       <includes>
@@ -46,6 +37,15 @@
       </options>
     </action>
   </actions>
+  <imagestyles>
+    <imagestyle id="modulestyle" composeable="true">
+      <scalingmode>box</scalingmode>
+      <width>150</width>
+      <height>200</height>
+      <name language="de">Modulbild</name>
+      <name language="en">Module image</name>
+    </imagestyle>
+  </imagestyles>
   <jobs>
     <job id="testjob">
       <name>Job title</name>
@@ -61,8 +61,13 @@
   </jobs>
   <options>
     <option>
-      <name>media.url</name>
-      <value>http://media.swissunihockey.ch/dev</value>
+      <name>complex</name>
+      <value>complex</value>
+      <value>value</value>
+    </option>
+    <option>
+      <name>simple</name>
+      <value>simple value</value>
     </option>
   </options>
 </module>

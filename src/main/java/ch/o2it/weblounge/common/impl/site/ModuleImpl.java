@@ -20,12 +20,18 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
+import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
+import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.page.SearchResult;
+import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Module;
@@ -37,12 +43,17 @@ import ch.o2it.weblounge.common.url.WebUrl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Base implementation for a module. It is recommended that individual
@@ -78,7 +89,7 @@ public class ModuleImpl implements Module {
   protected OptionsHelper options = null;
 
   /** Localized module title */
-  protected LocalizableContent<String> title = null;
+  protected LocalizableContent<String> name = null;
 
   /** Module pagelet renderers */
   protected Map<String, PageletRenderer> renderers = null;
@@ -89,6 +100,9 @@ public class ModuleImpl implements Module {
   /** Module image styles */
   protected Map<String, ImageStyle> imagestyles = null;
 
+  /** Module jobs */
+  protected Map<String, Job> jobs = null;
+
   /** List of module listeners */
   protected List<ModuleListener> moduleListeners = null;
 
@@ -96,10 +110,11 @@ public class ModuleImpl implements Module {
    * Creates a new module.
    */
   public ModuleImpl() {
-    title = new LocalizableContent<String>();
+    name = new LocalizableContent<String>();
     renderers = new HashMap<String, PageletRenderer>();
     actions = new HashMap<String, Action>();
     imagestyles = new HashMap<String, ImageStyle>();
+    jobs = new HashMap<String, Job>();
     options = new OptionsHelper();
   }
 
@@ -172,10 +187,13 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Module#init(ch.o2it.weblounge.common.site.Site)
+   * @see ch.o2it.weblounge.common.site.Module#setSite(ch.o2it.weblounge.common.site.Site)
    */
-  public void init(Site site) throws ModuleException {
+  public void setSite(Site site) throws ModuleException {
     this.site = site;
+    for (Action action : actions.values()) {
+      action.setSite(site);
+    }
   }
 
   /**
@@ -195,6 +213,7 @@ public class ModuleImpl implements Module {
   public void addAction(Action action) {
     actions.put(action.getIdentifier(), action);
     action.setModule(this);
+    action.setSite(site);
   }
   
   /**
@@ -205,6 +224,7 @@ public class ModuleImpl implements Module {
   public void removeAction(Action action) {
     actions.remove(action.getIdentifier());
     action.setModule(null);
+    action.setSite(null);
   }
   
   /**
@@ -301,6 +321,42 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#addJob(ch.o2it.weblounge.common.scheduler.Job)
+   */
+  public void addJob(Job job) {
+    jobs.put(job.getIdentifier(), job);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#removeJob(ch.o2it.weblounge.common.scheduler.Job)
+   */
+  public void removeJob(Job job) {
+    jobs.remove(job.getIdentifier());
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#getJob(java.lang.String)
+   */
+  public Job getJob(String id) {
+    return jobs.get(id);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#getJobs()
+   */
+  public Job[] getJobs() {
+    return jobs.values().toArray(new Job[jobs.size()]);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.site.Module#getSite()
    */
@@ -311,20 +367,20 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Module#setTitle(java.lang.String,
+   * @see ch.o2it.weblounge.common.site.Module#setName(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language)
    */
-  public void setTitle(String title, Language language) {
-    this.title.put(title, language);
+  public void setName(String title, Language language) {
+    this.name.put(title, language);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Module#getTitle(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.site.Module#getName(ch.o2it.weblounge.common.language.Language)
    */
-  public String getTitle(Language language) {
-    return title.get(language);
+  public String getName(Language language) {
+    return name.get(language);
   }
 
   /**
@@ -509,6 +565,174 @@ public class ModuleImpl implements Module {
         listener.moduleStopped(this);
       }
     }
+  }
+
+  /**
+   * Initializes this module from an XML node that was generated using
+   * {@link #toXml()}.
+   * <p>
+   * To speed things up, you might consider using the second signature that uses
+   * an existing <code>XPath</code> instance instead of creating a new one.
+   * 
+   * @param config
+   *          the module node
+   * @throws IllegalStateException
+   *           if the module cannot be parsed
+   * @see #fromXml(Node, XPath)
+   * @see #toXml()
+   */
+  public static Module fromXml(Node config) throws IllegalStateException {
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(config, xpath);
+  }
+
+  /**
+   * Initializes this module from an XML node that was generated using
+   * {@link #toXml()}.
+   * 
+   * @param config
+   *          the module node
+   * @param xpathProcessor
+   *          xpath processor to use
+   * @throws IllegalStateException
+   *           if the module cannot be parsed
+   * @see #toXml()
+   */
+  @SuppressWarnings("unchecked")
+  public static Module fromXml(Node config, XPath xpathProcessor)
+      throws IllegalStateException {
+
+    // identifier
+    String identifier = XPathHelper.valueOf(config, "@id", xpathProcessor);
+    if (identifier == null)
+      throw new IllegalStateException("Unable to create module without identifier");
+
+    // class
+    Module module = null;
+    String className = XPathHelper.valueOf(config, "class", xpathProcessor);
+    if (className != null) {
+      try {
+        Class<? extends Module> c = (Class<? extends Module>) Class.forName(className);
+        module = c.newInstance();
+        module.setIdentifier(identifier);
+      } catch (Exception e) {
+        throw new IllegalStateException("Unable to instantiate class " + className + " for module '" + identifier + ": " + e.getMessage(), e);
+      }
+    } else {
+      module = new ModuleImpl();
+      module.setIdentifier(identifier);
+    }
+
+    // name
+    NodeList names = XPathHelper.selectList(config, "name", xpathProcessor);
+    for (int i = 0; i < names.getLength(); i++) {
+      Node localiziation = names.item(i);
+      String language = XPathHelper.valueOf(localiziation, "@language", xpathProcessor);
+      if (language == null)
+        throw new IllegalStateException("Found module name without language");
+      String name = XPathHelper.valueOf(localiziation, "text()", xpathProcessor);
+      if (name == null)
+        throw new IllegalStateException("Found empty module name");
+      module.setName(name, LanguageSupport.getLanguage(language));
+    }
+    
+    // pagelets
+    NodeList pageletNodes = XPathHelper.selectList(config, "pagelets/pagelet", xpathProcessor);
+    for (int i = 0; i < pageletNodes.getLength(); i++) {
+      module.addRenderer(PageletRendererImpl.fromXml(pageletNodes.item(i), xpathProcessor));
+    }
+
+    // actions
+    NodeList actionNodes = XPathHelper.selectList(config, "actions/action", xpathProcessor);
+    for (int i = 0; i < actionNodes.getLength(); i++) {
+      module.addAction(ActionSupport.fromXml(actionNodes.item(i), xpathProcessor));
+    }
+
+    // image styles
+    NodeList imagestyleNodes = XPathHelper.selectList(config, "imagestyles/imagestyle", xpathProcessor);
+    for (int i = 0; i < imagestyleNodes.getLength(); i++) {
+      module.addImageStyle(ImageStyleImpl.fromXml(imagestyleNodes.item(i), xpathProcessor));
+    }
+
+    // jobs
+    NodeList jobNodes = XPathHelper.selectList(config, "jobs/job", xpathProcessor);
+    for (int i = 0; i < jobNodes.getLength(); i++) {
+      module.addJob(QuartzJob.fromXml(jobNodes.item(i), xpathProcessor));
+    }
+
+    // options
+    Node optionsNode = XPathHelper.select(config, "options", xpathProcessor);
+    OptionsHelper.fromXml(optionsNode, module, xpathProcessor);
+
+    return module;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Module#toXml()
+   */
+  public String toXml() {
+    StringBuffer b = new StringBuffer();
+    b.append("<module id=\"");
+    b.append(identifier);
+    b.append("\">");
+
+    // enable
+    b.append("<enable>").append(enabled).append("</enable>");
+
+    // class
+    if (!this.getClass().equals(ModuleImpl.class))
+      b.append("<class>").append(getClass().getName()).append("</class>");
+
+    // Names
+    for (Language l : name.languages()) {
+      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
+      b.append(name.get(l));
+      b.append("</name>");
+    }
+
+    // pagelets
+    if (renderers.size() > 0) {
+      b.append("<pagelets>");
+      for (PageletRenderer renderer : renderers.values()) {
+        b.append(renderer.toXml());
+      }
+      b.append("</pagelets>");
+    }
+
+    // actions
+    if (actions.size() > 0) {
+      b.append("<actions>");
+      for (Action action : actions.values()) {
+        b.append(action.toXml());
+      }
+      b.append("</actions>");
+    }
+
+    // image styles
+    if (imagestyles.size() > 0) {
+      b.append("<imagestyles>");
+      for (ImageStyle imagestyle : imagestyles.values()) {
+        b.append(imagestyle.toXml());
+      }
+      b.append("</imagestyles>");
+    }
+
+    // jobs
+    if (jobs.size() > 0) {
+      b.append("<jobs>");
+      for (Job job : jobs.values()) {
+        b.append(job.toXml());
+      }
+      b.append("</jobs>");
+    }
+
+    // Options
+    b.append(options.toXml());
+
+    b.append("</module>");
+    return b.toString();
   }
 
   /**

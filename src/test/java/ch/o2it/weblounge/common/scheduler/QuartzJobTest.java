@@ -41,7 +41,7 @@ public class QuartzJobTest {
   protected QuartzJob quartzJob = null;
 
   /** The job worker */
-  protected Class<? extends Job> jobClass = TestJob.class;
+  protected Class<? extends JobWorker> jobClass = TestJob.class;
   
   /** Identifier of the test job */
   protected String jobIdentifier = "testjob";
@@ -93,11 +93,11 @@ public class QuartzJobTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.QuartzJob#getJob()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.QuartzJob#getWorker()}.
    */
   @Test
   public void testGetJob() {
-    assertEquals(jobClass, quartzJob.getJob());
+    assertEquals(jobClass, quartzJob.getWorker());
   }
 
   /**

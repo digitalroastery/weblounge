@@ -56,7 +56,7 @@ public class QuartzJobXmlTest extends QuartzJobTest {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    quartzJob = QuartzJob.fromXml(doc.getFirstChild());
+    quartzJob = (QuartzJob)QuartzJob.fromXml(doc.getFirstChild());
   }
 
   /**

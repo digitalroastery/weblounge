@@ -41,7 +41,7 @@ import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.scheduler.Job;
+import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
@@ -577,7 +577,7 @@ public class SiteImpl implements Site {
   public void addModule(Module module) throws ModuleException {
     if (module == null)
       throw new IllegalArgumentException("Module must not be null");
-    module.init(this);
+    module.setSite(this);
     modules.put(module.getIdentifier(), module);
   }
 
@@ -1168,9 +1168,9 @@ public class SiteImpl implements Site {
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.site.Site#addJob(java.lang.String,
-   *      ch.o2it.weblounge.common.scheduler.Job, java.util.Map)
+   *      ch.o2it.weblounge.common.scheduler.JobWorker, java.util.Map)
    */
-  public void addJob(String name, Class<? extends Job> job,
+  public void addJob(String name, Class<? extends JobWorker> job,
       Dictionary<String, Serializable> config) {
     addJob(name, job, config, new FireOnceJobTrigger());
   }
@@ -1179,16 +1179,16 @@ public class SiteImpl implements Site {
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.site.Site#addJob(java.lang.String,
-   *      ch.o2it.weblounge.common.scheduler.Job, java.util.Map,
+   *      ch.o2it.weblounge.common.scheduler.JobWorker, java.util.Map,
    *      ch.o2it.weblounge.common.scheduler.JobTrigger)
    */
-  public void addJob(String name, Class<? extends Job> job,
+  public void addJob(String name, Class<? extends JobWorker> job,
       Dictionary<String, Serializable> config, JobTrigger trigger) {
 
     // Add site to context
     if (config == null)
       config = new Hashtable<String, Serializable>();
-    config.put(Job.CTXT_SITE, this);
+    config.put(JobWorker.CTXT_SITE, this);
 
     // Create the job
     QuartzJob jobDetail = new QuartzJob(name, job, config, trigger);
@@ -1228,7 +1228,7 @@ public class SiteImpl implements Site {
     // Throw the job at quartz
     String groupName = "site " + this.getIdentifier();
     String jobIdentifier = job.getIdentifier();
-    Class<?> jobClass = job.getJob();
+    Class<?> jobClass = job.getWorker();
     JobTrigger trigger = job.getTrigger();
 
     synchronized (jobs) {
@@ -1402,33 +1402,16 @@ public class SiteImpl implements Site {
     }
 
     // options
-    NodeList optionNodes = XPathHelper.selectList(config, "options/option", xpathProcessor);
-    for (int i = 0; i < optionNodes.getLength(); i++) {
-      Node option = optionNodes.item(i);
-      String optionName = XPathHelper.valueOf(option, "name", xpathProcessor);
-      String value = XPathHelper.valueOf(option, "value", xpathProcessor);
-      site.setOption(optionName, value);
-    }
+    Node optionsNode = XPathHelper.select(config, "options", xpathProcessor);
+    OptionsHelper.fromXml(optionsNode, site, xpathProcessor);
 
     return site;
   }
 
   /**
-   * Returns an <code>XML</code> representation of the site, which will look
-   * similar to the following example:
-   * 
-   * <pre>
-   * &lt;site id="mysite"&gt;
-   * TODO: Finish example
-   * &lt;/site&gt;
-   * </pre>
-   * 
-   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
-   * <code>Site</code> from the serialized output of this method.
-   * 
-   * @return the <code>XML</code> representation of the site
-   * @see #fromXml(Node)
-   * @see #fromXml(Node, XPath)
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#toXml()
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();

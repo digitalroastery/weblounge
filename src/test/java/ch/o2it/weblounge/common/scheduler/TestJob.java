@@ -42,7 +42,7 @@ import java.util.Dictionary;
  * checked <code>JobException</code>.
  */
 @Ignore
-public class TestJob implements Job {
+public class TestJob implements JobWorker {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(TestJob.class);
@@ -81,7 +81,7 @@ public class TestJob implements Job {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.scheduler.Job#execute(java.lang.String,
+   * @see ch.o2it.weblounge.common.scheduler.JobWorker#execute(java.lang.String,
    *      java.util.Dictionary)
    */
   public void execute(String name, Dictionary<String, Serializable> ctx)

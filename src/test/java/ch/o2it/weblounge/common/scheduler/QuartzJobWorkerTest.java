@@ -59,7 +59,7 @@ public class QuartzJobWorkerTest {
   protected static Scheduler scheduler = null;
 
   /** The job worker */
-  protected Class<? extends Job> jobClass = null;
+  protected Class<? extends JobWorker> jobClass = null;
 
   /** Quartz job */
   protected QuartzJob quartzJob = null;
@@ -261,7 +261,7 @@ public class QuartzJobWorkerTest {
       throws SchedulerException {
     String jobIdentifier = job.getIdentifier();
     JobTrigger trigger = job.getTrigger();
-    Class<?> jobClass = job.getJob();
+    Class<?> jobClass = job.getWorker();
 
     // Set up the job detail
     JobDataMap jobData = new JobDataMap();

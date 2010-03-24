@@ -205,10 +205,31 @@ public final class OptionsHelper implements Customizable {
   public static OptionsHelper fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
 
+    OptionsHelper options = new OptionsHelper();
+    fromXml(config, options, xpathProcessor);
+    return options;
+  }
+
+  /**
+   * Initializes the options from an XML node that was generated using
+   * {@link #toXml()}. This method expects a <code>&lt;properties&gt;</code>
+   * node as the input to <code>config</code>.
+   * 
+   * @param config
+   *          the options node
+   * @param customizable
+   *          the customizable object
+   * @param xpathProcessor
+   *          xpath processor to use
+   * @throws IllegalStateException
+   *           if the options cannot be parsed
+   * @see #toXml()
+   */
+  public static void fromXml(Node config, Customizable customizable,
+      XPath xpathProcessor) throws IllegalStateException {
+
     if (config == null)
-      return new OptionsHelper();
-    
-    OptionsHelper configurationBase = new OptionsHelper();
+      return;
 
     // Read the options
     NodeList nodes = XPathHelper.selectList(config, "option", xpathProcessor);
@@ -218,19 +239,9 @@ public final class OptionsHelper implements Customizable {
       NodeList valueNodes = XPathHelper.selectList(option, "value", xpathProcessor);
       for (int j = 0; j < valueNodes.getLength(); j++) {
         String value = valueNodes.item(j).getFirstChild().getNodeValue();
-        List<String> values = configurationBase.options.get(name);
-        if (values != null && !values.contains(value)) {
-          values.add(value);
-          Collections.sort(values);
-        } else {
-          values = new ArrayList<String>();
-          values.add(value);
-          configurationBase.options.put(name, values);
-        }
+        customizable.setOption(name, value);
       }
     }
-    return configurationBase;
-
   }
 
   /**

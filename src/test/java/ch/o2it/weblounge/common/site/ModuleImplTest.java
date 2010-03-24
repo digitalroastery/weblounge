@@ -20,9 +20,10 @@
 
 package ch.o2it.weblounge.common.site;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -30,9 +31,9 @@ import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.site.ModuleImpl;
-import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.language.Language;
 
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,19 +46,19 @@ import java.util.Locale;
 public class ModuleImplTest {
 
   /** The module to test */
-  protected ModuleImpl module = null;
+  protected Module module = null;
 
   /** The hosting site */
   protected Site site = null;
 
   /** Module identifier */
-  protected String identifier = "test-module";
+  protected String identifier = "testmodule";
 
   /** Enabled flag */
   protected boolean enabled = true;
 
   /** Searchable flag */
-  protected boolean searchable = true;
+  protected boolean searchable = false;
 
   /** Name of the simple option */
   protected String simpleOptionName = "simple";
@@ -75,7 +76,7 @@ public class ModuleImplTest {
   protected String englishTitle = "Test module";
 
   /** German title */
-  protected String germanTitle = "Test Modul";
+  protected String germanTitle = "Testmodul";
 
   /** The English language */
   protected final Language English = new LanguageImpl(new Locale("en"));
@@ -113,15 +114,15 @@ public class ModuleImplTest {
     setUpPreliminaries();
     module = new ModuleImpl();
     module.setIdentifier(identifier);
-    module.setTitle(englishTitle, English);
-    module.setTitle(germanTitle, German);
+    module.setName(germanTitle, German);
+    module.setName(englishTitle, English);
     module.setEnabled(enabled);
     module.setSearchable(searchable);
     module.setOption(simpleOptionName, simpleOptionValue);
     for (String o : complexOptionValue) {
       module.setOption(complexOptionName, o);
     }
-    module.init(site);
+    module.setSite(site);
     module.addAction(action);
     module.addRenderer(renderer);
     module.addImageStyle(imageStyle);
@@ -134,10 +135,16 @@ public class ModuleImplTest {
    *           if setup fails
    */
   protected void setUpPreliminaries() throws Exception {
+    site = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(site.getIdentifier()).andReturn("test");
+    EasyMock.replay(site);
+    
     action = new TestAction();
     action.setIdentifier(actionIdentifier);
+    
     renderer = new PageletRendererImpl();
     renderer.setIdentifier(rendererIdentifier);
+
     imageStyle = new ImageStyleImpl();
     imageStyle.setIdentifier(imageStyleIdentifier);
   }
@@ -150,15 +157,6 @@ public class ModuleImplTest {
   @After
   public void tearDown() throws Exception {
     module.destroy();
-  }
-
-  /**
-   * Sets up preliminary data structures.
-   * 
-   * @throws Exception
-   */
-  protected void setupPrerequisites() throws Exception {
-    site = new SiteImpl();
   }
 
   /**
@@ -192,7 +190,7 @@ public class ModuleImplTest {
    */
   @Test
   public void testGetAction() {
-    assertEquals(action, module.getAction(actionIdentifier));
+    assertNotNull(module.getAction(actionIdentifier));
     assertTrue(module.getAction("test") == null);
   }
 
@@ -256,14 +254,14 @@ public class ModuleImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getTitle(ch.o2it.weblounge.common.language.Language)}
+   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getName(ch.o2it.weblounge.common.language.Language)}
    * .
    */
   @Test
-  public void testGetTitle() {
-    assertEquals(englishTitle, module.getTitle(English));
-    assertEquals(germanTitle, module.getTitle(German));
-    assertEquals(englishTitle, module.getTitle(Italian));
+  public void testGetName() {
+    assertEquals(englishTitle, module.getName(English));
+    assertEquals(germanTitle, module.getName(German));
+    assertEquals(germanTitle, module.getName(Italian));
   }
 
   /**

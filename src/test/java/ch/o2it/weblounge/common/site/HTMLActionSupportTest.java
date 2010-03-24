@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNull;
 import ch.o2it.weblounge.common.impl.page.PageImpl;
 import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.site.AbstractActionSupport;
+import ch.o2it.weblounge.common.impl.site.ActionSupport;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
@@ -41,9 +41,9 @@ import org.junit.Test;
 import java.net.URL;
 
 /**
- * Test case for {@link AbstractActionSupport}.
+ * Test case for {@link ActionSupport}.
  */
-public class HTMLActionSupportTest extends AbstractActionTest {
+public class HTMLActionSupportTest extends ActionSupportTest {
 
   /** The action to test */
   protected HTMLActionSupport htmlAction = null;
@@ -101,7 +101,7 @@ public class HTMLActionSupportTest extends AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getPage()}.
+   * {@link ch.o2it.weblounge.common.impl.site.ActionSupport#getPage()}.
    */
   @Test
   public void testGetPage() {
@@ -111,7 +111,7 @@ public class HTMLActionSupportTest extends AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getPageURI()}.
+   * {@link ch.o2it.weblounge.common.impl.site.ActionSupport#getPageURI()}.
    */
   @Test
   public void testGetPageURI() {
@@ -122,7 +122,7 @@ public class HTMLActionSupportTest extends AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#getTemplate()}.
+   * {@link ch.o2it.weblounge.common.impl.site.ActionSupport#getTemplate()}.
    */
   @Test
   public void testGetTemplate() {
@@ -131,7 +131,7 @@ public class HTMLActionSupportTest extends AbstractActionTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.AbstractActionSupport#passivate()}.
+   * {@link ch.o2it.weblounge.common.impl.site.ActionSupport#passivate()}.
    */
   @Test
   public void testPassivate() {

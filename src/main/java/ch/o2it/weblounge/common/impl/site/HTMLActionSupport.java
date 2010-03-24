@@ -23,9 +23,14 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.util.I18n;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.page.HTMLHeadElement;
 import ch.o2it.weblounge.common.page.HTMLInclude;
+import ch.o2it.weblounge.common.page.Link;
 import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.page.PageURI;
+import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -54,7 +59,7 @@ import java.util.List;
  * implement the <code>activate()</code> and <code>passivate()</code> method
  * accordingly and include the respective super implementations.
  */
-public class HTMLActionSupport extends AbstractActionSupport implements HTMLAction {
+public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
   /** Logging facility */
   protected final static Logger log_ = LoggerFactory.getLogger(HTMLActionSupport.class);
@@ -125,6 +130,9 @@ public class HTMLActionSupport extends AbstractActionSupport implements HTMLActi
    */
   public void setSite(Site site) {
     super.setSite(site);
+    if (site == null)
+      return;
+
     if (targetPath != null)
       this.pageURI = new PageURIImpl(site, targetPath);
     if (templateId != null)
@@ -160,6 +168,19 @@ public class HTMLActionSupport extends AbstractActionSupport implements HTMLActi
   }
 
   /**
+   * Convenience method used to be able to define the target URI without having
+   * access to the <code>Site</code> yet that will allow to set the uri as an
+   * object of type <code>PageURI</code>.
+   * 
+   * @param uri
+   *          the target path
+   * @see #setPageURI(PageURI)
+   */
+  void setPageURI(String uri) {
+    this.targetPath = uri;
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.site.Action#getPageURI()
@@ -175,6 +196,19 @@ public class HTMLActionSupport extends AbstractActionSupport implements HTMLActi
    */
   public void setTemplate(PageTemplate template) {
     this.template = template;
+  }
+
+  /**
+   * Convenience method used to be able to define the target template without
+   * having access to the <code>Site</code> yet that will allow to set the
+   * template as an object of type <code>PageTemplate</code>.
+   * 
+   * @param template
+   *          the template identifier
+   * @see #setTemplate(PageTemplate)
+   */
+  void setTemplate(String template) {
+    this.templateId = template;
   }
 
   /**
@@ -495,6 +529,77 @@ public class HTMLActionSupport extends AbstractActionSupport implements HTMLActi
    */
   protected boolean hasErrors() {
     return errorMessages == null || errorMessages.size() == 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Action#toXml()
+   */
+  public String toXml() {
+    StringBuffer b = new StringBuffer();
+    b.append("<action id=\"");
+    b.append(identifier);
+    b.append("\">");
+
+    // class
+    b.append("<class>").append(getClass().getName()).append("</class>");
+
+    // mountpoint
+    b.append("<mountpoint>").append(mountpoint).append("</mountpoint>");
+
+    // pageuri
+    if (pageURI != null)
+      b.append("<page>").append(pageURI).append("</page>");
+    else if (targetPath != null)
+      b.append("<page>").append(targetPath).append("</page>");
+
+    // template
+    if (template != null)
+      b.append("<template>").append(template).append("</template>");
+    else if (templateId != null)
+      b.append("<template>").append(templateId).append("</template>");
+
+    // Recheck time
+    if (recheckTime >= 0) {
+      b.append("<recheck>");
+      b.append(ConfigurationUtils.toDuration(recheckTime));
+      b.append("</recheck>");
+    }
+
+    // Valid time
+    if (validTime >= 0) {
+      b.append("<valid>");
+      b.append(ConfigurationUtils.toDuration(validTime));
+      b.append("</valid>");
+    }
+
+    // Names
+    for (Language l : name.languages()) {
+      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
+      b.append(name.get(l));
+      b.append("</name>");
+    }
+
+    // Includes
+    if (includes.size() > 0) {
+      b.append("<includes>");
+      for (HTMLHeadElement include : getIncludes()) {
+        if (include instanceof Link)
+          b.append(include.toXml());
+      }
+      for (HTMLHeadElement include : getIncludes()) {
+        if (include instanceof Script)
+          b.append(include.toXml());
+      }
+      b.append("</includes>");
+    }
+
+    // Options
+    b.append(options.toXml());
+
+    b.append("</action>");
+    return b.toString();
   }
 
 }

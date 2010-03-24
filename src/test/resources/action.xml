@@ -2,8 +2,6 @@
 <action id="myaction">
   <class>ch.o2it.weblounge.common.site.TestAction</class>
   <mountpoint>/test/</mountpoint>
-  <page>/testpage/</page>
-  <template>testtemplate</template>
   <recheck>0</recheck>
   <valid>1M</valid>
   <name language="de">Test</name>

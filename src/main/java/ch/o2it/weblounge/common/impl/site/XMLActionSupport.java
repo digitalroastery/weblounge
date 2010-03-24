@@ -39,7 +39,7 @@ import java.io.IOException;
  * implement the <code>activate()</code> and <code>passivate()</code> method
  * accordingly and include the respective super implementations.
  */
-public class XMLActionSupport extends AbstractActionSupport implements XMLAction {
+public class XMLActionSupport extends ActionSupport implements XMLAction {
 
   /**
    * Creates a new action implementation that directly supports the generation

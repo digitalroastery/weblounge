@@ -23,6 +23,7 @@ package ch.o2it.weblounge.common.impl.scheduler;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
+import ch.o2it.weblounge.common.scheduler.JobWorker;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -38,7 +39,7 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Base implementation for jobs.
  */
-public final class QuartzJob {
+public final class QuartzJob implements Job {
 
   /** The job identifier */
   protected String identifier = null;
@@ -47,7 +48,7 @@ public final class QuartzJob {
   protected String name = null;
 
   /** The actual job implementation */
-  protected Class<? extends Job> worker = null;
+  protected Class<? extends JobWorker> worker = null;
 
   /** Job trigger */
   protected JobTrigger trigger = null;
@@ -65,7 +66,7 @@ public final class QuartzJob {
    * @param trigger
    *          the job trigger
    */
-  public QuartzJob(String identifier, Class<? extends Job> worker,
+  public QuartzJob(String identifier, Class<? extends JobWorker> worker,
       JobTrigger trigger) {
     this(identifier, worker, null, trigger);
   }
@@ -83,7 +84,7 @@ public final class QuartzJob {
    * @param trigger
    *          the job trigger
    */
-  public QuartzJob(String identifier, Class<? extends Job> worker,
+  public QuartzJob(String identifier, Class<? extends JobWorker> worker,
       Dictionary<String, Serializable> context, JobTrigger trigger) {
     if (identifier == null)
       throw new IllegalArgumentException("Job identifier must not be null");
@@ -114,51 +115,49 @@ public final class QuartzJob {
   }
 
   /**
-   * Returns the job identifier.
-   * 
-   * @return the job identifier
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#getIdentifier()
    */
   public String getIdentifier() {
     return identifier;
   }
 
   /**
-   * Sets the job name.
-   * 
-   * @param name
-   *          the job name
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#setName(java.lang.String)
    */
   public void setName(String name) {
     this.name = name;
   }
 
   /**
-   * Returns the job name.
-   * 
-   * @return the job name
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#getName()
    */
   public String getName() {
     return name;
   }
 
   /**
-   * Sets the job implementation.
-   * 
-   * @param job
-   *          the job
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#setWorker(java.lang.Class)
    */
-  public void setJob(Class<Job> job) {
+  public void setWorker(Class<JobWorker> job) {
     if (worker == null)
       throw new IllegalArgumentException("Job implementation must not be null");
     this.worker = job;
   }
 
   /**
-   * Returns the job implementation.
-   * 
-   * @return the job
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#getWorker()
    */
-  public Class<? extends Job> getJob() {
+  public Class<? extends JobWorker> getWorker() {
     return worker;
   }
 
@@ -172,10 +171,9 @@ public final class QuartzJob {
   }
 
   /**
-   * Adds a new trigger to the list of triggers.
-   * 
-   * @param trigger
-   *          the trigger to add
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#setTrigger(ch.o2it.weblounge.common.scheduler.JobTrigger)
    */
   public void setTrigger(JobTrigger trigger) {
     if (trigger == null)
@@ -184,9 +182,9 @@ public final class QuartzJob {
   }
 
   /**
-   * Returns the job trigger.
-   * 
-   * @return the trigger
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#getTrigger()
    */
   public JobTrigger getTrigger() {
     return trigger;
@@ -223,7 +221,7 @@ public final class QuartzJob {
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
-  public static QuartzJob fromXml(Node context) throws IllegalStateException {
+  public static Job fromXml(Node context) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(context, xpath);
   }
@@ -241,12 +239,8 @@ public final class QuartzJob {
    * @see #toXml()
    */
   @SuppressWarnings("unchecked")
-  public static QuartzJob fromXml(Node config, XPath xPathProcessor)
+  public static Job fromXml(Node config, XPath xPathProcessor)
       throws IllegalStateException {
-
-    Node contextRoot = XPathHelper.select(config, "/job", xPathProcessor);
-    if (contextRoot == null)
-      return null;
 
     CronJobTrigger jobTrigger = null;
     Dictionary<String, Serializable> ctx = new Hashtable<String, Serializable>();
@@ -257,9 +251,9 @@ public final class QuartzJob {
 
     // Implementation class
     String className = XPathHelper.valueOf(config, "class", xPathProcessor);
-    Class<Job> clazz;
+    Class<JobWorker> clazz;
     try {
-      clazz = (Class<Job>) Class.forName(className);
+      clazz = (Class<JobWorker>) Class.forName(className);
     } catch (ClassNotFoundException e) {
       throw new IllegalStateException();
     }
@@ -287,28 +281,9 @@ public final class QuartzJob {
   }
 
   /**
-   * Returns an <code>XML</code> representation of the job, which will look
-   * similar to the following example:
-   * 
-   * <pre>
-   * &lt;job id=&quot;test&quot;&gt;
-   *     &lt;name&gt;Job title&lt;/name&gt;
-   *     &lt;description&gt;Job title&lt;/description&gt;
-   *     &lt;class&gt;ch.o2it.weblounge.module.test.SampleCronJob&lt;/class&gt;
-   *     &lt;schedule&gt;0 0 * * 1&lt;/schedule&gt;
-   *     &lt;option&gt;
-   *         &lt;name&gt;opt&lt;/name&gt;
-   *         &lt;value&gt;optvalue&lt;/value&gt;
-   *     &lt;/option&gt;
-   * &lt;/job&gt;
-   * </pre>
-   * 
-   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
-   * <code>QuartzJob</code> from the serialized output of this method.
-   * 
-   * @return the <code>XML</code> representation of the context
-   * @see #fromXml(Node)
-   * @see #fromXml(Node, XPath)
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#toXml()
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();
