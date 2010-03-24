@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.test.site;
 
-import ch.o2it.weblounge.common.scheduler.Job;
+import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.scheduler.JobException;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -36,7 +36,7 @@ import java.util.Map;
  * Test job that will print a friendly greeting to <code>System.out</code>.
  */
 @SuppressWarnings("unchecked")
-public class GreeterJob implements Job {
+public class GreeterJob implements JobWorker {
 
   /** Logging facility */
   protected final static Logger logger = LoggerFactory.getLogger(GreeterJob.class);
@@ -52,7 +52,7 @@ public class GreeterJob implements Job {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.scheduler.Job#execute(java.lang.String,
+   * @see ch.o2it.weblounge.common.scheduler.JobWorker#execute(java.lang.String,
    *      java.util.Dictionary)
    */
   public void execute(String name, Dictionary<String, Serializable> ctx)
