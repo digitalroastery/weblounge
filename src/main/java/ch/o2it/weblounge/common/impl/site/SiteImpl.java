@@ -708,6 +708,9 @@ public class SiteImpl implements Site {
     synchronized (modules) {
       List<Module> started = new ArrayList<Module>(modules.size());
       for (Module module : modules.values()) {
+        if (!module.isEnabled())
+          continue;
+
         try {
           module.start();
           started.add(module);
