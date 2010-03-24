@@ -22,6 +22,9 @@ package ch.o2it.weblounge.common.scheduler;
 
 import org.w3c.dom.Node;
 
+import java.io.Serializable;
+import java.util.Dictionary;
+
 import javax.xml.xpath.XPath;
 
 /**
@@ -91,6 +94,14 @@ public interface Job {
    * @return the trigger
    */
   JobTrigger getTrigger();
+
+  /**
+   * Returns the job context which in the beginning only contains the
+   * configuration options found in the job definition.
+   * 
+   * @return the context
+   */
+  Dictionary<String, Serializable> getContext();
 
   /**
    * Returns an <code>XML</code> representation of the job, which will look
