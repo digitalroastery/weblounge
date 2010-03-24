@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository;
 
-import ch.o2it.weblounge.common.page.PageURI;
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.user.User;
 
 /**

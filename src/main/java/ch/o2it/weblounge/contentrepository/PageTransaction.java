@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository;
 
-import ch.o2it.weblounge.common.page.PageURI;
+import ch.o2it.weblounge.common.content.PageURI;
 
 /**
  * This interface defines fields and methods for a page transaction.

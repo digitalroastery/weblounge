@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.contentrepository;
 
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.user.User;
 

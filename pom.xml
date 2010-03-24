@@ -27,7 +27,7 @@
           <instructions>
             <Import-Package>
               ch.o2it.weblounge.common.language,
-              ch.o2it.weblounge.common.page,
+              ch.o2it.weblounge.common.content,
               ch.o2it.weblounge.common.security,
               ch.o2it.weblounge.common.user
             </Import-Package>

@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.contentrepository;
 
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageURI;
-import ch.o2it.weblounge.common.page.SearchQuery;
-import ch.o2it.weblounge.common.page.SearchResult;
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.SearchResult;
 
 /**
  * A <code>PageRepository</code> is a facility that serves pages to weblounge
