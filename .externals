@@ -9,7 +9,6 @@
 ../../../modules/weblounge-dispatcher-api/trunk	modules/weblounge-dispatcher-api
 ../../../modules/weblounge-kernel/trunk	modules/weblounge-kernel
 ../../../modules/weblounge-site/trunk	modules/weblounge-site
-../../../modules/weblounge-site-api/trunk	modules/weblounge-site-api
 ../../../modules/weblounge-test/trunk	modules/weblounge-test
 ../../../modules/weblounge-user/trunk	modules/weblounge-user
 ../../../modules/weblounge-user-api/trunk	modules/weblounge-user-api
