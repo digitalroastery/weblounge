@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl;
+package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageTemplate;
@@ -45,6 +45,7 @@ import ch.o2it.weblounge.common.site.XMLAction;
 import ch.o2it.weblounge.common.url.UrlMatcher;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.dispatcher.ActionRequestHandler;
+import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

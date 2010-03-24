@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component immediate="true" name="Weblounge Action Request Handler">
-  <implementation class="ch.o2it.weblounge.dispatcher.impl.ActionRequestHandlerImpl" />
+  <implementation class="ch.o2it.weblounge.dispatcher.impl.handler.ActionRequestHandlerImpl" />
   <property name="service.description" value="Weblounge Action Request Handler" />
   <service>
     <provide interface="ch.o2it.weblounge.dispatcher.RequestHandler" />

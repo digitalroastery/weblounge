@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl;
+package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
+import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class StaticContentHandler implements RequestHandler, Times {
    * 
    * @return the static content handler
    */
-  static StaticContentHandler getInstance() {
+  public static StaticContentHandler getInstance() {
     if (instance == null) {
       instance = new StaticContentHandler();
     }

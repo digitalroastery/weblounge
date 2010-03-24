@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl;
+package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import static ch.o2it.weblounge.common.request.RequestFlavor.HTML;
 

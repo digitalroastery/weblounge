@@ -23,6 +23,7 @@ package ch.o2it.weblounge.dispatcher.impl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.dispatcher.DispatchListener;
+import ch.o2it.weblounge.dispatcher.impl.handler.StaticContentHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
