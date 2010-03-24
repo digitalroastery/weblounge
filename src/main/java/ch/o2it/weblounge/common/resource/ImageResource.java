@@ -22,8 +22,8 @@ package ch.o2it.weblounge.common.resource;
 
 import java.io.File;
 
+import ch.o2it.weblounge.common.content.ImageStyle;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.url.WebUrl;
 
 /**

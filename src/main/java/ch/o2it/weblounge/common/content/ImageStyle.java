@@ -18,7 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.site;
+package ch.o2it.weblounge.common.content;
+
+import ch.o2it.weblounge.common.site.ScalingMode;
 
 /**
  * The <code>ImageStyle</code> defines a presentation style for images of a

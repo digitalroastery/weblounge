@@ -20,8 +20,9 @@
 
 package ch.o2it.weblounge.common.site;
 
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageURI;
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageTemplate;
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -96,7 +97,7 @@ public interface HTMLAction extends Action {
    *           if writing to the response fails
    * @throws ActionException
    *           if a processing error occurs while handling the request
-   * @see ch.o2it.weblounge.common.page.HTMLHeadElement
+   * @see ch.o2it.weblounge.common.content.HTMLHeadElement
    */
   void startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException;

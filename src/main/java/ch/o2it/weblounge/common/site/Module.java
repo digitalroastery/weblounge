@@ -21,8 +21,10 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Customizable;
+import ch.o2it.weblounge.common.content.ImageStyle;
+import ch.o2it.weblounge.common.content.PageletRenderer;
+import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.SearchResult;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.url.WebUrl;
 

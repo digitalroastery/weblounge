@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Customizable;
+import ch.o2it.weblounge.common.content.Composeable;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;

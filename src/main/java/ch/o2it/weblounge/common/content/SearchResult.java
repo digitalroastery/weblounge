@@ -18,10 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
+package ch.o2it.weblounge.common.content;
 
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.site.Renderer;
 
 /**
  * The search result is what is delivered by the search function of weblounge.

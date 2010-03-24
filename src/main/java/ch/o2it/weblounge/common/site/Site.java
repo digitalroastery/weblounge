@@ -21,10 +21,11 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Customizable;
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageLayout;
+import ch.o2it.weblounge.common.content.PageTemplate;
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageLayout;
-import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;

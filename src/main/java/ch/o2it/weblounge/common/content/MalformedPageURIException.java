@@ -18,30 +18,24 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
-
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.user.User;
+package ch.o2it.weblounge.common.content;
 
 /**
- * This interface defines the methods for listeners that are interested in page
- * access.
+ * This exception is thrown if an invalid <code>PageURI</code> is about to
+ * be created.
  */
-public interface PageAccessListener {
+public class MalformedPageURIException extends RuntimeException {
+
+  /** The serial version UID */
+  private static final long serialVersionUID = -4385183355893667958L;
 
   /**
-   * Notifies the listener about an access to the page identified by
-   * <code>uri</code>.
+   * Creates an exception stating that <code>path</code> is malformed.
    * 
-   * @param uri
-   *          the accessed uri
-   * @param user
-   *          the accessing user
-   * @param language
-   *          the requested language
-   * @param version
-   *          the requested version
+   * @param path the path to the page
    */
-  void access(PageURI uri, User user, Language language, String version);
+  public MalformedPageURIException(String path) {
+    super("The page uri path '" + path + "' is invalid!");
+  }
 
 }

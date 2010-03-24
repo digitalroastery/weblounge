@@ -18,11 +18,8 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
+package ch.o2it.weblounge.common.content;
 
-import ch.o2it.weblounge.common.content.Creatable;
-import ch.o2it.weblounge.common.content.LocalizedModifiable;
-import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.security.Permission;
@@ -137,7 +134,7 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * <code>null</code>.
    * 
    * @see #getContent(String, Language, boolean)
-   * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language, boolean)
    */
   String[] getMultiValueContent(String name, Language language, boolean force);
@@ -150,7 +147,7 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * <code>null</code>.
    * 
    * @see #getContent(String, Language)
-   * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language)
    */
   String[] getMultiValueContent(String name, Language language);
@@ -164,7 +161,7 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * 
    * @see #getContent(String)
    * @see #switchTo(Language)
-   * @see ch.o2it.weblounge.common.page.Pagelet#getContent(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String)
    */
   String[] getMultiValueContent(String name);
 
