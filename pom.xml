@@ -98,7 +98,6 @@
       <module>modules/weblounge-dispatcher-api</module>
       <module>modules/weblounge-dispatcher</module>
       <module>modules/weblounge-kernel</module>
-      <module>modules/weblounge-site-api</module>
       <!--
       <module>modules/weblounge-site</module>
       -->
