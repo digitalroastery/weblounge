@@ -23,11 +23,12 @@ package ch.o2it.weblounge.common.page;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.content.Link;
+import ch.o2it.weblounge.common.content.PageletRenderer;
+import ch.o2it.weblounge.common.impl.content.LinkImpl;
+import ch.o2it.weblounge.common.impl.content.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.site.PageletRenderer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -113,7 +114,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getIdentifier()}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getIdentifier()}
    * .
    */
   @Test
@@ -123,7 +124,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getName()}.
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getName()}.
    */
   @Test
   public void testGetName() {
@@ -132,7 +133,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language)}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language)}
    * .
    */
   @Test
@@ -143,7 +144,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#isComposeable()}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#isComposeable()}
    * .
    */
   @Test
@@ -153,7 +154,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getRecheckTime()}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getRecheckTime()}
    * .
    */
   @Test
@@ -163,7 +164,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getValidTime()}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getValidTime()}
    * .
    */
   @Test
@@ -173,7 +174,7 @@ public class PageletRendererImplTest {
   
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#getEditor()}.
+   * {@link ch.o2it.weblounge.common.impl.content.PageletRendererImpl#getEditor()}.
    */
   @Test
   public void testGetEditor() {
@@ -182,7 +183,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#render(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)}
+   * {@link ch.o2it.weblounge.common.impl.content.PageletRendererImpl#render(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)}
    * .
    */
   @Test

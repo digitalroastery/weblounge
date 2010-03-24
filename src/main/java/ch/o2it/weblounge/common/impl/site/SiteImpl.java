@@ -20,8 +20,12 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageLayout;
+import ch.o2it.weblounge.common.content.PageTemplate;
+import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.impl.content.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
@@ -35,9 +39,6 @@ import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageLayout;
-import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -50,7 +51,6 @@ import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleException;
-import ch.o2it.weblounge.common.site.PageTemplate;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteException;
 import ch.o2it.weblounge.common.site.SiteListener;
@@ -281,7 +281,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#addTemplate(ch.o2it.weblounge.common.site.PageTemplate)
+   * @see ch.o2it.weblounge.common.site.Site#addTemplate(ch.o2it.weblounge.common.content.PageTemplate)
    */
   public void addTemplate(PageTemplate template) {
     templates.put(template.getIdentifier(), template);
@@ -290,7 +290,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#removeTemplate(ch.o2it.weblounge.common.site.PageTemplate)
+   * @see ch.o2it.weblounge.common.site.Site#removeTemplate(ch.o2it.weblounge.common.content.PageTemplate)
    */
   public void removeTemplate(PageTemplate template) {
     if (template == null)
@@ -324,7 +324,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#setDefaultTemplate(ch.o2it.weblounge.common.site.PageTemplate)
+   * @see ch.o2it.weblounge.common.site.Site#setDefaultTemplate(ch.o2it.weblounge.common.content.PageTemplate)
    */
   public void setDefaultTemplate(PageTemplate template) {
     if (template != null) {
@@ -436,7 +436,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#addLayout(ch.o2it.weblounge.common.page.PageLayout)
+   * @see ch.o2it.weblounge.common.site.Site#addLayout(ch.o2it.weblounge.common.content.PageLayout)
    */
   public void addLayout(PageLayout layout) {
     if (layout == null)
@@ -1082,7 +1082,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#getPage(ch.o2it.weblounge.common.page.PageURI)
+   * @see ch.o2it.weblounge.common.site.Site#getPage(ch.o2it.weblounge.common.content.PageURI)
    */
   public Page getPage(PageURI uri) throws IOException {
     // TODO Auto-generated method stub

@@ -58,7 +58,7 @@ public class OptionsHelperXmlTest extends OptionsHelperTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.LinkImpl#toXml()}.
+   * {@link ch.o2it.weblounge.common.impl.content.LinkImpl#toXml()}.
    */
   @Test
   public void testToXml() {

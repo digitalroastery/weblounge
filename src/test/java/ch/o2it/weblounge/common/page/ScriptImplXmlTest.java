@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.page.ScriptImpl;
+import ch.o2it.weblounge.common.impl.content.ScriptImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class ScriptImplXmlTest extends ScriptImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.ScriptImpl#toXml()}.
+   * {@link ch.o2it.weblounge.common.impl.content.ScriptImpl#toXml()}.
    */
   @Test
   public void testToXml() {

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
+import ch.o2it.weblounge.common.impl.content.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.ScalingMode;
@@ -78,7 +78,7 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.image.ImageStyleImpl#getIdentifier()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ImageStyleImpl#getIdentifier()}.
    */
   @Test
   public void testGetIdentifier() {
@@ -86,7 +86,7 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.image.ImageStyleImpl#getScalingMode()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ImageStyleImpl#getScalingMode()}.
    */
   @Test
   public void testGetScalingMode() {
@@ -94,7 +94,7 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.image.ImageStyleImpl#getHeight()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ImageStyleImpl#getHeight()}.
    */
   @Test
   public void testGetHeight() {
@@ -102,7 +102,7 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.image.ImageStyleImpl#getWidth()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ImageStyleImpl#getWidth()}.
    */
   @Test
   public void testGetWidth() {
@@ -110,7 +110,7 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.image.ImageStyleImpl#getName(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ImageStyleImpl#getName(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetNameLanguage() {
@@ -119,7 +119,7 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.image.ImageStyleImpl#isComposeable()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ImageStyleImpl#isComposeable()}.
    */
   @Test
   public void testIsComposeable() {
@@ -127,7 +127,7 @@ public class ImageStyleImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.image.ImageStyleImpl#equals(java.lang.Object)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ImageStyleImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {

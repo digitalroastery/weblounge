@@ -20,10 +20,15 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.content.HTMLHeadElement;
+import ch.o2it.weblounge.common.content.Link;
+import ch.o2it.weblounge.common.content.PageTemplate;
+import ch.o2it.weblounge.common.content.PageletRenderer;
+import ch.o2it.weblounge.common.content.Script;
+import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
+import ch.o2it.weblounge.common.impl.content.LinkImpl;
+import ch.o2it.weblounge.common.impl.content.ScriptImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.page.GeneralComposeable;
-import ch.o2it.weblounge.common.impl.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.page.ScriptImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
@@ -31,9 +36,6 @@ import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.HTMLHeadElement;
-import ch.o2it.weblounge.common.page.Link;
-import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -41,8 +43,6 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.PageTemplate;
-import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;

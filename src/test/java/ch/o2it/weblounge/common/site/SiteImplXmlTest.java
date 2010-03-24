@@ -58,7 +58,7 @@ public class SiteImplXmlTest extends SiteImplTest {
   }
   
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#toXml()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#toXml()}.
    */
   @Test
   public void testToXml() {

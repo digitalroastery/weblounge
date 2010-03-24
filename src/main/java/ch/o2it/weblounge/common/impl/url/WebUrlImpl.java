@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
+import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
-import ch.o2it.weblounge.common.page.Page;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.Url;

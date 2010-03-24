@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.HTMLInclude;
+import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.HTMLInclude;
-import ch.o2it.weblounge.common.page.PageURI;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.HTMLAction;
 

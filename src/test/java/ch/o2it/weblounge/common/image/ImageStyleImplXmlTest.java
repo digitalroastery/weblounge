@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
+import ch.o2it.weblounge.common.impl.content.ImageStyleImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class ImageStyleImplXmlTest extends ImageStyleImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.image.ImageStyleImpl#toXml()} .
+   * {@link ch.o2it.weblounge.common.impl.content.ImageStyleImpl#toXml()} .
    */
   @Test
   public void testToXml() {

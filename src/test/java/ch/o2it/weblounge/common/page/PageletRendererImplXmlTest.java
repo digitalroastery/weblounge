@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
+import ch.o2it.weblounge.common.impl.content.PageletRendererImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class PageletRendererImplXmlTest extends PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#toXml()}.
+   * {@link ch.o2it.weblounge.common.impl.content.PageletRendererImpl#toXml()}.
    */
   @Test
   public void testToXml() {

@@ -20,24 +20,24 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.impl.image.ImageStyleImpl;
+import ch.o2it.weblounge.common.content.ImageStyle;
+import ch.o2it.weblounge.common.content.PageletRenderer;
+import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.impl.content.ImageStyleImpl;
+import ch.o2it.weblounge.common.impl.content.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.SearchResult;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.ImageStyle;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleException;
 import ch.o2it.weblounge.common.site.ModuleListener;
-import ch.o2it.weblounge.common.site.PageletRenderer;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -248,7 +248,7 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.Module#addImageStyle(ch.o2it.weblounge.common.site.ImageStyle)
+   * @see ch.o2it.weblounge.common.site.Module#addImageStyle(ch.o2it.weblounge.common.content.ImageStyle)
    */
   public void addImageStyle(ImageStyle imagestyle) {
     imagestyles.put(imagestyle.getIdentifier(), imagestyle);
@@ -257,7 +257,7 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.Module#removeImageStyle(ch.o2it.weblounge.common.site.ImageStyle)
+   * @see ch.o2it.weblounge.common.site.Module#removeImageStyle(ch.o2it.weblounge.common.content.ImageStyle)
    */
   public void removeImageStyle(ImageStyle imagestyle) {
     imagestyles.remove(imagestyle.getIdentifier());
@@ -284,7 +284,7 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.Module#addRenderer(ch.o2it.weblounge.common.site.PageletRenderer)
+   * @see ch.o2it.weblounge.common.site.Module#addRenderer(ch.o2it.weblounge.common.content.PageletRenderer)
    */
   public void addRenderer(PageletRenderer renderer) {
     renderers.put(renderer.getIdentifier(), renderer);
@@ -294,7 +294,7 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.Module#removeRenderer(ch.o2it.weblounge.common.site.PageletRenderer)
+   * @see ch.o2it.weblounge.common.site.Module#removeRenderer(ch.o2it.weblounge.common.content.PageletRenderer)
    */
   public void removeRenderer(PageletRenderer renderer) {
     renderers.remove(renderer.getIdentifier());

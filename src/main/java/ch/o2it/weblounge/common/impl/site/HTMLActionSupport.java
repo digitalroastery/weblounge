@@ -20,25 +20,25 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.HTMLHeadElement;
+import ch.o2it.weblounge.common.content.HTMLInclude;
+import ch.o2it.weblounge.common.content.Link;
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageTemplate;
+import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.Renderer;
+import ch.o2it.weblounge.common.content.Script;
+import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.util.I18n;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.page.HTMLHeadElement;
-import ch.o2it.weblounge.common.page.HTMLInclude;
-import ch.o2it.weblounge.common.page.Link;
-import ch.o2it.weblounge.common.page.Page;
-import ch.o2it.weblounge.common.page.PageURI;
-import ch.o2it.weblounge.common.page.Script;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.HTMLAction;
-import ch.o2it.weblounge.common.site.PageTemplate;
-import ch.o2it.weblounge.common.site.Renderer;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.jasper.JasperException;
@@ -161,7 +161,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Action#setPageURI(ch.o2it.weblounge.common.page.PageURI)
+   * @see ch.o2it.weblounge.common.site.Action#setPageURI(ch.o2it.weblounge.common.content.PageURI)
    */
   public void setPageURI(PageURI uri) {
     this.pageURI = uri;
@@ -192,7 +192,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Action#setTemplate(ch.o2it.weblounge.common.site.PageTemplate)
+   * @see ch.o2it.weblounge.common.site.Action#setTemplate(ch.o2it.weblounge.common.content.PageTemplate)
    */
   public void setTemplate(PageTemplate template) {
     this.template = template;

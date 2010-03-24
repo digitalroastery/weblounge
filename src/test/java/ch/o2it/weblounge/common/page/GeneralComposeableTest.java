@@ -26,11 +26,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.content.Link;
+import ch.o2it.weblounge.common.content.Script;
+import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
+import ch.o2it.weblounge.common.impl.content.LinkImpl;
+import ch.o2it.weblounge.common.impl.content.PageTemplateImpl;
+import ch.o2it.weblounge.common.impl.content.ScriptImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.page.GeneralComposeable;
-import ch.o2it.weblounge.common.impl.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
-import ch.o2it.weblounge.common.impl.page.ScriptImpl;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.junit.Before;
@@ -118,7 +120,7 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getIdentifier()}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getIdentifier()}
    * .
    */
   @Test
@@ -128,7 +130,7 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getName()}.
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getName()}.
    */
   @Test
   public void testGetName() {
@@ -137,7 +139,7 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language)}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language)}
    * .
    */
   @Test
@@ -149,7 +151,7 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language, boolean)}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language, boolean)}
    * .
    */
   @Test
@@ -161,7 +163,7 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#isComposeable()}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#isComposeable()}
    * .
    */
   @Test
@@ -171,7 +173,7 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getRecheckTime()}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getRecheckTime()}
    * .
    */
   @Test
@@ -181,7 +183,7 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#getValidTime()}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getValidTime()}
    * .
    */
   @Test
@@ -201,7 +203,7 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeable#equals(java.lang.Object)}
+   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#equals(java.lang.Object)}
    * .
    */
   @Test
