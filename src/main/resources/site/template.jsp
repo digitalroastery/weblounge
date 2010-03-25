@@ -4,6 +4,7 @@
 		<title>Test Template</title>
 	</head>
 	<body>
+		<h1><%= "Hello" %></h1>
 		<test:greeting/>
 	</body>
 </html>
