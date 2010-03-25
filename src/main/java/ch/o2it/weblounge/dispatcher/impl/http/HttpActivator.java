@@ -55,7 +55,7 @@ public abstract class HttpActivator {
 
   protected WebXml webXml = new WebXml();
 
-  boolean debug = false;
+  boolean debug = true;
 
   public String getBundleEntry() {
     return bundleEntry;
