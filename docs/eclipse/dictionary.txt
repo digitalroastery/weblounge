@@ -42,3 +42,4 @@ weblounge
 whisky
 xml
 xpath
+init
