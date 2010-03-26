@@ -39,7 +39,8 @@
             <Import-Package>
               ch.o2it.weblounge.common.request,
               ch.o2it.weblounge.common.site,
-              javax.servlet
+              javax.servlet,
+              javax.servlet.http
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.dispatcher
