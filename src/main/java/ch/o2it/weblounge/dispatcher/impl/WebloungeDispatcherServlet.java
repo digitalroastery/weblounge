@@ -29,6 +29,7 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.dispatcher.DispatchListener;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
+import ch.o2it.weblounge.dispatcher.SiteLocatorService;
 
 import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private transient ResponseCache cache = null;
 
   /** The sites that are online */
-  private transient SiteTracker sites = null;
+  private transient SiteLocatorService sites = null;
 
   /** List of request listeners */
   private List<RequestListener> requestListeners = null;
@@ -81,13 +82,20 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   /**
    * Creates a new instance of the weblounge dispatcher servlet.
    */
-  WebloungeDispatcherServlet(SiteTracker siteTracker) {
-    if (siteTracker == null)
-      throw new IllegalArgumentException("Site tracker cannot be null");
-    sites = siteTracker;
+  WebloungeDispatcherServlet() {
     requestListeners = new ArrayList<RequestListener>();
     dispatcher = new ArrayList<DispatchListener>();
     requestHandler = new ArrayList<RequestHandler>();
+  }
+  
+  /**
+   * Sets the site locator.
+   * 
+   * @param siteLocator
+   *          the site locator
+   */
+  public void setSiteLocator(SiteLocatorService siteLocator) {
+    this.sites = siteLocator;
   }
 
   /**
@@ -292,7 +300,9 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @return the target site or <code>null</code>
    */
   private Site getSiteByRequest(HttpServletRequest request) {
-    Site site = sites.getSiteByName(request.getServerName());
+    if (sites == null)
+      return null;
+    Site site = sites.findSiteByRequest(request);
     if (site != null && !site.isRunning()) {
       log_.debug("Ignoring request for disabled site {}", site);
       return null;

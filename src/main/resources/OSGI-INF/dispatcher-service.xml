@@ -6,5 +6,6 @@
     <provide interface="ch.o2it.weblounge.dispatcher.DispatcherService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
+  <reference name="sitelocator" interface="ch.o2it.weblounge.dispatcher.SiteLocatorService" cardinality="0..1" policy="dynamic" bind="setSiteLocator" unbind="removeRemoveSiteLocator" />
   <reference name="requesthandler" interface="ch.o2it.weblounge.dispatcher.RequestHandler" cardinality="0..n" policy="dynamic" bind="addRequestHandler" unbind="removeRequestHandler" />
 </component>

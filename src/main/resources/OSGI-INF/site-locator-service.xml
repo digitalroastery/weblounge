@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component immediate="true" start="activate" stop="deactivate" name="Weblounge Site Locator Service">
+  <implementation class="ch.o2it.weblounge.dispatcher.impl.SiteLocatorServiceImpl" />
+  <property name="service.description" value="Weblounge Site Locator Service" />
+  <service>
+    <provide interface="ch.o2it.weblounge.dispatcher.SiteLocatorService" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+  <reference name="httpservice" interface="org.osgi.service.HttpService" cardinality="0..1" policy="dynamic" bind="setHttpService" unbind="removeHttpService" />
+</component>

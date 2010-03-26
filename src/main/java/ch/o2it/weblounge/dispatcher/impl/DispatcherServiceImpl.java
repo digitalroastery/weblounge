@@ -21,6 +21,7 @@ package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.dispatcher.DispatcherService;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
+import ch.o2it.weblounge.dispatcher.SiteLocatorService;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -46,16 +47,13 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   private static final Logger log_ = LoggerFactory.getLogger(DispatcherServiceImpl.class);
 
   /** The main dispatcher servlet */
-  WebloungeDispatcherServlet dispatcher = null;
-
+  private WebloungeDispatcherServlet dispatcher = null;
+  
   /** Tracker for the http service */
   private HttpServiceTracker httpTracker = null;
 
   /** Tracker for the cache service */
   private CacheServiceTracker cacheTracker = null;
-
-  /** Tracker for weblounge sites */
-  private SiteTracker siteTracker = null;
 
   /**
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
@@ -78,12 +76,8 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     BundleContext bundleContext = context.getBundleContext();
     log_.debug("Activating weblounge dispatcher");
 
-    // Start site service tracking
-    siteTracker = new SiteTracker(bundleContext);
-    siteTracker.open();
-
     // Create an http tracker and make sure it forwards to our servlet
-    dispatcher = new WebloungeDispatcherServlet(siteTracker);
+    dispatcher = new WebloungeDispatcherServlet();
     log_.trace("Start looking for http service implementations");
     httpTracker = new HttpServiceTracker(bundleContext, dispatcher);
     httpTracker.open();
@@ -105,7 +99,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    * @param context
    *          the component context
    */
-  public void stop(ComponentContext context) {
+  public void deactivate(ComponentContext context) {
     log_.debug("Deactivating weblounge dispatcher");
 
     // Get rid of the http tracker
@@ -116,11 +110,27 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     cacheTracker.close();
     cacheTracker = null;
 
-    // Get rid of the site tracker
-    siteTracker.close();
-    siteTracker = null;
-
     log_.debug("Weblounge dispatcher deactivated");
+  }
+
+  /**
+   * Callback from the OSGi environment when the site locator is activated.
+   * 
+   * @param siteLocator
+   *          the site locator
+   */
+  public void setSiteLocator(SiteLocatorService siteLocator) {
+    dispatcher.setSiteLocator(siteLocator);
+  }
+
+  /**
+   * Callback from the OSGi environment when the site locator is deactivated.
+   * 
+   * @param siteLocator
+   *          the site locator service
+   */
+  public void removeSiteLocator(SiteLocatorService siteLocator) {
+    dispatcher.setSiteLocator(null);
   }
 
   /**
