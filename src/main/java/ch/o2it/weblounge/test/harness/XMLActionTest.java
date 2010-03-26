@@ -59,6 +59,10 @@ public class XMLActionTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of greeter action");
 
+    // Include the mountpoint
+    // TODO: Make this dynamic
+    serverUrl = UrlSupport.concat(serverUrl, "weblounge");
+
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();
     Set<String> languages = greetings.keySet();

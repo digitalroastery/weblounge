@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.test.harness.HTMLActionTest;
 import ch.o2it.weblounge.test.harness.IntegrationTest;
 import ch.o2it.weblounge.test.harness.JSONActionTest;
+import ch.o2it.weblounge.test.harness.SiteResourcesTest;
 import ch.o2it.weblounge.test.harness.XMLActionTest;
 
 import org.osgi.framework.BundleContext;
@@ -154,7 +155,7 @@ public final class TestCommand {
     // Print the test header
     Date startDate = new Date();
     log_.info("------------------------------------------------------------------------");
-    log_.info("Running Integration Tets");
+    log_.info("Running Integration Tests");
     log_.info("------------------------------------------------------------------------");
     log_.info("Tests: " + tests.size());
     log_.info("Started at: " + WebloungeDateFormat.formatStatic(startDate));
@@ -245,6 +246,7 @@ public final class TestCommand {
     tests.add(new HTMLActionTest());
     tests.add(new XMLActionTest());
     tests.add(new JSONActionTest());
+    tests.add(new SiteResourcesTest());
   }
 
 }
