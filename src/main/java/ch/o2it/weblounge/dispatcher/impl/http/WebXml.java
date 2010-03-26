@@ -20,133 +20,236 @@
 
 package ch.o2it.weblounge.dispatcher.impl.http;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 
+/**
+ * This class represents an in-memory representation of the classic
+ * <code>web.xml</code> found in web applications slated for deployment in a
+ * servlet container.
+ */
 public class WebXml {
 
+  /** The servlets */
   private TreeMap<String, WebXmlServlet> webXmlServlets = new TreeMap<String, WebXmlServlet>();
+
+  /** The servlet filters */
   private TreeMap<String, WebXmlFilter> webXmlFilters = new TreeMap<String, WebXmlFilter>();
 
-  private ArrayList<WebXmlContextParam> contextParams = new ArrayList<WebXmlContextParam>();
+  /** The context parameters */
+  private Map<String, String> contextParams = new HashMap<String, String>();
+
+  /** The list of welcome files */
   private ArrayList<String> webXmlWelcomeFiles = new ArrayList<String>();
 
-  public TreeMap<String, WebXmlFilter> getWebXmlFilters() {
+  /**
+   * Returns the filters.
+   * 
+   * @return the filters
+   */
+  public Map<String, WebXmlFilter> getFilters() {
     return webXmlFilters;
   }
 
-  public TreeMap<String, WebXmlServlet> getWebXmlServlets() {
+  /**
+   * Returns the servlets.
+   * 
+   * @return the servlets
+   */
+  public Map<String, WebXmlServlet> getServlets() {
     return webXmlServlets;
   }
 
-  public ArrayList<WebXmlContextParam> getContextParams() {
+  /**
+   * Returns the context parameters.
+   * 
+   * @return the context parameters
+   */
+  public Map<String, String> getContextParams() {
     return contextParams;
   }
 
-  public ArrayList<String> getWebXmlWelcomeFiles() {
+  /**
+   * Returns the welcome files.
+   * 
+   * @return the welcome files
+   */
+  public List<String> getWelcomeFiles() {
     return webXmlWelcomeFiles;
   }
 
-  public Dictionary<String, Object> getWebXmlWelcomeFilesAsDictionary() {
-
-    Dictionary<String, Object> webXmlFiles = new Hashtable<String, Object>();
-    if (webXmlWelcomeFiles != null && !webXmlWelcomeFiles.isEmpty())
-      webXmlFiles.put(WelcomeFileFilterServlet.WELCOME_FILES, StringUtils.join(webXmlWelcomeFiles, ";"));
-    return webXmlFiles;
-  }
-
+  /**
+   * Returns <code>true</code> if welcome files are defined.
+   * 
+   * @return <code>true</code> if welcome files are defined
+   */
   public boolean containsWelcomeFiles() {
     return !webXmlWelcomeFiles.isEmpty();
   }
 
+  /**
+   * Adds a welcome file.
+   * 
+   * @param file
+   *          the file name
+   * @return the web xml
+   */
   public WebXml addWelcomeFile(String file) {
     webXmlWelcomeFiles.add(file);
     return this;
   }
 
+  /**
+   * Adds a servlet with the given name and implementation.
+   * 
+   * @param name
+   *          the servlet name
+   * @param servlet
+   *          the servlet class
+   * @return the new servlet
+   */
   public WebXmlServlet addServlet(String name, Class<? extends Servlet> servlet) {
     if (servlet == null)
       return null;
     if (name == null)
       name = servlet.getName();
-
     WebXmlServlet webXmlServlet = new WebXmlServlet(name, servlet);
-
     webXmlServlets.put(name, webXmlServlet);
-    // we want to return an object that allows us to call addMapping to add one
-    // or more mappings
     return webXmlServlet;
   }
 
+  /**
+   * Adds a servlet with the servlet class name as the servlet name.
+   * 
+   * @param servlet
+   *          the servlet class
+   * @return the new servlet
+   */
   public WebXmlServlet addServlet(Class<? extends Servlet> servlet) {
     if (servlet == null)
       return null;
-    String name = servlet.getName(); // class name
-
+    String name = servlet.getName();
     WebXmlServlet webXmlServlet = new WebXmlServlet(name, servlet);
-
     webXmlServlets.put(name, webXmlServlet);
-    // we want to return an object that allows us to call addMapping to add one
-    // or more mappings
     return webXmlServlet;
   }
 
+  /**
+   * Adds a servlet filter with the given name and implementation.
+   * 
+   * @param name
+   *          the filter name
+   * @param filter
+   *          the filter class
+   * @return the new filter
+   */
   public WebXmlFilter addFilter(String name, Class<? extends Filter> filter) {
     if (filter == null)
       return null;
     if (name == null)
       name = filter.getName();
-
     WebXmlFilter webXmlFilter = new WebXmlFilter(name, filter);
-
     webXmlFilters.put(name, webXmlFilter);
-    // we want to return an object that allows us to call addMapping to add one
-    // or more mappings
     return webXmlFilter;
   }
 
+  /**
+   * Adds a servlet filter with the filter class name as the filter name.
+   * 
+   * @param filter
+   *          the filter class
+   * @return the new filter
+   */
   public WebXmlFilter addFilter(Class<?> filter) {
     if (filter == null)
       return null;
-    String name = filter.getName(); // class name
-
+    String name = filter.getName();
     WebXmlFilter webXmlFilter = new WebXmlFilter(name, filter);
-
     webXmlFilters.put(name, webXmlFilter);
-    // we want to return an object that allows us to call addMapping to add one
-    // or more mappings
     return webXmlFilter;
   }
 
+  /**
+   * Adds a context parameter.
+   * 
+   * @param paramName
+   *          name of the context parameter
+   * @param paramValue
+   *          parameter value
+   * @return the web xml
+   */
   public WebXml addContextParam(String paramName, String paramValue) {
     if (paramName == null || paramValue == null)
       return this;
-
-    WebXmlContextParam param = new WebXmlContextParam(paramName, paramValue);
-    contextParams.add(param);
+    contextParams.put(paramName, paramValue);
     return this;
   }
 
-  public boolean containsContextParam(String paramName) {
-    for (WebXmlContextParam param : contextParams) {
-      if (param.paramName.equals(paramName))
-        return true;
-    }
-    return false;
+  /**
+   * Returns the value of the given context parameter or <code>null</code> if no
+   * such parameter was specified.
+   * 
+   * @param paramName
+   *          the parameter name
+   * @return the parameter value
+   */
+  public String getContextParam(String paramName) {
+    return contextParams.get(paramName);
   }
 
+  /**
+   * Returns the value of the given context parameter or
+   * <code>defaultValue</code> if no such parameter was specified.
+   * 
+   * @param paramName
+   *          the parameter name
+   * @param defaultValue
+   *          the default value
+   * @return the parameter value
+   */
+  public String getContextParam(String paramName, String defaultValue) {
+    String value = contextParams.get(paramName);
+    return (value != null) ? value : defaultValue;
+  }
+
+  /**
+   * Returns <code>true</code> if a context parameter with the given name
+   * exists.
+   * 
+   * @param paramName
+   *          the parameter name
+   * @return <code>true</code> if the parameter is defined
+   */
+  public boolean containsContextParam(String paramName) {
+    return contextParams.containsKey(paramName);
+  }
+
+  /**
+   * Returns <code>true</code> if a filter with the given name exists.
+   * 
+   * @param filterName
+   *          the filter name
+   * @return <code>true</code> if the filter is defined
+   */
   public boolean containsFilter(String filterName) {
     return webXmlFilters.containsKey(filterName);
   }
 
+  /**
+   * Returns <code>true</code> if a servlet with the given name exists.
+   * 
+   * @param servletName
+   *          the servlet name
+   * @return <code>true</code> if the servlet is defined
+   */
   public boolean containsServlet(String servletName) {
     return webXmlServlets.containsKey(servletName);
   }
+
 }

@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.dispatcher.impl.http;
 
+import ch.o2it.weblounge.dispatcher.DispatcherConfiguration;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -34,27 +36,38 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Implementation of a servlet that forwards requests to a welcome file.
+ */
 public class WelcomeFileFilterServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 1L;
+  /** Serial version uid */
+  private static final long serialVersionUID = 4015041977387112025L;
 
-  public static final String WELCOME_FILES = "weblounge.http.WELCOME_FILES";
+  /** List of welcome files */
+  private List<String> welcomeFileList = new ArrayList<String>();
 
-  List<String> welcomeFileList = new ArrayList<String>();
-  String appRoot = null;
-  String bundleUriNamespace = null;
+  /** Application root path */
+  private String appRoot = null;
+  
+  /** Bundle root uri */
+  private String bundleUriNamespace = null;
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+   */
   public void service(HttpServletRequest req, HttpServletResponse res)
       throws ServletException, IOException {
 
     if (req.getPathInfo() != null && req.getPathInfo().equals("/")) {
-      if (welcomeFileList != null && !welcomeFileList.isEmpty()) {
+      if (!welcomeFileList.isEmpty()) {
         // use the first one for now:
         for (String welcomeFile : welcomeFileList) {
           try {
             if (welcomeFile.startsWith("/"))
               welcomeFile = welcomeFile.substring(1);
-
             RequestDispatcher dispatcher = req.getRequestDispatcher(welcomeFile);
             // TODO: check if resource exists before forwarding
             dispatcher.forward(req, res);
@@ -75,17 +88,19 @@ public class WelcomeFileFilterServlet extends HttpServlet {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
+   */
   public void init(ServletConfig config) throws ServletException {
-
-    String welcomeFilesDelimited = config.getInitParameter(WELCOME_FILES);
+    String welcomeFilesDelimited = config.getInitParameter(DispatcherConfiguration.WELCOME_FILES);
     if (welcomeFilesDelimited != null)
       welcomeFileList = Arrays.asList(StringUtils.split(welcomeFilesDelimited, ";"));
-
-    appRoot = config.getInitParameter(HttpActivator.WEBAPP_CONTEXTROOT);
+    appRoot = config.getInitParameter(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
     if (appRoot == null || appRoot.equals("/"))
       appRoot = "";
-
-    bundleUriNamespace = config.getInitParameter(HttpActivator.BUNDLE_URI_NAMESPACE);
+    bundleUriNamespace = config.getInitParameter(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
     if (bundleUriNamespace == null || bundleUriNamespace.equals("/"))
       bundleUriNamespace = "";
   }

@@ -6,5 +6,5 @@
     <provide interface="ch.o2it.weblounge.dispatcher.SiteLocatorService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-  <reference name="httpservice" interface="org.osgi.service.HttpService" cardinality="0..1" policy="dynamic" bind="setHttpService" unbind="removeHttpService" />
+  <reference name="site" interface="ch.o2it.weblounge.common.site.Site" cardinality="0..n" policy="dynamic" bind="addSite" unbind="removeSite" />
 </component>

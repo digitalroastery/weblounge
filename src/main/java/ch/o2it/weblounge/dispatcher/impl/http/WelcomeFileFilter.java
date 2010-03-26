@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.dispatcher.impl.http;
 
-import org.apache.commons.lang.StringUtils;
+import ch.o2it.weblounge.dispatcher.DispatcherConfiguration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -36,15 +36,20 @@ import javax.servlet.http.HttpServletRequest;
 
 public class WelcomeFileFilter implements javax.servlet.Filter {
 
-  public static final String WELCOME_FILES = "weblounge.http.WELCOME_FILES";
+  /** Logging facility */
+  private static final Logger log_ = LoggerFactory.getLogger(WelcomeFileFilter.class);
 
-  List<String> welcomeFileList = new ArrayList<String>();
-  String appRoot = null;
-  String bundleUriNamespace = null;
+  /** The application root path */
+  private String appRoot = null;
 
-  public void destroy() {
-  }
+  /** The bundle uri namespace */
+  private String bundleUriNamespace = null;
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
+   */
   public void doFilter(ServletRequest req, ServletResponse res,
       FilterChain chain) throws IOException, ServletException {
 
@@ -52,33 +57,35 @@ public class WelcomeFileFilter implements javax.servlet.Filter {
     String uri = hreq.getRequestURI();
     String contextPath = hreq.getContextPath();
     String servletPath = hreq.getServletPath();
-    System.out.println("WelcomeFileFilter.URI" + uri);
-    System.out.println("WelcomeFileFilter.contextPath" + contextPath);
-    System.out.println("WelcomeFileFilter.servletPath" + servletPath);
-
+    log_.debug("WelcomeFileFilter.URI=" + uri);
+    log_.debug("WelcomeFileFilter.contextPath=" + contextPath);
+    log_.debug("WelcomeFileFilter.servletPath=" + servletPath);
     if ((appRoot + bundleUriNamespace).equals(uri)) {
-      System.out.println("is welcomeURL");
+      log_.debug(uri + " is welcomeURL");
     }
-
     chain.doFilter(req, res);
-
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+   */
   public void init(FilterConfig config) throws ServletException {
-
-    String welcomeFilesDelimited = config.getInitParameter(WELCOME_FILES);
-    if (welcomeFilesDelimited != null)
-      welcomeFileList = Arrays.asList(StringUtils.split(welcomeFilesDelimited, ";"));
-    appRoot = config.getInitParameter(HttpActivator.WEBAPP_CONTEXTROOT);
+    appRoot = config.getInitParameter(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
     if (appRoot == null || appRoot.equals("/"))
       appRoot = "";
-
-    bundleUriNamespace = config.getInitParameter(HttpActivator.BUNDLE_URI_NAMESPACE);
+    bundleUriNamespace = config.getInitParameter(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
     if (bundleUriNamespace == null || bundleUriNamespace.equals("/"))
       bundleUriNamespace = "";
+  }
 
-    System.out.println("WelcomeFileFilter.init" + welcomeFilesDelimited);
-
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.Filter#destroy()
+   */
+  public void destroy() {
   }
 
 }

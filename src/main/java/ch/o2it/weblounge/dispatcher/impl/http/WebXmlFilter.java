@@ -21,25 +21,57 @@
 package ch.o2it.weblounge.dispatcher.impl.http;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WebXmlFilter {
-  String filterName;
 
+  String filterName;
+  Class<?> filterClass;
+  String loadOnStartup;
+  Map<String, String> initParams = new HashMap<String, String>();
+  ArrayList<String> filterMappings = new ArrayList<String>();
+
+  /**
+   * Creates a new filter.
+   * 
+   * @param filterName
+   *          the filter name
+   * @param filterClass
+   *          the filter implementation
+   */
+  public WebXmlFilter(String filterName, Class<?> filterClass) {
+    this.filterName = filterName;
+    this.filterClass = filterClass;
+  }
+
+  /**
+   * Returns the filter name
+   * 
+   * @return the filter name
+   */
   public String getFilterName() {
     return filterName;
   }
 
-  Class<?> filterClass;
-  String loadOnStartup;
-  Dictionary<String, String> initParams = new Hashtable<String, String>();
-  ArrayList<String> filterMappings = new ArrayList<String>();
-
-  public Dictionary<String, String> getInitParams() {
+  /**
+   * Returns the init parameters.
+   * 
+   * @return the parameters
+   */
+  public Map<String, String> getInitParams() {
     return initParams;
   }
 
+  /**
+   * Adds an init parameter.
+   * 
+   * @param paramName
+   *          the parameter name
+   * @param paramValue
+   *          the parameter value
+   * @return the filter
+   */
   public WebXmlFilter addInitParam(String paramName, String paramValue) {
     if (paramName != null && paramValue != null)
       initParams.put(paramName, paramValue);
@@ -58,20 +90,20 @@ public class WebXmlFilter {
   private WebXmlFilter() {
   }
 
-  public WebXmlFilter(String filterName, Class<?> filterClass) {
-    this.filterName = filterName;
-    this.filterClass = filterClass;
-  }
-
+  /**
+   * Adds a filter mapping.
+   * 
+   * @param mapping
+   *          the mapping
+   * @return the filter
+   */
   public WebXmlFilter addMapping(String mapping) {
-
     if (mapping == null)
       return null;
-
     if (mapping != null && !mapping.startsWith("/"))
       mapping = "/" + mapping;
-
     filterMappings.add(mapping);
     return this;
   }
+
 }

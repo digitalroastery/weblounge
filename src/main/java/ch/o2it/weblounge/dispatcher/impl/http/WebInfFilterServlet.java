@@ -27,10 +27,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet implementation that denies access to the contents of
+ * <code>WEB-INF</code> directories.
+ */
 public class WebInfFilterServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 1L;
+  /** Serial version UID */
+  private static final long serialVersionUID = -2890243093579204137L;
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+   */
   public void service(HttpServletRequest req, HttpServletResponse res)
       throws ServletException, IOException {
     res.sendError(HttpServletResponse.SC_FORBIDDEN);

@@ -64,6 +64,48 @@ public class SiteLocatorServiceImpl implements SiteLocatorService, ManagedServic
   }
 
   /**
+   * Callback from the OSGi environment when a new site is activated.
+   * 
+   * @param site
+   *          the site
+   */
+  public void addSite(Site site) {
+    synchronized (sites) {
+      sites.add(site);
+      for (String name : site.getHostNames()) {
+        if (site.equals(sitesByServerName.get(name))) {
+          log_.error("Another site is already registered to " + name);
+          continue;
+        }
+        sitesByServerName.put(name, site);
+      }
+    }
+    log_.debug("Site {} registered", site);
+  }
+
+  /**
+   * Callback from the OSGi environment when a site is deactivated.
+   * 
+   * @param site
+   *          the site
+   */
+  public void removeSite(Site site) {
+    synchronized (sites) {
+      sites.remove(site);
+      List<String> namesToRemove = new ArrayList<String>();
+      for (Map.Entry<String, Site> entry : sitesByServerName.entrySet()) {
+        if (site.equals(entry.getValue())) {
+          namesToRemove.add(entry.getKey());
+        }
+      }
+      for (String serverName : namesToRemove) {
+        sitesByServerName.remove(serverName);
+      }
+    }
+    log_.debug("Site {} unregistered", site);
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByIdentifier(java.lang.String)
@@ -112,48 +154,6 @@ public class SiteLocatorServiceImpl implements SiteLocatorService, ManagedServic
     if (request == null)
       throw new IllegalArgumentException("Request must not be null");
     return findSiteByName(request.getServerName());
-  }
-
-  /**
-   * Callback from the OSGi environment when a new site is activated.
-   * 
-   * @param site
-   *          the site
-   */
-  public void addSite(Site site) {
-    synchronized (sites) {
-      sites.add(site);
-      for (String name : site.getHostNames()) {
-        if (site.equals(sitesByServerName.get(name))) {
-          log_.error("Another site is already registered to " + name);
-          continue;
-        }
-        sitesByServerName.put(name, site);
-      }
-    }
-    log_.debug("Site {} registered", site);
-  }
-
-  /**
-   * Callback from the OSGi environment when a site is deactivated.
-   * 
-   * @param site
-   *          the site
-   */
-  public void removeSite(Site site) {
-    synchronized (sites) {
-      sites.remove(site);
-      List<String> namesToRemove = new ArrayList<String>();
-      for (Map.Entry<String, Site> entry : sitesByServerName.entrySet()) {
-        if (site.equals(entry.getValue())) {
-          namesToRemove.add(entry.getKey());
-        }
-      }
-      for (String serverName : namesToRemove) {
-        sitesByServerName.remove(serverName);
-      }
-    }
-    log_.debug("Site {} unregistered", site);
   }
 
 }

@@ -133,7 +133,7 @@
               ch.o2it.weblounge.dispatcher,
               ch.o2it.weblounge.site,
               org.apache.commons.lang,
-			        org.apache.jasper,
+              org.apache.jasper,
               org.slf4j,
               org.ops4j.pax.web.service;resolution:=optional,
               javax.activation,
@@ -156,6 +156,7 @@
               OSGI-INF/dispatcher-service.xml,
               OSGI-INF/action-requesthandler.xml,
               OSGI-INF/page-requesthandler.xml,
+              OSGI-INF/site-dispatcher-service.xml,
               OSGI-INF/site-locator-service.xml
             </Service-Component>
           </instructions>
