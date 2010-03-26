@@ -94,7 +94,7 @@
             <Service-Component>
               OSGI-INF/kernel-service.xml,
               OSGI-INF/site-command.xml,
-              OSGI-INF/siteobserver-service.xml
+              OSGI-INF/site-manager-service.xml
             </Service-Component>
           </instructions>
         </configuration>

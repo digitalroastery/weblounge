@@ -38,10 +38,10 @@ import java.util.List;
  * startup and the shutdown of sites and registers or unregisters various site
  * components with system components.
  */
-public final class SiteObserverService implements SiteListener {
+public final class SiteManagerService implements SiteListener {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(SiteObserverService.class);
+  private static final Logger log_ = LoggerFactory.getLogger(SiteManagerService.class);
 
   /** The action request handler */
   private ActionRequestHandler actionRequestHandler = null;
@@ -56,12 +56,9 @@ public final class SiteObserverService implements SiteListener {
    */
   public void siteStarted(Site site) {
     runningSites.add(site);
-
-    // Register site actions
     if (actionRequestHandler != null) {
       registerSite(site);
     }
-
   }
 
   /**
@@ -71,12 +68,9 @@ public final class SiteObserverService implements SiteListener {
    */
   public void siteStopped(Site site) {
     runningSites.remove(site);
-
-    // Unregister actions
     if (actionRequestHandler != null) {
       unregisterSite(site);
     }
-
   }
 
   /**
