@@ -43,3 +43,13 @@ whisky
 xml
 xpath
 init
+servlets
+mime
+serializable
+unbind
+timestamp
+decorators
+locales
+lowercase
+classpath
+filesystem
