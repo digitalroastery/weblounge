@@ -219,7 +219,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         log_.info("Rendering {} through {}", path, template);
         template.render(request, response);
       } catch (Exception e) {
-        String params = RequestUtils.getParameters(request);
+        String params = RequestUtils.dumpParameters(request);
         String msg = "Error rendering template '" + template + "' on '" + path + "' " + params;
         Throwable o = e.getCause();
         if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {

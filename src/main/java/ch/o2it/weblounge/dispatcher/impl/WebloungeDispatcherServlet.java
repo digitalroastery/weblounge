@@ -251,7 +251,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         }
       } catch (Throwable t) {
         response.invalidate();
-        String params = RequestUtils.getParameters(request);
+        String params = RequestUtils.dumpParameters(request);
         if (t.getCause() != null) {
           Throwable o = t.getCause();
           if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
