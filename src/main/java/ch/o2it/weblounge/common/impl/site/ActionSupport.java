@@ -103,9 +103,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   /** Map containing uploaded files */
   protected List<FileItem> files = null;
 
-  /** Parameter collection extracted from the url extension */
-  private List<String> urlparams = new ArrayList<String>();
-
   /** The number of includes */
   protected int includeCount = 0;
 
@@ -195,99 +192,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    */
   public String getPath() {
     return mountpoint;
-  }
-
-  /**
-   * Loads parameters provided via the url extension (e. g.
-   * action/param1/param2)
-   * 
-   * @param request
-   *          request to gather values from.
-   */
-  private void loadUrlExtensionValues(WebloungeRequest request) {
-    // load parameter values from url extension
-    urlparams = new ArrayList<String>();
-    String[] params = getRequestedUrlExtension().split("/");
-    // first param is empty (because of leading slash), therefore start with
-    // index
-    // 1
-    for (int i = 1; i < params.length; i++) {
-      urlparams.add(params[i]);
-    }
-  }
-
-  /**
-   * Returns a collection with all the parameters provided via the url
-   * extension.
-   * 
-   * TODO: Hide this in general getParameter()
-   * 
-   * @return a <code>List<String></code> object with all the parameters
-   */
-  public List<String> getUrlParameters() {
-    return this.urlparams;
-  }
-
-  /**
-   * Returns true, if there is an url parameter at the specified position,
-   * otherwise, false is returned.
-   * 
-   * TODO: Hide this in general getParameter()
-   * 
-   * @param i
-   *          position of the parameter in the url extension
-   * @return true if parameter is present, otherwise false
-   */
-  public boolean isUrlParameterPresent(int i) {
-    String param = getUrlParameter(i);
-    if (param == null || param.length() == 0)
-      return false;
-    else
-      return true;
-  }
-
-  /**
-   * Returns a parameter value which was provided via the url extension.
-   * 
-   * TODO: Hide this in general getParameter()
-   * 
-   * @param i
-   *          position of the parameter in the url extension
-   * @return a <code>String</code> object with the requested parameter value
-   */
-  public String getUrlParameter(int i) {
-    if (i < getUrlParameters().size())
-      return this.getUrlParameters().get(i);
-    else
-      return null;
-  }
-
-  /**
-   * Returns the extension part of the requested url. For example, if an action
-   * is mounted to <code>/test</code> and the url is <code>/test/a</code> then
-   * this method will return <code>/a</code>. For the mount point itself, the
-   * method will return <code>/</code>.
-   * 
-   * @return the path extension relative to the action's mount point
-   */
-  protected String getRequestedUrlExtension() {
-    if (request == null)
-      throw new IllegalStateException("Request has not started");
-    return request.getRequestedUrl().getPath().substring(mountpoint.length());
-  }
-
-  /**
-   * Returns the extension part of the target url. For example, if an action is
-   * mounted to <code>/test</code> and the url is <code>/test/a</code> then this
-   * method will return <code>/a</code>. For the mount point itself, the method
-   * will return <code>/</code>.
-   * 
-   * @return the path extension relative to the action's mount point
-   */
-  protected String getUrlExtension() {
-    if (request == null)
-      throw new IllegalStateException("Request has not started");
-    return request.getUrl().getPath().substring(mountpoint.length());
   }
 
   /**
@@ -440,8 +344,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     this.request = request;
     this.response = response;
     this.flavor = flavor;
-
-    loadUrlExtensionValues(request);
 
     // Check if we have a file upload request
     if (ServletFileUpload.isMultipartContent(request)) {

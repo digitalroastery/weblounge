@@ -20,8 +20,13 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
-import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.impl.site.ActionSupport;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.common.site.Action;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -36,8 +41,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public final class RequestUtils {
 
-  /** Request field containing the required field names */
-  public static final String FLD_REQUIRED = "required";
+  /** Logging facility */
+  private final static Logger log_ = LoggerFactory.getLogger(ActionSupport.class);
 
   /**
    * RequestSupport is a static class and therefore has no constructor.
@@ -68,7 +73,7 @@ public final class RequestUtils {
    *          the request
    * @return the request parameters
    */
-  public static String getParameters(WebloungeRequest request) {
+  public static String dumpParameters(WebloungeRequest request) {
     StringBuffer params = new StringBuffer();
     Enumeration<?> e = request.getParameterNames();
     while (e.hasMoreElements()) {
@@ -85,12 +90,53 @@ public final class RequestUtils {
   }
 
   /**
+   * Returns the extension part of the requested url. For example, if an action
+   * is mounted to <code>/test</code> and the url is <code>/test/a</code> then
+   * this method will return <code>/a</code>. For the mount point itself, the
+   * method will return <code>/</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the action
+   * @return the path extension relative to the action's mount point
+   */
+  protected String getRequestedUrlExtension(WebloungeRequest request,
+      Action action) {
+    if (request == null)
+      throw new IllegalStateException("Request has not started");
+    return request.getRequestedUrl().getPath().substring(action.getPath().length());
+  }
+
+  /**
+   * Returns the extension part of the target url. For example, if an action is
+   * mounted to <code>/test</code> and the url is <code>/test/a</code> then this
+   * method will return <code>/a</code>. For the mount point itself, the method
+   * will return <code>/</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the action
+   * @return the path extension relative to the action's mount point
+   */
+  protected String getUrlExtension(WebloungeRequest request, Action action) {
+    if (request == null)
+      throw new IllegalStateException("Request has not started");
+    return request.getUrl().getPath().substring(action.getPath().length());
+  }
+
+  /**
    * Checks if the parameter <code>parameter</code> is present in the request
    * and is not equal to the empty string. In this case, the parameter itself is
    * returned, <code>null</code> otherwise.
    * <p>
    * Note that this method includes the check for <tt>hidden</tt> parameters.
    * 
+   * @param request
+   *          the weblounge request
+   * @param parameter
+   *          the parameter name
    * @return the parameter value or <code>null</code> if the parameter is not
    *         available
    */
@@ -102,7 +148,48 @@ public final class RequestUtils {
       } catch (UnsupportedEncodingException e) {
       }
     }
-    return (p != null && !p.trim().equals("")) ? p : null;
+    return StringUtils.trimToNull(p);
+  }
+
+  /**
+   * Checks a parameter <code>parameter</code> is present in the url of the
+   * request at the indicated position, starting with the action's mountpoint.
+   * In this case, the parameter itself is returned, <code>null</code>
+   * otherwise.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param index
+   *          the parameter index
+   * @return the parameter value or <code>null</code> if the parameter is not
+   *         available
+   */
+  public static String getParameter(WebloungeRequest request, Action action,
+      int index) {
+
+    // load parameter values from url extension
+    List<String> urlparams = new ArrayList<String>();
+    String path = request.getRequestedUrl().getPath();
+    String actionMountpoint = action.getPath();
+    String[] params = path.substring(actionMountpoint.length()).split("/");
+    // first param is empty (because of leading slash), therefore start with
+    // index
+    // 1
+    for (int i = 1; i < params.length; i++) {
+      urlparams.add(params[i]);
+    }
+
+    // Did we extract as many parameters as we should?
+    if (index >= urlparams.size())
+      return null;
+
+    String p = urlparams.get(index);
+    try {
+      p = URLDecoder.decode(p.trim(), "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      log_.error("Encoding 'UTF-8' is not supported on this platform");
+    }
+    return StringUtils.trimToNull(p);
   }
 
   /**
@@ -112,13 +199,82 @@ public final class RequestUtils {
    * <p>
    * Note that this method includes the check for <tt>hidden</tt> parameters.
    * 
+   * @param request
+   *          the weblounge request
+   * @param parameter
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
    * @return the parameter value or <code>defaultValue</code> if the parameter
    *         is not available
    */
-  public static String getParameter(WebloungeRequest request, String parameter,
-      String defaultValue) {
+  public static String getParameterWithDefault(WebloungeRequest request,
+      String parameter, String defaultValue) {
     String p = getParameter(request, parameter);
     return (p != null) ? p : defaultValue;
+  }
+
+  /**
+   * Checks a parameter <code>parameter</code> is present in the url of the
+   * request at the indicated position, starting with the action's mountpoint.
+   * In this case, the parameter itself is returned, <code>defaultValue</code>
+   * otherwise.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param index
+   *          the parameter index
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   */
+  public static String getParameterWithDefault(WebloungeRequest request,
+      Action action, int index, String defaultValue) {
+    String p = getParameter(request, action, index);
+    return (p != null) ? p : defaultValue;
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and is not equal to the empty string. In this case, the parameter itself is
+   * returned, while a <code>IllegalStateException</code> is thrown otherwise.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameter
+   *          the parameter name
+   * @return the parameter
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static String getRequiredParameter(WebloungeRequest request,
+      String parameter) throws IllegalStateException {
+    String p = getParameter(request, parameter);
+    if (p == null)
+      throw new IllegalStateException("Request parameter '" + parameter + "' is mandatory");
+    return p;
+  }
+
+  /**
+   * Checks a parameter <code>parameter</code> is present in the url of the
+   * request at the indicated position, starting with the action's mountpoint.
+   * In this case, the parameter itself is returned, while a
+   * <code>IllegalStateException</code> is thrown otherwise.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameter
+   *          the parameter index
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static String getRequiredParameter(WebloungeRequest request,
+      Action action, int parameter) {
+    String p = getParameter(request, action, parameter);
+    if (p == null)
+      throw new IllegalStateException("Url parameter at " + parameter + " is mandatory");
+    return p;
   }
 
   /**
@@ -153,7 +309,7 @@ public final class RequestUtils {
         }
       }
     }
-    return (p != null && !"".equals(p)) ? p : null;
+    return StringUtils.trimToNull(p);
   }
 
   /**
@@ -166,56 +322,172 @@ public final class RequestUtils {
    *          the parameter name
    * @return <code>true</code> if the parameter is available
    */
-  public static boolean parameterExists(WebloungeRequest request, String parameter) {
-    String p = request.getParameter(parameter);
-    return (p != null && !p.equals(""));
+  public static boolean parameterExists(WebloungeRequest request,
+      String parameter) {
+    String p = getParameter(request, parameter);
+    return StringUtils.trimToNull(p) != null;
   }
 
   /**
    * Checks if the parameter <code>parameter</code> is present in the request
-   * and is not equal to the empty string. In this case, the parameter itself is
-   * returned, <code>defaultValue</code> otherwise.
-   * <p>
-   * Note that this method includes the check for <tt>hidden</tt> parameters.
+   * and is not equal to the empty string.
    * 
    * @param request
    *          the weblounge request
    * @param parameter
-   *          the parameter name
-   * @param defaultValue
-   *          parameter value, should the parameter not be included in the
-   *          request
-   * @return the parameter value or <code>defaultValue</code> if the parameter
-   *         is not available
+   *          the parameter index
+   * @return <code>true</code> if the parameter is available
    */
-  public static String getParameterWithDefault(WebloungeRequest request,
-      String parameter, String defaultValue) {
-    String p = getParameter(request, parameter);
-    return (p != null) ? p : defaultValue;
+  public static boolean parameterExists(WebloungeRequest request,
+      Action action, int parameter) {
+    String p = getParameter(request, action, parameter);
+    return StringUtils.trimToNull(p) != null;
   }
 
   /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and is not equal to the empty string. In this case, the parameter itself is
-   * returned, <code>null</code> otherwise.
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>short</code>. In that case, the
+   * parameter is returned as a <code>short</code>, otherwise <code>0</code> is
+   * returned.
    * 
-   * @return the parameter
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>short</code>
+   */
+  public static short getShortParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException {
+    return getShortParameter(request, parameterName, false);
+  }
+
+  /**
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>short</code>. In that
+   * case, the parameter is returned as a <code>short</code>, otherwise
+   * <code>0</code> is returned.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>short</code>
+   */
+  public static short getShortParameter(WebloungeRequest request,
+      Action action, int parameter) throws IllegalArgumentException {
+    return getShortParameter(request, action, parameter, false);
+  }
+
+  /**
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>short</code>. Should the parameter be
+   * part of the request, it's value is returned as a <code>short</code> whereas
+   * otherwise the <code>defaultValue</code> is returned instead.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>short</code>
+   */
+  public static short getShortParameterWithDefault(WebloungeRequest request,
+      String parameterName, short defaultValue) throws IllegalArgumentException {
+    try {
+      return getShortParameter(request, parameterName, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Checks if a parameter is present in the url at position <code>index</code>
+   * and represents a valid <code>short</code>. Should the parameter be part of
+   * the request, it's value is returned as a <code>short</code> whereas
+   * otherwise the <code>defaultValue</code> is returned instead.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param index
+   *          the parameter index
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>short</code>
+   */
+  public static short getShortParameterWithDefault(WebloungeRequest request,
+      Action action, int index, short defaultValue)
+      throws IllegalArgumentException {
+    try {
+      return getShortParameter(request, action, index, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>short</code>. Should the parameter not
+   * be part of the request, <code>defaultValue</code> is returned, otherwise
+   * the parameter value is returned as a <code>short</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>short</code>
    * @throws IllegalStateException
    *           if the parameter was not found in the request
    */
-  public static String getRequiredParameter(WebloungeRequest request,
-      String parameterName) throws IllegalStateException {
-    String p = getParameter(request, parameterName);
-    if (p == null)
-      throw new IllegalStateException("Request parameter '" + parameterName + "' is mandatory");
-    return p;
+  public static short getRequiredShortParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException,
+      IllegalStateException {
+    return getShortParameter(request, parameterName, true);
+  }
+
+  /**
+   * Checks if a parameter is present at position <code>index</code> in the url
+   * whether it represents a valid <code>short</code>. In this case, that
+   * parameter is returned as a <code>short</code> value, whereas otherwise a
+   * {@link IllegalStateException} is thrown.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the weblounge action
+   * @param index
+   *          the parameter index
+   * @return the parameter value
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>short</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static short getRequiredShortParameter(WebloungeRequest request,
+      Action action, int index) throws IllegalArgumentException,
+      IllegalStateException {
+    return getShortParameter(request, action, index, true);
   }
 
   /**
    * Checks if the parameter <code>parameter</code> is present in the request
-   * and is a valid <code>short</code>. Should the parameter not be part of the
-   * request, <code>0</code> is returned, otherwise the parameter value is
-   * returned as an <code>short</code>.
+   * and is a valid <code>short</code>. In that case, the parameter is returned
+   * as a <code>short</code>, otherwise <code>0</code> is returned.
    * <p>
    * If the parameter is required, then an {@link IllegalStateException} is
    * thrown.
@@ -229,7 +501,7 @@ public final class RequestUtils {
    * @return the parameter value or <code>0</code> if the parameter is not
    *         available
    * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>short</code>
+   *           if the parameter value cannot be cast to a <code>short</code>
    * @throws IllegalStateException
    *           if the parameter was not found in the request
    */
@@ -251,71 +523,115 @@ public final class RequestUtils {
   }
 
   /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>short</code>. Should the parameter not be part
-   * of the request, <code>0</code> is returned, otherwise the parameter value
-   * is returned as an <code>short</code>.
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>short</code>. In that
+   * case, the parameter is returned as a <code>short</code>, otherwise
+   * <code>0</code> is returned.
+   * <p>
+   * If the parameter is required, and it is not part of the url, then an
+   * {@link IllegalStateException} is thrown.
    * 
    * @param request
    *          the weblounge request
-   * @param parameterName
-   *          the parameter name
+   * @param action
+   *          the action that determines the mountpoint
+   * @param index
+   *          the index of the parameter in the url
+   * @param required
+   *          <code>true</code> if this parameter is mandatory
    * @return the parameter value or <code>0</code> if the parameter is not
    *         available
    * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>short</code>
-   */
-  public static short getShortParameter(WebloungeRequest request,
-      String parameterName) throws IllegalArgumentException {
-    return getShortParameter(request, parameterName, false);
-  }
-
-  /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>short</code>. Should the parameter not be part
-   * of the request, <code>defaultValue</code> is returned, otherwise the
-   * parameter value is returned as an <code>short</code>.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @param defaultValue
-   *          the default parameter value
-   * @return the parameter value or <code>0</code> if the parameter is not
-   *         available
-   * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>short</code>
-   */
-  public static short getShortParameterWithDefault(WebloungeRequest request,
-      String parameterName, short defaultValue) throws IllegalArgumentException {
-    short p = getShortParameter(request, parameterName, false);
-    return (p != 0) ? p : defaultValue;
-  }
-
-  /**
-   * Checks if the parameter <code>parameterName</code> is present in the
-   * request and represents a valid <code>short</code>. Should the parameter not
-   * be part of the request, <code>defaultValue</code> is returned, otherwise
-   * the parameter value is returned as an <code>short</code>.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @param defaultValue
-   *          the default parameter value
-   * @return the parameter value or <code>0</code> if the parameter is not
-   *         available
-   * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>short</code>
+   *           if the parameter value cannot be cast to a <code>short</code>
    * @throws IllegalStateException
    *           if the parameter was not found in the request
    */
-  public static short getRequiredShortParameter(WebloungeRequest request,
-      String parameterName) throws IllegalArgumentException,
-      IllegalStateException {
-    return getShortParameter(request, parameterName, true);
+  private static short getShortParameter(WebloungeRequest request,
+      Action action, int index, boolean required)
+      throws IllegalArgumentException, IllegalStateException {
+    String p = null;
+    if (required)
+      p = getRequiredParameter(request, action, index);
+    else
+      p = getParameter(request, action, index);
+    if (p == null)
+      return 0;
+    try {
+      return Short.valueOf(p);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Url parameter at index " + index + " must be a short");
+    }
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and represents a valid <code>int</code>. In that case, the parameter is
+   * returned as a <code>int</code>, otherwise <code>0</code> is returned.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>int</code>
+   */
+  public static int getIntegerParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException {
+    return getIntegerParameter(request, parameterName, false);
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and represents a valid <code>int</code>. Should the parameter not be part
+   * of the request, <code>defaultValue</code> is returned, otherwise the
+   * parameter value is returned as an <code>int</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>int</code>
+   */
+  public static int getIntegerParameterWithDefault(WebloungeRequest request,
+      String parameterName, int defaultValue) throws IllegalArgumentException {
+    try {
+      return getIntegerParameter(request, parameterName, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>int</code>. Should the
+   * parameter be part of the request, it's value is returned as a
+   * <code>int</code> whereas otherwise the <code>defaultValue</code> is
+   * returned instead.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param index
+   *          the parameter index
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>int</code>
+   */
+  public static int getIntegerParameterWithDefault(WebloungeRequest request,
+      Action action, int index, int defaultValue)
+      throws IllegalArgumentException {
+    try {
+      return getIntegerParameter(request, action, index, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
   }
 
   /**
@@ -358,46 +674,44 @@ public final class RequestUtils {
   }
 
   /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>int</code>. Should the parameter not be part
-   * of the request, <code>0</code> is returned, otherwise the parameter value
-   * is returned as an <code>int</code>.
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>int</code>. In that
+   * case, the parameter is returned as a <code>int</code>, otherwise
+   * <code>0</code> is returned.
+   * <p>
+   * If the parameter is required, and it is not part of the url, then an
+   * {@link IllegalStateException} is thrown.
    * 
    * @param request
    *          the weblounge request
-   * @param parameterName
-   *          the parameter name
+   * @param action
+   *          the action that determines the mountpoint
+   * @param index
+   *          the index of the parameter in the url
+   * @param required
+   *          <code>true</code> if this parameter is mandatory
    * @return the parameter value or <code>0</code> if the parameter is not
    *         available
    * @throws IllegalArgumentException
    *           if the parameter value cannot be cast to an <code>int</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
    */
-  public static int getIntegerParameter(WebloungeRequest request,
-      String parameterName) throws IllegalArgumentException {
-    return getIntegerParameter(request, parameterName, false);
-  }
-
-  /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>int</code>. Should the parameter not be part
-   * of the request, <code>defaultValue</code> is returned, otherwise the
-   * parameter value is returned as an <code>int</code>.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @param defaultValue
-   *          the default parameter value
-   * @return the parameter value or <code>0</code> if the parameter is not
-   *         available
-   * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>int</code>
-   */
-  public static int getIntegerParameterWithDefault(WebloungeRequest request,
-      String parameterName, int defaultValue) throws IllegalArgumentException {
-    int p = getIntegerParameter(request, parameterName, false);
-    return (p != 0) ? p : defaultValue;
+  private static int getIntegerParameter(WebloungeRequest request,
+      Action action, int index, boolean required)
+      throws IllegalArgumentException, IllegalStateException {
+    String p = null;
+    if (required)
+      p = getRequiredParameter(request, action, index);
+    else
+      p = getParameter(request, action, index);
+    if (p == null)
+      return 0;
+    try {
+      return Integer.valueOf(p);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Url parameter at index " + index + " must be a int");
+    }
   }
 
   /**
@@ -426,6 +740,100 @@ public final class RequestUtils {
   }
 
   /**
+   * Checks if a parameter is present at position <code>index</code> in the url
+   * whether it represents a valid <code>int</code>. In this case, that
+   * parameter is returned as a <code>int</code> value, whereas otherwise a
+   * {@link IllegalStateException} is thrown.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the weblounge action
+   * @param index
+   *          the parameter index
+   * @return the parameter value
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>int</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static int getRequiredIntegerParameter(WebloungeRequest request,
+      Action action, int index) throws IllegalArgumentException,
+      IllegalStateException {
+    return getIntegerParameter(request, action, index, true);
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and represents a valid <code>long</code>. In that case, the parameter is
+   * returned as a <code>long</code>, otherwise <code>0</code> is returned.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>long</code>
+   */
+  public static long getLongParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException {
+    return getLongParameter(request, parameterName, false);
+  }
+
+  /**
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>long</code>. Should the parameter not
+   * be part of the request, <code>defaultValue</code> is returned, otherwise
+   * the parameter value is returned as an <code>long</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>long</code>
+   */
+  public static long getLongParameterWithDefault(WebloungeRequest request,
+      String parameterName, long defaultValue) throws IllegalArgumentException {
+    try {
+      return getLongParameter(request, parameterName, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Checks if a parameter is present in the url at position <code>index</code>
+   * and represents a valid <code>long</code>. Should the parameter be part of
+   * the request, it's value is returned as a <code>long</code> whereas
+   * otherwise the <code>defaultValue</code> is returned instead.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param index
+   *          the parameter index
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>long</code>
+   */
+  public static long getLongParameterWithDefault(WebloungeRequest request,
+      Action action, int index, long defaultValue)
+      throws IllegalArgumentException {
+    try {
+      return getLongParameter(request, action, index, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
    * Checks if the parameter <code>parameter</code> is present in the request
    * and is a valid <code>long</code>. Should the parameter not be part of the
    * request, <code>0</code> is returned, otherwise the parameter value is
@@ -447,8 +855,9 @@ public final class RequestUtils {
    * @throws IllegalStateException
    *           if the parameter was not found in the request
    */
-  private static long getLongParameter(WebloungeRequest request, String parameterName,
-      boolean required) throws IllegalArgumentException, IllegalStateException {
+  private static long getLongParameter(WebloungeRequest request,
+      String parameterName, boolean required) throws IllegalArgumentException,
+      IllegalStateException {
     String p = null;
     if (required)
       p = getRequiredParameter(request, parameterName);
@@ -464,46 +873,44 @@ public final class RequestUtils {
   }
 
   /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>long</code>. Should the parameter not be part
-   * of the request, <code>0</code> is returned, otherwise the parameter value
-   * is returned as an <code>long</code>.
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>long</code>. In that
+   * case, the parameter is returned as a <code>long</code>, otherwise
+   * <code>0L</code> is returned.
+   * <p>
+   * If the parameter is required, and it is not part of the url, then an
+   * {@link IllegalStateException} is thrown.
    * 
    * @param request
    *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @return the parameter value or <code>0</code> if the parameter is not
+   * @param action
+   *          the action that determines the mountpoint
+   * @param index
+   *          the index of the parameter in the url
+   * @param required
+   *          <code>true</code> if this parameter is mandatory
+   * @return the parameter value or <code>0L</code> if the parameter is not
    *         available
    * @throws IllegalArgumentException
    *           if the parameter value cannot be cast to an <code>long</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
    */
-  public static long getLongParameter(WebloungeRequest request, String parameterName)
-      throws IllegalArgumentException {
-    return getLongParameter(request, parameterName, false);
-  }
-
-  /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>long</code>. Should the parameter not be part
-   * of the request, <code>defaultValue</code> is returned, otherwise the
-   * parameter value is returned as an <code>long</code>.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @param defaultValue
-   *          the default parameter value
-   * @return the parameter value or <code>0</code> if the parameter is not
-   *         available
-   * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>long</code>
-   */
-  public static long getLongParameterWithDefault(WebloungeRequest request,
-      String parameterName, long defaultValue) throws IllegalArgumentException {
-    long p = getLongParameter(request, parameterName, false);
-    return (p != 0) ? p : defaultValue;
+  private static long getLongParameter(WebloungeRequest request, Action action,
+      int index, boolean required) throws IllegalArgumentException,
+      IllegalStateException {
+    String p = null;
+    if (required)
+      p = getRequiredParameter(request, action, index);
+    else
+      p = getParameter(request, action, index);
+    if (p == null)
+      return 0L;
+    try {
+      return Long.valueOf(p);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Url parameter at index " + index + " must be a long");
+    }
   }
 
   /**
@@ -529,6 +936,101 @@ public final class RequestUtils {
       String parameterName) throws IllegalArgumentException,
       IllegalStateException {
     return getLongParameter(request, parameterName, true);
+  }
+
+  /**
+   * Checks if a parameter is present at position <code>index</code> in the url
+   * whether it represents a valid <code>long</code>. In this case, that
+   * parameter is returned as a <code>long</code> value, whereas otherwise a
+   * {@link IllegalStateException} is thrown.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the weblounge action
+   * @param index
+   *          the parameter index
+   * @return the parameter value
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>long</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static long getRequiredLongParameter(WebloungeRequest request,
+      Action action, int index) throws IllegalArgumentException,
+      IllegalStateException {
+    return getLongParameter(request, action, index, true);
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and represents a valid <code>float</code>. In that case, the parameter is
+   * returned as a <code>float</code>, otherwise <code>0.0f</code> is returned.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>float</code>
+   */
+  public static float getFloatParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException {
+    return getFloatParameter(request, parameterName, false);
+  }
+
+  /**
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>float</code>. Should the parameter not
+   * be part of the request, <code>defaultValue</code> is returned, otherwise
+   * the parameter value is returned as an <code>float</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>float</code>
+   */
+  public static float getFloatParameterWithDefault(WebloungeRequest request,
+      String parameterName, float defaultValue) throws IllegalArgumentException {
+    try {
+      return getFloatParameter(request, parameterName, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>float</code>. Should
+   * the parameter be part of the request, it's value is returned as a
+   * <code>float</code> whereas otherwise the <code>defaultValue</code> is
+   * returned instead.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param index
+   *          the parameter index
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>float</code>
+   */
+  public static float getFloatParameterWithDefault(WebloungeRequest request,
+      Action action, int index, float defaultValue)
+      throws IllegalArgumentException {
+    try {
+      return getFloatParameter(request, action, index, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
   }
 
   /**
@@ -571,46 +1073,44 @@ public final class RequestUtils {
   }
 
   /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>float</code>. Should the parameter not be part
-   * of the request, <code>0</code> is returned, otherwise the parameter value
-   * is returned as an <code>float</code>.
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>float</code>. In that
+   * case, the parameter is returned as a <code>float</code>, otherwise
+   * <code>0.0f</code> is returned.
+   * <p>
+   * If the parameter is required, and it is not part of the url, then an
+   * {@link IllegalStateException} is thrown.
    * 
    * @param request
    *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @return the parameter value or <code>0</code> if the parameter is not
+   * @param action
+   *          the action that determines the mountpoint
+   * @param index
+   *          the index of the parameter in the url
+   * @param required
+   *          <code>true</code> if this parameter is mandatory
+   * @return the parameter value or <code>0.0f</code> if the parameter is not
    *         available
    * @throws IllegalArgumentException
    *           if the parameter value cannot be cast to an <code>float</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
    */
-  public static float getFloatParameter(WebloungeRequest request,
-      String parameterName) throws IllegalArgumentException {
-    return getFloatParameter(request, parameterName, false);
-  }
-
-  /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>float</code>. Should the parameter not be part
-   * of the request, <code>defaultValue</code> is returned, otherwise the
-   * parameter value is returned as an <code>float</code>.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @param defaultValue
-   *          the default parameter value
-   * @return the parameter value or <code>0</code> if the parameter is not
-   *         available
-   * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>float</code>
-   */
-  public static float getFloatParameterWithDefault(WebloungeRequest request,
-      String parameterName, float defaultValue) throws IllegalArgumentException {
-    float p = getFloatParameter(request, parameterName, false);
-    return (p != 0) ? p : defaultValue;
+  private static float getFloatParameter(WebloungeRequest request,
+      Action action, int index, boolean required)
+      throws IllegalArgumentException, IllegalStateException {
+    String p = null;
+    if (required)
+      p = getRequiredParameter(request, action, index);
+    else
+      p = getParameter(request, action, index);
+    if (p == null)
+      return 0.0f;
+    try {
+      return Float.valueOf(p);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Url parameter at index " + index + " must be a float");
+    }
   }
 
   /**
@@ -636,6 +1136,152 @@ public final class RequestUtils {
       String parameterName) throws IllegalArgumentException,
       IllegalStateException {
     return getFloatParameter(request, parameterName, true);
+  }
+
+  /**
+   * Checks if a parameter is present at position <code>index</code> in the url
+   * whether it represents a valid <code>float</code>. In this case, that
+   * parameter is returned as a <code>float</code> value, whereas otherwise a
+   * {@link IllegalStateException} is thrown.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the weblounge action
+   * @param index
+   *          the parameter index
+   * @return the parameter value
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>float</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static float getRequiredFloatParameter(WebloungeRequest request,
+      Action action, int index) throws IllegalArgumentException,
+      IllegalStateException {
+    return getFloatParameter(request, action, index, true);
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and represents a valid <code>boolean</code>. Should the parameter not be
+   * part of the request, <code>0</code> is returned, otherwise the parameter
+   * value is returned as an <code>boolean</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>boolean</code>
+   */
+  public static boolean getBooleanParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException {
+    return getBooleanParameter(request, parameterName, false);
+  }
+
+  /**
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>boolean</code>. Should the parameter
+   * not be part of the request, <code>defaultValue</code> is returned,
+   * otherwise the parameter value is returned as an <code>boolean</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>boolean</code>
+   */
+  public static boolean getBooleanParameterWithDefault(
+      WebloungeRequest request, String parameterName, boolean defaultValue)
+      throws IllegalArgumentException {
+    String p = getParameter(request, parameterName);
+    if (p == null)
+      return defaultValue;
+    else
+      return getBooleanParameter(request, parameterName);
+  }
+
+  /**
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>boolean</code>. Should
+   * the parameter be part of the request, it's value is returned as a
+   * <code>boolean</code> whereas otherwise the <code>defaultValue</code> is
+   * returned instead.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param index
+   *          the parameter index
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>boolean</code>
+   */
+  public static boolean getBooleanParameterWithDefault(
+      WebloungeRequest request, Action action, int index, boolean defaultValue)
+      throws IllegalArgumentException {
+    try {
+      return getBooleanParameter(request, action, index, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>boolean</code>. Should the parameter
+   * not be part of the request, <code>defaultValue</code> is returned,
+   * otherwise the parameter value is returned as an <code>boolean</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>boolean</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static boolean getRequiredBooleanParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException,
+      IllegalStateException {
+    return getBooleanParameter(request, parameterName, true);
+  }
+
+  /**
+   * Checks if a parameter is present at position <code>index</code> in the url
+   * whether it represents a valid <code>boolean</code>. In this case, that
+   * parameter is returned as a <code>boolean</code> value, whereas otherwise a
+   * {@link IllegalStateException} is thrown.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the weblounge action
+   * @param index
+   *          the parameter index
+   * @return the parameter value
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>boolean</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static boolean getRequiredBooleanParameter(WebloungeRequest request,
+      Action action, int index) throws IllegalArgumentException,
+      IllegalStateException {
+    return getBooleanParameter(request, action, index, true);
   }
 
   /**
@@ -676,75 +1322,44 @@ public final class RequestUtils {
   }
 
   /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>boolean</code>. Should the parameter not be
-   * part of the request, <code>0</code> is returned, otherwise the parameter
-   * value is returned as an <code>boolean</code>.
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>boolean</code>. In that
+   * case, the parameter is returned as a <code>boolean</code>, otherwise
+   * <code>false</code> is returned.
+   * <p>
+   * If the parameter is required, and it is not part of the url, then an
+   * {@link IllegalStateException} is thrown.
    * 
    * @param request
    *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @return the parameter value or <code>0</code> if the parameter is not
-   *         available
-   * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>boolean</code>
-   */
-  public static boolean getBooleanParameter(WebloungeRequest request,
-      String parameterName) throws IllegalArgumentException {
-    return getBooleanParameter(request, parameterName, false);
-  }
-
-  /**
-   * Checks if the parameter <code>parameter</code> is present in the request
-   * and represents a valid <code>boolean</code>. Should the parameter not be
-   * part of the request, <code>defaultValue</code> is returned, otherwise the
-   * parameter value is returned as an <code>boolean</code>.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @param defaultValue
-   *          the default parameter value
-   * @return the parameter value or <code>0</code> if the parameter is not
-   *         available
-   * @throws IllegalArgumentException
-   *           if the parameter value cannot be cast to an <code>boolean</code>
-   */
-  public static boolean getBooleanParameterWithDefault(WebloungeRequest request,
-      String parameterName, boolean defaultValue)
-      throws IllegalArgumentException {
-    String p = getParameter(request, parameterName);
-    if (p == null)
-      return defaultValue;
-    else
-      return getBooleanParameter(request, parameterName);
-  }
-
-  /**
-   * Checks if the parameter <code>parameterName</code> is present in the
-   * request and represents a valid <code>boolean</code>. Should the parameter
-   * not be part of the request, <code>defaultValue</code> is returned,
-   * otherwise the parameter value is returned as an <code>boolean</code>.
-   * 
-   * @param request
-   *          the weblounge request
-   * @param parameterName
-   *          the parameter name
-   * @param defaultValue
-   *          the default parameter value
-   * @return the parameter value or <code>0</code> if the parameter is not
+   * @param action
+   *          the action that determines the mountpoint
+   * @param index
+   *          the index of the parameter in the url
+   * @param required
+   *          <code>true</code> if this parameter is mandatory
+   * @return the parameter value or <code>false</code> if the parameter is not
    *         available
    * @throws IllegalArgumentException
    *           if the parameter value cannot be cast to an <code>boolean</code>
    * @throws IllegalStateException
    *           if the parameter was not found in the request
    */
-  public static boolean getRequiredBooleanParameter(WebloungeRequest request,
-      String parameterName) throws IllegalArgumentException,
-      IllegalStateException {
-    return getBooleanParameter(request, parameterName, true);
+  private static boolean getBooleanParameter(WebloungeRequest request,
+      Action action, int index, boolean required)
+      throws IllegalArgumentException, IllegalStateException {
+    String p = null;
+    if (required)
+      p = getRequiredParameter(request, action, index);
+    else
+      p = getParameter(request, action, index);
+    if (p == null)
+      return false;
+    try {
+      return Boolean.valueOf(p);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Url parameter at index " + index + " must be a boolean");
+    }
   }
 
   /**
@@ -776,104 +1391,6 @@ public final class RequestUtils {
     }
     buf.append("]");
     throw new IllegalArgumentException(buf.toString());
-  }
-
-  // TODO: add Javadoc
-  public static boolean checkShort(String parameter, WebloungeRequest request) {
-    try {
-      Short.parseShort(request.getParameter(parameter));
-      return true;
-    } catch (NumberFormatException e) {
-      return false;
-    }
-  }
-
-  // TODO: add Javadoc
-  public static boolean checkShort(String parameter, short min, short max,
-      WebloungeRequest request) {
-    try {
-      short s = Short.parseShort(request.getParameter(parameter));
-      return (s >= min && s <= max);
-    } catch (NumberFormatException e) {
-      return false;
-    }
-  }
-
-  // TODO: add Javadoc
-  public static boolean checkInteger(String parameter, WebloungeRequest request) {
-    try {
-      Integer.parseInt(request.getParameter(parameter));
-      return true;
-    } catch (NumberFormatException e) {
-      return false;
-    }
-  }
-
-  // TODO: add Javadoc
-  public static boolean checkInteger(String parameter, int min, int max,
-      WebloungeRequest request) {
-    try {
-      int s = Integer.parseInt(request.getParameter(parameter));
-      return (s >= min && s <= max);
-    } catch (NumberFormatException e) {
-      return false;
-    }
-  }
-
-  // TODO: add Javadoc
-  public static boolean checkLong(String parameter, WebloungeRequest request) {
-    try {
-      Long.parseLong(request.getParameter(parameter));
-      return true;
-    } catch (NumberFormatException e) {
-      return false;
-    }
-  }
-
-  // TODO: add Javadoc
-  public static boolean checkLong(String parameter, long min, long max,
-      WebloungeRequest request) {
-    try {
-      long l = Long.parseLong(request.getParameter(parameter));
-      return (l >= min && l <= max);
-    } catch (NumberFormatException e) {
-      return false;
-    }
-  }
-
-  /**
-   * Returns a list of required fields, which are determined by evaluating the
-   * request parameter <code>{@link #FLD_REQUIRED}</code> and then searching the
-   * request for the fields mentioned there.
-   * 
-   * @param request
-   *          the request
-   * @return a list with missing fields
-   */
-  public static List<String> checkMissingFields(WebloungeRequest request) {
-    List<String> incomplete = new ArrayList<String>();
-
-    String fldRequired = request.getParameter(FLD_REQUIRED);
-    if (fldRequired == null || fldRequired.trim().length() == 0) {
-      return null;
-    }
-
-    // Check existence of required fields
-
-    String[] required = ConfigurationUtils.getMultiOptionValues(fldRequired);
-    for (int i = 0; i < required.length; i++) {
-      String field = required[i];
-      String value = request.getParameter(field);
-      if (value == null || value.trim().length() == 0) {
-        incomplete.add(field);
-      }
-    }
-
-    if (incomplete.size() > 0) {
-      request.setAttribute(FLD_REQUIRED, incomplete);
-      return incomplete;
-    }
-    return null;
   }
 
 }

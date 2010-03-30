@@ -368,7 +368,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
     try {
       renderer.render(request, response);
     } catch (Exception e) {
-      String params = RequestUtils.getParameters(request);
+      String params = RequestUtils.dumpParameters(request);
       String msg = "Error including '" + renderer + "' in action '" + this + "' on " + request.getUrl() + " " + params;
       Throwable o = e.getCause();
       if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
