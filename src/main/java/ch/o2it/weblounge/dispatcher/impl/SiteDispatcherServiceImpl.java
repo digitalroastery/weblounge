@@ -176,7 +176,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
     if (reference.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT) != null)
       webappRoot = (String) reference.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
     else if (System.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT) != null)
-      webappRoot = (String) System.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
+      webappRoot = System.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
     if (webappRoot == null)
       webappRoot = DEFAULT_WEBAPP_CONTEXT_ROOT;
     if (!webappRoot.startsWith("/"))
@@ -191,7 +191,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
     if (reference.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI) != null)
       sitesRoot = (String) reference.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
     else if (System.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI) != null)
-      sitesRoot = (String) System.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
+      sitesRoot = System.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
     if (sitesRoot == null)
       sitesRoot = DEFAULT_BUNDLE_CONTEXT_ROOT_URI;
     if (!sitesRoot.startsWith("/"))
@@ -214,7 +214,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
     if (reference.getProperty(DispatcherConfiguration.BUNDLE_ENTRY) != null)
       bundleEntry = (String) reference.getProperty(DispatcherConfiguration.BUNDLE_ENTRY);
     else if (System.getProperty(DispatcherConfiguration.BUNDLE_ENTRY) != null)
-      bundleEntry = (String) System.getProperty(DispatcherConfiguration.BUNDLE_ENTRY);
+      bundleEntry = System.getProperty(DispatcherConfiguration.BUNDLE_ENTRY);
     if (bundleEntry == null)
       bundleEntry = DEFAULT_BUNDLE_ENTRY;
     if (!bundleEntry.startsWith("/"))
@@ -275,6 +275,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
         // name
         if (servletMappings == null || servletMappings.isEmpty()) {
           servlet.addMapping(siteRoot + "/" + servlet.getServletClass().getName());
+          servletMappings = servlet.getServletMappings();
         }
 
         for (String mapping : servletMappings) {
