@@ -122,7 +122,23 @@
 
     <!-- End Specs -->
 
-    <!-- Pax -->
+    <!-- Pax Web -->
+
+    <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-jetty-bundle</artifactId>
+      <version>0.7.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-jsp</artifactId>
+      <version>0.7.2</version>
+    </dependency>
+
+    <!-- End Pax Web -->
+ 
+    <!-- Pax logging -->
 
     <dependency>
       <groupId>org.ops4j.pax.logging</groupId>
@@ -152,6 +168,7 @@
       <version>0.2.1</version>
     </dependency>
 
+    <!--
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-service</artifactId>
@@ -162,6 +179,7 @@
       <artifactId>pax-web-jsp</artifactId>
       <version>0.7.1</version>
     </dependency>
+    -->
 
     <!-- End Pax -->
     

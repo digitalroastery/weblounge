@@ -450,28 +450,10 @@
   
       <dependency>
         <groupId>org.ops4j.pax.web</groupId>
-        <artifactId>pax-web-service</artifactId>
-        <version>0.6.0</version>
+        <artifactId>pax-web-api</artifactId>
+        <version>0.7.2</version>
       </dependency>
   
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-bundle-minimal</artifactId>
-        <version>2.2.5</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.apache.cxf.dosgi</groupId>
-        <artifactId>cxf-dosgi-ri-discovery-local</artifactId>
-        <version>1.1</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.apache.cxf.dosgi</groupId>
-        <artifactId>cxf-dosgi-ri-dsw-cxf</artifactId>
-        <version>1.1</version>
-      </dependency>
-
       <dependency>
         <groupId>org.apache.tomcat</groupId>
         <artifactId>jasper</artifactId>
@@ -496,8 +478,6 @@
         <version>1.5.6</version>
       </dependency>
       
-      
-
     </dependencies>
   </dependencyManagement>
 
@@ -522,7 +502,6 @@
   </pluginRepositories>
 
   <repositories>
-
     <repository>
       <id>maven.repo</id>
       <name>Maven Repository</name>
@@ -535,7 +514,7 @@
     </repository>
     <repository>
       <id>ops4j</id>
-      <name>OPS4J Repository</name>
+      <name>Open Participation Software for Java Repository</name>
       <url>http://repository.ops4j.org/maven2</url>
     </repository>
     <repository>
@@ -549,22 +528,10 @@
       <url>http://download.java.net/maven/2</url>
     </repository>
     <repository>
-      <id>wso2</id>
-      <name>WS Oxygen Tank</name>
-      <url>http://dist.wso2.org/maven2</url>
-    </repository>
-     <repository>
       <id>apache.incubating</id>
       <name>Apache Incubating Repository</name>
       <url>http://people.apache.org/repo/m2-incubating-repository</url>
     </repository>
-    <!--
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>https://repository.apache.org/content/groups/snapshots</url>
-    </repository>
-    -->
   </repositories>
 
 </project>
