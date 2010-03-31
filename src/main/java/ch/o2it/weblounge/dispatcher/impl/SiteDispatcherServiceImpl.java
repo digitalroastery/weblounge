@@ -29,17 +29,12 @@ import ch.o2it.weblounge.dispatcher.impl.http.WebXml;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlFilter;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlServlet;
 
-import org.eclipse.equinox.http.helper.BundleEntryHttpContext;
-import org.eclipse.equinox.http.helper.ContextInitParametersServletAdaptor;
-import org.eclipse.equinox.http.helper.ContextPathServletAdaptor;
-import org.eclipse.equinox.http.helper.FilterServletAdaptor;
-import org.eclipse.equinox.jsp.jasper.JspServlet;
+import org.ops4j.pax.web.service.WebContainer;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -47,13 +42,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.servlet.Filter;
-import javax.servlet.Servlet;
 
 /**
  * The site tracker watches site services coming and going and registers them
@@ -74,7 +67,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
   public static final String DEFAULT_BUNDLE_ENTRY = "/site";
 
   /** The http service */
-  private HttpService httpService = null;
+  private WebContainer paxHttpService = null;
 
   /** The site tracker */
   private SiteTracker siteTracker = null;
@@ -129,21 +122,21 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
   /**
    * Callback from the OSGi environment when the http service is activated.
    * 
-   * @param httpService
+   * @param paxHttpService
    *          the site locator
    */
-  public void setHttpService(HttpService httpService) {
-    this.httpService = httpService;
+  public void setHttpService(WebContainer paxHttpService) {
+    this.paxHttpService = paxHttpService;
   }
 
   /**
    * Callback from the OSGi environment when the http service is deactivated.
    * 
-   * @param httpService
+   * @param paxHttpService
    *          the http service
    */
-  public void removeHttpService(HttpService httpService) {
-    this.httpService = null;
+  public void removeHttpService(WebContainer paxHttpService) {
+    this.paxHttpService = null;
   }
 
   /**
@@ -249,16 +242,19 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
 
     try {
       // Create the common http context
-      HttpContext commonContext = new BundleEntryHttpContext(siteBundle, bundleEntry);
+      HttpContext bundleHttpContext = new BundleHttpContext(siteBundle, bundleEntry);
 
       // Setup the servlet filters
       buildFilters(webXml);
 
       log_.debug("Site '{}' registered under site://{}", site, siteRoot);
 
+      paxHttpService.registerJsps(new String[] { "*.jsp" }, bundleHttpContext);
+      log_.debug("Registered jsp mapping {}*.jsp for site '{}'", siteRoot, site);
+
       // Register the site root
       try {
-        httpService.registerResources(siteRoot, "/", commonContext);
+        paxHttpService.registerResources(siteRoot, "/", bundleHttpContext);
       } catch (NamespaceException e) {
         log_.error("The alias '{}' is already in use", siteRoot);
       } catch (Exception e) {
@@ -267,68 +263,50 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
       }
 
       // Register servlets
-      Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
-      for (String name : webXmlServlets.keySet()) {
-        WebXmlServlet servlet = webXmlServlets.get(name);
-        List<String> servletMappings = servlet.getServletMappings();
-        // if there are no mappings, we still want to register it, use class
-        // name
-        if (servletMappings == null || servletMappings.isEmpty()) {
-          servlet.addMapping(siteRoot + "/" + servlet.getServletClass().getName());
-          servletMappings = servlet.getServletMappings();
-        }
-
-        for (String mapping : servletMappings) {
-          Servlet servletInstance = (servlet.getServletClass()).newInstance();
-
-          // apply namespace for bundle
-          mapping = siteRoot + mapping;
-          // new constructor
-          // System.out.println("Applying contextPathServletAdaptor to "+servlet.getServletClass().getName());
-
-          servletInstance = new ContextPathServletAdaptor(servletInstance, siteRoot);
-
-          // apply application context init parameters
-          // TODO: this overwrites context-param from outer web.xml
-          if (initParameters != null && !initParameters.isEmpty()) {
-            servletInstance = new ContextInitParametersServletAdaptor(servletInstance, initParameters);
-          }
-
-          // apply filters
-          for (String filterName : servlet.getFilterNames()) {
-            for (String filterNameMapping : filterNameMappings.get(filterName)) {
-              filterNameMapping = "" + filterNameMapping;
-              servletInstance = new FilterServletAdaptor(filterNameInstances.get(filterName), filterInitParamsMap.get(filterName), servletInstance);
-            }
-          }
-
-          log_.debug("registered servlet mapping:" + mapping + " for bundle " + siteBundle.getSymbolicName());
-
-          // register the servlet
-          httpService.registerServlet(mapping, servletInstance, servlet.getInitParams(), commonContext);
-        }
-      }
-
-      // Register JSPs
-      Servlet jspServlet = new JspServlet(siteBundle, bundleEntry);
-      jspServlet = new ContextPathServletAdaptor(jspServlet, siteRoot);
-      jspServlet = new ContextInitParametersServletAdaptor(jspServlet, initParameters);
-
-      // TODO: apply and test JSP filters
-      /*
-       * for (String filterName:filterNameInstances.keySet()) { for (String
-       * filterNameMapping:filterNameMappings.get(filterName)) {
-       * filterNameMapping = ""+filterNameMapping; jspServlet = new
-       * FilterServletAdaptor(filterNameInstances.get(filterName),
-       * filterInitParamsMap.get(filterName), jspServlet); } }
-       */
-
-      // Register the JspServlet
-      httpService.registerServlet(siteRoot + "/*.jsp", jspServlet, null, commonContext);
-      log_.debug("Registered jsp mapping {}/*.jsp for site '{}'", siteRoot, site);
+//      Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
+//      for (String name : webXmlServlets.keySet()) {
+//        WebXmlServlet servlet = webXmlServlets.get(name);
+//        List<String> servletMappings = servlet.getServletMappings();
+//        // if there are no mappings, we still want to register it, use class
+//        // name
+//        if (servletMappings == null || servletMappings.isEmpty()) {
+//          servlet.addMapping(siteRoot + "/" + servlet.getServletClass().getName());
+//          servletMappings = servlet.getServletMappings();
+//        }
+//
+//        for (String mapping : servletMappings) {
+//          Servlet servletInstance = (servlet.getServletClass()).newInstance();
+//
+//          // apply namespace for bundle
+//          mapping = siteRoot + mapping;
+//          // new constructor
+//          // System.out.println("Applying contextPathServletAdaptor to "+servlet.getServletClass().getName());
+//
+//          servletInstance = new ContextPathServletAdaptor(servletInstance, siteRoot);
+//
+//          // apply application context init parameters
+//          // TODO: this overwrites context-param from outer web.xml
+//          if (initParameters != null && !initParameters.isEmpty()) {
+//            servletInstance = new ContextInitParametersServletAdaptor(servletInstance, initParameters);
+//          }
+//
+//          // apply filters
+//          for (String filterName : servlet.getFilterNames()) {
+//            for (String filterNameMapping : filterNameMappings.get(filterName)) {
+//              filterNameMapping = "" + filterNameMapping;
+//              servletInstance = new FilterServletAdaptor(filterNameInstances.get(filterName), filterInitParamsMap.get(filterName), servletInstance);
+//            }
+//          }
+//
+//          log_.debug("registered servlet mapping:" + mapping + " for bundle " + siteBundle.getSymbolicName());
+//
+//          // register the servlet
+//          paxHttpService.registerServlet(mapping, servletInstance, servlet.getInitParams(), commonContext);
+//        }
+//      }
 
       // block access to /WEB-INF resources and return a SC_FORBIDDEN
-      httpService.registerServlet(siteRoot + "/WEB-INF", new WebInfFilterServlet(), null, commonContext);
+      paxHttpService.registerServlet(siteRoot + "/WEB-INF", new WebInfFilterServlet(), null, bundleHttpContext);
 
       log_.debug("Site '{}' registered under site://{}", site, siteRoot);
 
@@ -348,13 +326,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
   public void removeSite(Site site) {
     WebXml webXml = httpRegistrations.get(site);
     String siteRoot = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ROOT);
-    httpService.unregister(siteRoot);
-    httpService.unregister(siteRoot + "/*.jsp");
+    paxHttpService.unregister(siteRoot);
     Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
     for (String name : webXmlServlets.keySet()) {
       for (String mapping : webXmlServlets.get(name).getServletMappings()) {
         mapping = siteRoot + mapping;
-        httpService.unregister(mapping);
+        paxHttpService.unregister(mapping);
       }
     }
   }

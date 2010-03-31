@@ -5,5 +5,5 @@
   <service>
     <provide interface="ch.o2it.weblounge.dispatcher.SiteDispatcherService" />
   </service>
-  <reference name="httpservice" interface="org.osgi.service.http.HttpService" cardinality="1..1" policy="static" bind="setHttpService" unbind="removeHttpService" />
+  <reference name="httpservice" interface="org.ops4j.pax.web.service.WebContainer" cardinality="1..1" policy="static" bind="setHttpService" unbind="removeHttpService" />
 </component>
