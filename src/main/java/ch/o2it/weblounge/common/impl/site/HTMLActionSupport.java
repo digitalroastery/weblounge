@@ -41,7 +41,6 @@ import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.HTMLAction;
 import ch.o2it.weblounge.common.site.Site;
 
-import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -371,11 +370,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       String params = RequestUtils.dumpParameters(request);
       String msg = "Error including '" + renderer + "' in action '" + this + "' on " + request.getUrl() + " " + params;
       Throwable o = e.getCause();
-      if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
-        Throwable rootCause = ((JasperException) o).getRootCause();
-        msg += ": " + rootCause.getMessage();
-        log_.error(msg, rootCause);
-      } else if (o != null) {
+      if (o != null) {
         msg += ": " + o.getMessage();
         log_.error(msg, o);
       } else {
