@@ -40,6 +40,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class BundleHttpContext implements HttpContext {
 
+  /** WEB-INF directory */
+  private static final String WEB_INF = "/WEB-INF/";
+
   /** The bundle */
   private Bundle bundle = null;
 
@@ -120,7 +123,7 @@ public class BundleHttpContext implements HttpContext {
   public URL getResource(String resourceName) {
     if (resourceName.startsWith(siteURI))
       resourceName = resourceName.substring(siteURI.length());
-    if (bundlePath != null)
+    if (bundlePath != null && !resourceName.startsWith(WEB_INF))
       resourceName = UrlSupport.concat(bundlePath, resourceName);
     return bundle.getResource(resourceName);
   }

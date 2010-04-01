@@ -167,7 +167,8 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
       // Setup the servlet filters
       //buildFilters(webXml);
 
-      // Register the site root
+      // Register the site using jsp support (for tag libraries) and the site 
+      // servlet.
       try {
         SiteServlet siteServlet = new SiteServlet(bundleHttpContext);
         paxHttpService.registerServlet(siteRoot, siteServlet, null, bundleHttpContext);

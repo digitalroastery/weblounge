@@ -57,7 +57,7 @@ public class SiteServlet extends HttpServlet {
 
   /** ETag HTTP header name */
   private static final String ETAG = "ETag";
-
+  
   /** The http context */
   private final HttpContext siteHttpContext;
 
