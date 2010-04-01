@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.test.harness.HTMLActionTest;
 import ch.o2it.weblounge.test.harness.IntegrationTest;
 import ch.o2it.weblounge.test.harness.JSONActionTest;
+import ch.o2it.weblounge.test.harness.JavaServerPagesTest;
 import ch.o2it.weblounge.test.harness.SiteResourcesTest;
 import ch.o2it.weblounge.test.harness.XMLActionTest;
 
@@ -247,6 +248,7 @@ public final class TestCommand {
     tests.add(new XMLActionTest());
     tests.add(new JSONActionTest());
     tests.add(new SiteResourcesTest());
+    tests.add(new JavaServerPagesTest());
   }
 
 }
