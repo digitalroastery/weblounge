@@ -165,7 +165,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
       BundleHttpContext bundleHttpContext = new BundleHttpContext(siteBundle, siteRoot, bundleEntry);
       
       // Setup the servlet filters
-      //buildFilters(webXml);
+      buildFilters(webXml);
 
       // Register the site using jsp support (for tag libraries) and the site 
       // servlet.

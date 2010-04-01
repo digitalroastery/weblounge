@@ -62,7 +62,7 @@ public class SiteServlet extends HttpServlet {
   private final HttpContext siteHttpContext;
 
   /** The Jasper servlet */
-  private final Servlet jasperServlet;
+  protected final Servlet jasperServlet;
 
   /** Jasper specific class loader */
   private final JasperClassLoader jasperClassLoader;
@@ -201,7 +201,8 @@ public class SiteServlet extends HttpServlet {
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return;
     }
-    // set the etag
+    
+    // Set the etag
     response.setHeader(ETAG, eTag);
 
     String mimeType = siteHttpContext.getMimeType(requestPath);
