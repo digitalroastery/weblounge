@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.dispatcher.impl;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.jasper.servlet.JspServlet;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.resource.Resource;
 import org.ops4j.pax.web.jsp.JspServletWrapper;
@@ -34,6 +33,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -62,7 +62,7 @@ public class SiteServlet extends HttpServlet {
   private final HttpContext siteHttpContext;
 
   /** The Jasper servlet */
-  private final JspServlet jasperServlet;
+  private final Servlet jasperServlet;
 
   /** Jasper specific class loader */
   private final JasperClassLoader jasperClassLoader;
@@ -77,14 +77,14 @@ public class SiteServlet extends HttpServlet {
    */
   public SiteServlet(final BundleHttpContext httpContext) {
     siteHttpContext = httpContext;
-    jasperServlet = new JspServlet();
-    jasperClassLoader = new JasperClassLoader(httpContext.getBundle(), JspServletWrapper.class.getClassLoader());
+    jasperServlet = new JspServletWrapper(httpContext.getBundle());
+    jasperClassLoader = new JasperClassLoader(httpContext.getBundle(), JasperClassLoader.class.getClassLoader());
   }
 
   /**
    * Delegates to the jasper servlet with a controlled context class loader.
    * 
-   * @see JspServlet#init(ServletConfig)
+   * @see JspServletWrapper#init(ServletConfig)
    */
   public void init(final ServletConfig config) throws ServletException {
     try {
@@ -106,7 +106,7 @@ public class SiteServlet extends HttpServlet {
   /**
    * Delegates to jasper servlet.
    * 
-   * @see JspServlet#getServletConfig()
+   * @see JspServletWrapper#getServletConfig()
    */
   public ServletConfig getServletConfig() {
     return jasperServlet.getServletConfig();
@@ -132,7 +132,7 @@ public class SiteServlet extends HttpServlet {
   /**
    * Delegates to jasper servlet with a controlled context class loader.
    * 
-   * @see JspServlet#service(HttpServletRequest, HttpServletResponse)
+   * @see JspServletWrapper#service(HttpServletRequest, HttpServletResponse)
    */
   public void serviceJavaServerPage(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
@@ -232,7 +232,7 @@ public class SiteServlet extends HttpServlet {
   /**
    * Delegates to jasper servlet.
    * 
-   * @see JspServlet#getServletInfo()
+   * @see JspServletWrapper#getServletInfo()
    */
   public String getServletInfo() {
     return jasperServlet.getServletInfo();
@@ -241,7 +241,7 @@ public class SiteServlet extends HttpServlet {
   /**
    * Delegates to jasper servlet with a controlled context class loader.
    * 
-   * @see JspServlet#destroy()
+   * @see JspServletWrapper#destroy()
    */
   public void destroy() {
     try {

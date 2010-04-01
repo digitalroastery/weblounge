@@ -31,7 +31,6 @@ import ch.o2it.weblounge.dispatcher.DispatchListener;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.SiteLocatorService;
 
-import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,12 +252,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         response.invalidate();
         String params = RequestUtils.dumpParameters(request);
         if (t.getCause() != null) {
-          Throwable o = t.getCause();
-          if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
-            t = ((JasperException) o).getRootCause();
-          } else {
-            t = o.getCause();
-          }
+          t = t.getCause();
         }
         log_.error("Request handler {} failed to handle {} {}: {}", new Object[] {
             handler,

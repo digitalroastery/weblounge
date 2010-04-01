@@ -42,7 +42,6 @@ import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.dispatcher.PageRequestHandler;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 
-import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -222,11 +221,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         String params = RequestUtils.dumpParameters(request);
         String msg = "Error rendering template '" + template + "' on '" + path + "' " + params;
         Throwable o = e.getCause();
-        if (o instanceof JasperException && ((JasperException) o).getRootCause() != null) {
-          Throwable rootCause = ((JasperException) o).getRootCause();
-          msg += ": " + rootCause.getMessage();
-          log_.error(msg, rootCause);
-        } else if (o != null) {
+        if (o != null) {
           msg += ": " + o.getMessage();
           log_.error(msg, o);
         } else {

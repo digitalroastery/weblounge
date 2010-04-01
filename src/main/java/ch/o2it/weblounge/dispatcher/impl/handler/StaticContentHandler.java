@@ -29,7 +29,6 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
-import org.apache.jasper.JasperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -213,10 +212,11 @@ public class StaticContentHandler implements RequestHandler, Times {
           log.trace("Handling request {}", request.getUrl());
           DispatchUtils.forward(request, response, pathInfo);
         } catch (Exception e) {
-          if (e instanceof JasperException && ((JasperException) e).getRootCause() != null) {
+          Throwable o = e.getCause();
+          if (o != null) {
             String msg = "Error while dispatching static request to " + pathInfo + ": ";
             msg += e.getMessage();
-            log.error(msg, ((JasperException) e).getRootCause());
+            log.error(msg, o);
           } else {
             String msg = "Error while dispatching static request " + pathInfo + ": ";
             log.error(msg, e);
