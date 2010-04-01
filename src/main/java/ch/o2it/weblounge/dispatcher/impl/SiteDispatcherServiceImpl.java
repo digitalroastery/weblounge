@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.dispatcher.DispatcherConfiguration;
 import ch.o2it.weblounge.dispatcher.SiteDispatcherService;
-import ch.o2it.weblounge.dispatcher.impl.http.WebInfFilterServlet;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXml;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlFilter;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlServlet;
@@ -34,7 +33,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -140,6 +138,105 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#addSite(ch.o2it.weblounge.common.site.Site, org.osgi.framework.ServiceReference)
+   */
+  public void addSite(Site site, ServiceReference reference) {
+    WebXml webXml = createWebXml(site, reference);
+    Bundle siteBundle = reference.getBundle();
+    Properties initParameters = new Properties();
+
+    // Prepare the init parameters
+    initParameters.putAll(webXml.getContextParams());
+
+    // Create the site URI
+    String contextRoot = webXml.getContextParam(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT, DEFAULT_WEBAPP_CONTEXT_ROOT);
+    String bundleEntry = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ENTRY, DEFAULT_BUNDLE_ENTRY);
+    String bundleURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_URI, site.getIdentifier());
+    String siteContextURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, DEFAULT_BUNDLE_CONTEXT_ROOT_URI);
+    String siteContextRoot = UrlSupport.concat(contextRoot, siteContextURI);
+    String siteRoot = UrlSupport.concat(new String[] {
+        siteContextRoot,
+        bundleURI });
+
+    try {
+      // Create the common http context
+      BundleHttpContext bundleHttpContext = new BundleHttpContext(siteBundle, siteRoot, bundleEntry);
+      
+      // Setup the servlet filters
+      //buildFilters(webXml);
+
+      // Register the site root
+      try {
+        SiteServlet siteServlet = new SiteServlet(bundleHttpContext);
+        paxHttpService.registerServlet(siteRoot, siteServlet, null, bundleHttpContext);
+        log_.info("Site '{}' registered under site://{}", site, siteRoot);
+      } catch (NamespaceException e) {
+        log_.error("The alias '{}' is already in use", siteRoot);
+      } catch (Exception e) {
+        log_.error("Error registering resources for site '{}' at {}: {}", new Object[] { site, siteRoot, e.getMessage() });
+        log_.error(e.getMessage(), e);
+      }
+
+      log_.debug("Site '{}' registered under site://{}", site, siteRoot);
+
+    } catch (Exception e) {
+      log_.error("Error setting up site '{}' for http requests: {}", new Object[] { site, e.getMessage() });
+      log_.error(e.getMessage(), e);
+    }
+    
+    httpRegistrations.put(site, webXml);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#removeSite(ch.o2it.weblounge.common.site.Site)
+   */
+  public void removeSite(Site site) {
+    WebXml webXml = httpRegistrations.get(site);
+    String siteRoot = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ROOT);
+    paxHttpService.unregister(siteRoot);
+    Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
+    for (String name : webXmlServlets.keySet()) {
+      for (String mapping : webXmlServlets.get(name).getServletMappings()) {
+        mapping = siteRoot + mapping;
+        paxHttpService.unregister(mapping);
+      }
+    }
+  }
+
+  /**
+   * Creates a list of filters from the given web xml.
+   * 
+   * @param webXml
+   *          the web xml
+   * @throws IllegalAccessException
+   *           if accessing the filter implementation fails
+   * @throws InstantiationException
+   *           if creating an instance of the filter implementation fails
+   */
+  public void buildFilters(WebXml webXml) throws IllegalAccessException,
+      InstantiationException {
+    for (WebXmlFilter filter : webXml.getFilters().values()) {
+      Filter filterInstance = (Filter) (filter.getFilterClass()).newInstance();
+      filterNameInstances.put(filter.getFilterName(), filterInstance);
+      for (String mapping : filter.getFilterMappings()) {
+        if (!filterNameMappings.containsKey(filter.getFilterName())) {
+          filterNameMappings.put(filter.getFilterName(), new ArrayList<String>());
+        }
+        filterNameMappings.get(filter.getFilterName()).add(mapping);
+
+        // build a list of filterInitParams
+        Properties filterInitParamProperties = new Properties();
+        filterInitParamProperties.putAll(filter.getInitParams());
+        filterInitParamsMap.put(filterInstance.getClass().getName(), filterInitParamProperties);
+      }
+    }
+  }
+
+  /**
    * Returns the <code>web.xml</code> representation that is used to register
    * the site dispatcher servlets with the <code>HttpService</code>.
    * <p>
@@ -215,154 +312,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_ENTRY, bundleEntry);
 
     return webXml;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#addSite(ch.o2it.weblounge.common.site.Site, org.osgi.framework.ServiceReference)
-   */
-  public void addSite(Site site, ServiceReference reference) {
-    WebXml webXml = createWebXml(site, reference);
-    Bundle siteBundle = reference.getBundle();
-    Properties initParameters = new Properties();
-
-    // Prepare the init parameters
-    initParameters.putAll(webXml.getContextParams());
-
-    // Create the site URI
-    String contextRoot = webXml.getContextParam(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT, DEFAULT_WEBAPP_CONTEXT_ROOT);
-    String bundleEntry = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ENTRY, DEFAULT_BUNDLE_ENTRY);
-    String bundleURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_URI, site.getIdentifier());
-    String siteContextURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, DEFAULT_BUNDLE_CONTEXT_ROOT_URI);
-    String siteContextRoot = UrlSupport.concat(contextRoot, siteContextURI);
-    String siteRoot = UrlSupport.concat(new String[] {
-        siteContextRoot,
-        bundleURI });
-
-    try {
-      // Create the common http context
-      HttpContext bundleHttpContext = new BundleHttpContext(siteBundle, bundleEntry);
-
-      // Setup the servlet filters
-      buildFilters(webXml);
-
-      log_.debug("Site '{}' registered under site://{}", site, siteRoot);
-
-      paxHttpService.registerJsps(new String[] { "*.jsp" }, bundleHttpContext);
-      log_.debug("Registered jsp mapping {}*.jsp for site '{}'", siteRoot, site);
-
-      // Register the site root
-      try {
-        paxHttpService.registerResources(siteRoot, "/", bundleHttpContext);
-      } catch (NamespaceException e) {
-        log_.error("The alias '{}' is already in use", siteRoot);
-      } catch (Exception e) {
-        log_.error("Error registering resources for site '{}' at {}: {}", new Object[] { site, siteRoot, e.getMessage() });
-        log_.error(e.getMessage(), e);
-      }
-
-      // Register servlets
-//      Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
-//      for (String name : webXmlServlets.keySet()) {
-//        WebXmlServlet servlet = webXmlServlets.get(name);
-//        List<String> servletMappings = servlet.getServletMappings();
-//        // if there are no mappings, we still want to register it, use class
-//        // name
-//        if (servletMappings == null || servletMappings.isEmpty()) {
-//          servlet.addMapping(siteRoot + "/" + servlet.getServletClass().getName());
-//          servletMappings = servlet.getServletMappings();
-//        }
-//
-//        for (String mapping : servletMappings) {
-//          Servlet servletInstance = (servlet.getServletClass()).newInstance();
-//
-//          // apply namespace for bundle
-//          mapping = siteRoot + mapping;
-//          // new constructor
-//          // System.out.println("Applying contextPathServletAdaptor to "+servlet.getServletClass().getName());
-//
-//          servletInstance = new ContextPathServletAdaptor(servletInstance, siteRoot);
-//
-//          // apply application context init parameters
-//          // TODO: this overwrites context-param from outer web.xml
-//          if (initParameters != null && !initParameters.isEmpty()) {
-//            servletInstance = new ContextInitParametersServletAdaptor(servletInstance, initParameters);
-//          }
-//
-//          // apply filters
-//          for (String filterName : servlet.getFilterNames()) {
-//            for (String filterNameMapping : filterNameMappings.get(filterName)) {
-//              filterNameMapping = "" + filterNameMapping;
-//              servletInstance = new FilterServletAdaptor(filterNameInstances.get(filterName), filterInitParamsMap.get(filterName), servletInstance);
-//            }
-//          }
-//
-//          log_.debug("registered servlet mapping:" + mapping + " for bundle " + siteBundle.getSymbolicName());
-//
-//          // register the servlet
-//          paxHttpService.registerServlet(mapping, servletInstance, servlet.getInitParams(), commonContext);
-//        }
-//      }
-
-      // block access to /WEB-INF resources and return a SC_FORBIDDEN
-      paxHttpService.registerServlet(siteRoot + "/WEB-INF", new WebInfFilterServlet(), null, bundleHttpContext);
-
-      log_.debug("Site '{}' registered under site://{}", site, siteRoot);
-
-    } catch (Exception e) {
-      log_.error("Error setting up site '{}' for http requests: {}", new Object[] { site, e.getMessage() });
-      log_.error(e.getMessage(), e);
-    }
-    
-    httpRegistrations.put(site, webXml);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#removeSite(ch.o2it.weblounge.common.site.Site)
-   */
-  public void removeSite(Site site) {
-    WebXml webXml = httpRegistrations.get(site);
-    String siteRoot = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ROOT);
-    paxHttpService.unregister(siteRoot);
-    Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
-    for (String name : webXmlServlets.keySet()) {
-      for (String mapping : webXmlServlets.get(name).getServletMappings()) {
-        mapping = siteRoot + mapping;
-        paxHttpService.unregister(mapping);
-      }
-    }
-  }
-
-  /**
-   * Creates a list of filters from the given web xml.
-   * 
-   * @param webXml
-   *          the web xml
-   * @throws IllegalAccessException
-   *           if accessing the filter implementation fails
-   * @throws InstantiationException
-   *           if creating an instance of the filter implementation fails
-   */
-  public void buildFilters(WebXml webXml) throws IllegalAccessException,
-      InstantiationException {
-    for (WebXmlFilter filter : webXml.getFilters().values()) {
-      Filter filterInstance = (Filter) (filter.getFilterClass()).newInstance();
-      filterNameInstances.put(filter.getFilterName(), filterInstance);
-      for (String mapping : filter.getFilterMappings()) {
-        if (!filterNameMappings.containsKey(filter.getFilterName())) {
-          filterNameMappings.put(filter.getFilterName(), new ArrayList<String>());
-        }
-        filterNameMappings.get(filter.getFilterName()).add(mapping);
-
-        // build a list of filterInitParams
-        Properties filterInitParamProperties = new Properties();
-        filterInitParamProperties.putAll(filter.getInitParams());
-        filterInitParamsMap.put(filterInstance.getClass().getName(), filterInitParamProperties);
-      }
-    }
   }
 
   /**

@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
+
 import org.osgi.framework.Bundle;
 import org.osgi.service.http.HttpContext;
 
@@ -39,10 +41,13 @@ import javax.servlet.http.HttpServletResponse;
 public class BundleHttpContext implements HttpContext {
 
   /** The bundle */
-  private Bundle bundle;
+  private Bundle bundle = null;
+
+  /** The site uri */
+  private String siteURI = null;
 
   /** Root path inside the bundle */
-  private String bundlePath;
+  private String bundlePath = null;
 
   /**
    * Creates a new <code>HttpContext</code> which will be able to load resources
@@ -51,7 +56,7 @@ public class BundleHttpContext implements HttpContext {
    * @param bundle
    */
   public BundleHttpContext(Bundle bundle) {
-    this(bundle, null);
+    this(bundle, null, null);
   }
 
   /**
@@ -64,7 +69,7 @@ public class BundleHttpContext implements HttpContext {
    * @param bundlePath
    *          the context path inside the bundle
    */
-  public BundleHttpContext(Bundle bundle, String bundlePath) {
+  public BundleHttpContext(Bundle bundle, String siteURI, String bundlePath) {
     if (bundle == null)
       throw new IllegalArgumentException("Bundle must not be null");
     this.bundle = bundle;
@@ -75,6 +80,16 @@ public class BundleHttpContext implements HttpContext {
         bundlePath = null;
     }
     this.bundlePath = bundlePath;
+    this.siteURI = siteURI;
+  }
+
+  /**
+   * Returns the bundle that was used to create this context.
+   * 
+   * @return the bundle
+   */
+  public Bundle getBundle() {
+    return bundle;
   }
 
   /**
@@ -102,25 +117,12 @@ public class BundleHttpContext implements HttpContext {
    * 
    * @see org.osgi.service.http.HttpContext#getResource(java.lang.String)
    */
-  @SuppressWarnings("unchecked")
   public URL getResource(String resourceName) {
+    if (resourceName.startsWith(siteURI))
+      resourceName = resourceName.substring(siteURI.length());
     if (bundlePath != null)
-      resourceName = bundlePath + resourceName;
-
-    int lastSlash = resourceName.lastIndexOf('/');
-    if (lastSlash == -1)
-      return null;
-
-    String path = resourceName.substring(0, lastSlash);
-    if (path.length() == 0)
-      path = "/";
-    String file = resourceName.substring(lastSlash + 1);
-    Enumeration<URL> entryPaths = bundle.findEntries(path, file, false);
-
-    if (entryPaths != null && entryPaths.hasMoreElements())
-      return entryPaths.nextElement();
-
-    return null;
+      resourceName = UrlSupport.concat(bundlePath, resourceName);
+    return bundle.getResource(resourceName);
   }
 
   /**

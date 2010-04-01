@@ -56,6 +56,11 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
     
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -71,17 +76,25 @@
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
     </dependency>
-  
+
     <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-api</artifactId>
+      <version>0.7.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-jsp</artifactId>
+      <version>0.7.2</version>
     </dependency>
   
     <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>jasper</artifactId>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-jetty-bundle</artifactId>
+      <version>0.7.2</version>
     </dependency>
-
+  
     <!-- testing -->
     
     <dependency>
@@ -120,15 +133,22 @@
               ch.o2it.weblounge.common.user,
               ch.o2it.weblounge.dispatcher,
               ch.o2it.weblounge.site,
-              org.apache.commons.lang,
-              org.apache.jasper,
-              org.slf4j,
-              org.ops4j.pax.web.service,
               javax.activation,
+              javax.el;version="2.0.0",
               javax.servlet;version="2.4.0",
               javax.servlet.http;version="2.4.0",
               javax.servlet.jsp;version="2.0.0",
               javax.servlet.resources;version="2.4.0",
+              org.apache.commons.io,
+              org.apache.commons.lang,
+              org.apache.jasper,
+              org.apache.jasper.el,
+              org.apache.jasper.servlet,
+              org.mortbay.jetty,
+              org.mortbay.resource,
+              org.ops4j.pax.web.jsp,
+              org.ops4j.pax.web.service,
+              org.slf4j,
               org.osgi.framework,
               org.osgi.service.cm,
               org.osgi.service.component,
