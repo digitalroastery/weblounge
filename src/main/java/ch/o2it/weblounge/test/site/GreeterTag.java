@@ -22,6 +22,8 @@ package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -67,7 +69,11 @@ public class GreeterTag extends TagSupport {
         language = languages[(int)Math.random()*languages.length];
         greeting = greetings.get(language);
       }
-      pageContext.getOut().print(greeting);
+      String encodedGreeting = StringEscapeUtils.escapeHtml(greeting);
+      pageContext.getOut().print("<div id=\"greeting\">");
+      pageContext.getOut().print(encodedGreeting);
+      pageContext.getOut().print("</div>");
+      pageContext.getOut().flush();
     } catch (IOException ioe) {
       throw new JspException("IOException while writing to client" + ioe.getMessage());
     }
@@ -80,7 +86,7 @@ public class GreeterTag extends TagSupport {
    * @see javax.servlet.jsp.tagext.TagSupport#doEndTag()
    */
   public int doEndTag() throws JspException {
-    return SKIP_PAGE;
+    return EVAL_PAGE;
   }
 
 }

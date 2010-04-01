@@ -35,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Integration test for the loading of site resources.
  */
@@ -72,7 +74,7 @@ public class JavaServerPagesTest extends IntegrationTestBase {
     HttpClient httpClient = new DefaultHttpClient();
     try {
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
-      assertEquals(200, response.getStatusLine().getStatusCode());
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       String contentType = response.getEntity().getContentType().getValue();
       assertEquals(CONTENT_TYPE_HTML, contentType.split(";")[0]);
 
@@ -80,7 +82,12 @@ public class JavaServerPagesTest extends IntegrationTestBase {
       Document xml = TestSiteUtils.parseXMLResponse(response);
       String greeting = "Hello world!";
       String xpath = "/html/body/h1/text()";
-      Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));    
+      Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));
+      
+      // Test tag libraries
+      logger.info("Testing tag output on {}", requestUrl);
+      xpath = "/html/body/div[@id='greeting']";
+      Assert.assertNotNull(XPathHelper.valueOf(xml, xpath));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }

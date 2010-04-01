@@ -39,6 +39,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -91,7 +92,7 @@ public class HTMLActionTest extends IntegrationTestBase {
         HttpClient httpClient = new DefaultHttpClient();
         try {
           HttpResponse response = TestSiteUtils.request(httpClient, request, params);
-          Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+          Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
           String responseHTML = IOUtils.toString(response.getEntity().getContent());
           String responseXML = StringEscapeUtils.unescapeHtml(responseHTML);
           DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

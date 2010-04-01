@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Integration test to test JSON action output.
  */
@@ -81,7 +83,7 @@ public class JSONActionTest extends IntegrationTestBase {
       HttpClient httpClient = new DefaultHttpClient();
       try {
         HttpResponse response = TestSiteUtils.request(httpClient, request, params);
-        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         JSONObject json = TestSiteUtils.parseJSONResponse(response);
         Assert.assertEquals(greeting, json.getJSONObject("greetings").getString(language));    
       } finally {

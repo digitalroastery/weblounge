@@ -36,6 +36,8 @@ import org.w3c.dom.Document;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Integration test to test <code>XML</code> action output.
  */
@@ -82,7 +84,7 @@ public class XMLActionTest extends IntegrationTestBase {
       HttpClient httpClient = new DefaultHttpClient();
       try {
         HttpResponse response = TestSiteUtils.request(httpClient, request, params);
-        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         Document xml = TestSiteUtils.parseXMLResponse(response);
         String xpath = "/greetings/greeting[@language=\"" + language + "\"]/text()";
         Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));    

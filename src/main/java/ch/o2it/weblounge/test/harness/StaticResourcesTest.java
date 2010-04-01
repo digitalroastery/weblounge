@@ -21,10 +21,13 @@
 package ch.o2it.weblounge.test.harness;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -33,13 +36,15 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Integration test for the loading of site resources.
  */
-public class SiteResourcesTest extends IntegrationTestBase {
+public class StaticResourcesTest extends IntegrationTestBase {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(SiteResourcesTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(StaticResourcesTest.class);
 
   /** The image content type */
   private static final String CONTENT_TYPE_IMAGE = "image/jpeg";
@@ -50,8 +55,8 @@ public class SiteResourcesTest extends IntegrationTestBase {
   /**
    * Creates a new instance of the <code>SiteResources</code> test.
    */
-  public SiteResourcesTest() {
-    super("Site resources Test");
+  public StaticResourcesTest() {
+    super("Static Resources Test");
   }
 
   /**
@@ -63,16 +68,40 @@ public class SiteResourcesTest extends IntegrationTestBase {
     logger.info("Testing loading of an image");
     
     String requestUrl = UrlSupport.concat(serverUrl, IMAGE_PATH);
-    HttpGet request = new HttpGet(requestUrl);
-    logger.info("Sending request to {}", requestUrl);
+    
+    // Value of the Etag header from the first response */
+    String etagValue = null; 
 
     // Send and the request and examine the response
     HttpClient httpClient = new DefaultHttpClient();
     try {
+      HttpGet request = new HttpGet(requestUrl);
+
+      logger.info("Sending request to {}", requestUrl);
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
-      Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       String contentType = response.getEntity().getContentType().getValue();
       assertEquals(CONTENT_TYPE_IMAGE, contentType.split(";")[0]);
+      
+      // Read and store Etag
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      etagValue = eTagHeader.getValue();
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpGet request = new HttpGet(requestUrl);
+      request.addHeader("If-None-Match", etagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", requestUrl);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
