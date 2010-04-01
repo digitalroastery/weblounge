@@ -62,6 +62,7 @@ public class XMLActionTest extends IntegrationTestBase {
     // Include the mountpoint
     // TODO: Make this dynamic
     serverUrl = UrlSupport.concat(serverUrl, "weblounge");
+    String requestUrl = UrlSupport.concat(serverUrl, "greeting/xml");
 
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();
@@ -69,9 +70,11 @@ public class XMLActionTest extends IntegrationTestBase {
 
     // Prepare the request
     logger.info("Testing greeter action's xml output");
+    logger.info("Sending requests to {}", requestUrl);
+
     for (String language : languages) {
       String greeting = greetings.get(language);
-      HttpGet request = new HttpGet(UrlSupport.concat(serverUrl, "greeting/xml"));
+      HttpGet request = new HttpGet(requestUrl);
       String[][] params = new String[][] {{"language", language}};
   
       // Send and the request and examine the response

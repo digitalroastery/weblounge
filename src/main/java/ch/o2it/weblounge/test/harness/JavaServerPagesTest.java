@@ -44,7 +44,10 @@ public class JavaServerPagesTest extends IntegrationTestBase {
   private static final Logger logger = LoggerFactory.getLogger(JavaServerPagesTest.class);
 
   /** The html content type */
-  private static final String HTML_CONTENT_TYPE = "text/html";
+  private static final String CONTENT_TYPE_HTML = "text/html";
+  
+  /** Path to the jsp page */
+  private static final String JSP_PATH = "/weblounge-sites/weblounge-test/templates/template.jsp";
 
   /**
    * Creates a new instance of the <code>JavaServerPagesTest</code> test.
@@ -61,22 +64,21 @@ public class JavaServerPagesTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Testing loading of java server page");
     
-    String imagePath = "/weblounge-sites/weblounge-test/templates/template.jsp";
-    HttpGet request = new HttpGet(UrlSupport.concat(serverUrl, imagePath));
+    String requestUrl = UrlSupport.concat(serverUrl, JSP_PATH);
+    HttpGet request = new HttpGet(requestUrl);
+    logger.info("Sending request to {}", requestUrl);
 
     // Send and the request and examine the response
-    logger.debug("Sending request to {}", request.getURI());
     HttpClient httpClient = new DefaultHttpClient();
     try {
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
-      
-      // Test response state and headers
       assertEquals(200, response.getStatusLine().getStatusCode());
-      assertEquals(HTML_CONTENT_TYPE, response.getEntity().getContentType().getValue());
+      String contentType = response.getEntity().getContentType().getValue();
+      assertEquals(CONTENT_TYPE_HTML, contentType.split(";")[0]);
 
       // Test contents
       Document xml = TestSiteUtils.parseXMLResponse(response);
-      String greeting = "Hello World!";
+      String greeting = "Hello world!";
       String xpath = "/html/body/h1/text()";
       Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));    
     } finally {

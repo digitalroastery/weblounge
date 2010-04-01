@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.test.harness;
 
+import static org.junit.Assert.assertEquals;
+
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -40,7 +42,10 @@ public class SiteResourcesTest extends IntegrationTestBase {
   private static final Logger logger = LoggerFactory.getLogger(SiteResourcesTest.class);
 
   /** The image content type */
-  private static final String imageContentType = "image/jpeg";
+  private static final String CONTENT_TYPE_IMAGE = "image/jpeg";
+
+  /** Path to the image */
+  private static final String IMAGE_PATH = "/weblounge-sites/weblounge-test/web/images/porsche.jpg";
 
   /**
    * Creates a new instance of the <code>SiteResources</code> test.
@@ -57,16 +62,17 @@ public class SiteResourcesTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Testing loading of an image");
     
-    String imagePath = "/weblounge-sites/weblounge-test/web/images/porsche.jpg";
-    HttpGet request = new HttpGet(UrlSupport.concat(serverUrl, imagePath));
+    String requestUrl = UrlSupport.concat(serverUrl, IMAGE_PATH);
+    HttpGet request = new HttpGet(requestUrl);
+    logger.info("Sending request to {}", requestUrl);
 
     // Send and the request and examine the response
-    logger.debug("Sending request to {}", request.getURI());
     HttpClient httpClient = new DefaultHttpClient();
     try {
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-      Assert.assertEquals(imageContentType, response.getEntity().getContentType().getValue());
+      String contentType = response.getEntity().getContentType().getValue();
+      assertEquals(CONTENT_TYPE_IMAGE, contentType.split(";")[0]);
     } finally {
       httpClient.getConnectionManager().shutdown();
     }

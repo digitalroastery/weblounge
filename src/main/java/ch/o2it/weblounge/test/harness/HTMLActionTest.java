@@ -50,6 +50,9 @@ public class HTMLActionTest extends IntegrationTestBase {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HTMLActionTest.class);
 
+  /** The paths to test */
+  private static final String[] requestPaths = new String[] { "greeting/html", "greeting" };
+  
   /**
    * Creates a new instance of the <code>HTML</code> action test.
    */
@@ -75,8 +78,9 @@ public class HTMLActionTest extends IntegrationTestBase {
 
     // Prepare the request
     logger.info("Testing greeter action's html output");
+    logger.info("Sending request to {}", UrlSupport.concat(serverUrl, requestPaths[0]));
     
-    for (String path : new String[] { "greeting", "greeting/html"}) {
+    for (String path : requestPaths) {
       for (String language : languages) {
         String greeting = greetings.get(language);
         HttpGet request = new HttpGet(UrlSupport.concat(serverUrl, path));
