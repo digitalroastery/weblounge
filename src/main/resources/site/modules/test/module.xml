@@ -1,0 +1,34 @@
+<module id="testmodule">
+  <enable>true</enable>
+  <name language="de">Testmodul</name>
+  <name language="en">Test module</name>
+  <pagelets>
+    <pagelet id="greeting" composeable="true">
+      <renderer>/pagelets/greeting.jsp</renderer>
+      <recheck>1d10M</recheck>
+      <valid>1w1d1H1M</valid>
+      <name language="de">Begrüssung</name>
+      <name language="en">Greeting</name>
+      <includes>
+        <link href="${module.root}/css/stylesheet.css" type="text/css"/>
+      </includes>
+    </pagelet>
+  </pagelets>
+  <actions>
+    <action id="greeter.html">
+      <class>ch.o2it.weblounge.test.site.GreeterAction</class>
+      <mountpoint>/greeting/</mountpoint>
+      <includes>
+        <script src="${module.root}/scripts/greeting.js" type="javascript"/>
+      </includes>
+    </action>
+    <action id="greeter.xml">
+      <class>ch.o2it.weblounge.test.site.GreeterXMLAction</class>
+      <mountpoint>/greeting/</mountpoint>
+    </action>
+    <action id="greeter.json">
+      <class>ch.o2it.weblounge.test.site.GreeterJSONAction</class>
+      <mountpoint>/greeting/</mountpoint>
+    </action>
+  </actions>
+</module>

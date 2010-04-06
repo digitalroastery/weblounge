@@ -20,6 +20,9 @@
 
 package ch.o2it.weblounge.test.harness;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
@@ -30,7 +33,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -92,16 +94,34 @@ public class HTMLActionTest extends IntegrationTestBase {
         HttpClient httpClient = new DefaultHttpClient();
         try {
           HttpResponse response = TestSiteUtils.request(httpClient, request, params);
-          Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+          assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+          
+          // Look at the document contents
           String responseHTML = IOUtils.toString(response.getEntity().getContent());
           String responseXML = StringEscapeUtils.unescapeHtml(responseHTML);
           DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-          factory.setNamespaceAware(true);
           DocumentBuilder builder = factory.newDocumentBuilder();
           Document xml = builder.parse(new ByteArrayInputStream(responseXML.getBytes("utf-8")));
-          String found = XPathHelper.valueOf(xml, "/HTML/BODY/H1");
-          logger.debug("Found greeting " + found);
-          Assert.assertEquals(greeting, found);
+          
+          // Look for action parameter handling
+          String found = XPathHelper.valueOf(xml, "/html/body/h1");
+          assertEquals(greeting, found);
+          logger.info("Found greeting");
+          
+          // Look for included pagelets
+          assertNotNull(XPathHelper.valueOf(xml, "/html/body/div[class='greeting']"));
+          logger.info("Found pagelet content");
+
+          // Look for action header includes
+          assertNotNull(XPathHelper.valueOf(xml, "/html/head/script/src/[contains(., 'greeting.js')]"));
+          logger.info("Found action javascript include");
+          
+          // Look for pagelet header includes
+          assertNotNull(XPathHelper.valueOf(xml, "/html/head/link/href/[contains(., 'greeting.css')]"));
+          logger.info("Found pagelet stylesheet include");
+
+          // TODO: Look for <title> header
+          
         } finally {
           httpClient.getConnectionManager().shutdown();
         }

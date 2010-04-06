@@ -70,6 +70,18 @@ public class GreeterAction extends HTMLActionSupport {
       throw new ActionException("Language parameter '" + LANGUAGE_PARAM + "' was not specified");
     }
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startHeader(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   */
+  @Override
+  public void startHeader(WebloungeRequest request, WebloungeResponse response)
+      throws IOException, ActionException {
+    // TODO: Implement and add title header
+    super.startHeader(request, response);
+  }
 
   /**
    * {@inheritDoc}
@@ -82,7 +94,10 @@ public class GreeterAction extends HTMLActionSupport {
     try {
       String language = greetings.keySet().iterator().next();
       String htmlGreeting = StringEscapeUtils.escapeHtml(greetings.get(language));
-      IOUtils.write("<H1>" + htmlGreeting + "</H1>", response.getOutputStream(), "UTF-8");
+      IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getOutputStream(), "UTF-8");
+      
+      // Include a pagelet
+      include(request, response, "greeting", null);
       return SKIP_COMPOSER;
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
