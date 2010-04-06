@@ -22,30 +22,45 @@ package ch.o2it.weblounge.dispatcher;
 
 import ch.o2it.weblounge.common.site.Site;
 
-import org.osgi.framework.ServiceReference;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This service registers sites with the
  * <code>org.osgi.service.HttpService</code>.
  */
-public interface SiteDispatcherService {
+public interface SiteRegistrationService {
 
   /**
-   * Registers a site with the http service.
+   * Returns the site associated with the given server name.
+   * <p>
+   * Note that the server name is expected to not end with a trailing slash, so
+   * please pass in <code>www.o2it.ch</code> instead of
+   * <code>www.o2it.ch/</code>.
    * 
-   * @param site
-   *          the site
-   * @param reference
-   *          the site's <code>OSGi</code> service reference
+   * @param serverName
+   *          the server name, e.g. <code>www.o2it.ch</code>
+   * @return the site
    */
-  public abstract void addSite(Site site, ServiceReference reference);
+  Site findSiteByName(String serverName);
 
   /**
-   * Unregisters a site from the http service.
+   * Returns the site with the given site identifier or <code>null</code> if no
+   * such site is currently registered.
    * 
-   * @param site
-   *          the site
+   * @param identifier
+   *          the site identifier
+   * @return the site
    */
-  public abstract void removeSite(Site site);
+  Site findSiteByIdentifier(String identifier);
+
+  /**
+   * Returns the site targeted by the given request or <code>null</code> if no
+   * site can be matched to the request.
+   * 
+   * @param request
+   *          the servlet request
+   * @return the site
+   */
+  Site findSiteByRequest(HttpServletRequest request);
 
 }
