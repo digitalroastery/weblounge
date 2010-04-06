@@ -21,7 +21,7 @@ package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.dispatcher.DispatcherService;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.SiteLocatorService;
+import ch.o2it.weblounge.dispatcher.SiteRegistrationService;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -119,7 +119,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    * @param siteLocator
    *          the site locator
    */
-  public void setSiteLocator(SiteLocatorService siteLocator) {
+  public void setSiteLocator(SiteRegistrationService siteLocator) {
     dispatcher.setSiteLocator(siteLocator);
   }
 
@@ -129,7 +129,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    * @param siteLocator
    *          the site locator service
    */
-  public void removeSiteLocator(SiteLocatorService siteLocator) {
+  public void removeSiteLocator(SiteRegistrationService siteLocator) {
     dispatcher.setSiteLocator(null);
   }
 

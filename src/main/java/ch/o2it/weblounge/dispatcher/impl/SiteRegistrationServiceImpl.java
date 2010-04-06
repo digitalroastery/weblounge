@@ -23,7 +23,7 @@ package ch.o2it.weblounge.dispatcher.impl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.dispatcher.DispatcherConfiguration;
-import ch.o2it.weblounge.dispatcher.SiteDispatcherService;
+import ch.o2it.weblounge.dispatcher.SiteRegistrationService;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXml;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlFilter;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlServlet;
@@ -40,20 +40,22 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.servlet.Filter;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * The site tracker watches site services coming and going and registers them
  * with the weblounge dispatcher.
  */
-public class SiteDispatcherServiceImpl implements SiteDispatcherService {
+public class SiteRegistrationServiceImpl implements SiteRegistrationService {
 
   /** Logging facility */
-  private static final Logger log_ = LoggerFactory.getLogger(SiteDispatcherServiceImpl.class);
+  private static final Logger log_ = LoggerFactory.getLogger(SiteRegistrationServiceImpl.class);
 
   /** Default value for the <code>WEBAPP_CONTEXT_ROOT</code> property */
   public static final String DEFAULT_WEBAPP_CONTEXT_ROOT = "/";
@@ -69,6 +71,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
 
   /** The site tracker */
   private SiteTracker siteTracker = null;
+
+  /** The sites */
+  private List<Site> sites = new ArrayList<Site>();
+
+  /** Maps server names to sites */
+  private Map<String, Site> sitesByServerName = new HashMap<String, Site>();
 
   /** The site registrations */
   private Map<Site, WebXml> httpRegistrations = null;
@@ -140,7 +148,59 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#addSite(ch.o2it.weblounge.common.site.Site, org.osgi.framework.ServiceReference)
+   * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByIdentifier(java.lang.String)
+   */
+  public Site findSiteByIdentifier(String identifier) {
+    for (Site site : sites) {
+      if (site.getIdentifier().equals(identifier)) {
+        return site;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByName(java.lang.String)
+   */
+  public Site findSiteByName(String serverName) {
+    Site site = sitesByServerName.get(serverName);
+    if (site != null)
+      return site;
+
+    // There is obviously no direct match. Therefore, try to find a
+    // wildcard match
+    for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
+      String alias = e.getKey();
+      if (serverName.matches(alias)) {
+        site = e.getValue();
+        log_.info("Registering {} for site ", serverName, site);
+        sitesByServerName.put(serverName, site);
+        return site;
+      }
+    }
+    
+    log_.debug("Lookup for {} did not match any site", serverName);
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByRequest(javax.servlet.http.HttpServletRequest)
+   */
+  public Site findSiteByRequest(HttpServletRequest request) {
+    if (request == null)
+      throw new IllegalArgumentException("Request must not be null");
+    return findSiteByName(request.getServerName());
+  }
+
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#addSite(ch.o2it.weblounge.common.site.Site, org.osgi.framework.ServiceReference)
    */
   public void addSite(Site site, ServiceReference reference) {
     WebXml webXml = createWebXml(site, reference);
@@ -188,14 +248,31 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
     }
     
     httpRegistrations.put(site, webXml);
+    
+    // Register this site for the findByXYZ() methods
+    synchronized (sites) {
+      sites.add(site);
+      for (String name : site.getHostNames()) {
+        if (site.equals(sitesByServerName.get(name))) {
+          log_.error("Another site is already registered to " + name);
+          continue;
+        }
+        sitesByServerName.put(name, site);
+      }
+    }
+    
+    // TODO: register site dispatcher
+    
+    log_.debug("Site {} registered", site);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#removeSite(ch.o2it.weblounge.common.site.Site)
+   * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#removeSite(ch.o2it.weblounge.common.site.Site)
    */
   public void removeSite(Site site) {
+    // Remove site dispatcher servlet
     WebXml webXml = httpRegistrations.get(site);
     String siteRoot = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ROOT);
     paxHttpService.unregister(siteRoot);
@@ -206,6 +283,24 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
         paxHttpService.unregister(mapping);
       }
     }
+
+    // Remove site registration
+    synchronized (sites) {
+      sites.remove(site);
+      List<String> namesToRemove = new ArrayList<String>();
+      for (Map.Entry<String, Site> entry : sitesByServerName.entrySet()) {
+        if (site.equals(entry.getValue())) {
+          namesToRemove.add(entry.getKey());
+        }
+      }
+      for (String serverName : namesToRemove) {
+        sitesByServerName.remove(serverName);
+      }
+    }
+    
+    // TODO: unregister site dispatcher
+    
+    log_.debug("Site {} unregistered", site);
   }
 
   /**
@@ -323,7 +418,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
   private final class SiteTracker extends ServiceTracker {
 
     /** The site dispatcher */
-    private SiteDispatcherService dispatcher = null;
+    private SiteRegistrationServiceImpl dispatcher = null;
 
     /**
      * Creates a new <code>SiteTracker</code>.
@@ -333,7 +428,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService {
      * @param context
      *          the site dispatcher's bundle context
      */
-    public SiteTracker(SiteDispatcherService dispatcher, BundleContext context) {
+    public SiteTracker(SiteRegistrationServiceImpl dispatcher, BundleContext context) {
       super(context, Site.class.getName(), null);
       this.dispatcher = dispatcher;
     }

@@ -100,7 +100,7 @@ public class WebXmlFilter {
   public WebXmlFilter addMapping(String mapping) {
     if (mapping == null)
       return null;
-    if (mapping != null && !mapping.startsWith("/"))
+    if (!mapping.startsWith("/"))
       mapping = "/" + mapping;
     filterMappings.add(mapping);
     return this;

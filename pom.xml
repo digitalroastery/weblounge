@@ -159,8 +159,7 @@
               OSGI-INF/dispatcher-service.xml,
               OSGI-INF/action-requesthandler.xml,
               OSGI-INF/page-requesthandler.xml,
-              OSGI-INF/site-dispatcher-service.xml,
-              OSGI-INF/site-locator-service.xml
+              OSGI-INF/site-registration-service.xml
             </Service-Component>
           </instructions>
         </configuration>

@@ -27,6 +27,9 @@ import java.util.concurrent.Callable;
  */
 public class ContextClassLoaderUtils {
 
+  /**
+   * Don't instantiate this class, use its static methods.
+   */
   private ContextClassLoaderUtils() {
   }
 
@@ -55,7 +58,7 @@ public class ContextClassLoaderUtils {
       }
       return callable.call();
     } finally {
-      if (backupClassLoader != null) {
+      if (backupClassLoader != null && currentThread != null) {
         currentThread.setContextClassLoader(backupClassLoader);
       }
     }

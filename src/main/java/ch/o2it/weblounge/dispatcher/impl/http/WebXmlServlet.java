@@ -156,7 +156,7 @@ public class WebXmlServlet {
   public WebXmlServlet addMapping(String mapping) {
     if (mapping == null)
       return null;
-    if (mapping != null && !mapping.startsWith("/"))
+    if (!mapping.startsWith("/"))
       mapping = "/" + mapping;
     servletMappings.add(mapping);
     return this;

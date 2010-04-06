@@ -35,17 +35,8 @@ import java.util.NoSuchElementException;
  */
 public class BundleClassLoader extends ClassLoader {
 
+  /** An empty enumeration */
   private static final EmptyEnumeration<URL> EMPTY_URL_ENUMERATION = new EmptyEnumeration<URL>();
-
-  private static final class EmptyEnumeration<T> implements Enumeration<T> {
-    public boolean hasMoreElements() {
-      return false;
-    }
-
-    public T nextElement() {
-      throw new NoSuchElementException();
-    }
-  }
 
   /**
    * Bundle used for class loading.
@@ -124,7 +115,7 @@ public class BundleClassLoader extends ClassLoader {
   /**
    * If there is a parent class loader use the super implementation that will
    * first use the parent and as a fallback it will call findResource(). In case
-   * there is no parent directy use findResource() as if we call the super
+   * there is no parent directly use findResource() as if we call the super
    * implementation it will use the VMClassLoader, fact that should be avoided.
    * 
    * @see ClassLoader#getResource(String)
@@ -140,8 +131,9 @@ public class BundleClassLoader extends ClassLoader {
   /**
    * If there is a parent class loader use the super implementation that will
    * first use the parent and as a fallback it will call findResources(). In
-   * case there is no parent directly use findResources() as if we call the super
-   * implementation it will use the VMClassLoader, fact that should be avoided.
+   * case there is no parent directly use findResources() as if we call the
+   * super implementation it will use the VMClassLoader, fact that should be
+   * avoided.
    * 
    * @see ClassLoader#getResources(String)
    */
@@ -173,8 +165,8 @@ public class BundleClassLoader extends ClassLoader {
    * @see ClassLoader#getResource(String)
    */
   @Override
-  protected Class<?> loadClass(final String name, final boolean resolve)
-      throws ClassNotFoundException {
+  protected synchronized Class<?> loadClass(final String name,
+      final boolean resolve) throws ClassNotFoundException {
     if (getParent() != null) {
       return super.loadClass(name, resolve);
     }
@@ -214,11 +206,21 @@ public class BundleClassLoader extends ClassLoader {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#hashCode()
+   */
   @Override
-  public String toString() {
-    return new StringBuffer().append(this.getClass().getSimpleName()).append("{").append("bundle=").append(bundle).append(",parent=").append(getParent()).append("}").toString();
+  public int hashCode() {
+    return (bundle != null ? bundle.hashCode() : 0) * 37 + (getParent() != null ? getParent().hashCode() : 0);
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -241,8 +243,40 @@ public class BundleClassLoader extends ClassLoader {
     return true;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
   @Override
-  public int hashCode() {
-    return (bundle != null ? bundle.hashCode() : 0) * 37 + (getParent() != null ? getParent().hashCode() : 0);
+  public String toString() {
+    return new StringBuffer().append(this.getClass().getSimpleName()).append("{").append("bundle=").append(bundle).append(",parent=").append(getParent()).append("}").toString();
   }
+
+  /**
+   * Utility implementation that provides an empty enumeration for the given
+   * type <code>T</code>.
+   */
+  protected static final class EmptyEnumeration<T> implements Enumeration<T> {
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.util.Enumeration#hasMoreElements()
+     */
+    public boolean hasMoreElements() {
+      return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.util.Enumeration#nextElement()
+     */
+    public T nextElement() {
+      throw new NoSuchElementException();
+    }
+
+  }
+
 }
