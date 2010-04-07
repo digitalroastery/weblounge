@@ -63,7 +63,7 @@ public class XMLActionTest extends IntegrationTestBase {
 
     // Include the mountpoint
     // TODO: Make this dynamic
-    serverUrl = UrlSupport.concat(serverUrl, "weblounge");
+    //serverUrl = UrlSupport.concat(serverUrl, "weblounge");
     String requestUrl = UrlSupport.concat(serverUrl, "greeting/xml");
 
     // Load the test data

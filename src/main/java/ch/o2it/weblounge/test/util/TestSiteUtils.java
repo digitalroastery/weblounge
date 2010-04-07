@@ -22,6 +22,7 @@ package ch.o2it.weblounge.test.util;
 
 import ch.o2it.weblounge.test.site.GreeterAction;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -156,6 +157,19 @@ public class TestSiteUtils {
     String responseJson = EntityUtils.toString(response.getEntity());
     JSONObject json = new JSONObject(responseJson);
     return json;
+  }
+
+  /**
+   * Returns an unescaped version of the HTML string, which also does not
+   * contain any newline, return or tab characters.
+   * 
+   * @param responseHTML
+   * @return
+   */
+  public static String unescapeHtml(String responseHTML) {
+    String responseXML = responseHTML.replaceAll("\\r", "").replaceAll("\\n", "").replaceAll("\\t", "");
+    responseXML = StringEscapeUtils.unescapeHtml(responseXML);
+    return responseXML;
   }
 
 }

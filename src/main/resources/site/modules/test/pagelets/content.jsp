@@ -1,0 +1,1 @@
+<div class="pagelet">I am part of the regular page content</div>

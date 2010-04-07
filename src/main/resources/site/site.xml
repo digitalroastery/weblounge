@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<site id="weblounge-test">
+  <autostart>true</autostart>
+  <class>ch.o2it.weblounge.test.site.TestSite</class>
+  <name>Weblounge Test Site</name>
+  <domains>
+    <url>localhost</url>
+  </domains>
+  <security>
+    <administrator>
+      <login>testadmin</login>
+      <password type="plain">secret</password>
+      <name>Web Office</name>
+      <email>weboffice@nowhere.com</email>
+    </administrator>
+  </security>
+  <languages>
+    <language default="true">de</language>
+    <language>en</language>
+  </languages>
+  <!-- UNCOMMENT TO ACTIVATE
+  <templates>
+    <template id="default" composeable="true" default="true">
+      <renderer>${site.root}/templates/template.jsp</renderer>
+      <stage>main</stage>
+      <recheck>1d10M</recheck>
+      <valid>1w1d1H1M</valid>
+      <name language="de">Standard Vorlage</name>
+      <name language="en">Default template</name>
+    </template>
+  </templates>
+  -->
+  <jobs>
+    <job id="startup">
+      <name>Job title</name>
+      <class>ch.o2it.weblounge.test.site.SiteStartupJob</class>
+      <schedule>@restart</schedule>
+	</job>
+    <job id="greeter">
+      <name>Job title</name>
+      <class>ch.o2it.weblounge.test.site.GreeterJob</class>
+      <schedule>* * * * *</schedule>
+	</job>
+  </jobs>
+</site>

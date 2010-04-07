@@ -20,11 +20,7 @@
 
 package ch.o2it.weblounge.test.site;
 
-import ch.o2it.weblounge.common.impl.scheduler.CronJobTrigger;
-import ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
-
-import org.osgi.service.component.ComponentContext;
 
 /**
  * Implementation of the <code>Site</code> API that hosts the weblounge
@@ -40,41 +36,6 @@ public class TestSite extends SiteImpl {
    */
   public TestSite() {
     setAutoStart(true);
-    addHostName("localhost");
-    setName("Weblounge Test Site");
-  }
-
-  /**
-   * Callback from the OSGi environment to activate the site.
-   * <p>
-   * This method should be configured in the <tt>Dynamic Services</tt> section
-   * of your bundle.
-   * 
-   * @param context
-   *          the component context
-   */
-  @Override
-  public void activate(ComponentContext context) throws Exception {
-    super.activate(context);
-    addJob("startup", SiteStartupJob.class, null, new CronJobTrigger("@restart"));
-    addJob("greeter", GreeterJob.class, null, new PeriodicJobTrigger(60000, true));
-    addModule(new TestModule());
-  }
-
-  /**
-   * Callback from the OSGi environment to deactivate the site.
-   * <p>
-   * This method should be configured in the <tt>Dynamic Services</tt> section
-   * of your bundle.
-   * 
-   * @param context
-   *          the component context
-   */
-  @Override
-  public void deactivate(ComponentContext context) throws Exception {
-    super.deactivate(context);
-    removeJob("startup");
-    removeJob("greeter");
   }
 
 }

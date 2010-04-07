@@ -28,7 +28,6 @@ import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -73,7 +72,7 @@ public class HTMLActionTest extends IntegrationTestBase {
 
     // Include the mountpoint
     // TODO: Make this dynamic
-    serverUrl = UrlSupport.concat(serverUrl, "weblounge");
+    //serverUrl = UrlSupport.concat(serverUrl, "weblounge");
 
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();
@@ -81,7 +80,7 @@ public class HTMLActionTest extends IntegrationTestBase {
 
     // Prepare the request
     logger.info("Testing greeter action's html output");
-    logger.info("Sending request to {}", UrlSupport.concat(serverUrl, requestPaths[0]));
+    logger.info("Sending requests to {}", UrlSupport.concat(serverUrl, requestPaths[0]));
     
     for (String path : requestPaths) {
       for (String language : languages) {
@@ -98,30 +97,35 @@ public class HTMLActionTest extends IntegrationTestBase {
           
           // Look at the document contents
           String responseHTML = IOUtils.toString(response.getEntity().getContent());
-          String responseXML = StringEscapeUtils.unescapeHtml(responseHTML);
+          String responseXML = TestSiteUtils.unescapeHtml(responseHTML);
           DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+          factory.setCoalescing(true);
+          factory.setIgnoringComments(true);
+          factory.setIgnoringElementContentWhitespace(true);
+          factory.setNamespaceAware(true);
           DocumentBuilder builder = factory.newDocumentBuilder();
           Document xml = builder.parse(new ByteArrayInputStream(responseXML.getBytes("utf-8")));
           
           // Look for action parameter handling
           String found = XPathHelper.valueOf(xml, "/html/body/h1");
+          assertNotNull("General template output does not work", found);
           assertEquals(greeting, found);
-          logger.info("Found greeting");
+          logger.debug("Found greeting");
           
           // Look for included pagelets
-          assertNotNull(XPathHelper.valueOf(xml, "/html/body/div[class='greeting']"));
-          logger.info("Found pagelet content");
+          assertNotNull("JSP include failed", XPathHelper.valueOf(xml, "/html/body/div[@class='greeting']"));
+          logger.debug("Found pagelet content");
 
           // Look for action header includes
-          assertNotNull(XPathHelper.valueOf(xml, "/html/head/script/src/[contains(., 'greeting.js')]"));
-          logger.info("Found action javascript include");
+          assertEquals("Action include failed", "1", XPathHelper.valueOf(xml, "count(/html/head/script[contains(@src, '/scripts/greeting.js')])"));
+          logger.debug("Found action javascript include");
           
           // Look for pagelet header includes
-          assertNotNull(XPathHelper.valueOf(xml, "/html/head/link/href/[contains(., 'greeting.css')]"));
-          logger.info("Found pagelet stylesheet include");
-
-          // TODO: Look for <title> header
+          assertEquals("Pagelet include failed", "1", XPathHelper.valueOf(xml, "count(/html/head/link[contains(@href, 'greeting.css')])"));
+          logger.debug("Found pagelet stylesheet include");
           
+          // TODO: Test tag output
+
         } finally {
           httpClient.getConnectionManager().shutdown();
         }

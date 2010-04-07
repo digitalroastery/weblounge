@@ -62,7 +62,7 @@ public class JSONActionTest extends IntegrationTestBase {
 
     // Include the mountpoint
     // TODO: Make this dynamic
-    serverUrl = UrlSupport.concat(serverUrl, "weblounge");
+    //serverUrl = UrlSupport.concat(serverUrl, "weblounge");
     String requestUrl = UrlSupport.concat(serverUrl, "greeting/json");
 
     // Load the test data

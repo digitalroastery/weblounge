@@ -20,8 +20,16 @@
 
 package ch.o2it.weblounge.test.site;
 
+import ch.o2it.weblounge.common.content.HTMLInclude;
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.PageletRenderer;
+import ch.o2it.weblounge.common.impl.content.PageImpl;
+import ch.o2it.weblounge.common.impl.content.PageURIImpl;
+import ch.o2it.weblounge.common.impl.content.PageletImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
+import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -63,9 +71,15 @@ public class GreeterAction extends HTMLActionSupport {
       String greeting = allGreetings.get(language);
       if (greeting == null)
         // TODO: How do we indicate a 404 instead of 500? Different exceptions?
-        // Like this, a json action could not return an empty resultset
+        // Like this, a json action could not return an empty result set
         throw new ActionException("Unfortunately, we are not fluent in " + language);
       greetings.put(language, greeting);
+      
+      // Add a fake page, so we can test pagelet renderer includes
+      Page page = new PageImpl(new PageURIImpl(new WebUrlImpl(getSite(), "/test")));
+      Pagelet pagelet = new PageletImpl(getModule().getIdentifier(), "content");
+      page.addPagelet(pagelet, "main");
+      setPage(page);
     } catch (IllegalStateException e) {
       throw new ActionException("Language parameter '" + LANGUAGE_PARAM + "' was not specified");
     }
@@ -79,7 +93,10 @@ public class GreeterAction extends HTMLActionSupport {
   @Override
   public void startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
-    // TODO: Implement and add title header
+    PageletRenderer contentPagelet = getModule().getRenderer("greeting");
+    for (HTMLInclude include : contentPagelet.getIncludes()) {
+      addInclude(include);
+    }
     super.startHeader(request, response);
   }
 
@@ -95,8 +112,11 @@ public class GreeterAction extends HTMLActionSupport {
       String language = greetings.keySet().iterator().next();
       String htmlGreeting = StringEscapeUtils.escapeHtml(greetings.get(language));
       IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getOutputStream(), "UTF-8");
-      
+
       // Include a pagelet
+      include(request, response, "content", null);
+
+      // Include another pagelet
       include(request, response, "greeting", null);
       return SKIP_COMPOSER;
     } catch (IOException e) {
