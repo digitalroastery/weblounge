@@ -478,6 +478,13 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
       throws IndexOutOfBoundsException;
 
   /**
+   * Returns all pagelets from this page.
+   * 
+   * @return the pagelets
+   */
+  Pagelet[] getPagelets();
+
+  /**
    * Returns the pagelets that are contained in the specified composer.
    * 
    * @param composer
