@@ -20,6 +20,9 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
+import ch.o2it.weblounge.common.impl.util.classloader.JasperClassLoader;
+
 import org.apache.commons.io.FilenameUtils;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.resource.Resource;

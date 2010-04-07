@@ -126,6 +126,7 @@
               ch.o2it.weblounge.common.impl.site, 
               ch.o2it.weblounge.common.impl.url,
               ch.o2it.weblounge.common.impl.util,
+              ch.o2it.weblounge.common.impl.util.classloader,
               ch.o2it.weblounge.common.language,
               ch.o2it.weblounge.common.request,
               ch.o2it.weblounge.common.site,

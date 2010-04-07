@@ -326,22 +326,22 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           log_.trace("Rendering action '{}' on page {}", action, page);
           PageRequestHandlerImpl.getInstance().service(request, response);
         } else {
-          log_.trace("Rendering action '{}' on empty page", action);
+          log_.trace("Rendering action '{}' on ad-hoc page", action);
           response.getOutputStream().println("<!DOCTYPE HTML>");
-          response.getOutputStream().println("<HTML>\n\t<HEAD>");
+          response.getOutputStream().println("<html>\n\t<head>");
           if (action instanceof HTMLAction) {
             ((HTMLAction) action).startHeader(request, response);
           }
-          response.getOutputStream().println("\t</HEAD>\n\t<BODY>");
+          response.getOutputStream().println("\t</head>\n\t<body>");
           if (action instanceof HTMLAction) {
             ((HTMLAction) action).startStage(request, response);
           }
-          response.getOutputStream().print("\n\t</BODY>\n</HTML>");
+          response.getOutputStream().print("\n\t</body>\n</html>");
           response.flushBuffer();
         }
       }
     } catch (IOException e) {
-      log_.debug("Error writing action output to client: {}", e.getMessage());
+      log_.error("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
       log_.error("Error processing action '{}' for {}: {}", new Object[] {
           action,
