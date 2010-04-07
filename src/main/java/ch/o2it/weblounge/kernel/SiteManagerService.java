@@ -101,6 +101,12 @@ public final class SiteManagerService implements SiteListener {
    */
   public void removeSite(Site site) {
     site.removeSiteListener(this);
+    try {
+      if (site.isRunning())
+        site.stop();
+    } catch (Exception e) {
+      log_.error("Error stopping site '{}'", e);
+    }
   }
 
   /**
