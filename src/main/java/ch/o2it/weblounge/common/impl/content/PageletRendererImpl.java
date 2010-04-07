@@ -193,6 +193,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   public static PageletRenderer fromXml(Node node, XPath xpath)
       throws IllegalStateException {
 
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
     // Identifier
     String id = XPathHelper.valueOf(node, "@id", xpath);
     if (id == null)
@@ -203,12 +205,13 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
     // Renderer url
     URL rendererUrl = null;
-    if (XPathHelper.valueOf(node, "renderer", xpath) == null)
+    String rendererUrlNode = XPathHelper.valueOf(node, "renderer", xpath);
+    if (rendererUrlNode == null)
       throw new IllegalStateException("Missing renderer in page template definition");
     try {
-      rendererUrl = new URL(XPathHelper.valueOf(node, "renderer", xpath));
+      rendererUrl = new URL(rendererUrlNode);
     } catch (MalformedURLException e) {
-      throw new IllegalStateException("Malformed renderer url in page template definition");
+      throw new IllegalStateException("Malformed renderer url in page template definition: " + rendererUrlNode);
     }
 
     // Create the pagelet renderer
@@ -216,7 +219,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     if (className != null) {
       Class<? extends PageletRenderer> c = null;
       try {
-        c = (Class<? extends PageletRenderer>)Class.forName(className);
+        c = (Class<? extends PageletRenderer>)classLoader.loadClass(className);
         renderer = c.newInstance();
         renderer.setIdentifier(id);
         renderer.setRenderer(rendererUrl);
@@ -237,13 +240,14 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     renderer.setComposeable("true".equals(XPathHelper.valueOf(node, "@composeable", xpath)));
 
     // Editor url
+    String editorUrlNode = XPathHelper.valueOf(node, "editor", xpath);
     try {
-      if (XPathHelper.valueOf(node, "editor", xpath) != null) {
-        URL editorUrl = new URL(XPathHelper.valueOf(node, "editor", xpath));
+      if (editorUrlNode != null) {
+        URL editorUrl = new URL(editorUrlNode);
         renderer.setEditor(editorUrl);
       }
     } catch (MalformedURLException e) {
-      throw new IllegalStateException("Malformed renderer url in page template definition");
+      throw new IllegalStateException("Malformed editor url in page template definition: " + editorUrlNode);
     }
 
     // recheck time

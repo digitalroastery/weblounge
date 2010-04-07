@@ -126,10 +126,7 @@ public class XPathHelper {
       String value = StringUtils.trimToNull(processor.evaluate(xpathExpression, node));
       return (value != null) ? value : defaultValue;
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '{}' from {}", new Object[] {
-          xpathExpression,
-          node,
-          e });
+      log_.warn("Error when selecting '{}': {}", xpathExpression, e.getMessage());
       return null;
     }
   }

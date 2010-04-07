@@ -68,6 +68,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -77,12 +78,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -111,7 +115,7 @@ public class SiteImpl implements Site {
 
   /** Site running state */
   private boolean running = false;
-
+  
   /** Url of this site */
   private WebUrl url = null;
 
@@ -144,7 +148,7 @@ public class SiteImpl implements Site {
 
   /** The default hostname */
   protected String defaultHostname = "localhost";
-  
+
   /** Ordered list of site urls */
   protected List<String> hostnames = null;
 
@@ -177,7 +181,7 @@ public class SiteImpl implements Site {
 
   /** Listener for the quartz scheduler */
   private TriggerListener quartzTriggerListener = null;
-  
+
   /** Flag to tell whether we are currently shutting down */
   private boolean isShutdownInProgress = false;
 
@@ -475,7 +479,7 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#setDefaultHostname(java.lang.String)
    */
   public void setDefaultHostname(String hostname) {
@@ -484,7 +488,7 @@ public class SiteImpl implements Site {
     if (hostname != null)
       addHostName(hostname);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -530,7 +534,7 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#addAuthenticationModule(ch.o2it.weblounge.common.security.AuthenticationModule)
    */
   public void addAuthenticationModule(AuthenticationModule module) {
@@ -540,22 +544,22 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#removeAuthenticationModule(ch.o2it.weblounge.common.security.AuthenticationModule)
    */
   public void removeAuthenticationModule(AuthenticationModule module) {
     authenticationModules.remove(module);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#getLoginModules()
    */
   public AuthenticationModule[] getAuthenticationModules() {
     return authenticationModules.toArray(new AuthenticationModule[authenticationModules.size()]);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -714,14 +718,14 @@ public class SiteImpl implements Site {
         try {
           module.start();
           started.add(module);
-          
+
           // start jobs
           for (Job job : module.getJobs()) {
             scheduleJob(job);
           }
-          
+
           // actions are being registered automatically
-          
+
         } catch (Exception e) {
           log_.error("Error starting module '{}'", module, e);
         }
@@ -752,7 +756,7 @@ public class SiteImpl implements Site {
         unscheduleJob(job);
       }
     }
-    
+
     // actions are being unregistered automatically
 
     // Shutdown all of the modules
@@ -994,6 +998,7 @@ public class SiteImpl implements Site {
    * @throws Exception
    *           if the site activation fails
    */
+  @SuppressWarnings("unchecked")
   public void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
 
@@ -1006,9 +1011,25 @@ public class SiteImpl implements Site {
     }
 
     log_.debug("Initializing site '{}'", this);
-    log_.debug("Signing up for a job scheduling services");
 
-    // Connect to the
+    // Load the modules
+    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    Enumeration<URL> e = (Enumeration<URL>) bundleContext.getBundle().findEntries("site/modules", "module.xml", true);
+    if (e != null) {
+      while (e.hasMoreElements()) {
+        URL moduleUrl = e.nextElement();
+        log_.debug("Loading module {}", moduleUrl);
+        Document moduleXml = docBuilder.parse(moduleUrl.openStream());
+        Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());
+        log_.info("Loaded module {}", m);
+        addModule(m);
+      }
+    } else {
+      log_.info("No modules found for site '{}'", this);
+    }
+
+    // Look for a job scheduler
+    log_.debug("Signing up for a job scheduling services");
     schedulingServiceTracker = new SchedulingServiceTracker(bundleContext, this);
     schedulingServiceTracker.open();
 
@@ -1309,8 +1330,8 @@ public class SiteImpl implements Site {
    * @see #toXml()
    */
   @SuppressWarnings("unchecked")
-  public static Site fromXml(Node config, XPath xpathProcessor)
-      throws IllegalStateException {
+  public static Site fromXml(Node config, XPath xpathProcessor) throws IllegalStateException {
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     // identifier
     String identifier = XPathHelper.valueOf(config, "@id", xpathProcessor);
@@ -1322,7 +1343,7 @@ public class SiteImpl implements Site {
     String className = XPathHelper.valueOf(config, "class", xpathProcessor);
     if (className != null) {
       try {
-        Class<? extends Site> c = (Class<? extends Site>) Class.forName(className);
+        Class<? extends Site> c = (Class<? extends Site>) classLoader.loadClass(className);
         site = c.newInstance();
         site.setIdentifier(identifier);
       } catch (Exception e) {
@@ -1338,7 +1359,7 @@ public class SiteImpl implements Site {
     if (name == null)
       throw new IllegalStateException("Site '" + identifier + " has no name");
     site.setName(name);
-    
+
     // domains
     NodeList urlNodes = XPathHelper.selectList(config, "domains/url", xpathProcessor);
     if (urlNodes.getLength() == 0)
@@ -1350,7 +1371,7 @@ public class SiteImpl implements Site {
       else
         site.addHostName(url);
     }
-    
+
     // languages
     NodeList languageNodes = XPathHelper.selectList(config, "languages/language", xpathProcessor);
     if (languageNodes.getLength() == 0)
@@ -1369,7 +1390,7 @@ public class SiteImpl implements Site {
         throw new IllegalStateException("Site '" + identifier + "' defines unknown language: " + languageId);
       }
     }
-    
+
     // templates
     NodeList templateNodes = XPathHelper.selectList(config, "templates/template", xpathProcessor);
     for (int i = 0; i < templateNodes.getLength(); i++) {
@@ -1403,7 +1424,7 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#toXml()
    */
   public String toXml() {
@@ -1427,7 +1448,7 @@ public class SiteImpl implements Site {
       b.append("<security>");
       if (administrator != null)
         b.append(administrator.toXml());
-      
+
       if (authenticationModules.size() > 0) {
         b.append("<authentication>");
         for (AuthenticationModule module : authenticationModules) {
@@ -1451,7 +1472,7 @@ public class SiteImpl implements Site {
       }
       b.append("</domains>");
     }
-    
+
     // templates
     if (templates.size() > 0) {
       b.append("<templates>");
@@ -1474,7 +1495,7 @@ public class SiteImpl implements Site {
       }
       b.append("</languages>");
     }
-    
+
     // Options
     b.append(options.toXml());
 

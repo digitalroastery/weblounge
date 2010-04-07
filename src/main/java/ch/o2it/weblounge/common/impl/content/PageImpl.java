@@ -828,6 +828,19 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Page#getPagelets()
+   */
+  public Pagelet[] getPagelets() {
+    List<Pagelet> result = new ArrayList<Pagelet>();
+    for (List<Pagelet> pagelets : composers.values()) {
+      result.addAll(pagelets);
+    }
+    return result.toArray(new Pagelet[result.size()]);
+  }
+  
+  /**
    * Returns the pagelets that are contained in the specified composer.
    * 
    * @param composer

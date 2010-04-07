@@ -646,6 +646,8 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
   public static Action fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
 
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
     // identifier
     String identifier = XPathHelper.valueOf(config, "@id", xpathProcessor);
     if (identifier == null)
@@ -656,7 +658,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     String className = XPathHelper.valueOf(config, "class", xpathProcessor);
     if (className != null) {
       try {
-        Class<? extends Action> c = (Class<? extends Action>) Class.forName(className);
+        Class<? extends Action> c = (Class<? extends Action>) classLoader.loadClass(className);
         action = c.newInstance();
         action.setIdentifier(identifier);
       } catch (Exception e) {

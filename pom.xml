@@ -50,6 +50,11 @@
     </dependency>
 
     <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
@@ -114,6 +119,7 @@
               org.apache.commons.fileupload,
               org.apache.commons.fileupload.disk,
               org.apache.commons.fileupload.servlet,
+              org.apache.commons.io,
               org.apache.commons.lang,
               org.apache.commons.pool,
               org.apache.commons.pool.impl,

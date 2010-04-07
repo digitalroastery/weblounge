@@ -26,6 +26,8 @@ import ch.o2it.weblounge.common.content.Link;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.PageletRenderer;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.Script;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
@@ -39,6 +41,7 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.HTMLAction;
+import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
@@ -146,6 +149,22 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public void setPage(Page page) {
     this.page = page;
+    
+    if (page == null)
+      return;
+
+    // Add pagelet renderer includes
+    for (Pagelet p : page.getPagelets()) {
+      Module module = site.getModule(p.getModule());
+      if (module == null)
+        continue;
+      PageletRenderer renderer = module.getRenderer(p.getIdentifier());
+      if (renderer == null)
+        continue;
+      for (HTMLInclude include : renderer.getIncludes())
+        addInclude(include);
+    }
+
   }
 
   /**

@@ -597,6 +597,8 @@ public class ModuleImpl implements Module {
   @SuppressWarnings("unchecked")
   public static Module fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
+    
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     // identifier
     String identifier = XPathHelper.valueOf(config, "@id", xpathProcessor);
@@ -608,7 +610,7 @@ public class ModuleImpl implements Module {
     String className = XPathHelper.valueOf(config, "class", xpathProcessor);
     if (className != null) {
       try {
-        Class<? extends Module> c = (Class<? extends Module>) Class.forName(className);
+        Class<? extends Module> c = (Class<? extends Module>) classLoader.loadClass(className);
         module = c.newInstance();
         module.setIdentifier(identifier);
       } catch (Exception e) {

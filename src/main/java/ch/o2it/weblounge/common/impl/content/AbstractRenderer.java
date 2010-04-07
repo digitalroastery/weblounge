@@ -30,11 +30,11 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,12 +59,6 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
 
   /** The supported flavors */
   protected Set<RequestFlavor> flavors = new HashSet<RequestFlavor>();
-
-  /** Size of the temporary buffer */
-  private static final int BUFFER_SIZE = 8 * 1024;
-
-  /** A temporary buffer for data copying */
-  private static final ThreadLocal<byte[]> buffer = new ThreadLocal<byte[]>();
 
   /**
    * Creates a renderer with a recheck time of one day and a valid time of one
@@ -175,64 +169,54 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
     File jsp = null;
 
     try {
-      if (!"file".equals(renderer.getProtocol()))
-        throw new RenderException(this, renderer.toExternalForm() + " is not on the local file system");
-
-      // Find the best match for the template
-      // TODO: Cache the results
-      String[] filePaths = LanguageSupport.getLanguageVariantsByPriority(renderer.toExternalForm(), language, site.getDefaultLanguage());
-      for (String path : filePaths) {
-        log_.trace("Looking for jsp {}", path);
-        File f = new File(path);
-        if (f.exists()) {
-          log_.debug("Found jsp at {}", path);
-          jsp = f;
-          break;
+      if ("file".equals(renderer.getProtocol())) {
+        // Find the best match for the template
+        String[] filePaths = LanguageSupport.getLanguageVariantsByPriority(renderer.toExternalForm(), language, site.getDefaultLanguage());
+        for (String path : filePaths) {
+          log_.trace("Looking for jsp {}", path);
+          File f = new File(path);
+          if (f.exists()) {
+            log_.debug("Found jsp at {}", path);
+            jsp = f;
+            break;
+          }
         }
-      }
-
-      // Did we find a suitable JSP?
-      if (jsp == null) {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        throw new RenderException(this, "No suitable java server page found for " + renderer + " and language " + language.getIdentifier());
-      }
-
-      // Check readability
-      if (!jsp.canRead()) {
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
-        throw new RenderException(this, "Java server page at " + jsp + " cannot be read");
-      }
-
-      // No directory listings allowed
-      if (!jsp.isFile()) {
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
-        throw new RenderException(this, "Java server page at " + jsp + " is not a file");
+  
+        // Did we find a suitable JSP?
+        if (jsp == null) {
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          throw new RenderException(this, "No suitable java server page found for " + renderer + " and language " + language.getIdentifier());
+        }
+  
+        // Check readability
+        if (!jsp.canRead()) {
+          response.sendError(HttpServletResponse.SC_FORBIDDEN);
+          throw new RenderException(this, "Java server page at " + jsp + " cannot be read");
+        }
+  
+        // No directory listings allowed
+        if (!jsp.isFile()) {
+          response.sendError(HttpServletResponse.SC_FORBIDDEN);
+          throw new RenderException(this, "Java server page at " + jsp + " is not a file");
+        }
+        
+        renderer = jsp.toURI().toURL();
       }
 
       // Finally serve the JSP
-      log_.info("Including jsp {}", jsp);
-      InputStream is = new FileInputStream(jsp);
+      log_.debug("Including jsp {}", renderer);
+      InputStream is = renderer.openStream();
+      OutputStream os = response.getOutputStream();
       try {
-        int read = 0;
-        byte tmp[] = buffer.get();
-        if (tmp == null) {
-          tmp = new byte[BUFFER_SIZE];
-          buffer.set(tmp);
-        }
-        OutputStream os = response.getOutputStream();
-        while ((read = is.read(tmp)) >= 0) {
-          os.write(tmp, 0, read);
-        }
-        os.flush();
-        os.close();
+        IOUtils.copy(is, os);
       } catch (SocketException e) {
-        log_.debug("Request for {} canceled by client", jsp);
+        log_.debug("Request for {} canceled by client", renderer);
       } finally {
-        is.close();
+        IOUtils.closeQuietly(is);
       }
 
     } catch (IOException e) {
-      log_.error("Exception while including jsp {}", jsp, e);
+      log_.error("Exception while including jsp {}", renderer, e);
     } catch (Throwable t) {
       throw new RenderException(this, t);
     }

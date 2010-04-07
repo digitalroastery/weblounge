@@ -27,8 +27,8 @@ import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.language.Language;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Base implementation for composeable objects like page templates or images.
@@ -51,7 +51,7 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
   protected LocalizableContent<String> name = null;
   
   /** Includes */
-  protected List<HTMLInclude> includes = null;
+  protected Set<HTMLInclude> includes = null;
 
   /**
    * Creates a new composeable instance with a recheck time of a day and a valid
@@ -231,7 +231,7 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
    */
   public void addInclude(HTMLInclude include) {
     if (includes == null)
-      includes = new ArrayList<HTMLInclude>();
+      includes = new HashSet<HTMLInclude>();
     includes.add(include);
   }
 

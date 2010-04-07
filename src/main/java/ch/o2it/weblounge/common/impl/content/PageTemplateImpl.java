@@ -200,6 +200,8 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   public static PageTemplate fromXml(Node node, XPath xpath)
       throws IllegalStateException {
 
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    
     // Identifier
     String id = XPathHelper.valueOf(node, "@id", xpath);
     if (id == null)
@@ -210,12 +212,13 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
     // Renderer url
     URL rendererUrl = null;
-    if (XPathHelper.valueOf(node, "renderer", xpath) == null)
+    String rendererUrlNode = XPathHelper.valueOf(node, "renderer", xpath); 
+    if (rendererUrlNode == null)
       throw new IllegalStateException("Missing renderer in page template definition");
     try {
-      rendererUrl = new URL(XPathHelper.valueOf(node, "renderer", xpath));
+      rendererUrl = new URL(rendererUrlNode);
     } catch (MalformedURLException e) {
-      throw new IllegalStateException("Malformed renderer url in page template definition");
+      throw new IllegalStateException("Malformed renderer url in page template definition: " + rendererUrlNode);
     }
 
     // Create the page template
@@ -223,7 +226,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     if (className != null) {
       Class<? extends PageTemplate> c = null;
       try {
-        c = (Class<? extends PageTemplate>) Class.forName(className);
+        c = (Class<? extends PageTemplate>) classLoader.loadClass(className);
         template = c.newInstance();
         template.setIdentifier(id);
         template.setRenderer(rendererUrl);
