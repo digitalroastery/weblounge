@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.Link;
 import ch.o2it.weblounge.common.content.Page;
@@ -148,7 +149,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public void setPage(Page page) {
     this.page = page;
-    
+
     if (page == null)
       return;
 
@@ -299,21 +300,19 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
    * leaves rendering to the actual content of the composer. This means that if
    * this action is rendered on an existing page, a call to
-   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, int)} for
+   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.Pagelet)} for
    * each of them will be issued.
    * 
    * @param request
    *          the request object
    * @param response
    *          the response object
-   * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
-   *         depending on whether the action wants to render the composer on its
-   *         own or have the composer content do the rendering.
-   * @see ch.o2it.weblounge.api.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest,
-   *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
+   * @return <code>EVAL_COMPOSER</code>
+   * @see ch.o2it.weblounge.common.site.HTMLAction#startStage(ch.o2it.weblounge.api.request.WebloungeRequest,
+   *      ch.o2it.weblounge.api.request.WebloungeResponse, ch.o2it.weblounge.common.content.Composer)
    */
-  public int startStage(WebloungeRequest request, WebloungeResponse response)
-      throws IOException, ActionException {
+  public int startStage(WebloungeRequest request, WebloungeResponse response,
+      Composer composer) throws IOException, ActionException {
     return EVAL_COMPOSER;
   }
 
@@ -321,21 +320,20 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
    * leaves rendering to the actual content of the composer. This means that if
    * this action is rendered on an existing page, a call to
-   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, int)} for
-   * each of them will be issued.
+   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.Pagelet)}
+   * for each of them will be issued.
    * 
    * @param request
    *          the request object
    * @param response
    *          the response object
-   * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
-   *         depending on whether the action wants to render the composer on its
-   *         own or have the composer content do the rendering.
-   * @see ch.o2it.weblounge.api.module.ActionHandler#startComposer(ch.o2it.weblounge.api.request.WebloungeRequest,
-   *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String)
+   * @return <code>EVAL_COMPOSER</code>
+   * @see ch.o2it.weblounge.common.site.HTMLAction#startComposer(ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse,
+   *      ch.o2it.weblounge.common.content.Composer)
    */
   public int startComposer(WebloungeRequest request,
-      WebloungeResponse response, String composer) throws IOException,
+      WebloungeResponse response, Composer composer) throws IOException,
       ActionException {
     return EVAL_COMPOSER;
   }
@@ -348,19 +346,15 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    *          the request object
    * @param response
    *          the response object
-   * @param composer
-   *          the composer identifier
-   * @param position
-   *          the pagelet position
-   * @return either <code>EVAL_PAGELET</code> or <code>SKIP_PAGELET</code>
-   *         depending on whether the action wants to render the pagelet itself
-   *         or have the pagelet do the rendering.
-   * @see ch.o2it.weblounge.api.module.ActionHandler#startPagelet(ch.o2it.weblounge.api.request.WebloungeRequest,
-   *      ch.o2it.weblounge.api.request.WebloungeResponse, java.lang.String,
-   *      int)
+   * @param pagelet
+   *          the pagelet
+   * @return <code>EVAL_PAGELET</code>
+   * @see ch.o2it.weblounge.common.site.HTMLAction#startPagelet(ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse,
+   *      ch.o2it.weblounge.common.content.Pagelet)
    */
   public int startPagelet(WebloungeRequest request, WebloungeResponse response,
-      String composer, int position) throws IOException, ActionException {
+      Pagelet pagelet) throws IOException, ActionException {
     return EVAL_PAGELET;
   }
 
