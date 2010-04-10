@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.HTMLInclude;
 import ch.o2it.weblounge.common.content.Link;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageTemplate;
@@ -161,8 +160,8 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       PageletRenderer renderer = module.getRenderer(p.getIdentifier());
       if (renderer == null)
         continue;
-      for (HTMLInclude include : renderer.getIncludes())
-        addInclude(include);
+      for (HTMLHeadElement header : renderer.getHTMLHeaders())
+        addHTMLHeader(header);
     }
 
   }
@@ -284,14 +283,14 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * <p>
    * This implementation asks the action to return the include headers
    * <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code> by calling
-   * {@link #getIncludes()} and writes them to the response.
+   * {@link #getHTMLHeaders()} and writes them to the response.
    * 
    * @see ch.o2it.weblounge.common.site.HTMLAction#startHeader(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public void startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
-    for (HTMLInclude include : getIncludes()) {
+    for (HTMLHeadElement include : getHTMLHeaders()) {
       response.getOutputStream().println(include.toXml());
     }
   }
@@ -596,13 +595,13 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
     }
 
     // Includes
-    if (includes.size() > 0) {
+    if (headers.size() > 0) {
       b.append("<includes>");
-      for (HTMLHeadElement include : getIncludes()) {
+      for (HTMLHeadElement include : getHTMLHeaders()) {
         if (include instanceof Link)
           b.append(include.toXml());
       }
-      for (HTMLHeadElement include : getIncludes()) {
+      for (HTMLHeadElement include : getHTMLHeaders()) {
         if (include instanceof Script)
           b.append(include.toXml());
       }

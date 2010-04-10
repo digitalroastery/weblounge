@@ -420,7 +420,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     rendererTagSet.add(CacheTag.User, user.getLogin());
     rendererTagSet.add(CacheTag.Module, getModule().getIdentifier());
     rendererTagSet.add(CacheTag.Action, getIdentifier());
-    rendererTagSet.add(CacheTag.Position, includes);
+    rendererTagSet.add(CacheTag.Position, headers);
     Enumeration<?> pe = request.getParameterNames();
     int parameterCount = 0;
     while (pe.hasMoreElements()) {
@@ -713,13 +713,13 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     // scripts
     NodeList scripts = XPathHelper.selectList(config, "includes/script", xpathProcessor);
     for (int i = 0; i < scripts.getLength(); i++) {
-      action.addInclude(ScriptImpl.fromXml(scripts.item(i)));
+      action.addHTMLHeader(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
     NodeList includes = XPathHelper.selectList(config, "includes/link", xpathProcessor);
     for (int i = 0; i < includes.getLength(); i++) {
-      action.addInclude(LinkImpl.fromXml(includes.item(i)));
+      action.addHTMLHeader(LinkImpl.fromXml(includes.item(i)));
     }
 
     // name
@@ -781,15 +781,15 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // Includes
-    if (includes.size() > 0) {
+    if (headers.size() > 0) {
       b.append("<includes>");
-      for (HTMLHeadElement include : getIncludes()) {
-        if (include instanceof Link)
-          b.append(include.toXml());
+      for (HTMLHeadElement header : getHTMLHeaders()) {
+        if (header instanceof Link)
+          b.append(header.toXml());
       }
-      for (HTMLHeadElement include : getIncludes()) {
-        if (include instanceof Script)
-          b.append(include.toXml());
+      for (HTMLHeadElement header : getHTMLHeaders()) {
+        if (header instanceof Script)
+          b.append(header.toXml());
       }
       b.append("</includes>");
     }

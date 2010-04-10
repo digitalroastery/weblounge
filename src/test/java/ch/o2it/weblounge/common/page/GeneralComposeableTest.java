@@ -114,8 +114,8 @@ public class GeneralComposeableTest {
     composeable.setRecheckTime(recheckTime);
     composeable.setValidTime(validTime);
     composeable.setComposeable(isComposeable);
-    composeable.addInclude(css);
-    composeable.addInclude(javascript);
+    composeable.addHTMLHeader(css);
+    composeable.addHTMLHeader(javascript);
   }
 
   /**
@@ -193,12 +193,12 @@ public class GeneralComposeableTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeabl#getIncludes()
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeabl#getHTMLHeaders()
    * .
    */
   @Test
   public void testGetIncludes() {
-    assertEquals(2, composeable.getIncludes().length);
+    assertEquals(2, composeable.getHTMLHeaders().length);
   }
 
   /**

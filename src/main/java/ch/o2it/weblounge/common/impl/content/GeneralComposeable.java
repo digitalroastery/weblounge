@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Composeable;
+import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.HTMLInclude;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
@@ -50,8 +51,8 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
   /** Name of this composeable */
   protected LocalizableContent<String> name = null;
   
-  /** Includes */
-  protected Set<HTMLInclude> includes = null;
+  /** HTML head elements */
+  protected Set<HTMLHeadElement> headers = null;
 
   /**
    * Creates a new composeable instance with a recheck time of a day and a valid
@@ -227,33 +228,33 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Composeable#addInclude(ch.o2it.weblounge.common.content.HTMLInclude)
+   * @see ch.o2it.weblounge.common.content.Composeable#addHTMLHeader(HTMLHeadElement)
    */
-  public void addInclude(HTMLInclude include) {
-    if (includes == null)
-      includes = new HashSet<HTMLInclude>();
-    includes.add(include);
+  public void addHTMLHeader(HTMLHeadElement header) {
+    if (headers == null)
+      headers = new HashSet<HTMLHeadElement>();
+    headers.add(header);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Composeable#removeInclude(ch.o2it.weblounge.common.content.HTMLInclude)
+   * @see ch.o2it.weblounge.common.content.Composeable#removeHTMLHeader(HTMLHeadElement)
    */
-  public void removeInclude(HTMLInclude include) {
-    if (includes == null)
+  public void removeHTMLHeader(HTMLHeadElement header) {
+    if (headers == null)
       return;
-    includes.remove(include);
+    headers.remove(header);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Composeable#getIncludes()
+   * @see ch.o2it.weblounge.common.content.Composeable#getHTMLHeaders()
    */
-  public HTMLInclude[] getIncludes() {
-    if (includes != null) {
-      return includes.toArray(new HTMLInclude[includes.size()]);
+  public HTMLHeadElement[] getHTMLHeaders() {
+    if (headers != null) {
+      return headers.toArray(new HTMLInclude[headers.size()]);
     }
     return new HTMLInclude[] {};
   }

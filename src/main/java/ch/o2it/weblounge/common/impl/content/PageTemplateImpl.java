@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.HTMLInclude;
+import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.Link;
 import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.RenderException;
@@ -297,13 +297,13 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     // scripts
     NodeList scripts = XPathHelper.selectList(node, "includes/script", xpath);
     for (int i = 0; i < scripts.getLength(); i++) {
-      template.addInclude(ScriptImpl.fromXml(scripts.item(i)));
+      template.addHTMLHeader(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
     NodeList includes = XPathHelper.selectList(node, "includes/link", xpath);
     for (int i = 0; i < includes.getLength(); i++) {
-      template.addInclude(LinkImpl.fromXml(includes.item(i)));
+      template.addHTMLHeader(LinkImpl.fromXml(includes.item(i)));
     }
 
     return template;
@@ -361,15 +361,15 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     }
 
     // Includes
-    if (getIncludes().length > 0) {
+    if (getHTMLHeaders().length > 0) {
       buf.append("<includes>");
-      for (HTMLInclude include : getIncludes()) {
-        if (include instanceof Link)
-          buf.append(include.toXml());
+      for (HTMLHeadElement header : getHTMLHeaders()) {
+        if (header instanceof Link)
+          buf.append(header.toXml());
       }
-      for (HTMLInclude include : getIncludes()) {
-        if (include instanceof Script)
-          buf.append(include.toXml());
+      for (HTMLHeadElement header : getHTMLHeaders()) {
+        if (header instanceof Script)
+          buf.append(header.toXml());
       }
       buf.append("</includes>");
     }

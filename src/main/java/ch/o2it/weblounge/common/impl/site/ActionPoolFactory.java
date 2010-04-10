@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.content.HTMLInclude;
+import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
@@ -75,8 +75,8 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
     action.setPath(blueprint.getPath());
 
     // Includes
-    for (HTMLInclude include : blueprint.getIncludes()) {
-      action.addInclude(include);
+    for (HTMLHeadElement header : blueprint.getHTMLHeaders()) {
+      action.addHTMLHeader(header);
     }
 
     // Options

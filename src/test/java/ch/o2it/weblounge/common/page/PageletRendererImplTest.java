@@ -98,7 +98,7 @@ public class PageletRendererImplTest {
     renderer.setComposeable(composeable);
     renderer.setName(germanName, german);
     renderer.setName(englishName, english);
-    renderer.addInclude(css);
+    renderer.addHTMLHeader(css);
   }
 
   /**
@@ -193,13 +193,13 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeabl#getIncludes()
+   * {@link ch.o2it.weblounge.common.impl.page.GeneralComposeabl#getHTMLHeaders()
    * .
    */
   @Test
   public void testGetIncludes() {
-    assertEquals(1, renderer.getIncludes().length);
-    assertEquals(css, renderer.getIncludes()[0]);
+    assertEquals(1, renderer.getHTMLHeaders().length);
+    assertEquals(css, renderer.getHTMLHeaders()[0]);
   }
 
 }

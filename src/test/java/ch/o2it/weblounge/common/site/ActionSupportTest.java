@@ -94,9 +94,9 @@ public class ActionSupportTest {
   public void setUp() throws Exception {
     setUpPreliminaries();
     action.setIdentifier(identifier);
-    action.addInclude(link);
+    action.addHTMLHeader(link);
     action.addFlavor(RequestFlavor.HTML);
-    action.addInclude(script);
+    action.addHTMLHeader(script);
     action.setPath(mountpoint);
     action.setRecheckTime(recheckTime);
     action.setValidTime(validTime);
@@ -274,7 +274,7 @@ public class ActionSupportTest {
     assertNotNull(action.getSite());
     assertNotNull(action.getModule());
     assertEquals(identifier, action.getIdentifier());
-    assertEquals(2, action.getIncludes().length);
+    assertEquals(2, action.getHTMLHeaders().length);
     assertEquals(actionUrl, action.getUrl());
     assertEquals(recheckTime, action.getRecheckTime());
     assertEquals(validTime, action.getValidTime());
