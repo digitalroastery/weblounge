@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
  * or a part of a response to a request. When the Composeable represents a
  * response part only, it might want to place include instructions into the
  * <code>&lt;head&gt;</code> section of the enclosing <code>HTML</code> page. To
- * do this, it just needs to return these includes in {@link #getIncludes()} and
+ * do this, it just needs to return these includes in {@link #getHTMLHeaders()} and
  * {@link #getScripts()}.
  * <p>
  * Composeables are usually used to display content to the user. Often, this
@@ -156,18 +156,18 @@ public interface Composeable extends Localizable {
   /**
    * Adds a link or script to the list of includes.
    * 
-   * @param include
+   * @param header
    *          the include
    */
-  void addInclude(HTMLInclude include);
+  void addHTMLHeader(HTMLHeadElement header);
 
   /**
    * Removes a link or a script from the list of includes.
    * 
-   * @param include
+   * @param header
    *          the include
    */
-  void removeInclude(HTMLInclude include);
+  void removeHTMLHeader(HTMLHeadElement header);
 
   /**
    * Returns the &lt;link&gt; or &lt;script&gt; elements that have been defined
@@ -178,6 +178,6 @@ public interface Composeable extends Localizable {
    * 
    * @return the includes
    */
-  HTMLInclude[] getIncludes();
+  HTMLHeadElement[] getHTMLHeaders();
 
 }
