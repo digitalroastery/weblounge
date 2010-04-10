@@ -284,6 +284,7 @@ public class DispatchUtils {
    */
   public static void sendError(int status, WebloungeRequest request,
       WebloungeResponse response) {
+    status = status > 0 ? status : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
     sendError(status, null, request, response);
   }
 
