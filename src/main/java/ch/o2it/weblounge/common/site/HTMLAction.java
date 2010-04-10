@@ -20,9 +20,12 @@
 
 package ch.o2it.weblounge.common.site;
 
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -116,6 +119,8 @@ public interface HTMLAction extends Action {
    *          the request object
    * @param response
    *          the response object
+   * @param composer
+   *          the stage composer
    * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
    *         depending on whether the action wants to render the composer on its
    *         own or have the template do the rendering.
@@ -124,8 +129,8 @@ public interface HTMLAction extends Action {
    * @throws ActionException
    *           if a processing error occurs while handling the request
    */
-  int startStage(WebloungeRequest request, WebloungeResponse response)
-      throws IOException, ActionException;
+  int startStage(WebloungeRequest request, WebloungeResponse response,
+      Composer composer) throws IOException, ActionException;
 
   /**
    * This method is called when the rendering of the composer with the given
@@ -142,7 +147,7 @@ public interface HTMLAction extends Action {
    * @param response
    *          the response object
    * @param composer
-   *          the composer identifier
+   *          the composer
    * @return either <code>EVAL_COMPOSER</code> or <code>SKIP_COMPOSER</code>
    *         depending on whether the action wants to render the composer on its
    *         own or have the template do the rendering.
@@ -152,7 +157,7 @@ public interface HTMLAction extends Action {
    *           if a processing error occurs while handling the request
    */
   int startComposer(WebloungeRequest request, WebloungeResponse response,
-      String composer) throws IOException, ActionException;
+      Composer composer) throws IOException, ActionException;
 
   /**
    * This method is called when the rendering of the composer with the given
@@ -169,10 +174,8 @@ public interface HTMLAction extends Action {
    *          the request object
    * @param response
    *          the response object
-   * @param composer
-   *          the composer identifier
-   * @param position
-   *          the pagelet position within the composer
+   * @param pagelet
+   *          the pagelet
    * @return either <code>EVAL_PAGELET</code> or <code>SKIP_PAGELET</code>
    *         depending on whether the action wants to render the pagelet on its
    *         own or have the template do the rendering.
@@ -182,7 +185,7 @@ public interface HTMLAction extends Action {
    *           if a processing error occurs while handling the request
    */
   int startPagelet(WebloungeRequest request, WebloungeResponse response,
-      String composer, int position) throws IOException, ActionException;
+      Pagelet pagelet) throws IOException, ActionException;
 
   /**
    * Sets the uri of the page that is used to render the action.
