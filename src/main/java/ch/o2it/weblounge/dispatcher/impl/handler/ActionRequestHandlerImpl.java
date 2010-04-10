@@ -347,7 +347,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           action,
           request.getUrl(),
           e.getMessage() });
-      DispatchUtils.sendInternalError(request, response);
+      DispatchUtils.sendError(e.getStatusCode(), request, response);
     } catch (Throwable e) {
       log_.error("Error processing action '{}' for {}", action, request.getUrl());
       log_.error(e.getMessage(), e);
@@ -384,7 +384,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           action,
           request.getUrl(),
           e.getMessage() });
-      DispatchUtils.sendInternalError(request, response);
+      DispatchUtils.sendError(e.getStatusCode(), request, response);
     } catch (Throwable e) {
       log_.error("Error processing action '{}' for {}", action, request.getUrl());
       log_.error(e.getMessage(), e);
@@ -418,7 +418,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           action,
           request.getUrl(),
           e.getMessage() });
-      DispatchUtils.sendInternalError(request, response);
+      DispatchUtils.sendError(e.getStatusCode(), request, response);
     } catch (Throwable e) {
       log_.error("Error processing action '{}' for {}", action, request.getUrl());
       log_.error(e.getMessage(), e);
