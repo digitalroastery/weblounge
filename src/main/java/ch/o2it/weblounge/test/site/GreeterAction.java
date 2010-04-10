@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.test.site;
 
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
@@ -103,10 +104,10 @@ public class GreeterAction extends HTMLActionSupport {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse, ch.o2it.weblounge.common.content.Composer)
    */
   @Override
-  public int startStage(WebloungeRequest request, WebloungeResponse response)
+  public int startStage(WebloungeRequest request, WebloungeResponse response, Composer composer)
       throws ActionException {
     try {
       String language = greetings.keySet().iterator().next();
