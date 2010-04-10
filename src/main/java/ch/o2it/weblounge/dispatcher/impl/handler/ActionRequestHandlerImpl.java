@@ -20,10 +20,12 @@
 
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Renderer;
+import ch.o2it.weblounge.common.impl.content.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
@@ -334,7 +336,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           }
           response.getOutputStream().println("\t</head>\n\t<body>");
           if (action instanceof HTMLAction) {
-            ((HTMLAction) action).startStage(request, response);
+            Composer c = new ComposerImpl("stage");
+            ((HTMLAction) action).startStage(request, response, c);
           }
           response.getOutputStream().print("\n\t</body>\n</html>");
           response.flushBuffer();
