@@ -24,11 +24,18 @@ package ch.o2it.weblounge.common.site;
  * A <code>ActionException</code> is thrown if an exceptional state is reached
  * when executing an <code>Action</code> to create the output for either a page
  * or a single page element.
+ * <p>
+ * If one of the constructors with a status code is chosen, then the action
+ * handler that is executing the action will properly report that status to the
+ * client.
  */
 public class ActionException extends Exception {
 
   /** Serial version id */
   private static final long serialVersionUID = 1L;
+
+  /** The http status code that the handler should send back to the client */
+  private int statusCode = -1;
 
   /**
    * Creates a new <code>ActionException</code> with the given error message.
@@ -41,6 +48,43 @@ public class ActionException extends Exception {
   }
 
   /**
+   * Creates a new <code>ActionException</code> with the given <code>HTTP</code>
+   * status code and error message.
+   * 
+   * @param httpStatusCode
+   *          the status code to send back to the client
+   * @param message
+   *          the error message
+   */
+  public ActionException(int httpStatusCode, String message) {
+    this(httpStatusCode, message, null);
+  }
+
+  /**
+   * Creates a new <code>ActionException</code> with the given <code>HTTP</code>
+   * status code.
+   * 
+   * @param httpStatusCode
+   *          the status code to send back to the client
+   */
+  public ActionException(int httpStatusCode) {
+    this(httpStatusCode, null, null);
+  }
+
+  /**
+   * Creates a new <code>ActionException</code> with the given <code>HTTP</code>
+   * status code and originating from <code>cause</code>.
+   * 
+   * @param httpStatusCode
+   *          the status code to send back to the client
+   * @param cause
+   *          the original error
+   */
+  public ActionException(int httpStatusCode, Throwable cause) {
+    this(httpStatusCode, null, cause);
+  }
+
+  /**
    * Creates a new <code>ActionException</code> originating from
    * <code>cause</code>.
    * 
@@ -48,7 +92,7 @@ public class ActionException extends Exception {
    *          the original error
    */
   public ActionException(Throwable cause) {
-    super(cause);
+    this(-1, null, cause);
   }
 
   /**
@@ -61,7 +105,33 @@ public class ActionException extends Exception {
    *          the original error
    */
   public ActionException(String message, Throwable cause) {
+    this(-1, message, cause);
+  }
+
+  /**
+   * Creates a new <code>ActionException</code> with the given <code>HTTP</code>
+   * status code, error message and the indicated original cause of failure.
+   * 
+   * @param httpStatusCode
+   *          the status code to send back to the client
+   * @param message
+   *          the error message
+   * @param cause
+   *          the original error
+   */
+  public ActionException(int httpStatusCode, String message, Throwable cause) {
     super(message, cause);
+    this.statusCode = httpStatusCode;
+  }
+
+  /**
+   * Returns the http status code or <code>-1</code> if no status code has been
+   * set.
+   * 
+   * @return the http status code
+   */
+  public int getStatusCode() {
+    return statusCode;
   }
 
 }
