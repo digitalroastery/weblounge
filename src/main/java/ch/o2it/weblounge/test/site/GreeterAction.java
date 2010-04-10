@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.test.site;
 
-import ch.o2it.weblounge.common.content.HTMLInclude;
+import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.PageletRenderer;
@@ -94,8 +94,8 @@ public class GreeterAction extends HTMLActionSupport {
   public void startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
     PageletRenderer contentPagelet = getModule().getRenderer("greeting");
-    for (HTMLInclude include : contentPagelet.getIncludes()) {
-      addInclude(include);
+    for (HTMLHeadElement header : contentPagelet.getHTMLHeaders()) {
+      addHTMLHeader(header);
     }
     super.startHeader(request, response);
   }
