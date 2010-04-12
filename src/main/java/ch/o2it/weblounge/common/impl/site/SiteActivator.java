@@ -78,7 +78,7 @@ public class SiteActivator {
 
     // Load the modules
     DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Enumeration<URL> e = (Enumeration<URL>) bundleContext.getBundle().findEntries("site", "site.xml", false);
+    Enumeration<URL> e = bundleContext.getBundle().findEntries("site", "site.xml", false);
     if (e != null && e.hasMoreElements()) {
       URL siteUrl = e.nextElement();
 

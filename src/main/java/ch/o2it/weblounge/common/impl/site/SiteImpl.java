@@ -56,6 +56,7 @@ import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.quartz.JobDataMap;
@@ -1008,9 +1009,11 @@ public class SiteImpl implements Site {
     log_.debug("Initializing site '{}'", this);
 
     // Load the modules
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Enumeration<URL> e = bundleContext.getBundle().findEntries("site/modules", "module.xml", true);
+    final Bundle bundle = bundleContext.getBundle();
+    final Enumeration<URL> e = bundle.findEntries("site/modules", "module.xml", true);
+    
     if (e != null) {
+      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       while (e.hasMoreElements()) {
         URL moduleUrl = e.nextElement();
         log_.debug("Loading module {}", moduleUrl);

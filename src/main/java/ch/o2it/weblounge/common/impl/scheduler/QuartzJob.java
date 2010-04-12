@@ -25,6 +25,8 @@ import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.scheduler.JobWorker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -41,6 +43,9 @@ import javax.xml.xpath.XPathFactory;
  */
 public final class QuartzJob implements Job {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(QuartzJob.class);
+  
   /** The job identifier */
   protected String identifier = null;
 
@@ -244,7 +249,8 @@ public final class QuartzJob implements Job {
 
     CronJobTrigger jobTrigger = null;
     Dictionary<String, Serializable> ctx = new Hashtable<String, Serializable>();
-
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    
     // Main attributes
     String identifier = XPathHelper.valueOf(config, "@id", xPathProcessor);
     String name = XPathHelper.valueOf(config, "name", xPathProcessor);
@@ -253,8 +259,9 @@ public final class QuartzJob implements Job {
     String className = XPathHelper.valueOf(config, "class", xPathProcessor);
     Class<JobWorker> clazz;
     try {
-      clazz = (Class<JobWorker>) Class.forName(className);
+      clazz = (Class<JobWorker>) classLoader.loadClass(className);
     } catch (ClassNotFoundException e) {
+      logger.error("Error the implementation for job '{}'", identifier);
       throw new IllegalStateException();
     }
 
