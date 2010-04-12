@@ -27,7 +27,11 @@ import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.JSONAction;
 
+import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * This class is the default implementation for an <code>JSONAction</code>. The
@@ -80,6 +84,23 @@ public class JSONActionSupport extends ActionSupport implements JSONAction {
   public void startJSON(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
     return;
+  }
+
+  /**
+   * Serialized the json object and sends it to the client.
+   * 
+   * @param json
+   *          the json data
+   * @throws ActionException
+   *           if the response cannot be written to the client
+   */
+  protected void returnJSON(JSONObject json) throws ActionException {
+    try {
+      String encoding = response.getCharacterEncoding();
+      IOUtils.copy(new StringReader(json.toString()), response.getOutputStream(), encoding);
+    } catch (IOException e) {
+      throw new ActionException("Unable to send json response", e);
+    }
   }
 
 }
