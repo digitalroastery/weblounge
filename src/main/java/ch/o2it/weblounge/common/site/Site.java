@@ -27,8 +27,6 @@ import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestListener;
-import ch.o2it.weblounge.common.scheduler.JobWorker;
-import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
@@ -39,7 +37,6 @@ import ch.o2it.weblounge.common.user.WebloungeUser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.Dictionary;
 
 /**
  * The site interface defines the method that may be called on weblounge site
@@ -263,50 +260,6 @@ public interface Site extends Customizable, RequestListener, Serializable {
   PageLayout getLayout(String layoutId);
 
   /**
-   * Adds a job that is executed according to the schedule in
-   * <code>cronExpression</code>. Note that existing jobs with the same names
-   * will be canceled and replaced.
-   * <p>
-   * If your job implementation is thread safe and it makes sense to have the
-   * job executed in parallel (in case it is still running while the next
-   * execution is due), set <code>canRunConcurrently</code> to <code>true</code>.
-   * 
-   * @param name
-   *          the job name
-   * @param job
-   *          the job class
-   * @param config
-   *          the job configuration and context
-   * @param trigger
-   *          the job trigger
-   */
-  void addJob(String name, Class<? extends JobWorker> job,
-      Dictionary<String, Serializable> config, JobTrigger trigger);
-
-  /**
-   * Adds a job that is fired immediately and only once. Note that existing jobs
-   * with the same names will be replaced.
-   * 
-   * @param name
-   *          the job name
-   * @param job
-   *          the job class
-   * @param config
-   *          the job configuration and context
-   */
-  void addJob(String name, Class<? extends JobWorker> job,
-      Dictionary<String, Serializable> config);
-
-  /**
-   * Removes the job from the job scheduler. Current executions of the job will
-   * be finished regardless.
-   * 
-   * @param name
-   *          the job name
-   */
-  void removeJob(String name);
-
-  /**
    * Adds <code>module</code> to the ordered set of authentication modules.
    * 
    * @param login
@@ -514,6 +467,8 @@ public interface Site extends Customizable, RequestListener, Serializable {
 
   /**
    * Returns the path to the root directory of the static content for this site.
+   * 
+   * TODO: This method is most probably not needed
    * 
    * @return the static content root path
    */
