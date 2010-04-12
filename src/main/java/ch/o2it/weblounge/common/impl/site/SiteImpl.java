@@ -26,14 +26,13 @@ import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.content.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.scheduler.FireOnceJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
-import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
+import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -44,7 +43,6 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
-import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
@@ -73,14 +71,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -105,7 +100,7 @@ public class SiteImpl implements Site {
   public static final String PROP_IDENTIFIER = "site.identifier";
 
   /** Regular expression to test the validity of a site identifier */
-  private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9-_.]*$";
+  private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
 
   /** The site identifier */
   protected String identifier = null;
@@ -1014,7 +1009,7 @@ public class SiteImpl implements Site {
 
     // Load the modules
     DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Enumeration<URL> e = (Enumeration<URL>) bundleContext.getBundle().findEntries("site/modules", "module.xml", true);
+    Enumeration<URL> e = bundleContext.getBundle().findEntries("site/modules", "module.xml", true);
     if (e != null) {
       while (e.hasMoreElements()) {
         URL moduleUrl = e.nextElement();
@@ -1176,57 +1171,6 @@ public class SiteImpl implements Site {
    */
   public Map<String, List<String>> getOptions() {
     return options.getOptions();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#addJob(java.lang.String,
-   *      ch.o2it.weblounge.common.scheduler.JobWorker, java.util.Map)
-   */
-  public void addJob(String name, Class<? extends JobWorker> job,
-      Dictionary<String, Serializable> config) {
-    addJob(name, job, config, new FireOnceJobTrigger());
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#addJob(java.lang.String,
-   *      ch.o2it.weblounge.common.scheduler.JobWorker, java.util.Map,
-   *      ch.o2it.weblounge.common.scheduler.JobTrigger)
-   */
-  public void addJob(String name, Class<? extends JobWorker> job,
-      Dictionary<String, Serializable> config, JobTrigger trigger) {
-
-    // Add site to context
-    if (config == null)
-      config = new Hashtable<String, Serializable>();
-    config.put(JobWorker.CTXT_SITE, this);
-
-    // Create the job
-    QuartzJob jobDetail = new QuartzJob(name, job, config, trigger);
-
-    // Register the job
-    synchronized (jobs) {
-      jobs.put(job.getName(), jobDetail);
-    }
-
-    // Schedule it if this site is running
-    if (running) {
-      scheduleJob(jobDetail);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#removeJob(java.lang.String)
-   */
-  public void removeJob(String name) {
-    synchronized (jobs) {
-      jobs.remove(name);
-    }
   }
 
   /**
@@ -1405,7 +1349,7 @@ public class SiteImpl implements Site {
     // administrator
     Node adminNode = XPathHelper.select(config, "security/administrator", xpathProcessor);
     if (adminNode != null) {
-      site.setAdministrator(WebloungeAdminImpl.fromXml(adminNode, site, xpathProcessor));
+      site.setAdministrator(SiteAdminImpl.fromXml(adminNode, site, xpathProcessor));
     }
 
     // login modules
