@@ -30,16 +30,4 @@
     </template>
   </templates>
   -->
-  <jobs>
-    <job id="startup">
-      <name>Job title</name>
-      <class>ch.o2it.weblounge.test.site.SiteStartupJob</class>
-      <schedule>@restart</schedule>
-	</job>
-    <job id="greeter">
-      <name>Job title</name>
-      <class>ch.o2it.weblounge.test.site.GreeterJob</class>
-      <schedule>* * * * *</schedule>
-	</job>
-  </jobs>
 </site>
