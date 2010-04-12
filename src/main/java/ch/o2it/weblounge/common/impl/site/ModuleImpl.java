@@ -65,7 +65,7 @@ public class ModuleImpl implements Module {
   protected final static Logger log_ = LoggerFactory.getLogger(ModuleImpl.class);
 
   /** Regular expression to test the validity of a module identifier */
-  private static final String MODULE_IDENTIFIER_REGEX = "^[a-zA-Z0-9-_.]*$";
+  private static final String MODULE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
 
   /** The module identifier */
   protected String identifier = null;

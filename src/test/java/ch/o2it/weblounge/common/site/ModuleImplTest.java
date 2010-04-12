@@ -169,8 +169,23 @@ public class ModuleImplTest {
   @Test
   public void testSetIdentifier() {
     module.setIdentifier("1ab_2ABC3-.0");
+    module.setIdentifier("1");
+    module.setIdentifier("a");
     try {
       module.setIdentifier("Test id with spaces and,strange/characters");
+      fail("Module accepted identifier with spaces in it");
+    } catch (IllegalArgumentException e) {
+      // This is expected
+    }
+    try {
+      module.setIdentifier(".abc");
+      fail("Module accepted identifier starting with a special character");
+    } catch (IllegalArgumentException e) {
+      // This is expected
+    }
+    try {
+      module.setIdentifier("");
+      fail("Module accepted an empty identifier");
     } catch (IllegalArgumentException e) {
       // This is expected
     }

@@ -214,8 +214,23 @@ public class SiteImplTest {
   @Test
   public void testSetIdentifier() {
     site.setIdentifier("1ab_2ABC3-.0");
+    site.setIdentifier("1");
+    site.setIdentifier("a");
     try {
       site.setIdentifier("Test id with spaces and,strange/characters");
+      fail("Site accepted identifier with spaces in it");
+    } catch (IllegalArgumentException e) {
+      // This is expected
+    }
+    try {
+      site.setIdentifier(".abc");
+      fail("Site accepted identifier starting with a special character");
+    } catch (IllegalArgumentException e) {
+      // This is expected
+    }
+    try {
+      site.setIdentifier("");
+      fail("Site accepted an empty identifier");
     } catch (IllegalArgumentException e) {
       // This is expected
     }
