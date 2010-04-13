@@ -1,0 +1,17 @@
+<archetype xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype/1.0.0 http://maven.apache.org/xsd/archetype-1.0.0.xsd">
+  <id>weblounge-site</id>
+  <sources>
+    <source>src/main/java/CustomSite.java</source>
+    <source>src/main/java/CustomTag.java</source>
+  </sources>
+  <resources>
+    <resource>src/main/resources/OSGI-INF/site-activator.xml</resource>
+    <resource>src/main/resources/site/modules/README</resource>
+    <resource>src/main/resources/site/templates/template.jsp</resource>
+    <resource>src/main/resources/site/web/README</resource>
+    <resource>src/main/resources/site/site.xml</resource>
+    <resource>src/main/resources/WEB-INF/taglibrary.tld</resource>
+    <resource>src/main/resources/WEB-INF/web.xml</resource>
+  </resources>
+</archetype>
