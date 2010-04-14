@@ -53,3 +53,5 @@ locales
 lowercase
 classpath
 filesystem
+json
+utf
