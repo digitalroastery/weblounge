@@ -477,13 +477,7 @@
   </dependencyManagement>
 
   <pluginRepositories>
-    <pluginRepository>
-      <id>ops4j.releases</id>
-      <url>http://repository.ops4j.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
+  
     <pluginRepository>
       <id>apache Snapshots</id>
       <url>http://people.apache.org/repo/m2-snapshot-repository</url>
@@ -494,9 +488,35 @@
       <enabled>false</enabled>
       </releases>
     </pluginRepository>
+
   </pluginRepositories>
 
   <repositories>
+  
+    <repository>
+      <id>releases</id>
+      <url>http://maven.o2it.ch/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>snapshots</id>
+      <url>http://maven.o2it.ch/content/groups/public-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    
+    <!--
+
     <repository>
       <id>maven.repo</id>
       <name>Maven Repository</name>
@@ -527,6 +547,8 @@
       <name>Apache Incubating Repository</name>
       <url>http://people.apache.org/repo/m2-incubating-repository</url>
     </repository>
+
+    -->
   </repositories>
 
 </project>
