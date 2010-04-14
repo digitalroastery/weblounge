@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>ch.o2it.weblounge</groupId>
   <artifactId>weblounge-base</artifactId>
@@ -218,7 +218,7 @@
           <phase>install</phase>
           <configuration>
             <tasks if="deployTo">
-            <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${deployTo}" failonerror="false" />
+            <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${deployTo}" failonerror="false"/>
             </tasks>
           </configuration>
           <goals>
