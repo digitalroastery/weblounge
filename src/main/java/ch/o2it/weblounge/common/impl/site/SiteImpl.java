@@ -166,9 +166,6 @@ public class SiteImpl implements Site {
   /** User listeners */
   private List<UserListener> userListeners = null;
 
-  /** Root url to static content */
-  protected URL staticContentRoot = null;
-
   /** Scheduling service tracker */
   private SchedulingServiceTracker schedulingServiceTracker = null;
 
@@ -411,26 +408,6 @@ public class SiteImpl implements Site {
    */
   public Language getDefaultLanguage() {
     return defaultLanguage;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#setStaticContentRoot(java.net.URL)
-   */
-  public void setStaticContentRoot(URL root) {
-    if (root == null)
-      throw new IllegalStateException("Content root url must not be null");
-    this.staticContentRoot = root;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#getStaticContentRoot()
-   */
-  public URL getStaticContentRoot() {
-    return staticContentRoot;
   }
 
   /**
