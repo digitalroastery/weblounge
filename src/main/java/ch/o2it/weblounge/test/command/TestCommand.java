@@ -26,6 +26,7 @@ import ch.o2it.weblounge.test.harness.HTMLActionTest;
 import ch.o2it.weblounge.test.harness.IntegrationTest;
 import ch.o2it.weblounge.test.harness.JSONActionTest;
 import ch.o2it.weblounge.test.harness.JavaServerPagesTest;
+import ch.o2it.weblounge.test.harness.ProtectedStaticResourcesTest;
 import ch.o2it.weblounge.test.harness.StaticResourcesTest;
 import ch.o2it.weblounge.test.harness.XMLActionTest;
 
@@ -248,6 +249,7 @@ public final class TestCommand {
     tests.add(new XMLActionTest());
     tests.add(new JSONActionTest());
     tests.add(new StaticResourcesTest());
+    tests.add(new ProtectedStaticResourcesTest());
     tests.add(new JavaServerPagesTest());
   }
 
