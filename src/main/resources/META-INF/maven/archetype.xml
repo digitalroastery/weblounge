@@ -5,6 +5,9 @@
     <source>src/main/java/CustomSite.java</source>
     <source>src/main/java/CustomTag.java</source>
   </sources>
+  <testSources>
+    <source>src/test/java/CustomTagTest.java</source>
+  </testSources>
   <resources>
     <resource>src/main/resources/OSGI-INF/site-activator.xml</resource>
     <resource>src/main/resources/site/modules/README</resource>

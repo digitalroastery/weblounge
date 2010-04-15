@@ -5,9 +5,43 @@
   <artifactId>weblounge-site</artifactId>
   <version>3.0-SNAPSHOT</version>
   <name>Weblounge Site Archetype</name>
-  <parent>
-    <groupId>ch.o2it.weblounge</groupId>
-    <artifactId>weblounge-base</artifactId>
-    <version>3.0-SNAPSHOT</version>
-  </parent>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  <repositories>
+    <repository>
+      <id>releases</id>
+      <url>http://maven.o2it.ch/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>snapshots</id>
+      <url>http://maven.o2it.ch/content/groups/public-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>o2it.snapshots</id>
+      <name>O2 IT Snapshot Repository</name>
+      <url>http://maven.o2it.ch/content/repositories/snapshots</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+    <repository>
+      <id>o2it.releases</id>
+      <name>O2 IT Releases Repository</name>
+      <url>http://maven.o2it.ch/content/repositories/releases</url>
+    </repository>
+  </distributionManagement>
 </project>
