@@ -36,7 +36,6 @@ import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
 
 /**
  * The site interface defines the method that may be called on weblounge site
@@ -456,23 +455,6 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @return the site administrator user
    */
   WebloungeUser getAdministrator();
-
-  /**
-   * Specifies the location to this site's static resources.
-   * 
-   * @param root
-   *          the url to the static resources directory
-   */
-  void setStaticContentRoot(URL root);
-
-  /**
-   * Returns the path to the root directory of the static content for this site.
-   * 
-   * TODO: This method is most probably not needed
-   * 
-   * @return the static content root path
-   */
-  URL getStaticContentRoot();
 
   /**
    * Returns the user with the given login name or <code>null</code> if no such
