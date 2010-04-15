@@ -84,7 +84,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
    * This response type indicates a "416 Requested Range Not Satisfiable"
    * response required
    **/
-  public static final int RESPONSE_REQUESTED_RANGE_NOT_SATIFIABLE = 5;
+  public static final int RESPONSE_REQUESTED_RANGE_NOT_SATISFIABLE = 5;
 
   /**
    * This response type indicates a "405 Method Not Allowed" response required
@@ -200,7 +200,10 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
 
     /* precondidtion check failed */
     if (ifNoneMatch != null && ifNoneMatchMatch && !reqGetHead) {
-      log.error("412 PCF: Method={}, If-None-Match={}, match={}", new Object[] {req.getMethod(), ifNoneMatch, ifNoneMatchMatch});
+      log.error("412 PCF: Method={}, If-None-Match={}, match={}", new Object[] {
+          req.getMethod(),
+          ifNoneMatch,
+          ifNoneMatchMatch });
       log.info("If-None-Match header only supported in GET or HEAD requests.");
       type.type = RESPONSE_PRECONDITION_FAILED;
       type.err = "If-None-Match header only supported in GET or HEAD requests.";
@@ -297,85 +300,85 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
       else
         resp.setBufferSize(BUFFER_SIZE);
       switch (type.type) {
-      case RESPONSE_OK:
-        if (!type.isHeaderOnly() && is != null) {
-          try {
-            OutputStream os = resp.getOutputStream();
-            int read;
-            while ((read = is.read(tmp)) >= 0) {
-              os.write(tmp, 0, read);
-              stats[STATS_BYTES_WRITTEN] += read;
+        case RESPONSE_OK:
+          if (!type.isHeaderOnly() && is != null) {
+            try {
+              OutputStream os = resp.getOutputStream();
+              int read;
+              while ((read = is.read(tmp)) >= 0) {
+                os.write(tmp, 0, read);
+                stats[STATS_BYTES_WRITTEN] += read;
+              }
+              os.flush();
+              os.close();
+            } catch (SocketException e) {
+              log.debug("Request canceled by client");
             }
-            os.flush();
-            os.close();
-          } catch (SocketException e) {
-            log.debug("Request canceled by client");
           }
-        }
-        break;
+          break;
 
-      case RESPONSE_PARTIAL_CONTENT:
-        if (type.from < 0 || type.to < 0 || type.from > type.to || type.to > type.size) {
-          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Invalid partial content parameters");
-          log.warn("Invalid partial content parameters");
-        } else if (!type.isHeaderOnly() && is != null) {
-          OutputStream os = resp.getOutputStream();
-          if (is.skip(type.from) != type.from) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Premature end of input stream");
-            log.warn("Premature end of input stream");
-            break;
-          }
-          try {
-            int read, copy = type.to - type.from, write;
-            while (copy > 0 && (read = is.read(tmp)) >= 0) {
-              write = (copy -= read > 0 ? read : read + copy);
-              os.write(tmp, 0, write);
-              stats[STATS_BYTES_WRITTEN] += write;
-            }
-            if (copy > 0) {
+        case RESPONSE_PARTIAL_CONTENT:
+          if (type.from < 0 || type.to < 0 || type.from > type.to || type.to > type.size) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Invalid partial content parameters");
+            log.warn("Invalid partial content parameters");
+          } else if (!type.isHeaderOnly() && is != null) {
+            OutputStream os = resp.getOutputStream();
+            if (is.skip(type.from) != type.from) {
               resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Premature end of input stream");
               log.warn("Premature end of input stream");
               break;
             }
-            os.flush();
-            os.close();
-          } catch (SocketException e) {
-            log.debug("Request cancelled by client");
+            try {
+              int read, copy = type.to - type.from, write;
+              while (copy > 0 && (read = is.read(tmp)) >= 0) {
+                write = (copy -= read > 0 ? read : read + copy);
+                os.write(tmp, 0, write);
+                stats[STATS_BYTES_WRITTEN] += write;
+              }
+              if (copy > 0) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Premature end of input stream");
+                log.warn("Premature end of input stream");
+                break;
+              }
+              os.flush();
+              os.close();
+            } catch (SocketException e) {
+              log.debug("Request cancelled by client");
+            }
           }
-        }
-        break;
+          break;
 
-      case RESPONSE_NOT_MODIFIED:
-        /* NOTE: we MUST NOT return any content (RFC 2616)!!! */
-        break;
+        case RESPONSE_NOT_MODIFIED:
+          /* NOTE: we MUST NOT return any content (RFC 2616)!!! */
+          break;
 
-      case RESPONSE_PRECONDITION_FAILED:
-        if (type.err == null)
-          resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-        else
-          resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, type.err);
-        break;
+        case RESPONSE_PRECONDITION_FAILED:
+          if (type.err == null)
+            resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+          else
+            resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, type.err);
+          break;
 
-      case RESPONSE_REQUESTED_RANGE_NOT_SATIFIABLE:
-        if (type.err == null)
-          resp.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-        else
-          resp.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE, type.err);
-        break;
+        case RESPONSE_REQUESTED_RANGE_NOT_SATISFIABLE:
+          if (type.err == null)
+            resp.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+          else
+            resp.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE, type.err);
+          break;
 
-      case RESPONSE_METHOD_NOT_ALLOWED:
-        if (type.err == null)
-          resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        else
-          resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, type.err);
-        break;
+        case RESPONSE_METHOD_NOT_ALLOWED:
+          if (type.err == null)
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+          else
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, type.err);
+          break;
 
-      case RESPONSE_INTERNAL_SERVER_ERROR:
-      default:
-        if (type.err == null)
-          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        else
-          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, type.err);
+        case RESPONSE_INTERNAL_SERVER_ERROR:
+        default:
+          if (type.err == null)
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          else
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, type.err);
       }
     } catch (IOException e) {
       if (e.toString().startsWith("EOFException")) {
@@ -419,71 +422,71 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
 
     /* set the standard headers and status code */
     switch (type.type) {
-    case RESPONSE_PARTIAL_CONTENT:
-      if (type.expires > type.time)
-        resp.setDateHeader(HEADER_EXPIRES, type.expires);
-      if (type.modified > 0) {
-        resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
-        resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);
-      }
-      if (type.size < 0 || type.from < 0 || type.to < 0 || type.from > type.to || type.to > type.size) {
-        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        break;
-      }
-      resp.setContentLength((int) type.size);
-      resp.setHeader(HEADER_CONTENT_RANGE, "bytes " + type.from + "-" + type.to + "/" + type.size);
-      resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-      break;
-
-    case RESPONSE_OK:
-      if (type.expires > type.time)
-        resp.setDateHeader(HEADER_EXPIRES, type.expires);
-      if (type.modified > 0) {
-        resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
-        resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);
-      }
-      if (type.size >= 0)
+      case RESPONSE_PARTIAL_CONTENT:
+        if (type.expires > type.time)
+          resp.setDateHeader(HEADER_EXPIRES, type.expires);
+        if (type.modified > 0) {
+          resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
+          resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);
+        }
+        if (type.size < 0 || type.from < 0 || type.to < 0 || type.from > type.to || type.to > type.size) {
+          resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          break;
+        }
         resp.setContentLength((int) type.size);
-      resp.setStatus(HttpServletResponse.SC_OK);
-      break;
+        resp.setHeader(HEADER_CONTENT_RANGE, "bytes " + type.from + "-" + type.to + "/" + type.size);
+        resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        break;
 
-    case RESPONSE_NOT_MODIFIED:
-      if (type.expires > type.time)
-        resp.setDateHeader(HEADER_EXPIRES, type.expires);
-      if (type.modified > 0)
-        resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
-      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      break;
+      case RESPONSE_OK:
+        if (type.expires > type.time)
+          resp.setDateHeader(HEADER_EXPIRES, type.expires);
+        if (type.modified > 0) {
+          resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
+          resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);
+        }
+        if (type.size >= 0)
+          resp.setContentLength((int) type.size);
+        resp.setStatus(HttpServletResponse.SC_OK);
+        break;
 
-    case RESPONSE_METHOD_NOT_ALLOWED:
-      resp.setHeader(HEADER_ALLOW, "GET, POST, HEAD");
-      resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-      break;
+      case RESPONSE_NOT_MODIFIED:
+        if (type.expires > type.time)
+          resp.setDateHeader(HEADER_EXPIRES, type.expires);
+        if (type.modified > 0)
+          resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
+        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        break;
 
-    case RESPONSE_PRECONDITION_FAILED:
-      if (type.expires > type.time)
-        resp.setDateHeader(HEADER_EXPIRES, type.expires);
-      if (type.modified > 0) {
-        resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
-        resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);
-      }
-      resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
-      break;
+      case RESPONSE_METHOD_NOT_ALLOWED:
+        resp.setHeader(HEADER_ALLOW, "GET, POST, HEAD");
+        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        break;
 
-    case RESPONSE_REQUESTED_RANGE_NOT_SATIFIABLE:
-      if (type.expires > type.time)
-        resp.setDateHeader(HEADER_EXPIRES, type.expires);
-      if (type.modified > 0) {
-        resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
-        resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);
-      }
-      if (type.size >= 0)
-        resp.setHeader(HEADER_CONTENT_RANGE, "*/" + type.size);
-      break;
+      case RESPONSE_PRECONDITION_FAILED:
+        if (type.expires > type.time)
+          resp.setDateHeader(HEADER_EXPIRES, type.expires);
+        if (type.modified > 0) {
+          resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
+          resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);
+        }
+        resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+        break;
 
-    case RESPONSE_INTERNAL_SERVER_ERROR:
-    default:
-      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      case RESPONSE_REQUESTED_RANGE_NOT_SATISFIABLE:
+        if (type.expires > type.time)
+          resp.setDateHeader(HEADER_EXPIRES, type.expires);
+        if (type.modified > 0) {
+          resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
+          resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);
+        }
+        if (type.size >= 0)
+          resp.setHeader(HEADER_CONTENT_RANGE, "*/" + type.size);
+        break;
+
+      case RESPONSE_INTERNAL_SERVER_ERROR:
+      default:
+        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -509,10 +512,10 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
     if (value >= 0 && value < stats.length)
       return stats[value];
     switch (value) {
-    case STATS_BYTES_PER_RESPONSE:
-      return (stats[STATS_BODY_GENERATED] > 0) ? stats[STATS_BYTES_WRITTEN] / stats[STATS_BODY_GENERATED] : 0;
-    default:
-      return -1;
+      case STATS_BYTES_PER_RESPONSE:
+        return (stats[STATS_BODY_GENERATED] > 0) ? stats[STATS_BYTES_WRITTEN] / stats[STATS_BODY_GENERATED] : 0;
+      default:
+        return -1;
     }
   }
 
