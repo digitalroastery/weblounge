@@ -23,7 +23,6 @@ package ch.o2it.weblounge.dispatcher.impl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.dispatcher.DispatchListener;
-import ch.o2it.weblounge.dispatcher.impl.handler.StaticContentHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +44,6 @@ public class DispatchUtils {
 
   /** List of dispatcher listeners */
   private final static List<DispatchListener> dispatcher = new ArrayList<DispatchListener>();
-
-  /** The static content handler */
-  private final static StaticContentHandler staticContentHandler = StaticContentHandler.getInstance();
 
   /**
    * Asks the client to do <code>HTTP</code> authentication by sending back the
@@ -107,8 +103,8 @@ public class DispatchUtils {
 
     // If we get here, then no dispatcher seems to be responsible for handling
     // the request.
-    // In this case, we use the default mechanism for request forwarding:
-    staticContentHandler.service(request, response, url);
+    log_.debug("No dispatch listener took the request.");
+    sendError(HttpServletResponse.SC_NOT_FOUND, null, request, response);
   }
 
   /**
@@ -144,13 +140,11 @@ public class DispatchUtils {
       if (d.include(request, response, url))
         return;
     }
-    log_.debug("No dispatch listener took the request.");
-    log_.debug("Handling {} as static content", url);
 
     // If we get here, then no dispatcher seems to be responsible for handling
     // the request.
-    // In this case, we use the default mechanism for request forwarding:
-    staticContentHandler.service(request, response, url);
+    log_.debug("No dispatch listener took the request.");
+    sendError(HttpServletResponse.SC_NOT_FOUND, null, request, response);
   }
 
   /**
