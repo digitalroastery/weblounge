@@ -492,9 +492,9 @@
   </pluginRepositories>
 
   <repositories>
-  
+
     <repository>
-      <id>releases</id>
+      <id>central</id>
       <url>http://maven.o2it.ch/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
