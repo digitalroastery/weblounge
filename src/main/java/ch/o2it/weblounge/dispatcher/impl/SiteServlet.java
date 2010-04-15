@@ -20,11 +20,13 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
+import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
 import ch.o2it.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
 import ch.o2it.weblounge.common.impl.util.classloader.JasperClassLoader;
 
 import org.apache.commons.io.FilenameUtils;
-import org.mortbay.jetty.HttpConnection;
 import org.mortbay.resource.Resource;
 import org.ops4j.pax.web.jsp.JspServletWrapper;
 import org.osgi.service.http.HttpContext;
@@ -32,8 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.servlet.Servlet;
@@ -55,12 +60,6 @@ public class SiteServlet extends HttpServlet {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SiteServlet.class);
 
-  /** If-None-Match HTTP header name */
-  private static final String IFNONEMATCH_HEADER = "If-None-Match";
-
-  /** ETag HTTP header name */
-  private static final String ETAG = "ETag";
-  
   /** The http context */
   private final HttpContext siteHttpContext;
 
@@ -69,6 +68,9 @@ public class SiteServlet extends HttpServlet {
 
   /** Jasper specific class loader */
   private final JasperClassLoader jasperClassLoader;
+
+  /** Path rules */
+  private List<ResourceSet> resourceSets = null;
 
   /**
    * Creates a new site servlet for the given bundle and context.
@@ -82,6 +84,9 @@ public class SiteServlet extends HttpServlet {
     siteHttpContext = httpContext;
     jasperServlet = new JspServletWrapper(httpContext.getBundle());
     jasperClassLoader = new JasperClassLoader(httpContext.getBundle(), JasperClassLoader.class.getClassLoader());
+    resourceSets = new ArrayList<ResourceSet>();
+    resourceSets.add(new SiteResourceSet());
+    resourceSets.add(new ModuleResourceSet());
   }
 
   /**
@@ -175,7 +180,14 @@ public class SiteServlet extends HttpServlet {
   protected void serviceResource(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
 
+    Http11ResponseType responseType = null;
     String requestPath = request.getPathInfo();
+
+    // There is also a special set of resources that we don't want to expose
+    if (isProtected(requestPath)) {
+      response.sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
 
     // Does the resource exist?
     final URL url = siteHttpContext.getResource(requestPath);
@@ -197,40 +209,48 @@ public class SiteServlet extends HttpServlet {
       return;
     }
 
-    // If the request contains an etag and its the same for the resource, we
-    // deliver a not modified response
-    String eTag = String.valueOf(resource.lastModified());
-    if ((request.getHeader(IFNONEMATCH_HEADER) != null) && (eTag.equals(request.getHeader(IFNONEMATCH_HEADER)))) {
-      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      return;
-    }
-    
-    // Set the etag
-    response.setHeader(ETAG, eTag);
-
+    URLConnection conn = url.openConnection();
     String mimeType = siteHttpContext.getMimeType(requestPath);
-    if (mimeType == null) {
-      try {
-        mimeType = url.openConnection().getContentType();
-      } catch (IOException ignore) {
-        // we do not care about such an exception as the fact that we are using
-        // also the connection for finding the mime type is just a
-        // "nice to have" rather than a requirement
-      }
-    }
+    String encoding = null;
+
+    // Try to get mime type and content encoding from resource
+    if (mimeType == null)
+      mimeType = conn.getContentType();
+    encoding = conn.getContentEncoding();
+
     if (mimeType != null) {
+      if (encoding != null)
+        mimeType += ";" + encoding;
       response.setContentType(mimeType);
-      // TODO shall we handle also content encoding?
     }
 
     // Send the response back to the client
-    OutputStream out = response.getOutputStream();
-    if (out instanceof HttpConnection.Output) {
-      ((HttpConnection.Output) out).sendContent(resource.getInputStream());
-    } else {
-      resource.writeTo(out, 0, resource.length());
+    InputStream is = resource.getInputStream();
+    try {
+      logger.debug("Serving {}", url);
+      responseType = Http11ProtocolHandler.analyzeRequest(request, resource.lastModified(), Times.MS_PER_DAY + System.currentTimeMillis(), resource.length());
+      Http11ProtocolHandler.generateResponse(response, responseType, is);
+    } finally {
+      is.close();
     }
-    response.setStatus(HttpServletResponse.SC_OK);
+
+  }
+
+  /**
+   * Returns <code>true</code> if the resource is protected. Examples of
+   * protected resources are <code>web.xml</code> inside of the
+   * <code>WEB-INF</code> directory etc.
+   * 
+   * @param path
+   *          the path to the resource that is about to be served
+   * @return <code>true</code> if the resource needs to be protected
+   */
+  public boolean isProtected(String path) {
+    for (ResourceSet resourceSet : resourceSets) {
+      if (resourceSet.includes(path) && resourceSet.excludes(path))
+        return true;
+    }
+    return false;
   }
 
   /**
