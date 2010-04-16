@@ -84,15 +84,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /** The renderer used for this request */
   protected Renderer renderer = null;
 
-  /** Request parameter name for information messages */
-  public final static String INFOS = "webl:infos";
-
-  /** Request parameter name for information messages */
-  public final static String WARNINGS = "webl:warnings";
-
-  /** Request parameter name for information messages */
-  public final static String ERRORS = "webl:errors";
-
   /** The information messages */
   protected List<String> infoMessages = null;
 
@@ -253,7 +244,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       throw new IllegalArgumentException("Composer may not be null!");
 
     String stage = PageTemplate.DEFAULT_STAGE;
-    PageTemplate template = (PageTemplate) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+    PageTemplate template = (PageTemplate) request.getAttribute(WebloungeRequest.TEMPLATE);
     if (template != null)
       stage = template.getStage();
     return composer.equalsIgnoreCase(stage);
@@ -284,16 +275,18 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * <p>
    * This implementation asks the action to return the include headers
    * <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code> by calling
-   * {@link #getHTMLHeaders()} and writes them to the response.
+   * {@link #getHTMLHeaders()} and writes them to the response, then returns
+   * {@link HTMLAction#EVAL_HEADER}.
    * 
    * @see ch.o2it.weblounge.common.site.HTMLAction#startHeader(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
-  public void startHeader(WebloungeRequest request, WebloungeResponse response)
+  public int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
     for (HTMLHeadElement include : getHTMLHeaders()) {
       response.getOutputStream().println(include.toXml());
     }
+    return EVAL_HEADER;
   }
 
   /**
@@ -420,7 +413,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       throw new IllegalArgumentException("Message cannot be null");
     if (infoMessages == null) {
       infoMessages = new ArrayList<String>();
-      request.setAttribute(INFOS, infoMessages);
+      request.setAttribute(HTMLAction.INFOS, infoMessages);
     }
     infoMessages.add(createMessage(request, msg, arguments));
   }
@@ -462,7 +455,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       throw new IllegalArgumentException("Warning message cannot be null");
     if (warningMessages == null) {
       warningMessages = new ArrayList<String>();
-      request.setAttribute(WARNINGS, warningMessages);
+      request.setAttribute(HTMLAction.WARNINGS, warningMessages);
     }
     warningMessages.add(createMessage(request, msg, arguments));
   }
@@ -504,7 +497,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       throw new IllegalArgumentException("Error message cannot be null");
     if (errorMessages == null) {
       errorMessages = new ArrayList<String>();
-      request.setAttribute(ERRORS, errorMessages);
+      request.setAttribute(HTMLAction.ERRORS, errorMessages);
     }
     errorMessages.add(createMessage(request, msg, arguments));
   }

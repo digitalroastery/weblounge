@@ -218,7 +218,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       throw new IllegalArgumentException("Composer may not be null!");
 
     String stage = PageTemplate.DEFAULT_STAGE;
-    PageTemplate template = (PageTemplate) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+    PageTemplate template = (PageTemplate) request.getAttribute(WebloungeRequest.TEMPLATE);
     if (template != null)
       stage = template.getStage();
     return composer.equalsIgnoreCase(stage);
