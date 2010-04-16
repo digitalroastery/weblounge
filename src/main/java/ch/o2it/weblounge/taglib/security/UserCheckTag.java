@@ -86,7 +86,7 @@ public abstract class UserCheckTag extends WebloungeTag {
   }
 
   /**
-   * This method is used to define wether this tag skips on an available or a
+   * This method is used to define whether this tag skips on an available or a
    * non-available user.
    * 
    * @param user

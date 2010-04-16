@@ -11,6 +11,7 @@
  	<display-name>WebLounge Security Tags</display-name>
 	<description>Tag library providing access to the WebLounge CMS security features</description>
  
+    <!-- FINNISH IMPLEMENTATION
  	<tag>
 		<name>ifpermission</name>
 		<tag-class>ch.o2it.weblounge.taglib.security.IfPermissionTag</tag-class>
@@ -33,7 +34,9 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
+    -->
 
+    <!-- FINNISH IMPLEMENTATION
  	<tag>
 		<name>ifnotpermission</name>
 		<tag-class>ch.o2it.weblounge.taglib.security.IfNotPermissionTag</tag-class>
@@ -56,7 +59,9 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
+    -->
  
+    <!-- FINNISH IMPLEMENTATION
 	<tag>
 		<name>ifrole</name>
 		<tag-class>ch.o2it.weblounge.taglib.security.IfRoleTag</tag-class>
@@ -89,7 +94,9 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
+    -->
 
+    <!-- FINNISH IMPLEMENTATION
 	<tag>
 		<name>ifnotrole</name>
 		<tag-class>ch.o2it.weblounge.taglib.security.IfNotRoleTag</tag-class>
@@ -122,9 +129,10 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
-	
+	-->
+  
 	<tag>
-		<name>ifauth</name>
+		<name>ifauthenticated</name>
 		<tag-class>ch.o2it.weblounge.taglib.security.IfAuthenticatedTag</tag-class>
 		<body-content>JSP</body-content>
 		<display-name>Weblounge Authentication Check</display-name>
@@ -132,7 +140,7 @@
 	</tag>
 	
 	<tag>
-		<name>ifnotauth</name>
+		<name>ifnotauthenticated</name>
 		<tag-class>ch.o2it.weblounge.taglib.security.IfNotAuthenticatedTag</tag-class>
 		<body-content>JSP</body-content>
 		<display-name>Weblounge Authentication Check</display-name>
