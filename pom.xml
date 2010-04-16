@@ -47,6 +47,11 @@
     <!-- thirdparty -->
 
     <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -77,12 +82,6 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
       <version>4.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.jcip</groupId>
-      <artifactId>jcip-annotations</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <dependency>
@@ -119,9 +118,7 @@
         <configuration>
           <instructions>
             <Private-Package>
-              net.jcip.annotations.*,
               org.apache.commons.*,
-              org.junit.*,
               org.json.*,
               ch.o2it.weblounge.test.harness,
               ch.o2it.weblounge.test.util
@@ -130,7 +127,6 @@
               httpclient,
               httpcore,
               httpmime,
-              jcip-annotations,
               json,
               junit
             </Embed-Dependency>
@@ -139,13 +135,14 @@
               ch.o2it.weblounge.common.request,
               ch.o2it.weblounge.common.scheduler,
               ch.o2it.weblounge.common.site,
+              ch.o2it.weblounge.common.url,
               ch.o2it.weblounge.common.impl.content,
               ch.o2it.weblounge.common.impl.request,
               ch.o2it.weblounge.common.impl.scheduler,
               ch.o2it.weblounge.common.impl.site,
               ch.o2it.weblounge.common.impl.url, 
-			  ch.o2it.weblounge.common.impl.util,
-			  ch.o2it.weblounge.common.impl.util.config,
+              ch.o2it.weblounge.common.impl.util,
+              ch.o2it.weblounge.common.impl.util.config,
               ch.o2it.weblounge.common.impl.util.xml,
               javax.servlet,
               javax.servlet.jsp,
@@ -155,11 +152,12 @@
               javax.xml.transform.dom,
               javax.xml.transform.stream,
               org.apache.commons.io,
+              org.apache.commons.lang,
               org.slf4j,
               org.w3c.dom,
-			  org.osgi.service.command,
+              org.osgi.service.command,
               org.osgi.service.component,
-			  org.osgi.framework,
+              org.osgi.framework,
               *;resolution:=optional
             </Import-Package>
             <Service-Component>
