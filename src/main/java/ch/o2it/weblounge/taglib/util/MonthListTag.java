@@ -20,11 +20,14 @@
 
 package ch.o2it.weblounge.taglib.util;
 
-import ch.o2it.weblounge.common.impl.util.enumeration.Months;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 
@@ -36,6 +39,9 @@ public class MonthListTag extends WebloungeTag {
 	/** Serial version uid */
   private static final long serialVersionUID = 519583223753192813L;
   
+  /** Hash map holding the months for various language */
+  private Map<Language, Properties> months_ = new HashMap<Language, Properties>();
+
   /**  The selected month */
 	protected String selected = null;
 	
@@ -55,7 +61,7 @@ public class MonthListTag extends WebloungeTag {
 	 * @see javax.servlet.jsp.tagext.Tag#doStartTag()
 	 */
 	public int doStartTag() throws JspException {
-		Properties months = Months.getMonths(getRequest().getLanguage());
+		Properties months = getMonths(getRequest().getLanguage());
 		JspWriter writer;
 		try {
 			writer = pageContext.getOut();
@@ -94,5 +100,33 @@ public class MonthListTag extends WebloungeTag {
 		}
 		return EVAL_PAGE;
 	}
+  
+  /**
+   * Returns the months in the given language or the english version if no
+   * localized version can be found.
+   * 
+   * @param language the requested language
+   * @return the resource bundle
+   */
+  private Properties getMonths(Language language) {
+    Properties months = months_.get(language);
+    if (months != null) {
+      return months;
+    }     
+    Locale locale = new Locale(language.getIdentifier(), "");
+    String path = "/enumeration/months";
+    months = new Properties();
+    try {
+      months.load(MonthListTag.class.getResourceAsStream(path + "_" + locale + ".properties"));
+    } catch (IOException e) {
+      try {
+        months.load(MonthListTag.class.getResourceAsStream(path + ".properties"));
+      } catch (IOException e1) {
+        
+      }
+    }
+    months_.put(language, months);
+    return months;
+  }
 
 }

@@ -20,11 +20,14 @@
 
 package ch.o2it.weblounge.taglib.util;
 
-import ch.o2it.weblounge.common.impl.util.enumeration.Countries;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 
@@ -35,6 +38,9 @@ public class CountryListTag extends WebloungeTag {
 
   /** Serial version uid */
   private static final long serialVersionUID = 1326786853708846890L;
+
+  /** Hash map holding the countries for various language */
+  private static Map<Language, Properties> countries_ = new HashMap<Language, Properties>();
 
   /** The selected country */
   protected String selected = null;
@@ -56,7 +62,7 @@ public class CountryListTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doStartTag()
    */
   public int doStartTag() throws JspException {
-    Properties countries = Countries.getCountries(getRequest().getLanguage());
+    Properties countries = getCountries(getRequest().getLanguage());
     JspWriter writer;
     try {
       writer = pageContext.getOut();
@@ -95,6 +101,34 @@ public class CountryListTag extends WebloungeTag {
       throw new JspException(e);
     }
     return EVAL_PAGE;
+  }
+  
+  /**
+   * Returns the countries in the given language or the English version if no
+   * localized version can be found.
+   * 
+   * @param language the requested language
+   * @return the resource bundle
+   */
+  private Properties getCountries(Language language) {
+    Properties countries = countries_.get(language);
+    if (countries != null) {
+      return countries;
+    }     
+    Locale locale = new Locale(language.getIdentifier(), "");
+    String path = "/countries/countries";
+    countries = new Properties();
+    try {
+      countries.load(CountryListTag.class.getResourceAsStream(path + "_" + locale + ".properties"));
+    } catch (IOException e) {
+      try {
+        countries.load(CountryListTag.class.getResourceAsStream(path + ".properties"));
+      } catch (IOException e1) {
+        
+      }
+    }
+    countries_.put(language, countries);
+    return countries;
   }
 
   /**
