@@ -127,7 +127,6 @@
               ch.o2it.weblounge.common.url,
               ch.o2it.weblounge.common.user,
               ch.o2it.weblounge.dispatcher,
-              ch.o2it.weblounge.site,
               javax.activation,
               javax.el;version="2.0.0",
               javax.servlet;version="2.4.0",
