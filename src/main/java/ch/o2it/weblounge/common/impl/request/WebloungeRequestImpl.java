@@ -111,7 +111,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     // Extract the language from the session (a.k.a an earlier request). Then
     // make sure the language was put there for the current site.
-    language = (Language) getSession(true).getAttribute(SESSION_LANGUAGE);
+    language = (Language) getSession(true).getAttribute(LANGUAGE);
 
     // If no language has been found in the session, it's the visitor's first
     // access to this site. First thing we do is take a look at the url, where
@@ -150,7 +150,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       log_.trace("Selected default system language " + language);
     }
 
-    getSession().setAttribute(SESSION_LANGUAGE, language);
+    getSession().setAttribute(LANGUAGE, language);
     return language;
   }
 
@@ -213,7 +213,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     // Extract the user from the session (a.k.a an earlier request). Then make
     // sure the user was put there for the current site.
-    user = (User) getSession(true).getAttribute(SESSION_USER);
+    user = (User) getSession(true).getAttribute(USER);
 
     // if no valid user object has been found in the session, it's the
     // visitor's first access to this site. Therefore, he/she is automatically
@@ -272,7 +272,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // Handle changes to the users session that might be required should he/she
     // be surfing on another site
     HttpSession session = getSession(true);
-    Site oldSite = (Site) session.getAttribute(SESSION_SITE);
+    Site oldSite = (Site) session.getAttribute(SITE);
     if (!site.equals(oldSite)) {
       clearSession();
     }
@@ -312,9 +312,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    */
   private void clearSession() {
     HttpSession session = getSession(true);
-    session.removeAttribute(SESSION_USER);
-    session.removeAttribute(SESSION_LANGUAGE);
-    session.setAttribute(SESSION_SITE, site);
+    session.removeAttribute(USER);
+    session.removeAttribute(LANGUAGE);
+    session.setAttribute(SITE, site);
   }
 
   /**
