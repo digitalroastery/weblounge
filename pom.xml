@@ -99,6 +99,7 @@
       <module>modules/weblounge-dispatcher</module>
       <module>modules/weblounge-kernel</module>
       <module>modules/weblounge-site</module>
+      <module>modules/weblounge-taglib</module>
       <module>modules/weblounge-test</module>
       <module>modules/weblounge-user-api</module>
       <module>modules/weblounge-user</module>
