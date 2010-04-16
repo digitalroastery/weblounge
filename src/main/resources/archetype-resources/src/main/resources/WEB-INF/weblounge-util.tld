@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<taglib 
+	xmlns="http://java.sun.com/xml/ns/j2ee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" 
+	version="2.0">
+
+	<tlib-version>1.0</tlib-version>
+	<short-name>weblounge util</short-name>
+ 
+ 	<display-name>Weblounge Utilities Tags</display-name>
+	<description>Tag library providing access to the Weblounge CMS content</description>
+  
+	<tag>
+		<name>countryselection</name>
+		<tag-class>ch.o2it.weblounge.taglib.util.CountryListTag</tag-class>
+		<body-content>empty</body-content>
+		<display-name>Weblounge Country Tag</display-name>
+		<description>Lists all countries</description>
+		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>selected</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>target</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>class</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>name</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>style</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>title</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onclick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>ondblclick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmousedown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmouseup</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmousemove</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmouseover</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmouseout</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onkeydown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onkeypress</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onkeyup</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onClick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onDblClick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseDown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseUp</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseMove</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseOver</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseOut</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onKeydown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onKeyPress</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onKeyUp</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+	</tag>
+	
+		<tag>
+		<name>monthselection</name>
+		<tag-class>ch.o2it.weblounge.taglib.util.MonthListTag</tag-class>
+		<body-content>empty</body-content>
+		<display-name>Weblounge Month Tag</display-name>
+		<description>Lists all months</description>
+		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>selected</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>target</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>class</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>name</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>style</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>title</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onclick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>ondblclick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmousedown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmouseup</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmousemove</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmouseover</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onmouseout</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onkeydown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onkeypress</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onkeyup</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onClick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onDblClick</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseDown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseUp</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseMove</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseOver</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onMouseOut</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onKeydown</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onKeyPress</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>onKeyUp</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+	</tag>
+	
+</taglib>
