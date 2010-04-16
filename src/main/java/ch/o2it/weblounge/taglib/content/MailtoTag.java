@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.user.WebloungeUser;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import org.slf4j.Logger;
@@ -86,7 +86,7 @@ public class MailtoTag extends WebloungeTag {
   public int doEndTag() throws JspException {
     try {
       StringBuffer a = new StringBuffer("<a ");
-      User user = request.getSite().getUsers().getUser(login);
+      WebloungeUser user = request.getSite().getUser(login);
       String email = user.getEmail();
       if (email != null) {
         a.append("href=\"mailto:" + email + "\">");

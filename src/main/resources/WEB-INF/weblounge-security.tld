@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<taglib 
+	xmlns="http://java.sun.com/xml/ns/j2ee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" 
+	version="2.0">
+
+	<tlib-version>1.0</tlib-version>
+	<short-name>weblounge security</short-name>
+ 
+ 	<display-name>WebLounge Security Tags</display-name>
+	<description>Tag library providing access to the WebLounge CMS security features</description>
+ 
+ 	<tag>
+		<name>ifpermission</name>
+		<tag-class>ch.o2it.weblounge.taglib.security.IfPermissionTag</tag-class>
+		<body-content>JSP</body-content>
+		<display-name>WebLounge Permission Check Tag</display-name>
+		<description>Checks if the current user meets the permission requirements</description>
+		<attribute>
+			<name>permission</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>oneof</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>allof</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+ 	<tag>
+		<name>ifnotpermission</name>
+		<tag-class>ch.o2it.weblounge.taglib.security.IfNotPermissionTag</tag-class>
+		<body-content>JSP</body-content>
+		<display-name>WebLounge Permission Check Tag</display-name>
+		<description>Checks if the current user meets the permission requirements</description>
+		<attribute>
+			<name>permission</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>oneof</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>allof</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+ 
+	<tag>
+		<name>ifrole</name>
+		<tag-class>ch.o2it.weblounge.taglib.security.IfRoleTag</tag-class>
+		<body-content>JSP</body-content>
+		<display-name>WebLounge Role Check Tag</display-name>
+		<description>Checks if the current user meets the role requirements</description>
+		<attribute>
+			<name>context</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>roleid</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>role</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>oneof</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>allof</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<name>ifnotrole</name>
+		<tag-class>ch.o2it.weblounge.taglib.security.IfNotRoleTag</tag-class>
+		<body-content>JSP</body-content>
+		<display-name>WebLounge Role Check Tag</display-name>
+		<description>Checks if the current user failes to meet the role requirements</description>
+		<attribute>
+			<name>role</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>context</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>roleid</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>oneof</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>allof</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<name>ifauth</name>
+		<tag-class>ch.o2it.weblounge.taglib.security.IfAuthenticatedTag</tag-class>
+		<body-content>JSP</body-content>
+		<display-name>Weblounge Authentication Check</display-name>
+		<description>Checks if the current user is logged in</description>
+	</tag>
+	
+	<tag>
+		<name>ifnotauth</name>
+		<tag-class>ch.o2it.weblounge.taglib.security.IfNotAuthenticatedTag</tag-class>
+		<body-content>JSP</body-content>
+		<display-name>Weblounge Authentication Check</display-name>
+		<description>Checks if the current user is not logged in</description>
+	</tag>
+
+</taglib>

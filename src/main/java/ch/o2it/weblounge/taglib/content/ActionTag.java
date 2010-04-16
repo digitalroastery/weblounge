@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class ActionTag extends WebloungeTag {
   private Module module = null;
 
   /** action handler bundle configuration */
-  private Action action;
+  private Action action = null;
 
   /** the action identifier */
   private String actionId = null;
@@ -164,13 +164,8 @@ public class ActionTag extends WebloungeTag {
       if (getId() != null)
         a.append("id=\"" + getId() + "\"");
 
-      String actionPath = UrlSupport.concat(new String[] {
-          Env.getURI(),
-          Env.getServletPath(),
-          action.getMountpoint() });
-
       a.append("href=\"");
-      a.append(XMLEncoding.toXML(actionPath));
+      a.append(StringEscapeUtils.escapeXml(action.getPath()));
 
       // Add target url if present
       StringBuffer params = new StringBuffer("");
@@ -179,16 +174,16 @@ public class ActionTag extends WebloungeTag {
       Iterator<String> pi = parameters.keySet().iterator();
       while (pi.hasNext()) {
         String param = pi.next();
-        String value = XMLEncoding.toXML(parameters.get(param));
+        String value = StringEscapeUtils.escapeXml(parameters.get(param));
         params.append((params.length() == 0 ? "?" : "&") + param + "=" + value);
       }
 
-      a.append(XMLEncoding.toXML(params.toString()));
+      a.append(StringEscapeUtils.escapeXml(params.toString()));
       a.append("\"");
 
       if (target != null) {
         a.append(" target=\"");
-        a.append(XMLEncoding.toXML(target));
+        a.append(StringEscapeUtils.escapeXml(target));
         a.append("\"");
       }
 

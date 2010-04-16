@@ -43,13 +43,13 @@ import javax.servlet.jsp.JspException;
  * This tag prints out various headers for the &lt;head&gt; section of an html
  * page.
  */
-public class IncludesTag extends WebloungeTag {
+public class HTMLHeaderTag extends WebloungeTag {
 
   /** Serial version uid */
   private static final long serialVersionUID = -1813975272420106327L;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(IncludesTag.class);
+  private final static Logger log_ = LoggerFactory.getLogger(HTMLHeaderTag.class);
 
   /**
    * Does the tag processing.

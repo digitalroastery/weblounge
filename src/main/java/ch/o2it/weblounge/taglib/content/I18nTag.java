@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.impl.util.I18n;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;
@@ -32,24 +33,21 @@ import javax.servlet.jsp.JspException;
  */
 public class I18nTag extends WebloungeTag {
 
+  /** Serial vesion uid */
   private static final long serialVersionUID = 5791260790900823852L;
 
   /** The i18n key */
-  protected String i18n = null;
+  protected String i18nKey = null;
 
   /**
    * Sets the i18n attribute.
    * 
    * @see ch.o2it.weblounge.taglib.WebloungeTag#setName(java.lang.String)
    */
-  public void setName(String name) {
-    try {
-      this.i18n = (String) ExpressionUtil.evalNotNull("i18n", "name", name, String.class, this, pageContext);
-    } catch (NullAttributeException ex) {
-      this.i18n = "";
-    } catch (JspException ex) {
-      // TODO: add error handling
-    }
+  public void setKey(String name) throws JspException {
+    if (name == null)
+      throw new JspException("i18n name cannot be null");
+    i18nKey = name;
   }
 
   /**
@@ -59,8 +57,9 @@ public class I18nTag extends WebloungeTag {
    */
   public int doEndTag() throws JspException {
     try {
-      pageContext.getOut().write(I18n.toHTML(i18n, request.getLanguage(), request.getSite()));
+      pageContext.getOut().write(I18n.toHTML(i18nKey, request.getLanguage(), request.getSite()));
     } catch (IOException e) {
+      throw new JspException(e);
     }
     super.doEndTag();
     return EVAL_PAGE;

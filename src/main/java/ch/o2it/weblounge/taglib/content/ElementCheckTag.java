@@ -22,6 +22,7 @@ package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.util.Templates;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.taglib.ParseException;
