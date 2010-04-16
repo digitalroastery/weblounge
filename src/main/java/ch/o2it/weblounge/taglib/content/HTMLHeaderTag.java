@@ -73,22 +73,24 @@ public class HTMLHeaderTag extends WebloungeTag {
 
     // Pagelets links & scripts
     Page page = (Page) request.getAttribute(WebloungeRequest.PAGE);
-    Pagelet[] pagelets = page.getPagelets();
-    Site site = request.getSite();
-    for (Pagelet p : pagelets) {
-      String moduleId = p.getModule();
-      Module module = site.getModule(moduleId);
-      if (module == null) {
-        log_.warn("Unable to get renderer '" + p + "' for " + request.getUrl() + " since module '" + moduleId + "' is not installed");
-        continue;
-      }
-      Renderer renderer = module.getRenderer(p.getIdentifier());
-      if (renderer != null) {
-        for (HTMLHeadElement l : renderer.getHTMLHeaders())
-          headElements.add(l);
-      } else {
-        log_.warn("Renderer '" + p + "' not found for " + request.getUrl() + "!");
-        continue;
+    if (page != null) {
+      Pagelet[] pagelets = page.getPagelets();
+      Site site = request.getSite();
+      for (Pagelet p : pagelets) {
+        String moduleId = p.getModule();
+        Module module = site.getModule(moduleId);
+        if (module == null) {
+          log_.warn("Unable to get renderer '" + p + "' for " + request.getUrl() + " since module '" + moduleId + "' is not installed");
+          continue;
+        }
+        Renderer renderer = module.getRenderer(p.getIdentifier());
+        if (renderer != null) {
+          for (HTMLHeadElement l : renderer.getHTMLHeaders())
+            headElements.add(l);
+        } else {
+          log_.warn("Renderer '" + p + "' not found for " + request.getUrl() + "!");
+          continue;
+        }
       }
     }
 

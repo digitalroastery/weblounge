@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.taglib;
 
+import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
+import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
@@ -27,6 +29,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
@@ -519,22 +523,26 @@ public class WebloungeTag extends BodyTagSupport {
 
   /**
    * Extract the wrapped <code>WebloungeResponse</code> from a <code>
-	 * ServletResponse</code>
-   * .
+	 * ServletResponse</code>.
    * 
-   * @param resp
+   * @param response
    *          the wrapping response
    * @return the wrapped <code>WebloungeResponse</code> or <code>null</code> if
    *         no such response exists
    */
-  private static WebloungeResponse unwrapResponse(ServletResponse resp) {
-    while (resp != null) {
-      if (resp instanceof WebloungeResponse)
-        return (WebloungeResponse) resp;
-      if (!(resp instanceof ServletResponseWrapper))
+  private static WebloungeResponse unwrapResponse(ServletResponse response) {
+    while (response != null) {
+      if (response instanceof WebloungeResponse)
+        return (WebloungeResponse) response;
+      if (!(response instanceof ServletResponseWrapper))
         break;
-      resp = ((ServletResponseWrapper) resp).getResponse();
+      response = ((ServletResponseWrapper) response).getResponse();
     }
+
+    // Last resort
+    if (response instanceof HttpServletResponse)
+      return new WebloungeResponseImpl((HttpServletResponse) response);
+
     return null;
   }
 
@@ -543,19 +551,24 @@ public class WebloungeTag extends BodyTagSupport {
 	 * ServletRequest</code>
    * .
    * 
-   * @param resp
+   * @param request
    *          the wrapping request
    * @return the wrapped <code>WebloungeRequest</code> or <code>null</code> if
    *         no such response exists
    */
-  private static WebloungeRequest unwrapRequest(ServletRequest resp) {
-    while (resp != null) {
-      if (resp instanceof WebloungeRequest)
-        return (WebloungeRequest) resp;
-      if (!(resp instanceof ServletRequestWrapper))
+  private static WebloungeRequest unwrapRequest(ServletRequest request) {
+    while (request != null) {
+      if (request instanceof WebloungeRequest)
+        return (WebloungeRequest) request;
+      if (!(request instanceof ServletRequestWrapper))
         break;
-      resp = ((ServletRequestWrapper) resp).getRequest();
+      request = ((ServletRequestWrapper) request).getRequest();
     }
+
+    // Last resort
+    if (request instanceof HttpServletRequest)
+      return new WebloungeRequestImpl((HttpServletRequest)request);
+
     return null;
   }
 
