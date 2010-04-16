@@ -85,7 +85,7 @@ public class DispatchUtils {
     // Remove the url attribute to prevent loops. By removing, The Request
     // object
     // is forced to evaluate the url again.
-    request.removeAttribute(WebloungeRequest.SESSION_URL);
+    request.removeAttribute(WebloungeRequest.URL);
 
     // Ask registered listeners whether they want to redirect the url.
     // TODO: Are DispatchListeners still used?
@@ -125,7 +125,7 @@ public class DispatchUtils {
 
     // Remove the url attribute to prevent loops. By removing, The Request
     // object is forced to evaluate the url again.
-    request.removeAttribute(WebloungeRequest.SESSION_URL);
+    request.removeAttribute(WebloungeRequest.URL);
 
     // Ask registered listeners whether they want to redirect the url.
     // TODO: Are DispatchListeners still used?

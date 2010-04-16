@@ -310,8 +310,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
     // Finally, let's get some work done!
     try {
-      request.setAttribute(WebloungeRequest.REQUEST_ACTION, action);
-      request.setAttribute(WebloungeRequest.REQUEST_PAGE, page);
+      request.setAttribute(WebloungeRequest.ACTION, action);
+      request.setAttribute(WebloungeRequest.PAGE, page);
 
       // Prepare the action
       if (action instanceof HTMLAction) {
@@ -356,8 +356,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       log_.error(e.getMessage(), e);
       DispatchUtils.sendInternalError(request, response);
     } finally {
-      request.removeAttribute(WebloungeRequest.REQUEST_ACTION);
-      request.removeAttribute(WebloungeRequest.REQUEST_PAGE);
+      request.removeAttribute(WebloungeRequest.ACTION);
+      request.removeAttribute(WebloungeRequest.PAGE);
     }
   }
 
@@ -477,7 +477,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   protected PageTemplate getPageTemplate(Page page, WebloungeRequest request)
       throws IllegalStateException {
     Site site = request.getSite();
-    String templateId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+    String templateId = (String) request.getAttribute(WebloungeRequest.TEMPLATE);
     PageTemplate template = null;
     if (templateId != null) {
       template = site.getTemplate(templateId);

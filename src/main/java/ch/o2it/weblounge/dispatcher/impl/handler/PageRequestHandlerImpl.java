@@ -101,7 +101,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     }
 
     // Check if the request is controlled by an action.
-    Action action = (Action) request.getAttribute(WebloungeRequest.REQUEST_ACTION);
+    Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
 
     // Check if the page is already part of the cache. If so, our task is
     // already done!
@@ -176,7 +176,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       }
 
       // Store the page in the request
-      request.setAttribute(WebloungeRequest.REQUEST_PAGE, page);
+      request.setAttribute(WebloungeRequest.PAGE, page);
 
       // Get hold of the page template
       PageTemplate template = null;
@@ -264,7 +264,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
    */
   protected PageTemplate getPageTemplate(Page page, WebloungeRequest request) throws IllegalStateException {
     Site site = request.getSite();
-    String templateId = (String) request.getAttribute(WebloungeRequest.REQUEST_TEMPLATE);
+    String templateId = (String) request.getAttribute(WebloungeRequest.TEMPLATE);
     PageTemplate template = null;
     if (templateId != null) {
       template = site.getTemplate(templateId);
