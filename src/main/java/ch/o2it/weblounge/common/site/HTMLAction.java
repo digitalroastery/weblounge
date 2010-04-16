@@ -70,6 +70,12 @@ public interface HTMLAction extends Action {
   /** The target url */
   String TARGET = "target-url";
 
+  /** Constant indicating that the header includes should be evaluated */
+  int EVAL_HEADER = 0;
+
+  /** Constant indicating that the header includes should not be evaluated */
+  int SKIP_HEADER = 1;
+
   /** Constant indicating that the current composer should be evaluated */
   int EVAL_COMPOSER = 0;
 
@@ -81,6 +87,15 @@ public interface HTMLAction extends Action {
 
   /** Constant indicating that the current pagelet should not be evaluated */
   int SKIP_PAGELET = 1;
+
+  /** Request parameter name for information messages */
+  String WARNINGS = "webl:warnings";
+
+  /** Request parameter name for information messages */
+  String INFOS = "webl:infos";
+
+  /** Request parameter name for information messages */
+  String ERRORS = "webl:errors";
 
   /**
    * This method is called by the target page and gives the action the
@@ -100,9 +115,12 @@ public interface HTMLAction extends Action {
    *           if writing to the response fails
    * @throws ActionException
    *           if a processing error occurs while handling the request
+   * @return either <code>EVAL_HEADER</code> or <code>SKIP_HEADER</code>
+   *         depending on whether the action wants to render the header on its
+   *         own or have the template do the rendering.
    * @see ch.o2it.weblounge.common.content.HTMLHeadElement
    */
-  void startHeader(WebloungeRequest request, WebloungeResponse response)
+  int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException;
 
   /**
