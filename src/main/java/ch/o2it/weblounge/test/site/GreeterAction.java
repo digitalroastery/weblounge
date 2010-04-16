@@ -92,13 +92,13 @@ public class GreeterAction extends HTMLActionSupport {
    * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startHeader(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   @Override
-  public void startHeader(WebloungeRequest request, WebloungeResponse response)
+  public int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
     PageletRenderer contentPagelet = getModule().getRenderer("greeting");
     for (HTMLHeadElement header : contentPagelet.getHTMLHeaders()) {
       addHTMLHeader(header);
     }
-    super.startHeader(request, response);
+    return super.startHeader(request, response);
   }
 
   /**
