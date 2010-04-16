@@ -26,6 +26,12 @@
       <version>3.0-SNAPSHOT</version>
     </dependency>
 
+    <dependency>
+      <groupId>ch.o2it.weblounge</groupId>
+      <artifactId>weblounge-taglib</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
+
     <!-- osgi support -->
 
     <dependency>
@@ -144,6 +150,10 @@
               ch.o2it.weblounge.common.impl.util,
               ch.o2it.weblounge.common.impl.util.config,
               ch.o2it.weblounge.common.impl.util.xml,
+              ch.o2it.weblounge.taglib,
+              ch.o2it.weblounge.taglib.content,
+              ch.o2it.weblounge.taglib.security,
+              ch.o2it.weblounge.taglib.util,
               javax.servlet,
               javax.servlet.jsp,
               javax.servlet.jsp.tagext,

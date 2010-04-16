@@ -84,10 +84,17 @@ public class JavaServerPagesTest extends IntegrationTestBase {
       String xpath = "/html/body/h1/text()";
       Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));
       
-      // Test tag libraries
-      logger.info("Testing tag output on {}", requestUrl);
+      // Test site tag libraries
+      logger.info("Testing site taglibary on {}", requestUrl);
       xpath = "/html/body/div[@id='greeting']";
       Assert.assertNotNull(XPathHelper.valueOf(xml, xpath));
+
+      // Test site tag libraries
+      logger.info("Testing weblounge taglibrary on {}", requestUrl);
+      xpath = "/html/head/meta[@name='generator']/@content";
+      Assert.assertNotNull(XPathHelper.valueOf(xml, xpath));
+      Assert.assertNotNull("Weblounge 3.0", XPathHelper.valueOf(xml, xpath));
+
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
