@@ -36,7 +36,7 @@ public class GeneratorTag extends WebloungeTag {
   private static final long serialVersionUID = -498800954917968929L;
 
   /** The generator tag */
-  public static final String GENERATOR_TAG = "<meta name=\"generator\" content=\"Weblounge 2.0\" />";
+  public static final String GENERATOR_TAG = "<meta name=\"generator\" content=\"Weblounge 3.0\" />";
 
   /**
    * Writes the generator tag to the output.
