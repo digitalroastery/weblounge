@@ -93,7 +93,6 @@
       <module>modules/weblounge-cache</module>
       <module>modules/weblounge-common-api</module>
       <module>modules/weblounge-common</module>
-      <module>modules/weblounge-contentrepository-api</module>
       <module>modules/weblounge-contentrepository</module>
       <module>modules/weblounge-dispatcher-api</module>
       <module>modules/weblounge-dispatcher</module>
