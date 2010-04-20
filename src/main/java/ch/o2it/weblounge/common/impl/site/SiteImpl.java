@@ -20,10 +20,8 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageLayout;
 import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.content.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
@@ -38,6 +36,7 @@ import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
+import ch.o2it.weblounge.common.repository.ContentRepository;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -71,7 +70,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -147,6 +145,9 @@ public class SiteImpl implements Site {
 
   /** Ordered list of site urls */
   protected List<String> hostnames = null;
+  
+  /** Content repository for site pages and resources */
+  protected ContentRepository contentRepository = null;
 
   /** Jobs */
   protected Map<String, QuartzJob> jobs = null;
@@ -1039,16 +1040,6 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
-    return identifier;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.site.Site#getGroup(java.lang.String,
    *      java.lang.String)
    */
@@ -1080,12 +1071,20 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#getPage(ch.o2it.weblounge.common.content.PageURI)
+   *
+   * @see ch.o2it.weblounge.common.site.Site#setContentRepository(ch.o2it.weblounge.common.site.ContentRepository)
    */
-  public Page getPage(PageURI uri) throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+  public void setContentRepository(ContentRepository repository) {
+    this.contentRepository = repository;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#getContentRepository()
+   */
+  public ContentRepository getContentRepository() {
+    return contentRepository;
   }
 
   /**
@@ -1425,6 +1424,16 @@ public class SiteImpl implements Site {
 
     b.append("</site>");
     return b.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return identifier;
   }
 
 }

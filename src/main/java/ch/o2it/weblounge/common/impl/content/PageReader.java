@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.PageletURI;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
@@ -79,7 +80,7 @@ public final class PageReader extends WebloungeContentReader {
   }
 
   /**
-   * This method is called, when a <code>Page</code> object is instantiated.
+   * This method is called when a <code>Page</code> object is instantiated.
    * 
    * @param is
    *          the xml input stream
@@ -92,7 +93,7 @@ public final class PageReader extends WebloungeContentReader {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public PageImpl read(InputStream is, PageURIImpl uri) throws SAXException,
+  public PageImpl read(InputStream is, PageURI uri) throws SAXException,
       IOException, ParserConfigurationException {
     page = new PageImpl(uri);
     SAXParserFactory factory = SAXParserFactory.newInstance();

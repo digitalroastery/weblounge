@@ -79,6 +79,19 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   }
 
   /**
+   * Creates a new {@link PageURI} that is equal to <code>uri</code> except for
+   * the version which is switched to <code>version</code>.
+   * 
+   * @param uri
+   *          the uri
+   * @param version
+   *          the version
+   */
+  public PageURIImpl(PageURI uri, long version) {
+    this(uri.getSite(), uri.getPath(), version, uri.getId());
+  }
+
+  /**
    * Creates a new {@link PageURI} pointing to the live version of the page
    * identified by <code>site</code> and <code>path</code>.
    * 
