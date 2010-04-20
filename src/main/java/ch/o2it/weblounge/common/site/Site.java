@@ -21,11 +21,10 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Customizable;
-import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageLayout;
 import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.repository.ContentRepository;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
@@ -34,7 +33,6 @@ import ch.o2it.weblounge.common.security.UserListener;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -495,17 +493,19 @@ public interface Site extends Customizable, RequestListener, Serializable {
   Group getGroup(String group, String context);
 
   /**
-   * Returns the page identified by the <code>uri</code>.
+   * Returns the site's content repository.
    * 
-   * TODO: Remove
-   * 
-   * @param uri
-   *          the page uri
-   * @return the page or <code>null</code> if the page doesn't exist
-   * @throws IOException
-   *           if the page cannot be read from its source
+   * @return the content repository
    */
-  Page getPage(PageURI uri) throws IOException;
+  ContentRepository getContentRepository();
+
+  /**
+   * Sets the content repository of this site.
+   * 
+   * @param repository
+   *          the site's content repository
+   */
+  void setContentRepository(ContentRepository repository);
 
   /**
    * Returns an <code>XML</code> representation of the site, which will look
