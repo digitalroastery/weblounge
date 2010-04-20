@@ -81,6 +81,8 @@
             <Import-Package>
               ch.o2it.weblounge.common.site,
               ch.o2it.weblounge.common.language,
+              ch.o2it.weblounge.common.repository,
+              ch.o2it.weblounge.common.impl.repository,
               ch.o2it.weblounge.dispatcher,
               org.quartz,
               org.quartz.impl,
@@ -92,6 +94,7 @@
             </Import-Package>
             <Export-Package></Export-Package>
             <Service-Component>
+              OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/kernel-service.xml,
               OSGI-INF/site-command.xml,
               OSGI-INF/site-manager-service.xml
