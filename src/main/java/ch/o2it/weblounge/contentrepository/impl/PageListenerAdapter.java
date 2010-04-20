@@ -23,14 +23,14 @@ package ch.o2it.weblounge.contentrepository.impl;
 import ch.o2it.weblounge.common.content.PageLayout;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Renderer;
+import ch.o2it.weblounge.common.repository.PageListener;
 import ch.o2it.weblounge.common.user.User;
-import ch.o2it.weblounge.contentrepository.PageListener;
 
 /**
  * Convenience implementation for classes that are interested in callbacks to a
  * <code>PageListener</code>.
  * 
- * @see ch.o2it.weblounge.contentrepository.api.content.PageListener
+ * @see ch.o2it.weblounge.common.repository.api.content.PageListener
  */
 public class PageListenerAdapter implements PageListener {
 
@@ -47,7 +47,7 @@ public class PageListenerAdapter implements PageListener {
    *          the page's location
    * @param user
    *          the creating user
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageCreated(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageCreated(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageCreated(PageURI uri, User user) { }
@@ -60,7 +60,7 @@ public class PageListenerAdapter implements PageListener {
    *          the page's former location
    * @param user
    *          the removing user
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageRemoved(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageRemoved(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageRemoved(PageURI uri, User user) { }
@@ -75,7 +75,7 @@ public class PageListenerAdapter implements PageListener {
    *          the page's new location
    * @param user
    *          the user moving the page
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageMoved(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageMoved(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.api.url.WebUrl, ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageMoved(PageURI from, PageURI to, User user) {
@@ -89,7 +89,7 @@ public class PageListenerAdapter implements PageListener {
    *          the page's location
    * @param user
    *          the user publishing the page
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pagePublished(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pagePublished(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pagePublished(PageURI uri, User user) {
@@ -103,7 +103,7 @@ public class PageListenerAdapter implements PageListener {
    *          the page's location
    * @param user
    *          the user unpublishing the page
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageUnpublished(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageUnpublished(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageUnpublished(PageURI uri, User user) {
@@ -117,7 +117,7 @@ public class PageListenerAdapter implements PageListener {
    *          the page's location
    * @param user
    *          the user locking the page
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageLocked(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageLocked(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageLocked(PageURI uri, User user) {
@@ -131,7 +131,7 @@ public class PageListenerAdapter implements PageListener {
    *          the page's location
    * @param user
    *          the user releasing the page lock
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageUnlocked(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageUnlocked(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
   public void pageUnlocked(PageURI uri, User user) {
@@ -148,7 +148,7 @@ public class PageListenerAdapter implements PageListener {
    *          the former renderer
    * @param user
    *          the editing user
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageRendererChanged(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageRendererChanged(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.common.Renderer.renderer.Renderer,
    *      ch.o2it.weblounge.common.Renderer.renderer.Renderer,
    *      ch.o2it.weblounge.common.user.api.security.User)
@@ -168,7 +168,7 @@ public class PageListenerAdapter implements PageListener {
    *          the former layout
    * @param user
    *          the editing user
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageLayoutChanged(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageLayoutChanged(ch.o2it.weblounge.api.url.WebUrl,
    *      ch.o2it.weblounge.common.PageLayout.content.Layout,
    *      ch.o2it.weblounge.common.PageLayout.content.Layout,
    *      ch.o2it.weblounge.common.user.api.security.User)
@@ -188,7 +188,7 @@ public class PageListenerAdapter implements PageListener {
    *          the former page type
    * @param user
    *          the editing user
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageTypeChanged(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageTypeChanged(ch.o2it.weblounge.api.url.WebUrl,
    *      java.lang.String, java.lang.String,
    *      ch.o2it.weblounge.common.user.api.security.User)
    */
@@ -207,7 +207,7 @@ public class PageListenerAdapter implements PageListener {
    *          the old keywords
    * @param user
    *          the editing user
-   * @see ch.o2it.weblounge.contentrepository.api.content.PageListener#pageKeywordsChanged(ch.o2it.weblounge.api.url.WebUrl,
+   * @see ch.o2it.weblounge.common.repository.api.content.PageListener#pageKeywordsChanged(ch.o2it.weblounge.api.url.WebUrl,
    *      java.lang.String[], java.lang.String[],
    *      ch.o2it.weblounge.common.user.api.security.User)
    */

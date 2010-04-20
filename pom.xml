@@ -16,7 +16,7 @@
 	
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
-      <artifactId>weblounge-contentrepository-api</artifactId>
+      <artifactId>weblounge-common-api</artifactId>
       <version>3.0-SNAPSHOT</version>
     </dependency>
 
@@ -300,9 +300,6 @@
               !org.apache.tools.ant.*,
               !org.apache.lucene.demo,
             -->
-            <Service-Component>
-              OSGI-INF/contentrepository-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
