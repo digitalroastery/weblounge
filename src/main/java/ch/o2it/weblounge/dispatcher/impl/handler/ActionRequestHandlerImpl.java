@@ -34,6 +34,7 @@ import ch.o2it.weblounge.common.impl.site.ActionPool;
 import ch.o2it.weblounge.common.impl.url.UrlMatcherImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
+import ch.o2it.weblounge.common.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -293,7 +294,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     try {
       page = getTargetPage(action, request);
       // TODO: Check access rights with action configuration
-    } catch (IOException e) {
+    } catch (ContentRepositoryException e) {
       log_.error("Error loading target page for action {} at {}", action, url);
       DispatchUtils.sendInternalError(request, response);
       return;
@@ -508,11 +509,11 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    * @param request
    *          the weblounge request
    * @return the target page
-   * @throws IOException
+   * @throws ContentRepositoryException
    *           if the target page cannot be loaded
    */
   protected Page getTargetPage(Action action, WebloungeRequest request)
-      throws IOException {
+      throws ContentRepositoryException {
 
     PageURI target = null;
     Page page = null;
@@ -553,7 +554,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // We are about to render the action output in the composers of the target
     // page. This is why we have to make sure that this target page exists,
     // otherwise the user will get a 404.
-    page = site.getPage(target);
+    page = site.getContentRepository().getPage(target);
     if (page == null) {
       if (targetForced) {
         log_.warn("Output of action '{}' is configured to render on non existing page {}", action, target);
@@ -562,7 +563,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
       // Fall back to site homepage
       target = new PageURIImpl(site, "/");
-      page = site.getPage(target);
+      page = site.getContentRepository().getPage(target);
       if (page == null) {
         log_.debug("Site {} has no homepage as fallback to render actions", site);
         return null;

@@ -31,6 +31,7 @@ import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
+import ch.o2it.weblounge.common.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -140,8 +141,8 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
       // Load the page
       try {
-        page = site.getPage(pageURI);
-      } catch (IOException e) {
+        page = site.getContentRepository().getPage(pageURI);
+      } catch (ContentRepositoryException e) {
         log_.error("Unable to load page {}: {}", new Object[] {
             pageURI,
             e.getMessage(),
