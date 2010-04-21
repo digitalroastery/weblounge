@@ -34,7 +34,6 @@ import ch.o2it.weblounge.common.impl.site.ActionPool;
 import ch.o2it.weblounge.common.impl.url.UrlMatcherImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
-import ch.o2it.weblounge.common.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -47,6 +46,9 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.XMLAction;
 import ch.o2it.weblounge.common.url.UrlMatcher;
 import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.contentrepository.ContentRepository;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.ActionRequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
@@ -554,7 +556,14 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // We are about to render the action output in the composers of the target
     // page. This is why we have to make sure that this target page exists,
     // otherwise the user will get a 404.
-    page = site.getContentRepository().getPage(target);
+    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+    if (contentRepository == null) {
+      log_.warn("Content repository not available to read target page for action '{}'", action, target);
+      return null;
+    }
+    
+    // Does the page exist?
+    page = contentRepository.getPage(target);
     if (page == null) {
       if (targetForced) {
         log_.warn("Output of action '{}' is configured to render on non existing page {}", action, target);
@@ -563,7 +572,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
       // Fall back to site homepage
       target = new PageURIImpl(site, "/");
-      page = site.getContentRepository().getPage(target);
+      page = contentRepository.getPage(target);
       if (page == null) {
         log_.debug("Site {} has no homepage as fallback to render actions", site);
         return null;

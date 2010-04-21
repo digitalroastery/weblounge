@@ -31,7 +31,6 @@ import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
-import ch.o2it.weblounge.common.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -40,6 +39,9 @@ import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.contentrepository.ContentRepository;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.PageRequestHandler;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 
@@ -139,9 +141,16 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       Site site = request.getSite();
       RequestFlavor contentFlavor = request.getFlavor();
 
+      // Get a hold of the content repository
+      ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+      if (contentRepository == null) {
+        log_.warn("Content repository not available while trying to access {}", pageURI);
+        return false;
+      }
+
       // Load the page
       try {
-        page = site.getContentRepository().getPage(pageURI);
+        page = contentRepository.getPage(pageURI);
       } catch (ContentRepositoryException e) {
         log_.error("Unable to load page {}: {}", new Object[] {
             pageURI,
