@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.content.PageLayout;
 import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.repository.ContentRepository;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
@@ -491,21 +490,6 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @return the role
    */
   Group getGroup(String group, String context);
-
-  /**
-   * Returns the site's content repository.
-   * 
-   * @return the content repository
-   */
-  ContentRepository getContentRepository();
-
-  /**
-   * Sets the content repository of this site.
-   * 
-   * @param repository
-   *          the site's content repository
-   */
-  void setContentRepository(ContentRepository repository);
 
   /**
    * Returns an <code>XML</code> representation of the site, which will look
