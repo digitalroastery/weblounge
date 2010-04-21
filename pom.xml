@@ -56,11 +56,6 @@
       <artifactId>commons-fileupload</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-
     <!-- apache jackrabbit -->
 
     <dependency>
@@ -289,11 +284,12 @@
               jempbox
             -->
             <Export-Package>
-              ch.o2it.weblounge.contentrepository.bundle,
-              ch.o2it.weblounge.contentrepository.fs,
-              ch.o2it.weblounge.contentrepository.jcr
+              ch.o2it.weblounge.contentrepository.impl.bundle,
+              ch.o2it.weblounge.contentrepository.impl.fs,
+              ch.o2it.weblounge.contentrepository.impl.jcr
             </Export-Package>
             <Import-Package>
+              ch.o2it.weblounge.contentrepository,
               org.apache.xml.resolver.*;resolution:=optional,
               sun.io.*;resolution:=optional,
               !org.apache.jackrabbit.test,

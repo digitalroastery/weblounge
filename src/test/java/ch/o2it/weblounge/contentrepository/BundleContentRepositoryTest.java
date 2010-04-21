@@ -27,10 +27,11 @@ import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.bundle.BundleContentRepository;
+import ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
@@ -40,6 +41,7 @@ import java.util.Hashtable;
 /**
  * Test class for {@link BundleContentRepository}.
  */
+@Ignore
 public class BundleContentRepositoryTest {
 
   /** The bundle content repository */

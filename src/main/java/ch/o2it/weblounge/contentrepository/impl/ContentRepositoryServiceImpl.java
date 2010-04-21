@@ -18,10 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.contentrepository;
+package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.bundle.BundleContentRepository;
+import ch.o2it.weblounge.contentrepository.ContentRepository;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryService;
+import ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -32,7 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Service that will watch out for sites, associate them with a content
@@ -45,10 +51,10 @@ import java.util.Hashtable;
  * instance of the <code>BundleContentRepository</code> will be created which
  * will serve pages and resources from the site's bundle.
  */
-public class ContentRepositoryService {
+public class ContentRepositoryServiceImpl implements ContentRepositoryService {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryService.class);
+  private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryServiceImpl.class);
 
   /** Configuration key for the content repository implementation */
   public static final String CONTENT_REPOSITORY = "weblounge.contentrepository";
@@ -59,8 +65,23 @@ public class ContentRepositoryService {
   /** The prototype class */
   protected Class<? extends ContentRepository> prototype = null;
 
+  /** The registered content repositories */
+  private Map<Site, ContentRepository> repositories = new HashMap<Site, ContentRepository>();
+
   /** The site tracker */
   private SiteTracker siteTracker = null;
+  
+  /** Tracker for content repository factories */
+  private ContentRepositoryFactoryTracker factoryTracker = null;
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.contentrepository.ContentRepositoryService#getRepository(ch.o2it.weblounge.common.site.Site)
+   */
+  public ContentRepository getRepository(Site site) {
+    return repositories.get(site);
+  }
 
   /**
    * Callback from the OSGi environment to activate the service.
@@ -76,7 +97,7 @@ public class ContentRepositoryService {
     BundleContext bundleContext = context.getBundleContext();
     Object prototypeClassName = context.getProperties().get(CONTENT_REPOSITORY);
 
-    logger.info("Starting content repository factory");
+    logger.info("Starting content repository service");
 
     // Try to load the implementation from the system configuration
     if (prototypeClassName != null) {
@@ -87,8 +108,9 @@ public class ContentRepositoryService {
 
     // No luck here. Let's try the default
     else {
-      logger.warn("No content repository implementation specified. Using bundle content repository");
+      logger.info("No content repository implementation configured");
       prototype = (Class<? extends ContentRepository>) Class.forName(DEFAULT_REPOSITORY_TYPE);
+      logger.info("Using default implementation " + DEFAULT_REPOSITORY_TYPE);
     }
 
     // Test creation of the prototype
@@ -96,8 +118,11 @@ public class ContentRepositoryService {
 
     siteTracker = new SiteTracker(this, bundleContext);
     siteTracker.open();
+    
+    factoryTracker = new ContentRepositoryFactoryTracker(this, bundleContext);
+    factoryTracker.open();
 
-    logger.debug("Content repository factory activated");
+    logger.debug("Content repository service activated");
   }
 
   /**
@@ -110,10 +135,12 @@ public class ContentRepositoryService {
    *          the component context
    */
   public void deactivate(ComponentContext context) {
-    logger.debug("Deactivating content repository factory");
+    logger.debug("Deactivating content repository service");
     siteTracker.close();
+    factoryTracker.close();
     siteTracker = null;
-    logger.info("Content repository factory stopped");
+    factoryTracker = null;
+    logger.info("Content repository service stopped");
   }
 
   /**
@@ -133,7 +160,7 @@ public class ContentRepositoryService {
     try {
       repository = prototype.newInstance();
       repository.connect(properties);
-      ContentRepositoryFactory.register(site, repository);
+      repositories.put(site, repository);
     } catch (InstantiationException e) {
       logger.error("Unable to instantiate content repository " + prototype + " for site '" + site + "'", e);
     } catch (IllegalAccessException e) {
@@ -151,7 +178,7 @@ public class ContentRepositoryService {
    *          the site
    */
   public void unregisterSite(Site site) {
-    ContentRepository repository = ContentRepositoryFactory.unregister(site);
+    ContentRepository repository = repositories.remove(site);
     if (repository == null)
       return;
     try {
@@ -162,12 +189,24 @@ public class ContentRepositoryService {
   }
 
   /**
+   * Associates this service with the content repository factory in order to
+   * give the factory a backing implementation.
+   * 
+   * @param factory
+   *          the content repository factory
+   */
+  public void registerContentRepositoryFactory(ContentRepositoryFactory factory) {
+    logger.debug("Backing content repository factory with " + this);
+    factory.setContentRepositoryService(this);
+  }
+
+  /**
    * Service tracker for {@link Site} instances.
    */
   private static class SiteTracker extends ServiceTracker {
 
     /** The enclosing content repository factory */
-    private ContentRepositoryService factory = null;
+    private ContentRepositoryServiceImpl factory = null;
 
     /**
      * Creates a new site tracker which will call back to the
@@ -178,7 +217,8 @@ public class ContentRepositoryService {
      * @param context
      *          the bundle context
      */
-    public SiteTracker(ContentRepositoryService factory, BundleContext context) {
+    public SiteTracker(ContentRepositoryServiceImpl factory,
+        BundleContext context) {
       super(context, Site.class.getName(), null);
       this.factory = factory;
     }
@@ -205,6 +245,43 @@ public class ContentRepositoryService {
     public void removedService(ServiceReference reference, Object service) {
       factory.unregisterSite((Site) service);
       super.removedService(reference, service);
+    }
+
+  }
+
+  /**
+   * Service tracker for {@link ContentRepositoryFactoryTracker} instances.
+   */
+  private static class ContentRepositoryFactoryTracker extends ServiceTracker {
+
+    /** The enclosing content repository factory */
+    private ContentRepositoryServiceImpl service = null;
+
+    /**
+     * Creates a new site tracker which will call back to the
+     * <code>ContentRepositoryService</code> that created it.
+     * 
+     * @param service
+     *          the content repository service
+     * @param context
+     *          the bundle context
+     */
+    public ContentRepositoryFactoryTracker(ContentRepositoryServiceImpl service,
+        BundleContext context) {
+      super(context, ContentRepositoryFactory.class.getName(), null);
+      this.service = service;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
+     */
+    @Override
+    public Object addingService(ServiceReference reference) {
+      ContentRepositoryFactory factory = (ContentRepositoryFactory) super.addingService(reference);
+      service.registerContentRepositoryFactory(factory);
+      return factory;
     }
 
   }

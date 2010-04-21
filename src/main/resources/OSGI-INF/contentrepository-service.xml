@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component immediate="true" start="activate" stop="deactivate" name="Weblounge Content Repository Service">
-  <implementation class="ch.o2it.weblounge.contentrepository.ContentRepositoryService" />
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl" />
   <property name="service.description" value="Weblounge Content Repository Service" />
+  <service>
+    <provide interface="ch.o2it.weblounge.contentrepository.ContentRepositoryService" />
+  </service>
 </component>

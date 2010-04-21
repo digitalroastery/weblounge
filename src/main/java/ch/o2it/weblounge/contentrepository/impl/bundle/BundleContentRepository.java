@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.contentrepository.bundle;
+package ch.o2it.weblounge.contentrepository.impl.bundle;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
@@ -70,7 +70,7 @@ public class BundleContentRepository implements ContentRepository {
 
   /** The site */
   protected Site site = null;
-  
+
   /** The site bundle context */
   protected Bundle bundle = null;
 
@@ -85,8 +85,9 @@ public class BundleContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#connect(ch.o2it.weblounge.common.site.Site, java.util.Dictionary)
+   * 
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#connect(ch.o2it.weblounge.common.site.Site,
+   *      java.util.Dictionary)
    */
   public void connect(Dictionary<?, ?> properties)
       throws ContentRepositoryException {
@@ -112,7 +113,7 @@ public class BundleContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#exists(ch.o2it.weblounge.common.content.PageURI)
    */
   public boolean exists(PageURI uri) throws ContentRepositoryException {
@@ -120,16 +121,28 @@ public class BundleContentRepository implements ContentRepository {
       throw new IllegalArgumentException("Page uri cannot be null");
     String file = PageUtils.getDocument(uri.getVersion());
     String entryPath = UrlSupport.concat(new String[] {
-      pagesPathPrefix, uri.getPath(), file 
-    });
+        pagesPathPrefix,
+        uri.getPath(),
+        file });
     URL url = bundle.getEntry(entryPath);
     return url != null;
   }
 
   /**
+   * Returns the bundle or <code>null</code> if no bundle has been set so far.
+   * 
+   * @return the bundle
+   */
+  public Bundle getBundle() {
+    return bundle;
+  }
+
+  /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#exists(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)
+   * 
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#exists(ch.o2it.weblounge.common.content.PageURI,
+   *      ch.o2it.weblounge.common.user.User,
+   *      ch.o2it.weblounge.common.security.Permission)
    */
   public boolean exists(PageURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException {
@@ -142,7 +155,8 @@ public class BundleContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#findPages(ch.o2it.weblounge.common.content.SearchQuery)
    */
-  public SearchResult[] findPages(SearchQuery query) throws ContentRepositoryException {
+  public SearchResult[] findPages(SearchQuery query)
+      throws ContentRepositoryException {
     // TODO: Implement a static search index for bundles
     throw new UnsupportedOperationException("Searching in bundle repositories is not supported");
   }
@@ -155,7 +169,10 @@ public class BundleContentRepository implements ContentRepository {
   public Page getPage(PageURI uri) throws ContentRepositoryException {
     if (uri == null)
       throw new IllegalArgumentException("Page uri cannot be null");
-    String entryPath = UrlSupport.concat(pagesPathPrefix, uri.getPath());
+    String entryPath = UrlSupport.concat(new String[] {
+        pagesPathPrefix,
+        uri.getPath(),
+        PageUtils.getDocument(uri.getVersion()) });
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
@@ -189,7 +206,7 @@ public class BundleContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.PageURI)
    */
-  @SuppressWarnings({ "unchecked" })
+  @SuppressWarnings( { "unchecked" })
   public PageURI[] getVersions(PageURI uri) throws ContentRepositoryException {
     if (uri == null)
       throw new IllegalArgumentException("Page uri cannot be null");
@@ -210,7 +227,7 @@ public class BundleContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages()
    */
   public Iterator<PageURI> listPages() throws ContentRepositoryException {
@@ -219,7 +236,7 @@ public class BundleContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(long[])
    */
   public Iterator<PageURI> listPages(long[] versions)
@@ -229,7 +246,7 @@ public class BundleContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI)
    */
   public Iterator<PageURI> listPages(PageURI uri)
@@ -239,8 +256,9 @@ public class BundleContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, long[])
+   * 
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
+   *      long[])
    */
   public Iterator<PageURI> listPages(PageURI uri, long[] versions)
       throws ContentRepositoryException {
@@ -249,8 +267,9 @@ public class BundleContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, int)
+   * 
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
+   *      int)
    */
   public Iterator<PageURI> listPages(PageURI uri, int level)
       throws ContentRepositoryException {
@@ -259,8 +278,9 @@ public class BundleContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, int, long[])
+   * 
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
+   *      int, long[])
    */
   @SuppressWarnings("unchecked")
   public Iterator<PageURI> listPages(PageURI uri, int level, long[] versions)
@@ -349,6 +369,34 @@ public class BundleContentRepository implements ContentRepository {
     if (resourcesURI.startsWith("/"))
       throw new IllegalArgumentException("Pages uri Must be absolute");
     this.resourcesPathPrefix = resourcesURI;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof BundleContentRepository) {
+      BundleContentRepository repo = (BundleContentRepository) obj;
+      if (bundle != null) {
+        return bundle.equals(repo.getBundle());
+      } else {
+        return super.equals(obj);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "bundle repository " + bundle.toString();
   }
 
 }

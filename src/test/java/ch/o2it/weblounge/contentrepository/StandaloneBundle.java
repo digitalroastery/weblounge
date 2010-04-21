@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository;
 
+import org.junit.Ignore;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
@@ -37,6 +38,7 @@ import java.util.List;
 /**
  * Utility implementation for bundle related tests.
  */
+@Ignore
 public class StandaloneBundle implements Bundle {
 
   /** The test resources class loader */

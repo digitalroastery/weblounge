@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.contentrepository.jcr;
+package ch.o2it.weblounge.contentrepository.impl.jcr;
 
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 
