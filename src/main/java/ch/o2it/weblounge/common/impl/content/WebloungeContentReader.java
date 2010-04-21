@@ -272,6 +272,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
       Date endDate = (Date) clipboard.get("publish.end");
       if (endDate == null)
         throw new IllegalStateException("Publication end date not found");
+      endDate = new Date(Long.MAX_VALUE);
       setPublished(publisher, startDate, endDate);
       contentReaderContext = Context.Unknown;
     }
