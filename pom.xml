@@ -22,6 +22,12 @@
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
+      <artifactId>weblounge-contentrepository-api</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
       <version>3.0-SNAPSHOT</version>
     </dependency>
@@ -82,6 +88,7 @@
               ch.o2it.weblounge.common.site,
               ch.o2it.weblounge.common.url,
               ch.o2it.weblounge.common.user,
+              ch.o2it.weblounge.contentrepository,
               org.apache.commons.lang,
               org.slf4j,
               javax.servlet,
@@ -95,6 +102,9 @@
               ch.o2it.weblounge.taglib.security,
               ch.o2it.weblounge.taglib.util
             </Export-Package>
+            <Service-Component>
+              OSGI-INF/contentrepository-factory.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

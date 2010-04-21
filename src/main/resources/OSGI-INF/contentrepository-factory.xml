@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component immediate="true" name="Weblounge Taglibrary Content Repository Factory">
+  <implementation class="ch.o2it.weblounge.contentrepository.ContentRepositoryFactory" />
+  <property name="service.description" value="Weblounge Taglibrary Content Repository Factory" />
+  <service>
+    <provide interface="ch.o2it.weblounge.contentrepository.ContentRepositoryFactory" />
+  </service>
+</component>
