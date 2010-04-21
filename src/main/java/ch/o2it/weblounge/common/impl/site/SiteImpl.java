@@ -36,7 +36,6 @@ import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
-import ch.o2it.weblounge.common.repository.ContentRepository;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -146,9 +145,6 @@ public class SiteImpl implements Site {
   /** Ordered list of site urls */
   protected List<String> hostnames = null;
   
-  /** Content repository for site pages and resources */
-  protected ContentRepository contentRepository = null;
-
   /** Jobs */
   protected Map<String, QuartzJob> jobs = null;
 
@@ -1071,24 +1067,6 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.Site#setContentRepository(ch.o2it.weblounge.common.site.ContentRepository)
-   */
-  public void setContentRepository(ContentRepository repository) {
-    this.contentRepository = repository;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.Site#getContentRepository()
-   */
-  public ContentRepository getContentRepository() {
-    return contentRepository;
-  }
-
-  /**
-   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.Customizable#setOption(java.lang.String,
    *      java.lang.String)
@@ -1174,6 +1152,7 @@ public class SiteImpl implements Site {
       JobDataMap jobData = new JobDataMap();
       jobData.put(QuartzJobWorker.CLASS, jobClass);
       jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
+      job.getContext().put(Site.class.getName(), this);
       JobDetail quartzJob = new JobDetail(jobIdentifier, groupName, QuartzJobWorker.class);
       quartzJob.setJobDataMap(jobData);
 

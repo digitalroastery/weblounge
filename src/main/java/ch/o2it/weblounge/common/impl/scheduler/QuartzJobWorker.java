@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.scheduler;
 
 import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.scheduler.JobException;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -66,11 +67,13 @@ public class QuartzJobWorker implements org.quartz.Job {
       }
 
       // Prepare the local job context
-      Dictionary<String, Serializable> jobContext = (Dictionary<String, Serializable>)ctx.getJobDetail().getJobDataMap().get(CONTEXT);
+      JobDataMap jobData = ctx.getJobDetail().getJobDataMap();
+      Dictionary<String, Serializable> jobContext = (Dictionary<String, Serializable>)jobData.get(CONTEXT);
       if (jobContext == null) {
         logger.debug("Creating default job context");
         jobContext = new Hashtable<String, Serializable>();
-        ctx.getJobDetail().getJobDataMap().put(CONTEXT, jobContext);
+        jobContext.put(Site.class.getName(), (Site)jobData.get(Site.class.getName()));
+        jobData.put(CONTEXT, jobContext);
       }
       
       // Execute the worker
