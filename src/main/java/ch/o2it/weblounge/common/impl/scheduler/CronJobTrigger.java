@@ -102,6 +102,9 @@ public final class CronJobTrigger implements JobTrigger {
 
   /** The cached execution time */
   private long nextExecution = -1;
+  
+  /** The last execution */
+  private long lastExecution = -1;  
 
   /**
    * Creates a new trigger, that will - without further configuration - never
@@ -140,7 +143,9 @@ public final class CronJobTrigger implements JobTrigger {
     if (nextExecution > date.getTime())
       return new Date(nextExecution);
     else if (once) {
-      once = false;
+      if (lastExecution > -1)
+        return null;
+      lastExecution = date.getTime();
       return date;
     }
 
