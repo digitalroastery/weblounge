@@ -47,7 +47,7 @@ public class SiteStartupJob implements JobWorker {
    */
   public void execute(String name, Dictionary<String, Serializable> ctx)
       throws JobException {
-    Site site = (Site)ctx.get(JobWorker.CTXT_SITE);
+    Site site = (Site)ctx.get(Site.class.getName());
     if (site != null)
       log_.info("Site '" + site + "' started");
     else
