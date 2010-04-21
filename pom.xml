@@ -13,6 +13,12 @@
   <dependencies>
 	
     <!-- weblounge -->
+
+    <dependency>
+      <groupId>ch.o2it.weblounge</groupId>
+      <artifactId>weblounge-contentrepository-api</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
 	
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
@@ -283,7 +289,9 @@
               jempbox
             -->
             <Export-Package>
-              ch.o2it.weblounge.contentrepository.impl
+              ch.o2it.weblounge.contentrepository.bundle,
+              ch.o2it.weblounge.contentrepository.fs,
+              ch.o2it.weblounge.contentrepository.jcr
             </Export-Package>
             <Import-Package>
               org.apache.xml.resolver.*;resolution:=optional,
@@ -300,6 +308,9 @@
               !org.apache.tools.ant.*,
               !org.apache.lucene.demo,
             -->
+            <Service-Component>
+              OSGI-INF/contentrepository-service.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
