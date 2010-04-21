@@ -94,6 +94,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     super('/');
     this.site = site;
     this.path = analyzePath(path, '/');
+    version = Math.max(Page.LIVE, version);
   }
 
   /**
