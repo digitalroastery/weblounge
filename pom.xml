@@ -157,6 +157,7 @@
           	  ch.o2it.weblounge.dispatcher.impl
             </Export-Package>
             <Service-Component>
+              OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/dispatcher-service.xml,
               OSGI-INF/action-requesthandler.xml,
               OSGI-INF/page-requesthandler.xml,

@@ -44,6 +44,7 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.PageRequestHandler;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
+import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,6 +157,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
             pageURI,
             e.getMessage(),
             e });
+        DispatchUtils.sendInternalError(request, response);
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         return true;
       }
@@ -181,7 +183,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         // AccessController.checkPermission(p);
       } catch (SecurityException e) {
         log_.warn("Accessed to page {} denied for user {}", pageURI, user);
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        DispatchUtils.sendAccessDenied(request, response);
         return true;
       }
 
@@ -193,19 +195,14 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       try {
         template = getPageTemplate(page, request);
       } catch (IllegalStateException e) {
-        log_.warn(e.getMessage());
-        try {
-          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } catch (IOException e1) { /* never mind */ }
+        DispatchUtils.sendInternalError(request, response);
         return true;
       }
 
       // Does the template support the requested flavor?
       if (!template.supportsFlavor(contentFlavor)) {
         log_.warn("Template {} does not support requested flavor {}", template, contentFlavor);
-        try {
-          response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-        } catch (IOException e) { /* never mind */ }
+        DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, request, response);
         return true;
       }
 
@@ -237,7 +234,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         } else {
           log_.error(msg, e);
         }
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        DispatchUtils.sendInternalError(request, response);
       }
       return true;
     } catch (IOException e) {

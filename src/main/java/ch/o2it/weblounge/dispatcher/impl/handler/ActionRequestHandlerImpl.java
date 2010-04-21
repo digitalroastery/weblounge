@@ -490,7 +490,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     } else if (page != null) {
       template = site.getTemplate(page.getTemplate());
       if (template == null) {
-        throw new IllegalStateException("Page template " + templateId + " specified by page " + page + " was not found");
+        throw new IllegalStateException("Page template for page " + page + " was not found");
       }
     }
     return template;
