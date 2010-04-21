@@ -309,11 +309,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     buf.append(separatorChar).append(path);
     
     // Version
-    if (includeVersion && version >= 0) {
+    if (includeVersion && version > 0) {
       buf.append(separatorChar);
-      if (version == Page.LIVE)
-        buf.append("live");
-      else if (version == Page.WORK)
+      if (version == Page.WORK)
         buf.append("work");
       else if (version >= 0)
         buf.append(Long.toString(version));
