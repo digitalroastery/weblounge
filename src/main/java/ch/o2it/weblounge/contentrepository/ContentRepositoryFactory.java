@@ -22,8 +22,8 @@ package ch.o2it.weblounge.contentrepository;
 
 import ch.o2it.weblounge.common.site.Site;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the <code>ContentRepositoryFactory</code>. The
@@ -37,8 +37,22 @@ import java.util.Map;
  */
 public class ContentRepositoryFactory {
 
-  /** The registered content repositories */
-  private static Map<Site, ContentRepository> repositories = new HashMap<Site, ContentRepository>();
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryFactory.class);
+
+  /** The content repository service */
+  private static ContentRepositoryService repositoryService = null;
+
+  /**
+   * This method is used to register the factory with a backing service
+   * implementation.
+   * 
+   * @param service
+   *          the content repository service
+   */
+  public void setContentRepositoryService(ContentRepositoryService service) {
+    repositoryService = service;
+  }
 
   /**
    * {@inheritDoc}
@@ -46,30 +60,11 @@ public class ContentRepositoryFactory {
    * @see ch.o2it.weblounge.common.repository.ContentRepositoryFactory#newContentRepository(ch.o2it.weblounge.common.site.Site)
    */
   public static ContentRepository getRepository(Site site) {
-    return repositories.get(site);
-  }
-
-  /**
-   * Registers site and content repository with the factory.
-   * 
-   * @param site
-   *          the site
-   * @param repository
-   *          the site's content repository
-   */
-  static void register(Site site, ContentRepository repository) {
-    repositories.put(site, repository);
-  }
-
-  /**
-   * Unregisters the site from the factory, returning the associated content
-   * repository.
-   * 
-   * @param site
-   *          the site
-   */
-  static ContentRepository unregister(Site site) {
-    return repositories.remove(site);
+    if (repositoryService == null) {
+      logger.warn("Tried to access content repository without a backing service being configured");
+      return null;
+    }
+    return repositoryService.getRepository(site);
   }
 
 }

@@ -11,11 +11,22 @@
     <version>3.0-SNAPSHOT</version>
   </parent>
   <dependencies>
+
+    <!-- weblounge -->
+
   	<dependency>
   		<groupId>ch.o2it.weblounge</groupId>
   		<artifactId>weblounge-common-api</artifactId>
   		<version>3.0-SNAPSHOT</version>
   	</dependency>
+
+    <!-- thirdparty -->
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
@@ -30,7 +41,8 @@
               ch.o2it.weblounge.common.content,
               ch.o2it.weblounge.common.security,
               ch.o2it.weblounge.common.site,
-              ch.o2it.weblounge.common.user
+              ch.o2it.weblounge.common.user,
+              org.slf4j
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.contentrepository
