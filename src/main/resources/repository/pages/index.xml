@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <page id="0" version="live">
   <head>
-    <template>home</template>
-    <layout>news</layout>
+    <template>default</template>
     <promote>true</promote>
     <index>true</index>
     <metadata>
@@ -28,7 +27,7 @@
     <published>
       <user id="hans" realm="testland">Hans Muster</user>
       <from>2006/05/05 16:58:21 GMT</from>
-      <to>2010/01/01 00:00:00 GMT</to>
+      <to>292278994/08/17 08:12:55 CET</to>
     </published>
     <security>
       <owner>
