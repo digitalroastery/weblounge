@@ -18,10 +18,9 @@
     <language default="true">de</language>
     <language>en</language>
   </languages>
-  <!-- UNCOMMENT TO ACTIVATE
   <templates>
     <template id="default" composeable="true" default="true">
-      <renderer>${site.root}/templates/template.jsp</renderer>
+      <renderer>file://${site.root}/templates/template.jsp</renderer>
       <stage>main</stage>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
@@ -29,5 +28,4 @@
       <name language="en">Default template</name>
     </template>
   </templates>
-  -->
 </site>
