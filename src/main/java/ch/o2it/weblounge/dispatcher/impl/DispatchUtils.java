@@ -299,7 +299,8 @@ public class DispatchUtils {
       WebloungeRequest request, WebloungeResponse response) {
     try {
       response.invalidate();
-      response.sendError(status, msg);
+      if (!response.isCommitted())
+        response.sendError(status, msg);
     } catch (Exception e2) {
       log_.error("I/O Error when sending back error message {}: {}", status, e2.getMessage());
     }
