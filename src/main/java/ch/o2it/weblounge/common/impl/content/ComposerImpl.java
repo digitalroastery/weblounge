@@ -26,21 +26,25 @@ import ch.o2it.weblounge.common.content.Pagelet;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Default implementation of a <code>Composer</code>.
  */
 public class ComposerImpl implements Composer {
-  
+
   /** The composer identifier */
   protected String identifier = null;
-  
+
   /** The pagelets */
   protected List<Pagelet> pagelets = null;
-  
+
   /**
    * Creates a new composer with the given identifier.
+   * 
+   * @param identifier
+   *          the composer identifier
    */
   public ComposerImpl(String identifier) {
     if (StringUtils.trimToNull(identifier) == null)
@@ -50,8 +54,21 @@ public class ComposerImpl implements Composer {
   }
 
   /**
+   * Creates a new composer with the given identifier.
+   * 
+   * @param identifier
+   *          the composer identifier
+   * @param pagelets
+   *          the composer's content
+   */
+  public ComposerImpl(String identifier, Pagelet[] pagelets) {
+    this(identifier);
+    setPagelets(pagelets);
+  }
+
+  /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Composer#getIdentifier()
    */
   public String getIdentifier() {
@@ -59,8 +76,19 @@ public class ComposerImpl implements Composer {
   }
 
   /**
+   * Sets this composer's pagelets.
+   * 
+   * @param pagelets
+   *          the pagelets;
+   */
+  public void setPagelets(Pagelet[] pagelets) {
+    this.pagelets.clear();
+    this.pagelets.addAll(Arrays.asList(pagelets));
+  }
+
+  /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Composer#getPagelets()
    */
   public Pagelet[] getPagelets() {

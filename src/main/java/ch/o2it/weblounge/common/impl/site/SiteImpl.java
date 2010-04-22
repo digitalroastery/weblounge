@@ -69,6 +69,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1297,6 +1298,16 @@ public class SiteImpl implements Site {
     NodeList templateNodes = XPathHelper.selectList(config, "templates/template", xpathProcessor);
     for (int i = 0; i < templateNodes.getLength(); i++) {
       PageTemplate template = PageTemplateImpl.fromXml(templateNodes.item(i), xpathProcessor);
+
+      // Adjust the renderer url
+      String rendererUrl = template.getRenderer().toExternalForm();
+      rendererUrl = ConfigurationUtils.processTemplate(rendererUrl, site);
+      try {
+        template.setRenderer(new URL(rendererUrl));
+      } catch (MalformedURLException e) {
+        throw new IllegalStateException("Url '" + rendererUrl + "' of page template '" + template.getIdentifier() + "' is malformed");
+      }
+
       boolean isDefault = ConfigurationUtils.isDefault(templateNodes.item(i));
       if (isDefault)
         site.setDefaultTemplate(template);

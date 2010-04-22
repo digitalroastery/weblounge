@@ -21,11 +21,15 @@
 package ch.o2it.weblounge.common.impl.util.config;
 
 import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.site.Module;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -331,6 +335,54 @@ public class ConfigurationUtils {
       }
     }
     return millis;
+  }
+
+  /**
+   * Processes the given text by replacing these placeholders with their actual
+   * values:
+   * <ul>
+   * <li><code>file://${site.root}</code> with <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;</li>
+   * </ul>
+   * 
+   * @param text
+   *          the text to process
+   * @param site
+   *          the site
+   * @return the processed text
+   */
+  public static String processTemplate(String text, Site site) {
+    Map<String, String> replacements = new HashMap<String, String>();
+    replacements.put("file://\\$\\{site.root\\}", "http://" + site.getHostName() + ":8080/weblounge-sites/" + site.getIdentifier());
+    for (Map.Entry<String, String> entry : replacements.entrySet()) {
+      text = text.replaceAll(entry.getKey(), entry.getValue());
+    }
+    return text;
+  }
+
+  /**
+   * Processes the given text by replacing these placeholders with their actual
+   * values:
+   * <ul>
+   * <li><code>file://${site.root}</code> with <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;</li>
+   * <li><code>file://${module.root}</code> with <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;/modules/&lt;module&gt;</code></li>
+   * </ul>
+   * 
+   * @param text
+   *          the text to process
+   * @param site
+   *          the site
+   * @param module
+   *          the module
+   * @return the processed text
+   */
+  public static String processTemplate(String text, Site site, Module module) {
+    Map<String, String> replacements = new HashMap<String, String>();
+    replacements.put("file://\\$\\{site.root\\}", "http://" + site.getHostName() + ":8080/weblounge-sites/" + site.getIdentifier());
+    replacements.put("file://\\$\\{module.root\\}", "http://" + site.getHostName() + ":8080/weblounge-sites/" + site.getIdentifier() + "/modules/" + module.getIdentifier());
+    for (Map.Entry<String, String> entry : replacements.entrySet()) {
+      text = text.replaceAll(entry.getKey(), entry.getValue());
+    }
+    return text;
   }
 
 }

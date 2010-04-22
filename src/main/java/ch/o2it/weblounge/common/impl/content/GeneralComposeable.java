@@ -288,6 +288,16 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
   /**
    * {@inheritDoc}
    *
+   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#toString()
+   */
+  @Override
+  public String toString() {
+    return identifier;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#toString(ch.o2it.weblounge.common.language.Language)
    */
   @Override
