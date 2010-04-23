@@ -11,7 +11,7 @@
  	<display-name>Weblounge Content Tags</display-name>
 	<description>Tag library providing access to the Weblounge CMS content</description>
   
-  	<tag>
+  <tag>
 		<name>cachetag</name>
 		<tag-class>ch.o2it.weblounge.taglib.content.CacheTag</tag-class>
 		<body-content>empty</body-content>
