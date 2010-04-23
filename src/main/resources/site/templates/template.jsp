@@ -9,6 +9,5 @@
 	<body>
 		<h1><%= "Hello world!" %></h1>
 		<greeter:greeting/>
-		<webl:composer name="main"/>
 	</body>
 </html>
