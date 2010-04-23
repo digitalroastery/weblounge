@@ -21,7 +21,6 @@
 		<attribute><name>value</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
   
-    <!-- FINISH IMPLEMENTATION
 	<tag>
 		<name>composer</name>
 		<tag-class>ch.o2it.weblounge.taglib.content.ComposerTag</tag-class>
@@ -63,7 +62,6 @@
 		<attribute><name>onKeyPress</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>onKeyUp</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
-    -->
 
 	<tag>
 		<name>headers</name>
@@ -540,7 +538,6 @@
 	</tag>
     -->
 
-    <!-- FINISH IMPLEMENTATION
 	<tag>
 		<name>pagepreview</name>
 		<tag-class>ch.o2it.weblounge.taglib.content.PagePreviewTag</tag-class>
@@ -552,6 +549,5 @@
 		<attribute><name>start</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>end</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
-    -->
 	
 </taglib>

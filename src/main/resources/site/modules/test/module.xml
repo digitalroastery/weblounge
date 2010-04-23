@@ -13,8 +13,8 @@
         <link href="http://localhost:8080/weblounge-sites/weblounge-test/modules/test/css/content.css" type="text/css"/>
       </includes>
     </pagelet>
-    <pagelet id="greeting" composeable="true">
-      <renderer>http://localhost:8080/weblounge-sites/weblounge-test/modules/test/pagelets/greeting.jsp</renderer>
+    <pagelet id="include" composeable="true">
+      <renderer>http://localhost:8080/weblounge-sites/weblounge-test/modules/test/pagelets/include.jsp</renderer>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
       <name language="de">Begrüssung</name>

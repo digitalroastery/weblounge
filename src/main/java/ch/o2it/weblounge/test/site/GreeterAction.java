@@ -114,11 +114,8 @@ public class GreeterAction extends HTMLActionSupport {
       String htmlGreeting = StringEscapeUtils.escapeHtml(greetings.get(language));
       IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getOutputStream(), "UTF-8");
 
-      // Include a pagelet
-      include(request, response, "content", null);
-
       // Include another pagelet
-      include(request, response, "greeting", null);
+      include(request, response, "include", null);
       return SKIP_COMPOSER;
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
