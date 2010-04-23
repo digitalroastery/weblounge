@@ -359,6 +359,11 @@ public class ComposerTag extends WebloungeTag {
     ComposerImpl composer = new ComposerImpl(composerName);
     JspWriter writer = pageContext.getOut();
     Page targetPage = (Page)request.getAttribute(WebloungeRequest.PAGE);
+    
+    if (targetPage == null) {
+      log_.warn("No page was found while processing composer on " + url);
+      return EVAL_PAGE;
+    }
 
     long version = request.getVersion();
     boolean isLocked = targetPage.isLocked();
