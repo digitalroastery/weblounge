@@ -34,6 +34,8 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Module;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -49,6 +51,9 @@ import javax.xml.xpath.XPathFactory;
  */
 public class PageletRendererImpl extends AbstractRenderer implements PageletRenderer {
 
+  /** The logging facility */
+  private Logger logger = LoggerFactory.getLogger(PageletRendererImpl.class);
+  
   /** The editor url */
   protected URL editor = null;
 
@@ -121,6 +126,15 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
+    String path = renderer.toExternalForm();
+    if (path.matches(".*\\$\\{.*\\}.*")) {
+      try {
+        renderer = new URL(ConfigurationUtils.processTemplate(path, request, module));
+      } catch (MalformedURLException e) {
+        logger.error("Error processing renderer url '" + renderer + "'", e);
+        throw new RenderException(this, e);
+      }
+    }
     includeJSP(request, response, renderer);
   }
 
@@ -132,6 +146,15 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void renderAsEditor(WebloungeRequest request,
       WebloungeResponse response) throws RenderException {
+    String path = editor.toExternalForm();
+    if (path.matches(".*\\$\\{.*\\}.*")) {
+      try {
+        editor = new URL(ConfigurationUtils.processTemplate(path, request, module));
+      } catch (MalformedURLException e) {
+        logger.error("Error processing editor url '" + editor + "'", e);
+        throw new RenderException(this, e);
+      }
+    }
     includeJSP(request, response, editor);
   }
 

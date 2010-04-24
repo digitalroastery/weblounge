@@ -33,6 +33,8 @@ import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -47,6 +49,9 @@ import javax.xml.xpath.XPathFactory;
  * Page.
  */
 public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
+
+  /** The logging facility */
+  private Logger logger = LoggerFactory.getLogger(PageTemplateImpl.class);
 
   /** Default composer for action output */
   protected String stage = DEFAULT_STAGE;
@@ -140,6 +145,15 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
+    String path = renderer.toExternalForm();
+    if (path.matches(".*\\$\\{.*\\}.*")) {
+      try {
+        renderer = new URL(ConfigurationUtils.processTemplate(path, request));
+      } catch (MalformedURLException e) {
+        logger.error("Error processing renderer url '" + renderer + "'", e);
+        throw new RenderException(this, e);
+      }
+    }
     includeJSP(request, response, renderer);
   }
 

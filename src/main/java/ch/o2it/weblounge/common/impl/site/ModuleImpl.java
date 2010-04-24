@@ -637,26 +637,7 @@ public class ModuleImpl implements Module {
     // pagelets
     NodeList pageletNodes = XPathHelper.selectList(config, "pagelets/pagelet", xpathProcessor);
     for (int i = 0; i < pageletNodes.getLength(); i++) {
-      PageletRenderer pagelet = PageletRendererImpl.fromXml(pageletNodes.item(i), xpathProcessor);
-      
-//      // Adjust the renderer url
-//      String rendererUrl = pagelet.getRenderer().toExternalForm();
-//      rendererUrl = ConfigurationUtils.processTemplate(rendererUrl, site, module);
-//      try {
-//        pagelet.setRenderer(new URL(rendererUrl));
-//      } catch (MalformedURLException e) {
-//        throw new IllegalStateException("Renderer url '" + rendererUrl + "' of page template '" + template.getIdentifier() + "' is malformed");
-//      }
-//
-//      // Adjust the editor url
-//      String editorUrl = pagelet.getEditor().toExternalForm();
-//      editorUrl = ConfigurationUtils.processTemplate(editorUrl, site, module);
-//      try {
-//        pagelet.setEditor(new URL(editorUrl));
-//      } catch (MalformedURLException e) {
-//        throw new IllegalStateException("Editor url '" + editorUrl + "' of page template '" + template.getIdentifier() + "' is malformed");
-//      }
-
+      PageletRenderer pagelet = PageletRendererImpl.fromXml(pageletNodes.item(i), xpathProcessor);      
       module.addRenderer(pagelet);
     }
 

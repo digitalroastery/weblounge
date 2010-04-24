@@ -21,10 +21,13 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.ConfigurationException;
+import ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement;
 import ch.o2it.weblounge.common.content.Link;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Module;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
 
@@ -35,7 +38,7 @@ import javax.xml.xpath.XPathFactory;
  * This class encapsulates the information to include a link element within the
  * &lt;head&gt; section of an <code>HTML</code> page.
  */
-public class LinkImpl implements Link {
+public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
   /** Source */
   protected String href = null;
@@ -120,16 +123,17 @@ public class LinkImpl implements Link {
   }
 
   /**
-   * @see ch.o2it.weblounge.api.module.ModuleInclude#setModule(ch.o2it.weblounge.common.site.Module)
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement#configure(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.site.Site, ch.o2it.weblounge.common.site.Module)
    */
-  public void setModule(Module m) {
-    if (href == null)
-      return;
-    else if (href.indexOf("://") > 0 || href.startsWith("/"))
-      return;
-    href = UrlSupport.concat(m.getUrl().getLink(), href);
+  public void configure(WebloungeRequest request, Site site, Module module)
+      throws IllegalStateException {
+    if (href != null && href.matches(".*\\$\\{.*\\}.*")) {
+      href = ConfigurationUtils.processTemplate(href, request, module);
+    }
   }
-
+  
   /**
    * {@inheritDoc}
    *

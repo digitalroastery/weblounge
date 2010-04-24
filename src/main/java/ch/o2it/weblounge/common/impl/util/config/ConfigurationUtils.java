@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.impl.util.config;
 
 import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
@@ -346,13 +347,21 @@ public class ConfigurationUtils {
    * 
    * @param text
    *          the text to process
-   * @param site
-   *          the site
+   * @param request
+   *          the request
    * @return the processed text
    */
-  public static String processTemplate(String text, Site site) {
+  public static String processTemplate(String text, WebloungeRequest request) {
     Map<String, String> replacements = new HashMap<String, String>();
-    replacements.put("file://\\$\\{site.root\\}", "http://" + site.getHostName() + ":8080/weblounge-sites/" + site.getIdentifier());
+    Site site = request.getSite();
+    String hostname = request.getLocalName();
+    String port = request.getLocalPort() != 80 ? ":" + request.getLocalPort() : "";
+    
+    StringBuffer siteRootReplacement = new StringBuffer();
+    siteRootReplacement.append("http://").append(hostname).append(port);
+    siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
+
+    replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
     for (Map.Entry<String, String> entry : replacements.entrySet()) {
       text = text.replaceAll(entry.getKey(), entry.getValue());
     }
@@ -369,16 +378,27 @@ public class ConfigurationUtils {
    * 
    * @param text
    *          the text to process
-   * @param site
-   *          the site
+   * @param request
+   *          the request
    * @param module
    *          the module
    * @return the processed text
    */
-  public static String processTemplate(String text, Site site, Module module) {
+  public static String processTemplate(String text, WebloungeRequest request, Module module) {
     Map<String, String> replacements = new HashMap<String, String>();
-    replacements.put("file://\\$\\{site.root\\}", "http://" + site.getHostName() + ":8080/weblounge-sites/" + site.getIdentifier());
-    replacements.put("file://\\$\\{module.root\\}", "http://" + site.getHostName() + ":8080/weblounge-sites/" + site.getIdentifier() + "/modules/" + module.getIdentifier());
+    Site site = request.getSite();
+    String hostname = request.getLocalName();
+    String port = request.getLocalPort() != 80 ? ":" + request.getLocalPort() : "";
+    
+    StringBuffer siteRootReplacement = new StringBuffer();
+    siteRootReplacement.append("http://").append(hostname).append(port);
+    siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
+    replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
+
+    StringBuffer moduleRootReplacement = new StringBuffer(siteRootReplacement);
+    moduleRootReplacement.append("/modules/").append(module.getIdentifier());
+    replacements.put("file://\\$\\{module.root\\}", moduleRootReplacement.toString());
+
     for (Map.Entry<String, String> entry : replacements.entrySet()) {
       text = text.replaceAll(entry.getKey(), entry.getValue());
     }
