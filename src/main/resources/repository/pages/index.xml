@@ -40,7 +40,7 @@
   </head>
   <body>
     <composer id="main">
-      <pagelet module="testmodule" id="content">
+      <pagelet module="test" id="content">
         <security>
           <owner>
       			<user id="hans" realm="testland">Hans Muster</user>

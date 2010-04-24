@@ -1,26 +1,26 @@
-<module id="testmodule">
+<module id="test">
   <enable>true</enable>
   <name language="de">Testmodul</name>
   <name language="en">Test module</name>
   <pagelets>
     <pagelet id="content" composeable="true">
-      <renderer>http://localhost:8080/weblounge-sites/weblounge-test/modules/test/pagelets/content.jsp</renderer>
+      <renderer>file://${module.root}/pagelets/content.jsp</renderer>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
       <name language="de">Seiteninhalt</name>
       <name language="en">Page content</name>
       <includes>
-        <link href="http://localhost:8080/weblounge-sites/weblounge-test/modules/test/css/content.css" rel="stylesheet" type="text/css "/>
+        <link href="file://${module.root}/css/content.css" rel="stylesheet" type="text/css "/>
       </includes>
     </pagelet>
     <pagelet id="include" composeable="true">
-      <renderer>http://localhost:8080/weblounge-sites/weblounge-test/modules/test/pagelets/include.jsp</renderer>
+      <renderer>file://${module.root}/pagelets/include.jsp</renderer>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
       <name language="de">Begrüssung</name>
       <name language="en">Greeting</name>
       <includes>
-        <link href="http://localhost:8080/weblounge-sites/weblounge-test/modules/test/css/greeting.css" rel="stylesheet" type="text/css" />
+        <link href="file://${module.root}/css/greeting.css" rel="stylesheet" type="text/css" />
       </includes>
     </pagelet>
   </pagelets>
@@ -29,7 +29,7 @@
       <class>ch.o2it.weblounge.test.site.GreeterAction</class>
       <mountpoint>/greeting/</mountpoint>
       <includes>
-        <script src="http://localhost:8080/weblounge-sites/weblounge-test/modules/test/scripts/greeting.js" type="javascript"/>
+        <script src="file://${module.root}/scripts/greeting.js" type="javascript"/>
       </includes>
     </action>
     <action id="greeter.xml">
