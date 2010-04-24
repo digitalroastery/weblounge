@@ -326,7 +326,7 @@ public class LinkImpl implements Link {
       sb.append("\"");
     }
 
-    sb.append("/>");
+    sb.append(" />");
     return sb.toString();
   }
 

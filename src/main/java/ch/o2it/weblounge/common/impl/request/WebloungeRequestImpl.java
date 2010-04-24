@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.Guest;
 import ch.o2it.weblounge.common.language.Language;
@@ -34,11 +35,17 @@ import ch.o2it.weblounge.common.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
@@ -65,6 +72,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   /** Target site of this request */
   protected Site site = null;
 
+  /** The site servlet */
+  protected Servlet siteServlet = null;
+
   /** User of this request */
   protected User user = null;
 
@@ -82,9 +92,22 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    * 
    * @param request
    *          the request to wrap.
+   * @param servlet
+   *          the servlet used to serve content out of the request's site
+   */
+  public WebloungeRequestImpl(HttpServletRequest request, Servlet servlet) {
+    super(request);
+    this.siteServlet = servlet;
+  }
+
+  /**
+   * Creates a new wrapper for <code>request</code>.
+   * 
+   * @param request
+   *          the request to wrap.
    */
   public WebloungeRequestImpl(HttpServletRequest request) {
-    super(request);
+    this(request, null);
   }
 
   /**
@@ -95,10 +118,10 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     url = null;
     language = null;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getLanguage()
    */
   public Language getLanguage() {
@@ -156,7 +179,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getSite()
    */
   public Site getSite() {
@@ -168,7 +191,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getUrl()
    */
   public WebUrl getUrl() {
@@ -183,7 +206,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getRequestedUrl()
    */
   public WebUrl getRequestedUrl() {
@@ -201,7 +224,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getUser()
    */
   public User getUser() {
@@ -228,7 +251,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getVersion()
    */
   public long getVersion() {
@@ -239,7 +262,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getFlavor()
    */
   public RequestFlavor getFlavor() {
@@ -279,21 +302,50 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.ServletRequestWrapper#getRequestDispatcher(java.lang.String)
+   */
+  @Override
+  public RequestDispatcher getRequestDispatcher(String path) {
+    final String servletPath = UrlSupport.concat(new String[] {
+        "/weblounge-sites/",
+        site.getIdentifier() });
+    if (siteServlet != null && path.startsWith(servletPath)) {
+      return new RequestDispatcher() {
+        public void include(ServletRequest request, ServletResponse response)
+            throws ServletException, IOException {
+          siteServlet.service(request, response);
+        }
+
+        public void forward(ServletRequest request, ServletResponse response)
+            throws ServletException, IOException {
+          siteServlet.service(request, response);
+        }
+      };
+    } else {
+      return super.getRequestDispatcher(path);
+    }
+  }
+
+  /**
    * Method to reset this request object, forcing it to release any cached
    * information.
    * <p>
-   * Note that you should only set <code>clearSession</code> to <code>true</code>
-   * if you want to get rid of cached information to force a change in the way
-   * the current user is treated, e. g. if he/she has been logged out.
+   * Note that you should only set <code>clearSession</code> to
+   * <code>true</code> if you want to get rid of cached information to force a
+   * change in the way the current user is treated, e. g. if he/she has been
+   * logged out.
    * <p>
    * The following things are stored in the session
    * <ul>
-   *  <li>The current site</li>
-   *  <li>The user</li>
-   *  <li>The selected language</li>
+   * <li>The current site</li>
+   * <li>The user</li>
+   * <li>The selected language</li>
    * </ul>
    * 
-   * @param clearSession <code>true</code> to remove cached information as well
+   * @param clearSession
+   *          <code>true</code> to remove cached information as well
    */
   public void reset(boolean clearSession) {
     site = null;
@@ -305,7 +357,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       clearSession();
     }
   }
-  
+
   /**
    * Utility method used to clear the attributes stored by the url in the user's
    * session.
@@ -319,7 +371,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object o) {
@@ -331,7 +383,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
@@ -340,7 +392,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   public String toString() {

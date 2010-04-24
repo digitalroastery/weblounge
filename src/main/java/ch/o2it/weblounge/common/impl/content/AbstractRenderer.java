@@ -24,25 +24,23 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.RenderException;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.request.SiteRequestWrapper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.SocketException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -185,7 +183,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
         // Did we find a suitable JSP?
         if (jsp == null) {
           response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          throw new RenderException(this, "No suitable java server page found for " + renderer + " and language " + language.getIdentifier());
+          throw new RenderException(this, "No suitable java server page found for " + renderer + " and language '" + language.getIdentifier() + "'");
         }
   
         // Check readability
@@ -202,18 +200,30 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
         
         renderer = jsp.toURI().toURL();
       }
+      
+      // Prepare a request to site resources
+      String requestPath = renderer.getPath();
+      if (!request.getContextPath().equals(""))
+        requestPath = requestPath.substring(request.getContextPath().length());
+      SiteRequestWrapper siteRequest = new SiteRequestWrapper(request, requestPath, false);
 
+      RequestDispatcher dispatcher = request.getRequestDispatcher("/weblounge-sites/weblounge-test/");
+      if (dispatcher == null)
+        throw new IllegalStateException("No dispatcher found for site '" + site + "'");
+        
       // Finally serve the JSP
       log_.debug("Including jsp {}", renderer);
-      InputStream is = renderer.openStream();
-      OutputStream os = response.getOutputStream();
-      try {
-        IOUtils.copy(is, os);
-      } catch (SocketException e) {
-        log_.debug("Request for {} canceled by client", renderer);
-      } finally {
-        IOUtils.closeQuietly(is);
-      }
+      dispatcher.include(siteRequest, response);
+      
+//      InputStream is = renderer.openStream();
+//      OutputStream os = response.getOutputStream();
+//      try {
+//        IOUtils.copy(is, os);
+//      } catch (SocketException e) {
+//        log_.debug("Request for {} canceled by client", renderer);
+//      } finally {
+//        IOUtils.closeQuietly(is);
+//      }
 
     } catch (IOException e) {
       log_.error("Exception while including jsp {}", renderer, e);
