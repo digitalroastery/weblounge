@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement;
 import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
@@ -85,8 +86,11 @@ public class HTMLHeaderTag extends WebloungeTag {
         }
         Renderer renderer = module.getRenderer(p.getIdentifier());
         if (renderer != null) {
-          for (HTMLHeadElement l : renderer.getHTMLHeaders())
-            headElements.add(l);
+          for (HTMLHeadElement header : renderer.getHTMLHeaders()) {
+            if (header instanceof DeclarativeHTMLHeadElement)
+              ((DeclarativeHTMLHeadElement)header).configure(request, site, module);
+            headElements.add(header);
+          }
         } else {
           log_.warn("Renderer '" + p + "' not found for " + request.getUrl() + "!");
           continue;
