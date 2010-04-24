@@ -10,7 +10,7 @@
       <name language="de">Seiteninhalt</name>
       <name language="en">Page content</name>
       <includes>
-        <link href="http://localhost:8080/weblounge-sites/weblounge-test/modules/test/css/content.css" type="text/css"/>
+        <link href="http://localhost:8080/weblounge-sites/weblounge-test/modules/test/css/content.css" rel="stylesheet" type="text/css "/>
       </includes>
     </pagelet>
     <pagelet id="include" composeable="true">
@@ -20,7 +20,7 @@
       <name language="de">Begrüssung</name>
       <name language="en">Greeting</name>
       <includes>
-        <link href="http://localhost:8080/weblounge-sites/weblounge-test/modules/test/css/greeting.css" type="text/css"/>
+        <link href="http://localhost:8080/weblounge-sites/weblounge-test/modules/test/css/greeting.css" rel="stylesheet" type="text/css" />
       </includes>
     </pagelet>
   </pagelets>
