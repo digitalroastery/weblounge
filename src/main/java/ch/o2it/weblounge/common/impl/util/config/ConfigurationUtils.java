@@ -354,7 +354,7 @@ public class ConfigurationUtils {
   public static String processTemplate(String text, WebloungeRequest request) {
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
-    String hostname = request.getLocalName();
+    String hostname = site.getHostName();
     String port = request.getLocalPort() != 80 ? ":" + request.getLocalPort() : "";
     
     StringBuffer siteRootReplacement = new StringBuffer();
@@ -387,7 +387,7 @@ public class ConfigurationUtils {
   public static String processTemplate(String text, WebloungeRequest request, Module module) {
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
-    String hostname = request.getLocalName();
+    String hostname = site.getHostName();
     String port = request.getLocalPort() != 80 ? ":" + request.getLocalPort() : "";
     
     StringBuffer siteRootReplacement = new StringBuffer();
