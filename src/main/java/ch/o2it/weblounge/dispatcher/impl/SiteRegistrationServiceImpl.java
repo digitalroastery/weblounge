@@ -46,6 +46,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.servlet.Filter;
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -77,6 +78,9 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
 
   /** Maps server names to sites */
   private Map<String, Site> sitesByServerName = new HashMap<String, Site>();
+
+  /** Maps sites to site servlets */
+  private Map<Site, SiteServlet> siteServlets = new HashMap<Site, SiteServlet>();
 
   /** The site registrations */
   private Map<Site, WebXml> httpRegistrations = null;
@@ -145,6 +149,15 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
     this.paxHttpService = null;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#getSiteServlet(ch.o2it.weblounge.common.site.Site)
+   */
+  public Servlet getSiteServlet(Site site) {
+    return siteServlets.get(site);
+  }
+  
   /**
    * {@inheritDoc}
    *
@@ -230,8 +243,9 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
       // Register the site using jsp support (for tag libraries) and the site 
       // servlet.
       try {
-        SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
+        SiteServlet siteServlet = new SiteServlet(bundleHttpContext);
         paxHttpService.registerServlet(siteRoot, siteServlet, null, bundleHttpContext);
+        siteServlets.put(site, siteServlet);
         log_.info("Site '{}' registered under site://{}", site, siteRoot);
       } catch (NamespaceException e) {
         log_.error("The alias '{}' is already in use", siteRoot);

@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -203,12 +204,13 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     log_.debug("Serving {}", httpRequest.getRequestURI());
 
-    // Wrap request and response
-    WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest);
-    WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
-
     // Get the site dispatcher
-    Site site = getSiteByRequest(request);
+    Site site = getSiteByRequest(httpRequest);
+    Servlet siteServlet = sites.getSiteServlet(site);
+
+    // Wrap request and response
+    WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest, siteServlet);
+    WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
 
     // See if a site dispatcher was found, and if so, if it's enabled
     if (site == null) {

@@ -23,12 +23,8 @@ package ch.o2it.weblounge.dispatcher.impl;
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
-import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
-import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
 import ch.o2it.weblounge.common.impl.util.classloader.JasperClassLoader;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
 import org.mortbay.resource.Resource;
@@ -42,7 +38,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -65,9 +60,6 @@ public class SiteServlet extends HttpServlet {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SiteServlet.class);
 
-  /** The site */
-  private final Site site;
-  
   /** The http context */
   private final HttpContext siteHttpContext;
 
@@ -83,15 +75,12 @@ public class SiteServlet extends HttpServlet {
   /**
    * Creates a new site servlet for the given bundle and context.
    * 
-   * @param site
-   *          the site
    * @param bundle
    *          the site bundle
    * @param httpContext
    *          the http context
    */
-  public SiteServlet(final Site site, final BundleHttpContext httpContext) {
-    this.site = site;
+  public SiteServlet(final BundleHttpContext httpContext) {
     this.siteHttpContext = httpContext;
     this.jasperServlet = new JspServletWrapper(httpContext.getBundle());
     this.jasperClassLoader = new JasperClassLoader(httpContext.getBundle(), JasperClassLoader.class.getClassLoader());
@@ -153,30 +142,8 @@ public class SiteServlet extends HttpServlet {
    * 
    * @see JspServletWrapper#service(HttpServletRequest, HttpServletResponse)
    */
-  @SuppressWarnings("unchecked")
-  public void serviceJavaServerPage(final HttpServletRequest httpRequest,
-      final HttpServletResponse httpResponse) throws ServletException, IOException {
-
-    // Wrap request and response
-    final WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest);
-    final WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
-    
-    WebloungeRequest originalRequest = (WebloungeRequest)request.getSession().getAttribute(WebloungeRequest.class.getName());
-    if (originalRequest != null) {
-      Enumeration<String> attributeNames = originalRequest.getAttributeNames();
-      while (attributeNames.hasMoreElements()) {
-        String attributeName = attributeNames.nextElement();
-        request.setAttribute(attributeName, originalRequest.getAttribute(attributeName));
-      }
-    }
-
-    // Configure request and response objects
-    request.init(site);
-    response.setRequest(request);
-    // TODO: Add caching for tags!
-//    response.setResponseCache(cache);
-//    response.setHeader("X-Powered-By", poweredBy);
-
+  public void serviceJavaServerPage(final HttpServletRequest request,
+      final HttpServletResponse response) throws ServletException, IOException {
     try {
       ContextClassLoaderUtils.doWithClassLoader(jasperClassLoader, new Callable<Void>() {
         public Void call() throws Exception {
