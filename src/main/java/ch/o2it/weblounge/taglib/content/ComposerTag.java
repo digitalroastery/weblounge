@@ -358,23 +358,37 @@ public class ComposerTag extends WebloungeTag {
     WebUrl url = request.getUrl();
     ComposerImpl composer = new ComposerImpl(composerName);
     JspWriter writer = pageContext.getOut();
-    Page targetPage = (Page)request.getAttribute(WebloungeRequest.PAGE);
-    
-    if (targetPage == null) {
-      log_.warn("No page was found while processing composer on " + url);
-      return EVAL_PAGE;
-    }
 
+    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+    targetPage = (Page)request.getAttribute(WebloungeRequest.PAGE);
+
+    // If no page was specified, take homepage instead.
+    if (targetPage == null) {
+      PageURI homeURI = new PageURIImpl(site, "/");
+      try {
+        targetPage = contentRepository.getPage(homeURI, user, SystemPermission.READ);
+        if (targetPage == null) {
+          log_.warn("No page was found while processing composer on " + url);
+          return EVAL_PAGE;
+        }
+      } catch (SecurityException e) {
+        log_.warn("Composer '" + composerName + "' was unable to choose homepage as fallback: " + e.getMessage());
+        return EVAL_PAGE;
+      } catch (ContentRepositoryException e) {
+        log_.warn("Composer '" + composerName + "' was unable to choose homepage as fallback: " + e.getMessage());
+        return EVAL_PAGE;
+      }
+    }
+    
     long version = request.getVersion();
+    
     boolean isLocked = targetPage.isLocked();
     boolean isLockedByCurrentUser = isLocked && user.equals(targetPage.getLockOwner());
-    
-    ContentRepository contentRepository = null;
+
+    Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
     CacheTagSet composerCacheTags = null;
-    Action action = null;
 
     try {
-      contentRepository = ContentRepositoryFactory.getRepository(site);
 
       // Flush all input that has been written to the response so far.
       pageContext.getOut().flush();
@@ -389,18 +403,6 @@ public class ComposerTag extends WebloungeTag {
         case ORIENTATION_VERTICAL:
           addCssClass(CLASS_VCOMPOSER);
           break;
-      }
-
-      // Check whether this request is being controlled by an action. If so,
-      // we have to call the action on composer and pagelet start
-
-      action = (Action) request.getAttribute(WebloungeRequest.ACTION);
-      targetPage = (Page) request.getAttribute(WebloungeRequest.PAGE);
-
-      // If no page was specified, take homepage instead.
-      if (targetPage == null) {
-        PageURI homeURI = new PageURIImpl(site, "/");
-        targetPage = contentRepository.getPage(homeURI, user, SystemPermission.READ);
       }
 
       try {
@@ -479,11 +481,6 @@ public class ComposerTag extends WebloungeTag {
           }
         }
 
-        if (targetPage == null) {
-          log_.error("No data available for page '" + url + "'");
-          return EVAL_PAGE;
-        }
-
         // Load the pagelets
         pagelets = loadContent(ghostContentEnabled);
         composer.setPagelets(pagelets);
@@ -538,7 +535,7 @@ public class ComposerTag extends WebloungeTag {
 
             Module m = site.getModule(moduleId);
             if (m == null) {
-              log_.warn("Unable to load renderer '" + rendererId + "' for " + url + ": module '" + moduleId + "' not found!");
+              log_.warn("Unable to load renderer '" + rendererId + "' for pagelet in composer '" + composer + "' on " + url + ": module '" + moduleId + "' not found!");
               continue p;
             }
 

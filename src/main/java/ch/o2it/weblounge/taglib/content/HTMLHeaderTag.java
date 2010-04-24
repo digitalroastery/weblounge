@@ -57,7 +57,7 @@ public class HTMLHeaderTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    HTMLAction action = (HTMLAction) request.getAttribute(WebloungeRequest.ACTION);
+    HTMLAction action = (HTMLAction) getRequest().getAttribute(WebloungeRequest.ACTION);
     
     // See what the action has to contribute
     try {
@@ -103,7 +103,7 @@ public class HTMLHeaderTag extends WebloungeTag {
     // Write links & scripts to output
     try {
       for (HTMLHeadElement s : headElements) {
-        pageContext.getOut().print(s.toString());
+        pageContext.getOut().print(s.toXml());
       }
       pageContext.getOut().flush();
     } catch (IOException e) {
