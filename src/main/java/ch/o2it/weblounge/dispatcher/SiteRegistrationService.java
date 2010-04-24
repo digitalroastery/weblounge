@@ -22,6 +22,7 @@ package ch.o2it.weblounge.dispatcher;
 
 import ch.o2it.weblounge.common.site.Site;
 
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -62,5 +63,17 @@ public interface SiteRegistrationService {
    * @return the site
    */
   Site findSiteByRequest(HttpServletRequest request);
+
+  /**
+   * Returns the servlet that is registered to serve content from the specified
+   * site.
+   * 
+   * TODO: Move
+   * 
+   * @param site
+   *          the site
+   * @return the SiteServlet
+   */
+  Servlet getSiteServlet(Site site);
 
 }
