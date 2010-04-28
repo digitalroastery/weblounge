@@ -156,8 +156,8 @@ public class SiteServlet extends HttpServlet {
   public void serviceJavaServerPage(final HttpServletRequest httpRequest,
       final HttpServletResponse httpResponse) throws ServletException, IOException {
 
-    final WebloungeRequest request;
-    final WebloungeResponse response;
+    final HttpServletRequest request;
+    final HttpServletResponse response;
     
     // Wrap request and response if necessary
     if (httpRequest instanceof WebloungeRequest) {
@@ -167,7 +167,7 @@ public class SiteServlet extends HttpServlet {
       request = new WebloungeRequestImpl(httpRequest);
       response = new WebloungeResponseImpl(httpResponse);
       ((WebloungeRequestImpl)request).init(site);
-      ((WebloungeResponseImpl)response).setRequest(request);
+      ((WebloungeResponseImpl)response).setRequest((WebloungeRequestImpl)request);
     }
     
     // Configure request and response objects
