@@ -183,7 +183,7 @@ public class Http11Utils implements Http11Constants {
    * @return String the ETag
    */
   public static String calcETag(long modified) {
-    return "\"DS-" + Long.toHexString(modified) + "\"";
+    return "\"WL-" + Long.toHexString(modified) + "\"";
   }
 
   /**

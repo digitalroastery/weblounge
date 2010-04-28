@@ -20,7 +20,14 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
+import ch.o2it.weblounge.common.Times;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,11 +36,6 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.o2it.weblounge.common.Times;
 
 /**
  * The <code>Http11ProtocolHandler</code> analyzes HTTP 1.1 request headers and
@@ -59,6 +61,9 @@ import ch.o2it.weblounge.common.Times;
  * @see ftp://ftp.rfc-editor.org/in-notes/rfc2616.txt
  */
 public class Http11ProtocolHandler implements Times, Http11Constants {
+
+  /** Logging facility */
+  private final static Logger log = LoggerFactory.getLogger(Http11ProtocolHandler.class);
 
   /**
    * This response type indicates a "501 Internal Server Error" response
@@ -121,9 +126,6 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
   /** the size if the temporary buffer */
   private static final int BUFFER_SIZE = 8 * 1024;
 
-  /** Logging facility */
-  private final static Logger log = LoggerFactory.getLogger(Http11ProtocolHandler.class);
-
   /** protocol handler statistics */
   protected static long stats[] = new long[STATS_NOF_COUNTERS];
 
@@ -173,13 +175,17 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
     try {
       ifModifiedSince = req.getDateHeader(HEADER_IF_MODIFIED_SINCE);
     } catch (IllegalArgumentException e) {
+      log.debug("Client provided malformed '{}' header: {}", HEADER_IF_MODIFIED_SINCE, req.getDateHeader(HEADER_IF_MODIFIED_SINCE));
     }
     String ifNoneMatch = req.getHeader(HEADER_IF_NONE_MATCH);
+
     long ifUnmodifiedSince = -1;
     try {
       ifUnmodifiedSince = req.getDateHeader(HEADER_IF_UNMODIFIED_SINCE);
     } catch (IllegalArgumentException e) {
+      log.debug("Client provided malformed '{}' header: {}", HEADER_IF_UNMODIFIED_SINCE, req.getDateHeader(HEADER_IF_UNMODIFIED_SINCE));
     }
+    
     String ifMatch = req.getHeader(HEADER_IF_MATCH);
     String method = req.getMethod();
     type.headerOnly = method.equals(METHOD_HEAD);
@@ -192,13 +198,19 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
       return type;
     }
 
-    /* not modified */
-    if ((ifNoneMatch != null && ifModifiedSince != -1 && modified < ifModifiedSince + MS_PER_SECOND && ifNoneMatchMatch && reqGetHead) || (ifNoneMatch == null && ifModifiedSince != -1 && modified < ifModifiedSince + MS_PER_SECOND) || (ifNoneMatch != null && ifModifiedSince == -1 && ifNoneMatchMatch && reqGetHead)) {
+    /* check e-tag */
+    if (ifNoneMatch != null && ifNoneMatchMatch && reqGetHead) {
       type.type = RESPONSE_NOT_MODIFIED;
       return type;
     }
-
-    /* precondidtion check failed */
+    
+    /* check not modified */
+    if (ifNoneMatch == null && ifModifiedSince != -1 && modified < ifModifiedSince + MS_PER_SECOND) {
+      type.type = RESPONSE_NOT_MODIFIED;
+      return type;
+    }
+    
+    /* precondition check failed */
     if (ifNoneMatch != null && ifNoneMatchMatch && !reqGetHead) {
       log.error("412 PCF: Method={}, If-None-Match={}, match={}", new Object[] {
           req.getMethod(),
@@ -261,9 +273,11 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
    * @param type
    * @param buf
    * @return boolean
+   * @throws IOException
+   *           if generating the response fails
    */
   public static boolean generateResponse(HttpServletResponse resp,
-      Http11ResponseType type, byte[] buf) {
+      Http11ResponseType type, byte[] buf) throws IOException {
 
     return generateResponse(resp, type, new ByteArrayInputStream(buf));
   }
@@ -275,9 +289,11 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
    * @param type
    * @param is
    * @return boolean
+   * @throws IOException
+   *           if generating the response fails
    */
   public static boolean generateResponse(HttpServletResponse resp,
-      Http11ResponseType type, InputStream is) {
+      Http11ResponseType type, InputStream is) throws IOException {
 
     /* first generate the response headers */
     generateHeaders(resp, type);
@@ -286,33 +302,22 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
     ++stats[STATS_BODY_GENERATED];
     incResponseStats(type.type, bodyStats);
 
-    /* get the temporary buffer for this thread */
-    byte tmp[] = buffer.get();
-    if (tmp == null) {
-      tmp = new byte[BUFFER_SIZE];
-      buffer.set(tmp);
-    }
-
     /* generate the response body */
     try {
       if (resp.isCommitted())
         log.warn("Response is already committed!");
-      else
-        resp.setBufferSize(BUFFER_SIZE);
       switch (type.type) {
         case RESPONSE_OK:
           if (!type.isHeaderOnly() && is != null) {
+            resp.setBufferSize(BUFFER_SIZE);
+            OutputStream os = null;
             try {
-              OutputStream os = resp.getOutputStream();
-              int read;
-              while ((read = is.read(tmp)) >= 0) {
-                os.write(tmp, 0, read);
-                stats[STATS_BYTES_WRITTEN] += read;
-              }
-              os.flush();
-              os.close();
+              os = resp.getOutputStream();
+              IOUtils.copy(is, os);
             } catch (SocketException e) {
               log.debug("Request canceled by client");
+            } finally {
+              IOUtils.closeQuietly(os);
             }
           }
           break;
@@ -322,6 +327,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Invalid partial content parameters");
             log.warn("Invalid partial content parameters");
           } else if (!type.isHeaderOnly() && is != null) {
+            resp.setBufferSize(BUFFER_SIZE);
             OutputStream os = resp.getOutputStream();
             if (is.skip(type.from) != type.from) {
               resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Premature end of input stream");
@@ -329,6 +335,14 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
               break;
             }
             try {
+
+              /* get the temporary buffer for this thread */
+              byte tmp[] = buffer.get();
+              if (tmp == null) {
+                tmp = new byte[BUFFER_SIZE];
+                buffer.set(tmp);
+              }
+
               int read, copy = type.to - type.from, write;
               while (copy > 0 && (read = is.read(tmp)) >= 0) {
                 write = (copy -= read > 0 ? read : read + copy);
@@ -381,13 +395,15 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, type.err);
       }
     } catch (IOException e) {
-      if (e.toString().startsWith("EOFException")) {
+      if (e instanceof EOFException) {
         log.debug("Request canceled by client");
         return true;
       }
       ++stats[STATS_ERRORS];
-      log.warn("IOException while sending response: {}", e.getMessage(), e);
-      return false;
+      String message = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      Throwable cause = e.getCause() != null ? e.getCause() : e;
+      log.warn("I/O exception while sending response: {}", message, cause);
+      throw e;
     }
 
     return true;
