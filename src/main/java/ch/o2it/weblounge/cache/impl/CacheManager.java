@@ -31,6 +31,7 @@ import ch.o2it.weblounge.common.request.CacheTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -180,6 +181,7 @@ public class CacheManager {
     if (entry != null) {
       /* handle the request */
       log.debug("Lookup for {} succeeded (hit)", rootHnd);
+
       incStats(rootHnd.getClass(), true);
       incStats(CACHE_TRANSACTION_SKIP);
 
@@ -191,7 +193,12 @@ public class CacheManager {
       Http11ResponseType type = Http11ProtocolHandler.analyzeRequest(req, entry.modified, entry.recheck + System.currentTimeMillis(), entry.buf.length);
 
       /* generate response */
-      Http11ProtocolHandler.generateResponse(resp, type, entry.buf);
+      try {
+        Http11ProtocolHandler.generateResponse(resp, type, entry.buf);
+      } catch (IOException e) {
+        log.error("Error sending cached response to client: {}", e.getMessage());
+        return null;
+      }
 
       return null;
     }
@@ -306,7 +313,13 @@ public class CacheManager {
 
     /* finally, generate the response */
     if (!resp.isCommitted()) {
-      return Http11ProtocolHandler.generateResponse(tx.resp, type, entry.buf);
+      try {
+        return Http11ProtocolHandler.generateResponse(tx.resp, type, entry.buf);
+      } catch (IOException e) {
+        log.warn("Error generating cacheable response: {}", e.getMessage());
+        resp.invalidateOutput();
+        return false;
+      }
     }
     return true;
   }
