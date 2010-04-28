@@ -23,8 +23,13 @@ package ch.o2it.weblounge.dispatcher.impl;
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
+import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
+import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
 import ch.o2it.weblounge.common.impl.util.classloader.JasperClassLoader;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
 import org.mortbay.resource.Resource;
@@ -60,6 +65,9 @@ public class SiteServlet extends HttpServlet {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SiteServlet.class);
 
+  /** The site */
+  private final Site site;
+  
   /** The http context */
   private final HttpContext siteHttpContext;
 
@@ -75,12 +83,15 @@ public class SiteServlet extends HttpServlet {
   /**
    * Creates a new site servlet for the given bundle and context.
    * 
+   * @param site
+   *          the site
    * @param bundle
    *          the site bundle
    * @param httpContext
    *          the http context
    */
-  public SiteServlet(final BundleHttpContext httpContext) {
+  public SiteServlet(final Site site, final BundleHttpContext httpContext) {
+    this.site = site;
     this.siteHttpContext = httpContext;
     this.jasperServlet = new JspServletWrapper(httpContext.getBundle());
     this.jasperClassLoader = new JasperClassLoader(httpContext.getBundle(), JasperClassLoader.class.getClassLoader());
@@ -142,8 +153,25 @@ public class SiteServlet extends HttpServlet {
    * 
    * @see JspServletWrapper#service(HttpServletRequest, HttpServletResponse)
    */
-  public void serviceJavaServerPage(final HttpServletRequest request,
-      final HttpServletResponse response) throws ServletException, IOException {
+  public void serviceJavaServerPage(final HttpServletRequest httpRequest,
+      final HttpServletResponse httpResponse) throws ServletException, IOException {
+
+    final WebloungeRequest request;
+    final WebloungeResponse response;
+    
+    // Wrap request and response if necessary
+    if (httpRequest instanceof WebloungeRequest) {
+      request = (WebloungeRequest)httpRequest;
+      response = (WebloungeResponse)httpResponse;
+    } else {
+      request = new WebloungeRequestImpl(httpRequest);
+      response = new WebloungeResponseImpl(httpResponse);
+      ((WebloungeRequestImpl)request).init(site);
+      ((WebloungeResponseImpl)response).setRequest(request);
+    }
+    
+    // Configure request and response objects
+
     try {
       ContextClassLoaderUtils.doWithClassLoader(jasperClassLoader, new Callable<Void>() {
         public Void call() throws Exception {

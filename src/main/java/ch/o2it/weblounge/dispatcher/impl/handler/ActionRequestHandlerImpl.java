@@ -295,6 +295,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     Page page = null;
     try {
       page = getTargetPage(action, request);
+      request.setAttribute(WebloungeRequest.PAGE, page);
       // TODO: Check access rights with action configuration
     } catch (ContentRepositoryException e) {
       log_.error("Error loading target page for action {} at {}", action, url);

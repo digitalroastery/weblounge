@@ -36,6 +36,7 @@ import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
+import ch.o2it.weblounge.common.site.HTMLAction;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
@@ -50,6 +51,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletResponse;
@@ -138,34 +141,42 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     // bundle.
     try {
       Page page = null;
-      PageURI pageURI = new PageURIImpl(request);
+      PageURI pageURI = null;
       Site site = request.getSite();
       RequestFlavor contentFlavor = request.getFlavor();
 
-      // Get a hold of the content repository
-      ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
-      if (contentRepository == null) {
-        log_.warn("Content repository not available while trying to access {}", pageURI);
-        return false;
+      // Check if a target-page parameter was passed
+      if (request.getAttribute(WebloungeRequest.PAGE) != null) {
+        page = (Page)request.getAttribute(WebloungeRequest.PAGE);
       }
 
-      // Load the page
-      try {
-        page = contentRepository.getPage(pageURI);
-      } catch (ContentRepositoryException e) {
-        log_.error("Unable to load page {}: {}", new Object[] {
-            pageURI,
-            e.getMessage(),
-            e });
-        DispatchUtils.sendInternalError(request, response);
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        return true;
-      }
-
-      // Does it exist at all?
-      if (page == null) {
-        log_.debug("No page found for {}", pageURI);
-        return false;
+      // Load the page from the content repository
+      else {
+        ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+        if (contentRepository == null) {
+          log_.warn("Content repository not available while trying to access {}", pageURI);
+          return false;
+        }
+  
+        // Load the page
+        try {
+          pageURI = getTargetPage(request);
+          page = contentRepository.getPage(pageURI);
+        } catch (ContentRepositoryException e) {
+          log_.error("Unable to load page {}: {}", new Object[] {
+              pageURI,
+              e.getMessage(),
+              e });
+          DispatchUtils.sendInternalError(request, response);
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          return true;
+        }
+  
+        // Does it exist at all?
+        if (page == null) {
+          log_.debug("No page found for {}", pageURI);
+          return false;
+        }
       }
 
       // Is it published?
@@ -257,6 +268,49 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
   }
 
   /**
+   * Tries to determine the target page for the action result. The
+   * <code>target-url</code> request attribute and parameter will be considered.
+   * In any case, the site's homepage will be the fallback.
+   * 
+   * @param request
+   *          the weblounge request
+   * @return the target page
+   */
+  protected PageURI getTargetPage(WebloungeRequest request) {
+
+    PageURI target = null;
+    Site site = request.getSite();
+
+    // Check if a target-page parameter was passed
+    if (request.getAttribute(WebloungeRequest.PAGE) != null) {
+      return ((Page)request.getAttribute(WebloungeRequest.PAGE)).getURI();
+    }
+
+    // Check if a target-page parameter was passed
+    else if (request.getParameter(HTMLAction.TARGET) != null) {
+      String targetUrl = request.getParameter(HTMLAction.TARGET);
+      try {
+        String decocedTargetUrl = null;
+        String encoding = request.getCharacterEncoding();
+        if (encoding == null)
+          encoding = "utf-8";
+        decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
+        target = new PageURIImpl(site, decocedTargetUrl);
+      } catch (UnsupportedEncodingException e) {
+        log_.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
+        target = new PageURIImpl(site, "/");
+      }
+    }
+
+    // Nothing found, let's choose the site's homepage
+    if (target == null) {
+      target = new PageURIImpl(site, "/");
+    }
+
+    return target;
+  }
+
+  /**
    * Returns the template that will be used to handle this request. If the
    * template cannot be found or used for some reason, an
    * {@link IllegalStateException} is thrown.
@@ -269,7 +323,8 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
    * @throws IllegalStateException
    *           if the template cannot be found
    */
-  protected PageTemplate getPageTemplate(Page page, WebloungeRequest request) throws IllegalStateException {
+  protected PageTemplate getPageTemplate(Page page, WebloungeRequest request)
+      throws IllegalStateException {
     Site site = request.getSite();
     String templateId = (String) request.getAttribute(WebloungeRequest.TEMPLATE);
     PageTemplate template = null;

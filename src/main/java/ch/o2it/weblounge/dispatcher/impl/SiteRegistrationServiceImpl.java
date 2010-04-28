@@ -243,7 +243,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
       // Register the site using jsp support (for tag libraries) and the site 
       // servlet.
       try {
-        SiteServlet siteServlet = new SiteServlet(bundleHttpContext);
+        SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
         paxHttpService.registerServlet(siteRoot, siteServlet, null, bundleHttpContext);
         siteServlets.put(site, siteServlet);
         log_.info("Site '{}' registered under site://{}", site, siteRoot);
