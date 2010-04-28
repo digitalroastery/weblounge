@@ -28,7 +28,6 @@ import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
 import ch.o2it.weblounge.common.impl.util.classloader.JasperClassLoader;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
@@ -161,8 +160,8 @@ public class SiteServlet extends HttpServlet {
     
     // Wrap request and response if necessary
     if (httpRequest instanceof WebloungeRequest) {
-      request = (WebloungeRequest)httpRequest;
-      response = (WebloungeResponse)httpResponse;
+      request = httpRequest;
+      response = httpResponse;
     } else {
       request = new WebloungeRequestImpl(httpRequest);
       response = new WebloungeResponseImpl(httpResponse);
@@ -257,7 +256,9 @@ public class SiteServlet extends HttpServlet {
     try {
       logger.debug("Serving {}", url);
       responseType = Http11ProtocolHandler.analyzeRequest(request, resource.lastModified(), Times.MS_PER_DAY + System.currentTimeMillis(), resource.length());
-      Http11ProtocolHandler.generateResponse(response, responseType, is);
+      if (!Http11ProtocolHandler.generateResponse(response, responseType, is)) {
+        logger.warn("I/O error while generating content from {}", url);
+      }
     } finally {
       is.close();
     }
