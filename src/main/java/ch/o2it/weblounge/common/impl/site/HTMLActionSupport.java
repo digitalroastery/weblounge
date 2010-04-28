@@ -284,7 +284,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
     for (HTMLHeadElement include : getHTMLHeaders()) {
-      response.getOutputStream().println(include.toXml());
+      response.getWriter().println(include.toXml());
     }
     return EVAL_HEADER;
   }

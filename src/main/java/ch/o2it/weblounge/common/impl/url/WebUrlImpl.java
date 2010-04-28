@@ -92,6 +92,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    */
   public WebUrlImpl(Site site, String path) {
     super('/');
+    if (site == null)
+      throw new IllegalArgumentException("Site must not be null");
+    if (path == null)
+      throw new IllegalArgumentException("Path must not be null");
     this.site = site;
     this.path = analyzePath(path, '/');
     version = Math.max(Page.LIVE, version);
@@ -180,6 +184,8 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    */
   public WebUrlImpl(Site site, String path, long version, RequestFlavor flavor) {
     super(path, '/');
+    if (site == null)
+      throw new IllegalArgumentException("Site must not be null");
     this.site = site;
     this.version = version;
     this.flavor = flavor;

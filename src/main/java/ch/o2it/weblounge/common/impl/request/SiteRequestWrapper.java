@@ -20,8 +20,13 @@
 
 package ch.o2it.weblounge.common.impl.request;
 
+import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
+import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.url.WebUrl;
+import ch.o2it.weblounge.common.user.User;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -37,7 +42,7 @@ import javax.servlet.http.HttpUtils;
 /**
  * DispatcherRequest
  */
-public class SiteRequestWrapper extends HttpServletRequestWrapper {
+public class SiteRequestWrapper extends HttpServletRequestWrapper implements WebloungeRequest {
 
   /** the name of the request uri include attribute */
   public static final String REQUEST_URI = "javax.servlet.include.request_uri";
@@ -92,6 +97,9 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper {
 
   /** The site */
   private final Site site;
+  
+  /** The url */
+  private final WebUrl url;
 
   /**
    * Creates a new <code>DispatcherRequest</code>.
@@ -132,6 +140,9 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper {
     String contextPath = request.getContextPath();
     String servletPath = "/weblounge-sites/" + site.getIdentifier();
     String pathInfo = url.substring(contextPath.length() + servletPath.length());
+    
+    // Adjust the url
+    this.url = new WebUrlImpl(site, url);
 
     if (include) {
       attrs = new HashMap<String, Object>(5);
@@ -333,6 +344,69 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper {
     if (include)
       return super.getServletPath();
     return servletPath;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getFlavor()
+   */
+  public RequestFlavor getFlavor() {
+    return ((WebloungeRequest)getRequest()).getFlavor();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getLanguage()
+   */
+  public Language getLanguage() {
+    return ((WebloungeRequest)getRequest()).getLanguage();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getRequestedUrl()
+   */
+  public WebUrl getRequestedUrl() {
+    return ((WebloungeRequest)getRequest()).getUrl();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getSite()
+   */
+  public Site getSite() {
+    return site;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getUrl()
+   */
+  public WebUrl getUrl() {
+    return url;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getUser()
+   */
+  public User getUser() {
+    return ((WebloungeRequest)getRequest()).getUser();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.WebloungeRequest#getVersion()
+   */
+  public long getVersion() {
+    return ((WebloungeRequest)getRequest()).getVersion();
   }
 
 }
