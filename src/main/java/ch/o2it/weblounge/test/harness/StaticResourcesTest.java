@@ -83,6 +83,9 @@ public class StaticResourcesTest extends IntegrationTestBase {
       String contentType = response.getEntity().getContentType().getValue();
       assertEquals(CONTENT_TYPE_IMAGE, contentType.split(";")[0]);
       
+      // Read the content
+      response.getEntity().consumeContent();
+      
       // Read and store Etag
       Header eTagHeader = response.getFirstHeader("Etag");
       assertNotNull(eTagHeader);
