@@ -21,16 +21,8 @@
 package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.Pagelet;
-import ch.o2it.weblounge.common.content.PageletRenderer;
-import ch.o2it.weblounge.common.impl.content.PageImpl;
-import ch.o2it.weblounge.common.impl.content.PageURIImpl;
-import ch.o2it.weblounge.common.impl.content.PageletImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
-import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -75,30 +67,9 @@ public class GreeterAction extends HTMLActionSupport {
         // Like this, a json action could not return an empty result set
         throw new ActionException("Unfortunately, we are not fluent in " + language);
       greetings.put(language, greeting);
-      
-      // Add a fake page, so we can test pagelet renderer includes
-      Page page = new PageImpl(new PageURIImpl(new WebUrlImpl(getSite(), "/test")));
-      Pagelet pagelet = new PageletImpl(getModule().getIdentifier(), "content");
-      page.addPagelet(pagelet, "main");
-      setPage(page);
     } catch (IllegalStateException e) {
       throw new ActionException("Language parameter '" + LANGUAGE_PARAM + "' was not specified");
     }
-  }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startHeader(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
-   */
-  @Override
-  public int startHeader(WebloungeRequest request, WebloungeResponse response)
-      throws IOException, ActionException {
-    PageletRenderer contentPagelet = getModule().getRenderer("greeting");
-    for (HTMLHeadElement header : contentPagelet.getHTMLHeaders()) {
-      addHTMLHeader(header);
-    }
-    return super.startHeader(request, response);
   }
 
   /**
