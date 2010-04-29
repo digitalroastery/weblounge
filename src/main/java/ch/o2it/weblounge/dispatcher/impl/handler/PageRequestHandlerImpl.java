@@ -233,7 +233,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         response.setRecheckTime(template.getRecheckTime());
         response.setValidTime(template.getValidTime());
 
-        log_.info("Rendering {} through {}", path, template);
+        log_.debug("Rendering {} using page template '{}'", path, template);
         template.render(request, response);
       } catch (Exception e) {
         String params = RequestUtils.dumpParameters(request);

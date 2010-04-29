@@ -333,17 +333,17 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           PageRequestHandlerImpl.getInstance().service(request, response);
         } else {
           log_.trace("Rendering action '{}' on ad-hoc page", action);
-          response.getOutputStream().println("<!DOCTYPE HTML>");
-          response.getOutputStream().println("<html>\n\t<head>");
+          response.getWriter().println("<!DOCTYPE HTML>");
+          response.getWriter().println("<html>\n\t<head>");
           if (action instanceof HTMLAction) {
             ((HTMLAction) action).startHeader(request, response);
           }
-          response.getOutputStream().println("\t</head>\n\t<body>");
+          response.getWriter().println("\t</head>\n\t<body>");
           if (action instanceof HTMLAction) {
             Composer c = new ComposerImpl("stage");
             ((HTMLAction) action).startStage(request, response, c);
           }
-          response.getOutputStream().print("\n\t</body>\n</html>");
+          response.getWriter().print("\n\t</body>\n</html>");
           response.flushBuffer();
         }
       }
