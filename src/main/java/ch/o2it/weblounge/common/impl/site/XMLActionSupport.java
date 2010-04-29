@@ -109,7 +109,7 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
   protected void returnXML(Element doc, Transformer transformer)
       throws ActionException {
     try {
-      transformer.transform(new DOMSource(doc), new StreamResult(response.getOutputStream()));
+      transformer.transform(new DOMSource(doc), new StreamResult(response.getWriter()));
     } catch (TransformerException e) {
       throw new ActionException("Unable to create xml response", e);
     } catch (IOException e) {

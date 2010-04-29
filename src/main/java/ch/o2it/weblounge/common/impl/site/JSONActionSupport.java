@@ -96,8 +96,7 @@ public class JSONActionSupport extends ActionSupport implements JSONAction {
    */
   protected void returnJSON(JSONObject json) throws ActionException {
     try {
-      String encoding = response.getCharacterEncoding();
-      IOUtils.copy(new StringReader(json.toString()), response.getOutputStream(), encoding);
+      IOUtils.copy(new StringReader(json.toString()), response.getWriter());
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
     }

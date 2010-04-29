@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.content.Composer;
+import ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement;
 import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.Link;
 import ch.o2it.weblounge.common.content.Page;
@@ -109,6 +110,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public void passivate() {
     super.passivate();
     page = null;
+    headers = null;
     renderer = null;
     infoMessages = null;
     warningMessages = null;
@@ -275,26 +277,32 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * <p>
    * This implementation asks the action to return the include headers
    * <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code> by calling
-   * {@link #getHTMLHeaders()} and writes them to the response, then returns
-   * {@link HTMLAction#EVAL_HEADER}.
+   * {@link #getHTMLHeaders()} and writes them to the response.
+   * <p>
+   * Since this implementation collects all of the includes that are needed to
+   * render the page by iterating over the included elements, it returns
+   * {@link HTMLAction#SKIP_HEADER} to tell the tag implementation that no
+   * further work is needed.
    * 
    * @see ch.o2it.weblounge.common.site.HTMLAction#startHeader(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
-    for (HTMLHeadElement include : getHTMLHeaders()) {
-      response.getWriter().println(include.toXml());
+    for (HTMLHeadElement header : getHTMLHeaders()) {
+      if (header instanceof DeclarativeHTMLHeadElement)
+        ((DeclarativeHTMLHeadElement) header).configure(request, site, module);
+      response.getWriter().println(header.toXml());
     }
-    return EVAL_HEADER;
+    return SKIP_HEADER;
   }
 
   /**
    * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
    * leaves rendering to the actual content of the composer. This means that if
    * this action is rendered on an existing page, a call to
-   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.Pagelet)} for
-   * each of them will be issued.
+   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.Pagelet)}
+   * for each of them will be issued.
    * 
    * @param request
    *          the request object
@@ -302,7 +310,8 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    *          the response object
    * @return <code>EVAL_COMPOSER</code>
    * @see ch.o2it.weblounge.common.site.HTMLAction#startStage(ch.o2it.weblounge.api.request.WebloungeRequest,
-   *      ch.o2it.weblounge.api.request.WebloungeResponse, ch.o2it.weblounge.common.content.Composer)
+   *      ch.o2it.weblounge.api.request.WebloungeResponse,
+   *      ch.o2it.weblounge.common.content.Composer)
    */
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws IOException, ActionException {
