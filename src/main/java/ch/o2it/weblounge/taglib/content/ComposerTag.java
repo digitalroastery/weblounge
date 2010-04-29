@@ -702,6 +702,7 @@ public class ComposerTag extends WebloungeTag {
             }
           }
         }
+
       } finally {
 
         // Syntactically close the composer
@@ -725,16 +726,17 @@ public class ComposerTag extends WebloungeTag {
           writer.flush();
         }
       }
+
     } catch (IOException e) {
       response.invalidate();
       log_.error("Unable to print to out", e);
       return EVAL_PAGE;
     } catch (Throwable t) {
       response.invalidate();
-      String msg = "Exception when processing composer '" + composerName + "'";
+      String msg = "Exception when processing composer '" + composerName + "' on " + getRequest().getRequestedUrl();
       if (action != null)
-        msg += " for action " + action;
-      log_.error(msg + ":" + t.getMessage());
+        msg += " for action '" + action + "'";
+      log_.error(msg, t);
       return EVAL_PAGE;
     } finally {
       reset();

@@ -62,8 +62,10 @@ public class HTMLHeaderTag extends WebloungeTag {
     
     // See what the action has to contribute
     try {
+      pageContext.getOut().flush();
       if (action != null && action.startHeader(request, response) == HTMLAction.SKIP_HEADER) {
-        return EVAL_BODY_INCLUDE;
+        pageContext.getOut().flush();
+        return EVAL_PAGE;
       }
     } catch (Exception e) {
       log_.error("Error asking action '" + action + "' for headers", e);
@@ -106,8 +108,9 @@ public class HTMLHeaderTag extends WebloungeTag {
 
     // Write links & scripts to output
     try {
+      pageContext.getOut().flush();
       for (HTMLHeadElement s : headElements) {
-        pageContext.getOut().print(s.toXml());
+        pageContext.getOut().println(s.toXml());
       }
       pageContext.getOut().flush();
     } catch (IOException e) {
