@@ -10,7 +10,8 @@
       <name language="de">Seiteninhalt</name>
       <name language="en">Page content</name>
       <includes>
-        <link href="file://${module.root}/css/content.css" rel="stylesheet" type="text/css "/>
+        <script src="file://${module.root}/scripts/greeting.js" type="javascript"/>
+        <link href="file://${module.root}/css/greeting.css" rel="stylesheet" type="text/css" />
       </includes>
     </pagelet>
     <pagelet id="include" composeable="true">

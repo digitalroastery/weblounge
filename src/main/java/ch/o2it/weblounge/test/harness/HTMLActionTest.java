@@ -80,7 +80,7 @@ public class HTMLActionTest extends IntegrationTestBase {
 
     // Prepare the request
     logger.info("Testing greeter action's html output");
-    logger.info("Sending requests to {}", UrlSupport.concat(serverUrl, requestPaths[0]));
+    logger.info("Sending {} requests to {}", languages.size(), UrlSupport.concat(serverUrl, requestPaths[0]));
     
     for (String path : requestPaths) {
       for (String language : languages) {
@@ -106,14 +106,17 @@ public class HTMLActionTest extends IntegrationTestBase {
           DocumentBuilder builder = factory.newDocumentBuilder();
           Document xml = builder.parse(new ByteArrayInputStream(responseXML.getBytes("utf-8")));
           
-          // Look for action parameter handling
-          String found = XPathHelper.valueOf(xml, "/html/body/h1");
-          assertNotNull("General template output does not work", found);
-          assertEquals(greeting, found);
+          // Look for template output
+          String templateOutput = XPathHelper.valueOf(xml, "/html/body/h1[. = 'Welcome to the Weblounge 3.0 testpage!']");
+          assertNotNull("General template output does not work", templateOutput);
+
+          // Look for action parameter handling and direct output of startState()
+          String actualGreeting = XPathHelper.valueOf(xml, "/html/body/div[@class='vcomposer']/h1");
+          assertEquals(greeting, actualGreeting);
           logger.debug("Found greeting");
           
           // Look for included pagelets
-          assertNotNull("JSP include failed", XPathHelper.valueOf(xml, "/html/body/div[@class='greeting']"));
+          assertNotNull("JSP include failed", XPathHelper.valueOf(xml, "/html/body/div[@class='vcomposer']/div[@class='greeting']"));
           logger.debug("Found pagelet content");
 
           // Look for action header includes
@@ -124,14 +127,25 @@ public class HTMLActionTest extends IntegrationTestBase {
           assertEquals("Pagelet include failed", "1", XPathHelper.valueOf(xml, "count(/html/head/link[contains(@href, 'greeting.css')])"));
           logger.debug("Found pagelet stylesheet include");
           
-          // TODO: Test tag output
-
+          // Test for template replacement
+          assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${module.root}')]"));
+          assertNull("Header tag templating failed", XPathHelper.valueOf(xml, "//@src[contains(., '${site.root}')]"));
+          
         } finally {
           httpClient.getConnectionManager().shutdown();
         }
       }
     }
 
+  }
+
+  /**
+   * @param string
+   * @param valueOf
+   */
+  private void assertNull(String string, String valueOf) {
+    // TODO Auto-generated method stub
+    
   }
 
 }

@@ -78,9 +78,9 @@ public class JavaServerPagesTest extends IntegrationTestBase {
       String contentType = response.getEntity().getContentType().getValue();
       assertEquals(CONTENT_TYPE_HTML, contentType.split(";")[0]);
 
-      // Test contents
+      // Test template contents
       Document xml = TestSiteUtils.parseXMLResponse(response);
-      String greeting = "Hello world!";
+      String greeting = "Welcome to the Weblounge 3.0 testpage!";
       String xpath = "/html/body/h1/text()";
       Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));
       

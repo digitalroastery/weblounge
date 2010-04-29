@@ -83,7 +83,7 @@ public class GreeterAction extends HTMLActionSupport {
     try {
       String language = greetings.keySet().iterator().next();
       String htmlGreeting = StringEscapeUtils.escapeHtml(greetings.get(language));
-      IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getOutputStream(), "UTF-8");
+      IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getWriter());
 
       // Include another pagelet
       include(request, response, "include", null);
@@ -100,8 +100,8 @@ public class GreeterAction extends HTMLActionSupport {
    */
   @Override
   public void passivate() {
-    super.passivate();
     greetings.clear();
+    super.passivate();
   }
 
 }

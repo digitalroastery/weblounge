@@ -72,7 +72,7 @@ public class GreeterTag extends TagSupport {
       String encodedGreeting = StringEscapeUtils.escapeHtml(greeting);
       pageContext.getOut().print("<div id=\"greeting\">");
       pageContext.getOut().print(encodedGreeting);
-      pageContext.getOut().print("</div>");
+      pageContext.getOut().println("</div>");
       pageContext.getOut().flush();
     } catch (IOException ioe) {
       throw new JspException("IOException while writing to client" + ioe.getMessage());

@@ -58,7 +58,7 @@ public class GreeterJSONAction extends GreeterAction implements JSONAction {
     try {
       JSONObject json = new JSONObject();
       json.put("greetings", greetings);
-      IOUtils.copy(new StringReader(json.toString()), response.getOutputStream(), "UTF-8");
+      IOUtils.copy(new StringReader(json.toString()), response.getWriter());
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
     } catch (JSONException e) {

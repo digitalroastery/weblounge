@@ -7,7 +7,7 @@
 		<webl:headers/>
 	</head>
 	<body>
-		<h1><%= "Hello world!" %></h1>
+		<h1><%= "Welcome to the Weblounge 3.0 testpage!" %></h1>
 		<greeter:greeting/>
 		<webl:composer name="main"/>
 	</body>
