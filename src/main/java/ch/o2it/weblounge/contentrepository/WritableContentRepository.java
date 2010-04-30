@@ -43,9 +43,13 @@ public interface WritableContentRepository extends ContentRepository {
    *          the page uri
    * @param page
    *          the page
+   * @throws SecurityException
+   *           if access is denied for the given user and permission
+   * @throws IOException
+   *           if adding fails due to a database error
    * @return the page with the given uri
    */
-  Page put(PageURI uri, Page page);
+  Page put(PageURI uri, Page page, User user) throws SecurityException, IOException;
 
   /**
    * Updates the given page. This method writes the page header to the database
@@ -55,12 +59,14 @@ public interface WritableContentRepository extends ContentRepository {
    *          the user updating the page
    * @param uri
    *          uri of the page to update
+   * @param page
+   *          the page
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
    *           if updating fails due to a database error
    */
-  boolean update(PageURI uri, User user) throws SecurityException, IOException;
+  boolean update(PageURI uri, Page page, User user) throws SecurityException, IOException;
 
   /**
    * This method moves the given page to the new uri.

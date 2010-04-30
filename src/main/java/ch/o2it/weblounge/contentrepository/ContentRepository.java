@@ -41,8 +41,18 @@ public interface ContentRepository {
 
   /**
    * Sets the repository uri.
+   * 
+   * @param repositoryURI
+   *          the repository URI
    */
   void setURI(String repositoryURI);
+
+  /**
+   * Returns the repository uri.
+   * 
+   * @return the uri
+   */
+  String getURI();
 
   /**
    * Opens the repository. Depending on the type of the repository
@@ -59,8 +69,7 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if connecting to the repository fails
    */
-  void connect(Dictionary<?, ?> properties)
-      throws ContentRepositoryException;
+  void connect(Dictionary<?, ?> properties) throws ContentRepositoryException;
 
   /**
    * Disconnects from the content repository.
@@ -143,31 +152,6 @@ public interface ContentRepository {
    *           if looking up the page versions from the repository fails
    */
   PageURI[] getVersions(PageURI uri) throws ContentRepositoryException;
-
-  /**
-   * Returns an iteration of all pages starting from the repository root.
-   * 
-   * @return the page uris
-   * @throws ContentRepositoryException
-   *           if listing the repository fails
-   */
-  Iterator<PageURI> listPages() throws ContentRepositoryException;
-
-  /**
-   * Returns an iteration of all pages starting from the repository root that
-   * match the specified versions.
-   * <p>
-   * Live versions of pages are returned using {@link Page#LIVE}, while work
-   * pages are specified using {@link Page#WORK}.
-   * 
-   * @param versions
-   *          the versions to list
-   * @return the page uris
-   * @throws ContentRepositoryException
-   *           if listing the repository fails
-   */
-  Iterator<PageURI> listPages(long[] versions)
-      throws ContentRepositoryException;
 
   /**
    * Returns an iteration of all pages with their uri containing
