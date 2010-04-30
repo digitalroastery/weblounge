@@ -274,10 +274,10 @@ public class ActionSupportTest {
     assertNotNull(action.getSite());
     assertNotNull(action.getModule());
     assertEquals(identifier, action.getIdentifier());
-    assertEquals(2, action.getHTMLHeaders().length);
     assertEquals(actionUrl, action.getUrl());
     assertEquals(recheckTime, action.getRecheckTime());
     assertEquals(validTime, action.getValidTime());
+    assertEquals(0, action.getHTMLHeaders().length);
     assertEquals(1, action.getOptions().size());
   }
 
