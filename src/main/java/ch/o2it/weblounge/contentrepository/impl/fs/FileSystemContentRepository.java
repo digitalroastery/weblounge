@@ -22,182 +22,335 @@ package ch.o2it.weblounge.contentrepository.impl.fs;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.SearchQuery;
-import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.user.User;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
+import ch.o2it.weblounge.common.impl.content.PageReader;
+import ch.o2it.weblounge.common.impl.content.PageURIImpl;
+import ch.o2it.weblounge.common.impl.content.PageUtils;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository;
+import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Dictionary;
-import java.util.Iterator;
+import java.util.Stack;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerFactory;
 
 /**
  * Implementation of a content repository that lives on a filesystem.
  */
-public class FileSystemContentRepository implements ContentRepository {
+public class FileSystemContentRepository extends AbstractWritableContentRepository {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(FileSystemContentRepository.class);
+
+  /** Prefix for repository configuration keys */
+  private static final String OPT_PREFIX = FileSystemContentRepository.class.getName();
+
+  /** Configuration key for the repository's root directory */
+  public static final String OPT_ROOT_DIR = OPT_PREFIX + ".directory";
+
+  /** Configuration key for the repository uri */
+  public static final String OPT_ROOT_URI = OPT_PREFIX + ".uri";
 
   /** The repository root directory */
+  protected File filesystemRoot = null;
+
+  /** The site root directory inside the repository */
   protected File repositoryRoot = null;
-  
+
+  /** The document builder factory */
+  protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+
+  /** The xml transformer factory */
+  protected final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#connect(java.util.Dictionary)
    */
   public void connect(Dictionary<?, ?> properties)
       throws ContentRepositoryException {
-    // TODO Auto-generated method stub
+    
+    // Call the super implementation
+    super.connect(properties);
 
+    // Detect the filesystem root directory
+    String fsRootDir = (String) properties.get(OPT_ROOT_DIR);
+    if (fsRootDir == null) {
+      fsRootDir = UrlSupport.concat(new String[] {
+          System.getProperty("java.io.tmpdir"),
+          "weblounge",
+          "repository" });
+    }
+    filesystemRoot = new File(fsRootDir);
+    logger.debug("Content repository root is located at {}", filesystemRoot);
+
+    // Consider the site uri when building the repository uri
+    if (rootURI == null) {
+      setURI(site.getIdentifier());
+      repositoryRoot = new File(filesystemRoot, getURI());
+    }
+    
+    logger.debug("Content repository root for site '{}' is located at {}", site, repositoryRoot);
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#disconnect()
+   * 
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#index()
    */
-  public void disconnect() throws ContentRepositoryException {
-    // TODO Auto-generated method stub
+  public void index() throws ContentRepositoryException {
+    if (!connected)
+      throw new IllegalStateException("Repository is not connected");
+      
+    // Clear the current search index
+    index.clear();
 
+    // Recreate the index
+    int repositoryRootIndex = repositoryRoot.getAbsolutePath().length();
+    Stack<File> stack = new Stack<File>();
+    stack.push(repositoryRoot);
+    logger.info("Starting reindex of " + this);
+    while (!stack.empty()) {
+      File dir = stack.pop();
+      for (File f : dir.listFiles()) {
+        if (f.isDirectory()) {
+          stack.push(f);
+        } else {
+          String path = f.getAbsolutePath().substring(repositoryRootIndex);
+          String repositoryPath = FilenameUtils.getPath(path);
+          long version = PageUtils.getVersion(path);
+          PageURI pageURI = new PageURIImpl(site, repositoryPath, version);
+          index.add(pageURI);
+          logger.debug("Adding {} to repository index");
+        }
+      }
+    }
+    logger.info("Finished reindex of " + this);
+  }
+
+  /**
+   * Returns the root directory for this repository.
+   * <p>
+   * The root is either equal to the repository's filesystem root or, in case
+   * this repository hosts multiple sites, to the filesystem root + a uri.
+   * 
+   * @return the repository root directory
+   */
+  public File getRootDirectory() {
+    return repositoryRoot;
+  }
+
+  /**
+   * Returns the <code>File</code> object that is represented by
+   * <code>uri</code> or <code>null</code> if the page does not exist on the
+   * filesystem.
+   * 
+   * @param uri
+   *          the page uri
+   * @return the file
+   */
+  protected File uriToFile(PageURI uri) {
+    StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
+    String id = null;
+    if (uri.getId() != null) {
+      id = uri.getId();
+    } else {
+      id = index.toId(uri);
+      if (id == null) {
+        logger.warn("Uri '{}' is not part of the repository index", uri);
+        return null;
+      }
+    }
+    path = appendIdToPath(uri.getId(), path);
+    path.append(File.separatorChar);
+    path.append(PageUtils.getDocument(uri.getVersion()));
+    return new File(path.toString());
+  }
+
+  /**
+   * Returns the page uri's parent directory or <code>null</code> if the
+   * directory does not exist on the filesystem.
+   * 
+   * @param uri
+   *          the page uri
+   * @return the parent directory
+   */
+  protected File uriToDirectory(PageURI uri) {
+    StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
+    String id = null;
+    if (uri.getId() != null) {
+      id = uri.getId();
+    } else {
+      id = index.toId(uri);
+      if (id == null) {
+        logger.warn("Uri '{}' is not part of the repository index", uri);
+        return null;
+      }
+    }
+    path = appendIdToPath(uri.getId(), path);
+    return new File(path.toString());
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.PageURI)
+   * 
+   * @see java.lang.Object#hashCode()
    */
-  public boolean exists(PageURI uri) throws ContentRepositoryException {
-    // TODO Auto-generated method stub
+  @Override
+  public int hashCode() {
+    if (repositoryRoot != null)
+      return repositoryRoot.hashCode();
+    else
+      return super.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof FileSystemContentRepository) {
+      FileSystemContentRepository repo = (FileSystemContentRepository) obj;
+      if (repositoryRoot != null) {
+        return repositoryRoot.equals(repo.getRootDirectory());
+      } else {
+        return super.equals(obj);
+      }
+    }
     return false;
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)
+   * 
+   * @see java.lang.Object#toString()
    */
-  public boolean exists(PageURI uri, User user, Permission p)
-      throws ContentRepositoryException, SecurityException {
-    // TODO Auto-generated method stub
-    return false;
+  @Override
+  public String toString() {
+    return "filesystem content repository " + repositoryRoot;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#findPages(ch.o2it.weblounge.common.content.SearchQuery)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
    */
-  public SearchResult[] findPages(SearchQuery query)
-      throws ContentRepositoryException {
+  @Override
+  protected Page loadPage(PageURI uri) throws IOException {
+    File pageFile = uriToFile(uri);
+    FileInputStream fis = null;
+    try {
+      fis = new FileInputStream(pageFile);
+      PageReader pageReader = new PageReader();
+      Page page = pageReader.read(fis, uri);
+      return page;
+    } catch (IOException e) {
+      throw new IOException("Error accessing page " + uri + " at " + pageFile, e);
+    } catch (SAXException e) {
+      throw new RuntimeException("Error parsing page " + uri + " at " + pageFile, e);
+    } catch (ParserConfigurationException e) {
+      throw new IllegalStateException("Parser configuration error while trying to parse page " + uri + " at " + pageFile, e);
+    } finally {
+      if (fis != null)
+        IOUtils.closeQuietly(fis);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deletePage(ch.o2it.weblounge.common.content.PageURI, long[])
+   */
+  @Override
+  protected void deletePage(PageURI uri, long[] revisions) throws IOException {
+
+    // Remove the pages
+    for (long r : revisions) {
+      PageURI pageURI = new PageURIImpl(uri, r);
+      File f = uriToFile(uri);
+      if (f.exists() && !f.delete()) {
+        logger.warn("Tried to remove non-existing page '{}' from repository", uri);
+        throw new IOException("Unable to delete page " + pageURI + " located at " + f + " from repository");
+      }
+    }
+
+    // Get the page's directory
+    File f = uriToDirectory(uri);
+    if (!f.exists()) {
+      throw new IOException("Unable to get directory for page " + uri + ", supposedly located at " + f);
+    }
+
+    // Remove the file
+    try {
+      if (f.listFiles().length == 0)
+        FileUtils.deleteDirectory(f);
+    } catch (IOException e) {
+      throw new IOException("Unable to delete directory for page " + uri, e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storePage(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.content.Page)
+   */
+  @Override
+  protected void storePage(PageURI uri, Page page) throws IOException {
+    File pageUrl = uriToFile(uri);
+    InputStream is = null;
+    OutputStream os = null;
+    try {
+      FileUtils.forceDelete(pageUrl);
+      is = new ByteArrayInputStream(page.toXml().getBytes());
+      os = new FileOutputStream(pageUrl);
+      IOUtils.copy(is, os);
+    } finally {
+      if (is != null)
+        IOUtils.closeQuietly(is);
+      if (os != null)
+        IOUtils.closeQuietly(os);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#updatePage(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.content.Page)
+   */
+  @Override
+  protected void updatePage(PageURI uri, Page page) throws IOException {
+    storePage(uri, page);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadIndex()
+   */
+  @Override
+  protected ContentRepositoryIndex loadIndex() throws IOException {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPage(ch.o2it.weblounge.common.content.PageURI)
-   */
-  public Page getPage(PageURI uri) throws ContentRepositoryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPage(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)
-   */
-  public Page getPage(PageURI uri, User user, Permission p)
-      throws ContentRepositoryException, SecurityException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.PageURI)
-   */
-  public PageURI[] getVersions(PageURI uri) throws ContentRepositoryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages()
-   */
-  public Iterator<PageURI> listPages() throws ContentRepositoryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(long[])
-   */
-  public Iterator<PageURI> listPages(long[] versions)
-      throws ContentRepositoryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI)
-   */
-  public Iterator<PageURI> listPages(PageURI uri)
-      throws ContentRepositoryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, long[])
-   */
-  public Iterator<PageURI> listPages(PageURI uri, long[] versions)
-      throws ContentRepositoryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, int)
-   */
-  public Iterator<PageURI> listPages(PageURI uri, int level)
-      throws ContentRepositoryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, int, long[])
-   */
-  public Iterator<PageURI> listPages(PageURI uri, int level, long[] versions)
-      throws ContentRepositoryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#setURI(java.lang.String)
-   */
-  public void setURI(String repositoryURI) {
-    // TODO Auto-generated method stub
-
   }
 
 }
