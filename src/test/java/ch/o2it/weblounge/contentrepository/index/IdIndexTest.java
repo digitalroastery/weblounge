@@ -223,11 +223,11 @@ public class IdIndexTest {
     // Resize to the same size
     try {
       idx.add(uuid, address);
-      idx.resize(slotsInIndex, entriesPerSlot * 5);
+      idx.resize(slotsInIndex, entriesPerSlot * 3);
       assertEquals(slotsInIndex, idx.getSlots());
-      assertEquals(entriesPerSlot * 5, idx.getSlotSize());
+      assertEquals(entriesPerSlot * 3, idx.getSlotSize());
       assertEquals(1, idx.getEntries());
-      assertEquals(16 + (slotsInIndex * (4 + entriesPerSlot * 5 * 8)), idx.size());
+      assertEquals(16 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
       long[] candidates = idx.locate(uuid);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);

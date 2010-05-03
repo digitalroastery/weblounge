@@ -36,19 +36,16 @@ import java.io.RandomAccessFile;
  * or the <code>Tree</code> index.
  * 
  * <pre>
- * | slot | slot number in tree.idx
+ * | slot | entries | slot number in tree.idx
  * |------------------------------------------
- * | 1    | addressOf(a-b-c-d), addressOf(e-f-g-h)
- * | 2    | addressOf(u-v-w-y)
+ * | 1    | 2       | addressOf(a-b-c-d), addressOf(e-f-g-h)
+ * | 2    | 1       | addressOf(u-v-w-y)
  * </pre>
  * 
  * The index is made up of a header which consists of the number of slots (4
  * bytes) followed by the number of addresses per slot (4 bytes), the number of
  * entries currently in the index and then the slots containing the indicated
  * number of 64-bit addresses (8 bytes).
- * <p>
- * Within each slot, there will be a sentinel of value <code>-1</code> so we
- * don't have to read the whole line.
  */
 public class IdIndex {
 
