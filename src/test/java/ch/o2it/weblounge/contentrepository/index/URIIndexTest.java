@@ -46,7 +46,7 @@ public class URIIndexTest {
   protected File indexFile = null;
 
   /** Number of bytes per entry */
-  protected int bytesPerEntry = 128;
+  protected int pathLength = 128;
 
   /**
    * @throws java.lang.Exception
@@ -56,7 +56,7 @@ public class URIIndexTest {
     indexFile = new File(new File(System.getProperty("java.io.tmpdir")), "id.idx");
     if (indexFile.exists())
       indexFile.delete();
-    idx = new URIIndex(indexFile, false, bytesPerEntry);
+    idx = new URIIndex(indexFile, false, pathLength);
   }
 
   /**
@@ -87,7 +87,7 @@ public class URIIndexTest {
    */
   @Test
   public void testSize() {
-    assertEquals(16, idx.size());
+    assertEquals(24, idx.size());
     String uuid = UUID.randomUUID().toString();
     try {
       idx.add(uuid, "/");
@@ -95,7 +95,7 @@ public class URIIndexTest {
       e.printStackTrace();
       fail("Error adding entry to the index");
     }
-    assertEquals(16 + uuid.length() + bytesPerEntry, idx.size());
+    assertEquals(24 + uuid.getBytes().length + pathLength, idx.size());
   }
 
   /**
@@ -105,7 +105,7 @@ public class URIIndexTest {
    */
   @Test
   public void testGetEntrySize() {
-    assertEquals(bytesPerEntry, idx.getEntrySize());
+    assertEquals(pathLength, idx.getEntrySize());
   }
 
   /**
@@ -201,7 +201,20 @@ public class URIIndexTest {
    */
   @Test
   public void testClear() {
-    fail("Not yet implemented"); // TODO
+    String uuid = UUID.randomUUID().toString();
+    try {
+      idx.clear();
+      assertEquals(0, idx.getEntries());
+      assertEquals(24, idx.size());
+
+      idx.add(uuid, "/");
+      idx.clear();
+      assertEquals(0, idx.getEntries());
+      assertEquals(24 + uuid.getBytes().length + pathLength, idx.size());
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error clearing the index");
+    }
   }
 
   /**
@@ -216,7 +229,7 @@ public class URIIndexTest {
     String uuid2 = UUID.randomUUID().toString();
     String shortPath = "/weblounge";
     StringBuffer path = new StringBuffer("/");
-    for (int i = 0; i < bytesPerEntry + 1; i++)
+    for (int i = 0; i < pathLength + 1; i++)
       path.append("x");
     try {
       address = idx.add(uuid1, shortPath);
@@ -241,7 +254,7 @@ public class URIIndexTest {
     String uuid2 = UUID.randomUUID().toString();
     String shortPath = "/weblounge";
     StringBuffer path = new StringBuffer("/");
-    for (int i = 0; i < bytesPerEntry + 1; i++)
+    for (int i = 0; i < pathLength + 1; i++)
       path.append("x");
     try {
       address = idx.add(uuid1, shortPath);
@@ -264,12 +277,12 @@ public class URIIndexTest {
     long address = -1;
     String uuid = UUID.randomUUID().toString();
     StringBuffer path = new StringBuffer("/");
-    for (int i = 0; i < bytesPerEntry + 1; i++)
+    for (int i = 0; i < pathLength + 1; i++)
       path.append("x");
     try {
       address = idx.add(uuid, path.toString());
       assertEquals(1, idx.getEntries());
-      assertEquals(bytesPerEntry * 2, idx.getEntrySize());
+      assertEquals(pathLength * 2, idx.getEntrySize());
       assertEquals(path.toString(), idx.getPath(address));
     } catch (IOException e) {
       e.printStackTrace();
