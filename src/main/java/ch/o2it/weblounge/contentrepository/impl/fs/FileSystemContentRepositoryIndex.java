@@ -24,6 +24,7 @@ import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.IdIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.PathIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.URIIndex;
+import ch.o2it.weblounge.contentrepository.impl.index.VersionIndex;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +45,9 @@ public class FileSystemContentRepositoryIndex extends ContentRepositoryIndex {
   /** Name for the path index file */
   public static final String PATH_IDX_NAME = "path.idx";
 
+  /** Name for the version index file */
+  public static final String VERSION_IDX_NAME = "version.idx";
+
   /**
    * Creates a new content repository index that lives inside the given
    * directory.
@@ -55,7 +59,12 @@ public class FileSystemContentRepositoryIndex extends ContentRepositoryIndex {
    *           files fails
    */
   public FileSystemContentRepositoryIndex(File directory) throws IOException {
-    super(new URIIndex(new File(directory, URI_IDX_NAME), false), new IdIndex(new File(directory, ID_IDX_NAME), false), new PathIndex(new File(directory, PATH_IDX_NAME), false));
+    super(
+      new URIIndex(new File(directory, URI_IDX_NAME), false), 
+      new IdIndex(new File(directory, ID_IDX_NAME), false), 
+      new PathIndex(new File(directory, PATH_IDX_NAME), false), 
+      new VersionIndex(new File(directory, VERSION_IDX_NAME), false)
+    );
   }
 
 }

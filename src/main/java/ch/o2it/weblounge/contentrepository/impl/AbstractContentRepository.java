@@ -180,14 +180,17 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
-    long[] revisions = index.getRevisions(uri);
-    PageURI[] uris = new PageURI[revisions.length];
-    int i = 0;
-    for (long r : revisions) {
-      uris[i++] = new PageURIImpl(uri, r);
+    try {
+      long [] revisions = index.getRevisions(uri);
+      PageURI[] uris = new PageURI[revisions.length];
+      int i = 0;
+      for (long r : revisions) {
+        uris[i++] = new PageURIImpl(uri, r);
+      }
+      return uris;
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
     }
-
-    return uris;
   }
 
   /**

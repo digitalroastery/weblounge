@@ -49,6 +49,9 @@ public class ContentRepositoryIndex {
   /** The path index */
   protected PathIndex pathIdx = null;
 
+  /** The version index */
+  protected VersionIndex versionIdx = null;
+
   /**
    * Creates a new content repository index using the three sub indices.
    * 
@@ -58,12 +61,15 @@ public class ContentRepositoryIndex {
    *          the id index
    * @param pathIndex
    *          the path index
+   * @param versionIndex
+   *          the version index
    */
   public ContentRepositoryIndex(URIIndex uriIndex, IdIndex idIndex,
-      PathIndex pathIndex) {
+      PathIndex pathIndex, VersionIndex versionIndex) {
     this.uriIdx = uriIndex;
     this.idIdx = idIndex;
     this.pathIdx = pathIndex;
+    this.versionIdx = versionIndex;
   }
 
   /**
@@ -76,6 +82,7 @@ public class ContentRepositoryIndex {
     uriIdx.close();
     idIdx.close();
     pathIdx.close();
+    versionIdx.close();
   }
 
   /**
@@ -91,14 +98,26 @@ public class ContentRepositoryIndex {
   public synchronized PageURI add(PageURI uri) throws IOException {
     if (uri.getPath() == null)
       throw new IllegalArgumentException("Uri must contain a path");
-
-    if (uri.getId() == null) {
+    
+    long address = toURIEntry(uri);
+    
+    // If there is no address, we are about to add a new page
+    if (address < 0) {
       String uuid = UUID.randomUUID().toString();
       uri = new PageURIImpl(uri.getSite(), uri.getPath(), uri.getVersion(), uuid);
+      String id = uri.getId();
+      String path = uri.getPath();
+      address = uriIdx.add(id, path);
+      idIdx.add(id, address);
+      pathIdx.add(path, address);
+      versionIdx.add(id, uri.getVersion());
+    } 
+    
+    // Otherwise, it's just a new version
+    else {
+      versionIdx.add(address, uri.getVersion());
     }
-    long address = uriIdx.add(uri.getId(), uri.getPath());
-    idIdx.add(uri.getId(), address);
-    pathIdx.add(uri.getPath(), address);
+    
     return uri;
   }
 
@@ -131,6 +150,7 @@ public class ContentRepositoryIndex {
     idIdx.delete(id, address);
     pathIdx.delete(path, address);
     uriIdx.delete(address);
+    versionIdx.delete(address);
   }
 
   /**
@@ -141,8 +161,15 @@ public class ContentRepositoryIndex {
    *          the page uri
    * @return the revisions
    */
-  public long[] getRevisions(PageURI uri) {
-    return null;
+  public long[] getRevisions(PageURI uri) throws IOException {
+    // Locate the entry in question
+    long address = toURIEntry(uri);
+
+    // Everything ok?
+    if (address == -1)
+      throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
+
+    return versionIdx.getVersions(address);
   }
 
   /**
@@ -218,7 +245,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if clearing the index fails
    */
-  public void clear() throws IOException {
+  public synchronized void clear() throws IOException {
     uriIdx.clear();
     idIdx.clear();
     pathIdx.clear();
@@ -232,18 +259,10 @@ public class ContentRepositoryIndex {
    * @return <code>true</code> if the uri exists
    */
   public boolean exists(PageURI uri) throws IOException {
-    String id = uri.getId();
-    String path = uri.getPath();
-
-    if (id == null && path == null)
-      throw new IllegalArgumentException("Uri must contain either id or path");
-
-    // Do a lookup
-    if (id != null) {
-      return idIdx.locate(id).length > 0;
-    } else {
-      return pathIdx.locate(path).length > 0;
-    }
+    long address = toURIEntry(uri);
+    if (address == -1)
+      return false;
+    return versionIdx.hasVersion(address, uri.getVersion());
   }
 
   /**
@@ -320,7 +339,6 @@ public class ContentRepositoryIndex {
 
     // Is the uri part of the index?
     if (addresses.length == 0) {
-      logger.warn("Attempt to locate non-existing path {}", path);
       return -1;
     }
 

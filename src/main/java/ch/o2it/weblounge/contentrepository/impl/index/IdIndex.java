@@ -311,7 +311,6 @@ public class IdIndex {
     for (int i = deleteEntry + 1; i < slotEntries.length; i++) {
       idx.writeLong(slotEntries[i]);
     }
-    idx.writeLong(0);
 
     // Update the file header
     entries--;

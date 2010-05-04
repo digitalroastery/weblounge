@@ -25,6 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
@@ -121,9 +122,25 @@ public class ContentRepositoryIndexTest {
    * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getRevisions(ch.o2it.weblounge.common.content.PageURI)}.
    */
   @Test
-  @Ignore
   public void testGetRevisions() {
-    fail("Not yet implemented");
+    PageURI uri1 = new PageURIImpl(site, "/weblounge");
+    PageURI uri2Live = new PageURIImpl(site, "/etc/weblounge");
+    PageURI uri2Work = new PageURIImpl(site, "/etc/weblounge", Page.WORK);
+    try {
+      idx.add(uri1);
+      idx.add(uri2Live);
+      idx.add(uri2Work);
+      long[] revisions = idx.getRevisions(uri1);
+      assertEquals(1, revisions.length);
+      assertEquals(Page.LIVE, revisions[0]);
+      revisions = idx.getRevisions(uri2Live);
+      assertEquals(2, revisions.length);
+      assertEquals(Page.LIVE, revisions[0]);
+      assertEquals(Page.WORK, revisions[1]);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
   }
 
   /**

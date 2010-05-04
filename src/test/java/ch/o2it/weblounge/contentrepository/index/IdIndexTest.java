@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.contentrepository.index;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.contentrepository.impl.index.IdIndex;
@@ -176,7 +175,7 @@ public class IdIndexTest {
     try {
       idx.add(uuid, address);
       idx.clear();
-      assertTrue(idx.getEntries() == 0);
+      assertEquals(0, idx.getEntries());
       assertEquals(slotsInIndex, idx.getSlots());
       assertEquals(entriesPerSlot, idx.getSlotSize());
       assertEquals(0.0, idx.getLoadFactor());

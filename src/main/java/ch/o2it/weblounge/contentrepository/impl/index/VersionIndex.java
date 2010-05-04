@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
+import ch.o2it.weblounge.common.impl.content.PageUtils;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,31 +34,31 @@ import java.io.RandomAccessFile;
 
 /**
  * This index is part of the content repository index and maps page identifiers
- * to paths. In order to quickly get to an entry, use the <code>id</code> or
+ * to versions. In order to quickly get to an entry, use the <code>id</code> or
  * <code>path</code> index.
  * 
  * <pre>
- * | slot | id      | path
+ * | slot | id      | versions
  * |------------------------------------------
- * | 1    | a-b-c-d | /etc/weblounge
+ * | 1    | a-b-c-d | 1 876876876
  * </pre>
  */
-public class URIIndex {
+public class VersionIndex {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(URIIndex.class);
+  private static final Logger logger = LoggerFactory.getLogger(VersionIndex.class);
 
   /** Default number of bytes used per id */
   private static final int IDX_BYTES_PER_ID = 36;
 
-  /** Default number of bytes per path */
-  private static final int IDX_BYTES_PER_PATH = 128;
+  /** Default number of versions per index entry */
+  private static final int IDX_VERSIONS_PER_ENTRY = 10;
 
   /** Location of the bytes-per-id header */
   protected static final long IDX_BYTES_PER_ID_HEADER_LOCATION = 0;
 
-  /** Location of the bytes-per-path header */
-  protected static final long IDX_BYTES_PER_PATH_HEADER_LOCATION = 4;
+  /** Location of the versions-per-entry header */
+  protected static final long IDX_VERSIONS_PER_ENTRY_HEADER_LOCATION = 4;
 
   /** Location of the entries header */
   protected static final long IDX_SLOTS_HEADER_LOCATION = 8;
@@ -82,11 +84,11 @@ public class URIIndex {
   /** Number of bytes per id */
   protected int bytesPerId = IDX_BYTES_PER_ID;
 
-  /** Number of bytes per path */
-  protected int bytesPerPath = IDX_BYTES_PER_PATH;
+  /** Number of versions per entry */
+  protected int versionsPerEntry = IDX_VERSIONS_PER_ENTRY;
 
   /** Number of bytes per entry */
-  protected int bytesPerEntry = bytesPerId + bytesPerPath;
+  protected int bytesPerEntry = bytesPerId + IDX_VERSIONS_PER_ENTRY * 8;
 
   /** Number of entries */
   protected long entries = 0;
@@ -97,11 +99,11 @@ public class URIIndex {
   /**
    * Creates an index from the given file. If the file does not exist, it is
    * created and initialized with the default index settings, which means that
-   * uri identifiers are expected to be made out of 36 bytes (uuid) while paths
-   * are allowed up to 128 bytes.
+   * uri identifiers are expected to be made out of 36 bytes (uuid) while there
+   * is room for 10 versions with 8 bytes each.
    * <p>
-   * Note that the path length will automatically be increased as soon as longer
-   * paths are added, while the size of identifiers is fixed.
+   * Note that the number of versions will automatically be increased as soon as
+   * an additional version is added, while the size of identifiers is fixed.
    * 
    * @param indexFile
    *          location of the index file
@@ -110,8 +112,8 @@ public class URIIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public URIIndex(File indexFile, boolean readOnly) throws IOException {
-    this(indexFile, readOnly, IDX_BYTES_PER_ID, IDX_BYTES_PER_PATH);
+  public VersionIndex(File indexFile, boolean readOnly) throws IOException {
+    this(indexFile, readOnly, IDX_BYTES_PER_ID, IDX_VERSIONS_PER_ENTRY);
   }
 
   /**
@@ -119,28 +121,26 @@ public class URIIndex {
    * created and initialized with the default index settings, which means that
    * uri identifiers are expected to be made out of 36 bytes (uuid).
    * <p>
-   * Note that the path length will automatically be increased as soon as longer
-   * paths are added, while the size of identifiers is fixed.
+   * Note that the number of versions will automatically be increased as soon as
+   * an additional version is added, while the size of identifiers is fixed.
    * 
    * @param indexFile
    *          location of the index file
-   * @param pathLengthInBytes
-   *          the number of bytes per path
+   * @param versions
+   *          the number of versions per entry
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @throws IOException
    *           if reading from the index fails
    */
-  public URIIndex(File indexFile, boolean readOnly, int pathLengthInBytes)
+  public VersionIndex(File indexFile, boolean readOnly, int versions)
       throws IOException {
-    this(indexFile, readOnly, IDX_BYTES_PER_ID, pathLengthInBytes);
+    this(indexFile, readOnly, IDX_BYTES_PER_ID, versions);
   }
 
   /**
    * Creates an index from the given file. If the file does not exist, it is
    * created and initialized with the default index settings.
-   * <p>
-   * The number of bytes per entry defines the size of the index.
    * 
    * @param indexFile
    *          location of the index file
@@ -148,13 +148,13 @@ public class URIIndex {
    *          <code>true</code> to indicate a read only index
    * @param idLengthInBytes
    *          the number of bytes per id
-   * @param pathLengthInBytes
-   *          the number of bytes per path
+   * @param versions
+   *          the number of versions per entry
    * @throws IOException
    *           if reading from the index fails
    */
-  public URIIndex(File indexFile, boolean readOnly, int idLengthInBytes,
-      int pathLengthInBytes) throws IOException {
+  public VersionIndex(File indexFile, boolean readOnly, int idLengthInBytes,
+      int versions) throws IOException {
 
     this.idxFile = indexFile;
     this.isReadOnly = readOnly;
@@ -170,16 +170,16 @@ public class URIIndex {
     // Read index header information
     try {
       this.bytesPerId = idx.readInt();
-      this.bytesPerPath = idx.readInt();
+      this.versionsPerEntry = idx.readInt();
       this.entries = idx.readLong();
-      this.bytesPerEntry = bytesPerId + bytesPerPath;
-      if (this.bytesPerId != idLengthInBytes || this.bytesPerPath != pathLengthInBytes)
-        resize(idLengthInBytes, pathLengthInBytes);
+      this.bytesPerEntry = bytesPerId + 4 + versionsPerEntry * 8;
+      if (this.bytesPerId != idLengthInBytes || this.versionsPerEntry != versions)
+        resize(idLengthInBytes, versions);
     } catch (EOFException e) {
       if (readOnly) {
         throw new IllegalStateException("Readonly index cannot be empty");
       }
-      init(idLengthInBytes, pathLengthInBytes);
+      init(idLengthInBytes, versions);
     } catch (IOException e) {
       logger.error("Error reading from path index: " + e.getMessage());
       throw e;
@@ -207,12 +207,12 @@ public class URIIndex {
   }
 
   /**
-   * Returns the number of bytes per entry;
+   * Returns the number of versions per entry;
    * 
-   * @return the number of bytes per entry
+   * @return the number of versions per entry
    */
-  public int getEntrySize() {
-    return bytesPerPath;
+  public int getVersionsPerEntry() {
+    return versionsPerEntry;
   }
 
   /**
@@ -225,82 +225,122 @@ public class URIIndex {
   }
 
   /**
-   * Adds id and path to the index and returns the index address.
+   * Adds id and version to the index and returns the index address.
    * 
    * @param id
    *          the identifier
-   * @param path
-   *          the page path
+   * @param version
+   *          the page version
    * @return the entry's address in this index
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized long add(String id, String path) throws IOException {
-    if (id.getBytes().length != bytesPerId)
+  public synchronized long add(String id, long version) throws IOException {
+    return add(entries, id, version);
+  }
+
+  /**
+   * Adds the version to the entry that is located in slot <code>address</code>
+   * and returns the index address.
+   * 
+   * @param entry
+   *          the entry where the version needs to be added
+   * @param version
+   *          the page version
+   * @return the entry's address in this index
+   * @throws IOException
+   *           if writing to the index fails
+   */
+  public synchronized long add(long entry, long version)
+      throws IOException {
+    return add(entry, null, version);
+  }
+
+  /**
+   * Adds the version to the entry that is located in slot <code>address</code>
+   * and returns the index address.
+   * 
+   * @param entry
+   *          the entry where the version needs to be added
+   * @param id
+   *          the identifier
+   * @param version
+   *          the page version
+   * @return the entry's address in this index
+   * @throws IOException
+   *           if writing to the index fails
+   */
+  private long add(long entry, String id, long version)
+      throws IOException {
+    if (id != null && id.getBytes().length != bytesPerId)
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
-    long entry = entries;
-    long startOfEntry = IDX_HEADER_SIZE + (entries * bytesPerEntry);
-
-    int pathLengthInBytes = path.getBytes().length;
-
-    // Make sure there is still room left for an additional entry. One entry
-    // consists of the uuid, the path and a closing '\n'
-    if (pathLengthInBytes >= bytesPerPath) {
-      logger.info("Path doesn't fit, triggering index resize");
-      int newBytesPerPath = bytesPerPath * 2;
-      while (newBytesPerPath < pathLengthInBytes)
-        newBytesPerPath *= 2;
-      resize(bytesPerId, newBytesPerPath);
-      startOfEntry = IDX_HEADER_SIZE + (entries * bytesPerEntry);
-    }
-
-    // See if there is an empty slot
-    long address = IDX_HEADER_SIZE;
-    long e = 0;
     boolean reusingSlot = false;
-    idx.seek(address);
-    while (address < startOfEntry) {
-      if (idx.readChar() == '\n') {
-        logger.debug("Found orphan line for reuse");
-        startOfEntry = address;
-        reusingSlot = true;
-        entry = e;
-        break;
+    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    int existingVersions = 0;
+
+    // See if there is an empty slot (only if we are adding a whole new entry)
+    if (entry == entries) {
+      long address = IDX_HEADER_SIZE;
+      long e = 0;
+      idx.seek(address);
+      while (address < startOfEntry) {
+        if (idx.read() == '\n') {
+          logger.debug("Found orphan line for reuse");
+          startOfEntry = address;
+          reusingSlot = true;
+          entry = e;
+          break;
+        }
+        idx.skipBytes(bytesPerEntry - 2);
+        address += bytesPerEntry;
+        e++;
       }
-      idx.skipBytes(bytesPerEntry - 1);
-      address += bytesPerEntry;
-      e++;
     }
 
-    // Add the new address at the end
+    // Make sure there is still room left for an additional entry
+    else {
+      idx.seek(startOfEntry);
+      byte[] bytes = new byte[bytesPerId];
+      idx.read(bytes);
+      id = new String(bytes);
+      existingVersions = idx.readInt();
+      if (existingVersions >= versionsPerEntry) {
+        logger.info("Adding additional version, triggering index resize");
+        resize(bytesPerId, versionsPerEntry * 2);
+        startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+      }
+    }
+
+    // Add the new address
     idx.seek(startOfEntry);
     idx.write(id.getBytes());
-    idx.write(path.getBytes());
-    idx.write('\n');
-    long remainingBytes = bytesPerEntry - IDX_BYTES_PER_ID - pathLengthInBytes - 1;
-    for (int i = 0; i < remainingBytes; i++) {
-      idx.writeByte(0);
-    }
-
-    if (!reusingSlot)
-      slots++;
-    entries++;
+    idx.writeInt(existingVersions + 1);
+    idx.skipBytes(existingVersions * 8);
+    idx.writeLong(version);
 
     // Update the file header
-    idx.seek(IDX_SLOTS_HEADER_LOCATION);
-    idx.writeLong(slots);
-    idx.writeLong(entries);
+    if (entry == entries) {
+      if (!reusingSlot)
+        slots++;
+      entries++;
+      idx.seek(IDX_SLOTS_HEADER_LOCATION);
+      idx.writeLong(slots);
+      idx.writeLong(entries);
+      logger.debug("Added uri with id '{}' and initial version '{}' as entry no {}", new Object[] {
+          id,
+          PageUtils.getVersionString(version),
+          entries });
+    } else {
+      logger.debug("Added version '{}' to uri with id '{}'", PageUtils.getVersionString(version), id);
+    }
 
-    logger.debug("Added uri with id '{}' and path '{}' as entry no {}", new Object[] {
-        id,
-        path,
-        entries });
     return entry;
   }
 
   /**
-   * Removes all entries for the given page uri from the index.
+   * Removes all versions for the page uri that is located at slot
+   * <code>entry</code> from the index.
    * 
    * @param entry
    *          start address of uri entry
@@ -310,11 +350,11 @@ public class URIIndex {
   public synchronized void delete(long entry) throws IOException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
 
-    // Remove the entry by writing a '\n' to the first byte
+    // Remove the entry
     idx.seek(startOfEntry);
     idx.write('\n');
     idx.write(new byte[bytesPerEntry - 1]);
-    
+
     // Update the file header
     entries--;
     idx.seek(IDX_ENTRIES_HEADER_LOCATION);
@@ -324,39 +364,46 @@ public class URIIndex {
   }
 
   /**
-   * Updates the path on the uri located at <code>entry</code>.
+   * Removes the given version from the page uri that is located at slot
+   * <code>entry</code>.
    * 
    * @param entry
-   *          start address of uri
-   * @param path
-   *          the new path
+   *          start address of uri entry
+   * @param version
+   *          the version to delete
    * @throws IOException
-   *           if updating the path in the index fails
+   *           if removing the entry from the index fails
    */
-  public synchronized void update(long entry, String path) throws IOException {
+  public synchronized void delete(long entry, long version) throws IOException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
 
-    // Check if the new path fits the current index
-    int pathLengthInBytes = path.getBytes().length;
-    if (pathLengthInBytes >= bytesPerPath) {
-      logger.info("Path doesn't fit, triggering index resize");
-      int newBytesPerPath = bytesPerPath * 2;
-      while (newBytesPerPath < pathLengthInBytes)
-        newBytesPerPath *= 2;
-      resize(bytesPerId, newBytesPerPath);
-      startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
-    }
-
-    // Write the path to the index
+    // Remove the version from the indicated entry
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
-    idx.write(path.getBytes());
-    idx.write('\n');
-    for (int i = 1; i < bytesPerEntry; i++) {
-      idx.writeLong(0);
+    int deleteEntry = -1;
+    int v = idx.readInt();
+    long[] versions = new long[v];
+    for (int i = 0; i < v; i++) {
+      versions[i] = idx.readLong();
+      if (versions[i] == version) {
+        deleteEntry = i;
+      }
     }
 
-    logger.debug("Updated uri at address '{}' to {}", entry, path);
+    // Everything ok?
+    if (deleteEntry == -1)
+      throw new IllegalStateException("Version '" + version + "' is not part of the index");
+
+    // Drop the version
+    idx.seek(startOfEntry + bytesPerId);
+    idx.writeInt(v - 1);
+    idx.skipBytes(deleteEntry * 8);
+    for (int i = deleteEntry + 1; i < v; i++) {
+      idx.writeLong(versions[i]);
+    }
+    idx.write(new byte[(versionsPerEntry - v - 1) * 8]);
+
+    logger.debug("Removed version '{}' from uri '{}' from index", version, entry);
   }
 
   /**
@@ -366,57 +413,78 @@ public class URIIndex {
    *           if writing to the index fails
    */
   public synchronized void clear() throws IOException {
-    init(bytesPerId, bytesPerPath);
+    init(bytesPerId, versionsPerEntry);
   }
 
   /**
-   * Returns the uri's id.
+   * Returns the uri's versions.
    * 
    * @param entry
    *          the entry at which the id is expected
-   * @return the id
-   * @throws IllegalStateException
-   *           if the user tries to access an address with no data
+   * @return the versions
    * @throws EOFException
    *           if the user tries to access a non-existing address
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized String getId(long entry) throws IOException, EOFException {
-    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
-    idx.seek(startOfEntry);
-    byte[] bytes = new byte[bytesPerId];
-    int bytesRead = idx.read(bytes);
-    if (bytesRead < bytesPerId || bytes[0] == '\n')
-      throw new IllegalStateException("No data at address " + entry);
-    return new String(bytes);
-  }
-
-  /**
-   * Returns the uri's path.
-   * 
-   * @param entry
-   *          the entry at which the id is expected
-   * @return the path
-   * @throws EOFException
-   *           if the user tries to access a non-existing address
-   * @throws IOException
-   *           if reading from the index fails
-   */
-  public synchronized String getPath(long entry) throws IOException,
+  public synchronized long[] getVersions(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
-
-    byte[] bytes = new byte[bytesPerPath];
-    idx.read(bytes);
-    for (int i = 0; i < bytes.length; i++) {
-      if (bytes[i] == '\n')
-        return new String(bytes, 0, i);
+    int v = idx.readInt();
+    long[] versions = new long[v];
+    for (int i = 0; i < v; i++) {
+      versions[i] = idx.readLong();
     }
+    return versions;
+  }
 
-    throw new IllegalStateException("Found path without delimiter");
+  /**
+   * Returns <code>true</code> if the uri at address <code>entry</code> has the
+   * indicated version.
+   * 
+   * @param entry
+   *          the entry at which the id is expected
+   * @param version
+   *          the version to look up
+   * @return <code>true</code> if version <code>version</code> exist
+   * @throws EOFException
+   *           if the user tries to access a non-existing address
+   * @throws IOException
+   *           if reading from the index fails
+   */
+  public synchronized boolean hasVersion(long entry, long version)
+      throws IOException, EOFException {
+    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    idx.seek(startOfEntry);
+    idx.skipBytes(bytesPerId);
+    int v = idx.readInt();
+    for (int i = 0; i < v; i++) {
+      if (version == idx.readLong())
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns <code>true</code> if the uri at address <code>entry</code> has a
+   * version associated.
+   * 
+   * @param entry
+   *          the entry at which the id is expected
+   * @return <code>true</code> if some <code>version</code> exists
+   * @throws EOFException
+   *           if the user tries to access a non-existing address
+   * @throws IOException
+   *           if reading from the index fails
+   */
+  public synchronized boolean hasVersions(long entry) throws IOException,
+      EOFException {
+    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    idx.seek(startOfEntry);
+    idx.skipBytes(bytesPerId);
+    return idx.readInt() > 0;
   }
 
   /**
@@ -428,17 +496,17 @@ public class URIIndex {
    * @throws IOException
    *           writing to the index fails
    */
-  private void init(int bytesPerId, int bytesPerPath) throws IOException {
+  private void init(int bytesPerId, int versionsPerEntry) throws IOException {
     this.bytesPerId = bytesPerId;
-    this.bytesPerPath = bytesPerPath;
-    this.bytesPerEntry = bytesPerId + bytesPerPath;
+    this.versionsPerEntry = versionsPerEntry;
+    this.bytesPerEntry = bytesPerId + 4 + versionsPerEntry * 8;
 
-    logger.info("Creating uri index with {} bytes per entry", bytesPerEntry);
+    logger.info("Creating version index with {} bytes per entry", bytesPerEntry);
 
     // Write header
     idx.seek(0);
     idx.writeInt(bytesPerId);
-    idx.writeInt(bytesPerPath);
+    idx.writeInt(versionsPerEntry);
     idx.writeLong(0);
     idx.writeLong(0);
 
@@ -455,7 +523,7 @@ public class URIIndex {
 
     this.entries = 0;
 
-    logger.debug("Uri index created");
+    logger.debug("Version index created");
   }
 
   /**
@@ -463,26 +531,26 @@ public class URIIndex {
    * 
    * @param newBytesPerId
    *          the number of bytes per id
-   * @param newBytesPerPath
-   *          the number of bytes per entry
+   * @param newVersionsPerEntry
+   *          the number of versions per entry
    * @throws IOException
    *           writing to the index fails
    * @throws IllegalStateException
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public synchronized void resize(int newBytesPerId, int newBytesPerPath)
+  public synchronized void resize(int newBytesPerId, int newVersionsPerEntry)
       throws IOException {
     if (this.bytesPerId > newBytesPerId && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of bytes per id when there are entries in the index");
-    if (this.bytesPerPath > newBytesPerPath && this.entries > 0)
-      throw new IllegalStateException("Cannot reduce the number of bytes per path when there are entries in the index");
+    if (this.versionsPerEntry > newVersionsPerEntry && this.entries > 0)
+      throw new IllegalStateException("Cannot reduce the number of versions per entry when there are entries in the index");
     if (this.isReadOnly)
       throw new IllegalStateException("This index is readonly");
 
-    int newBytesPerEntry = newBytesPerId + newBytesPerPath;
+    int newBytesPerEntry = newBytesPerId + 4 + newVersionsPerEntry * 8;
 
-    logger.info("Resizing uri index with {} entries to {} bytes per entry", entries, newBytesPerEntry);
+    logger.info("Resizing version index with {} entries to {} bytes per entry", entries, newBytesPerEntry);
 
     String idxFilename = idxFile.getName();
     String fileName = FilenameUtils.getBaseName(idxFilename);
@@ -503,7 +571,7 @@ public class URIIndex {
     // Write header
     idxNew.seek(0);
     idxNew.writeInt(newBytesPerId);
-    idxNew.writeInt(newBytesPerPath);
+    idxNew.writeInt(newVersionsPerEntry);
     idxNew.writeLong(slots);
     idxNew.writeLong(entries);
 
@@ -532,11 +600,11 @@ public class URIIndex {
 
     this.bytesPerEntry = newBytesPerEntry;
     this.bytesPerId = newBytesPerId;
-    this.bytesPerPath = newBytesPerPath;
+    this.versionsPerEntry = newVersionsPerEntry;
     this.idxFile = newIdxFile;
 
     time = System.currentTimeMillis() - time;
-    logger.info("Uri index resized in {} ms", time);
+    logger.info("Version index resized in {} ms", time);
   }
 
 }
