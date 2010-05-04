@@ -441,11 +441,14 @@ public class PathIndex {
     if (this.isReadOnly)
       throw new IllegalStateException("This index is readonly");
 
+    logger.info("Resizing path index with {} entries to {} bytes per entry", entries, entriesPerSlot);
+
     String idxFilename = idxFile.getName();
     String fileName = FilenameUtils.getBaseName(idxFilename);
     String fileExtension = FilenameUtils.getExtension(idxFilename);
     String idxFilenameNew = fileName + "_resized." + fileExtension;
     File newIdxFile = new File(idxFile.getParentFile(), idxFilenameNew);
+    long time = System.currentTimeMillis();
 
     logger.debug("Creating resized index at " + newIdxFile);
 
@@ -499,10 +502,12 @@ public class PathIndex {
     this.slotSizeInBytes = 4 + (entriesPerSlot * IDX_ENTRY_SIZE);
     long totalEntries = slots * entriesPerSlot;
 
-    logger.info("Path index resized to {} entries ({} slots, {} entries per slot)", new Object[] {
+    time = System.currentTimeMillis() - time;
+    logger.info("Path index resized to {} entries ({} slots, {} entries per slot in {} ms)", new Object[] {
         totalEntries,
         slots,
-        entriesPerSlot });
+        entriesPerSlot, 
+        time });
   }
   
 }
