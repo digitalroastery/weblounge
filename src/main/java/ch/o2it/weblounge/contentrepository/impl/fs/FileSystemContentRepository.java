@@ -119,29 +119,33 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   public void index() throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Repository is not connected");
-      
-    // Clear the current search index
-    index.clear();
-
-    // Recreate the index
-    int repositoryRootIndex = repositoryRoot.getAbsolutePath().length();
-    Stack<File> stack = new Stack<File>();
-    stack.push(repositoryRoot);
-    logger.info("Starting reindex of " + this);
-    while (!stack.empty()) {
-      File dir = stack.pop();
-      for (File f : dir.listFiles()) {
-        if (f.isDirectory()) {
-          stack.push(f);
-        } else {
-          String path = f.getAbsolutePath().substring(repositoryRootIndex);
-          String repositoryPath = FilenameUtils.getPath(path);
-          long version = PageUtils.getVersion(path);
-          PageURI pageURI = new PageURIImpl(site, repositoryPath, version);
-          index.add(pageURI);
-          logger.debug("Adding {} to repository index");
+    
+    try {
+      // Clear the current search index
+      index.clear();
+  
+      // Recreate the index
+      int repositoryRootIndex = repositoryRoot.getAbsolutePath().length();
+      Stack<File> stack = new Stack<File>();
+      stack.push(repositoryRoot);
+      logger.info("Starting reindex of " + this);
+      while (!stack.empty()) {
+        File dir = stack.pop();
+        for (File f : dir.listFiles()) {
+          if (f.isDirectory()) {
+            stack.push(f);
+          } else {
+            String path = f.getAbsolutePath().substring(repositoryRootIndex);
+            String repositoryPath = FilenameUtils.getPath(path);
+            long version = PageUtils.getVersion(path);
+            PageURI pageURI = new PageURIImpl(site, repositoryPath, version);
+            index.add(pageURI);
+            logger.debug("Adding {} to repository index");
+          }
         }
       }
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
     }
     logger.info("Finished reindex of " + this);
   }
@@ -167,7 +171,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *          the page uri
    * @return the file
    */
-  protected File uriToFile(PageURI uri) {
+  protected File uriToFile(PageURI uri) throws IOException {
     StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
     String id = null;
     if (uri.getId() != null) {
@@ -193,7 +197,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *          the page uri
    * @return the parent directory
    */
-  protected File uriToDirectory(PageURI uri) {
+  protected File uriToDirectory(PageURI uri) throws IOException {
     StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
     String id = null;
     if (uri.getId() != null) {

@@ -132,8 +132,8 @@ public class PathIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public PathIndex(File indexFile, boolean readOnly, int slots, int entriesPerSlot)
-      throws IOException {
+  public PathIndex(File indexFile, boolean readOnly, int slots,
+      int entriesPerSlot) throws IOException {
 
     this.idxFile = indexFile;
     this.isReadOnly = readOnly;
@@ -232,7 +232,8 @@ public class PathIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized void add(String path, long addressOfPath) throws IOException {
+  public synchronized void add(String path, long addressOfPath)
+      throws IOException {
     int slot = findSlot(path);
     long startOfSlot = IDX_HEADER_SIZE + (slot * slotSizeInBytes);
 
@@ -332,7 +333,8 @@ public class PathIndex {
   }
 
   /**
-   * Returns the slot number of the path's entry in the <code>paths</code> index.
+   * Returns the slot number of the path's entry in the <code>paths</code>
+   * index.
    * 
    * @param path
    *          the path
@@ -348,10 +350,10 @@ public class PathIndex {
    * <code>Tree</code> index.
    * <p>
    * The reason for this method returning a number of addresses rather than one
-   * is that a hashing algorithm is used to map paths to slot numbers in order to
-   * keep the index small. Therefore, if you want to get to the final entry in
-   * the tree or children index, you need to test all of the addresses returned
-   * by this method.
+   * is that a hashing algorithm is used to map paths to slot numbers in order
+   * to keep the index small. Therefore, if you want to get to the final entry
+   * in the tree or children index, you need to test all of the addresses
+   * returned by this method.
    * <p>
    * 
    * @param path
@@ -506,8 +508,8 @@ public class PathIndex {
     logger.info("Path index resized to {} entries ({} slots, {} entries per slot in {} ms)", new Object[] {
         totalEntries,
         slots,
-        entriesPerSlot, 
+        entriesPerSlot,
         time });
   }
-  
+
 }

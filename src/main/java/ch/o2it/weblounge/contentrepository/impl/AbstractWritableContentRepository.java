@@ -95,17 +95,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
-    long[] revisions = index.getRevisions(uri);
-    if (revisions == null) {
-      logger.warn("Page '{}' not found in repository index", uri);
-      return false;
-    }
-
     // Update the index
-    for (long revision : revisions) {
-      PageURI u = new PageURIImpl(target, revision);
-      index.update(u);
-    }
+    index.update(uri, target.getPath());
 
     return true;
   }
@@ -151,9 +142,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // TDOO: Check permissions
 
     updatePage(uri, page);
-
-    // Update entry in index
-    index.update(uri);
 
     return true;
   }

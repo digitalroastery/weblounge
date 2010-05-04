@@ -274,9 +274,9 @@ public class URIIndex {
 
     // Add the new address at the end
     idx.seek(startOfEntry);
-    idx.writeBytes(id);
-    idx.writeBytes(path);
-    idx.writeChar('\n');
+    idx.write(id.getBytes());
+    idx.write(path.getBytes());
+    idx.write('\n');
     long remainingBytes = bytesPerEntry - IDX_BYTES_PER_ID - pathLengthInBytes - 1;
     for (int i = 0; i < remainingBytes; i++) {
       idx.writeByte(0);
@@ -322,6 +322,42 @@ public class URIIndex {
     idx.writeLong(entries);
 
     logger.debug("Removed uri at address '{}' from index", entry);
+  }
+
+  /**
+   * Updates the path on the uri located at <code>entry</code>.
+   * 
+   * @param entry
+   *          start address of uri
+   * @param path
+   *          the new path
+   * @throws IOException
+   *           if updating the path in the index fails
+   */
+  public synchronized void update(long entry, String path) throws IOException {
+    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+
+    // Check if the new path fits the current index
+    int pathLengthInBytes = path.getBytes().length;
+    if (pathLengthInBytes >= bytesPerPath) {
+      logger.info("Path doesn't fit, triggering index resize");
+      int newBytesPerPath = bytesPerPath * 2;
+      while (newBytesPerPath < pathLengthInBytes)
+        newBytesPerPath *= 2;
+      resize(bytesPerId, newBytesPerPath);
+      startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    }
+
+    // Write the path to the index
+    idx.seek(startOfEntry);
+    idx.skipBytes(bytesPerId);
+    idx.write(path.getBytes());
+    idx.write('\n');
+    for (int i = 1; i < bytesPerEntry; i++) {
+      idx.writeLong(0);
+    }
+
+    logger.debug("Updated uri at address '{}' to {}", entry, path);
   }
 
   /**
@@ -378,7 +414,7 @@ public class URIIndex {
     idx.read(bytes);
     for (int i = 0; i < bytes.length; i++) {
       if (bytes[i] == '\n')
-        return new String(bytes, 0, i - 1);
+        return new String(bytes, 0, i);
     }
 
     throw new IllegalStateException("Found path without delimiter");

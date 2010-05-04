@@ -138,8 +138,7 @@ public class URIIndexTest {
       long address = idx.add(uuid, path);
       assertEquals(0, address);
       assertEquals(1, idx.getEntries());
-      assertEquals(uuid, idx.getId(address));
-      assertEquals(path, idx.getPath(address));
+      assertEquals(pathLength, idx.getEntrySize());
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error adding entry to the index");
@@ -192,6 +191,52 @@ public class URIIndexTest {
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error adding second entry to the index");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.URIIndex#update(java.lang.String, java.lang.String)}
+   * .
+   */
+  @Test
+  public void testUpdate() {
+    try {
+      String uuid = UUID.randomUUID().toString();
+      String path = "/weblounge";
+      String newPath = "/etc/weblounge";
+      StringBuffer newLongPathBuffer = new StringBuffer("/");
+      for (int i = 0; i < pathLength + 1; i++)
+        newLongPathBuffer.append("x");
+      String newLongPath = newLongPathBuffer.toString();
+
+      // Add the entry
+      long address = idx.add(uuid, path);
+
+      // Update it
+      idx.update(address, newPath);
+      assertEquals(1, idx.getEntries());
+      assertEquals(uuid, idx.getId(address));
+      assertEquals(newPath, idx.getPath(address));
+      assertEquals(pathLength, idx.getEntrySize());
+
+      // ... again ...
+      idx.update(address, path);
+      assertEquals(1, idx.getEntries());
+      assertEquals(uuid, idx.getId(address));
+      assertEquals(path, idx.getPath(address));
+      assertEquals(pathLength, idx.getEntrySize());
+
+      // ... with a very long path
+      idx.update(address, newLongPath.toString());
+      assertEquals(1, idx.getEntries());
+      assertEquals(uuid, idx.getId(address));
+      assertEquals(newLongPath, idx.getPath(address));
+      assertEquals(2 * pathLength, idx.getEntrySize());
+
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error adding entry to the index");
     }
   }
 

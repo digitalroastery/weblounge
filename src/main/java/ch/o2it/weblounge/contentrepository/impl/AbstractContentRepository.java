@@ -94,7 +94,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public boolean exists(PageURI uri) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
-    return index.exists(uri);
+    try {
+      return index.exists(uri);
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
+    }
   }
 
   /**
@@ -110,7 +114,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new IllegalStateException("Content repository is not connected");
 
     // TODO: Implement security
-    return index.exists(uri);
+    try {
+      return index.exists(uri);
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
+    }
   }
 
   /**
@@ -191,7 +199,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
-    return listPages(uri, Integer.MAX_VALUE, null);
+    return listPages(uri, Integer.MAX_VALUE, -1);
   }
 
   /**
@@ -200,9 +208,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
    *      long[])
    */
-  public Iterator<PageURI> listPages(PageURI uri, long[] versions)
+  public Iterator<PageURI> listPages(PageURI uri, long version)
       throws ContentRepositoryException {
-    return listPages(uri, Integer.MAX_VALUE, versions);
+    return listPages(uri, Integer.MAX_VALUE, version);
   }
 
   /**
@@ -213,21 +221,21 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public Iterator<PageURI> listPages(PageURI uri, int level)
       throws ContentRepositoryException {
-    return listPages(uri, level, null);
+    return listPages(uri, level, -1);
   }
 
   /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
-   *      int, long[])
+   *      int, long)
    */
-  public Iterator<PageURI> listPages(PageURI uri, int level, long[] versions)
+  public Iterator<PageURI> listPages(PageURI uri, int level, long version)
       throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
-    return index.list(uri, level, versions);
+    return index.list(uri, level, version);
   }
 
   /**

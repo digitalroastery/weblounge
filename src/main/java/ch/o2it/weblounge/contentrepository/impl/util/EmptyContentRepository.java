@@ -132,9 +132,9 @@ public class EmptyContentRepository implements ContentRepository {
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
-   *      long[])
+   *      long)
    */
-  public Iterator<PageURI> listPages(PageURI uri, long[] versions)
+  public Iterator<PageURI> listPages(PageURI uri, long version)
       throws ContentRepositoryException {
     return null;
   }
@@ -154,9 +154,9 @@ public class EmptyContentRepository implements ContentRepository {
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
-   *      int, long[])
+   *      int, long)
    */
-  public Iterator<PageURI> listPages(PageURI uri, int level, long[] versions)
+  public Iterator<PageURI> listPages(PageURI uri, int level, long version)
       throws ContentRepositoryException {
     return null;
   }

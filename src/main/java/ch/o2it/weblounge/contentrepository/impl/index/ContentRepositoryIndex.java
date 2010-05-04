@@ -21,8 +21,14 @@
 package ch.o2it.weblounge.contentrepository.impl.index;
 
 import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.UUID;
 
 /**
  * This index into the repository is used to map page and resource urls into
@@ -31,14 +37,57 @@ import java.util.Iterator;
  */
 public class ContentRepositoryIndex {
 
+  /** Logging facility */
+  private final static Logger logger = LoggerFactory.getLogger(ContentRepositoryIndex.class);
+
+  /** The uri index */
+  protected URIIndex uriIdx = null;
+
+  /** The id index */
+  protected IdIndex idIdx = null;
+
+  /** The path index */
+  protected PathIndex pathIdx = null;
+
   /**
-   * Adds all relevant entries for the given page uri to the index.
+   * Creates a new content repository index using the three sub indices.
+   * 
+   * @param uriIndex
+   *          the uri index
+   * @param idIndex
+   *          the id index
+   * @param pathIndex
+   *          the path index
+   */
+  public ContentRepositoryIndex(URIIndex uriIndex, IdIndex idIndex,
+      PathIndex pathIndex) {
+    this.uriIdx = uriIndex;
+    this.idIdx = idIndex;
+    this.pathIdx = pathIndex;
+  }
+
+  /**
+   * Adds all relevant entries for the given page uri to the index and returns
+   * it, probably providing a newly created uri identifier.
    * 
    * @param uri
    *          the page uri
+   * @return the uri
+   * @throws IOException
+   *           if accessing the index fails
    */
-  public void add(PageURI uri) {
-    // TODO Auto-generated method stub
+  public synchronized PageURI add(PageURI uri) throws IOException {
+    if (uri.getPath() == null)
+      throw new IllegalArgumentException("Uri must contain a path");
+
+    if (uri.getId() == null) {
+      String uuid = UUID.randomUUID().toString();
+      uri = new PageURIImpl(uri.getSite(), uri.getPath(), uri.getVersion(), uuid);
+    }
+    long address = uriIdx.add(uri.getId(), uri.getPath());
+    idIdx.add(uri.getId(), address);
+    pathIdx.add(uri.getPath(), address);
+    return uri;
   }
 
   /**
@@ -46,9 +95,30 @@ public class ContentRepositoryIndex {
    * 
    * @param uri
    *          the page uri
+   * @throws IOException
+   *           if accessing the index fails
    */
-  public void delete(PageURI uri) {
-    // TODO Auto-generated method stub
+  public synchronized void delete(PageURI uri) throws IOException {
+    String id = uri.getId();
+    String path = uri.getPath();
+
+    // Locate the entry in question
+    long address = toURIEntry(uri);
+
+    // Everything ok?
+    if (address == -1)
+      throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
+    
+    // Load the missing data
+    if (id == null)
+      id = uriIdx.getId(address);
+    if (path == null)
+      path = uriIdx.getPath(address);
+
+    // Delete the entry
+    idIdx.delete(id, address);
+    pathIdx.delete(path, address);
+    uriIdx.delete(address);
   }
 
   /**
@@ -72,11 +142,33 @@ public class ContentRepositoryIndex {
    * @return the id
    * @throws IllegalArgumentException
    *           if the uri does not contain a path
+   * @throws IOException
+   *           if accessing the index fails
    */
-  public String toId(PageURI uri) {
+  public String toId(PageURI uri) throws IOException {
     if (uri.getPath() == null)
       throw new IllegalArgumentException("PageURI must contain a path");
-    // TODO Auto-generated method stub
+
+    String path = uri.getPath();
+    if (path == null)
+      throw new IllegalArgumentException("Uri must contain a path");
+
+    long[] addresses = pathIdx.locate(path);
+
+    // Is the uri part of the index?
+    if (addresses.length == 0) {
+      logger.warn("Attempt to locate non-existing path {}", path);
+      return null;
+    }
+
+    // Locate the entry in question
+    for (long a : addresses) {
+      String idxPath = uriIdx.getPath(a);
+      if (idxPath.equals(path)) {
+        return uriIdx.getId(a);
+      }
+    }
+
     return null;
   }
 
@@ -86,39 +178,136 @@ public class ContentRepositoryIndex {
    * @param uri
    *          the uri
    * @param path
-   *          the page
+   *          the new path
+   * @throws IOException
+   *           if updating the index fails
    */
-  public void update(PageURI uri) {
-    // TODO Auto-generated method stub
+  public void update(PageURI uri, String path) throws IOException {
+    String oldPath = uri.getPath();
 
+    // Locate the entry in question
+    long address = toURIEntry(uri);
+
+    // Everything ok?
+    if (address == -1)
+      throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
+
+    uriIdx.update(address, path);
+    pathIdx.delete(oldPath, address);
+    pathIdx.add(path, address);
   }
 
   /**
-   * Removes all entries from the index. 
+   * Removes all entries from the index.
+   * 
+   * @throws IOException
+   *           if clearing the index fails
    */
-  public void clear() {
-    // TODO Auto-generated method stub
-    
+  public void clear() throws IOException {
+    uriIdx.clear();
+    idIdx.clear();
+    pathIdx.clear();
   }
 
   /**
+   * Returns <code>true</code> if the given uri exists.
+   * 
    * @param uri
-   * @return
+   *          the uri
+   * @return <code>true</code> if the uri exists
    */
-  public boolean exists(PageURI uri) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean exists(PageURI uri) throws IOException {
+    String id = uri.getId();
+    String path = uri.getPath();
+
+    if (id == null && path == null)
+      throw new IllegalArgumentException("Uri must contain either id or path");
+
+    // Do a lookup
+    if (id != null) {
+      return idIdx.locate(id).length > 0;
+    } else {
+      return pathIdx.locate(path).length > 0;
+    }
   }
 
   /**
+   * Returns all uris that share the common root <code>uri</code>, are no more
+   * than <code>level</code> levels deep nested and feature the indicated
+   * version.
+   * <p>
+   * 
    * @param uri
+   *          the root uri
    * @param level
-   * @param versions
-   * @return
+   *          the maximum nesting, <code>0</code> to return direct children only
+   * @return an iteration of the resulting uris
    */
-  public Iterator<PageURI> list(PageURI uri, int level, long[] versions) {
+  public Iterator<PageURI> list(PageURI uri, int level) {
+    return list(uri, level, -1);
+  }
+
+  /**
+   * Returns all uris that share the common root <code>uri</code>, are no more
+   * than <code>level</code> levels deep nested and feature the indicated
+   * version.
+   * <p>
+   * 
+   * @param uri
+   *          the root uri
+   * @param level
+   *          the maximum nesting, <code>0</code> to return direct children only
+   * @param version
+   *          the requested version, <code>-1</code> for any version
+   * @return an iteration of the resulting uris
+   */
+  public Iterator<PageURI> list(PageURI uri, int level, long version) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  /**
+   * Returns the position of the uri in the <code>uri</code> index or
+   * <code>-1</code> if there is no such entry.
+   * 
+   * @param uri
+   *          the uri
+   * @return the id
+   * @throws IllegalArgumentException
+   *           if the uri contains neither an id nor a path
+   * @throws IOException
+   *           if accessing the index fails
+   */
+  public long toURIEntry(PageURI uri) throws IOException {
+    String id = uri.getId();
+    String path = uri.getPath();
+
+    if (id == null && path == null)
+      throw new IllegalArgumentException("Uri must contain either id or path");
+
+    long[] addresses = null;
+    if (id != null) {
+      addresses = idIdx.locate(id);
+    } else {
+      addresses = pathIdx.locate(path);
+    }
+
+    // Is the uri part of the index?
+    if (addresses.length == 0) {
+      logger.warn("Attempt to locate non-existing path {}", path);
+      return -1;
+    }
+
+    // Locate the entry in question
+    for (long a : addresses) {
+      if (id != null && id.equals(uriIdx.getId(a))) {
+        return a;
+      } else if (path != null && path.equals(uriIdx.getPath(a))) {
+        return a;
+      }
+    }
+
+    return -1;
   }
 
 }
