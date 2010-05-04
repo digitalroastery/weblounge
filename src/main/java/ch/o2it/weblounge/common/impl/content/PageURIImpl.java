@@ -130,6 +130,23 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    *          the site
    * @param path
    *          the path
+   * @param id
+   *          the page identifier
+   */
+  public PageURIImpl(Site site, String path, String id)
+      throws MalformedPageURIException {
+    this(site, path, Page.LIVE, id);
+  }
+
+  /**
+   * Creates a new {@link PageURI} pointing to a specific version of the page
+   * identified by <code>id<code>, <code>site</code>, <code>path</code> and
+   * <code>version</code>.
+   * 
+   * @param site
+   *          the site
+   * @param path
+   *          the path
    * @param version
    *          the version
    * @param id
