@@ -140,6 +140,7 @@ public class IdIndex {
 
     String mode = readOnly ? "r" : "rwd";
     try {
+      indexFile.getParentFile().mkdirs();
       idx = new RandomAccessFile(indexFile, mode);
     } catch (FileNotFoundException e) {
       throw new IllegalArgumentException("Index file " + indexFile + " does not exist");
@@ -157,7 +158,6 @@ public class IdIndex {
       if (readOnly) {
         throw new IllegalStateException("Readonly index cannot be empty");
       }
-      logger.info("Initializing index with default index values");
       init(slots, entriesPerSlot);
     } catch (IOException e) {
       logger.error("Error reading from id index: " + e.getMessage());
@@ -307,7 +307,7 @@ public class IdIndex {
     entriesInSlot--;
     idx.seek(startOfSlot);
     idx.writeInt(entriesInSlot);
-    idx.skipBytes((deleteEntry + 1) * IDX_ENTRY_SIZE);
+    idx.skipBytes(deleteEntry * IDX_ENTRY_SIZE);
     for (int i = deleteEntry + 1; i < slotEntries.length; i++) {
       idx.writeLong(slotEntries[i]);
     }
@@ -339,8 +339,7 @@ public class IdIndex {
    * @return the slot number
    */
   private int findSlot(String id) {
-    int slot = Math.abs(id.hashCode()) % slots;
-    return slot;
+    return Math.abs(id.hashCode()) % slots;
   }
 
   /**
@@ -393,6 +392,11 @@ public class IdIndex {
 
     long totalEntries = slots * entriesPerSlot;
 
+    logger.info("Creating id index with {} entries ({} slots, {} entries per slot)", new Object[] {
+        totalEntries,
+        slots,
+        entriesPerSlot });
+
     idx.seek(0);
 
     // Write header
@@ -401,17 +405,12 @@ public class IdIndex {
     idx.writeLong(entries);
 
     // Write entries
+    byte[] entry = new byte[4 + entriesPerSlot * 8];
     for (int i = 0; i < slots; i++) {
-      idx.writeInt(0);
-      for (int j = 0; j < entriesPerSlot; j++) {
-        idx.writeLong(0);
-      }
+      idx.write(entry);
     }
 
-    logger.info("Id index initialized to {} entries ({} slots, {} entries per slot)", new Object[] {
-        totalEntries,
-        slots,
-        entriesPerSlot });
+    logger.debug("Id index crated");
   }
 
   /**
@@ -471,15 +470,12 @@ public class IdIndex {
 
     // Write entries
     for (int i = 0; i < slots; i++) {
-      if (i < this.slots)
-        idxNew.writeInt(idx.readInt());
-      else
-        idxNew.writeInt(0);
-      for (int j = 0; j < entriesPerSlot; j++) {
-        if (j < this.entriesPerSlot)
-          idxNew.writeLong(idx.readLong());
-        else
-          idxNew.writeLong(0);
+      byte[] bytes = new byte[4 + entriesPerSlot * 8];
+      if (i < this.slots) {
+        idx.read(bytes, 0, 4 + this.entriesPerSlot * 8);
+        idxNew.write(bytes);
+      } else {
+        idxNew.write(bytes);
       }
     }
 

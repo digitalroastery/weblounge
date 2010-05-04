@@ -161,6 +161,7 @@ public class URIIndex {
 
     String mode = readOnly ? "r" : "rwd";
     try {
+      indexFile.getParentFile().mkdirs();
       idx = new RandomAccessFile(indexFile, mode);
     } catch (FileNotFoundException e) {
       throw new IllegalArgumentException("Index file " + indexFile + " does not exist");
@@ -168,16 +169,16 @@ public class URIIndex {
 
     // Read index header information
     try {
+      this.bytesPerId = idx.readInt();
       this.bytesPerPath = idx.readInt();
       this.entries = idx.readLong();
-      this.bytesPerEntry = IDX_BYTES_PER_ID + pathLengthInBytes;
+      this.bytesPerEntry = bytesPerId + bytesPerPath;
       if (this.bytesPerId != idLengthInBytes || this.bytesPerPath != pathLengthInBytes)
         resize(idLengthInBytes, pathLengthInBytes);
     } catch (EOFException e) {
       if (readOnly) {
         throw new IllegalStateException("Readonly index cannot be empty");
       }
-      logger.info("Initializing index with default index values");
       init(idLengthInBytes, pathLengthInBytes);
     } catch (IOException e) {
       logger.error("Error reading from path index: " + e.getMessage());
@@ -434,6 +435,8 @@ public class URIIndex {
     this.bytesPerPath = bytesPerPath;
     this.bytesPerEntry = bytesPerId + bytesPerPath;
 
+    logger.info("Creating uri index with {} bytes per entry", bytesPerEntry);
+
     // Write header
     idx.seek(0);
     idx.writeInt(bytesPerId);
@@ -454,7 +457,7 @@ public class URIIndex {
 
     this.entries = 0;
 
-    logger.info("Uri index initialized with {} bytes per entry", bytesPerEntry);
+    logger.debug("Uri index created");
   }
 
   /**

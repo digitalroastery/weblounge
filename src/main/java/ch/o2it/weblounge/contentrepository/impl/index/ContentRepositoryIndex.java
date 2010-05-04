@@ -67,6 +67,18 @@ public class ContentRepositoryIndex {
   }
 
   /**
+   * Closes the index files. No more read and write operations are allowed.
+   * 
+   * @throws IOException
+   *           if closing the index fails
+   */
+  public void close() throws IOException {
+    uriIdx.close();
+    idIdx.close();
+    pathIdx.close();
+  }
+
+  /**
    * Adds all relevant entries for the given page uri to the index and returns
    * it, probably providing a newly created uri identifier.
    * 
@@ -108,7 +120,7 @@ public class ContentRepositoryIndex {
     // Everything ok?
     if (address == -1)
       throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
-    
+
     // Load the missing data
     if (id == null)
       id = uriIdx.getId(address);
@@ -182,7 +194,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if updating the index fails
    */
-  public void update(PageURI uri, String path) throws IOException {
+  public synchronized void update(PageURI uri, String path) throws IOException {
     String oldPath = uri.getPath();
 
     // Locate the entry in question
@@ -192,9 +204,12 @@ public class ContentRepositoryIndex {
     if (address == -1)
       throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
 
-    uriIdx.update(address, path);
+    // Do it this way to make sure we have identical path trimming
+    uri = new PageURIImpl(uri.getSite(), path, uri.getVersion(), uri.getId());
+
     pathIdx.delete(oldPath, address);
-    pathIdx.add(path, address);
+    pathIdx.add(uri.getPath(), address);
+    uriIdx.update(address, uri.getPath());
   }
 
   /**
@@ -267,6 +282,17 @@ public class ContentRepositoryIndex {
   }
 
   /**
+   * Returns the number of entries in this index.
+   * 
+   * @return the number of indexed entries
+   * @throws IOException
+   *           if reading the number of entries fails
+   */
+  public long size() throws IOException {
+    return uriIdx.getEntries();
+  }
+
+  /**
    * Returns the position of the uri in the <code>uri</code> index or
    * <code>-1</code> if there is no such entry.
    * 
@@ -278,7 +304,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public long toURIEntry(PageURI uri) throws IOException {
+  protected long toURIEntry(PageURI uri) throws IOException {
     String id = uri.getId();
     String path = uri.getPath();
 
