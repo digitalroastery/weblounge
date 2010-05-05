@@ -166,22 +166,21 @@ public interface ContentRepository {
   Iterator<PageURI> listPages(PageURI uri) throws ContentRepositoryException;
 
   /**
-   * Returns an iteration of all pages with their uri containing
-   * <code>uri</code> as a prefix and their versions matching one of the
-   * versions specified.
+   * Returns an iteration of all pages with version <code>version</code> and
+   * their uri containing <code>uri</code> as a prefix.
    * <p>
    * Live versions of pages are returned using {@link Page#LIVE}, while work
    * pages are specified using {@link Page#WORK}.
    * 
    * @param uri
    *          the root uri
-   * @param versions
-   *          the page versions to list
+   * @param version
+   *          the page version to list
    * @return the page uris
    * @throws ContentRepositoryException
    *           if listing the repository fails
    */
-  Iterator<PageURI> listPages(PageURI uri, long[] versions)
+  Iterator<PageURI> listPages(PageURI uri, long version)
       throws ContentRepositoryException;
 
   /**
@@ -203,9 +202,8 @@ public interface ContentRepository {
       throws ContentRepositoryException;
 
   /**
-   * Returns an iteration of all pages with their uri containing
-   * <code>uri</code> as a prefix and their version matching one of
-   * <code>versions</code>.
+   * Returns an iteration of all pages with version <code>version</code> and
+   * their uri containing <code>uri</code> as a prefix.
    * <p>
    * Only those pages will be returned that are nested <code>level</code> levels
    * deep under <code>uri</code>. Therefore, specifying <code>level</code> as
@@ -219,11 +217,11 @@ public interface ContentRepository {
    * 
    * @return the page uris
    * @param versions
-   *          the page versions to list
+   *          the page version to list
    * @throws ContentRepositoryException
    *           if listing the repository fails
    */
-  Iterator<PageURI> listPages(PageURI uri, int level, long[] versions)
+  Iterator<PageURI> listPages(PageURI uri, int level, long versions)
       throws ContentRepositoryException;
 
   /**
