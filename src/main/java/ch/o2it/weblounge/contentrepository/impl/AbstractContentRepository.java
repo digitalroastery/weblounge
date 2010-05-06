@@ -143,8 +143,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public Page getPage(PageURI uri) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      return loadPage(uri);
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
+    }
   }
 
   /**
@@ -159,12 +162,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
-    Page page = null;
-    try {
-      page = loadPage(uri);
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
-    }
+    Page page = getPage(uri);
 
     // TODO: Check permissions
 
