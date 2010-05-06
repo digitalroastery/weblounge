@@ -132,7 +132,7 @@ public class PropertyTag extends WebloungeTag {
         String name = def.getName();
         String alias = def.getAlias();
         String value = getProperty(name, request.getSite());
-        log_.info("Defining variable '" + alias + "': " + value);
+        log_.trace("Defining variable '" + alias + "': " + value);
         if (value == null)
           value = "";
         pageContext.setAttribute(alias, value);
