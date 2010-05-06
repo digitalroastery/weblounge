@@ -207,7 +207,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
         requestPath = requestPath.substring(request.getContextPath().length());
       SiteRequestWrapper siteRequest = new SiteRequestWrapper(request, requestPath, false);
 
-      RequestDispatcher dispatcher = request.getRequestDispatcher("/weblounge-sites/weblounge-test/");
+      RequestDispatcher dispatcher = request.getRequestDispatcher(siteRequest.getServletPath());
       if (dispatcher == null)
         throw new IllegalStateException("No dispatcher found for site '" + site + "'");
         
@@ -215,16 +215,6 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
       log_.debug("Including jsp {}", renderer);
       dispatcher.include(siteRequest, response);
       
-//      InputStream is = renderer.openStream();
-//      OutputStream os = response.getOutputStream();
-//      try {
-//        IOUtils.copy(is, os);
-//      } catch (SocketException e) {
-//        log_.debug("Request for {} canceled by client", renderer);
-//      } finally {
-//        IOUtils.closeQuietly(is);
-//      }
-
     } catch (IOException e) {
       log_.error("Exception while including jsp {}", renderer, e);
     } catch (Throwable t) {
