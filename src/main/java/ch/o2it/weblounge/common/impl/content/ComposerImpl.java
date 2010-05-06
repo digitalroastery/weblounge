@@ -94,5 +94,15 @@ public class ComposerImpl implements Composer {
   public Pagelet[] getPagelets() {
     return pagelets.toArray(new Pagelet[pagelets.size()]);
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return identifier;
+  }
 
 }
