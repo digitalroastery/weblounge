@@ -145,9 +145,10 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       Site site = request.getSite();
       RequestFlavor contentFlavor = request.getFlavor();
 
-      // Check if a target-page parameter was passed
+      // Check if a page was passed as an attribute
       if (request.getAttribute(WebloungeRequest.PAGE) != null) {
-        page = (Page)request.getAttribute(WebloungeRequest.PAGE);
+        page = (Page) request.getAttribute(WebloungeRequest.PAGE);
+        pageURI = page.getURI();
       }
 
       // Load the page from the content repository
@@ -157,10 +158,13 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
           log_.warn("Content repository not available while trying to access {}", pageURI);
           return false;
         }
-  
+
         // Load the page
         try {
-          pageURI = getTargetPage(request);
+          if (action != null)
+            pageURI = getPageURIForAction(action, request);
+          else
+            pageURI = new PageURIImpl(request);
           page = contentRepository.getPage(pageURI);
         } catch (ContentRepositoryException e) {
           log_.error("Unable to load page {}: {}", new Object[] {
@@ -171,7 +175,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
           response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           return true;
         }
-  
+
         // Does it exist at all?
         if (page == null) {
           log_.debug("No page found for {}", pageURI);
@@ -269,25 +273,21 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
   /**
    * Tries to determine the target page for the action result. The
-   * <code>target-url</code> request attribute and parameter will be considered.
-   * In any case, the site's homepage will be the fallback.
+   * <code>{@link HTMLAction.TARGET}</code> request attribute and parameter will
+   * be considered. In any case, the site's homepage will be the fallback.
    * 
+   * @param action
+   *          the action handler
    * @param request
    *          the weblounge request
    * @return the target page
    */
-  protected PageURI getTargetPage(WebloungeRequest request) {
-
+  protected PageURI getPageURIForAction(Action action, WebloungeRequest request) {
     PageURI target = null;
     Site site = request.getSite();
 
     // Check if a target-page parameter was passed
-    if (request.getAttribute(WebloungeRequest.PAGE) != null) {
-      return ((Page)request.getAttribute(WebloungeRequest.PAGE)).getURI();
-    }
-
-    // Check if a target-page parameter was passed
-    else if (request.getParameter(HTMLAction.TARGET) != null) {
+    if (request.getParameter(HTMLAction.TARGET) != null) {
       String targetUrl = request.getParameter(HTMLAction.TARGET);
       try {
         String decocedTargetUrl = null;
