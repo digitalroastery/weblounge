@@ -4,7 +4,7 @@
   <class>ch.o2it.weblounge.test.site.TestSite</class>
   <name>Weblounge Test Site</name>
   <domains>
-    <url>localhost</url>
+    <url>127.0.0.1</url>
   </domains>
   <security>
     <administrator>

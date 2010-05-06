@@ -219,7 +219,7 @@ public final class TestCommand {
     log_.info("Running test '" + test + "'");
     log_.info("------------------------------------------------------------------------");
     try {
-      test.execute("http://localhost:8080");
+      test.execute("http://127.0.0.1:8080");
       log_.info("Test '" + test + "' succeeded");
       return true;
     } catch (Throwable t) {
