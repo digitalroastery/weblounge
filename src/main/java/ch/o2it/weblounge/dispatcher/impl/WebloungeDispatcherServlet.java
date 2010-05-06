@@ -256,12 +256,11 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         if (t.getCause() != null) {
           t = t.getCause();
         }
-        log_.error("Request handler {} failed to handle {} {}: {}", new Object[] {
+        log_.error("Request handler '{}' failed to handle {} {}", new Object[] {
             handler,
             request,
-            params,
-            t.getMessage(),
-            t });
+            params });
+        log_.error(t.getMessage(), t);
         DispatchUtils.sendInternalError(t.getMessage(), request, response);
       } finally {
         log_.debug("Finished processing of {}", httpRequest.getRequestURI());
