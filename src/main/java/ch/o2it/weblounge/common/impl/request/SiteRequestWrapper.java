@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpUtils;
 
@@ -372,7 +373,11 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    * @see ch.o2it.weblounge.common.request.WebloungeRequest#getRequestedUrl()
    */
   public WebUrl getRequestedUrl() {
-    return ((WebloungeRequest)getRequest()).getUrl();
+    ServletRequest request = getRequest();
+    while (request instanceof HttpServletRequestWrapper && !(request instanceof WebloungeRequestImpl)) {
+      request = ((HttpServletRequestWrapper)request).getRequest();
+    }
+    return ((WebloungeRequest)request).getUrl();
   }
 
   /**
