@@ -344,8 +344,8 @@
             <Bundle-Category>ch.o2it</Bundle-Category>
             <Bundle-DocURL>http://digitalcafe.lighthouseapp.com/projects/35461/welcome</Bundle-DocURL>
             <Bundle-Vendor>O2 IT Engineering</Bundle-Vendor>
-            <Bundle-Name>${pom.name}</Bundle-Name>
-            <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+            <Bundle-Name>${project.name}</Bundle-Name>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
           </instructions>
           </configuration>
         </plugin>
