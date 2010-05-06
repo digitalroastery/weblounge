@@ -7,17 +7,17 @@
   </security>
   <created>
 		<user id="hans" realm="testland">Hans Muster</user>
-		<date>2009/01/07 19:05:41 GMT</date>
+		<date>2009-01-07T20:05:41Z</date>
   </created>
   <published>
 		<user id="hans" realm="testland">Hans Muster</user>
-		<from>2009/01/07 19:05:41 GMT</from>
-		<to>2009/02/18 21:06:40 GMT</to>
+		<from>2009-01-07T20:05:41Z</from>
+		<to>2009-02-18T22:06:40Z</to>
   </published>
 	<locale language="de" original="true">
 		<modified>
 			<user id="hans" realm="testland">Hans Muster</user>
-			<date>2009/01/07 19:05:41 GMT</date>
+			<date>2009-01-07T20:05:41Z</date>
 		</modified>
 		<text id="credits"><![CDATA[Friedrich Nietzsche]]></text>
 		<text id="tag"><![CDATA[Neu]]></text>
@@ -27,7 +27,7 @@
 	<locale language="fr">
 		<modified>
 			<user id="amelie" realm="testland">Amélie Poulard</user>
-			<date>2009/02/18 21:06:40 GMT</date>
+			<date>2009-02-18T22:06:40Z</date>
 		</modified>
 		<text id="tag"><![CDATA[Nouveau]]></text>
 		<text id="tag"><![CDATA[Technique]]></text>

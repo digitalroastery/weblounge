@@ -47,7 +47,7 @@ public class PublishingContextImplTest {
   protected User publisher = new UserImpl("john", "testland", "John Doe");
 
   /** Publication start date */
-  protected Date startDate = new Date(1257497572000L);
+  protected Date startDate = new Date(1257501172000L);
 
   /** Publication end date */
   protected Date endDate = new Date(1289087999000L);

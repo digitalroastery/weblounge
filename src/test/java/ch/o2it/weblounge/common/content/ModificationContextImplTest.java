@@ -47,7 +47,7 @@ public class ModificationContextImplTest {
   protected ModificationContext ctxWithModifier = null;
 
   /** Creation date */
-  protected Date modificationDate = new Date(1257497572000L);
+  protected Date modificationDate = new Date(1257501172000L);
 
   /** Creator */
   protected User modifier = new UserImpl("john", "testland", "John Doe");

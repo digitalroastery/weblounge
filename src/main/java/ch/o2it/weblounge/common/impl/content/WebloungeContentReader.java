@@ -213,7 +213,7 @@ public abstract class WebloungeContentReader extends DefaultHandler {
         Date d = dateFormat.parse(getCharacters());
         clipboard.put("date", d);
       } catch (Exception e) {
-        throw new IllegalStateException("Reading in date " + characters + " failed: '" + getCharacters() + "'");
+        throw new IllegalStateException("Reading date failed: '" + getCharacters() + "'");
       }
     }
 

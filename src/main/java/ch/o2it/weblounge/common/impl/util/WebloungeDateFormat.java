@@ -37,7 +37,7 @@ public final class WebloungeDateFormat {
   private static final ThreadLocal<SoftReference<DateFormat>> ldf = new ThreadLocal<SoftReference<DateFormat>>();
 
   /** the date format */
-  private static final String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss z";
+  private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
   /**
    * Formats a date using a weblounge compatible date format.
@@ -47,7 +47,7 @@ public final class WebloungeDateFormat {
    * @return the formatted date string
    */
   public final String format(Date date) {
-    return getDateFormat().format(date);
+    return getDateFormat().format(date) + "Z";
   }
 
   /**
@@ -58,7 +58,7 @@ public final class WebloungeDateFormat {
    * @return the formatted date string
    */
   public static final String formatStatic(Date date) {
-    return getDateFormat().format(date);
+    return getDateFormat().format(date) + "Z";
   }
 
   /**
@@ -69,7 +69,7 @@ public final class WebloungeDateFormat {
    * @return the formatted date string
    */
   public static final String formatStatic(long milliseconds) {
-    return getDateFormat().format(new Date(milliseconds));
+    return getDateFormat().format(new Date(milliseconds)) + "Z";
   }
 
   /**
@@ -108,7 +108,7 @@ public final class WebloungeDateFormat {
     DateFormat df;
     if (sr == null || (df = sr.get()) == null) {
       df = new SimpleDateFormat(DATE_FORMAT, Locale.US);
-      df.setTimeZone(TimeZone.getTimeZone("GMT"));
+      df.setTimeZone(TimeZone.getTimeZone("UTC"));
       ldf.set(new SoftReference<DateFormat>(df));
     }
     return df;

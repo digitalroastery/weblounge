@@ -42,7 +42,7 @@ public class CreationContextImplTest {
   protected CreationContext ctx = null;
 
   /** Creation date */
-  protected Date creationDate = new Date(1257497572000L);
+  protected Date creationDate = new Date(1257501172000L);
 
   /** Creator */
   protected User creator = new UserImpl("john", "testland", "John Doe");

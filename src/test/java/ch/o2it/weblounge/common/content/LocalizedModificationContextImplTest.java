@@ -60,10 +60,10 @@ public class LocalizedModificationContextImplTest {
   protected Date creationDate = new Date(1000000000000L);
 
   /** German modification date */
-  protected Date germanModifcationDate = new Date(1231355141000L);
+  protected Date germanModifcationDate = new Date(1231358741000L);
 
   /** French modification date */
-  protected Date frenchModifcationDate = new Date(1234991200000L);
+  protected Date frenchModifcationDate = new Date(1234994800000L);
 
   /** Some date after the latest modification date */
   protected Date futureDate = new Date(2000000000000L);

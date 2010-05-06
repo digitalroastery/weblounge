@@ -120,7 +120,7 @@ public class WebloungeUserImplTest {
     EasyMock.expect(mockSite.getGroup("publisher", "system")).andReturn(publisherGroup);
     EasyMock.expect(mockSite.getRole("apprentice", "myapp")).andReturn(apprenticeRole);
     EasyMock.replay(mockSite);
-    lastLoginDate = WebloungeDateFormat.parseStatic("2009/03/17 02:22:05 GMT");
+    lastLoginDate = WebloungeDateFormat.parseStatic("2009-03-17T03:22:05Z");
   }
 
   /**
@@ -136,7 +136,7 @@ public class WebloungeUserImplTest {
     user.setEmail(email);
     user.addMembership(publisherGroup);
     user.assignRole(apprenticeRole);
-    lastLoginDate = WebloungeDateFormat.parseStatic("2009/03/17 02:22:05 GMT");
+    lastLoginDate = WebloungeDateFormat.parseStatic("2009-03-17T03:22:05Z");
     user.setLastLogin(lastLoginDate, lastLoginSource);
     user.setProperty(propertyName, propertyValue);
   }

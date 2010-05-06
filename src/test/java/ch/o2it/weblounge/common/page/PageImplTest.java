@@ -103,16 +103,16 @@ public class PageImplTest {
   protected String frenchCoverage = "Zurich";
 
   /** Content creation date */
-  protected Date creationDate = new Date(1231355141000L);
+  protected Date creationDate = new Date(1231358741000L);
   
   /** French modification date */
-  protected Date frenchModificationDate = new Date(1234991200000L);
+  protected Date frenchModificationDate = new Date(1234994800000L);
 
   /** Publishing start date */
-  protected Date publishingStartDate = new Date(1146848301000L);
+  protected Date publishingStartDate = new Date(1146851901000L);
 
   /** Publishing end date */
-  protected Date publishingEndDate = new Date(1262304000000L);
+  protected Date publishingEndDate = new Date(1262307600000L);
 
   /** Some date after the latest modification date */
   protected Date futureDate = new Date(2000000000000L);
