@@ -18,16 +18,16 @@
     </metadata>
     <created>
       <user id="hans" realm="testland">Hans Muster</user>
-      <date>2009/01/07 19:05:41 GMT</date>
+      <date>2009-01-07T19:05:41Z</date>
     </created>
     <modified>
       <user id="amelie" realm="testland">Amélie Poulard</user>
-      <date>2009/02/18 21:06:40 GMT</date>
+      <date>2009-02-18T21:06:40Z</date>
     </modified>
     <published>
       <user id="hans" realm="testland">Hans Muster</user>
-      <from>2006/05/05 16:58:21 GMT</from>
-      <to>292278994/08/17 07:12:55 GMT</to>
+      <from>2006-05-05T16:58:21Z</from>
+      <to>292278994-08-17T07:12:55Z</to>
     </published>
     <security>
       <owner>
@@ -48,17 +48,17 @@
         </security>
         <created>
       		<user id="hans" realm="testland">Hans Muster</user>
-      		<date>2009/01/07 19:05:41 GMT</date>
+      		<date>2009-01-07T19:05:41Z</date>
         </created>
         <published>
       		<user id="hans" realm="testland">Hans Muster</user>
-      		<from>2009/01/07 19:05:41 GMT</from>
-          <to>292278994/08/17 07:12:55 GMT</to>
+      		<from>2009-01-07T19:05:41Z</from>
+          <to>292278994-08-17T07:12:55Z</to>
         </published>
       	<locale language="de" original="true">
       		<modified>
       			<user id="hans" realm="testland">Hans Muster</user>
-      			<date>2009/01/07 19:05:41 GMT</date>
+      			<date>2009-01-07T19:05:41Z</date>
       		</modified>
       		<text id="credits"><![CDATA[Friedrich Nietzsche]]></text>
       		<text id="tag"><![CDATA[Neu]]></text>
@@ -68,7 +68,7 @@
       	<locale language="fr">
       		<modified>
       			<user id="amelie" realm="testland">Amélie Poulard</user>
-      			<date>2009/02/18 21:06:40 GMT</date>
+      			<date>2009-02-18T21:06:40Z</date>
       		</modified>
       		<text id="tag"><![CDATA[Nouveau]]></text>
       		<text id="tag"><![CDATA[Technique]]></text>

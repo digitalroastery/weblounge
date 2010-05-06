@@ -19,16 +19,16 @@
     </metadata>
     <created>
       <user id="hans" realm="testland">Hans Muster</user>
-      <date>2009/01/07 19:05:41 GMT</date>
+      <date>2009-01-07T19:05:41Z</date>
     </created>
     <modified>
       <user id="amelie" realm="testland">Amélie Poulard</user>
-      <date>2009/02/18 21:06:40 GMT</date>
+      <date>2009-02-18T21:06:40Z</date>
     </modified>
     <published>
       <user id="hans" realm="testland">Hans Muster</user>
-      <from>2006/05/05 16:58:21 GMT</from>
-      <to>2010/01/01 00:00:00 GMT</to>
+      <from>2006-05-05T16:58:21Z</from>
+      <to>2010-01-01T00:00:00Z</to>
     </published>
     <security>
       <owner>
