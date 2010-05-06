@@ -52,7 +52,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    *          the associated site
    */
   PageURIImpl(Site site) {
-    this(site, "/", Page.LIVE);
+    this(site, "/", Page.LIVE, null);
   }
 
   /**
@@ -63,7 +63,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    *          the request
    */
   public PageURIImpl(WebloungeRequest request) {
-    this(request.getSite(), request.getUrl().getPath(), request.getVersion());
+    this(request.getSite(), request.getUrl().getPath(), request.getVersion(), null);
   }
 
   /**
@@ -75,7 +75,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    *          the url
    */
   public PageURIImpl(WebUrl url) {
-    this(url.getSite(), url.getPath(), Page.LIVE);
+    this(url.getSite(), url.getPath(), Page.LIVE, null);
   }
 
   /**
