@@ -113,7 +113,7 @@ public class ContextTag extends WebloungeTag {
     if (variables != null) {
       define(variables.getUri(), uri);
       define(variables.getSite(), request.getSite());
-      define(variables.getUrl(), request.getUrl());
+      define(variables.getUrl(), request.getRequestedUrl());
       define(variables.getAction(), request.getAttribute(WebloungeRequest.ACTION));
       define(variables.getLanguage(), request.getLanguage());
       define(variables.getUser(), request.getUser());
@@ -122,7 +122,7 @@ public class ContextTag extends WebloungeTag {
       define(variables.getComposer(), request.getAttribute(WebloungeRequest.COMPOSER));
     } else {
       define(ContextTagVariables.URI, uri);
-      define(ContextTagVariables.URL, request.getUrl());
+      define(ContextTagVariables.URL, request.getRequestedUrl());
       define(ContextTagVariables.ACTION, request.getAttribute(WebloungeRequest.ACTION));
       define(ContextTagVariables.SITE, request.getSite());
       define(ContextTagVariables.LANGUAGE, request.getLanguage());
