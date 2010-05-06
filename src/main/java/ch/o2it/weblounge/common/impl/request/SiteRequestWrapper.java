@@ -140,6 +140,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     String contextPath = request.getContextPath();
     String servletPath = "/weblounge-sites/" + site.getIdentifier();
     String pathInfo = url.substring(contextPath.length() + servletPath.length());
+    String requestURI = servletPath + pathInfo;
     
     // Adjust the url
     this.url = new WebUrlImpl(site, url);
@@ -154,6 +155,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
       this.contextPath = contextPath;
       this.servletPath = servletPath;
       this.pathInfo = pathInfo;
+      this.requestURI = requestURI;
       this.queryString = request.getQueryString();
       this.attrs = new HashMap<String, Object>(0);
     }
@@ -407,6 +409,16 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
    */
   public long getVersion() {
     return ((WebloungeRequest)getRequest()).getVersion();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return getRequestURI();
   }
 
 }
