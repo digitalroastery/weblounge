@@ -1,7 +1,7 @@
+<!-- module id="test" xmlns="http://www.o2it.ch/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd" -->
 <module id="test">
   <enable>true</enable>
   <name language="de">Testmodul</name>
-  <name language="en">Test module</name>
   <pagelets>
     <pagelet id="content" composeable="true">
       <renderer>file://${module.root}/pagelets/content.jsp</renderer>
