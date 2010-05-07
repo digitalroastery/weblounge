@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.o2it.ch/weblounge/3.0/page" xmlns="http://www.o2it.ch/weblounge/3.0/page"
+  elementFormDefault="qualified">
+
+  <!-- definitions of complex types -->
+  <xsd:complexType name="localizedstringtype">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="language" use="required" type="xsd:language" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="changestamptype">
+    <xsd:all>
+      <xsd:element ref="user" />
+      <xsd:element name="date" type="xsd:dateTime" />
+    </xsd:all>
+  </xsd:complexType>
+
+  <xsd:complexType name="simplenodewithidtype">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="id" use="required" type="xsd:string" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <!-- definition of elements -->
+  <xsd:element name="page">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element ref="head" />
+        <xsd:element ref="body" />
+      </xsd:all>
+      <xsd:attribute name="id" type="xsd:string" /> <!-- TODO: check valid id with regex -->
+      <xsd:attribute name="version" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="live" />
+            <xsd:enumeration value="draft" /> <!-- TODO: add possible version-attribute values -->
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="head">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element name="template" type="xsd:string" />
+        <xsd:element name="layout" type="xsd:string" />
+        <xsd:element name="promote" type="xsd:boolean" />
+        <xsd:element name="index" type="xsd:boolean" />
+        <xsd:element ref="metadata" />
+        <xsd:element ref="created" />
+        <xsd:element ref="modified" />
+        <xsd:element ref="published" />
+        <xsd:element ref="security" />
+        <xsd:element ref="locked" minOccurs="0" />
+      </xsd:all>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="body">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="composer" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="metadata">
+    <xsd:complexType>
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="title" type="localizedstringtype" />
+        <xsd:element name="description" type="localizedstringtype" />
+        <xsd:element name="subject" type="xsd:string" />
+        <xsd:element name="coverage" type="localizedstringtype" />
+        <xsd:element name="rights" type="localizedstringtype" />
+        <xsd:element name="type" type="xsd:string" />
+      </xsd:choice>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="user">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="id" use="required" type="xsd:string" />
+          <xsd:attribute name="realm" use="required" type="xsd:string" />
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="created" type="changestamptype" />
+  <xsd:element name="modified" type="changestamptype" />
+
+  <xsd:element name="published">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element ref="user" />
+        <xsd:element name="from" type="xsd:dateTime" />
+        <xsd:element name="to" type="xsd:dateTime" />
+      </xsd:all>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="security">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element ref="owner" />
+      </xsd:all>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="owner">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element ref="user" />
+      </xsd:all>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="locked">
+    <xsd:complexType>
+      <xsd:all>
+        <xsd:element ref="user" />
+      </xsd:all>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="composer">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="pagelet" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="pagelet">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="security" />
+        <xsd:element ref="created" />
+        <xsd:element ref="published" />
+        <xsd:element ref="locale" maxOccurs="unbounded" />
+        <xsd:element ref="properties" />
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:string" use="required" />
+      <xsd:attribute name="module" type="xsd:string" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="locale">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="modified" />
+        <xsd:element name="text" type="simplenodewithidtype" maxOccurs="unbounded" />
+      </xsd:sequence>
+      <xsd:attribute name="language" type="xsd:language" use="required" />
+      <xsd:attribute name="original" type="xsd:boolean" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="properties">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="property" type="simplenodewithidtype" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>
