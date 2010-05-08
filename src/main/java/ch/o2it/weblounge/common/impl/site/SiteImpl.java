@@ -108,7 +108,7 @@ public class SiteImpl implements Site {
 
   /** Site running state */
   private boolean running = false;
-  
+
   /** Url of this site */
   private WebUrl url = null;
 
@@ -144,7 +144,7 @@ public class SiteImpl implements Site {
 
   /** Ordered list of site urls */
   protected List<String> hostnames = null;
-  
+
   /** Jobs */
   protected Map<String, QuartzJob> jobs = null;
 
@@ -985,7 +985,7 @@ public class SiteImpl implements Site {
     // Load the modules
     final Bundle bundle = bundleContext.getBundle();
     final Enumeration<URL> e = bundle.findEntries("site/modules", "module.xml", true);
-    
+
     if (e != null) {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       while (e.hasMoreElements()) {
@@ -1232,7 +1232,8 @@ public class SiteImpl implements Site {
    * @see #toXml()
    */
   @SuppressWarnings("unchecked")
-  public static Site fromXml(Node config, XPath xpathProcessor) throws IllegalStateException {
+  public static Site fromXml(Node config, XPath xpathProcessor)
+      throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     // identifier
@@ -1333,7 +1334,11 @@ public class SiteImpl implements Site {
     StringBuffer b = new StringBuffer();
     b.append("<site id=\"");
     b.append(identifier);
-    b.append("\">");
+    b.append("\" ");
+
+    // schema reference
+    b.append("xmlns=\"http://www.o2it.ch/weblounge/3.0/site\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.o2it.ch/weblounge/3.0/site http://www.o2it.ch/xsd/weblounge/3.0/site.xsd\"");
+    b.append(">");
 
     // autostart
     b.append("<autostart>").append(autoStart).append("</autostart>");

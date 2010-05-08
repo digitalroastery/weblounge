@@ -141,6 +141,7 @@
               javax.xml.transform,
               javax.xml.transform.dom,
               javax.xml.transform.stream,
+              javax.xml.validation,
               javax.xml.xpath,
               org.osgi.framework,
               org.osgi.service.component,

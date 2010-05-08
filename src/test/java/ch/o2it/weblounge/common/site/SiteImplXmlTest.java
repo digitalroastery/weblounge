@@ -33,8 +33,12 @@ import org.w3c.dom.Document;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 /**
  * Test case for the xml capabilities of {@link SiteImpl}.
@@ -50,10 +54,17 @@ public class SiteImplXmlTest extends SiteImplTest {
   @Before
   public void setUp() throws Exception {
     setupPrerequisites();
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    URL schemaUrl = SiteImpl.class.getResource("/xsd/site.xsd");
+    Schema siteSchema = schemaFactory.newSchema(schemaUrl);
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    docBuilderFactory.setSchema(siteSchema);
+    docBuilderFactory.setValidating(true);
+    docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
+    siteSchema.newValidator().validate(new DOMSource(doc.getFirstChild()));
     site = SiteImpl.fromXml(doc.getFirstChild());
   }
   

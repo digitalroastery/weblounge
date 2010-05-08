@@ -35,8 +35,12 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.concurrent.Callable;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 /**
  * The <code>SiteActivator</code> is used to load a site from the enclosing
@@ -74,17 +78,27 @@ public class SiteActivator {
   public void activate(final ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
 
-    logger.info("Scanning bundle '{}' for site.xml", bundleContext.getBundle().getSymbolicName());
+    logger.debug("Scanning bundle '{}' for site.xml", bundleContext.getBundle().getSymbolicName());
 
-    // Load the modules
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    // Prepare document builder and schema validator
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    URL schemaUrl = SiteImpl.class.getResource("/xsd/site.xsd");
+    Schema siteSchema = schemaFactory.newSchema(schemaUrl);
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    docBuilderFactory.setSchema(siteSchema);
+    docBuilderFactory.setValidating(true);
+    docBuilderFactory.setNamespaceAware(true);
+    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+
+    // Load the site
     Enumeration<URL> e = bundleContext.getBundle().findEntries("site", "site.xml", false);
     if (e != null && e.hasMoreElements()) {
       URL siteUrl = e.nextElement();
 
       // Load the site
-      logger.debug("Loading site from bundle at {}", siteUrl);
+      logger.info("Loading site from bundle at {}", siteUrl);
       final Document siteXml = docBuilder.parse(siteUrl.openStream());
+      siteSchema.newValidator().validate(new DOMSource(siteXml.getFirstChild()));
       final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
       ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
         public Void call() throws Exception {
