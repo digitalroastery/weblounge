@@ -272,11 +272,11 @@ public class ConfigurationUtils {
     // Cleanup
     if (millis > 0) {
       result.append(millis);
-      result.append(v).append(humanReadable ? " milliseconds " : "");
+      result.append(v).append(humanReadable ? " milliseconds" : "");
     } else if (result.length() == 0)
       result.append("0");
 
-    return result.toString();
+    return result.toString().trim();
   }
 
   /**
