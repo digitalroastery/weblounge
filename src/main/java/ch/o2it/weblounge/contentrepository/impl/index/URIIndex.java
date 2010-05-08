@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,6 +164,8 @@ public class URIIndex {
     String mode = readOnly ? "r" : "rwd";
     try {
       indexFile.getParentFile().mkdirs();
+      if (!indexFile.exists())
+        indexFile.createNewFile();
       idx = new RandomAccessFile(indexFile, mode);
     } catch (FileNotFoundException e) {
       throw new IllegalArgumentException("Index file " + indexFile + " does not exist");
@@ -240,7 +244,6 @@ public class URIIndex {
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
     long entry = entries;
-    long startOfEntry = IDX_HEADER_SIZE + (entries * bytesPerEntry);
 
     int pathLengthInBytes = path.getBytes().length;
 
@@ -252,16 +255,16 @@ public class URIIndex {
       while (newBytesPerPath < pathLengthInBytes)
         newBytesPerPath *= 2;
       resize(bytesPerId, newBytesPerPath);
-      startOfEntry = IDX_HEADER_SIZE + (entries * bytesPerEntry);
     }
 
     // See if there is an empty slot
+    long startOfEntry = IDX_HEADER_SIZE + (entries * bytesPerEntry);
     long address = IDX_HEADER_SIZE;
     long e = 0;
     boolean reusingSlot = false;
     idx.seek(address);
     while (address < startOfEntry) {
-      if (idx.readChar() == '\n') {
+      if (idx.read() == '\n') {
         logger.debug("Found orphan line for reuse");
         startOfEntry = address;
         reusingSlot = true;
@@ -314,7 +317,7 @@ public class URIIndex {
     idx.seek(startOfEntry);
     idx.write('\n');
     idx.write(new byte[bytesPerEntry - 1]);
-    
+
     // Update the file header
     entries--;
     idx.seek(IDX_ENTRIES_HEADER_LOCATION);
@@ -536,7 +539,7 @@ public class URIIndex {
     this.idxFile = newIdxFile;
 
     time = System.currentTimeMillis() - time;
-    logger.info("Uri index resized in {} ms", time);
+    logger.info("Uri index resized in {}", ConfigurationUtils.toHumanReadableDuration(time));
   }
 
 }

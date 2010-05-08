@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl.index;
 
 import ch.o2it.weblounge.common.impl.content.PageUtils;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -162,6 +163,8 @@ public class VersionIndex {
     String mode = readOnly ? "r" : "rwd";
     try {
       indexFile.getParentFile().mkdirs();
+      if (!indexFile.exists())
+        indexFile.createNewFile();
       idx = new RandomAccessFile(indexFile, mode);
     } catch (FileNotFoundException e) {
       throw new IllegalArgumentException("Index file " + indexFile + " does not exist");
@@ -251,8 +254,7 @@ public class VersionIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized long add(long entry, long version)
-      throws IOException {
+  public synchronized long add(long entry, long version) throws IOException {
     return add(entry, null, version);
   }
 
@@ -270,8 +272,7 @@ public class VersionIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  private long add(long entry, String id, long version)
-      throws IOException {
+  private long add(long entry, String id, long version) throws IOException {
     if (id != null && id.getBytes().length != bytesPerId)
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
@@ -314,7 +315,10 @@ public class VersionIndex {
 
     // Add the new address
     idx.seek(startOfEntry);
-    idx.write(id.getBytes());
+    if (id != null)
+      idx.write(id.getBytes());
+    else
+      idx.skipBytes(bytesPerId);
     idx.writeInt(existingVersions + 1);
     idx.skipBytes(existingVersions * 8);
     idx.writeLong(version);
@@ -604,7 +608,7 @@ public class VersionIndex {
     this.idxFile = newIdxFile;
 
     time = System.currentTimeMillis() - time;
-    logger.info("Version index resized in {} ms", time);
+    logger.info("Version index resized in {}", ConfigurationUtils.toHumanReadableDuration(time));
   }
 
 }

@@ -89,6 +89,38 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
+   * This default implementation triggers loading of the index, so when
+   * overwriting, make sure to invoke by calling <code>super.start()</code>.
+   * 
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#start()
+   */
+  public void start() throws ContentRepositoryException {
+    try {
+      index = loadIndex();
+    } catch (IOException e) {
+      throw new ContentRepositoryException("Error loading repository index", e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * This implementation closes the index, so when overwriting, make sure to
+   * invoke by calling <code>super.stop()</code>.
+   * 
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#stop()
+   */
+  public void stop() throws ContentRepositoryException {
+    try {
+      index.close();
+    } catch (IOException e) {
+      throw new ContentRepositoryException("Error closing repository index", e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.PageURI)
    */
   public boolean exists(PageURI uri) throws ContentRepositoryException {
@@ -179,7 +211,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new IllegalStateException("Content repository is not connected");
 
     try {
-      long [] revisions = index.getRevisions(uri);
+      long[] revisions = index.getRevisions(uri);
       PageURI[] uris = new PageURI[revisions.length];
       int i = 0;
       for (long r : revisions) {
@@ -227,6 +259,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
+   * 
+   * This implementation uses the index to get the list.
    * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
    *      int, long)
@@ -291,7 +325,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    *          the identifier
    * @return the path
    */
-  protected String idToPath(String id) {
+  protected String idToDirectory(String id) {
     if (id == null)
       throw new IllegalArgumentException("Identifier must not be null");
     String[] elements = id.split("-");
@@ -337,8 +371,13 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * implementation is in charge of populating the index.
    * 
    * @return the index
+   * @throws IOException
+   *           if reading or creating the index fails
+   * @throws ContentRepositoryException
+   *           if populating the index fails
    */
-  protected abstract ContentRepositoryIndex loadIndex() throws IOException;
+  protected abstract ContentRepositoryIndex loadIndex() throws IOException,
+      ContentRepositoryException;
 
   /**
    * {@inheritDoc}

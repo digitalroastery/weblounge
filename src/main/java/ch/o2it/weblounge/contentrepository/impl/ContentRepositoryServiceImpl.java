@@ -157,18 +157,31 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService {
     Dictionary properties = new Hashtable();
     properties.put(Site.class.getName(), site);
     properties.put(Bundle.class.getName(), bundle);
+    
+    // Create and set up the repository
     try {
       repository = prototype.newInstance();
       repository.connect(properties);
       repositories.put(site, repository);
     } catch (InstantiationException e) {
       logger.error("Unable to instantiate content repository " + prototype + " for site '" + site + "'", e);
+      return;
     } catch (IllegalAccessException e) {
       logger.error("Illegal access while instantiating content repository " + prototype + " for site '" + site + "'", e);
+      return;
     } catch (ContentRepositoryException e) {
       logger.error("Unable to connect content repository " + repository + " for site '" + site + "'", e);
+      return;
     }
-  }
+
+    // Start the repository
+    try {
+      repository.start();
+      repositories.put(site, repository);
+    } catch (ContentRepositoryException e) {
+      logger.error("Unable to start content repository " + repository + " for site '" + site + "'", e);
+    }
+}
 
   /**
    * Callback from the OSGi environment when a site is destroyed. This method
@@ -181,6 +194,11 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService {
     ContentRepository repository = repositories.remove(site);
     if (repository == null)
       return;
+    try {
+      repository.stop();
+    } catch (ContentRepositoryException e) {
+      logger.error("Unable to stop content repository " + repository + " for site '" + site + "'", e);
+    }
     try {
       repository.disconnect();
     } catch (ContentRepositoryException e) {

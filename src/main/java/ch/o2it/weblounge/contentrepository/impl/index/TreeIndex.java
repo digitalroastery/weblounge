@@ -18,28 +18,20 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.contentrepository.impl.bundle;
+package ch.o2it.weblounge.contentrepository.impl.index;
 
-import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
- * Index implementation for a content repository located inside an OSGi bundle.
+ * This index is part of the content repository page index and maps
+ * <code>int</code> representations of page identifiers to slot numbers in the
+ * uri index.
+ * 
+ * <pre>
+ * | slot | address in map.idx
+ * |------------------------------------------
+ * | 1    | addressOf(a-b-c-d), addressOf(e-f-g-h)
+ * </pre>
  */
-public class BundleContentRepositoryIndex extends ContentRepositoryIndex {
-
-  /**
-   * Creates a new repository index at the specified location.
-   * 
-   * @param rootDir
-   *          the index root directory
-   * @throws IOException
-   *           if the index cannot be created at the given location
-   */
-  public BundleContentRepositoryIndex(File rootDir) throws IOException {
-    super(rootDir, false);
-  }
+public class TreeIndex {
 
 }

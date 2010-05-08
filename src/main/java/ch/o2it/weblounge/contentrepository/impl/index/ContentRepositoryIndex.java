@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
@@ -53,7 +54,25 @@ public class ContentRepositoryIndex {
   protected VersionIndex versionIdx = null;
 
   /**
-   * Creates a new content repository index using the three sub indices.
+   * Creates a new index that is located in the indicated folder.
+   * 
+   * @param rootDir
+   *          the root directory
+   * @param readOnly
+   *          <code>true</code> if the index should be read only
+   * @throws IOException
+   *           if creating the indices fails
+   */
+  public ContentRepositoryIndex(File rootDir, boolean readOnly)
+      throws IOException {
+    this.uriIdx = new URIIndex(new File(rootDir, "uris.idx"), false);
+    this.idIdx = new IdIndex(new File(rootDir, "ids.idx"), readOnly);
+    this.pathIdx = new PathIndex(new File(rootDir, "paths.idx"), readOnly);
+    this.versionIdx = new VersionIndex(new File(rootDir, "versions.idx"), readOnly);
+  }
+
+  /**
+   * Creates a new content repository index using the provided sub indices.
    * 
    * @param uriIndex
    *          the uri index
@@ -73,16 +92,60 @@ public class ContentRepositoryIndex {
   }
 
   /**
+   * Sets the uri index.
+   * 
+   * @param uriIndex
+   *          the uri index
+   */
+  protected void setURIIndex(URIIndex uriIndex) {
+    this.uriIdx = uriIndex;
+  }
+
+  /**
+   * Sets the id index.
+   * 
+   * @param idIndex
+   *          the id index
+   */
+  protected void setIdIndex(IdIndex idIndex) {
+    this.idIdx = idIndex;
+  }
+
+  /**
+   * Sets the path index.
+   * 
+   * @param pathIndex
+   *          the path index
+   */
+  protected void setPathIndex(PathIndex pathIndex) {
+    this.pathIdx = pathIndex;
+  }
+
+  /**
+   * Sets the version index.
+   * 
+   * @param versionIndex
+   *          the version index
+   */
+  protected void setVersionIndex(VersionIndex versionIndex) {
+    this.versionIdx = versionIndex;
+  }
+
+  /**
    * Closes the index files. No more read and write operations are allowed.
    * 
    * @throws IOException
    *           if closing the index fails
    */
   public void close() throws IOException {
-    uriIdx.close();
-    idIdx.close();
-    pathIdx.close();
-    versionIdx.close();
+    if (uriIdx != null)
+      uriIdx.close();
+    if (idIdx != null)
+      idIdx.close();
+    if (pathIdx != null)
+      pathIdx.close();
+    if (versionIdx != null)
+      versionIdx.close();
   }
 
   /**
@@ -98,9 +161,9 @@ public class ContentRepositoryIndex {
   public synchronized PageURI add(PageURI uri) throws IOException {
     if (uri.getPath() == null)
       throw new IllegalArgumentException("Uri must contain a path");
-    
+
     long address = toURIEntry(uri);
-    
+
     // If there is no address, we are about to add a new page
     if (address < 0) {
       String uuid = UUID.randomUUID().toString();
@@ -111,13 +174,13 @@ public class ContentRepositoryIndex {
       idIdx.add(id, address);
       pathIdx.add(path, address);
       versionIdx.add(id, uri.getVersion());
-    } 
-    
+    }
+
     // Otherwise, it's just a new version
     else {
       versionIdx.add(address, uri.getVersion());
     }
-    
+
     return uri;
   }
 
@@ -185,12 +248,9 @@ public class ContentRepositoryIndex {
    *           if accessing the index fails
    */
   public String toId(PageURI uri) throws IOException {
-    if (uri.getPath() == null)
-      throw new IllegalArgumentException("PageURI must contain a path");
-
     String path = uri.getPath();
     if (path == null)
-      throw new IllegalArgumentException("Uri must contain a path");
+      throw new IllegalArgumentException("PageURI must contain a path");
 
     long[] addresses = pathIdx.locate(path);
 
@@ -205,6 +265,43 @@ public class ContentRepositoryIndex {
       String idxPath = uriIdx.getPath(a);
       if (idxPath.equals(path)) {
         return uriIdx.getId(a);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns the path of the page with uri <code>uri</code> by looking it up
+   * using the uri's identifier or <code>null</code> if the uri is not part of
+   * the index.
+   * 
+   * @param uri
+   *          the uri
+   * @return the path
+   * @throws IllegalArgumentException
+   *           if the uri does not contain an identifier
+   * @throws IOException
+   *           if accessing the index fails
+   */
+  public String toPath(PageURI uri) throws IOException {
+    String id = uri.getId();
+    if (id == null)
+      throw new IllegalArgumentException("PageURI must contain an identifier");
+
+    long[] addresses = idIdx.locate(id);
+
+    // Is the uri part of the index?
+    if (addresses.length == 0) {
+      logger.warn("Attempt to locate non-existing id {}", id);
+      return null;
+    }
+
+    // Locate the entry in question
+    for (long a : addresses) {
+      String idxPath = uriIdx.getPath(a);
+      if (idxPath.equals(id)) {
+        return uriIdx.getPath(a);
       }
     }
 

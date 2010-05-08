@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,6 +143,8 @@ public class PathIndex {
     String mode = readOnly ? "r" : "rwd";
     try {
       indexFile.getParentFile().mkdirs();
+      if (!indexFile.exists())
+        indexFile.createNewFile();
       idx = new RandomAccessFile(indexFile, mode);
     } catch (FileNotFoundException e) {
       throw new IllegalArgumentException("Index file " + indexFile + " does not exist");
@@ -500,11 +504,11 @@ public class PathIndex {
     long totalEntries = slots * entriesPerSlot;
 
     time = System.currentTimeMillis() - time;
-    logger.info("Path index resized to {} entries ({} slots, {} entries per slot in {} ms)", new Object[] {
+    logger.info("Path index resized to {} entries ({} slots, {} entries per slot in {})", new Object[] {
         totalEntries,
         slots,
         entriesPerSlot,
-        time });
+        ConfigurationUtils.toHumanReadableDuration(time) });
   }
 
 }
