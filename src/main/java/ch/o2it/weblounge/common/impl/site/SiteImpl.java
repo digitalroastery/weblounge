@@ -33,7 +33,9 @@ import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
+import ch.o2it.weblounge.common.impl.util.xml.ValidationErrorHandler;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
+import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.request.RequestListener;
@@ -78,8 +80,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -92,10 +97,13 @@ public class SiteImpl implements Site {
   private static final long serialVersionUID = 5544198303137698222L;
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(SiteImpl.class);
+  final static Logger log_ = LoggerFactory.getLogger(SiteImpl.class);
 
   /** Bundle property name of the site identifier */
   public static final String PROP_IDENTIFIER = "site.identifier";
+  
+  /** Xml namespace for the site */
+  public static final String SITE_XMLNS = "http://www.o2it.ch/weblounge/3.0/site";
 
   /** Regular expression to test the validity of a site identifier */
   private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
@@ -982,16 +990,35 @@ public class SiteImpl implements Site {
 
     log_.debug("Initializing site '{}'", this);
 
+    // Prepare schema validator
+    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    URL schemaUrl = SiteImpl.class.getResource("/xsd/module.xsd");
+    Schema moduleSchema = schemaFactory.newSchema(schemaUrl);
+
+    // Set up the document builder
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+//    docBuilderFactory.setSchema(moduleSchema);
+    docBuilderFactory.setNamespaceAware(true);
+    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+    
     // Load the modules
     final Bundle bundle = bundleContext.getBundle();
-    final Enumeration<URL> e = bundle.findEntries("site/modules", "module.xml", true);
+    final Enumeration<URL> e = bundle.findEntries("site", "module.xml", true);
 
     if (e != null) {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       while (e.hasMoreElements()) {
         URL moduleUrl = e.nextElement();
         log_.debug("Loading module {}", moduleUrl);
+        
+        // Load and validate the module descriptor
+        ValidationErrorHandler errorHandler = new ValidationErrorHandler(moduleUrl);
+        docBuilder.setErrorHandler(errorHandler);
         Document moduleXml = docBuilder.parse(moduleUrl.openStream());
+        if (errorHandler.hasErrors()) {
+          log_.error("Errors found while validating module descriptor {}. Site '{}' is not loaded", moduleUrl, this);
+          throw new IllegalStateException("Errors found while validating module descriptor " + moduleUrl);
+        }
+        
         Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());
         log_.info("Loaded module {}", m);
         addModule(m);
@@ -1216,6 +1243,12 @@ public class SiteImpl implements Site {
    */
   public static Site fromXml(Node config) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
+
+    // Define the xml namespace
+    XPathNamespaceContext nsCtx = new XPathNamespaceContext(false);
+    nsCtx.defineNamespaceURI("ns", SITE_XMLNS);
+    xpath.setNamespaceContext(nsCtx);
+    
     return fromXml(config, xpath);
   }
 
@@ -1235,7 +1268,7 @@ public class SiteImpl implements Site {
   public static Site fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
+    
     // identifier
     String identifier = XPathHelper.valueOf(config, "@id", xpathProcessor);
     if (identifier == null)
@@ -1243,7 +1276,7 @@ public class SiteImpl implements Site {
 
     // class
     Site site = null;
-    String className = XPathHelper.valueOf(config, "class", xpathProcessor);
+    String className = XPathHelper.valueOf(config, "ns:class", xpathProcessor);
     if (className != null) {
       try {
         Class<? extends Site> c = (Class<? extends Site>) classLoader.loadClass(className);
@@ -1258,13 +1291,13 @@ public class SiteImpl implements Site {
     }
 
     // name
-    String name = XPathHelper.valueOf(config, "name", xpathProcessor);
+    String name = XPathHelper.valueOf(config, "ns:name", xpathProcessor);
     if (name == null)
       throw new IllegalStateException("Site '" + identifier + " has no name");
     site.setName(name);
 
     // domains
-    NodeList urlNodes = XPathHelper.selectList(config, "domains/url", xpathProcessor);
+    NodeList urlNodes = XPathHelper.selectList(config, "ns:domains/ns:url", xpathProcessor);
     if (urlNodes.getLength() == 0)
       throw new IllegalStateException("Site '" + identifier + " has no hostname");
     for (int i = 0; i < urlNodes.getLength(); i++) {
@@ -1276,7 +1309,7 @@ public class SiteImpl implements Site {
     }
 
     // languages
-    NodeList languageNodes = XPathHelper.selectList(config, "languages/language", xpathProcessor);
+    NodeList languageNodes = XPathHelper.selectList(config, "ns:languages/ns:language", xpathProcessor);
     if (languageNodes.getLength() == 0)
       throw new IllegalStateException("Site '" + identifier + " has no languages");
     for (int i = 0; i < languageNodes.getLength(); i++) {
@@ -1295,7 +1328,7 @@ public class SiteImpl implements Site {
     }
 
     // templates
-    NodeList templateNodes = XPathHelper.selectList(config, "templates/template", xpathProcessor);
+    NodeList templateNodes = XPathHelper.selectList(config, "ns:templates/ns:template", xpathProcessor);
     for (int i = 0; i < templateNodes.getLength(); i++) {
       PageTemplate template = PageTemplateImpl.fromXml(templateNodes.item(i), xpathProcessor);
       boolean isDefault = ConfigurationUtils.isDefault(templateNodes.item(i));
@@ -1306,20 +1339,20 @@ public class SiteImpl implements Site {
     }
 
     // administrator
-    Node adminNode = XPathHelper.select(config, "security/administrator", xpathProcessor);
+    Node adminNode = XPathHelper.select(config, "ns:security/ns:administrator", xpathProcessor);
     if (adminNode != null) {
       site.setAdministrator(SiteAdminImpl.fromXml(adminNode, site, xpathProcessor));
     }
 
     // login modules
-    NodeList loginModuleNodes = XPathHelper.selectList(config, "security/authentication/loginmodule", xpathProcessor);
+    NodeList loginModuleNodes = XPathHelper.selectList(config, "ns:security/ns:authentication/ns:loginmodule", xpathProcessor);
     for (int i = 0; i < loginModuleNodes.getLength(); i++) {
       AuthenticationModule module = AuthenticationModuleImpl.fromXml(loginModuleNodes.item(i), xpathProcessor);
       site.addAuthenticationModule(module);
     }
 
     // options
-    Node optionsNode = XPathHelper.select(config, "options", xpathProcessor);
+    Node optionsNode = XPathHelper.select(config, "ns:options", xpathProcessor);
     OptionsHelper.fromXml(optionsNode, site, xpathProcessor);
 
     return site;

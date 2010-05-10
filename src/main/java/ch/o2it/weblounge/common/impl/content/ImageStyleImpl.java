@@ -34,6 +34,7 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.ScalingMode;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -219,8 +220,8 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     // Width
     int width = -1;
     try {
-      if (XPathHelper.valueOf(node, "width", xpath) != null)
-        width = Integer.parseInt(XPathHelper.valueOf(node, "width", xpath));
+      if (XPathHelper.valueOf(node, "m:width", xpath) != null)
+        width = Integer.parseInt(XPathHelper.valueOf(node, "m:width", xpath));
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Missing width in image style definition");
     }
@@ -228,8 +229,8 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     // Height
     int height = -1;
     try {
-      if (XPathHelper.valueOf(node, "height", xpath) != null)
-        height = Integer.parseInt(XPathHelper.valueOf(node, "height", xpath));
+      if (XPathHelper.valueOf(node, "m:height", xpath) != null)
+        height = Integer.parseInt(XPathHelper.valueOf(node, "m:height", xpath));
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Missing height in image style definition");
     }
@@ -238,7 +239,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     boolean composeable = "true".equals(XPathHelper.valueOf(node, "@composeable", xpath));
 
     // Scaling mode
-    String mode = XPathHelper.valueOf(node, "scalingmode", xpath);
+    String mode = XPathHelper.valueOf(node, "m:scalingmode", xpath);
     ScalingMode scalingMode = mode == null ? None : ScalingMode.parseString(mode);
 
     if (Width.equals(scalingMode) && width <= 0)
@@ -256,7 +257,17 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     ImageStyleImpl imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable);
 
     // Names
-    LanguageSupport.addDescriptions(node, "name", null, imageStyle.name, false);
+    NodeList names = XPathHelper.selectList(node, "m:name", xpath);
+    for (int i = 0; i < names.getLength(); i++) {
+      Node localiziation = names.item(i);
+      String language = XPathHelper.valueOf(localiziation, "@language", xpath);
+      if (language == null)
+        throw new IllegalStateException("Found image style name without language");
+      String name = XPathHelper.valueOf(localiziation, "text()", xpath);
+      if (name == null)
+        throw new IllegalStateException("Found empty imagestyle name");
+      imageStyle.setName(name, LanguageSupport.getLanguage(language));
+    }
 
     return imageStyle;
   }

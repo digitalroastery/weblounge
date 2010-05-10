@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.site.ActionSupport;
+import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +36,8 @@ import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Test case for the xml serialization of the {@link ActionSupport}.
@@ -54,7 +57,9 @@ public class ActionSupportXmlTest extends ActionSupportTest {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    action = ActionSupport.fromXml(doc.getFirstChild());
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    xpath.setNamespaceContext(new XPathNamespaceContext(true));
+    action = ActionSupport.fromXml(doc.getFirstChild(), xpath);
     action.setSite(site);
     action.setModule(module);
   }

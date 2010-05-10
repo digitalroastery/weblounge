@@ -97,8 +97,8 @@ public final class LanguageSupport {
    * various languages and applies them to the multilingual object
    * <code>o</code>.
    * <p>
-   * The localized content is looked up in the tags specified by
-   * parameter <code>tagName</code>, language identifier are expected in the
+   * The localized content is looked up in the tags specified by parameter
+   * <code>tagName</code>, language identifier are expected in the
    * <code>language</code> attribute of these tags.
    * <p>
    * If the description is found in the default language, then
@@ -134,6 +134,54 @@ public final class LanguageSupport {
       String tagName, Language defaultLanguage, LocalizableContent<String> o,
       boolean escape) {
 
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return addDescriptions(configuration, tagName, defaultLanguage, o, escape, xpath);
+  }
+
+  /**
+   * Reads the names of an object described in a weblounge configuration file in
+   * various languages and applies them to the multilingual object
+   * <code>o</code>.
+   * <p>
+   * The localized content is looked up in the tags specified by parameter
+   * <code>tagName</code>, language identifier are expected in the
+   * <code>language</code> attribute of these tags.
+   * <p>
+   * If the description is found in the default language, then
+   * {@link LocalizableContent#setDefaultLanguage(Language)} is called.
+   * <p>
+   * The required format of the input node is as follows:
+   * 
+   * <pre>
+   *     &lt;role&gt;
+   *         &lt;id&gt;editor&lt;/id&gt;
+   *         &lt;name language=&quot;de&quot;&gt;Editor&lt;/name&gt;
+   *         &lt;name language=&quot;fr&quot;&gt;Editeur&lt;/name&gt;
+   *         &lt;name language=&quot;it&quot;&gt;Editore&lt;/name&gt;
+   * &lt;/role&gt;
+   * </pre>
+   * <p>
+   * The method throws a &lt;code&gt;ConfigurationException&lt;/code&gt; if no
+   * name is provided the site default language.
+   * 
+   * @param configuration
+   *          the XML configuration node containing the descriptions
+   * @param tagName
+   *          the tag name containing the localized content
+   * @param defaultLanguage
+   *          the default language
+   * @param o
+   *          the localizable object
+   * @param escape
+   *          &lt;code&gt;true&lt;/code&gt; to filter out &quot; and '
+   * @param xpath
+   *          the xpath processor
+   * @return the localized content
+   */
+  public static LocalizableContent<String> addDescriptions(Node configuration,
+      String tagName, Language defaultLanguage, LocalizableContent<String> o,
+      boolean escape, XPath xpath) {
+
     if (configuration == null)
       throw new IllegalArgumentException("Cannot extract from empty configuration");
     if (tagName == null)
@@ -141,7 +189,6 @@ public final class LanguageSupport {
     if (o == null)
       o = new LocalizableContent<String>();
 
-    XPath xpath = XPathFactory.newInstance().newXPath();
     try {
       NodeList nodes = XPathHelper.selectList(configuration, tagName, xpath);
       for (int i = 0; i < nodes.getLength(); i++) {
@@ -298,8 +345,8 @@ public final class LanguageSupport {
       return null;
 
     Language l = null;
-      String languageId = s.substring(languagePosition + 1, languagePosition + 3);
-      l = getLanguage(languageId);
+    String languageId = s.substring(languagePosition + 1, languagePosition + 3);
+    l = getLanguage(languageId);
     return l;
   }
 

@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.RenderException;
 import ch.o2it.weblounge.common.content.Script;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -40,7 +41,9 @@ import org.w3c.dom.NodeList;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -194,6 +197,16 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   public static PageTemplate fromXml(Node node) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
+    
+    // Define the xml namespace
+    xpath.setNamespaceContext(new NamespaceContext() {
+      public String getNamespaceURI(String prefix) {
+        return "ns".equals(prefix) ? SiteImpl.SITE_XMLNS : null;
+      }
+      public String getPrefix(String namespaceURI) { return null; }
+      public Iterator<?> getPrefixes(String namespaceURI) { return null; }
+    });
+
     return fromXml(node, xpath);
   }
 
@@ -226,7 +239,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
     // Renderer url
     URL rendererUrl = null;
-    String rendererUrlNode = XPathHelper.valueOf(node, "renderer", xpath); 
+    String rendererUrlNode = XPathHelper.valueOf(node, "ns:renderer", xpath); 
     if (rendererUrlNode == null)
       throw new IllegalStateException("Missing renderer in page template definition");
     try {
@@ -262,17 +275,17 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     template.setDefault(ConfigurationUtils.isTrue(XPathHelper.valueOf(node, "@default", xpath)));
 
     // Stage
-    String stage = XPathHelper.valueOf(node, "stage", xpath);
+    String stage = XPathHelper.valueOf(node, "ns:stage", xpath);
     if (stage != null)
       template.setStage(stage);
 
     // Layout
-    String layout = XPathHelper.valueOf(node, "layout", xpath);
+    String layout = XPathHelper.valueOf(node, "ns:layout", xpath);
     if (layout != null)
       template.setDefaultLayout(layout);
 
     // recheck time
-    String recheck = XPathHelper.valueOf(node, "recheck", xpath);
+    String recheck = XPathHelper.valueOf(node, "ns:recheck", xpath);
     if (recheck != null) {
       try {
         template.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
@@ -284,7 +297,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     }
 
     // valid time
-    String valid = XPathHelper.valueOf(node, "valid", xpath);
+    String valid = XPathHelper.valueOf(node, "ns:valid", xpath);
     if (valid != null) {
       try {
         template.setValidTime(ConfigurationUtils.parseDuration(valid));
@@ -296,7 +309,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     }
 
     // name
-    NodeList names = XPathHelper.selectList(node, "name", xpath);
+    NodeList names = XPathHelper.selectList(node, "ns:name", xpath);
     for (int i = 0; i < names.getLength(); i++) {
       Node localiziation = names.item(i);
       String language = XPathHelper.valueOf(localiziation, "@language", xpath);
@@ -309,15 +322,15 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
     }
 
     // scripts
-    NodeList scripts = XPathHelper.selectList(node, "includes/script", xpath);
+    NodeList scripts = XPathHelper.selectList(node, "ns:includes/ns:script", xpath);
     for (int i = 0; i < scripts.getLength(); i++) {
       template.addHTMLHeader(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
-    NodeList includes = XPathHelper.selectList(node, "includes/link", xpath);
-    for (int i = 0; i < includes.getLength(); i++) {
-      template.addHTMLHeader(LinkImpl.fromXml(includes.item(i)));
+    NodeList links = XPathHelper.selectList(node, "ns:includes/ns:link", xpath);
+    for (int i = 0; i < links.getLength(); i++) {
+      template.addHTMLHeader(LinkImpl.fromXml(links.item(i)));
     }
 
     return template;

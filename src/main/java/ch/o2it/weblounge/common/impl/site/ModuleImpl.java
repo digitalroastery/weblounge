@@ -32,6 +32,7 @@ import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
+import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.site.Action;
@@ -66,6 +67,9 @@ public class ModuleImpl implements Module {
 
   /** Regular expression to test the validity of a module identifier */
   private static final String MODULE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
+
+  /** Xml namespace for the module */
+  public static final String MODULE_XMLNS = "http://www.o2it.ch/weblounge/3.0/module";
 
   /** The module identifier */
   protected String identifier = null;
@@ -579,6 +583,12 @@ public class ModuleImpl implements Module {
    */
   public static Module fromXml(Node config) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
+
+    // Define the xml namespace
+    XPathNamespaceContext nsCtx = new XPathNamespaceContext(false);
+    nsCtx.defineNamespaceURI("m", MODULE_XMLNS);
+    xpath.setNamespaceContext(nsCtx);
+
     return fromXml(config, xpath);
   }
 
@@ -607,7 +617,7 @@ public class ModuleImpl implements Module {
 
     // class
     Module module = null;
-    String className = XPathHelper.valueOf(config, "class", xpathProcessor);
+    String className = XPathHelper.valueOf(config, "m:class", xpathProcessor);
     if (className != null) {
       try {
         Class<? extends Module> c = (Class<? extends Module>) classLoader.loadClass(className);
@@ -622,7 +632,7 @@ public class ModuleImpl implements Module {
     }
 
     // name
-    NodeList names = XPathHelper.selectList(config, "name", xpathProcessor);
+    NodeList names = XPathHelper.selectList(config, "m:name", xpathProcessor);
     for (int i = 0; i < names.getLength(); i++) {
       Node localiziation = names.item(i);
       String language = XPathHelper.valueOf(localiziation, "@language", xpathProcessor);
@@ -635,32 +645,32 @@ public class ModuleImpl implements Module {
     }
     
     // pagelets
-    NodeList pageletNodes = XPathHelper.selectList(config, "pagelets/pagelet", xpathProcessor);
+    NodeList pageletNodes = XPathHelper.selectList(config, "m:pagelets/m:pagelet", xpathProcessor);
     for (int i = 0; i < pageletNodes.getLength(); i++) {
       PageletRenderer pagelet = PageletRendererImpl.fromXml(pageletNodes.item(i), xpathProcessor);      
       module.addRenderer(pagelet);
     }
 
     // actions
-    NodeList actionNodes = XPathHelper.selectList(config, "actions/action", xpathProcessor);
+    NodeList actionNodes = XPathHelper.selectList(config, "m:actions/m:action", xpathProcessor);
     for (int i = 0; i < actionNodes.getLength(); i++) {
       module.addAction(ActionSupport.fromXml(actionNodes.item(i), xpathProcessor));
     }
 
     // image styles
-    NodeList imagestyleNodes = XPathHelper.selectList(config, "imagestyles/imagestyle", xpathProcessor);
+    NodeList imagestyleNodes = XPathHelper.selectList(config, "m:imagestyles/m:imagestyle", xpathProcessor);
     for (int i = 0; i < imagestyleNodes.getLength(); i++) {
       module.addImageStyle(ImageStyleImpl.fromXml(imagestyleNodes.item(i), xpathProcessor));
     }
 
     // jobs
-    NodeList jobNodes = XPathHelper.selectList(config, "jobs/job", xpathProcessor);
+    NodeList jobNodes = XPathHelper.selectList(config, "m:jobs/m:job", xpathProcessor);
     for (int i = 0; i < jobNodes.getLength(); i++) {
       module.addJob(QuartzJob.fromXml(jobNodes.item(i), xpathProcessor));
     }
 
     // options
-    Node optionsNode = XPathHelper.select(config, "options", xpathProcessor);
+    Node optionsNode = XPathHelper.select(config, "m:options", xpathProcessor);
     OptionsHelper.fromXml(optionsNode, module, xpathProcessor);
 
     return module;
@@ -675,7 +685,12 @@ public class ModuleImpl implements Module {
     StringBuffer b = new StringBuffer();
     b.append("<module id=\"");
     b.append(identifier);
-    b.append("\">");
+    b.append("\" ");
+    
+    // namespace and schema
+    b.append("xmlns=\"http://www.o2it.ch/weblounge/3.0/module\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd\"");
+
+    b.append(">");
 
     // enable
     b.append("<enable>").append(enabled).append("</enable>");

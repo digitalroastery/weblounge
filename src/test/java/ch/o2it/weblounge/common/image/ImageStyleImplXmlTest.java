@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.content.ImageStyleImpl;
+import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,8 @@ import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Tests loading and serializing of {@link ImageStyleImpl} objects from and to
@@ -55,7 +58,9 @@ public class ImageStyleImplXmlTest extends ImageStyleImplTest {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
     Document doc = docBuilder.parse(testContext.openStream());
-    imageStyle = ImageStyleImpl.fromXml(doc.getFirstChild());
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    xpath.setNamespaceContext(new XPathNamespaceContext(true));
+    imageStyle = ImageStyleImpl.fromXml(doc.getFirstChild(), xpath);
   }
 
   /**

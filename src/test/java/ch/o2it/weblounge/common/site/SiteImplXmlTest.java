@@ -21,10 +21,12 @@
 package ch.o2it.weblounge.common.site;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
+import ch.o2it.weblounge.common.impl.util.xml.ValidationErrorHandler;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +38,6 @@ import java.net.URL;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -47,24 +48,32 @@ public class SiteImplXmlTest extends SiteImplTest {
 
   /** Name of the test file */
   protected String testFile = "/site.xml";
-  
+
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
     setupPrerequisites();
+    
+    // Schema validator setup
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     URL schemaUrl = SiteImpl.class.getResource("/xsd/site.xsd");
     Schema siteSchema = schemaFactory.newSchema(schemaUrl);
+    
+    // Site.xml document builder setup
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
     docBuilderFactory.setSchema(siteSchema);
-    docBuilderFactory.setValidating(true);
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+
+    // Validate and read the site descriptor
     URL testContext = this.getClass().getResource(testFile);
+    ValidationErrorHandler errorHandler = new ValidationErrorHandler(testContext);
+    docBuilder.setErrorHandler(errorHandler);
     Document doc = docBuilder.parse(testContext.openStream());
-    siteSchema.newValidator().validate(new DOMSource(doc.getFirstChild()));
+    assertFalse("Schema validation failed", errorHandler.hasErrors());
+
     site = SiteImpl.fromXml(doc.getFirstChild());
   }
   

@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.scheduler;
 
+import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
@@ -28,12 +29,13 @@ import ch.o2it.weblounge.common.scheduler.JobWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -253,10 +255,10 @@ public final class QuartzJob implements Job {
     
     // Main attributes
     String identifier = XPathHelper.valueOf(config, "@id", xPathProcessor);
-    String name = XPathHelper.valueOf(config, "name", xPathProcessor);
+    String name = XPathHelper.valueOf(config, "m:name", xPathProcessor);
 
     // Implementation class
-    String className = XPathHelper.valueOf(config, "class", xPathProcessor);
+    String className = XPathHelper.valueOf(config, "m:class", xPathProcessor);
     Class<JobWorker> clazz;
     try {
       clazz = (Class<JobWorker>) classLoader.loadClass(className);
@@ -266,18 +268,21 @@ public final class QuartzJob implements Job {
     }
 
     // Read execution schedule
-    String schedule = XPathHelper.valueOf(config, "schedule", xPathProcessor);
+    String schedule = XPathHelper.valueOf(config, "m:schedule", xPathProcessor);
     if (schedule == null)
       throw new IllegalStateException("No schedule has been defined for job '" + identifier + "'");
     jobTrigger = new CronJobTrigger(schedule);
 
     // Read options
-    NodeList nodes = XPathHelper.selectList(config, "options/option", xPathProcessor);
-    for (int i = 0; i < nodes.getLength(); i++) {
-      Node option = nodes.item(i);
-      String optionName = XPathHelper.valueOf(option, "name", xPathProcessor);
-      String value = XPathHelper.valueOf(option, "value", xPathProcessor);
-      ctx.put(optionName, value);
+    Node nodes = XPathHelper.select(config, "m:options", xPathProcessor);
+    OptionsHelper options = OptionsHelper.fromXml(nodes, xPathProcessor);
+    for (Map.Entry<String, List<String>> entry : options.getOptions().entrySet()) {
+      String key = entry.getKey();
+      String[] values = options.getOptionValues(key);
+      if (values.length == 1)
+        ctx.put(key, values[0]);
+      else
+        ctx.put(key, values);
     }
 
     // Did we find something?
@@ -327,9 +332,19 @@ public final class QuartzJob implements Job {
         b.append("<name>");
         b.append(key);
         b.append("</name>");
-        b.append("<value>");
-        b.append(ctx.get(key));
-        b.append("</value>");
+        Object value = ctx.get(key);
+        if (value instanceof String[]) {
+          String[] values = (String[])ctx.get(key);
+          for (String v : values) {
+            b.append("<value>");
+            b.append(v);
+            b.append("</value>");
+          }
+        } else {
+          b.append("<value>");
+          b.append(value);
+          b.append("</value>");
+        }
         b.append("</option>");
       }
       b.append("</options>");

@@ -224,11 +224,11 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       throw new IllegalStateException("Missing id in page template definition");
 
     // Class
-    String className = XPathHelper.valueOf(node, "class", xpath);
+    String className = XPathHelper.valueOf(node, "m:class", xpath);
 
     // Renderer url
     URL rendererUrl = null;
-    String rendererUrlNode = XPathHelper.valueOf(node, "renderer", xpath);
+    String rendererUrlNode = XPathHelper.valueOf(node, "m:renderer", xpath);
     if (rendererUrlNode == null)
       throw new IllegalStateException("Missing renderer in page template definition");
     try {
@@ -263,7 +263,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     renderer.setComposeable("true".equals(XPathHelper.valueOf(node, "@composeable", xpath)));
 
     // Editor url
-    String editorUrlNode = XPathHelper.valueOf(node, "editor", xpath);
+    String editorUrlNode = XPathHelper.valueOf(node, "m:editor", xpath);
     try {
       if (editorUrlNode != null) {
         URL editorUrl = new URL(editorUrlNode);
@@ -274,7 +274,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     }
 
     // recheck time
-    String recheck = XPathHelper.valueOf(node, "recheck", xpath);
+    String recheck = XPathHelper.valueOf(node, "m:recheck", xpath);
     if (recheck != null) {
       try {
         renderer.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
@@ -286,7 +286,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     }
 
     // valid time
-    String valid = XPathHelper.valueOf(node, "valid", xpath);
+    String valid = XPathHelper.valueOf(node, "m:valid", xpath);
     if (valid != null) {
       try {
         renderer.setValidTime(ConfigurationUtils.parseDuration(valid));
@@ -298,7 +298,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     }
 
     // name
-    NodeList names = XPathHelper.selectList(node, "name", xpath);
+    NodeList names = XPathHelper.selectList(node, "m:name", xpath);
     for (int i = 0; i < names.getLength(); i++) {
       Node localiziation = names.item(i);
       String language = XPathHelper.valueOf(localiziation, "@language", xpath);
@@ -311,13 +311,13 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     }
 
     // scripts
-    NodeList scripts = XPathHelper.selectList(node, "includes/script", xpath);
+    NodeList scripts = XPathHelper.selectList(node, "m:includes/m:script", xpath);
     for (int i = 0; i < scripts.getLength(); i++) {
       renderer.addHTMLHeader(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
-    NodeList includes = XPathHelper.selectList(node, "includes/link", xpath);
+    NodeList includes = XPathHelper.selectList(node, "m:includes/m:link", xpath);
     for (int i = 0; i < includes.getLength(); i++) {
       renderer.addHTMLHeader(LinkImpl.fromXml(includes.item(i)));
     }

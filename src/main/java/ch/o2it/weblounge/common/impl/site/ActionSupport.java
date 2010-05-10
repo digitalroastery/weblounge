@@ -655,7 +655,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
 
     // class
     Action action = null;
-    String className = XPathHelper.valueOf(config, "class", xpathProcessor);
+    String className = XPathHelper.valueOf(config, "m:class", xpathProcessor);
     if (className != null) {
       try {
         Class<? extends Action> c = (Class<? extends Action>) classLoader.loadClass(className);
@@ -670,7 +670,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // mountpoint
-    String mountpoint = XPathHelper.valueOf(config, "mountpoint", xpathProcessor);
+    String mountpoint = XPathHelper.valueOf(config, "m:mountpoint", xpathProcessor);
     if (mountpoint == null)
       throw new IllegalStateException("Action '" + identifier + " has no mountpoint");
     action.setPath(mountpoint);
@@ -678,16 +678,16 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
 
     if (action instanceof HTMLActionSupport) {
       // content url
-      String targetUrl = XPathHelper.valueOf(config, "page", xpathProcessor);
+      String targetUrl = XPathHelper.valueOf(config, "m:page", xpathProcessor);
       ((HTMLActionSupport) action).setPageURI(targetUrl);
 
       // template
-      String targetTemplate = XPathHelper.valueOf(config, "template", xpathProcessor);
+      String targetTemplate = XPathHelper.valueOf(config, "m:template", xpathProcessor);
       ((HTMLActionSupport) action).setTemplate(targetTemplate);
     }
 
     // recheck time
-    String recheck = XPathHelper.valueOf(config, "recheck", xpathProcessor);
+    String recheck = XPathHelper.valueOf(config, "m:recheck", xpathProcessor);
     if (recheck != null) {
       try {
         action.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
@@ -699,7 +699,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // valid time
-    String valid = XPathHelper.valueOf(config, "valid", xpathProcessor);
+    String valid = XPathHelper.valueOf(config, "m:valid", xpathProcessor);
     if (valid != null) {
       try {
         action.setValidTime(ConfigurationUtils.parseDuration(valid));
@@ -711,19 +711,19 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // scripts
-    NodeList scripts = XPathHelper.selectList(config, "includes/script", xpathProcessor);
+    NodeList scripts = XPathHelper.selectList(config, "m:includes/m:script", xpathProcessor);
     for (int i = 0; i < scripts.getLength(); i++) {
       action.addHTMLHeader(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
-    NodeList includes = XPathHelper.selectList(config, "includes/link", xpathProcessor);
+    NodeList includes = XPathHelper.selectList(config, "m:includes/m:link", xpathProcessor);
     for (int i = 0; i < includes.getLength(); i++) {
       action.addHTMLHeader(LinkImpl.fromXml(includes.item(i)));
     }
 
     // name
-    NodeList names = XPathHelper.selectList(config, "name", xpathProcessor);
+    NodeList names = XPathHelper.selectList(config, "m:name", xpathProcessor);
     for (int i = 0; i < names.getLength(); i++) {
       Node localiziation = names.item(i);
       String language = XPathHelper.valueOf(localiziation, "@language", xpathProcessor);
@@ -736,7 +736,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // options
-    Node optionsNode = XPathHelper.select(config, "options", xpathProcessor);
+    Node optionsNode = XPathHelper.select(config, "m:options", xpathProcessor);
     OptionsHelper.fromXml(optionsNode, action, xpathProcessor);
 
     return action;

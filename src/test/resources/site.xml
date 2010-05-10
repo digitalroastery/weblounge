@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <site id="dev" xmlns="http://www.o2it.ch/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/site http://www.o2it.ch/xsd/weblounge/3.0/site.xsd">
   <autostart>true</autostart>
   <name>Main site</name>

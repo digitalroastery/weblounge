@@ -208,12 +208,12 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
       throws IllegalStateException {
 
     // class
-    String moduleClassName = XPathHelper.valueOf(config, "class", xpathProcessor);
+    String moduleClassName = XPathHelper.valueOf(config, "ns:class", xpathProcessor);
     if (moduleClassName == null)
       throw new IllegalStateException("Login module must have an implementation class");
 
     // relevance
-    String relevanceValue = XPathHelper.valueOf(config, "relevance", xpathProcessor);
+    String relevanceValue = XPathHelper.valueOf(config, "ns:relevance", xpathProcessor);
     if (relevanceValue == null)
       throw new IllegalStateException("Login module must have a relevance");
     Relevance relevance = null;
@@ -226,7 +226,7 @@ public final class AuthenticationModuleImpl implements AuthenticationModule {
     AuthenticationModuleImpl module = new AuthenticationModuleImpl(moduleClassName, relevance);
 
     // options
-    Node optionsNode = XPathHelper.select(config, "options", xpathProcessor);
+    Node optionsNode = XPathHelper.select(config, "ns:options", xpathProcessor);
     module.options = OptionsHelper.fromXml(optionsNode, xpathProcessor);
     
     return module;

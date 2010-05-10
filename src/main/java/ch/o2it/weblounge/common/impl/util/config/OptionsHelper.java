@@ -232,11 +232,11 @@ public final class OptionsHelper implements Customizable {
       return;
 
     // Read the options
-    NodeList nodes = XPathHelper.selectList(config, "option", xpathProcessor);
+    NodeList nodes = XPathHelper.selectList(config, "ns:option", xpathProcessor);
     for (int i = 0; i < nodes.getLength(); i++) {
       Node option = nodes.item(i);
-      String name = XPathHelper.valueOf(option, "name", xpathProcessor);
-      NodeList valueNodes = XPathHelper.selectList(option, "value", xpathProcessor);
+      String name = XPathHelper.valueOf(option, "ns:name", xpathProcessor);
+      NodeList valueNodes = XPathHelper.selectList(option, "ns:value", xpathProcessor);
       for (int j = 0; j < valueNodes.getLength(); j++) {
         String value = valueNodes.item(j).getFirstChild().getNodeValue();
         customizable.setOption(name, value);

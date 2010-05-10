@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.user;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
+import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -32,8 +33,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -101,8 +104,18 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
    */
   public static SiteAdminImpl fromXml(Node userNode, Site site)
       throws IllegalStateException {
-    XPath xpath_ = XPathFactory.newInstance().newXPath();
-    return fromXml(userNode, site, xpath_);
+    XPath xpath = XPathFactory.newInstance().newXPath();
+
+    // Define the xml namespace
+    xpath.setNamespaceContext(new NamespaceContext() {
+      public String getNamespaceURI(String prefix) {
+        return "ns".equals(prefix) ? SiteImpl.SITE_XMLNS : null;
+      }
+      public String getPrefix(String namespaceURI) { return null; }
+      public Iterator<?> getPrefixes(String namespaceURI) { return null; }
+    });
+
+    return fromXml(userNode, site, xpath);
   }
 
   /**
@@ -124,36 +137,36 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
     if (userNode == null)
       return null;
 
-    String login = XPathHelper.valueOf(userNode, "login", xpath);      
+    String login = XPathHelper.valueOf(userNode, "ns:login", xpath);      
     SiteAdminImpl user = new SiteAdminImpl(login);
 
     Node enabledAttribute = userNode.getAttributes().getNamedItem("enabled");
     user.enabled = enabledAttribute == null || ConfigurationUtils.isTrue(XPathHelper.valueOf(userNode, "@enabled", xpath));
 
-    String name = XPathHelper.valueOf(userNode, "name", xpath);
+    String name = XPathHelper.valueOf(userNode, "ns:name", xpath);
     if (name != null) {
       user.name = name;
     } else {
-      user.firstName = XPathHelper.valueOf(userNode, "firstname", xpath);
-      user.lastName = XPathHelper.valueOf(userNode, "lastname", xpath);
+      user.firstName = XPathHelper.valueOf(userNode, "ns:firstname", xpath);
+      user.lastName = XPathHelper.valueOf(userNode, "ns:lastname", xpath);
     }
 
     // E-mail
-    user.email = XPathHelper.valueOf(userNode, "email", xpath);
+    user.email = XPathHelper.valueOf(userNode, "ns:email", xpath);
 
     // Language
-    String language = XPathHelper.valueOf(userNode, "language", xpath);
+    String language = XPathHelper.valueOf(userNode, "ns:language", xpath);
     if (language != null) {
       Language l = LanguageSupport.getLanguage(language);
       user.language = (l != null) ? l : site.getDefaultLanguage();
     }
 
     // Password
-    String password = XPathHelper.valueOf(userNode, "password", xpath);
+    String password = XPathHelper.valueOf(userNode, "ns:password", xpath);
     if (password != null) {
       String digestType = null;
       try {
-        digestType = XPathHelper.valueOf(userNode, "password/@type", xpath);
+        digestType = XPathHelper.valueOf(userNode, "ns:password/@type", xpath);
         user.passwordDigestType = DigestType.valueOf(digestType);
         user.password = password.getBytes();
       } catch (Exception e) {
@@ -162,11 +175,11 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
     }
 
     // Properties
-    NodeList properties = XPathHelper.selectList(userNode, "properties/property", xpath);
+    NodeList properties = XPathHelper.selectList(userNode, "ns:properties/ns:property", xpath);
     if (properties != null) {
       for (int i = 0; i < properties.getLength(); i++) {
-        String key = XPathHelper.valueOf(properties.item(i), "name", xpath);
-        String value = XPathHelper.valueOf(properties.item(i), "value", xpath);
+        String key = XPathHelper.valueOf(properties.item(i), "ns:name", xpath);
+        String value = XPathHelper.valueOf(properties.item(i), "ns:value", xpath);
         // TODO: Check for serialized objects or xml nodes
         if (key != null && value != null)
           user.properties.put(key, value);

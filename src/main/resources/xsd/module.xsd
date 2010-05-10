@@ -34,7 +34,7 @@
 
 	<xsd:complexType name="includestype">
 		<xsd:sequence>
-			<xsd:element name="link" type="linktype" maxOccurs="unbounded" />
+			<xsd:element name="link" type="linktype"/>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -48,7 +48,7 @@
 			<xsd:element name="editor" type="xsd:anyURI" />
 			<xsd:element name="recheck" type="xsd:duration" />
 			<xsd:element name="valid" type="xsd:duration" />
-			<xsd:element name="name" type="nametype" maxOccurs="unbounded" />
+			<xsd:element name="name" type="nametype" />
 			<xsd:element name="includes" type="includestype" />
 		</xsd:all>
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
@@ -57,21 +57,14 @@
 	
 	<xsd:complexType name="pageletstype">
 		<xsd:all>
-			<xsd:element name="pagelet" type="pagelettype" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="pagelet" type="pagelettype" minOccurs="0" />
 		</xsd:all>
 	</xsd:complexType>
-
-
-
-
-
-
-
 
 	<xsd:complexType name="moduletype">
 		<xsd:all>
 			<xsd:element name="enable" type="xsd:boolean" />
-			<xsd:element name="name" type="nametype" maxOccurs="unbounded" />
+			<xsd:element name="name" type="nametype" />
 		</xsd:all>
 		<xsd:attribute name="id" type="xsd:ID" use="required" />
 	</xsd:complexType>

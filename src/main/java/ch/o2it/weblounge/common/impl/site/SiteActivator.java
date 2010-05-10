@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.impl.util.classloader.BundleClassLoader;
 import ch.o2it.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
+import ch.o2it.weblounge.common.impl.util.xml.ValidationErrorHandler;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.osgi.framework.BundleContext;
@@ -38,7 +39,6 @@ import java.util.concurrent.Callable;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -48,16 +48,16 @@ import javax.xml.validation.SchemaFactory;
  * <code>OSGi Declarative Services</code> facility.
  * <p>
  * It will scan the bundle resources for a file called <code>site.xml</code>
- * located at <code>site</code> directory relative to the bundle root. 
+ * located at <code>site</code> directory relative to the bundle root.
  */
 public class SiteActivator {
-  
+
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SiteActivator.class);
-  
+  static final Logger logger = LoggerFactory.getLogger(SiteActivator.class);
+
   /** The site service registration */
   protected ServiceRegistration siteService = null;
-  
+
   /** The site */
   protected Site site = null;
 
@@ -80,13 +80,14 @@ public class SiteActivator {
 
     logger.debug("Scanning bundle '{}' for site.xml", bundleContext.getBundle().getSymbolicName());
 
-    // Prepare document builder and schema validator
+    // Prepare schema validator
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     URL schemaUrl = SiteImpl.class.getResource("/xsd/site.xsd");
     Schema siteSchema = schemaFactory.newSchema(schemaUrl);
+
+    // Set up the document builder
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
     docBuilderFactory.setSchema(siteSchema);
-    docBuilderFactory.setValidating(true);
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 
@@ -95,16 +96,23 @@ public class SiteActivator {
     if (e != null && e.hasMoreElements()) {
       URL siteUrl = e.nextElement();
 
-      // Load the site
       logger.info("Loading site from bundle at {}", siteUrl);
+
+      // Load and validate the site descriptor
+      ValidationErrorHandler errorHandler = new ValidationErrorHandler(siteUrl);
+      docBuilder.setErrorHandler(errorHandler);
       final Document siteXml = docBuilder.parse(siteUrl.openStream());
-      siteSchema.newValidator().validate(new DOMSource(siteXml.getFirstChild()));
+      if (errorHandler.hasErrors()) {
+        logger.error("Errors found while validating site descriptor {}. Site is not loaded", siteUrl);
+        return;
+      }
+
       final BundleClassLoader bundleClassLoader = new BundleClassLoader(bundleContext.getBundle());
       ContextClassLoaderUtils.doWithClassLoader(bundleClassLoader, new Callable<Void>() {
         public Void call() throws Exception {
           site = SiteImpl.fromXml(siteXml.getFirstChild());
           if (site instanceof SiteImpl) {
-            ((SiteImpl)site).activate(context);
+            ((SiteImpl) site).activate(context);
           }
           return null;
         }
@@ -122,9 +130,9 @@ public class SiteActivator {
   }
 
   /**
-   * Callback from the OSGi environment to deactivate a site. Subclasses
-   * should make sure to call this super implementation as it will assist in
-   * correctly shutting down the site.
+   * Callback from the OSGi environment to deactivate a site. Subclasses should
+   * make sure to call this super implementation as it will assist in correctly
+   * shutting down the site.
    * <p>
    * This method should be configured in the <tt>Dynamic Services</tt> section
    * of your bundle.
@@ -136,7 +144,7 @@ public class SiteActivator {
    */
   public void deactivate(ComponentContext context) throws Exception {
     if (site != null && site instanceof SiteImpl) {
-      ((SiteImpl)site).deactivate(context);
+      ((SiteImpl) site).deactivate(context);
     }
 
     if (siteService != null)

@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -124,6 +125,17 @@ public class XPathHelper {
 
     try {
       String value = StringUtils.trimToNull(processor.evaluate(xpathExpression, node));
+      
+      // If we are running in test mode, we may neglect namespaces
+      if (value == null) {
+        NamespaceContext ctx = processor.getNamespaceContext();
+        if (ctx instanceof XPathNamespaceContext && ((XPathNamespaceContext)ctx).isTest()) {
+          if (xpathExpression.matches("(.*)[a-zA-Z0-9]+\\:[a-zA-Z0-9]+(.*)")) {
+            String xpNs = xpathExpression.replaceAll("[a-zA-Z0-9]+\\:", "");
+            value = StringUtils.trimToNull(processor.evaluate(xpNs, node));
+          }
+        }
+      }
       return (value != null) ? value : defaultValue;
     } catch (XPathExpressionException e) {
       log_.warn("Error when selecting '{}': {}", xpathExpression, e.getMessage());
@@ -163,15 +175,27 @@ public class XPathHelper {
    *          the xpath processor
    * @return the selected node
    */
-  public static Node select(Node node, String xpath, XPath processor) {
+  public static Node select(Node node, String xpathExpression, XPath processor) {
     if (node == null || processor == null) {
       return null;
     }
     try {
-      return (Node) processor.evaluate(xpath, node, XPathConstants.NODE);
+      Node result = (Node) processor.evaluate(xpathExpression, node, XPathConstants.NODE);
+
+      // If we are running in test mode, we may neglect namespaces
+      if (result == null) {
+        NamespaceContext ctx = processor.getNamespaceContext();
+        if (ctx instanceof XPathNamespaceContext && ((XPathNamespaceContext)ctx).isTest()) {
+          if (xpathExpression.matches("(.*)[a-zA-Z0-9]+\\:[a-zA-Z0-9]+(.*)")) {
+            String xpNs = xpathExpression.replaceAll("[a-zA-Z0-9]+\\:", "");
+            result = (Node)processor.evaluate(xpNs, node, XPathConstants.NODE);
+          }
+        }
+      }
+      return result;
     } catch (XPathExpressionException e) {
       log_.warn("Error when selecting '{}' from {}", new Object[] {
-          xpath,
+          xpathExpression,
           node,
           e });
       return null;
@@ -210,15 +234,28 @@ public class XPathHelper {
    *          the xpath processor
    * @return the selected node
    */
-  public static NodeList selectList(Node node, String xpath, XPath processor) {
+  public static NodeList selectList(Node node, String xpathExpression, XPath processor) {
     if (node == null || processor == null) {
       return null;
     }
     try {
-      return (NodeList) processor.evaluate(xpath, node, XPathConstants.NODESET);
+      NodeList result = (NodeList) processor.evaluate(xpathExpression, node, XPathConstants.NODESET);
+
+      // If we are running in test mode, we may neglect namespaces
+      if (result == null || result.getLength() == 0) {
+        NamespaceContext ctx = processor.getNamespaceContext();
+        if (ctx instanceof XPathNamespaceContext && ((XPathNamespaceContext)ctx).isTest()) {
+          if (xpathExpression.matches("(.*)[a-zA-Z0-9]+\\:[a-zA-Z0-9]+(.*)")) {
+            String xpNs = xpathExpression.replaceAll("[a-zA-Z0-9]+\\:", "");
+            result = (NodeList)processor.evaluate(xpNs, node, XPathConstants.NODESET);
+          }
+        }
+      }
+      return result;
+
     } catch (XPathExpressionException e) {
       log_.warn("Error when selecting '{}' from {}", new Object[] {
-          xpath,
+          xpathExpression,
           node,
           e });
       return null;
