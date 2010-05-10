@@ -997,7 +997,7 @@ public class SiteImpl implements Site {
 
     // Set up the document builder
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-//    docBuilderFactory.setSchema(moduleSchema);
+    docBuilderFactory.setSchema(moduleSchema);
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     
@@ -1383,20 +1383,18 @@ public class SiteImpl implements Site {
     if (!this.getClass().equals(SiteImpl.class))
       b.append("<class>").append(this.getClass().getName()).append("</class>");
 
-    // security
-    if (administrator != null || authenticationModules.size() > 0) {
-      b.append("<security>");
-      if (administrator != null)
-        b.append(administrator.toXml());
-
-      if (authenticationModules.size() > 0) {
-        b.append("<authentication>");
-        for (AuthenticationModule module : authenticationModules) {
-          b.append(module.toXml());
-        }
-        b.append("</authentication>");
+    // languages
+    if (languages.size() > 0) {
+      b.append("<languages>");
+      for (Language language : languages.values()) {
+        b.append("<language");
+        if (language.equals(defaultLanguage))
+          b.append(" default=\"true\"");
+        b.append(">");
+        b.append(language.getIdentifier());
+        b.append("</language>");
       }
-      b.append("</security>");
+      b.append("</languages>");
     }
 
     // hostnames
@@ -1413,6 +1411,22 @@ public class SiteImpl implements Site {
       b.append("</domains>");
     }
 
+    // security
+    if (administrator != null || authenticationModules.size() > 0) {
+      b.append("<security>");
+      if (administrator != null)
+        b.append(administrator.toXml());
+
+      if (authenticationModules.size() > 0) {
+        b.append("<authentication>");
+        for (AuthenticationModule module : authenticationModules) {
+          b.append(module.toXml());
+        }
+        b.append("</authentication>");
+      }
+      b.append("</security>");
+    }
+
     // templates
     if (templates.size() > 0) {
       b.append("<templates>");
@@ -1420,20 +1434,6 @@ public class SiteImpl implements Site {
         b.append(template.toXml());
       }
       b.append("</templates>");
-    }
-
-    // languages
-    if (languages.size() > 0) {
-      b.append("<languages>");
-      for (Language language : languages.values()) {
-        b.append("<language");
-        if (language.equals(defaultLanguage))
-          b.append(" default=\"true\"");
-        b.append(">");
-        b.append(language.getIdentifier());
-        b.append("</language>");
-      }
-      b.append("</languages>");
     }
 
     // Options

@@ -350,15 +350,21 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       buf.append(" default=\"true\"");
     buf.append(">");
 
+    // Names
+    for (Language l : name.languages()) {
+      buf.append("<name language=\"").append(l.getIdentifier()).append("\">");
+      buf.append(name.get(l));
+      buf.append("</name>");
+    }
+
     // Renderer class
     if (!this.getClass().equals(PageTemplateImpl.class))
       buf.append("<class>").append(getClass().getName()).append("</class>");
 
     // Renderer url
-    // TODO: Handle relative paths
     buf.append("<renderer>").append(renderer.toExternalForm()).append("</renderer>");
 
-    // State name
+    // Stage name
     if (stage != null && !DEFAULT_STAGE.equals(stage))
       buf.append("<stage>").append(stage).append("</stage>");
 
@@ -378,13 +384,6 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       buf.append("<valid>");
       buf.append(ConfigurationUtils.toDuration(validTime));
       buf.append("</valid>");
-    }
-
-    // Names
-    for (Language l : name.languages()) {
-      buf.append("<name language=\"").append(l.getIdentifier()).append("\">");
-      buf.append(name.get(l));
-      buf.append("</name>");
     }
 
     // Includes

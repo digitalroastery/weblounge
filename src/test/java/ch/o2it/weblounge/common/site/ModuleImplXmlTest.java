@@ -64,7 +64,7 @@ public class ModuleImplXmlTest extends ModuleImplTest {
     
     // Site.xml document builder setup
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-//    docBuilderFactory.setSchema(siteSchema);
+    docBuilderFactory.setSchema(siteSchema);
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 

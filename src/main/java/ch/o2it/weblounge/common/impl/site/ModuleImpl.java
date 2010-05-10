@@ -695,16 +695,16 @@ public class ModuleImpl implements Module {
     // enable
     b.append("<enable>").append(enabled).append("</enable>");
 
-    // class
-    if (!this.getClass().equals(ModuleImpl.class))
-      b.append("<class>").append(getClass().getName()).append("</class>");
-
     // Names
     for (Language l : name.languages()) {
       b.append("<name language=\"").append(l.getIdentifier()).append("\">");
       b.append(name.get(l));
       b.append("</name>");
     }
+
+    // class
+    if (!this.getClass().equals(ModuleImpl.class))
+      b.append("<class>").append(getClass().getName()).append("</class>");
 
     // pagelets
     if (renderers.size() > 0) {
@@ -724,15 +724,6 @@ public class ModuleImpl implements Module {
       b.append("</actions>");
     }
 
-    // image styles
-    if (imagestyles.size() > 0) {
-      b.append("<imagestyles>");
-      for (ImageStyle imagestyle : imagestyles.values()) {
-        b.append(imagestyle.toXml());
-      }
-      b.append("</imagestyles>");
-    }
-
     // jobs
     if (jobs.size() > 0) {
       b.append("<jobs>");
@@ -740,6 +731,15 @@ public class ModuleImpl implements Module {
         b.append(job.toXml());
       }
       b.append("</jobs>");
+    }
+
+    // image styles
+    if (imagestyles.size() > 0) {
+      b.append("<imagestyles>");
+      for (ImageStyle imagestyle : imagestyles.values()) {
+        b.append(imagestyle.toXml());
+      }
+      b.append("</imagestyles>");
     }
 
     // Options

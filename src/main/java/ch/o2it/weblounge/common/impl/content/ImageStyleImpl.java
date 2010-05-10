@@ -289,6 +289,15 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
     buf.append(">");
 
+    // name
+    for (Language l : name.languages()) {
+      buf.append("<name language=\"");
+      buf.append(l.getIdentifier());
+      buf.append("\">");
+      buf.append(name.get(l));
+      buf.append("</name>");
+    }
+
     // scaling mode
     buf.append("<scalingmode>");
     buf.append(scalingMode.toString().toLowerCase());
@@ -301,15 +310,6 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     // height
     if (height > 0)
       buf.append("<height>").append(height).append("</height>");
-
-    // name
-    for (Language l : name.languages()) {
-      buf.append("<name language=\"");
-      buf.append(l.getIdentifier());
-      buf.append("\">");
-      buf.append(name.get(l));
-      buf.append("</name>");
-    }
 
     buf.append("</imagestyle>");
     return buf.toString();

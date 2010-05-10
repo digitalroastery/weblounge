@@ -2,6 +2,15 @@
 <site id="dev" xmlns="http://www.o2it.ch/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/site http://www.o2it.ch/xsd/weblounge/3.0/site.xsd">
   <autostart>true</autostart>
   <name>Main site</name>
+  <languages>
+    <language default="true">de</language>
+    <language>en</language>
+  </languages>
+  <domains>
+  	<url default="true">www.weblounge.org</url>
+  	<url>*.nowhere.com</url>
+    <url>localhost:8080</url>
+  </domains>
   <security>
     <administrator>
       <login>blogadmin</login>
@@ -16,32 +25,23 @@
     	</loginmodule>
     </authentication>
   </security>
-  <domains>
-  	<url default="true">www.weblounge.org</url>
-  	<url>*.nowhere.com</url>
-    <url>localhost:8080</url>
-  </domains>
   <templates>
     <template id="default" composeable="true" default="true">
+      <name language="de">Standard Vorlage</name>
+      <name language="en">Default template</name>
       <renderer>file://template/default.jsp</renderer>
       <stage>boxes</stage>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
-      <name language="de">Standard Vorlage</name>
-      <name language="en">Default template</name>
     </template>
     <template id="mobile" composeable="true">
+      <name language="de">Mobile</name>
+      <name language="en">Mobile</name>
     	<renderer>file://template/mobile.jsp</renderer>
       <recheck>1d</recheck>
       <valid>1w</valid>
-      <name language="de">Mobile</name>
-      <name language="en">Mobile</name>
     </template>
   </templates>
-  <languages>
-    <language default="true">de</language>
-    <language>en</language>
-  </languages>
   <options>
     <option>
       <name>media.url</name>

@@ -551,6 +551,13 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
     b.append(identifier);
     b.append("\">");
 
+    // Names
+    for (Language l : name.languages()) {
+      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
+      b.append(name.get(l));
+      b.append("</name>");
+    }
+
     // class
     b.append("<class>").append(getClass().getName()).append("</class>");
 
@@ -581,13 +588,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       b.append("<valid>");
       b.append(ConfigurationUtils.toDuration(validTime));
       b.append("</valid>");
-    }
-
-    // Names
-    for (Language l : name.languages()) {
-      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
-      b.append(name.get(l));
-      b.append("</name>");
     }
 
     // Includes

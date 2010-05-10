@@ -94,7 +94,7 @@ public class AuthenticatedUserImplTest {
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#setLoginContext(javax.security.auth.login.LoginContext)}.
    */
-  @Test
+  @Test @Ignore
   public void testSetLoginContext() {
     System.err.println("Don't know how to test this");
   }
@@ -102,7 +102,7 @@ public class AuthenticatedUserImplTest {
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#getLoginContext()}.
    */
-  @Test
+  @Test @Ignore
   public void testGetLoginContext() {
     System.err.println("Don't know how to test this");
   }
