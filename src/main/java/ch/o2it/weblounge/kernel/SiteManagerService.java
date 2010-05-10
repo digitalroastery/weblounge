@@ -117,7 +117,7 @@ public final class SiteManagerService implements SiteListener {
    *          the action request handler
    */
   public void addActionRequestHandler(ActionRequestHandler handler) {
-    log_.info("Registering {}", handler);
+    log_.debug("Registering {}", handler);
     actionRequestHandler = handler;
     registerAllSites();
   }
@@ -130,7 +130,7 @@ public final class SiteManagerService implements SiteListener {
    *          the action request handler
    */
   public void removeActionRequestHandler(ActionRequestHandler handler) {
-    log_.info("Unregistering {}", handler);
+    log_.debug("Unregistering {}", handler);
     unregisterAllSites();
     actionRequestHandler = null;
   }
