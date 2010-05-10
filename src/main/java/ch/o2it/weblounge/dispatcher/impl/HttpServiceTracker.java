@@ -81,7 +81,7 @@ public class HttpServiceTracker extends ServiceTracker {
       HttpContext httpContext = httpService.createDefaultHttpContext();
       Dictionary<?, ?> initParams = new Properties();
       httpService.registerServlet(contextPath, dispatcher, initParams, httpContext);
-      log_.info("Weblounge dispatcher hooked up with {}", httpService.getClass().getName());
+      log_.info("Weblounge dispatcher hooked up with http service {}", httpService.getClass().getName());
 
     } catch (ServletException e) {
       log_.error("Error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
