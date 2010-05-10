@@ -291,7 +291,7 @@ public class BundleContentRepository extends AbstractContentRepository {
     index = new BundleContentRepositoryIndex(idxRootDir);
 
     try {
-      logger.info("Populating temporary site index '{}'", site);
+      logger.info("Populating temporary site index '{}' ...", site);
       long time = System.currentTimeMillis();
       long pageCount = 0;
       long pageVersionCount = 0;
@@ -308,7 +308,7 @@ public class BundleContentRepository extends AbstractContentRepository {
       }
       time = System.currentTimeMillis() - time;
       logger.info("Site index populated in {}", ConfigurationUtils.toHumanReadableDuration(time));
-      logger.info("Found {} pages and {} revisions", pageCount, pageVersionCount);
+      logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount);
     } catch (MalformedPageURIException e) {
       throw new ContentRepositoryException("Error while reading page uri for index", e);
     }
