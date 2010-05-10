@@ -291,7 +291,7 @@ public class BundleContentRepository extends AbstractContentRepository {
     index = new BundleContentRepositoryIndex(idxRootDir);
 
     try {
-      logger.info("Populating temporary site index '{}' ...", site);
+      logger.info("Populating temporary site index '{}'...", site);
       long time = System.currentTimeMillis();
       long pageCount = 0;
       long pageVersionCount = 0;
