@@ -57,3 +57,6 @@ json
 utf
 uid
 standalone
+transactional
+readonly
+validator
