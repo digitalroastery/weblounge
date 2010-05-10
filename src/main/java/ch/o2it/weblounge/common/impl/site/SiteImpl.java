@@ -1008,7 +1008,7 @@ public class SiteImpl implements Site {
     if (e != null) {
       while (e.hasMoreElements()) {
         URL moduleUrl = e.nextElement();
-        log_.debug("Loading module {}", moduleUrl);
+        log_.debug("Loading module '{}' for site '{}'", moduleUrl, this);
         
         // Load and validate the module descriptor
         ValidationErrorHandler errorHandler = new ValidationErrorHandler(moduleUrl);
@@ -1020,11 +1020,11 @@ public class SiteImpl implements Site {
         }
         
         Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());
-        log_.info("Loaded module {}", m);
+        log_.info("Module '{}' loaded for site '{}'", m, this);
         addModule(m);
       }
     } else {
-      log_.info("No modules found for site '{}'", this);
+      log_.info("Site '{}' has no modules", this);
     }
 
     // Look for a job scheduler
