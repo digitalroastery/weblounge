@@ -172,6 +172,13 @@ public interface Site extends Customizable, RequestListener, Serializable {
   Module[] getModules();
 
   /**
+   * Returns the <code>i18n</code> dictionary.
+   * 
+   * @return the dictionary
+   */
+  I18nDictionary getI18n();
+
+  /**
    * Adds <code>template</code> to the list of templates.
    * 
    * @param template
