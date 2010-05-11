@@ -28,7 +28,7 @@ import javax.servlet.http.Cookie;
  */
 public class IfNotCookieTag extends CookieCheckTag {
 
-  /** Serial vesion uid */
+  /** Serial versionn uid */
   private static final long serialVersionUID = 3669993697999784282L;
 
   /**

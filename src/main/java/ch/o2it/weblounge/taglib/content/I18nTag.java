@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.impl.util.I18n;
+import ch.o2it.weblounge.common.site.I18nDictionary;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;
@@ -28,12 +28,11 @@ import java.io.IOException;
 import javax.servlet.jsp.JspException;
 
 /**
- * This tag inserts a <code>generator</code> meta tag into the head section of
- * an html or jsp page.
+ * This tag inserts the value of the given <code>i18n</code> key into the page.
  */
 public class I18nTag extends WebloungeTag {
 
-  /** Serial vesion uid */
+  /** Serial version uid */
   private static final long serialVersionUID = 5791260790900823852L;
 
   /** The i18n key */
@@ -51,13 +50,14 @@ public class I18nTag extends WebloungeTag {
   }
 
   /**
-   * Writes the generator tag to the output.
+   * Writes the i18n value to the output.
    * 
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
     try {
-      pageContext.getOut().write(I18n.toHTML(i18nKey, request.getLanguage(), request.getSite()));
+      I18nDictionary dictionary = request.getSite().getI18n();
+      pageContext.getOut().write(dictionary.getAsHTML(i18nKey, request.getLanguage()));
     } catch (IOException e) {
       throw new JspException(e);
     }

@@ -28,7 +28,7 @@ import ch.o2it.weblounge.common.site.Action;
  */
 public class IfActionTag extends ActionCheckTag {
 
-  /** Serial vesion uid */
+  /** Serial versionn uid */
   private static final long serialVersionUID = 9001981722859780524L;
 
   /**

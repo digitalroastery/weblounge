@@ -535,7 +535,7 @@ public class ComposerTag extends WebloungeTag {
 
             Module m = site.getModule(moduleId);
             if (m == null) {
-              log_.warn("Unable to load renderer '" + rendererId + "' for pagelet in composer '" + composer + "' on " + url + ": module '" + moduleId + "' not found!");
+              log_.warn("Unable to render '{}' on {}://{}: module '{}' not installed", new Object[] { rendererId, site, request.getRequestedUrl(), moduleId });
               continue p;
             }
 

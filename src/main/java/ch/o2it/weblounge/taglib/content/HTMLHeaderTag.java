@@ -83,7 +83,7 @@ public class HTMLHeaderTag extends WebloungeTag {
         String moduleId = p.getModule();
         Module module = site.getModule(moduleId);
         if (module == null) {
-          log_.warn("Unable to get renderer '" + p + "' for " + request.getUrl() + " since module '" + moduleId + "' is not installed");
+          log_.debug("Unable to load includes for renderer '{}': module '{}' not installed", new Object[] { p.getIdentifier(), site, request.getRequestedUrl(), moduleId });
           continue;
         }
         Renderer renderer = module.getRenderer(p.getIdentifier());
