@@ -29,6 +29,7 @@ import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -47,6 +48,7 @@ import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
+import ch.o2it.weblounge.common.site.I18nDictionary;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleException;
 import ch.o2it.weblounge.common.site.Site;
@@ -155,6 +157,9 @@ public class SiteImpl implements Site {
 
   /** Jobs */
   protected Map<String, QuartzJob> jobs = null;
+  
+  /** The i18n dictionary */
+  protected I18nDictionaryImpl i18n = null;
 
   /** Authentication modules */
   protected List<AuthenticationModule> authenticationModules = null;
@@ -195,6 +200,7 @@ public class SiteImpl implements Site {
     hostnames = new ArrayList<String>();
     jobs = new HashMap<String, QuartzJob>();
     authenticationModules = new ArrayList<AuthenticationModule>();
+    i18n = new I18nDictionaryImpl();
     options = new OptionsHelper();
   }
 
@@ -280,6 +286,15 @@ public class SiteImpl implements Site {
     return administrator;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#getI18n()
+   */
+  public I18nDictionary getI18n() {
+    return i18n;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -403,6 +418,7 @@ public class SiteImpl implements Site {
    */
   public void setDefaultLanguage(Language language) {
     addLanguage(language);
+    i18n.setDefaultLanguage(language);
     defaultLanguage = language;
   }
 
@@ -978,7 +994,9 @@ public class SiteImpl implements Site {
    */
   @SuppressWarnings("unchecked")
   public void activate(ComponentContext context) throws Exception {
+
     BundleContext bundleContext = context.getBundleContext();
+    final Bundle bundle = bundleContext.getBundle();
 
     // Fix the site identifier
     if (getIdentifier() == null) {
@@ -989,6 +1007,12 @@ public class SiteImpl implements Site {
     }
 
     log_.debug("Initializing site '{}'", this);
+
+    // Load i18n dictionary
+    Enumeration<URL> i18nEnum = bundle.findEntries("site/i18n", "*.xml", false);
+    while (i18nEnum != null && i18nEnum.hasMoreElements()) {
+      i18n.addDictionary(i18nEnum.nextElement(), autoStart);
+    }
 
     // Prepare schema validator
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -1002,7 +1026,6 @@ public class SiteImpl implements Site {
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     
     // Load the modules
-    final Bundle bundle = bundleContext.getBundle();
     final Enumeration<URL> e = bundle.findEntries("site", "module.xml", true);
 
     if (e != null) {
@@ -1017,6 +1040,13 @@ public class SiteImpl implements Site {
         if (errorHandler.hasErrors()) {
           log_.error("Errors found while validating module descriptor {}. Site '{}' is not loaded", moduleUrl, this);
           throw new IllegalStateException("Errors found while validating module descriptor " + moduleUrl);
+        }
+
+        // Load i18n dictionaries
+        String i18nPath = UrlSupport.concat(moduleUrl.getPath(), "i18n");
+        i18nEnum = bundle.findEntries(i18nPath, "*.xml", false);
+        while (i18nEnum != null && i18nEnum.hasMoreElements()) {
+          i18n.addDictionary(i18nEnum.nextElement(), autoStart);
         }
         
         Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());

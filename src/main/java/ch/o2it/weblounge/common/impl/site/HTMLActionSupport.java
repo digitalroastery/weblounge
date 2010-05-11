@@ -33,7 +33,6 @@ import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.Script;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
-import ch.o2it.weblounge.common.impl.util.I18n;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
@@ -42,6 +41,7 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.HTMLAction;
+import ch.o2it.weblounge.common.site.I18nDictionary;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
@@ -525,7 +525,8 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   private String createMessage(WebloungeRequest request, String msg,
       Object... args) {
-    msg = I18n.get(msg, request.getLanguage(), request.getSite());
+    I18nDictionary dictionary = request.getSite().getI18n();
+    msg = dictionary.get(msg, request.getLanguage());
     if (args == null || args.length == 0)
       return msg;
     return MessageFormat.format(msg, args);
