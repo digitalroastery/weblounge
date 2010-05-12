@@ -33,17 +33,14 @@ import ch.o2it.weblounge.common.language.Language;
 public interface I18nDictionary {
 
   /**
-   * Sets the default language, which will be used as a fallback option in the
-   * case where a dictionary entry is not available in the requested language.
-   * <p>
-   * Usually, this will be the site default language, but any other language
-   * may be specified as well including <code>null</code>, in which case no
-   * fallback is performed.
+   * Adds the entry to the dictionary's default values.
    * 
-   * @param language
-   *          the default language
+   * @param key
+   *          the <code>18n</code> key
+   * @param value
+   *          the <code>18n</code> value
    */
-  void setDefaultLanguage(Language language);
+  void add(String key, String value);
 
   /**
    * Adds the entry to the given language of the dictionary.
@@ -76,11 +73,21 @@ public interface I18nDictionary {
   void remove(String key);
 
   /**
-   * Returns the localized message identified by <code>key</code>.
-   * <p>
-   * If <code>key</code> does not exist in the specified language, the site's
-   * default language is used as a fallback. If that doesn't exist as well, the
-   * key itself will be returned.
+   * Returns the localized message identified by <code>key</code> from the
+   * default dictionary. If no value for <code>key</code> exists, the key itself
+   * is returned.
+   * 
+   * @param key
+   *          the key into the resource bundle
+   * @param language
+   *          the language variant to return
+   * @return the result
+   */
+  String get(String key);
+
+  /**
+   * Returns the localized message identified by <code>key</code>. If no value
+   * for <code>key</code> exists, the key itself is returned.
    * 
    * @param key
    *          the key into the resource bundle
@@ -91,26 +98,22 @@ public interface I18nDictionary {
   String get(String key, Language language);
 
   /**
-   * Returns the localized message identified by <code>key</code> or
-   * <code>null</code> if no such message could be found.
+   * Returns the localized and HTML-encoded message identified by
+   * <code>key</code> from the default entries. If no value for <code>key</code>
+   * exists, the key itself is returned.
    * 
    * @param key
    *          the key into the resource bundle
    * @param language
    *          the language variant to return
-   * @param force
-   *          <code>true</code> to enforce the given language
    * @return the result
    */
-  String get(String key, Language language, boolean force);
+  String getAsHTML(String key);
 
   /**
    * Returns the localized and HTML-encoded message identified by
-   * <code>key</code>.
-   * <p>
-   * If <code>key</code> does not exist in the specified language, the site's
-   * default language is used as a fallback. If that doesn't exist as well, the
-   * key itself will be returned.
+   * <code>key</code> from the set of entries specified by <code>language</code>
+   * . If no value for <code>key</code> exists, the key itself is returned.
    * 
    * @param key
    *          the key into the resource bundle
@@ -119,19 +122,5 @@ public interface I18nDictionary {
    * @return the result
    */
   String getAsHTML(String key, Language language);
-
-  /**
-   * Returns the localized and HTML-encoded message identified by
-   * <code>key</code> or <code>null</code> if no such message could be found.
-   * 
-   * @param key
-   *          the key into the resource bundle
-   * @param language
-   *          the language variant to return
-   * @param force
-   *          <code>true</code> to enforce the given language
-   * @return the result
-   */
-  String getAsHTML(String key, Language language, boolean force);
 
 }
