@@ -59,32 +59,13 @@ public class I18nDictionaryImpl implements I18nDictionary {
   /** The defaults (language neutral) */
   private Properties defaults = new Properties();
 
-  /** The default language */
-  protected Language defaultLanguage = null;
-
-  /**
-   * Creates a new <code>i18n</code> dictionary.
-   */
-  public I18nDictionaryImpl() {
-  }
-
-  /**
-   * Creates a new <code>i18n</code> dictionary with the given default language.
-   * 
-   * @param defaultLanguage
-   *          the default language
-   */
-  public I18nDictionaryImpl(Language defaultLanguage) {
-    this.defaultLanguage = defaultLanguage;
-  }
-
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.I18nDictionary#setDefaultLanguage(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.site.I18nDictionary#add(java.lang.String, java.lang.String)
    */
-  public void setDefaultLanguage(Language language) {
-    this.defaultLanguage = language;
+  public void add(String key, String value) {
+    add(key, value, null);
   }
 
   /**
@@ -114,6 +95,15 @@ public class I18nDictionaryImpl implements I18nDictionary {
       log_.warn("I18n key '{}' already defined", key);
     }
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.I18nDictionary#get(java.lang.String)
+   */
+  public String get(String key) {
+    return get(key, null);
+  }
 
   /**
    * {@inheritDoc}
@@ -122,17 +112,13 @@ public class I18nDictionaryImpl implements I18nDictionary {
    *      ch.o2it.weblounge.common.language.Language)
    */
   public String get(String key, Language language) {
-    return get(key, language, false);
-  }
+    Properties p = null;
+    if (language != null) {
+      p = i18n.get(language);
+    } else {
+      p = defaults;
+    }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.I18nDictionary#get(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language, boolean)
-   */
-  public String get(String key, Language language, boolean force) {
-    Properties p = i18n.get(language);
     String dictEntry = null;
     if (p != null)
       dictEntry = p.getProperty(key);
@@ -140,18 +126,19 @@ public class I18nDictionaryImpl implements I18nDictionary {
     // Either return the entry or try the default language fallback
     if (dictEntry != null)
       return dictEntry;
-    else if (force)
-      return null;
-    else if (defaultLanguage != null && !language.equals(defaultLanguage))
-      return get(key, defaultLanguage);
 
-    // Try defaults
-    String defaultValue = defaults.getProperty(key, key);
-    if (defaultValue != null)
-      return defaultValue;
-    
     // Last resort: return the key itself
     return key;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.I18nDictionary#getAsHTML(java.lang.String)
+   */
+  public String getAsHTML(String key) {
+    String value = get(key);
+    return value != null ? StringEscapeUtils.escapeHtml(value) : null;
   }
 
   /**
@@ -161,34 +148,8 @@ public class I18nDictionaryImpl implements I18nDictionary {
    *      ch.o2it.weblounge.common.language.Language)
    */
   public String getAsHTML(String key, Language language) {
-    return StringEscapeUtils.escapeHtml(get(key, language, false));
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.I18nDictionary#getAsHTML(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language, boolean)
-   */
-  public String getAsHTML(String key, Language language, boolean force) {
-    String value = get(key, language, true);
+    String value = get(key, language);
     return value != null ? StringEscapeUtils.escapeHtml(value) : null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.I18nDictionary#remove(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public void remove(String key, Language language) {
-    Properties p = null;
-    if (language == null)
-      p = i18n.get(language);
-    else
-      p = defaults;
-    if (p != null)
-      p.remove(key);
   }
 
   /**
@@ -202,35 +163,65 @@ public class I18nDictionaryImpl implements I18nDictionary {
       p.remove(key);
     }
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.I18nDictionary#remove(java.lang.String,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public void remove(String key, Language language) {
+    Properties p = null;
+    if (language != null)
+      p = i18n.get(language);
+    else
+      p = defaults;
+    if (p != null)
+      p.remove(key);
+  }
+
   /**
    * Adds the the dictionary found in <code>file</code> to the current i18n
-   * definitions. If <code>warn</code> is <code>false</code> then warnings about
-   * existing keys are suppressed.
+   * definitions. The implementation tries to derive the language from the
+   * filename, which is expected to be of the form
+   * <code>&lt;name&gt;_&lt;language&gt;.xml</code>, where &lt;language&gt; is
+   * the ISO language identifier.
    * 
    * @param url
    *          the i18n dictionary
-   * @param warn
-   *          <code>true</code> to warn on duplicate keys
    */
-  public void addDictionary(URL url, boolean warn) {
+  public void addDictionary(URL url) {
+    String name = FilenameUtils.getBaseName(url.getFile());
+    Language language = null;
+    String languageId = null;
+    int lidstart = name.indexOf('_') + 1;
+    if (lidstart > 0 && lidstart < name.length()) {
+      languageId = name.substring(lidstart);
+      language = LanguageSupport.getLanguage(languageId);
+    }
+    addDictionary(url, language);
+  }
+
+  /**
+   * Adds the the dictionary found in <code>file</code> to the current i18n
+   * definitions.
+   * 
+   * @param url
+   *          the i18n dictionary
+   * @param language
+   *          the dictionary language
+   */
+  public void addDictionary(URL url, Language language) {
     DocumentBuilder docBuilder;
     try {
       docBuilder = XMLUtilities.getDocumentBuilder();
       Document doc = docBuilder.parse(url.openStream());
       String name = FilenameUtils.getBaseName(url.getFile());
-      Language language = null;
 
-      // Get the language
-
-      String languageId = null;
-      int lidstart = name.indexOf('_') + 1;
-      if (lidstart > 0 && lidstart < name.length()) {
-        languageId = name.substring(lidstart);
-        language = LanguageSupport.getLanguage(languageId);
-      }
-      
-      log_.info("Reading i18n dictionary {}", name);
+      if (language != null)
+        log_.info("Reading i18n dictionary {} ({})", name, language);
+      else
+        log_.info("Reading default i18n dictionary {}", name);
 
       // Get the target properties
 
@@ -253,7 +244,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
         Node messageNode = nodes.item(j);
         String key = XPathHelper.valueOf(messageNode, "@name", path);
         String value = XPathHelper.valueOf(messageNode, "value/text()", path);
-        if (warn && p.containsKey(key)) {
+        if (p.containsKey(key)) {
           log_.warn("I18n key '{}' redefined in {}", key, url);
         }
         p.put(key, value);

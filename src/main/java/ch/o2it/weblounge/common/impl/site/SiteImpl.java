@@ -418,7 +418,6 @@ public class SiteImpl implements Site {
    */
   public void setDefaultLanguage(Language language) {
     addLanguage(language);
-    i18n.setDefaultLanguage(language);
     defaultLanguage = language;
   }
 
@@ -1011,7 +1010,7 @@ public class SiteImpl implements Site {
     // Load i18n dictionary
     Enumeration<URL> i18nEnum = bundle.findEntries("site/i18n", "*.xml", false);
     while (i18nEnum != null && i18nEnum.hasMoreElements()) {
-      i18n.addDictionary(i18nEnum.nextElement(), autoStart);
+      i18n.addDictionary(i18nEnum.nextElement());
     }
 
     // Prepare schema validator
@@ -1046,7 +1045,7 @@ public class SiteImpl implements Site {
         String i18nPath = UrlSupport.concat(moduleUrl.getPath(), "i18n");
         i18nEnum = bundle.findEntries(i18nPath, "*.xml", false);
         while (i18nEnum != null && i18nEnum.hasMoreElements()) {
-          i18n.addDictionary(i18nEnum.nextElement(), autoStart);
+          i18n.addDictionary(i18nEnum.nextElement());
         }
         
         Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());
