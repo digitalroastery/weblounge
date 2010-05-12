@@ -216,12 +216,11 @@ public class I18nDictionaryImpl implements I18nDictionary {
     try {
       docBuilder = XMLUtilities.getDocumentBuilder();
       Document doc = docBuilder.parse(url.openStream());
-      String name = FilenameUtils.getBaseName(url.getFile());
 
       if (language != null)
-        log_.info("Reading i18n dictionary {} ({})", name, language);
+        log_.debug("Reading i18n dictionary {} ({})", url.getFile(), language);
       else
-        log_.info("Reading default i18n dictionary {}", name);
+        log_.debug("Reading default i18n dictionary {}", url.getFile());
 
       // Get the target properties
 
