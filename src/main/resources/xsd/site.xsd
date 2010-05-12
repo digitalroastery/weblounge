@@ -138,7 +138,7 @@
     <xsd:complexType>
       <xsd:simpleContent>
         <xsd:extension base="xsd:string">
-          <xsd:attribute name="language" type="xsd:language" />
+          <xsd:attribute name="language" type="xsd:language" use="required" />
         </xsd:extension>
       </xsd:simpleContent>
     </xsd:complexType>
