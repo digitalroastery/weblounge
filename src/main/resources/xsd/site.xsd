@@ -8,6 +8,7 @@
     <xsd:complexType>
       <xsd:sequence>
         <xsd:element name="autostart" type="xsd:boolean" />
+        <xsd:element name="class" type="xsd:string" minOccurs="0" />
         <xsd:element name="name" type="xsd:string" />
         <xsd:element ref="languages" />
         <xsd:element ref="domains" />

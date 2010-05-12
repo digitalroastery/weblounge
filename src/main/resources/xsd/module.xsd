@@ -7,6 +7,7 @@
     <xsd:complexType>
       <xsd:sequence>
         <xsd:element name="enable" type="xsd:boolean" />
+        <xsd:element name="class" type="xsd:string" minOccurs="0" />
         <xsd:element ref="name" maxOccurs="unbounded" />
         <xsd:element ref="pagelets" minOccurs="0" />
         <xsd:element ref="actions" minOccurs="0" />
