@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!-- site id="weblounge-test" xmlns="http://www.o2it.ch/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/site http://www.o2it.ch/xsd/weblounge/3.0/site.xsd" -->
-<site id="weblounge-test">
+<site id="weblounge-test" xmlns="http://www.o2it.ch/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/site http://www.o2it.ch/xsd/weblounge/3.0/site.xsd">
   <autostart>true</autostart>
   <class>ch.o2it.weblounge.test.site.TestSite</class>
   <name>Weblounge Test Site</name>
+  <languages>
+    <language default="true">de</language>
+    <language>en</language>
+  </languages>
   <domains>
     <url>127.0.0.1</url>
   </domains>
@@ -15,18 +18,14 @@
       <email>weboffice@nowhere.com</email>
     </administrator>
   </security>
-  <languages>
-    <language default="true">de</language>
-    <language>en</language>
-  </languages>
   <templates>
     <template id="default" composeable="true" default="true">
+      <name language="de">Standard Vorlage</name>
+      <name language="en">Default template</name>
       <renderer>file://${site.root}/templates/template.jsp</renderer>
       <stage>main</stage>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
-      <name language="de">Standard Vorlage</name>
-      <name language="en">Default template</name>
     </template>
   </templates>
 </site>

@@ -1,0 +1,8 @@
+<i18n>
+  <message name="greeting.hello">
+    <value>hallo</value>
+  </message>
+  <message name="greeting.world">
+    <value>welt</value>
+  </message>
+</i18n>

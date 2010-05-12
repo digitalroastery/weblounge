@@ -1,25 +1,24 @@
-<!-- module id="test" xmlns="http://www.o2it.ch/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd" -->
-<module id="test">
+<module id="test" xmlns="http://www.o2it.ch/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd">
   <enable>true</enable>
   <name language="de">Testmodul</name>
   <pagelets>
     <pagelet id="content" composeable="true">
+      <name language="de">Seiteninhalt</name>
+      <name language="en">Page content</name>
       <renderer>file://${module.root}/pagelets/content.jsp</renderer>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
-      <name language="de">Seiteninhalt</name>
-      <name language="en">Page content</name>
       <includes>
-        <script src="file://${module.root}/scripts/greeting.js" type="javascript"/>
         <link href="file://${module.root}/css/greeting.css" rel="stylesheet" type="text/css" />
+        <script src="file://${module.root}/scripts/greeting.js" type="javascript"/>
       </includes>
     </pagelet>
     <pagelet id="include" composeable="true">
+      <name language="de">Begrüssung</name>
+      <name language="en">Greeting</name>
       <renderer>file://${module.root}/pagelets/include.jsp</renderer>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
-      <name language="de">Begrüssung</name>
-      <name language="en">Greeting</name>
       <includes>
         <link href="file://${module.root}/css/greeting.css" rel="stylesheet" type="text/css" />
       </includes>
@@ -27,6 +26,7 @@
   </pagelets>
   <actions>
     <action id="greeter.html">
+      <name language="en">Greetings</name>
       <class>ch.o2it.weblounge.test.site.GreeterAction</class>
       <mountpoint>/greeting/</mountpoint>
       <includes>
@@ -34,10 +34,12 @@
       </includes>
     </action>
     <action id="greeter.xml">
+      <name language="en">XML Greetings</name>
       <class>ch.o2it.weblounge.test.site.GreeterXMLAction</class>
       <mountpoint>/greeting/</mountpoint>
     </action>
     <action id="greeter.json">
+      <name language="en">JSON Greetings</name>
       <class>ch.o2it.weblounge.test.site.GreeterJSONAction</class>
       <mountpoint>/greeting/</mountpoint>
     </action>
