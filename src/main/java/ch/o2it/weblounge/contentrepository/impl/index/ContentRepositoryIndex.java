@@ -149,6 +149,24 @@ public class ContentRepositoryIndex {
   }
 
   /**
+   * Returns the number of pages in this index.
+   * 
+   * @return the number of pages
+   */
+  public long getPages() {
+    return uriIdx.getEntries();
+  }
+
+  /**
+   * Returns the number of versions in this index.
+   * 
+   * @return the number of versions
+   */
+  public long getVersions() {
+    return versionIdx.getEntries();
+  }
+
+  /**
    * Adds all relevant entries for the given page uri to the index and returns
    * it, probably providing a newly created uri identifier.
    * 

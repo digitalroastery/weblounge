@@ -20,12 +20,15 @@
 
 package ch.o2it.weblounge.contentrepository.impl.fs;
 
+import ch.o2it.weblounge.common.content.MalformedPageURIException;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.content.PageReader;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.PageUtils;
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
@@ -74,6 +77,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /** The site root directory inside the repository */
   protected File repositoryRoot = null;
 
+  /** The root directory for the temporary bundle index */
+  protected File idxRootDir = null;
+
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -107,8 +113,22 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       setURI(site.getIdentifier());
       repositoryRoot = new File(filesystemRoot, getURI());
     }
-    
-    logger.debug("Content repository root for site '{}' is located at {}", site, repositoryRoot);
+
+    // Make sure we can create a temporary index
+    idxRootDir = new File(PathSupport.concat(new String[] {
+        System.getProperty("java.io.tmpdir"),
+        "weblounge",
+        "tmp",
+        "index",
+        getSite().getIdentifier() }));
+    try {
+      FileUtils.deleteQuietly(idxRootDir);
+      FileUtils.forceMkdir(idxRootDir);
+    } catch (IOException e) {
+      throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
+    }
+
+    logger.info("Content repository for site '{}' connected at {}", site, repositoryRoot);
   }
 
   /**
@@ -348,13 +368,65 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadIndex()
    */
   @Override
-  protected ContentRepositoryIndex loadIndex() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+  protected ContentRepositoryIndex loadIndex() throws IOException,
+      ContentRepositoryException {
+    
+    FileSystemContentRepositoryIndex index = null;
+    
+    // If there is an existing index, try to load it
+    if (idxRootDir.exists()) {
+      logger.debug("Trying to load site index from {}", idxRootDir);
+      index = new FileSystemContentRepositoryIndex(idxRootDir);
+      logger.info("Loaded site index containing {} pages in {} versions", index.getPages(), index.getVersions());
+      return index;
+    }
+
+    FileUtils.forceMkdir(idxRootDir);
+    index = new FileSystemContentRepositoryIndex(idxRootDir);
+
+    try {
+      logger.info("Populating site index '{}'...", site);
+      long time = System.currentTimeMillis();
+      long pageCount = 0;
+      long pageVersionCount = 0;
+      
+      Stack<File> uris = new Stack<File>();
+      String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), "pages");
+      uris.push(new File(PathSupport.trim(homePath)));
+      while (!uris.empty()) {
+        File dir = uris.pop();
+        File[] files = dir.listFiles();
+        boolean foundPage = false;
+        for (File f : files) {
+          if (f.isDirectory()) {
+            uris.push(f);
+          } else {
+            String path = f.getAbsolutePath().substring(homePath.length());
+            long version = PageUtils.getVersion(FilenameUtils.getBaseName(f.getName()));
+            PageURI uri = new PageURIImpl(site, path, version);
+            index.add(uri);
+            pageVersionCount ++;
+            if (!foundPage) {
+              logger.info("Indexing {}", path);
+              pageCount ++;
+              foundPage = true;
+            }
+          }
+        }
+      }
+      
+      time = System.currentTimeMillis() - time;
+      logger.info("Site index populated in {}", ConfigurationUtils.toHumanReadableDuration(time));
+      logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount);
+    } catch (MalformedPageURIException e) {
+      throw new ContentRepositoryException("Error while reading page uri for index", e);
+    }
+
+    return index;
   }
 
 }

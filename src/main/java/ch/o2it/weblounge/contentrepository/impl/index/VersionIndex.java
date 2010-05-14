@@ -210,7 +210,11 @@ public class VersionIndex {
   }
 
   /**
-   * Returns the number of versions per entry;
+   * Returns the maximum number of versions per entry.
+   * <p>
+   * This number may change if a resize operation happens, e. g. as soon as an
+   * additional version is added to a uri that already has the current maximum
+   * number of versions associated with it.
    * 
    * @return the number of versions per entry
    */
