@@ -302,8 +302,10 @@ public class BundleContentRepository extends AbstractContentRepository {
         PageURI uri = pi.next();
         index.add(uri);
         pageVersionCount++;
-        if (previousURI != null && !previousURI.getPath().equals(uri.getPath()))
+        if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
+          logger.info("Indexing {}", uri.getPath());
           pageCount++;
+        }
         previousURI = uri;
       }
       time = System.currentTimeMillis() - time;
