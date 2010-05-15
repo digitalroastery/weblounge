@@ -40,7 +40,7 @@
   </actions>
   <jobs>
     <job id="testjob">
-      <name>Job title</name>
+      <name language="en">Job title</name>
       <class>ch.o2it.weblounge.common.scheduler.TestJob</class>
       <schedule>0 0 * * 1</schedule>
       <options>

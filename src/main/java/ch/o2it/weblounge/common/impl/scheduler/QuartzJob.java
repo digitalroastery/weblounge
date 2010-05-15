@@ -20,8 +20,11 @@
 
 package ch.o2it.weblounge.common.impl.scheduler;
 
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.scheduler.JobWorker;
@@ -29,6 +32,7 @@ import ch.o2it.weblounge.common.scheduler.JobWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.Serializable;
 import java.util.Dictionary;
@@ -52,7 +56,7 @@ public final class QuartzJob implements Job {
   protected String identifier = null;
 
   /** The job name */
-  protected String name = null;
+  protected LocalizableContent<String> name = null;
 
   /** The actual job implementation */
   protected Class<? extends JobWorker> worker = null;
@@ -100,6 +104,7 @@ public final class QuartzJob implements Job {
     if (trigger == null)
       throw new IllegalArgumentException("Trigger must not be null");
     this.identifier = identifier;
+    this.name = new LocalizableContent<String>();
     this.worker = worker;
     this.trigger = trigger;
     this.ctx = context;
@@ -135,8 +140,8 @@ public final class QuartzJob implements Job {
    *
    * @see ch.o2it.weblounge.common.scheduler.Job#setName(java.lang.String)
    */
-  public void setName(String name) {
-    this.name = name;
+  public void setName(String name, Language language) {
+    this.name.put(name, language);
   }
 
   /**
@@ -145,7 +150,25 @@ public final class QuartzJob implements Job {
    * @see ch.o2it.weblounge.common.scheduler.Job#getName()
    */
   public String getName() {
-    return name;
+    return name.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#getName(ch.o2it.weblounge.common.language.Language)
+   */
+  public String getName(Language language) {
+    return name.get(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.Job#getName(ch.o2it.weblounge.common.language.Language, boolean)
+   */
+  public String getName(Language language, boolean force) {
+    return name.get(language, force);
   }
 
   /**
@@ -255,7 +278,6 @@ public final class QuartzJob implements Job {
     
     // Main attributes
     String identifier = XPathHelper.valueOf(config, "@id", xPathProcessor);
-    String name = XPathHelper.valueOf(config, "m:name", xPathProcessor);
 
     // Implementation class
     String className = XPathHelper.valueOf(config, "m:class", xPathProcessor);
@@ -288,7 +310,20 @@ public final class QuartzJob implements Job {
     // Did we find something?
 
     QuartzJob job = new QuartzJob(identifier, clazz, ctx, jobTrigger);
-    job.setName(name);
+    
+    // name
+    NodeList names = XPathHelper.selectList(config, "m:name", xPathProcessor);
+    for (int i = 0; i < names.getLength(); i++) {
+      Node localiziation = names.item(i);
+      String language = XPathHelper.valueOf(localiziation, "@language", xPathProcessor);
+      if (language == null)
+        throw new IllegalStateException("Found job name without language");
+      String name = XPathHelper.valueOf(localiziation, "text()", xPathProcessor);
+      if (name == null)
+        throw new IllegalStateException("Found empty job name");
+      job.setName(name, LanguageSupport.getLanguage(language));
+    }
+
     return job;
   }
 
@@ -303,10 +338,10 @@ public final class QuartzJob implements Job {
     b.append(identifier);
     b.append("\">");
 
-    // Name
-    if (name != null) {
-      b.append("<name>");
-      b.append(name);
+    // Names
+    for (Language l : name.languages()) {
+      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
+      b.append(name.get(l));
       b.append("</name>");
     }
 
