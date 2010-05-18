@@ -36,6 +36,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.contentrepository-api</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common.language,
               ch.o2it.weblounge.common.content,
