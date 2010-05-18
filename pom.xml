@@ -123,6 +123,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.test</Bundle-SymbolicName>
             <Private-Package>
               org.apache.commons.*,
               org.json.*,
