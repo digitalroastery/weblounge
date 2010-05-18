@@ -30,6 +30,8 @@ import ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -51,13 +53,13 @@ import java.util.Map;
  * instance of the <code>BundleContentRepository</code> will be created which
  * will serve pages and resources from the site's bundle.
  */
-public class ContentRepositoryServiceImpl implements ContentRepositoryService {
+public class ContentRepositoryServiceImpl implements ContentRepositoryService, ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryServiceImpl.class);
 
   /** Configuration key for the content repository implementation */
-  public static final String CONTENT_REPOSITORY = "weblounge.contentrepository";
+  public static final String OPT_REPOSITORY_TYPE = "ch.o2it.weblounge.contentrepository";
 
   /** Default implementation for a content repository */
   public static final String DEFAULT_REPOSITORY_TYPE = BundleContentRepository.class.getName();
@@ -95,7 +97,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService {
   @SuppressWarnings("unchecked")
   public void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
-    Object prototypeClassName = context.getProperties().get(CONTENT_REPOSITORY);
+    Object prototypeClassName = context.getProperties().get(OPT_REPOSITORY_TYPE);
 
     logger.info("Starting content repository service");
 
@@ -141,6 +143,25 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService {
     siteTracker = null;
     factoryTracker = null;
     logger.info("Content repository service stopped");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @SuppressWarnings("unchecked")
+  public void updated(Dictionary properties) throws ConfigurationException {
+    Object prototypeClassName = properties.get(OPT_REPOSITORY_TYPE);
+    if (prototypeClassName != null) {
+      logger.info("Switching content repository implementation to " + prototypeClassName);
+      ClassLoader loader = Thread.currentThread().getContextClassLoader();
+      try {
+        prototype = (Class<? extends ContentRepository>) loader.loadClass((String) prototypeClassName);
+      } catch (ClassNotFoundException e) {
+        throw new ConfigurationException(OPT_REPOSITORY_TYPE, e.getMessage());
+      }
+    }
   }
 
   /**
@@ -204,18 +225,6 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService {
     } catch (ContentRepositoryException e) {
       logger.error("Unable to disconnect content repository " + repository + " for site '" + site + "'", e);
     }
-  }
-
-  /**
-   * Associates this service with the content repository factory in order to
-   * give the factory a backing implementation.
-   * 
-   * @param factory
-   *          the content repository factory
-   */
-  public void registerContentRepositoryFactory(ContentRepositoryFactory factory) {
-    logger.debug("Backing content repository factory with " + this);
-    factory.setContentRepositoryService(this);
   }
 
   /**
@@ -298,7 +307,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService {
     @Override
     public Object addingService(ServiceReference reference) {
       ContentRepositoryFactory factory = (ContentRepositoryFactory) super.addingService(reference);
-      service.registerContentRepositoryFactory(factory);
+      factory.setContentRepositoryService(service);
       return factory;
     }
 

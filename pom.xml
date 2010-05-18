@@ -261,6 +261,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.contentrepository</Bundle-SymbolicName>
             <Embed-Dependency>
               jcr,
               jta,
