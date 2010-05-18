@@ -118,6 +118,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.dispatcher</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common,
               ch.o2it.weblounge.common.content,
