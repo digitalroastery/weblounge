@@ -84,6 +84,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.cache</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.cache,
               ch.o2it.weblounge.common,
