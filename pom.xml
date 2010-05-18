@@ -78,6 +78,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.kernel</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common.site,
               ch.o2it.weblounge.common.language,
