@@ -48,6 +48,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.dispatcher-api</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common.request,
               ch.o2it.weblounge.common.site,
