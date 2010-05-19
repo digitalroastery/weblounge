@@ -101,7 +101,7 @@ public final class RequestUtils {
    *          the action
    * @return the path extension relative to the action's mount point
    */
-  protected String getRequestedUrlExtension(WebloungeRequest request,
+  public String getRequestedUrlExtension(WebloungeRequest request,
       Action action) {
     if (request == null)
       throw new IllegalStateException("Request has not started");
@@ -120,7 +120,7 @@ public final class RequestUtils {
    *          the action
    * @return the path extension relative to the action's mount point
    */
-  protected String getUrlExtension(WebloungeRequest request, Action action) {
+  public String getUrlExtension(WebloungeRequest request, Action action) {
     if (request == null)
       throw new IllegalStateException("Request has not started");
     return request.getUrl().getPath().substring(action.getPath().length());
