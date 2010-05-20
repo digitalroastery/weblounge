@@ -30,6 +30,7 @@ import ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -37,7 +38,10 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -58,8 +62,14 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryServiceImpl.class);
 
+  /** Service pid, used to look up the service configuration */
+  public static final String SERVICE_PID = "ch.o2it.weblounge.contentrepository";
+
+  /** Configuration key prefix for content repository configuration */
+  public static final String OPT_PREFIX = "weblounge.contentrepository";
+
   /** Configuration key for the content repository implementation */
-  public static final String OPT_REPOSITORY_TYPE = "ch.o2it.weblounge.contentrepository";
+  public static final String OPT_REPOSITORY_TYPE = OPT_PREFIX + ".type";
 
   /** Default implementation for a content repository */
   public static final String DEFAULT_REPOSITORY_TYPE = BundleContentRepository.class.getName();
@@ -70,9 +80,15 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
   /** The registered content repositories */
   private Map<Site, ContentRepository> repositories = new HashMap<Site, ContentRepository>();
 
+  /** The registered bundles */
+  private Map<Site, Bundle> bundles = new HashMap<Site, Bundle>();
+
+  /** Extended configuration properties */
+  private Map<String, String> extendedProperties = new HashMap<String, String>();
+  
   /** The site tracker */
   private SiteTracker siteTracker = null;
-  
+
   /** Tracker for content repository factories */
   private ContentRepositoryFactoryTracker factoryTracker = null;
 
@@ -97,30 +113,27 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
   @SuppressWarnings("unchecked")
   public void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
-    Object prototypeClassName = context.getProperties().get(OPT_REPOSITORY_TYPE);
 
     logger.info("Starting content repository service");
 
-    // Try to load the implementation from the system configuration
-    if (prototypeClassName != null) {
-      logger.info("Creating content repository prototype from " + prototypeClassName);
-      ClassLoader loader = Thread.currentThread().getContextClassLoader();
-      prototype = (Class<? extends ContentRepository>) loader.loadClass((String) prototypeClassName);
-    }
-
-    // No luck here. Let's try the default
-    else {
+    // Check the configuration of the repository implementation
+    if (prototype == null) {
       logger.info("No content repository implementation configured");
       prototype = (Class<? extends ContentRepository>) Class.forName(DEFAULT_REPOSITORY_TYPE);
       logger.info("Using default implementation " + DEFAULT_REPOSITORY_TYPE);
     }
 
     // Test creation of the prototype
-    prototype.newInstance();
+    try {
+      prototype.newInstance();
+    } catch (Exception e) {
+      logger.error("Error creating instance of content repository implementation {}", e);
+      throw e;
+    }
 
     siteTracker = new SiteTracker(this, bundleContext);
     siteTracker.open();
-    
+
     factoryTracker = new ContentRepositoryFactoryTracker(this, bundleContext);
     factoryTracker.open();
 
@@ -146,22 +159,108 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
   }
 
   /**
+   * Callback from the OSGi environment to register with the
+   * <code>ConfigurationAdmin</code> service.
+   * <p>
+   * This method is configured in the <tt>Dynamic Services</tt> section of the
+   * bundle and relies on the existence of a <code>service.pid</code> with the
+   * value of <tt>ch.o2it.weblounge.contentrepository</tt> being configured.
+   * 
+   * @param configAdmin
+   *          the configuration admin
+   * @throws IOException
+   *           if the configuration cannot be read
+   * @throws ConfigurationException
+   *           if configuration fails due to inconsistent configuration data
+   */
+  public void setConfiguration(ConfigurationAdmin configAdmin)
+      throws IOException, ConfigurationException {
+    Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
+    configure(config);
+  }
+
+  /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
-    Object prototypeClassName = properties.get(OPT_REPOSITORY_TYPE);
-    if (prototypeClassName != null) {
-      logger.info("Switching content repository implementation to " + prototypeClassName);
-      ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    if (configure(properties)) {
+      for (Site site : new ArrayList<Site>(repositories.keySet())) {
+        Bundle bundle = bundles.get(site);
+        unregisterSite(site);
+        registerSite(site, bundle);
+      }
+    }
+  }
+
+  /**
+   * Configures this service using the given configuration properties.
+   * 
+   * @param config
+   *          the service configuration
+   * @throws ConfigurationException
+   *           if configuration fails
+   */
+  @SuppressWarnings("unchecked")
+  private synchronized boolean configure(Dictionary<?, ?> config) throws ConfigurationException {
+    boolean configurationChanged = false;
+
+    // Repository type
+    Object prototypeClassName = config.get(OPT_REPOSITORY_TYPE);
+    if (prototypeClassName != null && (prototype == null || !prototypeClassName.equals(prototype.getName()))) {
+      logger.info("Content repository implementation is " + prototypeClassName);
+      ClassLoader loader = ContentRepositoryServiceImpl.class.getClassLoader();
       try {
         prototype = (Class<? extends ContentRepository>) loader.loadClass((String) prototypeClassName);
+        configurationChanged = true;
       } catch (ClassNotFoundException e) {
         throw new ConfigurationException(OPT_REPOSITORY_TYPE, e.getMessage());
       }
     }
+    
+    // Extended properties
+    if (config.size() != extendedProperties.size())
+      configurationChanged = true;
+    else {
+      for (Map.Entry<String, String> entry : extendedProperties.entrySet()) {
+        if (!entry.getValue().equals(config.get(entry.getKey()))) {
+          configurationChanged = true;
+          break;
+        }
+      }
+    }
+
+    // Did we find a noticeable change?
+    if (!configurationChanged) {
+      logger.info("Received updated but identical content repository service configuration");
+      return false;
+    }
+    
+    // First, update the connection properties
+    extendedProperties.clear();
+    for (Enumeration<?> keys = config.keys(); keys.hasMoreElements(); ) {
+      String key = keys.nextElement().toString();
+      String value = config.get(key).toString();
+      
+      // Do variable replacement using the system properties
+      for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+        StringBuffer envKey = new StringBuffer("\\$\\{").append(entry.getKey()).append("\\}");
+        value = value.replaceAll(envKey.toString(), entry.getValue().toString());
+      }
+
+      // Do variable replacement using the system environment
+      for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+        StringBuffer envKey = new StringBuffer("\\$\\{").append(entry.getKey()).append("\\}");
+        value = value.replaceAll(envKey.toString(), entry.getValue());
+      }
+
+      logger.debug("Registering extended property {}={}", key, value);
+      extendedProperties.put(key, value);
+    }
+
+    return true;
   }
 
   /**
@@ -179,11 +278,17 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
     properties.put(Site.class.getName(), site);
     properties.put(Bundle.class.getName(), bundle);
     
+    // Add the extended properties from either the bundle or the service configuration
+    for (Map.Entry<String, String> p : extendedProperties.entrySet()) {
+      properties.put(p.getKey(), p.getValue());
+    }
+
     // Create and set up the repository
     try {
       repository = prototype.newInstance();
-      repository.connect(properties);
       repositories.put(site, repository);
+      bundles.put(site, bundle);
+      repository.connect(properties);
     } catch (InstantiationException e) {
       logger.error("Unable to instantiate content repository " + prototype + " for site '" + site + "'", e);
       return;
@@ -198,11 +303,10 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
     // Start the repository
     try {
       repository.start();
-      repositories.put(site, repository);
     } catch (ContentRepositoryException e) {
       logger.error("Unable to start content repository " + repository + " for site '" + site + "'", e);
     }
-}
+  }
 
   /**
    * Callback from the OSGi environment when a site is destroyed. This method
@@ -213,6 +317,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
    */
   public void unregisterSite(Site site) {
     ContentRepository repository = repositories.remove(site);
+    bundles.remove(site);
     if (repository == null)
       return;
     try {
@@ -293,8 +398,8 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
      * @param context
      *          the bundle context
      */
-    public ContentRepositoryFactoryTracker(ContentRepositoryServiceImpl service,
-        BundleContext context) {
+    public ContentRepositoryFactoryTracker(
+        ContentRepositoryServiceImpl service, BundleContext context) {
       super(context, ContentRepositoryFactory.class.getName(), null);
       this.service = service;
     }

@@ -88,6 +88,10 @@ public class BundleContentRepository extends AbstractContentRepository {
 
   /** The root directory for the temporary bundle index */
   protected File idxRootDir = null;
+  
+  /** Flag to indicate whether temporary indices should be removed on shutdown */
+  // TODO: Add configuration for this
+  protected boolean cleanupTemporaryIndex = false;
 
   /**
    * {@inheritDoc}
@@ -112,7 +116,6 @@ public class BundleContentRepository extends AbstractContentRepository {
         "index",
         getSite().getIdentifier() }));
     try {
-      FileUtils.deleteQuietly(idxRootDir);
       FileUtils.forceMkdir(idxRootDir);
     } catch (IOException e) {
       throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
@@ -129,7 +132,7 @@ public class BundleContentRepository extends AbstractContentRepository {
   @Override
   public void disconnect() throws ContentRepositoryException {
     super.disconnect();
-    if (idxRootDir != null && idxRootDir.exists()) {
+    if (idxRootDir != null && idxRootDir.exists() && cleanupTemporaryIndex) {
       logger.info("Removing temporary site index at {}", idxRootDir);
       FileUtils.deleteQuietly(idxRootDir);
     }
@@ -289,6 +292,15 @@ public class BundleContentRepository extends AbstractContentRepository {
     FileUtils.forceMkdir(idxRootDir);
     BundleContentRepositoryIndex index = null;
     index = new BundleContentRepositoryIndex(idxRootDir);
+    
+    // Is there an existing index?
+    if (index.getPages() > 0) {
+      long pageCount = index.getPages();
+      long pageVersionCount = index.getVersions();
+      logger.info("Using exising index at {}", idxRootDir);
+      logger.info("{} pages and {} revisions found in index", pageCount, pageVersionCount);
+      return index;
+    }
 
     try {
       logger.info("Populating temporary site index '{}'...", site);
