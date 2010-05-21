@@ -32,18 +32,6 @@ import java.io.IOException;
  */
 public class FileSystemContentRepositoryIndex extends ContentRepositoryIndex {
 
-  /** Name for the uri index file */
-  public static final String URI_IDX_NAME = "uri.idx";
-
-  /** Name for the id index file */
-  public static final String ID_IDX_NAME = "id.idx";
-
-  /** Name for the path index file */
-  public static final String PATH_IDX_NAME = "path.idx";
-
-  /** Name for the version index file */
-  public static final String VERSION_IDX_NAME = "version.idx";
-
   /**
    * Creates a new content repository index that lives inside the given
    * directory.

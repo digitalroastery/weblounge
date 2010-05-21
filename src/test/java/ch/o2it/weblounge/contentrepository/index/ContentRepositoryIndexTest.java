@@ -50,9 +50,12 @@ public class ContentRepositoryIndexTest {
   /** The content repository index */
   protected ContentRepositoryIndex idx = null;
   
-  /** The index root directory */
+  /** The index' root directory */
   protected File indexRootDirectory = null;
-  
+
+  /** The structural index' root directory */
+  protected File structuralIndexRootDirectory = null;
+
   /** The site */
   protected Site site = null;
   
@@ -62,6 +65,7 @@ public class ContentRepositoryIndexTest {
   @Before
   public void setUp() throws Exception {
     indexRootDirectory = new File(new File(System.getProperty("java.io.tmpdir")), "index");
+    structuralIndexRootDirectory = new File(indexRootDirectory, "structure");
     FileUtils.deleteDirectory(indexRootDirectory);
     idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
     site = EasyMock.createNiceMock(Site.class);
@@ -82,9 +86,10 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testFilesystem() {
-    assertTrue(new File(indexRootDirectory, FileSystemContentRepositoryIndex.URI_IDX_NAME).exists());
-    assertTrue(new File(indexRootDirectory, FileSystemContentRepositoryIndex.ID_IDX_NAME).exists());
-    assertTrue(new File(indexRootDirectory, FileSystemContentRepositoryIndex.PATH_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, ContentRepositoryIndex.URI_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, ContentRepositoryIndex.ID_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, ContentRepositoryIndex.PATH_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, ContentRepositoryIndex.VERSION_IDX_NAME).exists());
   }
   
   /**

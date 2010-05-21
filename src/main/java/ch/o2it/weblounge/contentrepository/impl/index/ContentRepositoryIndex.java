@@ -41,6 +41,18 @@ public class ContentRepositoryIndex {
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(ContentRepositoryIndex.class);
 
+  /** Name for the uri index file */
+  public static final String URI_IDX_NAME = "uri.idx";
+
+  /** Name for the id index file */
+  public static final String ID_IDX_NAME = "id.idx";
+
+  /** Name for the path index file */
+  public static final String PATH_IDX_NAME = "path.idx";
+
+  /** Name for the version index file */
+  public static final String VERSION_IDX_NAME = "version.idx";
+
   /** The uri index */
   protected URIIndex uriIdx = null;
 
@@ -65,10 +77,10 @@ public class ContentRepositoryIndex {
    */
   public ContentRepositoryIndex(File rootDir, boolean readOnly)
       throws IOException {
-    this.uriIdx = new URIIndex(new File(new File(rootDir, "structure"), "uris.idx"), false);
-    this.idIdx = new IdIndex(new File(new File(rootDir, "structure"), "ids.idx"), readOnly);
-    this.pathIdx = new PathIndex(new File(new File(rootDir, "structure"), "paths.idx"), readOnly);
-    this.versionIdx = new VersionIndex(new File(new File(rootDir, "structure"), "versions.idx"), readOnly);
+    this.uriIdx = new URIIndex(new File(new File(rootDir, "structure"), URI_IDX_NAME), false);
+    this.idIdx = new IdIndex(new File(new File(rootDir, "structure"), ID_IDX_NAME), readOnly);
+    this.pathIdx = new PathIndex(new File(new File(rootDir, "structure"), PATH_IDX_NAME), readOnly);
+    this.versionIdx = new VersionIndex(new File(new File(rootDir, "structure"), VERSION_IDX_NAME), readOnly);
   }
 
   /**

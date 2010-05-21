@@ -65,7 +65,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
   public static final String SERVICE_PID = "ch.o2it.weblounge.contentrepository";
 
   /** Configuration key prefix for content repository configuration */
-  public static final String OPT_PREFIX = "weblounge.contentrepository";
+  public static final String OPT_PREFIX = "contentrepository";
 
   /** Configuration key for the content repository implementation */
   public static final String OPT_REPOSITORY_TYPE = OPT_PREFIX + ".type";

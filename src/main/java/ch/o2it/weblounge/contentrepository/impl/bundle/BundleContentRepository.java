@@ -293,7 +293,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         index.add(uri);
         pageVersionCount++;
         if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
-          logger.info("Adding /{} to site index", FilenameUtils.getPath(uri.getPath()));
+          logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());
           pageCount++;
         }
         previousURI = uri;

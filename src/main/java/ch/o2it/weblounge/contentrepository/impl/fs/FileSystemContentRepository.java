@@ -26,11 +26,11 @@ import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.content.PageReader;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.PageUtils;
-import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository;
+import ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
@@ -64,7 +64,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   private static final Logger logger = LoggerFactory.getLogger(FileSystemContentRepository.class);
 
   /** Prefix for repository configuration keys */
-  private static final String OPT_PREFIX = "filesystem.contentrepository";
+  private static final String OPT_PREFIX = ContentRepositoryServiceImpl.OPT_PREFIX + ".fs";
 
   /** Configuration key for the repository's root directory */
   public static final String OPT_ROOT_DIR = OPT_PREFIX + ".root";
@@ -136,11 +136,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       long pageCount = 0;
       long pageVersionCount = 0;
       
-      boolean restructured = true;
+      boolean restructured = false;
       
       Stack<File> uris = new Stack<File>();
       String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), "pages");
-      uris.push(new File(PathSupport.trim(homePath)));
+      File siteRootDirectory = new File(homePath);
+      FileUtils.forceMkdir(siteRootDirectory);
+      
+      uris.push(siteRootDirectory);
       while (!uris.empty()) {
         File dir = uris.pop();
         File[] files = dir.listFiles(new FileFilter() {
@@ -150,7 +153,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
             return path.isDirectory() || path.getName().endsWith(".xml");
           }
         });
-        if (files == null)
+        if (files == null || files.length == 0)
           break;
         boolean foundPage = false;
         for (File f : files) {
@@ -161,11 +164,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
             String path = "/" + FilenameUtils.getPath(relativePath);
             long version = PageUtils.getVersion(FilenameUtils.getBaseName(f.getName()));
             String id = loadPageId(f.toURI().toURL());
+            // TODO: Load page path from page file rather than from storage path
+            // Currently, a re-index is not possible, since path information
+            // is nowhere to be found!
             PageURI uri = new PageURIImpl(site, path, version, id);
             index.add(uri);
             pageVersionCount ++;
             if (!foundPage) {
-              logger.info("Adding /{} to site index", FilenameUtils.getPath(path));
+              logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());
               pageCount ++;
               foundPage = true;
             }
@@ -183,10 +189,16 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       
       // Move new site in place
       if (restructured) {
-        File site = new File(repositoryRoot, "pages");
         File movedOldSite = new File(repositoryRoot, "pages-old");
-        FileUtils.moveDirectory(site, movedOldSite);
-        FileUtils.moveDirectory(restructuredSite, site);
+        if (movedOldSite.exists()) {
+          for (int i=1; i < Integer.MAX_VALUE; i++) {
+            movedOldSite = new File(repositoryRoot, "pages-old " + i);
+            if (!movedOldSite.exists())
+              break;
+          }
+        }
+        FileUtils.moveDirectory(siteRootDirectory, movedOldSite);
+        FileUtils.moveDirectory(restructuredSite, siteRootDirectory);
       }
       
       time = System.currentTimeMillis() - time;
@@ -197,7 +209,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     } catch (MalformedPageURIException e) {
       throw new ContentRepositoryException("Error while reading page uri for index", e);
     } finally {
-      FileUtils.deleteQuietly(restructuredSite);
+      if (restructuredSite.exists())
+        FileUtils.deleteQuietly(restructuredSite);
     }
   }
 
