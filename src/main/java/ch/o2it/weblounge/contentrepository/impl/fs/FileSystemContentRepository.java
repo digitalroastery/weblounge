@@ -154,7 +154,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
           }
         });
         if (files == null || files.length == 0)
-          break;
+          continue;
         boolean foundPage = false;
         for (File f : files) {
           if (f.isDirectory()) {
