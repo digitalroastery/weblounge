@@ -160,7 +160,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     if (!path.startsWith("/"))
-      throw new MalformedPageURIException("Path can't be relative: " + path);
+      throw new MalformedPageURIException(path);
     this.site = site;
     this.id = id;
     this.version = version;
