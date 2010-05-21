@@ -41,19 +41,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -198,7 +193,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         if (version != -1 && v != version)
           continue;
         try {
-          String id = getPageId(entry);
+          String id = loadPageId(entry);
           pages.add(new PageURIImpl(getSite(), path, v, id));
           logger.trace("Found version '{}' of page {}", entry, uri);
         } catch (IOException e) {
@@ -207,25 +202,6 @@ public class BundleContentRepository extends AbstractContentRepository {
       }
     }
     return pages.iterator();
-  }
-
-  /**
-   * Returns the page id or <code>null</code> if no page id could be found on
-   * the specified document.
-   */
-  private String getPageId(URL url) throws IOException {
-    BufferedInputStream is = new BufferedInputStream(url.openStream());
-    InputStreamReader reader = new InputStreamReader(is);
-    CharBuffer buf = CharBuffer.allocate(512);
-    reader.read(buf);
-    Pattern p = Pattern.compile(".*id=\"([a-z0-9-]*)\".*");
-    String s = new String(buf.array());
-    s = s.replace('\n', ' ');
-    Matcher m = p.matcher(s);
-    if (m.matches()) {
-      return m.group(1);
-    }
-    return null;
   }
 
   /**
@@ -288,8 +264,10 @@ public class BundleContentRepository extends AbstractContentRepository {
   @Override
   protected ContentRepositoryIndex loadIndex() throws IOException,
       ContentRepositoryException {
+
     logger.debug("Creating temporary site index at {}", idxRootDir);
     FileUtils.forceMkdir(idxRootDir);
+
     BundleContentRepositoryIndex index = null;
     index = new BundleContentRepositoryIndex(idxRootDir);
     
@@ -297,8 +275,8 @@ public class BundleContentRepository extends AbstractContentRepository {
     if (index.getPages() > 0) {
       long pageCount = index.getPages();
       long pageVersionCount = index.getVersions();
-      logger.info("Using exising index at {}", idxRootDir);
-      logger.info("{} pages and {} revisions found in index", pageCount, pageVersionCount);
+      logger.info("Loaded exising site index from {}", idxRootDir);
+      logger.info("Site index contains {} pages and {} revisions", pageCount, pageVersionCount);
       return index;
     }
 
@@ -315,7 +293,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         index.add(uri);
         pageVersionCount++;
         if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
-          logger.info("Indexing {}", uri.getPath());
+          logger.info("Adding /{} to site index", FilenameUtils.getPath(uri.getPath()));
           pageCount++;
         }
         previousURI = uri;

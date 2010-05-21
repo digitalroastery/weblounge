@@ -373,7 +373,7 @@ public class PathIndex {
     long[] paths = new long[entries];
     for (int i = 0; i < entries; i++) {
       long address = idx.readLong();
-      paths[i++] = address;
+      paths[i] = address;
     }
     return paths;
   }

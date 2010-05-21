@@ -7,5 +7,4 @@
     <provide interface="ch.o2it.weblounge.contentrepository.ContentRepositoryService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-  <reference name="configuration" interface="org.osgi.service.cm.ConfigurationAdmin" cardinality="1..1" policy="static" bind="setConfiguration" />
 </component>

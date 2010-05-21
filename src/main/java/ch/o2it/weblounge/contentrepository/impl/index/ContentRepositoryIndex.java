@@ -65,10 +65,10 @@ public class ContentRepositoryIndex {
    */
   public ContentRepositoryIndex(File rootDir, boolean readOnly)
       throws IOException {
-    this.uriIdx = new URIIndex(new File(rootDir, "uris.idx"), false);
-    this.idIdx = new IdIndex(new File(rootDir, "ids.idx"), readOnly);
-    this.pathIdx = new PathIndex(new File(rootDir, "paths.idx"), readOnly);
-    this.versionIdx = new VersionIndex(new File(rootDir, "versions.idx"), readOnly);
+    this.uriIdx = new URIIndex(new File(new File(rootDir, "structure"), "uris.idx"), false);
+    this.idIdx = new IdIndex(new File(new File(rootDir, "structure"), "ids.idx"), readOnly);
+    this.pathIdx = new PathIndex(new File(new File(rootDir, "structure"), "paths.idx"), readOnly);
+    this.versionIdx = new VersionIndex(new File(new File(rootDir, "structure"), "versions.idx"), readOnly);
   }
 
   /**
@@ -184,9 +184,11 @@ public class ContentRepositoryIndex {
 
     // If there is no address, we are about to add a new page
     if (address < 0) {
-      String uuid = UUID.randomUUID().toString();
-      uri = new PageURIImpl(uri.getSite(), uri.getPath(), uri.getVersion(), uuid);
       String id = uri.getId();
+      if (id == null) {
+        id = UUID.randomUUID().toString();
+        uri = new PageURIImpl(uri.getSite(), uri.getPath(), uri.getVersion(), id);
+      }
       String path = uri.getPath();
       address = uriIdx.add(id, path);
       idIdx.add(id, address);
@@ -274,7 +276,7 @@ public class ContentRepositoryIndex {
 
     // Is the uri part of the index?
     if (addresses.length == 0) {
-      logger.warn("Attempt to locate non-existing path {}", path);
+      logger.debug("Attempt to locate non-existing path {}", path);
       return null;
     }
 

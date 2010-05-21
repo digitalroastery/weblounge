@@ -32,9 +32,15 @@ import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.CharBuffer;
 import java.util.Dictionary;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
@@ -408,6 +414,30 @@ public abstract class AbstractContentRepository implements ContentRepository {
       }
     }
     return false;
+  }
+
+  /**
+   * Returns the page id or <code>null</code> if no page id could be found on
+   * the specified document. This method is intended to serve as a utility
+   * method for importing pages.
+   * 
+   * @param url
+   *          location of the page file
+   * @return the page id
+   */
+  protected String loadPageId(URL url) throws IOException {
+    BufferedInputStream is = new BufferedInputStream(url.openStream());
+    InputStreamReader reader = new InputStreamReader(is);
+    CharBuffer buf = CharBuffer.allocate(512);
+    reader.read(buf);
+    Pattern p = Pattern.compile(".*id=\"([a-z0-9-]*)\".*");
+    String s = new String(buf.array());
+    s = s.replace('\n', ' ');
+    Matcher m = p.matcher(s);
+    if (m.matches()) {
+      return m.group(1);
+    }
+    return null;
   }
 
 }

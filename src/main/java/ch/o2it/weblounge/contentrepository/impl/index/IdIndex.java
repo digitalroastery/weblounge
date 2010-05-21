@@ -371,7 +371,7 @@ public class IdIndex {
     long[] ids = new long[entries];
     for (int i = 0; i < entries; i++) {
       long address = idx.readLong();
-      ids[i++] = address;
+      ids[i] = address;
     }
     return ids;
   }

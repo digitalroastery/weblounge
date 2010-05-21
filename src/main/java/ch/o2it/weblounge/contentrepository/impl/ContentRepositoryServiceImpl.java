@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
+import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -31,14 +32,12 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -116,6 +115,16 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
 
     logger.info("Starting content repository service");
 
+    // Try to get hold of the service configuration
+    ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
+    if (configAdminRef != null) {
+      ConfigurationAdmin configAdmin = (ConfigurationAdmin)bundleContext.getService(configAdminRef);
+      Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
+      configure(config);
+    } else {
+      logger.warn("Unable to load content repository service configuration");
+    }
+    
     // Check the configuration of the repository implementation
     if (prototype == null) {
       logger.info("No content repository implementation configured");
@@ -159,39 +168,22 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
   }
 
   /**
-   * Callback from the OSGi environment to register with the
-   * <code>ConfigurationAdmin</code> service.
-   * <p>
-   * This method is configured in the <tt>Dynamic Services</tt> section of the
-   * bundle and relies on the existence of a <code>service.pid</code> with the
-   * value of <tt>ch.o2it.weblounge.contentrepository</tt> being configured.
-   * 
-   * @param configAdmin
-   *          the configuration admin
-   * @throws IOException
-   *           if the configuration cannot be read
-   * @throws ConfigurationException
-   *           if configuration fails due to inconsistent configuration data
-   */
-  public void setConfiguration(ConfigurationAdmin configAdmin)
-      throws IOException, ConfigurationException {
-    Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
-    configure(config);
-  }
-
-  /**
    * {@inheritDoc}
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @SuppressWarnings("unchecked")
-  public void updated(Dictionary properties) throws ConfigurationException {
-    if (configure(properties)) {
-      for (Site site : new ArrayList<Site>(repositories.keySet())) {
-        Bundle bundle = bundles.get(site);
-        unregisterSite(site);
-        registerSite(site, bundle);
+  public void updated(Dictionary properties) {
+    try {
+      if (configure(properties)) {
+        for (Site site : new ArrayList<Site>(repositories.keySet())) {
+          Bundle bundle = bundles.get(site);
+          unregisterSite(site);
+          registerSite(site, bundle);
+        }
       }
+    } catch (ConfigurationException e) {
+      logger.error("Error configuring " + this + ": ", e.getMessage());
     }
   }
 
@@ -216,7 +208,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
         prototype = (Class<? extends ContentRepository>) loader.loadClass((String) prototypeClassName);
         configurationChanged = true;
       } catch (ClassNotFoundException e) {
-        throw new ConfigurationException(OPT_REPOSITORY_TYPE, e.getMessage());
+        throw new ConfigurationException(e.getMessage());
       }
     }
     
