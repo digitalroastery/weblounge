@@ -253,4 +253,18 @@ public interface ContentRepository {
    */
   SearchResult[] findPages(SearchQuery query) throws ContentRepositoryException;
 
+  /**
+   * Returns the number of pages in this index.
+   * 
+   * @return the number of pages
+   */
+  long getPages();
+
+  /**
+   * Returns the number of versions in this index.
+   * 
+   * @return the number of versions
+   */
+  long getVersions();
+
 }
