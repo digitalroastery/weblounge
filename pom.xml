@@ -26,6 +26,12 @@
       <version>3.0-SNAPSHOT</version>
     </dependency>
 
+    <dependency>
+      <groupId>ch.o2it.weblounge</groupId>
+      <artifactId>weblounge-contentrepository-api</artifactId>
+      <version>3.0-SNAPSHOT</version>
+    </dependency>
+
     <!-- osgi support -->
 
     <dependency>
@@ -82,6 +88,7 @@
             <Import-Package>
               ch.o2it.weblounge.common.site,
               ch.o2it.weblounge.common.language,
+              ch.o2it.weblounge.contentrepository,
               ch.o2it.weblounge.dispatcher,
               org.quartz,
               org.quartz.impl,
@@ -93,6 +100,7 @@
             </Import-Package>
             <Export-Package></Export-Package>
             <Service-Component>
+              OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/kernel-service.xml,
               OSGI-INF/site-command.xml,
               OSGI-INF/site-manager-service.xml

@@ -22,6 +22,10 @@ package ch.o2it.weblounge.kernel.command;
 
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.contentrepository.ContentRepository;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
+import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.command.CommandProcessor;
@@ -43,7 +47,7 @@ public class SiteCommand {
 
   /** Logger */
   private static final Logger log_ = LoggerFactory.getLogger(SiteCommand.class);
-  
+
   /** The list of registered sites */
   private List<Site> sites = new ArrayList<Site>();
 
@@ -56,6 +60,7 @@ public class SiteCommand {
    * <li><code>site <id> restart</code></li>
    * <li><code>site <id> enable</code></li>
    * <li><code>site <id> disable</code></li>
+   * <li><code>site <id> index</code></li>
    * <li><code>site <id> status</code></li>
    * </ul>
    * 
@@ -76,7 +81,7 @@ public class SiteCommand {
       }
     } else if (args.length == 2) {
       String id = args[0];
-      
+
       // Look up the site
       Site site = getSite(id);
       if (site == null) {
@@ -99,6 +104,8 @@ public class SiteCommand {
         stop(site);
       else if ("restart".equals(args[1]))
         restart(site);
+      else if ("index".equals(args[1]))
+        index(site);
       else if ("status".equals(args[1]))
         status(site);
       else {
@@ -122,21 +129,22 @@ public class SiteCommand {
    */
   private void list() {
     synchronized (sites) {
-      
+
       // Are there any sites?
       if (sites.size() == 0) {
         System.out.println("No sites found");
         return;
       }
-      
+
       // Setup the number formatter
       int digits = 1 + (int) (Math.log(sites.size() + 1) / Math.log(10));
       StringBuffer format = new StringBuffer();
-      for (int i=0; i < digits; i++) format.append("#");
+      for (int i = 0; i < digits; i++)
+        format.append("#");
       DecimalFormat formatter = new DecimalFormat(format.toString());
-      
+
       // Display the site list
-      for (int i=0; i < sites.size(); i++) {
+      for (int i = 0; i < sites.size(); i++) {
         Site site = sites.get(i);
         StringBuffer buf = new StringBuffer();
         buf.append("[ ").append(formatter.format(i + 1)).append(" ] ");
@@ -145,7 +153,7 @@ public class SiteCommand {
         buf.append(site.getName() != null ? site.getName() : site.getIdentifier());
         buf.append(" ");
         int descriptionLength = buf.length();
-        for (int j=0; j < 64-descriptionLength; j++)
+        for (int j = 0; j < 64 - descriptionLength; j++)
           buf.append(".");
         buf.append(site.isRunning() ? " STARTED " : " STOPPED");
         while (buf.length() < 22)
@@ -165,17 +173,17 @@ public class SiteCommand {
     status("identifier", site.getIdentifier());
     if (site.getName() != null)
       status("description", site.getName());
-    
+
     // Enabled
     status("autostart", (site.isStartedAutomatically() ? "yes" : "no"));
- 
+
     // Started / Stopped
     status("running", (site.isRunning() ? "yes" : "no"));
 
     // Hostnames
     if (site.getHostNames().length > 0)
       status("host", site.getHostNames());
-    
+
     // Languages
     if (site.getLanguages().length > 0) {
       StringBuffer buf = new StringBuffer();
@@ -191,32 +199,66 @@ public class SiteCommand {
     if (site.getDefaultLanguage() != null)
       status("default language", site.getDefaultLanguage().toString());
   }
-  
+
+  /**
+   * Triggers a rebuilding of the site index.
+   * 
+   * @param site
+   *          the site
+   */
+  private void index(Site site) {
+    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    if (repository == null) {
+      System.out.println("Site " + site + " has no content repository");
+      return;
+    } else if (!site.isRunning()) {
+      System.out.println("Site " + site + " is not running");
+      return;
+    } else if (!(repository instanceof WritableContentRepository)) {
+      System.out.println("Site " + site + " is read only");
+      return;
+    }
+    
+    System.out.println("Indexing site " + site);
+
+    try {
+      ((WritableContentRepository)repository).index();
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+    }
+
+    System.out.println("Index for site " + site + " rebuilt");
+  }
+
   /**
    * Returns a padded version of the text.
    * 
-   * @param caption the caption
-   * @param info the information
+   * @param caption
+   *          the caption
+   * @param info
+   *          the information
    */
   private void status(String caption, String[] info) {
-    for (int i=0; i < info.length; i++) {
+    for (int i = 0; i < info.length; i++) {
       if (i == 0)
         status(caption, info[i]);
       else
         status(null, info[i]);
     }
   }
-  
+
   /**
    * Returns a padded version of the text.
    * 
-   * @param caption the caption
-   * @param info the information
+   * @param caption
+   *          the caption
+   * @param info
+   *          the information
    */
   private void status(String caption, String info) {
     if (caption == null)
       caption = "";
-    for (int i=0; i < (12 - caption.length()); i++)
+    for (int i = 0; i < (12 - caption.length()); i++)
       System.out.print(" ");
     if (!"".equals(caption)) {
       System.out.print(caption);
@@ -290,6 +332,7 @@ public class SiteCommand {
     System.out.println("    site list");
     System.out.println("    site <id> enable|disable");
     System.out.println("    site <id> start|stop|restart");
+    System.out.println("    site <id> index");
     System.out.println("    site <id> status");
   }
 
@@ -321,7 +364,7 @@ public class SiteCommand {
    */
   private Site getSite(int index) {
     synchronized (sites) {
-      index --;
+      index--;
       return (index < sites.size()) ? sites.get(index) : null;
     }
   }
