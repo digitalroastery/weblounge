@@ -955,6 +955,8 @@ public class PageImpl extends LocalizableObject implements Page {
 
     b.append("<page id=\"");
     b.append(uri.getId());
+    b.append("\" path=\"");
+    b.append(uri.getPath());
     b.append("\" version=\"");
     b.append(PageUtils.getVersionString(uri.getVersion()));
     b.append("\">");

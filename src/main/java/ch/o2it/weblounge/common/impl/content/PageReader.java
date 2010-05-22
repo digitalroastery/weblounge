@@ -190,6 +190,8 @@ public final class PageReader extends WebloungeContentReader {
     if ("page".equals(raw)) {
       context_ = ParserContext.Page;
       ((PageURIImpl)page.uri).id = attrs.getValue("id");
+      if (attrs.getValue("path") != null)
+        ((PageURIImpl)page.uri).setPath(attrs.getValue("path"));
     }
 
     // in the header

@@ -77,10 +77,7 @@ public class UrlImpl implements Url {
     if (path.length() == 0 || path.charAt(0) != separator)
       path  = separator + path;
     this.separatorChar = separator;
-    this.path = trim(path);
-    if (!this.path.startsWith(Character.toString(separator)))
-      this.path = separator + this.path;
-
+    setPath(path);
   }
 
   /**
@@ -101,6 +98,17 @@ public class UrlImpl implements Url {
    */
   public char getPathSeparator() {
     return separatorChar;
+  }
+  
+  /**
+   * Sets the path.
+   * 
+   * @param path the path
+   */
+  public void setPath(String path) {
+    this.path = trim(path);
+    if (!this.path.startsWith(Character.toString(separatorChar)))
+      this.path = separatorChar + this.path;
   }
 
   /**
