@@ -182,12 +182,18 @@ public class SiteCommand {
 
     // Hostnames
     if (site.getHostNames().length > 0)
-      status("host", site.getHostNames());
+      status("hosts", site.getHostNames());
 
     // Languages
     if (site.getLanguages().length > 0) {
       StringBuffer buf = new StringBuffer();
+      if (site.getDefaultLanguage() != null) {
+        buf.append(site.getDefaultLanguage());
+        buf.append(" (default)");
+      }
       for (Language language : site.getLanguages()) {
+        if (language.equals(site.getDefaultLanguage()))
+          continue;
         if (buf.length() > 0)
           buf.append(", ");
         buf.append(language);
@@ -195,9 +201,12 @@ public class SiteCommand {
       status("languages", buf.toString());
     }
 
-    // Default language
-    if (site.getDefaultLanguage() != null)
-      status("default language", site.getDefaultLanguage().toString());
+    // Pages and revisions
+    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    long pages = repository != null ? repository.getPages() : -1;
+    status("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
+    long revisions = repository != null ? repository.getVersions() : -1;
+    status("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
   }
 
   /**
@@ -207,27 +216,45 @@ public class SiteCommand {
    *          the site
    */
   private void index(Site site) {
+    boolean restart = site.isRunning();
+
+    // Make sure we are in good shape before we index
     ContentRepository repository = ContentRepositoryFactory.getRepository(site);
     if (repository == null) {
       System.out.println("Site " + site + " has no content repository");
       return;
-    } else if (!site.isRunning()) {
-      System.out.println("Site " + site + " is not running");
-      return;
     } else if (!(repository instanceof WritableContentRepository)) {
       System.out.println("Site " + site + " is read only");
       return;
+    } else if (site.isRunning()) {
+      while (true) {
+        String answer = System.console().readLine("Can't index a running site! Stop now? [y/n] ");
+        if ("y".equalsIgnoreCase(answer)) {
+          stop(site);
+          System.out.println();
+          break;
+        } else if ("n".equalsIgnoreCase(answer)) {
+          return;
+        } else {
+          answer = null;
+        }
+      }
     }
-    
-    System.out.println("Indexing site " + site);
 
+    // Finally! Let's do the work
+    System.out.println("Indexing site " + site);
     try {
       ((WritableContentRepository)repository).index();
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
     }
 
-    System.out.println("Index for site " + site + " rebuilt");
+    // Restart the site if we shut it down previously
+    System.out.println("Site " + site + " indexed");
+    if (restart) {
+      System.out.println();
+      start(site);
+    }
   }
 
   /**
@@ -258,7 +285,7 @@ public class SiteCommand {
   private void status(String caption, String info) {
     if (caption == null)
       caption = "";
-    for (int i = 0; i < (12 - caption.length()); i++)
+    for (int i = 0; i < (15 - caption.length()); i++)
       System.out.print(" ");
     if (!"".equals(caption)) {
       System.out.print(caption);
@@ -330,7 +357,6 @@ public class SiteCommand {
   private void printUsage() {
     System.out.println("  Usage:");
     System.out.println("    site list");
-    System.out.println("    site <id> enable|disable");
     System.out.println("    site <id> start|stop|restart");
     System.out.println("    site <id> index");
     System.out.println("    site <id> status");
