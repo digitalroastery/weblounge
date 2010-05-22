@@ -194,4 +194,22 @@ public class EmptyContentRepository implements ContentRepository {
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPages()
+   */
+  public long getPages() {
+    return 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions()
+   */
+  public long getVersions() {
+    return 0;
+  }
+
 }

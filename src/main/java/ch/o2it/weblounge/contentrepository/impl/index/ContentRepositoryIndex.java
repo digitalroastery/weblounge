@@ -378,6 +378,7 @@ public class ContentRepositoryIndex {
     uriIdx.clear();
     idIdx.clear();
     pathIdx.clear();
+    versionIdx.clear();
   }
 
   /**

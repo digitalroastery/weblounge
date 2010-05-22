@@ -304,6 +304,24 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPages()
+   */
+  public long getPages() {
+    return index != null ? index.getPages() : -1;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions()
+   */
+  public long getVersions() {
+    return index != null ? index.getVersions() : -1;
+  }
+
+  /**
    * Appends the identifier of the form <code>x-y-z-u-v</code> to
    * <code>path</code> as in <code>/x/y/z/u/v</code>, with the "/" being the
    * platform's file separator.
@@ -417,27 +435,26 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
-   * Returns the page id or <code>null</code> if no page id could be found on
-   * the specified document. This method is intended to serve as a utility
-   * method for importing pages.
+   * Returns the page uri or <code>null</code> if no page id and/or path could
+   * be found on the specified document. This method is intended to serve as a
+   * utility method when importing pages.
    * 
    * @param url
    *          location of the page file
-   * @return the page id
+   * @return the page uri
    */
-  protected String loadPageId(URL url) throws IOException {
+  protected PageURI loadPageURI(Site site, URL url) throws IOException {
     BufferedInputStream is = new BufferedInputStream(url.openStream());
     InputStreamReader reader = new InputStreamReader(is);
-    CharBuffer buf = CharBuffer.allocate(512);
+    CharBuffer buf = CharBuffer.allocate(1024);
     reader.read(buf);
-    Pattern p = Pattern.compile(".*id=\"([a-z0-9-]*)\".*");
+    Pattern p = Pattern.compile(".*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*");
     String s = new String(buf.array());
     s = s.replace('\n', ' ');
     Matcher m = p.matcher(s);
     if (m.matches()) {
-      return m.group(1);
+      return new PageURIImpl(site, m.group(2), m.group(1));
     }
     return null;
   }
-
 }

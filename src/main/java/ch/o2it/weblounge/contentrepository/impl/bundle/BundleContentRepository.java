@@ -193,8 +193,10 @@ public class BundleContentRepository extends AbstractContentRepository {
         if (version != -1 && v != version)
           continue;
         try {
-          String id = loadPageId(entry);
-          pages.add(new PageURIImpl(getSite(), path, v, id));
+          PageURI pageURI = loadPageURI(site, entry);
+          if (pageURI == null)
+            throw new IllegalStateException("Page " + entry + " has no uri");
+          pages.add(pageURI);
           logger.trace("Found version '{}' of page {}", entry, uri);
         } catch (IOException e) {
           throw new ContentRepositoryException("Unable to read id from page at " + entry, e);

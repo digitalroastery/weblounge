@@ -34,7 +34,6 @@ import ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,14 +159,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
           if (f.isDirectory()) {
             uris.push(f);
           } else {
-            String relativePath = f.getAbsolutePath().substring(homePath.length());
-            String path = "/" + FilenameUtils.getPath(relativePath);
-            long version = PageUtils.getVersion(FilenameUtils.getBaseName(f.getName()));
-            String id = loadPageId(f.toURI().toURL());
-            // TODO: Load page path from page file rather than from storage path
-            // Currently, a re-index is not possible, since path information
-            // is nowhere to be found!
-            PageURI uri = new PageURIImpl(site, path, version, id);
+            PageURI uri = loadPageURI(site, f.toURI().toURL());
+            if (uri == null)
+              throw new IllegalStateException("Page " + f + " has no uri");
             index.add(uri);
             pageVersionCount ++;
             if (!foundPage) {
