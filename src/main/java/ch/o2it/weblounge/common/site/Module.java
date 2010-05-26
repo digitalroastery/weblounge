@@ -23,7 +23,7 @@ package ch.o2it.weblounge.common.site;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.content.ImageStyle;
 import ch.o2it.weblounge.common.content.PageletRenderer;
-import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -177,7 +177,7 @@ public interface Module extends Customizable {
    *          the search query
    * @return the search result
    */
-  SearchResult[] search(String query);
+  SearchResultItem[] search(String query);
 
   /**
    * Adds the renderer to the set of renderers.

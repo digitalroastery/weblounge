@@ -20,64 +20,80 @@
 
 package ch.o2it.weblounge.common.content;
 
-import ch.o2it.weblounge.common.language.Localizable;
-
 /**
- * The search result is what is delivered by the search function of weblounge.
- * Search results can be delivered by two sources: First of all, the site is
- * searched and hits may include pages or resources. Second, the site's modules
- * will be queried adding the ability to add search results that are found
- * outside of the site's content repository. It is up to the module to decide
- * what the relevance value should be for the search results that it adds.
+ * A result as returned by a search operation.
  */
-public interface SearchResult extends Localizable, Comparable<SearchResult> {
+public interface SearchResult {
 
   /**
-   * Returns the uri that will lead to the location where the hit occurred.
+   * The search items as returned by the search operation or an empty array in
+   * case the search query did not yield any results.
    * 
-   * @return the hit location
+   * @return the items
    */
-  PageURI getURI();
+  SearchResultItem[] getItems();
 
   /**
-   * Returns the title of this search result.
+   * Returns the original query that yielded this result set.
    * 
-   * @return the title
+   * @return the query.
    */
-  String getTitle();
+  SearchQuery getQuery();
 
   /**
-   * Returns a preview of the search result.
+   * Returns the total number of items in the search result.
+   * <p>
+   * Note that this number might not match the size of the array as returned by
+   * {@link #getItems()}, which is likely to be limited by the value returned by
+   * {@link #getLimit()}.
    * 
-   * @return the preview
+   * @return the size of this search result
    */
-  String getPreview();
+  long size();
 
   /**
-   * Returns the renderer that is used to render the search result. Depending on
-   * who delivered the result (could be either weblounge or a custom module),
-   * the result might be rendered by a simple pagelet or some more sophisticated
-   * renderer.
+   * Returns the number of items in this search result, possibly limited with
+   * respect to the total number of result items by <code>offset</code> and
+   * <code>limit</code>.
    * 
-   * @return the renderer
+   * @return the total number of hits.
+   * @see #getOffset()
+   * @see #getLimit()
    */
-  Renderer getPreviewRenderer();
+  long getPageSize();
 
   /**
-   * Returns the relevance of this hit with respect to the search terms. Greater
-   * values mean increased relevance, a 1.0 signifies a direct hit while 0.0
-   * means a very unlikely hit.
+   * Get the offset within the search result or <code>-1</code> if no limit has
+   * been specified.
    * 
-   * @return the relevance
+   * @return the offset
    */
-  float getRelevance();
+  long getOffset();
 
   /**
-   * Returns the source of this search result. This will usually be the site or
-   * a site's module.
+   * Returns the limit of this search results or <code>-1</code> if no limit has
+   * been specified.
    * 
-   * @return the source
+   * @return the limit
    */
-  Object getSource();
+  long getLimit();
+
+  /**
+   * Returns the page of the current result items within the complete search
+   * result. This number is influenced by the <code>offset</code> and the page
+   * size <code>limit</code>.
+   * <p>
+   * Note that the page size is one-based
+   * 
+   * @return the page number
+   */
+  long getPage();
+
+  /**
+   * Returns the search time in milliseconds.
+   * 
+   * @return the time
+   */
+  long getSearchTime();
 
 }

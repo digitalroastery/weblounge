@@ -24,12 +24,51 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.user.User;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * This interface defines a fluent api for a query object used to lookup pages
  * in the {@link PageRepository}.
  */
 public interface SearchQuery {
+
+  /**
+   * Sets the number of results that are returned.
+   * 
+   * @param limit
+   *          the number of results
+   * @return the search query
+   */
+  SearchQuery withLimit(int limit);
+
+  /**
+   * Returns the number of results that are returned, starting at the offset
+   * returned by <code>getOffset()</code>. If no limit was specified, this
+   * method returns <code>-1</code>.
+   * 
+   * @return the maximum number of results
+   */
+  int getLimit();
+
+  /**
+   * Sets the starting offset. Search results will be returned starting at that
+   * offset and until the limit is reached, as specified by
+   * <code>getLimit()</code>.
+   * 
+   * @param offset
+   *          the starting offset
+   * @return the search query
+   * @see
+   */
+  SearchQuery withOffset(int offset);
+
+  /**
+   * Returns the starting offset within the search result or <code>0</code> if
+   * no offset was specified.
+   * 
+   * @return the offset
+   */
+  int getOffset();
 
   /**
    * Return pages that contain the given text.
@@ -41,6 +80,31 @@ public interface SearchQuery {
   SearchQuery withText(String text);
 
   /**
+   * Returns the search text or <code>null</code> if no text was specified.
+   * 
+   * @return the text
+   */
+  String getText();
+
+  /**
+   * Sets the search text.
+   * 
+   * @param property
+   *          the property name
+   * @param value
+   *          the property value
+   * @return the search query
+   */
+  SearchQuery withProperty(String property, String value);
+
+  /**
+   * Returns the search text or <code>null</code> if no text was specified.
+   * 
+   * @return the text
+   */
+  Map<String, String> getProperties();
+
+  /**
    * Return only pages with hits in the specified language.
    * 
    * @param language
@@ -48,6 +112,13 @@ public interface SearchQuery {
    * @return the query extended by this criterion
    */
   SearchQuery withLanguage(Language language);
+
+  /**
+   * Returns the language or <code>null</code> if no language was specified.
+   * 
+   * @return the language
+   */
+  Language getLanguage();
 
   /**
    * Return only pages that have been created or modified by the specified
@@ -140,6 +211,13 @@ public interface SearchQuery {
   SearchQuery withPathPrefix(String path);
 
   /**
+   * Returns the path prefix.
+   * 
+   * @return the prefix
+   */
+  String getPathPrefix();
+
+  /**
    * Return pages that contain the specified pagelet.
    * <p>
    * Note that you can specify the location where the pagelet needs to be by a
@@ -164,6 +242,13 @@ public interface SearchQuery {
   SearchQuery inComposer(String composer) throws IllegalStateException;
 
   /**
+   * Returns the composer.
+   * 
+   * @return the composer
+   */
+  String getComposer();
+
+  /**
    * This method may be called after a call to {@link #inComposer(String)} in
    * order to specify the pagelet's position within that composer.
    * 
@@ -174,6 +259,13 @@ public interface SearchQuery {
    *           if no composer has been specified before
    */
   SearchQuery atPosition(int position) throws IllegalStateException;
+
+  /**
+   * Returns the pagelet position.
+   * 
+   * @return the position
+   */
+  int getPosition();
 
   /**
    * Only return pages that contain a certain pagelet (see
