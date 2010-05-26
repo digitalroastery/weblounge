@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -51,6 +52,46 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQueryImpl(Site site) {
     this.site = site;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withLimit(int)
+   */
+  public SearchQuery withLimit(int limit) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getLimit()
+   */
+  public int getLimit() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withOffset(int)
+   */
+  public SearchQuery withOffset(int offset) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getOffset()
+   */
+  public int getOffset() {
+    // TODO Auto-generated method stub
+    return 0;
   }
 
   /**
@@ -104,6 +145,16 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getPosition()
+   */
+  public int getPosition() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#inComposer(java.lang.String)
    */
@@ -112,6 +163,16 @@ public class SearchQueryImpl implements SearchQuery {
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getComposer()
+   */
+  public String getComposer() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -134,6 +195,16 @@ public class SearchQueryImpl implements SearchQuery {
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getLanguage()
+   */
+  public Language getLanguage() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -183,6 +254,16 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getPathPrefix()
+   */
+  public String getPathPrefix() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withPublisher(ch.o2it.weblounge.common.user.User)
    */
@@ -226,7 +307,37 @@ public class SearchQueryImpl implements SearchQuery {
     // TODO Auto-generated method stub
     return null;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getText()
+   */
+  public String getText() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withProperty(java.lang.String, java.lang.String)
+   */
+  public SearchQuery withProperty(String property, String value) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getProperties()
+   */
+  public Map<String, String> getProperties() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
   /**
    * Pushes the configuration object onto the stack.
    * 

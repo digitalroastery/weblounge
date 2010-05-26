@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.content.ImageStyle;
 import ch.o2it.weblounge.common.content.PageletRenderer;
-import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.impl.content.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.content.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
@@ -432,8 +432,8 @@ public class ModuleImpl implements Module {
    * 
    * @see ch.o2it.weblounge.common.site.Module#search(java.lang.String)
    */
-  public SearchResult[] search(String query) {
-    return new SearchResult[] {};
+  public SearchResultItem[] search(String query) {
+    return new SearchResultItem[] {};
   }
 
   /**
