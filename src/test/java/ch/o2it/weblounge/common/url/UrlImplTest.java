@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.url;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlImpl;
@@ -72,17 +71,6 @@ public class UrlImplTest {
     defaultPath = new UrlImpl(defaultFilePath, filePathSeparator);
   }
 
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.UrlImpl#UrlImpl(java.lang.String, char)}.
-   */
-  @Test
-  public void testUrlImplStringChar() {
-    try {
-      new UrlImpl(null);
-      fail("UrlImpl accepted null url");
-    } catch (IllegalArgumentException e) { /* this is intended */ }
-  }
-  
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.url.UrlImpl#UrlImpl(java.lang.String, char)}.
    */

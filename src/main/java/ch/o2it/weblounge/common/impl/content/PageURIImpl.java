@@ -155,8 +155,6 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   public PageURIImpl(Site site, String path, long version, String id)
       throws MalformedPageURIException {
     super(path, '/');
-    if (path == null)
-      throw new IllegalArgumentException("Path must not be null");
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     if (!path.startsWith("/"))

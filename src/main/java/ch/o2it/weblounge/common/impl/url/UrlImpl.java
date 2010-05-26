@@ -72,12 +72,9 @@ public class UrlImpl implements Url {
    *          the path separator
    */
   public UrlImpl(String path, char separator) {
-    if (path == null)
-      throw new IllegalArgumentException("Url path cannot be null");
-    if (path.length() == 0 || path.charAt(0) != separator)
-      path  = separator + path;
     this.separatorChar = separator;
-    setPath(path);
+    if (path != null)
+      setPath(path);
   }
 
   /**
