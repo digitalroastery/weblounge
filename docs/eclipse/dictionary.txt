@@ -60,3 +60,4 @@ standalone
 transactional
 readonly
 validator
+solr
