@@ -451,59 +451,59 @@ public class WebloungeTag extends BodyTagSupport {
   protected String getStandardAttributes() {
     StringBuffer b = new StringBuffer(" ");
     if (css != null) {
-      b.append("class=\"" + css + "\" ");
+      b.append("class=\"".concat(css).concat("\" "));
     }
     if (getId() != null) {
-      b.append("id=\"" + getId() + "\" ");
+      b.append("id=\"".concat(getId()).concat("\" "));
     }
     if (name != null) {
-      b.append("name=\"" + name + "\" ");
+      b.append("name=\"".concat(name).concat("\" "));
     }
     if (style != null) {
-      b.append("style=\"" + style + "\" ");
+      b.append("style=\"".concat(style).concat("\" "));
     }
     if (lang != null) {
-      b.append("lang=\"" + lang + "\" ");
+      b.append("lang=\"".concat(lang).concat("\" "));
     }
     if (dir != null) {
-      b.append("dir=\"" + dir + "\" ");
+      b.append("dir=\"".concat(dir).concat("\" "));
     }
     if (title != null) {
-      b.append("title=\"" + title + "\" ");
+      b.append("title=\"".concat(title).concat("\" "));
     }
 
     // Mouse events
     if (onclick != null) {
-      b.append("onclick=\"" + onclick + "\" ");
+      b.append("onclick=\"".concat(onclick).concat("\" "));
     }
     if (ondblclick != null) {
-      b.append("ondblclick=\"" + ondblclick + "\" ");
+      b.append("ondblclick=\"".concat(ondblclick).concat("\" "));
     }
     if (onmousedown != null) {
-      b.append("onmousedown=\"" + onmousedown + "\" ");
+      b.append("onmousedown=\"".concat(onmousedown).concat("\" "));
     }
     if (onmousemove != null) {
-      b.append("onmousemove=\"" + onmousemove + "\"");
+      b.append("onmousemove=\"".concat(onmousemove).concat("\""));
     }
     if (onmouseout != null) {
-      b.append("onmouseout=\"" + onmouseout + "\" ");
+      b.append("onmouseout=\"".concat(onmouseout).concat("\" "));
     }
     if (onmouseover != null) {
-      b.append("onmouseover=\"" + onmouseover + "\" ");
+      b.append("onmouseover=\"".concat(onmouseover).concat("\" "));
     }
     if (onmouseup != null) {
-      b.append("onmouseup=\"" + onmouseup + "\" ");
+      b.append("onmouseup=\"".concat(onmouseup).concat("\" "));
     }
 
     // Keyboard events
     if (onkeydown != null) {
-      b.append("onkeydown=\"" + onkeydown + "\" ");
+      b.append("onkeydown=\"".concat(onkeydown).concat("\" "));
     }
     if (onkeypress != null) {
-      b.append("onkeypress=\"" + onkeypress + "\" ");
+      b.append("onkeypress=\"".concat(onkeypress).concat("\" "));
     }
     if (onkeyup != null) {
-      b.append("onkeyup=\"" + onkeyup + "\" ");
+      b.append("onkeyup=\"".concat(onkeyup).concat("\" "));
     }
 
     return b.toString().trim();
