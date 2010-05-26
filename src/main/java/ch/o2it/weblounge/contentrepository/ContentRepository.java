@@ -23,7 +23,7 @@ package ch.o2it.weblounge.contentrepository;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
-import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.user.User;
 
@@ -251,7 +251,7 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if performing the search query fails
    */
-  SearchResult[] findPages(SearchQuery query) throws ContentRepositoryException;
+  SearchResultItem[] findPages(SearchQuery query) throws ContentRepositoryException;
 
   /**
    * Returns the number of pages in this index.
