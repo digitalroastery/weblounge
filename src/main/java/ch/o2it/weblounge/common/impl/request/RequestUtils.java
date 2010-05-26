@@ -25,12 +25,15 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Action;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -101,8 +104,7 @@ public final class RequestUtils {
    *          the action
    * @return the path extension relative to the action's mount point
    */
-  public String getRequestedUrlExtension(WebloungeRequest request,
-      Action action) {
+  public String getRequestedUrlExtension(WebloungeRequest request, Action action) {
     if (request == null)
       throw new IllegalStateException("Request has not started");
     return request.getRequestedUrl().getPath().substring(action.getPath().length());
@@ -304,7 +306,8 @@ public final class RequestUtils {
         } catch (UnsupportedEncodingException e) {
           throw new IllegalArgumentException("Encoding " + decoding + " is unsupported");
         } catch (IllegalArgumentException e) {
-          // Tried decoding a string with a % inside, so obviously the parameter
+          // Tried decoding a string with a % inside, so obviously the
+          // parameter
           // was decoded already
         }
       }
@@ -1360,6 +1363,245 @@ public final class RequestUtils {
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("Url parameter at index " + index + " must be a boolean");
     }
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and represents a valid <code>java.util.Date</code>. Should the parameter
+   * not be part of the request, <code>0</code> is returned, otherwise the
+   * parameter value is returned as an <code>java.util.Date</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>boolean</code>
+   */
+  public static Date getDateParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException {
+    return getDateParameter(request, parameterName, false);
+  }
+
+  /**
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>java.util.Date</code>. Should the
+   * parameter not be part of the request, <code>defaultValue</code> is
+   * returned, otherwise the parameter value is returned as an
+   * <code>java.util.Date</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>boolean</code>
+   */
+  public static Date getDateParameterWithDefault(WebloungeRequest request,
+      String parameterName, Date defaultValue) throws IllegalArgumentException {
+    String p = getParameter(request, parameterName);
+    if (p == null)
+      return defaultValue;
+    else
+      return getDateParameter(request, parameterName);
+  }
+
+  /**
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>java.util.Date</code> .
+   * Should the parameter be part of the request, it's value is returned as a
+   * <code>java.util.Date</code> whereas otherwise the <code>defaultValue</code>
+   * is returned instead.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param index
+   *          the parameter index
+   * @return the parameter value or <code>defaultValue</code> if the parameter
+   *         is not available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>boolean</code>
+   */
+  public static Date getDateParameterWithDefault(WebloungeRequest request,
+      Action action, int index, Date defaultValue)
+      throws IllegalArgumentException {
+    try {
+      return getDateParameter(request, action, index, true);
+    } catch (IllegalStateException e) {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Checks if the parameter <code>parameterName</code> is present in the
+   * request and represents a valid <code>java.util.Date</code>. Should the
+   * parameter not be part of the request, <code>defaultValue</code> is
+   * returned, otherwise the parameter value is returned as an
+   * <code>java.util.Date</code>.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param defaultValue
+   *          the default parameter value
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>boolean</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static Date getRequiredDateParameter(WebloungeRequest request,
+      String parameterName) throws IllegalArgumentException,
+      IllegalStateException {
+    return getDateParameter(request, parameterName, true);
+  }
+
+  /**
+   * Checks if a parameter is present at position <code>index</code> in the url
+   * whether it represents a valid <code>java.util.Date</code>. In this case,
+   * that parameter is returned as a <code>java.util.Date</code> value, whereas
+   * otherwise a {@link IllegalStateException} is thrown.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the weblounge action
+   * @param index
+   *          the parameter index
+   * @return the parameter value
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to a <code>boolean</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  public static Date getRequiredDateParameter(WebloungeRequest request,
+      Action action, int index) throws IllegalArgumentException,
+      IllegalStateException {
+    return getDateParameter(request, action, index, true);
+  }
+
+  /**
+   * Checks if the parameter <code>parameter</code> is present in the request
+   * and is a valid <code>java.util.Date</code>. Should the parameter not be
+   * part of the request, <code>0</code> is returned, otherwise the parameter
+   * value is returned as an <code>java.util.Date</code>.
+   * <p>
+   * If the parameter is required, then an {@link IllegalStateException} is
+   * thrown.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param parameterName
+   *          the parameter name
+   * @param required
+   *          <code>true</code> if this parameter is mandatory
+   * @return the parameter value or <code>0</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>boolean</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  private static Date getDateParameter(WebloungeRequest request,
+      String parameterName, boolean required) throws IllegalArgumentException,
+      IllegalStateException {
+    String p = null;
+    if (required)
+      p = getRequiredParameter(request, parameterName);
+    else
+      p = getParameter(request, parameterName);
+    if (p == null)
+      return null;
+    try {
+      return parseDate(p);
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Request parameter must be a date");
+    }
+  }
+
+  /**
+   * Checks if a parameter is present in the url at position
+   * <code>parameter</code> and represents a valid <code>java.util.Date</code> .
+   * In that case, the parameter is returned as a <code>java.util.Date</code>,
+   * otherwise <code>false</code> is returned.
+   * <p>
+   * If the parameter is required, and it is not part of the url, then an
+   * {@link IllegalStateException} is thrown.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the action that determines the mountpoint
+   * @param index
+   *          the index of the parameter in the url
+   * @param required
+   *          <code>true</code> if this parameter is mandatory
+   * @return the parameter value or <code>false</code> if the parameter is not
+   *         available
+   * @throws IllegalArgumentException
+   *           if the parameter value cannot be cast to an <code>boolean</code>
+   * @throws IllegalStateException
+   *           if the parameter was not found in the request
+   */
+  private static Date getDateParameter(WebloungeRequest request, Action action,
+      int index, boolean required) throws IllegalArgumentException,
+      IllegalStateException {
+    String p = null;
+    if (required)
+      p = getRequiredParameter(request, action, index);
+    else
+      p = getParameter(request, action, index);
+    if (p == null)
+      return null;
+    try {
+      return parseDate(p);
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Url parameter at index " + index + " must be a date");
+    }
+  }
+
+  /**
+   * Parses a string into a <code>java.util.Date</code> object. Valid date
+   * string patterns are
+   * 
+   * <ul>
+   * <li>dd.MM.yyyy (ex. 18.12.2010)</li>
+   * <li>dd.MM.yyyy kk:mm (ex. 18.12.2010 15:35)</li>
+   * <li>dd.MM.yyyy kk:mm:ss (ex. 18.12.2010 15:35:22)</li>
+   * <li>yyyy-MM-dd (ex. 2010-12-18)</li>
+   * <li>yyyyMMdd (ex. 20101218)</li>
+   * <li>yyyy-MM-ddTkk:mmZ (ex. 2010-12-18T15:35+01:00)</li>
+   * <li>yyyy-MM-ddTkk:mm:ssZ (ex. 2010-12-18T15:35:22+01:00)</li>
+   * </ul>
+   * 
+   * @param datestring
+   *          string to parse
+   * @return date
+   * @throws ParseException
+   *           if the given string could not be converted to a valid date object
+   */
+  private static Date parseDate(String datestring) throws ParseException {
+    String[] parsePatterns = {
+    // german/swiss date format
+        "dd.MM.yyyy",
+        "dd.MM.yyyy kk:mm",
+        "dd.MM.yyyy kk:mm:ss",
+        // ISO8601
+        "yyyy-MM-dd",
+        "yyyyMMdd",
+        "yyyy-MM-ddTkk:mmZ",
+        "yyyy-MM-ddTkk:mm:ssZ",
+        // us date format
+        "MM/dd/yyyy" };
+    return DateUtils.parseDate(datestring, parsePatterns);
   }
 
   /**
