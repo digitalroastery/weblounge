@@ -61,184 +61,104 @@
       <artifactId>commons-fileupload</artifactId>
     </dependency>
 
-    <!-- apache jackrabbit -->
-
+    <!-- apache solr -->
+    
     <dependency>
-      <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-api</artifactId>
-      <version>1.6.0</version>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-common</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-core</artifactId>
+      <version>1.3.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>woodstox</groupId>
+          <artifactId>wstx-asl</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-lucene-core</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-lucene-highlighter</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-lucene-queries</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-lucene-snowball</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-lucene-spellchecker</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-dataimporthandler</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj</artifactId>
+      <version>1.3.0</version>
+    </dependency>
+ 
+    <!-- apache lucene -->
+ 
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-analyzers</artifactId>
+      <version>2.4.1</version>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-memory</artifactId>
+      <version>2.4.1</version>
+    </dependency>
+ 
+    <dependency>
+      <groupId>net.java.dev.stax-utils</groupId>
+      <artifactId>stax-utils</artifactId>
+      <version>20040917</version>
     </dependency>
 
-    <dependency>
-       <groupId>org.apache.jackrabbit</groupId>
-       <artifactId>jackrabbit-core</artifactId>
-       <version>1.6.0</version>
-    </dependency>
-
-    <dependency>
-       <groupId>org.apache.jackrabbit</groupId>
-       <artifactId>jackrabbit-jcr-commons</artifactId>
-       <version>1.6.0</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.apache.jackrabbit</groupId>
-        <artifactId>jackrabbit-spi</artifactId>
-        <version>1.6.0</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.apache.jackrabbit</groupId>
-        <artifactId>jackrabbit-spi-commons</artifactId>
-        <version>1.6.0</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.apache.jackrabbit</groupId>
-        <artifactId>jackrabbit-text-extractors</artifactId>
-        <version>1.6.0</version>
-    </dependency>
-
-    <!-- end apache jackrabbit -->
-
-    <!-- apache jackrabbit support -->
-
-    <!-- supports jackrabbit-core -->
     <dependency>
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
       <version>1.0</version>
     </dependency>
 
-    <!-- supports jackrabbit-core -->
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.0.1B</version>
-    </dependency>
-
-    <!-- supports jackrabbit-core, jackrabbit-spi-commons -->
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
     </dependency>
 
-    <!-- supports jackrabbit-core -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
     
-    <!-- supports jackrabbit-core -->
-    <dependency>
-      <groupId>org.apache.derby</groupId>
-      <artifactId>derby</artifactId>
-      <version>10.4.2.0</version>
-    </dependency>
-    
-    <!-- supports derby (see above) -->
-    <dependency>
-      <groupId>xalan</groupId>
-      <artifactId>xalan</artifactId>
-      <version>2.7.1</version>
-    </dependency>
-
-    <!-- supports xalan (see above) -->
-    <dependency>
-      <groupId>xalan</groupId>
-      <artifactId>serializer</artifactId>
-      <version>2.7.1</version>
-    </dependency>
-
-    <!-- supports derby (see above) -->    
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-      <version>2.9.1</version>
-    </dependency>
-
-    <!-- supports xercexImpl (see above) -->    
-    <dependency>
-        <groupId>xml-resolver</groupId>
-        <artifactId>xml-resolver</artifactId>
-        <version>1.2</version>
-    </dependency>
-    
-    <!-- supports jackrabbit-core -->
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-core</artifactId>
-      <version>2.4.1</version>
-    </dependency>
- 
-    <!-- supports jackrabbit-core -->
-    <dependency>
-        <groupId>concurrent</groupId>
-        <artifactId>concurrent</artifactId>
-        <version>1.3.4</version>
-    </dependency>
-
-    <!-- supports jackrabbit-jcr-commons -->
-    <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20090211</version>
-    </dependency>
-
-    <!-- supports jackrabbit-text-extractors -->
-    <!--
-    <dependency>
-      <groupId>net.sourceforge.nekohtml</groupId>
-      <artifactId>nekohtml</artifactId>
-      <version>1.9.7</version>
-    </dependency>
-    -->
-    
-    <!--  supports jackrabbit-text-extractors -->
-    <!--
-    <dependency>
-      <groupId>pdfbox</groupId>
-      <artifactId>pdfbox</artifactId>
-      <version>0.7.3</version>
-    </dependency>
-    -->
-
-    <!--  supports pdfbox (see above) -->
-    <!--
-    <dependency>
-      <groupId>bouncycastle</groupId>
-      <artifactId>bcmail-jdk14</artifactId>
-      <version>139</version>
-    </dependency>
-    -->
-
-    <!--  supports pdfbox (see above) -->
-    <!--
-    <dependency>
-      <groupId>bouncycastle</groupId>
-      <artifactId>bcprov-jdk14</artifactId>
-      <version>140</version>
-    </dependency>
-    -->
-
-    <!-- supports pdfbox (see above) -->
-    <!--
-    <dependency>
-      <groupId>org.fontbox</groupId>
-      <artifactId>fontbox</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-    -->
-
-    <!-- supports pdfbox (see above) -->
-    <!--
-    <dependency>
-      <groupId>org.jempbox</groupId>
-      <artifactId>jempbox</artifactId>
-      <version>0.2.0</version>
-    </dependency>
-    -->
-
     <!-- testing -->
 
     <dependency>
@@ -263,53 +183,38 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.contentrepository</Bundle-SymbolicName>
             <Embed-Dependency>
-              jcr,
-              jta,
-              jackrabbit-api,
-              jackrabbit-core,
-              jackrabbit-jcr-commons,
-              jackrabbit-spi,
-              jackrabbit-spi-commons,
-              jackrabbit-text-extractors,
-              lucene-core,
-              derby,
-              commons-collections,
-              commons-io,
-              concurrent,
-              xalan,
-              serializer,
-              xercesImpl,
-              json
+              jcr;inline=true,
+              lucene-analyzers;inline=true,
+              lucene-memory;inline=true,
+              solr-common;inline=true,
+              solr-core;inline=true,
+              solr-dataimporthandler;inline=true,
+              solr-solrj;inline=true,
+              solr-lucene-contrib;inline=true,
+              solr-lucene-core;inline=true,
+              solr-lucene-highlighter;inline=true,
+              solr-lucene-queries;inline=true,
+              solr-lucene-snowball;inline=true,
+              solr-lucene-spellchecker;inline=true,
+              stax-utils;inline=true,
             </Embed-Dependency>
-            <!--  Embed for additional indexing support            
-              nekohtml
-              pdfbox,
-              bcmail-jdk14,
-              bcprov-jdk14,
-              fontbox,
-              jempbox
-            -->
+            <Private-Package>
+              solr.*,
+              org.tartarus.*;-split-package:=merge-first,
+              org.apache.solr.*;-split-package:=merge-first,
+              org.apache.lucene.*;-split-package:=merge-first
+            </Private-Package>
             <Export-Package>
+              ch.o2it.weblounge.contentrepository.impl,
               ch.o2it.weblounge.contentrepository.impl.bundle,
               ch.o2it.weblounge.contentrepository.impl.fs,
+              ch.o2it.weblounge.contentrepository.impl.index,
               ch.o2it.weblounge.contentrepository.impl.jcr
             </Export-Package>
             <Import-Package>
               ch.o2it.weblounge.contentrepository,
-              org.apache.xml.resolver.*;resolution:=optional,
-              sun.io.*;resolution:=optional,
-              !org.apache.jackrabbit.test,
-              !org.apache.derby.impl.drda,
-              !org.cyberneko.html.*,
-              !org.apache.poi.*,
-              !org.pdfbox.*,
-              *
+              *;resolution:=optional
             </Import-Package>
-            <!-- Import for additional indexing support
-              !junit.*,
-              !org.apache.tools.ant.*,
-              !org.apache.lucene.demo,
-            -->
             <Service-Component>
               OSGI-INF/contentrepository-service.xml
             </Service-Component>
