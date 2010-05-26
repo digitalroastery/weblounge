@@ -122,6 +122,7 @@
               org.apache.commons.fileupload.servlet,
               org.apache.commons.io,
               org.apache.commons.lang,
+              org.apache.commons.lang.time,
               org.apache.commons.pool,
               org.apache.commons.pool.impl,
               org.quartz,
