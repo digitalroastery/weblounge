@@ -37,8 +37,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Utility implementation to deal with <code>HttpRequest</code> objects.
  */
@@ -54,19 +52,21 @@ public final class RequestUtils {
   }
 
   /**
-   * Dumps the request headers to <code>System.out</code>.
+   * Returns a string representation of the request headers.
    * 
    * @param request
    *          the request
+   * @return the headers
    */
-  public static void dumpHeaders(HttpServletRequest request) {
-    Enumeration<?> hi = request.getHeaderNames();
-    System.out.println("Request headers:");
-    while (hi.hasMoreElements()) {
-      String header = (String) hi.nextElement();
+  public static String dumpHeaders(WebloungeRequest request) {
+    Enumeration<?> hn = request.getHeaderNames();
+    String headers = "Request headers:";
+    while (hn.hasMoreElements()) {
+      String header = (String) hn.nextElement();
       String value = request.getHeader(header);
-      System.out.println("\t" + header + ": " + value);
+      headers = headers.concat(header).concat(": ").concat(value);
     }
+    return headers;
   }
 
   /**
@@ -104,10 +104,42 @@ public final class RequestUtils {
    *          the action
    * @return the path extension relative to the action's mount point
    */
-  public String getRequestedUrlExtension(WebloungeRequest request, Action action) {
+  public static String getRequestedUrlExtension(WebloungeRequest request,
+      Action action) {
     if (request == null)
       throw new IllegalStateException("Request has not started");
     return request.getRequestedUrl().getPath().substring(action.getPath().length());
+  }
+
+  /**
+   * Returns a list of parameters found in the path extension requested url
+   * (split by '/'). For example, if an action is mounted to <code>/test</code>
+   * and the url is <code>/test/a/b/c</code> then this method will return a list
+   * with the values 'a', 'b' and 'c'. For the mount point itself, the method
+   * will return an empty list.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the action
+   * @return a list with parameters found in the path extension of the action's
+   *         mount point
+   */
+  public static List<String> getRequestedUrlParams(WebloungeRequest request,
+      Action action) {
+    // load parameter values from url extension
+    List<String> urlparams = new ArrayList<String>();
+    String path = request.getRequestedUrl().getPath();
+    String actionMountpoint = action.getPath();
+    String[] params = path.substring(actionMountpoint.length()).split("/");
+
+    // first param is empty (because of leading slash), therefore start with
+    // index 1
+    for (int i = 1; i < params.length; i++) {
+      urlparams.add(params[i]);
+    }
+
+    return urlparams;
   }
 
   /**
@@ -122,10 +154,41 @@ public final class RequestUtils {
    *          the action
    * @return the path extension relative to the action's mount point
    */
-  public String getUrlExtension(WebloungeRequest request, Action action) {
+  public static String getUrlExtension(WebloungeRequest request, Action action) {
     if (request == null)
       throw new IllegalStateException("Request has not started");
     return request.getUrl().getPath().substring(action.getPath().length());
+  }
+
+  /**
+   * Returns a list of parameters found in the extension part of the targeted
+   * url (split by '/'). For example, if an action is mounted to
+   * <code>/test</code> and the url is <code>/test/a/b/c</code> then this method
+   * will return a list with the values 'a', 'b' and 'c'. For the mount point
+   * itself, the method will return an empty list.
+   * 
+   * @param request
+   *          the weblounge request
+   * @param action
+   *          the action
+   * @return a list with parameters found in the path extension of the action's
+   *         mount point
+   */
+  public static List<String> getUrlParams(WebloungeRequest request,
+      Action action) {
+    // load parameter values from url extension
+    List<String> urlparams = new ArrayList<String>();
+    String path = request.getUrl().getPath();
+    String actionMountpoint = action.getPath();
+    String[] params = path.substring(actionMountpoint.length()).split("/");
+
+    // first param is empty (because of leading slash), therefore start with
+    // index 1
+    for (int i = 1; i < params.length; i++) {
+      urlparams.add(params[i]);
+    }
+
+    return urlparams;
   }
 
   /**
@@ -168,18 +231,7 @@ public final class RequestUtils {
    */
   public static String getParameter(WebloungeRequest request, Action action,
       int index) {
-
-    // load parameter values from url extension
-    List<String> urlparams = new ArrayList<String>();
-    String path = request.getRequestedUrl().getPath();
-    String actionMountpoint = action.getPath();
-    String[] params = path.substring(actionMountpoint.length()).split("/");
-    // first param is empty (because of leading slash), therefore start with
-    // index
-    // 1
-    for (int i = 1; i < params.length; i++) {
-      urlparams.add(params[i]);
-    }
+    List<String> urlparams = getRequestedUrlParams(request, action);
 
     // Did we extract as many parameters as we should?
     if (index >= urlparams.size())
