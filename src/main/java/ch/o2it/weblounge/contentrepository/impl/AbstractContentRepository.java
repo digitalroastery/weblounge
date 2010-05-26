@@ -33,6 +33,7 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -305,7 +306,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPages()
    */
   public long getPages() {
@@ -314,7 +315,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions()
    */
   public long getVersions() {
@@ -323,8 +324,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /**
    * Appends the identifier of the form <code>x-y-z-u-v</code> to
-   * <code>path</code> as in <code>/x/y/z/u/v</code>, with the "/" being the
-   * platform's file separator.
+   * <code>path</code> as in <code>/&lt;int&gt;/&lt;int&gt;/id</code>, with the
+   * "/" being the platform's file separator.
    * 
    * @param id
    *          the identifier
@@ -335,15 +336,14 @@ public abstract class AbstractContentRepository implements ContentRepository {
   protected StringBuffer appendIdToPath(String id, StringBuffer path) {
     if (id == null)
       throw new IllegalArgumentException("Identifier must not be null");
-    String[] elements = id.split("-");
-    for (String e : elements)
-      path.append("/").append(e);
+    path.append(idToDirectory(id));
     return path;
   }
 
   /**
    * Returns the identifier of the form <code>x-y-z-u-v</code> as a path as in
-   * <code>/x/y/z/u/v</code>, with the "/" being the platform's file separator.
+   * <code>/&lt;int&gt;/&lt;int&gt;/id</code>, with the "/" being the platform's
+   * file separator.
    * 
    * @param id
    *          the identifier
@@ -354,8 +354,19 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new IllegalArgumentException("Identifier must not be null");
     String[] elements = id.split("-");
     StringBuffer path = new StringBuffer();
-    for (String e : elements)
-      path.append("/").append(e);
+
+    // convert first part of uuid to long and apply modulo 100
+    path.append(File.separatorChar);
+    path.append(String.valueOf(Long.parseLong(elements[0], 16) % 100));
+
+    // convert second part of uuid to long and apply modulo 10
+    path.append(File.separatorChar);
+    path.append(String.valueOf(Long.parseLong(elements[1], 16) % 10));
+
+    // append the full uuid as the actual directory
+    path.append(File.separatorChar);
+    path.append(id);
+
     return path.toString();
   }
 
