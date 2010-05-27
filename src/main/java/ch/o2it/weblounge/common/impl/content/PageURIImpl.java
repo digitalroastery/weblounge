@@ -51,7 +51,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    * @param site
    *          the associated site
    */
-  PageURIImpl(Site site) {
+  public PageURIImpl(Site site) {
     this(site, "/", Page.LIVE, null);
   }
 
@@ -162,6 +162,16 @@ public class PageURIImpl extends UrlImpl implements PageURI {
     this.site = site;
     this.id = id;
     this.version = version;
+  }
+
+  /**
+   * Sets the page identifier.
+   * 
+   * @param id
+   *          the identifier
+   */
+  public void setIdentifier(String id) {
+    this.id = id;
   }
 
   /**

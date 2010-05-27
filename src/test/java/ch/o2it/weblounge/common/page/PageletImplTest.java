@@ -225,6 +225,16 @@ public class PageletImplTest {
 
   /**
    * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.PageletImpl#getPropertyNames()}
+   * .
+   */
+  @Test
+  public void testGetPropertyNames() {
+    assertEquals(2, pagelet.getPropertyNames().length);
+  }
+
+  /**
+   * Test method for
    * {@link ch.o2it.weblounge.common.impl.content.PageletImpl#getProperty(java.lang.String)}
    * .
    */
@@ -399,6 +409,17 @@ public class PageletImplTest {
     assertEquals(location, pagelet.getURI());
   }
 
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.PageletImpl#getContentNames(Language)}
+   * .
+   */
+  @Test
+  public void textGetContentNames() {
+    assertEquals(3, pagelet.getContentNames(german).length);
+    assertEquals(2, pagelet.getContentNames(french).length);
+  }
+  
   /**
    * Test method for
    * {@link ch.o2it.weblounge.common.impl.content.PageletImpl#isMultiValueContent(java.lang.String)}

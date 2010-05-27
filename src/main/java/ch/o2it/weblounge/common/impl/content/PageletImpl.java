@@ -167,6 +167,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    *
+   * @see ch.o2it.weblounge.common.content.Pagelet#getPropertyNames()
+   */
+  public String[] getPropertyNames() {
+    return properties.keySet().toArray(new String[properties.size()]);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.o2it.weblounge.common.content.Pagelet#getProperty(java.lang.String)
    */
   public String getProperty(String key) {
@@ -466,6 +475,18 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     modificationCtx.setModified(user, date, language);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Pagelet#getContentNames(ch.o2it.weblounge.common.language.Language)
+   */
+  public String[] getContentNames(Language language) {
+    Map<String, String[]> languageContent = content.get(language, true);
+    if (languageContent == null)
+      return new String[] {};
+    return languageContent.keySet().toArray(new String[languageContent.size()]);
+  }
+  
   /**
    * {@inheritDoc}
    *
