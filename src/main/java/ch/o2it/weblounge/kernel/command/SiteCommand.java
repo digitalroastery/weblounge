@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.kernel.command;
 
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -55,13 +58,15 @@ public class SiteCommand {
    * Command signature that allows to do
    * <ul>
    * <li><code>site list</code></li>
-   * <li><code>site <id> start</code></li>
-   * <li><code>site <id> stop</code></li>
-   * <li><code>site <id> restart</code></li>
-   * <li><code>site <id> enable</code></li>
-   * <li><code>site <id> disable</code></li>
-   * <li><code>site <id> index</code></li>
-   * <li><code>site <id> status</code></li>
+   * <li><code>site &lt;id&gt; start</code></li>
+   * <li><code>site &lt;id&gt; stop</code></li>
+   * <li><code>site &lt;id&gt; restart</code></li>
+   * <li><code>site &lt;id&gt; enable</code></li>
+   * <li><code>site &lt;id&gt; disable</code></li>
+   * <li><code>site &lt;id&gt; index</code></li>
+   * <li><code>site &lt;id&gt; status</code></li>
+   * <li><code>site &lt;id&gt; inspect &lt;url&gt;</code></li>
+   * <li><code>site &lt;id&gt; search &lt;terms&gt;</code></li>
    * </ul>
    * 
    * @param session
@@ -108,7 +113,11 @@ public class SiteCommand {
         index(site);
       else if ("status".equals(args[1]))
         status(site);
-      else {
+      else if ("inspect".equals(args[1]))
+        inspect(site, Arrays.copyOfRange(args, 2, args.length));
+      else if ("search".equals(args[1])) {
+        search(site, Arrays.copyOfRange(args, 2, args.length));
+      } else {
         System.out.println("Unknown command: " + args[1]);
         return;
       }
@@ -170,19 +179,19 @@ public class SiteCommand {
    *          the site
    */
   private void status(Site site) {
-    status("identifier", site.getIdentifier());
+    pad("identifier", site.getIdentifier());
     if (site.getName() != null)
-      status("description", site.getName());
+      pad("description", site.getName());
 
     // Enabled
-    status("autostart", (site.isStartedAutomatically() ? "yes" : "no"));
+    pad("autostart", (site.isStartedAutomatically() ? "yes" : "no"));
 
     // Started / Stopped
-    status("running", (site.isRunning() ? "yes" : "no"));
+    pad("running", (site.isRunning() ? "yes" : "no"));
 
     // Hostnames
     if (site.getHostNames().length > 0)
-      status("hosts", site.getHostNames());
+      pad("hosts", site.getHostNames());
 
     // Languages
     if (site.getLanguages().length > 0) {
@@ -198,15 +207,86 @@ public class SiteCommand {
           buf.append(", ");
         buf.append(language);
       }
-      status("languages", buf.toString());
+      pad("languages", buf.toString());
     }
 
     // Pages and revisions
     ContentRepository repository = ContentRepositoryFactory.getRepository(site);
     long pages = repository != null ? repository.getPages() : -1;
-    status("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
+    pad("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
     long revisions = repository != null ? repository.getVersions() : -1;
-    status("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
+    pad("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
+  }
+
+  /**
+   * Prints out information about the given url or page identifier.
+   * 
+   * @param site
+   *          the site
+   * @param args
+   *          arguments to this function
+   */
+  private void inspect(Site site, String[] args) {
+    if (args.length == 0) {
+      System.out.println("Please specify what to inspect");
+      printUsage();
+      return;
+    }
+
+    // What are we looking at?
+    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    Page page = null;
+
+    // Is it a page?
+    try {
+      page = repository.getPage(new PageURIImpl(site, args[0]));
+      if (page == null)
+        page = repository.getPage(new PageURIImpl(site, null, args[0]));
+      if (page != null) {
+        System.out.println("Page:");
+        pad("id", page.getURI().getId().toString());
+        pad("path", page.getURI().getPath());
+      }
+    } catch (ContentRepositoryException e) {
+      System.err.println("Error trying access the content repository");
+      e.printStackTrace(System.err);
+    }
+  }
+
+  /**
+   * Does a search using the terms from the arguments and displays the search
+   * hits on the console.
+   * 
+   * @param site
+   *          the site
+   * @param args
+   *          search terms
+   */
+  private void search(Site site, String[] args) {
+    if (args.length == 0) {
+      System.out.println("Please specify what to inspect");
+      printUsage();
+      return;
+    }
+
+    // What are we looking at?
+    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    Page page = null;
+
+    // Is it a page?
+    try {
+      page = repository.getPage(new PageURIImpl(site, args[0]));
+      if (page == null)
+        page = repository.getPage(new PageURIImpl(site, null, args[0]));
+      if (page != null) {
+        System.out.println("Page:");
+        pad("id", page.getURI().getId().toString());
+        pad("path", page.getURI().getPath());
+      }
+    } catch (ContentRepositoryException e) {
+      System.err.println("Error trying access the content repository");
+      e.printStackTrace(System.err);
+    }
   }
 
   /**
@@ -244,7 +324,7 @@ public class SiteCommand {
     // Finally! Let's do the work
     System.out.println("Indexing site " + site);
     try {
-      ((WritableContentRepository)repository).index();
+      ((WritableContentRepository) repository).index();
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
     }
@@ -265,12 +345,12 @@ public class SiteCommand {
    * @param info
    *          the information
    */
-  private void status(String caption, String[] info) {
+  private void pad(String caption, String[] info) {
     for (int i = 0; i < info.length; i++) {
       if (i == 0)
-        status(caption, info[i]);
+        pad(caption, info[i]);
       else
-        status(null, info[i]);
+        pad(null, info[i]);
     }
   }
 
@@ -282,7 +362,7 @@ public class SiteCommand {
    * @param info
    *          the information
    */
-  private void status(String caption, String info) {
+  private void pad(String caption, String info) {
     if (caption == null)
       caption = "";
     for (int i = 0; i < (15 - caption.length()); i++)
@@ -360,6 +440,8 @@ public class SiteCommand {
     System.out.println("    site <id> start|stop|restart");
     System.out.println("    site <id> index");
     System.out.println("    site <id> status");
+    System.out.println("    site <id> inspect <url|id>");
+    System.out.println("    site <id> search <terms>");
   }
 
   /**
