@@ -36,6 +36,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,7 +85,7 @@ public class SiteCommand {
       } else {
         printUsage();
       }
-    } else if (args.length == 2) {
+    } else if (args.length > 1) {
       String id = args[0];
 
       // Look up the site
@@ -228,8 +229,8 @@ public class SiteCommand {
    */
   private void inspect(Site site, String[] args) {
     if (args.length == 0) {
-      System.out.println("Please specify what to inspect");
-      printUsage();
+      System.err.println("Please specify what to inspect");
+      System.err.println("Usage: site <id> inspect <url>|<id>");
       return;
     }
 
@@ -243,9 +244,46 @@ public class SiteCommand {
       if (page == null)
         page = repository.getPage(new PageURIImpl(site, null, args[0]));
       if (page != null) {
-        System.out.println("Page:");
+        pad("type", "page");
         pad("id", page.getURI().getId().toString());
         pad("path", page.getURI().getPath());
+        
+        System.out.println();
+        
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG);
+
+        // Created
+        if (page.getCreationDate() != null) {
+          StringBuffer buf = new StringBuffer();
+          buf.append(df.format(page.getCreationDate()));
+          if (page.getCreator() != null) {
+            buf.append(" by ").append(page.getCreator().toString());
+          }
+          pad("created", buf.toString());
+        }
+
+        // Modified
+        if (page.getModificationDate() != null) {
+          StringBuffer buf = new StringBuffer();
+          buf.append(df.format(page.getModificationDate()));
+          if (page.getModifier() != null) {
+            buf.append(" by ").append(page.getModifier().toString());
+          }
+          pad("modified", buf.toString());
+        }
+
+        // Published
+        if (page.getPublishFrom() != null) {
+          StringBuffer buf = new StringBuffer();
+          buf.append(df.format(page.getPublishFrom()));
+          if (page.getPublisher() != null) {
+            buf.append(" by ").append(page.getPublisher().toString());
+          }
+          pad("published", buf.toString());
+          if (page.getPublishTo() != null)
+            pad("published until", df.format(page.getPublishTo()));
+        }
+        
       }
     } catch (ContentRepositoryException e) {
       System.err.println("Error trying access the content repository");
