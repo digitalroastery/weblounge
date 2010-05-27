@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
+import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.security.Authority;
@@ -231,7 +232,8 @@ public abstract class WebloungeContentReader extends DefaultHandler {
     else if (contentReaderContext == Context.Publish && "to".equals(raw)) {
       try {
         Date d = dateFormat.parse(getCharacters());
-        clipboard.put("publish.end", d);
+        if (d.getTime() < Times.MAX_DATE)
+          clipboard.put("publish.end", d);
       } catch (Exception e) {
         throw new IllegalStateException("Reading publishing end date failed: '" + getCharacters() + "'");
       }
@@ -270,8 +272,6 @@ public abstract class WebloungeContentReader extends DefaultHandler {
       if (startDate == null)
         throw new IllegalStateException("Publication start date not found");
       Date endDate = (Date) clipboard.get("publish.end");
-      if (endDate == null)
-        throw new IllegalStateException("Publication end date not found");
       setPublished(publisher, startDate, endDate);
       contentReaderContext = Context.Unknown;
     }

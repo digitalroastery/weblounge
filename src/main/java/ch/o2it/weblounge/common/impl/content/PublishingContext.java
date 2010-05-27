@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
+import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
@@ -121,7 +122,7 @@ public class PublishingContext implements Cloneable {
    */
   public void setPublished(User publisher, Date startDate, Date endDate)
       throws IllegalStateException {
-    if (startDate.after(endDate))
+    if (endDate != null && startDate.after(endDate))
       throw new IllegalArgumentException("Start date is after end date");
     this.publisher = publisher;
     this.startDate = startDate;
@@ -310,7 +311,9 @@ public class PublishingContext implements Cloneable {
     String endDate = XPathHelper.valueOf(contextRoot, "/published/to", xpathProcessor);
     if (endDate != null) {
       try {
-        ctx.setPublishTo(WebloungeDateFormat.parseStatic(endDate));
+        Date date = WebloungeDateFormat.parseStatic(endDate);
+        if (date.getTime() < Times.MAX_DATE)
+          ctx.setPublishTo(date);
       } catch (ParseException e) {
         throw new IllegalStateException("The publishing end date '" + endDate + "' cannot be parsed", e);
       }
@@ -357,7 +360,7 @@ public class PublishingContext implements Cloneable {
     }
 
     // End date
-    if (endDate != null) {
+    if (endDate != null && endDate.getTime() < Times.MAX_DATE) {
       b.append("<to>");
       b.append(WebloungeDateFormat.formatStatic(endDate));
       b.append("</to>");
