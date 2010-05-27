@@ -53,10 +53,11 @@ public class URIIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    indexFile = new File(new File(System.getProperty("java.io.tmpdir")), "id.idx");
+    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+    indexFile = new File(tmpDir, URIIndex.URI_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new URIIndex(indexFile, false, pathLength);
+    idx = new URIIndex(tmpDir, false, pathLength);
   }
 
   /**

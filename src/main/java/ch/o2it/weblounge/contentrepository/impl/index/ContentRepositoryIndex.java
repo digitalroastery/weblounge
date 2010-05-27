@@ -20,7 +20,10 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
+import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 
 import org.slf4j.Logger;
@@ -41,18 +44,6 @@ public class ContentRepositoryIndex {
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(ContentRepositoryIndex.class);
 
-  /** Name for the uri index file */
-  public static final String URI_IDX_NAME = "uri.idx";
-
-  /** Name for the id index file */
-  public static final String ID_IDX_NAME = "id.idx";
-
-  /** Name for the path index file */
-  public static final String PATH_IDX_NAME = "path.idx";
-
-  /** Name for the version index file */
-  public static final String VERSION_IDX_NAME = "version.idx";
-
   /** The uri index */
   protected URIIndex uriIdx = null;
 
@@ -64,6 +55,9 @@ public class ContentRepositoryIndex {
 
   /** The version index */
   protected VersionIndex versionIdx = null;
+
+  /** The search index */
+  protected SearchIndex searchIdx = null;
 
   /**
    * Creates a new index that is located in the indicated folder.
@@ -77,10 +71,11 @@ public class ContentRepositoryIndex {
    */
   public ContentRepositoryIndex(File rootDir, boolean readOnly)
       throws IOException {
-    this.uriIdx = new URIIndex(new File(new File(rootDir, "structure"), URI_IDX_NAME), false);
-    this.idIdx = new IdIndex(new File(new File(rootDir, "structure"), ID_IDX_NAME), readOnly);
-    this.pathIdx = new PathIndex(new File(new File(rootDir, "structure"), PATH_IDX_NAME), readOnly);
-    this.versionIdx = new VersionIndex(new File(new File(rootDir, "structure"), VERSION_IDX_NAME), readOnly);
+    this.uriIdx = new URIIndex(new File(rootDir, "structure"), false);
+    this.idIdx = new IdIndex(new File(rootDir, "structure"), readOnly);
+    this.pathIdx = new PathIndex(new File(rootDir, "structure"), readOnly);
+    this.versionIdx = new VersionIndex(new File(rootDir, "structure"), readOnly);
+    this.searchIdx = new SearchIndex(rootDir, readOnly);
   }
 
   /**
@@ -144,6 +139,16 @@ public class ContentRepositoryIndex {
   }
 
   /**
+   * Sets the search index.
+   * 
+   * @param searchIndex
+   *          the search index
+   */
+  protected void setSearchIndex(SearchIndex searchIndex) {
+    this.searchIdx = searchIndex;
+  }
+
+  /**
    * Closes the index files. No more read and write operations are allowed.
    * 
    * @throws IOException
@@ -158,6 +163,8 @@ public class ContentRepositoryIndex {
       pathIdx.close();
     if (versionIdx != null)
       versionIdx.close();
+    if (searchIdx != null)
+      searchIdx.close();
   }
 
   /**
@@ -188,7 +195,8 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public synchronized PageURI add(PageURI uri) throws IOException {
+  public synchronized PageURI add(Page page) throws IOException {
+    PageURI uri = page.getURI();
     if (uri.getPath() == null)
       throw new IllegalArgumentException("Uri must contain a path");
 
@@ -200,12 +208,14 @@ public class ContentRepositoryIndex {
       if (id == null) {
         id = UUID.randomUUID().toString();
         uri = new PageURIImpl(uri.getSite(), uri.getPath(), uri.getVersion(), id);
+        ((PageURIImpl)page.getURI()).setIdentifier(id);
       }
       String path = uri.getPath();
       address = uriIdx.add(id, path);
       idIdx.add(id, address);
       pathIdx.add(path, address);
       versionIdx.add(id, uri.getVersion());
+      searchIdx.add(page);
     }
 
     // Otherwise, it's just a new version
@@ -246,6 +256,7 @@ public class ContentRepositoryIndex {
     pathIdx.delete(path, address);
     uriIdx.delete(address);
     versionIdx.delete(address);
+    searchIdx.delete(id);
   }
 
   /**
@@ -366,6 +377,7 @@ public class ContentRepositoryIndex {
     pathIdx.delete(oldPath, address);
     pathIdx.add(uri.getPath(), address);
     uriIdx.update(address, uri.getPath());
+    // TODO: Update search index
   }
 
   /**
@@ -379,6 +391,7 @@ public class ContentRepositoryIndex {
     idIdx.clear();
     pathIdx.clear();
     versionIdx.clear();
+    searchIdx.clear();
   }
 
   /**
@@ -426,8 +439,18 @@ public class ContentRepositoryIndex {
    * @return an iteration of the resulting uris
    */
   public Iterator<PageURI> list(PageURI uri, int level, long version) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Not yet implemented");
+  }
+
+  /**
+   * Issues a search query and returns the matches in the result set.
+   * 
+   * @param query
+   *          the search query
+   * @return the search result
+   */
+  public SearchResult findPages(SearchQuery query) throws IOException {
+    return searchIdx.getByQuery(query);
   }
 
   /**

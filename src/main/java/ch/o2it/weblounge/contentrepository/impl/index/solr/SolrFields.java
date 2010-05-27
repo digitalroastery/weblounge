@@ -27,11 +27,56 @@ public interface SolrFields {
 
   public static final String ID = "id";
 
-  /** Solr ranking score */
-  public static final String SCORE = "score";
+  /** Path field name */
+  public static final String PATH = "path";
+
+  /** Preview field name */
+  public static final String PREVIEW_XML = "preview-xml";
+
+  /** Description field name */
+  public static final String DESCRIPTION = "description";
+
+  /** Coverage field name */
+  public static final String COVERAGE = "coverage";
+
+  /** Rights field name */
+  public static final String RIGHTS = "rights";
 
   /** Title field name */
   public static final String TITLE = "title";
+
+  /** Created field name */
+  public static final String CREATED = "created";
+
+  /** Creator field name */
+  public static final String CREATED_BY = "created-by";
+
+  /** Modified field name */
+  public static final String MODIFIED = "modified";
+
+  /** Modifier field name */
+  public static final String MODIFIED_BY = "modified-by";
+
+  /** Publishing start date field name */
+  public static final String PUBLISHED_FROM = "published-from";
+
+  /** Publishing end date field name */
+  public static final String PUBLISHED_TO = "published-to";
+
+  /** Publisher field name */
+  public static final String PUBLISHED_BY = "published-by";
+
+  /** Pagelet text field name */
+  public static final String PAGELET_TEXT = "pagelet-text-{0}-{1}";
+
+  /** Pagelet properties field name */
+  public static final String PAGELET_PROPERTIES = "pagelet-properties-{0}";
+
+  /** Pagelet xml field name */
+  public static final String PAGELET_XML = "pagelet-xml-{0}";
+
+  /** Solr ranking score */
+  public static final String SCORE = "score";
   
   /** Accumulative fulltext field */
   public static final String FULLTEXT = "fulltext";

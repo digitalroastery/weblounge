@@ -23,7 +23,6 @@ package ch.o2it.weblounge.contentrepository.impl.index;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.PageInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrConnection;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
@@ -49,10 +48,8 @@ import java.util.logging.Level;
  */
 public class SearchIndex {
 
-  /** Log facility */
-  private static final Logger log_ = LoggerFactory.getLogger(SearchIndex.class);
-
-  public static final String CONFIG_SOLR_ROOT = "search.searchindexdir";
+  /** Logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(SearchIndex.class);
 
   /** Connection to the solr database */
   private SolrConnection solrConnection = null;
@@ -60,15 +57,21 @@ public class SearchIndex {
   /** Solr query execution */
   private SolrRequester solrRequester = null;
 
+  /** True if this is a readonly index */
+  protected boolean isReadOnly = false;
+
   /**
-   * Creates a search service that puts solr into the given root directory. If
-   * the directory doesn't exist, it will be created.
+   * Creates a search index that puts solr into the given root directory. If the
+   * directory doesn't exist, it will be created.
    * 
    * @param solrRoot
    *          the solr root directory
+   * @param readOnly
+   *          <code>true</code> to indicate a read only index
    */
-  public SearchIndex(String solrRoot) {
+  public SearchIndex(File solrRoot, boolean readOnly) {
     setupSolr(solrRoot);
+    this.isReadOnly = readOnly;
   }
 
   /**
@@ -81,7 +84,7 @@ public class SearchIndex {
     try {
       solrConnection.destroy();
     } catch (Throwable t) {
-      log_.error("Error closing the solr connection");
+      logger.error("Error closing the solr connection");
     }
   }
 
@@ -91,28 +94,32 @@ public class SearchIndex {
    * @param query
    *          the search query
    * @return the result set
-   * @throws SolrServerException
+   * @throws IOException
    *           if executing the search operation fails
    */
-  public SearchResult getByQuery(SearchQuery query) throws SolrServerException {
-    log_.debug("Searching index using custom query '{}'", query);
-    return solrRequester.getByQuery(query);
+  public SearchResult getByQuery(SearchQuery query) throws IOException {
+    logger.debug("Searching index using query '{}'", query);
+    try {
+      return solrRequester.getByQuery(query);
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
   }
 
   /**
    * Clears the search index. Make sure you know what you are doing.
    * 
-   * @throws SolrServerException
+   * @throws IOException
    *           if an errors occurs while talking to solr
    */
-  public void clear() throws SolrServerException {
+  public void clear() throws IOException {
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.deleteByQuery("*:*");
     solrRequest.setAction(ACTION.COMMIT, true, true);
     try {
       solrConnection.update(solrRequest);
     } catch (Exception e) {
-      log_.error("Cannot clear solr index", e);
+      logger.error("Cannot clear solr index", e);
     }
   }
 
@@ -122,10 +129,11 @@ public class SearchIndex {
    * 
    * @param id
    *          identifier of the page or resource
-   * @throws SolrServerException
+   * @throws IOException
    *           if an errors occurs while talking to solr
    */
-  public boolean delete(String id) throws SolrServerException {
+  public boolean delete(String id) throws IOException {
+    logger.debug("Removing element with id '{}' from searching index", id);
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.deleteById(id);
     solrRequest.setAction(ACTION.COMMIT, true, true);
@@ -133,7 +141,7 @@ public class SearchIndex {
       solrConnection.update(solrRequest);
       return true;
     } catch (Exception e) {
-      log_.error("Unable to clear solr index", e);
+      logger.error("Unable to clear solr index", e);
       return false;
     }
   }
@@ -143,10 +151,11 @@ public class SearchIndex {
    * 
    * @param page
    *          the page to add to the index
-   * @throws SolrServerException
+   * @throws IOException
    *           if an errors occurs while talking to solr
    */
-  public boolean add(Page page) throws SolrServerException {
+  public boolean add(Page page) throws IOException {
+    logger.debug("Adding page {} to searching index", page);
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.setAction(ACTION.COMMIT, true, true);
     solrRequest.add(new PageInputDocument(page));
@@ -156,7 +165,7 @@ public class SearchIndex {
       solrConnection.update(solrRequest);
       return true;
     } catch (Exception e) {
-      log_.error("Cannot clear solr index");
+      logger.error("Cannot clear solr index");
       return false;
     }
   }
@@ -167,16 +176,16 @@ public class SearchIndex {
    * @param solrRoot
    *          the solr root directory
    */
-  private void setupSolr(String solrRoot) {
+  private void setupSolr(File solrRoot) {
     try {
-      log_.info("Setting up solr search index at {}", solrRoot);
+      logger.info("Setting up solr search index at {}", solrRoot);
       File solrConfigDir = new File(solrRoot, "conf");
 
       // Create the config directory
       if (solrConfigDir.exists()) {
-        log_.info("solr search index found at {}", solrConfigDir);
+        logger.info("Using solr search index at {}", solrRoot);
       } else {
-        log_.info("solr config directory doesn't exist.  Creating {}", solrConfigDir);
+        logger.info("Solr config directory doesn't exist, creating one at {}", solrConfigDir);
         FileUtils.forceMkdir(solrConfigDir);
       }
 
@@ -188,21 +197,15 @@ public class SearchIndex {
       copyClasspathResourceToFile("/solr/stopwords.txt", solrConfigDir);
       copyClasspathResourceToFile("/solr/synonyms.txt", solrConfigDir);
 
-      // Test for the existence of a data directory
-      File solrDataDir = new File(solrRoot, "search");
-      if (!solrDataDir.exists()) {
-        FileUtils.forceMkdir(solrDataDir);
-      }
-
       // Test for the existence of the index. Note that an empty index directory
       // will prevent solr from completing normal setup.
-      File solrIndexDir = new File(solrDataDir, "index");
+      File solrIndexDir = new File(solrRoot, "index");
       if (solrIndexDir.exists() && solrIndexDir.list().length == 0) {
         FileUtils.deleteDirectory(solrIndexDir);
       }
 
       SolrCore.log.getParent().setLevel(Level.WARNING);
-      solrConnection = new SolrConnection(solrRoot, solrDataDir.getAbsolutePath());
+      solrConnection = new SolrConnection(solrRoot.getAbsolutePath(), solrRoot.getAbsolutePath());
       solrRequester = new SolrRequester(solrConnection);
     } catch (IOException e) {
       throw new RuntimeException("Error setting up solr index at " + solrRoot, e);
@@ -222,7 +225,7 @@ public class SearchIndex {
     InputStream in = SearchIndex.class.getResourceAsStream(classpath);
     try {
       File file = new File(dir, FilenameUtils.getName(classpath));
-      log_.debug("copying inputstream " + in + " to file to " + file);
+      logger.debug("copying inputstream " + in + " to file to " + file);
       IOUtils.copy(in, new FileOutputStream(file));
     } catch (IOException e) {
       throw new RuntimeException("Error copying solr classpath resource to the filesystem", e);

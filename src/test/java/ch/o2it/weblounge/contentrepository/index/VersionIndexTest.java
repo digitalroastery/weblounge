@@ -61,10 +61,11 @@ public class VersionIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    indexFile = new File(new File(System.getProperty("java.io.tmpdir")), "versions.idx");
+    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+    indexFile = new File(tmpDir, VersionIndex.VERSION_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new VersionIndex(indexFile, false, versionsPerEntry);
+    idx = new VersionIndex(tmpDir, false, versionsPerEntry);
     expectedSize = 24;
   }
 

@@ -58,10 +58,11 @@ public class IdIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    indexFile = new File(new File(System.getProperty("java.io.tmpdir")), "id.idx");
+    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+    indexFile = new File(tmpDir, IdIndex.ID_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new IdIndex(indexFile, false, slotsInIndex, entriesPerSlot);
+    idx = new IdIndex(tmpDir, false, slotsInIndex, entriesPerSlot);
     expectedSize = 16 + (slotsInIndex * (4 + entriesPerSlot * 8));
   }
 

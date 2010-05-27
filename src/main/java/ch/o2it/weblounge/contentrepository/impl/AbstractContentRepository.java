@@ -23,7 +23,8 @@ package ch.o2it.weblounge.contentrepository.impl;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
-import ch.o2it.weblounge.common.content.SearchResultItem;
+import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.impl.content.PageReader;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.site.Site;
@@ -31,6 +32,8 @@ import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
+
+import org.xml.sax.SAXException;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -44,6 +47,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactory;
 
 /**
@@ -165,13 +169,16 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#findPages(ch.o2it.weblounge.common.content.SearchQuery)
    */
-  public SearchResultItem[] findPages(SearchQuery query)
+  public SearchResult findPages(SearchQuery query)
       throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
-    // TODO: Implement search service
-    throw new UnsupportedOperationException("Not implemented");
+    try {
+      return index.findPages(query);
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
+    }
   }
 
   /**
@@ -446,6 +453,25 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
+   * Returns the page that is located at the indicated url.
+   * 
+   * @param url
+   *          location of the page file
+   * @return the page
+   */
+  protected Page loadPage(Site site, URL url) throws IOException {
+    BufferedInputStream is = new BufferedInputStream(url.openStream());
+    PageReader reader = new PageReader();
+    try {
+      return reader.read(is, new PageURIImpl(site));
+    } catch (SAXException e) {
+      throw new IOException("Error reading page from " + url);
+    } catch (ParserConfigurationException e) {
+      throw new IOException("Error parsing page at " + url);
+    }
+  }
+
+  /**
    * Returns the page uri or <code>null</code> if no page id and/or path could
    * be found on the specified document. This method is intended to serve as a
    * utility method when importing pages.
@@ -468,4 +494,5 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
     return null;
   }
+
 }

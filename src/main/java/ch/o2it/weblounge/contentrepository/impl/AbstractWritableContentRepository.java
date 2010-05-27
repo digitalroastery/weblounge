@@ -120,7 +120,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     storePage(uri, page);
 
     // Add entry to index
-    index.add(uri);
+    index.add(page);
 
     return page;
   }

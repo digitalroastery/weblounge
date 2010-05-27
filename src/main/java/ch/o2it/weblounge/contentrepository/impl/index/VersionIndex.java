@@ -49,6 +49,9 @@ public class VersionIndex {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(VersionIndex.class);
 
+  /** Name for the version index file */
+  public static final String VERSION_IDX_NAME = "version.idx";
+
   /** Default number of bytes used per id */
   private static final int IDX_BYTES_PER_ID = 36;
 
@@ -98,35 +101,35 @@ public class VersionIndex {
   protected long slots = 0;
 
   /**
-   * Creates an index from the given file. If the file does not exist, it is
-   * created and initialized with the default index settings, which means that
-   * uri identifiers are expected to be made out of 36 bytes (uuid) while there
-   * is room for 10 versions with 8 bytes each.
+   * Creates an index inside the given directory. If the index does not exist,
+   * it is created and initialized with the default index settings, which means
+   * that uri identifiers are expected to be made out of 36 bytes (uuid) while
+   * there is room for 10 versions with 8 bytes each.
    * <p>
    * Note that the number of versions will automatically be increased as soon as
    * an additional version is added, while the size of identifiers is fixed.
    * 
-   * @param indexFile
-   *          location of the index file
+   * @param indexRootDir
+   *          location of the index root directory
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @throws IOException
    *           if reading from the index fails
    */
-  public VersionIndex(File indexFile, boolean readOnly) throws IOException {
-    this(indexFile, readOnly, IDX_BYTES_PER_ID, IDX_VERSIONS_PER_ENTRY);
+  public VersionIndex(File indexRootDir, boolean readOnly) throws IOException {
+    this(indexRootDir, readOnly, IDX_BYTES_PER_ID, IDX_VERSIONS_PER_ENTRY);
   }
 
   /**
-   * Creates an index from the given file. If the file does not exist, it is
-   * created and initialized with the default index settings, which means that
-   * uri identifiers are expected to be made out of 36 bytes (uuid).
+   * Creates an index inside the given root directory. If the index does not
+   * exist, it is created and initialized with the default index settings, which
+   * means that uri identifiers are expected to be made out of 36 bytes (uuid).
    * <p>
    * Note that the number of versions will automatically be increased as soon as
    * an additional version is added, while the size of identifiers is fixed.
    * 
-   * @param indexFile
-   *          location of the index file
+   * @param indexRootDirectory
+   *          location of the index root directory
    * @param versions
    *          the number of versions per entry
    * @param readOnly
@@ -134,17 +137,17 @@ public class VersionIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public VersionIndex(File indexFile, boolean readOnly, int versions)
+  public VersionIndex(File indexRootDirectory, boolean readOnly, int versions)
       throws IOException {
-    this(indexFile, readOnly, IDX_BYTES_PER_ID, versions);
+    this(indexRootDirectory, readOnly, IDX_BYTES_PER_ID, versions);
   }
 
   /**
-   * Creates an index from the given file. If the file does not exist, it is
-   * created and initialized with the default index settings.
+   * Creates an index inside the given directory. If the index does not exist,
+   * it is created and initialized with the default index settings.
    * 
-   * @param indexFile
-   *          location of the index file
+   * @param indexRootDir
+   *          location of the index root directory
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @param idLengthInBytes
@@ -154,20 +157,20 @@ public class VersionIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public VersionIndex(File indexFile, boolean readOnly, int idLengthInBytes,
+  public VersionIndex(File indexRootDir, boolean readOnly, int idLengthInBytes,
       int versions) throws IOException {
 
-    this.idxFile = indexFile;
+    this.idxFile = new File(indexRootDir, VERSION_IDX_NAME);
     this.isReadOnly = readOnly;
 
     String mode = readOnly ? "r" : "rwd";
     try {
-      indexFile.getParentFile().mkdirs();
-      if (!indexFile.exists())
-        indexFile.createNewFile();
-      idx = new RandomAccessFile(indexFile, mode);
+      idxFile.getParentFile().mkdirs();
+      if (!idxFile.exists())
+        idxFile.createNewFile();
+      idx = new RandomAccessFile(idxFile, mode);
     } catch (FileNotFoundException e) {
-      throw new IllegalArgumentException("Index file " + indexFile + " does not exist");
+      throw new IllegalArgumentException("Index file " + idxFile + " does not exist");
     }
 
     // Read index header information

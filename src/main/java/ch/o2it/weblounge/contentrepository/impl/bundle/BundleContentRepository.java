@@ -292,7 +292,10 @@ public class BundleContentRepository extends AbstractContentRepository {
       Iterator<PageURI> pi = listPages(homeURI, Integer.MAX_VALUE, -1);
       while (pi.hasNext()) {
         PageURI uri = pi.next();
-        index.add(uri);
+        Page page = loadPage(uri);
+        if (page == null)
+          continue;
+        index.add(page);
         pageVersionCount++;
         if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
           logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());

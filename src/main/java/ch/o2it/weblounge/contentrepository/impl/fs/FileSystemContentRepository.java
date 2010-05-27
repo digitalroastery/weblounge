@@ -159,10 +159,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
           if (f.isDirectory()) {
             uris.push(f);
           } else {
-            PageURI uri = loadPageURI(site, f.toURI().toURL());
+            Page page = loadPage(site, f.toURI().toURL());
+            PageURI uri = page.getURI();
             if (uri == null)
               throw new IllegalStateException("Page " + f + " has no uri");
-            index.add(uri);
+            index.add(page);
             pageVersionCount ++;
             if (!foundPage) {
               logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());

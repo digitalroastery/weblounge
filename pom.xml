@@ -190,7 +190,6 @@
               solr-core;inline=true,
               solr-dataimporthandler;inline=true,
               solr-solrj;inline=true,
-              solr-lucene-contrib;inline=true,
               solr-lucene-core;inline=true,
               solr-lucene-highlighter;inline=true,
               solr-lucene-queries;inline=true,
@@ -209,6 +208,7 @@
               ch.o2it.weblounge.contentrepository.impl.bundle,
               ch.o2it.weblounge.contentrepository.impl.fs,
               ch.o2it.weblounge.contentrepository.impl.index,
+              ch.o2it.weblounge.contentrepository.impl.index.solr,
               ch.o2it.weblounge.contentrepository.impl.jcr
             </Export-Package>
             <Import-Package>

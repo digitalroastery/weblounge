@@ -54,6 +54,9 @@ public class PathIndex {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PathIndex.class);
 
+  /** Name for the path index file */
+  public static final String PATH_IDX_NAME = "path.idx";
+
   /** Number of bytes that are used for the index header */
   protected static final int IDX_HEADER_SIZE = 16;
 
@@ -100,22 +103,22 @@ public class PathIndex {
   protected long entries = 0;
 
   /**
-   * Creates an index from the given file. If the file does not exist, it is
-   * created and initialized with the default index settings.
+   * Creates an index inside the given directory. If the index does not exist,
+   * it is created and initialized with the default index settings.
    * 
-   * @param indexFile
-   *          location of the index file
+   * @param indexRootDir
+   *          location of the index root directory
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @throws IOException
    *           if reading from the index fails
    */
-  public PathIndex(File indexFile, boolean readOnly) throws IOException {
-    this(indexFile, readOnly, IDX_ENTRIES, IDX_ADDRESSES_PER_ENTRY);
+  public PathIndex(File indexRootDir, boolean readOnly) throws IOException {
+    this(indexRootDir, readOnly, IDX_ENTRIES, IDX_ADDRESSES_PER_ENTRY);
   }
 
   /**
-   * Creates an index from the given file. If the file does not exist, it is
+   * Creates an index inside the given file. If the index does not exist, it is
    * created and initialized with the default index settings.
    * <p>
    * The number of slots and entries per slot defines the size of the index. At
@@ -123,8 +126,8 @@ public class PathIndex {
    * is <code>slots * entriesPerSlot * 8</code> bytes large, plus 16 bytes of
    * header information.
    * 
-   * @param indexFile
-   *          location of the index file
+   * @param indexRootDir
+   *          location of the index root directory
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @param slots
@@ -134,20 +137,20 @@ public class PathIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public PathIndex(File indexFile, boolean readOnly, int slots,
+  public PathIndex(File indexRootDir, boolean readOnly, int slots,
       int entriesPerSlot) throws IOException {
 
-    this.idxFile = indexFile;
+    this.idxFile = new File(indexRootDir, PATH_IDX_NAME);
     this.isReadOnly = readOnly;
 
     String mode = readOnly ? "r" : "rwd";
     try {
-      indexFile.getParentFile().mkdirs();
-      if (!indexFile.exists())
-        indexFile.createNewFile();
-      idx = new RandomAccessFile(indexFile, mode);
+      idxFile.getParentFile().mkdirs();
+      if (!idxFile.exists())
+        idxFile.createNewFile();
+      idx = new RandomAccessFile(idxFile, mode);
     } catch (FileNotFoundException e) {
-      throw new IllegalArgumentException("Index file " + indexFile + " does not exist");
+      throw new IllegalArgumentException("Index file " + idxFile + " does not exist");
     }
 
     // Read index header information

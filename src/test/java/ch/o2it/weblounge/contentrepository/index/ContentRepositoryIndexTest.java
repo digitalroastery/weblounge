@@ -27,10 +27,15 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.impl.content.PageImpl;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
+import ch.o2it.weblounge.contentrepository.impl.index.IdIndex;
+import ch.o2it.weblounge.contentrepository.impl.index.PathIndex;
+import ch.o2it.weblounge.contentrepository.impl.index.URIIndex;
+import ch.o2it.weblounge.contentrepository.impl.index.VersionIndex;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -55,6 +60,9 @@ public class ContentRepositoryIndexTest {
 
   /** The structural index' root directory */
   protected File structuralIndexRootDirectory = null;
+  
+  /** The sample page */
+  protected Page page = null;
 
   /** The site */
   protected Site site = null;
@@ -70,6 +78,7 @@ public class ContentRepositoryIndexTest {
     idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
+    page = new PageImpl(new PageURIImpl(site, "/weblounge"));
   }
 
   /**
@@ -86,10 +95,10 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testFilesystem() {
-    assertTrue(new File(structuralIndexRootDirectory, ContentRepositoryIndex.URI_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, ContentRepositoryIndex.ID_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, ContentRepositoryIndex.PATH_IDX_NAME).exists());
-    assertTrue(new File(structuralIndexRootDirectory, ContentRepositoryIndex.VERSION_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, URIIndex.URI_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, IdIndex.ID_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, PathIndex.PATH_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, VersionIndex.VERSION_IDX_NAME).exists());
   }
   
   /**
@@ -97,9 +106,8 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testAdd() {
-    PageURI uri = new PageURIImpl(site, "/weblounge");
     try {
-      idx.add(uri);
+      idx.add(page);
       assertEquals(1, idx.size());
     } catch (IOException e) {
       e.printStackTrace();
@@ -112,10 +120,9 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testDelete() {
-    PageURI uri = new PageURIImpl(site, "/weblounge");
     try {
-      idx.add(uri);
-      idx.delete(uri);
+      idx.add(page);
+      idx.delete(page.getURI());
       assertEquals(0, idx.size());
     } catch (IOException e) {
       e.printStackTrace();
@@ -132,9 +139,9 @@ public class ContentRepositoryIndexTest {
     PageURI uri2Live = new PageURIImpl(site, "/etc/weblounge");
     PageURI uri2Work = new PageURIImpl(site, "/etc/weblounge", Page.WORK);
     try {
-      idx.add(uri1);
-      idx.add(uri2Live);
-      idx.add(uri2Work);
+      idx.add(new PageImpl(uri1));
+      idx.add(new PageImpl(uri2Live));
+      idx.add(new PageImpl(uri2Work));
       long[] revisions = idx.getRevisions(uri1);
       assertEquals(1, revisions.length);
       assertEquals(Page.LIVE, revisions[0]);
@@ -153,11 +160,10 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testUpdate() {
-    PageURI uri = new PageURIImpl(site, "/weblounge");
     String newPath = "/etc/weblounge";
     try {
-      String id = idx.add(uri).getId();
-      idx.update(uri, newPath);
+      String id = idx.add(page).getId();
+      idx.update(page.getURI(), newPath);
       assertEquals(1, idx.size());
       assertEquals(id, idx.toId(new PageURIImpl(site, newPath)));
     } catch (IOException e) {
@@ -171,9 +177,8 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testClear() {
-    PageURI uri = new PageURIImpl(site, "/weblounge");
     try {
-      idx.add(uri);
+      idx.add(page);
       idx.clear();
       assertEquals(0, idx.size());
     } catch (IOException e) {
@@ -187,11 +192,10 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testExists() {
-    PageURI uri = new PageURIImpl(site, "/weblounge");
     try {
-      assertFalse(idx.exists(uri));
-      String id = idx.add(uri).getId();
-      assertTrue(idx.exists(uri));
+      assertFalse(idx.exists(page.getURI()));
+      String id = idx.add(page).getId();
+      assertTrue(idx.exists(page.getURI()));
       assertTrue(idx.exists(new PageURIImpl(site, "/weblounge")));
       assertFalse(idx.exists(new PageURIImpl(site, "/xxx")));
       
@@ -226,10 +230,9 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testSize() {
-    PageURI uri = new PageURIImpl(site, "/weblounge");
     try {
       assertEquals(0, idx.size());
-      idx.add(uri);
+      idx.add(page);
       assertEquals(1, idx.size());
     } catch (IOException e) {
       e.printStackTrace();

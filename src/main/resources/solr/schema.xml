@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="opencast" version="1.1">
+<schema name="weblounge" version="1.0">
 
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        Applications should change this to reflect the nature of the search collection.
@@ -233,10 +233,28 @@
     <!-- The page/resource id. This is the unique identifier. -->
     <field name="id" type="string" indexed="true" stored="true" required="true" /> 
     <field name="path" type="string" indexed="true" stored="true" required="true" />
+
+    <field name="preview-xml" type="string" indexed="false" stored="true" required="false" />
+
+
+    <field name="description" type="string" indexed="true" stored="true" required="false" />
+    <field name="coverage" type="string" indexed="true" stored="true" required="false" />
+    <field name="rights" type="string" indexed="true" stored="true" required="false" />
+    <field name="title" type="string" indexed="true" stored="true" required="false" />
+
+    <!-- Workflow-specific fields -->
+    <field name="created" type="date" indexed="true" stored="true" required="false" />
+    <field name="created-by" type="string" indexed="true" stored="true" required="false" />
+    <field name="modified" type="date" indexed="true" stored="true" required="false" />
+    <field name="modified-by" type="string" indexed="true" stored="true" required="false" />
+    <field name="published-from" type="date" indexed="true" stored="true" required="false" />
+    <field name="published-to" type="date" indexed="true" stored="true" required="false" />
+    <field name="published-by" type="string" indexed="true" stored="true" required="false" />
    
     <!-- Dynamic fields for pagelet texts and properties -->
-    <dynamicField name="pagelet_text_*"  type="text"  indexed="true"  stored="true"/>
-    <dynamicField name="pagelet_property_*"  type="text"  indexed="true"  stored="true"/>
+    <dynamicField name="pagelet-text-*"  type="text"  indexed="true"  stored="true"/>
+    <dynamicField name="pagelet-properties-*"  type="text"  indexed="true"  stored="true"/>
+    <dynamicField name="pagelet-xml-*"  type="text"  indexed="false"  stored="true"/>
 
     <!-- A fulltext copy field. -->
     <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
@@ -260,8 +278,14 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
    <copyField source="id" dest="fulltext"/>
    <copyField source="path" dest="fulltext"/>
-   <copyField source="pagelet_text_*" dest="fulltext"/>
-   <copyField source="pagelet_property_*" dest="fulltext"/>
+   <copyField source="description" dest="fulltext"/>
+   <copyField source="coverage" dest="fulltext"/>
+   <copyField source="title" dest="fulltext"/>
+   <copyField source="created-by" dest="fulltext"/>
+   <copyField source="modified-by" dest="fulltext"/>
+   <copyField source="published-by" dest="fulltext"/>
+   <copyField source="pagelet-text_*" dest="fulltext"/>
+   <copyField source="pagelet-properties-*" dest="fulltext"/>
 
   <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine

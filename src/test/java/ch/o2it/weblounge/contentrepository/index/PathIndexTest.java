@@ -61,10 +61,11 @@ public class PathIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    indexFile = new File(new File(System.getProperty("java.io.tmpdir")), "path.idx");
+    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+    indexFile = new File(tmpDir, PathIndex.PATH_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new PathIndex(indexFile, false, slotsInIndex, entriesPerSlot);
+    idx = new PathIndex(tmpDir, false, slotsInIndex, entriesPerSlot);
     expectedSize = 16 + (slotsInIndex * (4 + entriesPerSlot * 8));
   }
 

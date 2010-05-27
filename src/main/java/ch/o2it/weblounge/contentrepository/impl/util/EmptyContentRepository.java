@@ -23,7 +23,7 @@ package ch.o2it.weblounge.contentrepository.impl.util;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
-import ch.o2it.weblounge.common.content.SearchResultItem;
+import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -99,7 +99,7 @@ public class EmptyContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#findPages(ch.o2it.weblounge.common.content.SearchQuery)
    */
-  public SearchResultItem[] findPages(SearchQuery query)
+  public SearchResult findPages(SearchQuery query)
       throws ContentRepositoryException {
     return null;
   }
