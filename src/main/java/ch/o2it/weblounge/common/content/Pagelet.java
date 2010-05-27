@@ -61,6 +61,13 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
   String getIdentifier();
 
   /**
+   * Returns the names of the properties stored inside this pagelet.
+   * 
+   * @return the property names
+   */
+  String[] getPropertyNames();
+
+  /**
    * Adds a property to this pagelet. Properties are language independent, so
    * there is no need to pass the language.
    * 
@@ -101,6 +108,16 @@ public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedM
    * @return the property values
    */
   String[] getMultiValueProperty(String key);
+
+  /**
+   * Returns the names of the content elements stored inside this pagelet for
+   * the given language.
+   * 
+   * @param language
+   *          the language
+   * @return the content names
+   */
+  String[] getContentNames(Language language);
 
   /**
    * Sets the pagelet's content in the given language. If the content identified
