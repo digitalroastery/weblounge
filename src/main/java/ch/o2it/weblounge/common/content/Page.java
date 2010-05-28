@@ -427,6 +427,15 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   String getTemplate();
 
   /**
+   * Returns a list of composers on this page. Note that there is no way of
+   * knowing for sure whether this list is complete, since it only lists those
+   * composers that have at least one pagelet in them.
+   * 
+   * @return the composers
+   */
+  Composer[] getComposers();
+
+  /**
    * Adds <code>pagelet</code> as the last pagelet in the specified composer and
    * returns it with an updated {@link PageletURI}.
    * 
