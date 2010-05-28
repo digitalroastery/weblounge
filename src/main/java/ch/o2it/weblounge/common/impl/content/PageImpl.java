@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageContentListener;
 import ch.o2it.weblounge.common.content.PageURI;
@@ -754,7 +755,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Page#setUnlocked()
    */
   public User setUnlocked() {
@@ -770,6 +771,19 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public boolean isLocked() {
     return lockOwner != null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Page#getComposers()
+   */
+  public Composer[] getComposers() {
+    List<Composer> composerList = new ArrayList<Composer>();
+    for (String name : composers.keySet()) {
+      composerList.add(new ComposerImpl(name));
+    }
+    return composerList.toArray(new Composer[composerList.size()]);
   }
 
   /**
@@ -829,7 +843,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Page#getPagelets()
    */
   public Pagelet[] getPagelets() {
@@ -839,7 +853,7 @@ public class PageImpl extends LocalizableObject implements Page {
     }
     return result.toArray(new Pagelet[result.size()]);
   }
-  
+
   /**
    * Returns the pagelets that are contained in the specified composer.
    * 
@@ -1000,7 +1014,7 @@ public class PageImpl extends LocalizableObject implements Page {
       b.append(description.get(language));
       b.append("]]></description>");
     }
-    
+
     // Subject
     Collections.sort(subjects);
     for (String s : subjects) {
@@ -1008,7 +1022,7 @@ public class PageImpl extends LocalizableObject implements Page {
       b.append(s);
       b.append("]]></subject>");
     }
-    
+
     // Type
     b.append("<type><![CDATA[");
     b.append(type);
@@ -1030,7 +1044,7 @@ public class PageImpl extends LocalizableObject implements Page {
       b.append("\"><![CDATA[");
       b.append(rights.get(language));
       b.append("]]></rights>");
-    }    
+    }
 
     b.append("</metadata>");
 
@@ -1045,7 +1059,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
     // Security
     b.append(securityCtx.toXml());
-    
+
     // Pagelock
     if (lockOwner != null) {
       b.append("<locked>");
