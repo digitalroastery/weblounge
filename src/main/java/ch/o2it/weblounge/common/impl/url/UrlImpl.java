@@ -212,7 +212,7 @@ public class UrlImpl implements Url {
   protected String trim(String url) {
     if (url == null)
       throw new IllegalArgumentException("Url cannot be null");
-    url = url.trim();
+    url = url.trim().toLowerCase();
     String separator = Character.toString(separatorChar);
     // TODO: this fails if the separator is the windows file separator
     //url = url.replaceAll(separator + separator, separator);
