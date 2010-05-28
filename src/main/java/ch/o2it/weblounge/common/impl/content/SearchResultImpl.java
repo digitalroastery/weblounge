@@ -41,27 +41,36 @@ public class SearchResultImpl implements SearchResult {
   /** The search limit */
   protected long limit = 0;
 
+  /** The total number of appearances of the search criteria */
+  protected long hitCount = 0;
+
   /** The total size of the search result set */
   protected long size = 0;
 
   /** The time it took to do the search in ms */
   protected long time = 0;
-  
+
   /** The search result */
   protected List<SearchResultItem> result = new ArrayList<SearchResultItem>();
 
   /**
-   * Creates a search result that was created using the given query.
+   * Creates a search result that was created using the given query. Note that
+   * <code>hits</code> indicates the overall number of appearances of the search
+   * term, while size is equal to the number of documents that contain those
+   * <code>hits</code> hits.
    * 
    * @param query
    *          the query
+   * @param hitCount
+   *          the number of hits
    * @param size
    *          the total size of the result set
    */
-  public SearchResultImpl(SearchQuery query, long size) {
+  public SearchResultImpl(SearchQuery query, long hitCount, long size) {
     this.query = query;
     this.offset = query.getOffset();
     this.limit = query.getLimit();
+    this.hitCount = hitCount;
     this.size = size;
   }
 
@@ -110,7 +119,7 @@ public class SearchResultImpl implements SearchResult {
   public long getPage() {
     if (offset == 0 || limit == 0)
       return 1;
-    return (long)Math.floor(offset / limit) + 1;
+    return (long) Math.floor(offset / limit) + 1;
   }
 
   /**
@@ -150,6 +159,15 @@ public class SearchResultImpl implements SearchResult {
     return time;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchResult#getHitCount()
+   */
+  public long getHitCount() {
+    return hitCount;
+  }
+  
   /**
    * {@inheritDoc}
    * 

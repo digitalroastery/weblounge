@@ -52,8 +52,8 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   /** Regular expression for /path/to/resource/work_de.html */
   private final static Pattern pathInspector = Pattern.compile("^(.*)/(work|index|live|[0-9]*)(_[a-zA-Z]+)?\\.([a-zA-Z0-9]+)$");
 
-  /** Regular expression for /path/to/resource/work/de/html */
-  private final static Pattern segmentInspector = Pattern.compile("^(.*://)?(.*?)(/work|index|live|[0-9]*)?(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
+  /** Regular expression for /path/to/resource/de/html */
+  private final static Pattern segmentInspector = Pattern.compile("^(.*://)?(.*?)(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
 
   /** The default request flavor */
   private RequestFlavor defaultFlavor = RequestFlavor.HTML;
@@ -321,18 +321,31 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
         buf.append("work");
       else if (version >= 0)
         buf.append(Long.toString(version));
+      
+      // Language
+      if (includeLanguage && language != null) {
+        buf.append("_").append(language.getIdentifier());
+      }
+      
+      // Flavor
+      if (includeFlavor && flavor != null) {
+        buf.append(".").append(flavor.toExtension());
+      } else {
+        buf.append(".");
+        buf.append(RequestFlavor.HTML.toExtension());
+      }
+    } else {
+      // Language
+      if (includeLanguage && language != null) {
+        buf.append(separatorChar).append(language.getIdentifier());
+      }
+      
+      // Flavor
+      if (includeFlavor && flavor != null) {
+        buf.append(separatorChar).append(flavor.toExtension());
+      }
     }
     
-    // Language
-    if (includeLanguage && language != null) {
-      buf.append(separatorChar).append(language.getIdentifier());
-    }
-    
-    // Flavor
-    if (includeFlavor && flavor != null) {
-      buf.append(separatorChar).append(flavor.toString().toLowerCase());
-    }
-
     return UrlSupport.trim(buf.toString());
   }
   
@@ -453,7 +466,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       return trim(pathMatcher.group(1));
     }
 
-    // Try the segmented approach for /path/to/resource/work/de/html
+    // Try the segmented approach for /path/to/resource/<language>/<flavor>
     Matcher segmentMatcher = segmentInspector.matcher(path);
     if (segmentMatcher.matches()) {
       int group = segmentMatcher.groupCount();
@@ -478,7 +491,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
           this.flavor = RequestFlavor.parseString(f);
           group--;
         } catch (IllegalArgumentException e) {
-          log_.debug("Found unknwon request flavor {}", f);
+          log_.debug("Found unknown request flavor {}", f);
         }
       }
 
@@ -510,38 +523,6 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
           } catch (UnknownLanguageException e) {
             // Nothing to do, definitely not a language identifier
           }
-        }
-      }
-
-      // Done?
-      if (group < 3) {
-        String protocol = segmentMatcher.group(1);
-        String url = segmentMatcher.group(2);
-        return trim(protocol != null ? protocol + url : url);
-      }
-
-      // Test group for version
-      String v = segmentMatcher.group(group);
-      if (v == null || "".equals(v)) {
-        String protocol = segmentMatcher.group(1);
-        String url = segmentMatcher.group(2);
-        return trim(protocol != null ? protocol + url : url);
-      }
-
-      if (v.startsWith("/"))
-        v = v.substring(1);
-      if ("index".equals(v) || "live".equals(v)) {
-        this.version = Page.LIVE;
-        group--;
-      } else if ("work".equals(v)) {
-        this.version = Page.WORK;
-        group--;
-      } else {
-        try {
-          this.version = Long.parseLong(v);
-          group--;
-        } catch (NumberFormatException e) {
-          // Nothing to do, definitely not a version identifier
         }
       }
 

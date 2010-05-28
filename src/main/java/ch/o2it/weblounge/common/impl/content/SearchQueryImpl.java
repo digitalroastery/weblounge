@@ -43,6 +43,15 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The object that needs to show up next */
   protected Object expectation = null;
+  
+  /** Query terms */
+  protected String text = null;
+
+  /** The query offset */
+  protected int offset = -1;
+
+  /** The query limit */
+  protected int limit = -1;
 
   /**
    * Creates a new search query that is operating on the given site.
@@ -57,11 +66,20 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getSite()
+   */
+  public Site getSite() {
+    return site;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.o2it.weblounge.common.content.SearchQuery#withLimit(int)
    */
   public SearchQuery withLimit(int limit) {
-    // TODO Auto-generated method stub
-    return null;
+    this.limit = limit;
+    return this;
   }
   
   /**
@@ -70,8 +88,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.o2it.weblounge.common.content.SearchQuery#getLimit()
    */
   public int getLimit() {
-    // TODO Auto-generated method stub
-    return 0;
+    return limit;
   }
   
   /**
@@ -80,8 +97,8 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.o2it.weblounge.common.content.SearchQuery#withOffset(int)
    */
   public SearchQuery withOffset(int offset) {
-    // TODO Auto-generated method stub
-    return null;
+    this.offset = offset;
+    return this;
   }
   
   /**
@@ -90,8 +107,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.o2it.weblounge.common.content.SearchQuery#getOffset()
    */
   public int getOffset() {
-    // TODO Auto-generated method stub
-    return 0;
+    return offset;
   }
 
   /**
@@ -102,7 +118,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery and(Date date) {
     ensureExpectation(Date.class);
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -115,7 +131,7 @@ public class SearchQueryImpl implements SearchQuery {
       throws IllegalStateException {
     ensureConfigurationObject(Pagelet.class);
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -128,7 +144,7 @@ public class SearchQueryImpl implements SearchQuery {
       throws IllegalStateException {
     ensureConfigurationObject(Pagelet.class);
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -140,7 +156,7 @@ public class SearchQueryImpl implements SearchQuery {
     ensureConfigurationObject(Pagelet.class);
     ensureConfigurationObject(String.class);
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -160,7 +176,7 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery inComposer(String composer) throws IllegalStateException {
     ensureConfigurationObject(Pagelet.class);
-    return null;
+    return this;
   }
 
   /**
@@ -181,7 +197,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withAuthor(User author) {
     clearExpectations();
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -192,7 +208,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withLanguage(Language language) {
     clearExpectations();
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -213,7 +229,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withModificationDate(Date date) {
     clearExpectations();
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -226,7 +242,7 @@ public class SearchQueryImpl implements SearchQuery {
     configure(date);
     expect(Date.class);
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -238,7 +254,7 @@ public class SearchQueryImpl implements SearchQuery {
     clearExpectations();
     configure(pagelet);
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -249,7 +265,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withPathPrefix(String path) {
     clearExpectations();
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -270,7 +286,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withPublisher(User publisher) {
     clearExpectations();
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -281,7 +297,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withPublishingDate(Date date) {
     clearExpectations();
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -294,7 +310,7 @@ public class SearchQueryImpl implements SearchQuery {
     configure(date);
     expect(Date.class);
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
 
   /**
@@ -304,8 +320,8 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withText(String text) {
     clearExpectations();
-    // TODO Auto-generated method stub
-    return null;
+    this.text = text;
+    return this;
   }
   
   /**
@@ -314,8 +330,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.o2it.weblounge.common.content.SearchQuery#getText()
    */
   public String getText() {
-    // TODO Auto-generated method stub
-    return null;
+    return text;
   }
 
   /**
@@ -325,7 +340,7 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withProperty(String property, String value) {
     // TODO Auto-generated method stub
-    return null;
+    return this;
   }
   
   /**

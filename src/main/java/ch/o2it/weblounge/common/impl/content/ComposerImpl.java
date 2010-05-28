@@ -54,7 +54,7 @@ public class ComposerImpl implements Composer {
   }
 
   /**
-   * Creates a new composer with the given identifier.
+   * Creates a new composer with the given identifier and set of pagelets.
    * 
    * @param identifier
    *          the composer identifier
@@ -64,6 +64,21 @@ public class ComposerImpl implements Composer {
   public ComposerImpl(String identifier, Pagelet[] pagelets) {
     this(identifier);
     setPagelets(pagelets);
+  }
+
+  /**
+   * Creates a new composer with the given identifier and set of pagelets.
+   * 
+   * @param identifier
+   *          the composer identifier
+   * @param pagelets
+   *          the composer's content
+   */
+  public ComposerImpl(String identifier, List<Pagelet> pagelets) {
+    this(identifier);
+    if (pagelets == null)
+      throw new IllegalArgumentException("Pagelets cannot be null");
+    this.pagelets = pagelets;
   }
 
   /**

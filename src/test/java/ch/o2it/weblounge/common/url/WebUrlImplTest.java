@@ -61,27 +61,6 @@ public class WebUrlImplTest {
   /** Url instance pointing to JSON output of the document's live version */
   protected WebUrlImpl flavoredLocalizedSegmentedLiveUrl = null;
 
-  /** Url instance pointing to JSON output of the document's work version */
-  protected WebUrlImpl workUrl = null;
-
-  /** Url instance pointing to JSON output of the document's work version */
-  protected WebUrlImpl flavoredWorkUrl = null;
-
-  /** Url instance pointing to JSON output of the document's work version */
-  protected WebUrlImpl localizedWorkUrl = null;
-
-  /** Url instance pointing to JSON output of the document's work version */
-  protected WebUrlImpl flavoredLocalizedWorkUrl = null;
-
-  /** Url instance pointing to JSON output of the document's work version */
-  protected WebUrlImpl localizedSegmentedWorkUrl = null;
-
-  /** Url instance pointing to JSON output of the document's work version */
-  protected WebUrlImpl flavoredSegmentedWorkUrl = null;
-
-  /** Url instance pointing to JSON output of the document's work version */
-  protected WebUrlImpl flavoredLocalizedSegmentedWorkUrl = null;
-
   /** Url instance pointing to JSON output of the document's version 17 */
   protected WebUrlImpl versionedUrl = null;
 
@@ -94,15 +73,6 @@ public class WebUrlImplTest {
   /** Url instance pointing to JSON output of the document's version 17 */
   protected WebUrlImpl flavoredLocalizedVersionedUrl = null;
 
-  /** Url instance pointing to JSON output of the document's version 17 */
-  protected WebUrlImpl localizedSegmentedVersionedUrl = null;
-
-  /** Url instance pointing to JSON output of the document's version 17 */
-  protected WebUrlImpl flavoredSegmentedVersionedUrl = null;
-
-  /** Url instance pointing to JSON output of the document's version 17 */
-  protected WebUrlImpl flavoredLocalizedSegmentedVersionedUrl = null;
-
   /** Site hostname */
   protected String hostname = "www.test.com";
 
@@ -110,46 +80,25 @@ public class WebUrlImplTest {
   protected String livePath = "/test/";
 
   /** Segmented live path */
-  protected String segmentedLivePath = "/test/";
+  protected String segmentedPath = "/test/";
 
   /** Localized live path */
-  protected String localizedLivePath = "/test/index_de.html";
+  protected String localizedPath = "/test/index_de.html";
 
   /** JSON path to live version */
-  protected String flavoredLivePath = "/test/index.json";
+  protected String flavoredPath = "/test/index.json";
 
   /** JSON path to live version */
-  protected String flavoredLocalizedLivePath = "/test/index_de.json";
+  protected String flavoredLocalizedPath = "/test/index_de.json";
 
   /** JSON path to live version */
-  protected String flavoredSegmentedLivePath = "/test/json/";
+  protected String flavoredSegmentedPath = "/test/json/";
 
   /** Localized live path */
-  protected String localizedSegmentedLivePath = "/test/de/";
+  protected String localizedSegmentedPath = "/test/de/";
 
   /** JSON path to live version */
-  protected String flavoredLocalizedSegmentedLivePath = "/test/de/json/";
-
-  /** JSON path to work version */
-  protected String workPath = "/test/work.html";
-
-  /** JSON path to work version */
-  protected String flavoredWorkPath = "/test/work.json";
-
-  /** JSON path to work version */
-  protected String localizedWorkPath = "/test/work_de.html";
-
-  /** JSON path to work version */
-  protected String flavoredLocalizedWorkPath = "/test/work_de.json";
-
-  /** JSON path to work version */
-  protected String flavoredSegmentedWorkPath = "/test/work/json/";
-
-  /** JSON path to work version */
-  protected String localizedSegmentedWorkPath = "/test/work/de/";
-
-  /** JSON path to work version */
-  protected String flavoredLocalizedSegmentedWorkPath = "/test/work/de/json/";
+  protected String flavoredLocalizedSegmentedPath = "/test/de/json/";
 
   /** JSON path to version 17 */
   protected String versionedPath = "/test/17.html";
@@ -162,15 +111,6 @@ public class WebUrlImplTest {
 
   /** JSON path to version 17 */
   protected String flavoredLocalizedVersionedPath = "/test/17_de.json";
-
-  /** JSON path to version 17 */
-  protected String flavoredSegmentedVersionedPath = "/test/17/json/";
-
-  /** JSON path to version 17 */
-  protected String localizedSegmentedVersionedPath = "/test/17/de/";
-
-  /** JSON path to version 17 */
-  protected String flavoredLocalizedSegmentedVersionedPath = "/test/17/de/json/";
 
   /** The mock site */
   protected Site siteMock = null;
@@ -200,26 +140,16 @@ public class WebUrlImplTest {
     otherSiteMock = EasyMock.createNiceMock(Site.class);
 
     liveUrl = new WebUrlImpl(siteMock, livePath);
-    localizedLiveUrl = new WebUrlImpl(siteMock, localizedLivePath);
-    flavoredLiveUrl = new WebUrlImpl(siteMock, flavoredLivePath);
-    flavoredLocalizedLiveUrl = new WebUrlImpl(siteMock, flavoredLocalizedLivePath);
-    localizedSegmentedLiveUrl = new WebUrlImpl(siteMock, localizedSegmentedLivePath);
-    flavoredSegmentedLiveUrl = new WebUrlImpl(siteMock, flavoredSegmentedLivePath);
-    flavoredLocalizedSegmentedLiveUrl = new WebUrlImpl(siteMock, flavoredLocalizedSegmentedLivePath);
-    workUrl = new WebUrlImpl(siteMock, workPath);
-    flavoredWorkUrl = new WebUrlImpl(siteMock, flavoredWorkPath);
-    localizedWorkUrl = new WebUrlImpl(siteMock, localizedWorkPath);
-    flavoredLocalizedWorkUrl = new WebUrlImpl(siteMock, flavoredLocalizedWorkPath);
-    flavoredSegmentedWorkUrl = new WebUrlImpl(siteMock, flavoredSegmentedWorkPath);
-    localizedSegmentedWorkUrl = new WebUrlImpl(siteMock, localizedSegmentedWorkPath);
-    flavoredLocalizedSegmentedWorkUrl = new WebUrlImpl(siteMock, flavoredLocalizedSegmentedWorkPath);
+    localizedLiveUrl = new WebUrlImpl(siteMock, localizedPath);
+    flavoredLiveUrl = new WebUrlImpl(siteMock, flavoredPath);
+    flavoredLocalizedLiveUrl = new WebUrlImpl(siteMock, flavoredLocalizedPath);
+    localizedSegmentedLiveUrl = new WebUrlImpl(siteMock, localizedSegmentedPath);
+    flavoredSegmentedLiveUrl = new WebUrlImpl(siteMock, flavoredSegmentedPath);
+    flavoredLocalizedSegmentedLiveUrl = new WebUrlImpl(siteMock, flavoredLocalizedSegmentedPath);
     versionedUrl = new WebUrlImpl(siteMock, versionedPath);
     flavoredVersionedUrl = new WebUrlImpl(siteMock, flavoredVersionedPath);
     localizedVersionedUrl = new WebUrlImpl(siteMock, localizedVersionedPath);
     flavoredLocalizedVersionedUrl = new WebUrlImpl(siteMock, flavoredLocalizedVersionedPath);
-    flavoredSegmentedVersionedUrl = new WebUrlImpl(siteMock, flavoredSegmentedVersionedPath);
-    localizedSegmentedVersionedUrl = new WebUrlImpl(siteMock, localizedSegmentedVersionedPath);
-    flavoredLocalizedSegmentedVersionedUrl = new WebUrlImpl(siteMock, flavoredLocalizedSegmentedVersionedPath);
   }
 
   /**
@@ -234,7 +164,6 @@ public class WebUrlImplTest {
     assertTrue(flavoredLocalizedLiveUrl.equals(flavoredLocalizedLiveUrl));
     assertFalse(liveUrl.equals(flavoredLiveUrl));
     assertFalse(liveUrl.equals(flavoredLocalizedLiveUrl));
-    assertFalse(flavoredLiveUrl.equals(flavoredWorkUrl));
   }
 
   /**
@@ -260,20 +189,10 @@ public class WebUrlImplTest {
     assertEquals(livePath, flavoredSegmentedLiveUrl.getPath());
     assertEquals(livePath, localizedSegmentedLiveUrl.getPath());
     assertEquals(livePath, flavoredLocalizedSegmentedLiveUrl.getPath());
-    assertEquals(livePath, workUrl.getPath());
-    assertEquals(livePath, flavoredWorkUrl.getPath());
-    assertEquals(livePath, localizedWorkUrl.getPath());
-    assertEquals(livePath, flavoredLocalizedWorkUrl.getPath());
-    assertEquals(livePath, flavoredSegmentedWorkUrl.getPath());
-    assertEquals(livePath, localizedSegmentedWorkUrl.getPath());
-    assertEquals(livePath, flavoredLocalizedSegmentedWorkUrl.getPath());
     assertEquals(livePath, versionedUrl.getPath());
     assertEquals(livePath, flavoredVersionedUrl.getPath());
     assertEquals(livePath, localizedVersionedUrl.getPath());
     assertEquals(livePath, flavoredLocalizedVersionedUrl.getPath());
-    assertEquals(livePath, flavoredSegmentedVersionedUrl.getPath());
-    assertEquals(livePath, localizedSegmentedVersionedUrl.getPath());
-    assertEquals(livePath, flavoredLocalizedSegmentedVersionedUrl.getPath());
   }
 
   /**
@@ -283,26 +202,16 @@ public class WebUrlImplTest {
   @Test
   public void testGetLink() {
     assertEquals(livePath, liveUrl.getLink());
-    assertTrue(flavoredLiveUrl.getLink().endsWith(flavoredLivePath));
-    assertTrue(localizedLiveUrl.getLink().endsWith(localizedLivePath));
-    assertTrue(flavoredLocalizedLiveUrl.getLink().endsWith(flavoredLocalizedLivePath));
-    assertTrue(flavoredSegmentedLiveUrl.getLink().endsWith(flavoredLivePath));
-    assertTrue(localizedSegmentedLiveUrl.getLink().endsWith(localizedLivePath));
-    assertTrue(flavoredLocalizedSegmentedLiveUrl.getLink().endsWith(flavoredLocalizedLivePath));
-    assertEquals(workPath, workUrl.getLink());
-    assertTrue(flavoredWorkUrl.getLink().endsWith(flavoredWorkPath));
-    assertTrue(localizedWorkUrl.getLink().endsWith(localizedWorkPath));
-    assertTrue(flavoredLocalizedWorkUrl.getLink().endsWith(flavoredLocalizedWorkPath));
-    assertTrue(flavoredSegmentedWorkUrl.getLink().endsWith(flavoredWorkPath));
-    assertTrue(localizedSegmentedWorkUrl.getLink().endsWith(localizedWorkPath));
-    assertTrue(flavoredLocalizedSegmentedWorkUrl.getLink().endsWith(flavoredLocalizedWorkPath));
+    assertTrue(flavoredLiveUrl.getLink().endsWith(flavoredPath));
+    assertTrue(localizedLiveUrl.getLink().endsWith(localizedPath));
+    assertTrue(flavoredLocalizedLiveUrl.getLink().endsWith(flavoredLocalizedPath));
+    assertTrue(flavoredSegmentedLiveUrl.getLink().endsWith(flavoredPath));
+    assertTrue(localizedSegmentedLiveUrl.getLink().endsWith(localizedPath));
+    assertTrue(flavoredLocalizedSegmentedLiveUrl.getLink().endsWith(flavoredLocalizedPath));
     assertEquals(versionedPath, versionedUrl.getLink());
     assertTrue(flavoredVersionedUrl.getLink().endsWith(flavoredVersionedPath));
     assertTrue(localizedVersionedUrl.getLink().endsWith(localizedVersionedPath));
     assertTrue(flavoredLocalizedVersionedUrl.getLink().endsWith(flavoredLocalizedVersionedPath));
-    assertTrue(flavoredSegmentedVersionedUrl.getLink().endsWith(flavoredVersionedPath));
-    assertTrue(localizedSegmentedVersionedUrl.getLink().endsWith(localizedVersionedPath));
-    assertTrue(flavoredLocalizedSegmentedVersionedUrl.getLink().endsWith(flavoredLocalizedVersionedPath));
   }
 
   /**
@@ -313,27 +222,17 @@ public class WebUrlImplTest {
   @Test
   public void testGetLinkLanguage() {
     String l = "_fr";
-    assertEquals(localizedLivePath.replaceAll("_de", l), liveUrl.getLink(french));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l), flavoredLiveUrl.getLink(french));
-    assertEquals(localizedLivePath.replaceAll("_de", l), localizedLiveUrl.getLink(french));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l), flavoredSegmentedLiveUrl.getLink(french));
-    assertEquals(localizedLivePath.replaceAll("_de", l), localizedSegmentedLiveUrl.getLink(french));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l), flavoredLocalizedLiveUrl.getLink(french));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l), flavoredLocalizedSegmentedLiveUrl.getLink(french));
-    assertEquals(localizedWorkPath.replaceAll("_de", l), workUrl.getLink(french));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l), flavoredWorkUrl.getLink(french));
-    assertEquals(localizedWorkPath.replaceAll("_de", l), localizedWorkUrl.getLink(french));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l), flavoredSegmentedWorkUrl.getLink(french));
-    assertEquals(localizedWorkPath.replaceAll("_de", l), localizedSegmentedWorkUrl.getLink(french));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l), flavoredLocalizedWorkUrl.getLink(french));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l), flavoredLocalizedSegmentedWorkUrl.getLink(french));
+    assertEquals(localizedPath.replaceAll("_de", l), liveUrl.getLink(french));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l), flavoredLiveUrl.getLink(french));
+    assertEquals(localizedPath.replaceAll("_de", l), localizedLiveUrl.getLink(french));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l), flavoredSegmentedLiveUrl.getLink(french));
+    assertEquals(localizedPath.replaceAll("_de", l), localizedSegmentedLiveUrl.getLink(french));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l), flavoredLocalizedLiveUrl.getLink(french));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l), flavoredLocalizedSegmentedLiveUrl.getLink(french));
     assertEquals(localizedVersionedPath.replaceAll("_de", l), versionedUrl.getLink(french));
     assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l), flavoredVersionedUrl.getLink(french));
     assertEquals(localizedVersionedPath.replaceAll("_de", l), localizedVersionedUrl.getLink(french));
-    assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l), flavoredSegmentedVersionedUrl.getLink(french));
-    assertEquals(localizedVersionedPath.replaceAll("_de", l), localizedSegmentedVersionedUrl.getLink(french));
     assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l), flavoredLocalizedVersionedUrl.getLink(french));
-    assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l), flavoredLocalizedSegmentedVersionedUrl.getLink(french));
   }
 
   /**
@@ -344,27 +243,17 @@ public class WebUrlImplTest {
   @Test
   public void testGetLinkString() {
     String flavor = "pdf";
-    assertEquals(flavoredLivePath.replaceAll("json", flavor), liveUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("json", flavor), localizedLiveUrl.getLink(flavor));
-    assertEquals(flavoredLivePath.replaceAll("json", flavor), flavoredLiveUrl.getLink(flavor));
-    assertEquals(flavoredLivePath.replaceAll("json", flavor), flavoredSegmentedLiveUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("json", flavor), localizedSegmentedLiveUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("json", flavor), flavoredLocalizedLiveUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("json", flavor), flavoredLocalizedSegmentedLiveUrl.getLink(flavor));
-    assertEquals(flavoredWorkPath.replaceAll("json", flavor), workUrl.getLink(flavor));
-    assertEquals(flavoredWorkPath.replaceAll("json", flavor), flavoredWorkUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("json", flavor), localizedWorkUrl.getLink(flavor));
-    assertEquals(flavoredWorkPath.replaceAll("json", flavor), flavoredSegmentedWorkUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("json", flavor), localizedSegmentedWorkUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("json", flavor), flavoredLocalizedWorkUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("json", flavor), flavoredLocalizedSegmentedWorkUrl.getLink(flavor));
+    assertEquals(flavoredPath.replaceAll("json", flavor), liveUrl.getLink(flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("json", flavor), localizedLiveUrl.getLink(flavor));
+    assertEquals(flavoredPath.replaceAll("json", flavor), flavoredLiveUrl.getLink(flavor));
+    assertEquals(flavoredPath.replaceAll("json", flavor), flavoredSegmentedLiveUrl.getLink(flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("json", flavor), localizedSegmentedLiveUrl.getLink(flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("json", flavor), flavoredLocalizedLiveUrl.getLink(flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("json", flavor), flavoredLocalizedSegmentedLiveUrl.getLink(flavor));
     assertEquals(flavoredVersionedPath.replaceAll("json", flavor), versionedUrl.getLink(flavor));
     assertEquals(flavoredVersionedPath.replaceAll("json", flavor), flavoredVersionedUrl.getLink(flavor));
     assertEquals(flavoredLocalizedVersionedPath.replaceAll("json", flavor), localizedVersionedUrl.getLink(flavor));
-    assertEquals(flavoredVersionedPath.replaceAll("json", flavor), flavoredSegmentedVersionedUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedVersionedPath.replaceAll("json", flavor), localizedSegmentedVersionedUrl.getLink(flavor));
     assertEquals(flavoredLocalizedVersionedPath.replaceAll("json", flavor), flavoredLocalizedVersionedUrl.getLink(flavor));
-    assertEquals(flavoredLocalizedVersionedPath.replaceAll("json", flavor), flavoredLocalizedSegmentedVersionedUrl.getLink(flavor));
   }
 
   /**
@@ -375,27 +264,16 @@ public class WebUrlImplTest {
   public void testGetLinkLong() {
     long version = 13;
     String v = Long.toString(version);
-    assertEquals(workPath.replaceAll("work", v), liveUrl.getLink(version));
-    assertEquals(flavoredLivePath.replaceAll("index", v), flavoredLiveUrl.getLink(version));
-    assertEquals(localizedLivePath.replaceAll("index", v), localizedLiveUrl.getLink(version));
-    assertEquals(flavoredLivePath.replaceAll("index", v), flavoredSegmentedLiveUrl.getLink(version));
-    assertEquals(localizedLivePath.replaceAll("index", v), localizedSegmentedLiveUrl.getLink(version));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("index", v), flavoredLocalizedLiveUrl.getLink(version));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("index", v), flavoredLocalizedSegmentedLiveUrl.getLink(version));
-    assertEquals(workPath.replaceAll("work", v), workUrl.getLink(version));
-    assertEquals(flavoredWorkPath.replaceAll("work", v), flavoredWorkUrl.getLink(version));
-    assertEquals(localizedWorkPath.replaceAll("work", v), localizedWorkUrl.getLink(version));
-    assertEquals(flavoredWorkPath.replaceAll("work", v), flavoredSegmentedWorkUrl.getLink(version));
-    assertEquals(localizedWorkPath.replaceAll("work", v), localizedSegmentedWorkUrl.getLink(version));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("work", v), flavoredLocalizedWorkUrl.getLink(version));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("work", v), flavoredLocalizedSegmentedWorkUrl.getLink(version));
+    assertEquals(flavoredPath.replaceAll("index", v), flavoredLiveUrl.getLink(version));
+    assertEquals(localizedPath.replaceAll("index", v), localizedLiveUrl.getLink(version));
+    assertEquals(flavoredPath.replaceAll("index", v), flavoredSegmentedLiveUrl.getLink(version));
+    assertEquals(localizedPath.replaceAll("index", v), localizedSegmentedLiveUrl.getLink(version));
+    assertEquals(flavoredLocalizedPath.replaceAll("index", v), flavoredLocalizedLiveUrl.getLink(version));
+    assertEquals(flavoredLocalizedPath.replaceAll("index", v), flavoredLocalizedSegmentedLiveUrl.getLink(version));
     assertEquals(versionedPath.replaceAll("17", v), versionedUrl.getLink(version));
     assertEquals(flavoredVersionedPath.replaceAll("17", v), flavoredVersionedUrl.getLink(version));
     assertEquals(localizedVersionedPath.replaceAll("17", v), localizedVersionedUrl.getLink(version));
-    assertEquals(flavoredVersionedPath.replaceAll("17", v), flavoredSegmentedVersionedUrl.getLink(version));
-    assertEquals(localizedVersionedPath.replaceAll("17", v), localizedSegmentedVersionedUrl.getLink(version));
     assertEquals(flavoredLocalizedVersionedPath.replaceAll("17", v), flavoredLocalizedVersionedUrl.getLink(version));
-    assertEquals(flavoredLocalizedVersionedPath.replaceAll("17", v), flavoredLocalizedSegmentedVersionedUrl.getLink(version));
   }
 
   /**
@@ -409,27 +287,17 @@ public class WebUrlImplTest {
     long version = 13;
     String v = Long.toString(version);
     String l = "_fr";
-    assertEquals(localizedLivePath.replaceAll("_de", l).replaceAll("index", v).replaceAll("html", flavor), liveUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), flavoredLiveUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), localizedLiveUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), flavoredSegmentedLiveUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), localizedSegmentedLiveUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), flavoredLocalizedLiveUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedLivePath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), flavoredLocalizedSegmentedLiveUrl.getLink(version, french, flavor));
-    assertEquals(localizedWorkPath.replaceAll("_de", l).replaceAll("work", v).replaceAll("html", flavor), workUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l).replaceAll("work", v).replaceAll("json", flavor), flavoredWorkUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l).replaceAll("work", v).replaceAll("json", flavor), localizedWorkUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l).replaceAll("work", v).replaceAll("json", flavor), flavoredSegmentedWorkUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l).replaceAll("work", v).replaceAll("json", flavor), localizedSegmentedWorkUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l).replaceAll("work", v).replaceAll("json", flavor), flavoredLocalizedWorkUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedWorkPath.replaceAll("_de", l).replaceAll("work", v).replaceAll("json", flavor), flavoredLocalizedSegmentedWorkUrl.getLink(version, french, flavor));
+    assertEquals(localizedPath.replaceAll("_de", l).replaceAll("index", v).replaceAll("html", flavor), liveUrl.getLink(version, french, flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), flavoredLiveUrl.getLink(version, french, flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), localizedLiveUrl.getLink(version, french, flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), flavoredSegmentedLiveUrl.getLink(version, french, flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), localizedSegmentedLiveUrl.getLink(version, french, flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), flavoredLocalizedLiveUrl.getLink(version, french, flavor));
+    assertEquals(flavoredLocalizedPath.replaceAll("_de", l).replaceAll("index", v).replaceAll("json", flavor), flavoredLocalizedSegmentedLiveUrl.getLink(version, french, flavor));
     assertEquals(localizedVersionedPath.replaceAll("_de", l).replaceAll("17", v).replaceAll("html", flavor), versionedUrl.getLink(version, french, flavor));
     assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l).replaceAll("17", v).replaceAll("json", flavor), flavoredVersionedUrl.getLink(version, french, flavor));
     assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l).replaceAll("17", v).replaceAll("json", flavor), localizedVersionedUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l).replaceAll("17", v).replaceAll("json", flavor), flavoredSegmentedVersionedUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l).replaceAll("17", v).replaceAll("json", flavor), localizedSegmentedVersionedUrl.getLink(version, french, flavor));
     assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l).replaceAll("17", v).replaceAll("json", flavor), flavoredLocalizedVersionedUrl.getLink(version, french, flavor));
-    assertEquals(flavoredLocalizedVersionedPath.replaceAll("_de", l).replaceAll("17", v).replaceAll("json", flavor), flavoredLocalizedSegmentedVersionedUrl.getLink(version, french, flavor));
   }
 
   /**
@@ -455,16 +323,10 @@ public class WebUrlImplTest {
    */
   @Test
   public void testNormalize() {
-    assertEquals(UrlSupport.concat(hostname, segmentedLivePath), liveUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, flavoredSegmentedLivePath), flavoredSegmentedLiveUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, localizedSegmentedLivePath), localizedSegmentedLiveUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, flavoredLocalizedSegmentedLivePath), flavoredLocalizedSegmentedLiveUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, flavoredSegmentedWorkPath), flavoredSegmentedWorkUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, localizedSegmentedWorkPath), localizedSegmentedWorkUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, flavoredLocalizedSegmentedWorkPath), flavoredLocalizedSegmentedWorkUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, flavoredSegmentedVersionedPath), flavoredSegmentedVersionedUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, localizedSegmentedVersionedPath), localizedSegmentedVersionedUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, flavoredLocalizedSegmentedVersionedPath), flavoredLocalizedSegmentedVersionedUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, segmentedPath), liveUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, flavoredSegmentedPath), flavoredSegmentedLiveUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, localizedSegmentedPath), localizedSegmentedLiveUrl.normalize());
+    assertEquals(UrlSupport.concat(hostname, flavoredLocalizedSegmentedPath), flavoredLocalizedSegmentedLiveUrl.normalize());
   }
 
   /**
@@ -475,7 +337,7 @@ public class WebUrlImplTest {
   @Test
   public void testNormalizeBooleanBooleanBoolean() {
     WebUrl url = flavoredLocalizedVersionedUrl;
-    String fullUrl = UrlSupport.concat(hostname, flavoredLocalizedSegmentedVersionedPath);
+    String fullUrl = UrlSupport.concat(hostname, flavoredLocalizedVersionedPath);
     assertEquals(fullUrl, url.normalize(true, true, true));
 
     // Everything

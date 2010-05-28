@@ -781,7 +781,7 @@ public class PageImpl extends LocalizableObject implements Page {
   public Composer[] getComposers() {
     List<Composer> composerList = new ArrayList<Composer>();
     for (String name : composers.keySet()) {
-      composerList.add(new ComposerImpl(name));
+      composerList.add(new ComposerImpl(name, composers.get(name)));
     }
     return composerList.toArray(new Composer[composerList.size()]);
   }

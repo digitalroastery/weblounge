@@ -167,7 +167,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       log_.trace("Selected default site language " + language);
     }
 
-    // Wow, that's really a configuration disaster!
+    // This really looks like a configuration disaster!
     if (language == null) {
       language = new LanguageImpl(Locale.getDefault());
       log_.trace("Selected default system language " + language);
