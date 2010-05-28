@@ -41,6 +41,14 @@ public interface SearchResult {
   SearchQuery getQuery();
 
   /**
+   * Returns the total number of appearances of the search criteria in the
+   * search result, spread over <code>size()</code> number of documents.
+   * 
+   * @return the overall hits
+   */
+  long getHitCount();
+
+  /**
    * Returns the total number of items in the search result.
    * <p>
    * Note that this number might not match the size of the array as returned by

@@ -70,7 +70,7 @@ public interface SearchResultItem extends Localizable, Comparable<SearchResultIt
    * 
    * @return the relevance
    */
-  float getRelevance();
+  double getRelevance();
 
   /**
    * Returns the source of this search result. This will usually be the site or

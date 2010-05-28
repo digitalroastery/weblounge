@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.content;
 
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import java.util.Date;
@@ -31,6 +32,13 @@ import java.util.Map;
  * in the {@link PageRepository}.
  */
 public interface SearchQuery {
+
+  /**
+   * Returns the contextual site for this query.
+   * 
+   * @return the site
+   */
+  Site getSite();
 
   /**
    * Sets the number of results that are returned.
