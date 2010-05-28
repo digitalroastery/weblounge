@@ -178,14 +178,14 @@ public class SearchIndex {
    */
   private void setupSolr(File solrRoot) {
     try {
-      logger.info("Setting up solr search index at {}", solrRoot);
+      logger.debug("Setting up solr search index at {}", solrRoot);
       File solrConfigDir = new File(solrRoot, "conf");
 
       // Create the config directory
       if (solrConfigDir.exists()) {
-        logger.info("Using solr search index at {}", solrRoot);
+        logger.debug("Using solr search index at {}", solrRoot);
       } else {
-        logger.info("Solr config directory doesn't exist, creating one at {}", solrConfigDir);
+        logger.info("Creating search index at {}", solrConfigDir);
         FileUtils.forceMkdir(solrConfigDir);
       }
 
