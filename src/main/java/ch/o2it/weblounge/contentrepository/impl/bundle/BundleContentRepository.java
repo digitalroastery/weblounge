@@ -307,9 +307,11 @@ public class BundleContentRepository extends AbstractContentRepository {
 
       success = true;
       
-      time = System.currentTimeMillis() - time;
-      logger.info("Site index populated in {}", ConfigurationUtils.toHumanReadableDuration(time));
-      logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount);
+      if (pageCount > 0) {
+        time = System.currentTimeMillis() - time;
+        logger.info("Site index populated in {} ms", ConfigurationUtils.toHumanReadableDuration(time));
+        logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount - pageCount);
+      }
     } catch (MalformedPageURIException e) {
       throw new ContentRepositoryException("Error while reading page uri for index", e);
     } finally {

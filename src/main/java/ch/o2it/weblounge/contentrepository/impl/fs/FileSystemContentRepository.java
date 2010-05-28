@@ -199,9 +199,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       
       success = true;
 
-      time = System.currentTimeMillis() - time;
-      logger.info("Site index populated in {}", ConfigurationUtils.toHumanReadableDuration(time));
-      logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount);
+      if (pageCount > 0) {
+        time = System.currentTimeMillis() - time;
+        logger.info("Site index populated in {} ms", ConfigurationUtils.toHumanReadableDuration(time));
+        logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount - pageCount);
+      }
     } catch (IOException e) {
       throw new ContentRepositoryException("Error while writing to index", e);
     } catch (MalformedPageURIException e) {
