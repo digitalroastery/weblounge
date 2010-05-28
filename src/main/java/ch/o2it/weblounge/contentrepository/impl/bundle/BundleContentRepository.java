@@ -161,7 +161,7 @@ public class BundleContentRepository extends AbstractContentRepository {
       String filename = FilenameUtils.getBaseName(entry.getPath());
       long version = PageUtils.getVersion(filename);
       if (version != -1) {
-        logger.trace("Found version '{}' of page {}", entry, uri);
+        logger.trace("Found revision '{}' of page {}", entry, uri);
         versions.add(new PageURIImpl(uri, version));
       }
     }
@@ -197,7 +197,7 @@ public class BundleContentRepository extends AbstractContentRepository {
           if (pageURI == null)
             throw new IllegalStateException("Page " + entry + " has no uri");
           pages.add(pageURI);
-          logger.trace("Found version '{}' of page {}", entry, uri);
+          logger.trace("Found revision '{}' of page {}", entry, uri);
         } catch (IOException e) {
           throw new ContentRepositoryException("Unable to read id from page at " + entry, e);
         }
@@ -272,13 +272,14 @@ public class BundleContentRepository extends AbstractContentRepository {
 
     BundleContentRepositoryIndex index = null;
     index = new BundleContentRepositoryIndex(idxRootDir);
+    boolean success = false;
     
     // Is there an existing index?
     if (index.getPages() > 0) {
       long pageCount = index.getPages();
       long pageVersionCount = index.getVersions();
       logger.info("Loaded exising site index from {}", idxRootDir);
-      logger.info("Site index contains {} pages and {} revisions", pageCount, pageVersionCount);
+      logger.info("Index contains {} pages and {} revisions", pageCount, pageVersionCount - pageCount);
       return index;
     }
 
@@ -303,11 +304,22 @@ public class BundleContentRepository extends AbstractContentRepository {
         }
         previousURI = uri;
       }
+
+      success = true;
+      
       time = System.currentTimeMillis() - time;
       logger.info("Site index populated in {}", ConfigurationUtils.toHumanReadableDuration(time));
       logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount);
     } catch (MalformedPageURIException e) {
       throw new ContentRepositoryException("Error while reading page uri for index", e);
+    } finally {
+      if (!success) {
+        try {
+          index.clear();
+        } catch (IOException e) {
+          logger.error("Error while trying to cleanup after failed indexing operation", e);
+        }
+      }
     }
 
     return index;

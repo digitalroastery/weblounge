@@ -20,9 +20,13 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultImpl;
+import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -68,49 +72,57 @@ public class SolrRequester {
    *           if executing the search operation fails
    */
   public SearchResult getByQuery(SearchQuery query) throws SolrServerException {
-    StringBuilder sb = new StringBuilder();
+    Site site = query.getSite();
+    
+    // Build the solr query string
+    StringBuilder solrQuery = new StringBuilder();
     if (query.getText() != null) {
-      sb.append("(");
-      sb.append(SolrFields.FULLTEXT);
-      sb.append(":");
-      sb.append(query.getText());
-      sb.append(")");
+      solrQuery.append("(");
+      solrQuery.append(SolrFields.FULLTEXT);
+      solrQuery.append(":");
+      solrQuery.append(query.getText());
+      solrQuery.append(")");
     }
-    if (sb.length() == 0)
-      sb.append("*:*");
+    if (solrQuery.length() == 0)
+      solrQuery.append("*:*");
+
+    logger.debug("Solr query is {}", solrQuery.toString());
 
     // Prepare the solr query
-    SolrQuery solrQuery = new SolrQuery(sb.toString());
-    solrQuery.setStart(query.getOffset());
+    SolrQuery q = new SolrQuery(solrQuery.toString());
+    if (query.getOffset() > 0)
+      q.setStart(query.getOffset());
     if (query.getLimit() > 0)
-      solrQuery.setRows(query.getLimit());
-    solrQuery.setFields("* score");
+      q.setRows(query.getLimit());
+    q.setFields("* score");
 
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
     try {
-      solrResponse = solrConnection.request(query.toString());
+      solrResponse = solrConnection.request(q.toString());
     } catch (Exception e) {
       throw new SolrServerException(e);
     }
 
     // Create and configure the query result
-    long size = solrResponse.getResults().getNumFound();
+    long hits = solrResponse.getResults().getNumFound();
+    long size = solrResponse.getResults().size();
 
-    SearchResultImpl result = new SearchResultImpl(query, size);
+    SearchResultImpl result = new SearchResultImpl(query, hits, size);
     result.setSearchTime(solrResponse.getQTime());
 
     // Walk through response and create new items with title, creator, etc:
     for (SolrDocument doc : solrResponse.getResults()) {
+      float score = (Float)doc.getFieldValue(SolrFields.SCORE);
 
-      // SearchResultItemImpl item = new SearchResultItemImpl();
-      // item.setId(doc.getFieldValue(SolrFields.ID).toString());
-      //
-      // // the solr ranking score
-      // item.setScore(Double.parseDouble(toString(doc.getFieldValue(SolrFields.SCORE))));
-      //
-      // // Add the item to the result set
-      // result.addResultItem(item);
+      String id = (String)doc.getFieldValue(SolrFields.ID);
+      String path = (String)doc.getFieldValue(SolrFields.PATH);
+      PageURI uri = new PageURIImpl(site, path, id);
+
+      SearchResultItemImpl item = new SearchResultItemImpl(uri, site, score);
+
+      // Add the item to the result set
+      result.addResultItem(item);
     }
 
     return result;

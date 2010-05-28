@@ -125,6 +125,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Temporary path for rebuilt site
     File restructuredSite = new File(repositoryRoot, ".pages");
+    boolean success = false;
 
     try {
       // Clear the current search index
@@ -196,6 +197,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         FileUtils.moveDirectory(restructuredSite, siteRootDirectory);
       }
       
+      success = true;
+
       time = System.currentTimeMillis() - time;
       logger.info("Site index populated in {}", ConfigurationUtils.toHumanReadableDuration(time));
       logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount);
@@ -204,6 +207,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     } catch (MalformedPageURIException e) {
       throw new ContentRepositoryException("Error while reading page uri for index", e);
     } finally {
+      if (!success)
+        try {
+          index.clear();
+        } catch (IOException e) {
+          logger.error("Error while trying to cleanup after failed indexing operation", e);
+        }
       if (restructuredSite.exists())
         FileUtils.deleteQuietly(restructuredSite);
     }
@@ -427,7 +436,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       long pageCount = index.getPages();
       long pageVersionCount = index.getVersions();
       logger.info("Loaded existing site index from {}", idxRootDir);
-      logger.info("Index contains {} pages and {} revisions", pageCount, pageVersionCount);
+      logger.info("Index contains {} pages and {} revisions", pageCount, pageVersionCount - pageCount);
       return index;
     }
 
