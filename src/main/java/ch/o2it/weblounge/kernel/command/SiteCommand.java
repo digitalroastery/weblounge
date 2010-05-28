@@ -22,7 +22,11 @@ package ch.o2it.weblounge.kernel.command;
 
 import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
+import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -241,8 +245,10 @@ public class SiteCommand {
 
     // Is it a page?
     try {
-      page = repository.getPage(new PageURIImpl(site, args[0]));
-      if (page == null)
+      String objectId = args[0];
+      if (objectId.startsWith("/"))
+        page = repository.getPage(new PageURIImpl(site, args[0]));
+      else
         page = repository.getPage(new PageURIImpl(site, null, args[0]));
       if (page != null) {
         title("page");
@@ -287,6 +293,9 @@ public class SiteCommand {
 
         section("header");
 
+        if (page.getTitle() != null)
+          pad("title", page.getTitle());
+
         // subjects
         StringBuffer subjectList = new StringBuffer();
         for (String c : page.getSubjects()) {
@@ -294,7 +303,7 @@ public class SiteCommand {
             subjectList.append(", ");
           subjectList.append(c);
         }
-        pad("composers", subjectList.toString());
+        pad("subjects", subjectList.toString());
 
 
         section("content");
@@ -311,7 +320,7 @@ public class SiteCommand {
 
       }
     } catch (ContentRepositoryException e) {
-      System.err.println("Error trying access the content repository");
+      System.err.println("Error trying to access the content repository");
       e.printStackTrace(System.err);
     }
   }
@@ -326,28 +335,33 @@ public class SiteCommand {
    *          search terms
    */
   private void search(Site site, String[] args) {
+    StringBuffer text = new StringBuffer();
     if (args.length == 0) {
-      System.out.println("Please specify what to inspect");
-      printUsage();
+      System.out.println("Please specify a search term");
+      System.err.println("Usage: site <id> search <terms>");
       return;
+    } else {
+      for (String s : args) {
+        if (text.length() > 0)
+          text.append(" ");
+        text.append(s);
+      }
     }
 
-    // What are we looking at?
+    // Get hold of the content repository
     ContentRepository repository = ContentRepositoryFactory.getRepository(site);
-    Page page = null;
+    SearchQuery query = new SearchQueryImpl(site);
+    query.withText(text.toString());
 
     // Is it a page?
     try {
-      page = repository.getPage(new PageURIImpl(site, args[0]));
-      if (page == null)
-        page = repository.getPage(new PageURIImpl(site, null, args[0]));
-      if (page != null) {
-        System.out.println("Page:");
-        pad("id", page.getURI().getId().toString());
-        pad("path", page.getURI().getPath());
+      SearchResult result = repository.findPages(query);
+      for (SearchResultItem item : result.getItems()) {
+        System.out.println(item.getURI().getPath());
       }
+      System.out.println("Found " + result.size() + " results (" + result.getSearchTime() + " ms)");
     } catch (ContentRepositoryException e) {
-      System.err.println("Error trying access the content repository");
+      System.err.println("Error trying to access the content repository");
       e.printStackTrace(System.err);
     }
   }
@@ -436,9 +450,10 @@ public class SiteCommand {
    *          the title
    */
   private void section(String title) {
+    System.out.println();
     for (int i = 0; i < (15 - title.length()); i++)
       System.out.print(" ");
-    System.out.println(title);
+    System.out.println(title.toUpperCase());
   }
 
   /**
