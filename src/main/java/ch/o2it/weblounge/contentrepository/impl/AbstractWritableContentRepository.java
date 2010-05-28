@@ -96,7 +96,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // Update the index
-    index.update(uri, target.getPath());
+    index.move(uri, target.getPath());
 
     return true;
   }

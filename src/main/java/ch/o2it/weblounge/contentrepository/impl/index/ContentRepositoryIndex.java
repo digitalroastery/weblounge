@@ -215,12 +215,23 @@ public class ContentRepositoryIndex {
       idIdx.add(id, address);
       pathIdx.add(path, address);
       versionIdx.add(id, uri.getVersion());
-      searchIdx.add(page);
+      if (uri.getVersion() == Page.LIVE) {
+        searchIdx.add(page);
+      }
     }
 
     // Otherwise, it's just a new version
-    else {
+    else if (!versionIdx.hasVersion(address, uri.getVersion())) {
       versionIdx.add(address, uri.getVersion());
+      if (uri.getVersion() == Page.LIVE) {
+        searchIdx.add(page);
+      }
+    }
+
+    // Seems to be an existing site, so it's an update rather than an addition
+    else {
+      logger.warn("Existing page {} was passed to add() method, redirecting to update()");
+      update(page);
     }
 
     return uri;
@@ -256,7 +267,7 @@ public class ContentRepositoryIndex {
     pathIdx.delete(path, address);
     uriIdx.delete(address);
     versionIdx.delete(address);
-    searchIdx.delete(id);
+    searchIdx.delete(uri);
   }
 
   /**
@@ -352,16 +363,31 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Updates the path of the given page uri.
+   * Updates the contents of the given page.
    * 
-   * @param uri
-   *          the uri
+   * @param page
+   *          the page to update
+   * @throws IOException
+   *           if updating the index fails
+   */
+  public synchronized void update(Page page) throws IOException {
+    PageURI uri = page.getURI();
+    if (uri.getVersion() == Page.LIVE) {
+      searchIdx.update(page);
+    }
+  }
+
+  /**
+   * Updates the path of the given page.
+   * 
+   * @param uir
+   *          the page uri
    * @param path
    *          the new path
    * @throws IOException
    *           if updating the index fails
    */
-  public synchronized void update(PageURI uri, String path) throws IOException {
+  public synchronized void move(PageURI uri, String path) throws IOException {
     String oldPath = uri.getPath();
 
     // Locate the entry in question
@@ -377,7 +403,9 @@ public class ContentRepositoryIndex {
     pathIdx.delete(oldPath, address);
     pathIdx.add(uri.getPath(), address);
     uriIdx.update(address, uri.getPath());
-    // TODO: Update search index
+    if (uri.getVersion() == Page.LIVE) {
+      searchIdx.move(uri, path);
+    }
   }
 
   /**

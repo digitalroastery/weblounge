@@ -156,14 +156,14 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#update(ch.o2it.weblounge.common.content.PageURI, java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#move(ch.o2it.weblounge.common.content.PageURI, java.lang.String)}.
    */
   @Test
-  public void testUpdate() {
+  public void testMove() {
     String newPath = "/etc/weblounge";
     try {
       String id = idx.add(page).getId();
-      idx.update(page.getURI(), newPath);
+      idx.move(page.getURI(), newPath);
       assertEquals(1, idx.size());
       assertEquals(id, idx.toId(new PageURIImpl(site, newPath)));
     } catch (IOException e) {

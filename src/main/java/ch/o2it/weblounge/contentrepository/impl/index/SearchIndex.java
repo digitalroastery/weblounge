@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl.index;
 
 import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.PageInputDocument;
@@ -132,10 +133,10 @@ public class SearchIndex {
    * @throws IOException
    *           if an errors occurs while talking to solr
    */
-  public boolean delete(String id) throws IOException {
-    logger.debug("Removing element with id '{}' from searching index", id);
+  public boolean delete(PageURI uri) throws IOException {
+    logger.debug("Removing element with id '{}' from searching index", uri.getId());
     UpdateRequest solrRequest = new UpdateRequest();
-    solrRequest.deleteById(id);
+    solrRequest.deleteById(uri.getId());
     solrRequest.setAction(ACTION.COMMIT, true, true);
     try {
       solrConnection.update(solrRequest);
@@ -155,7 +156,7 @@ public class SearchIndex {
    *           if an errors occurs while talking to solr
    */
   public boolean add(Page page) throws IOException {
-    logger.debug("Adding page {} to searching index", page);
+    logger.debug("Adding page {} to search index", page);
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.setAction(ACTION.COMMIT, true, true);
     solrRequest.add(new PageInputDocument(page));
@@ -165,9 +166,45 @@ public class SearchIndex {
       solrConnection.update(solrRequest);
       return true;
     } catch (Exception e) {
-      logger.error("Cannot clear solr index");
+      logger.error("Cannot add page " + page + " to index", e);
       return false;
     }
+  }
+
+  /**
+   * Posts the updated page to the search index.
+   * 
+   * @param page
+   *          the page to update
+   */
+  public boolean update(Page page) {
+    logger.debug("Updating page {} in search index", page);
+    UpdateRequest solrRequest = new UpdateRequest();
+    solrRequest.setAction(ACTION.COMMIT, true, true);
+    solrRequest.add(new PageInputDocument(page));
+
+    // Post everything to the search index
+    try {
+      solrConnection.update(solrRequest);
+      return true;
+    } catch (Exception e) {
+      logger.error("Cannot update page " + page + " in index", e);
+      return false;
+    }
+  }
+
+  /**
+   * Move the page identified by <code>uri</code> to the new location.
+   * 
+   * @param uri
+   *          the page uri
+   * @param path
+   *          the new path
+   *          @return 
+   */
+  public boolean move(PageURI uri, String path) {
+    // TODO: Update the path field in the page identified by the uri
+    return false;
   }
 
   /**
