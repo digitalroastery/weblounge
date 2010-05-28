@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.kernel.command;
 
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
@@ -244,11 +245,11 @@ public class SiteCommand {
       if (page == null)
         page = repository.getPage(new PageURIImpl(site, null, args[0]));
       if (page != null) {
-        pad("type", "page");
+        title("page");
         pad("id", page.getURI().getId().toString());
         pad("path", page.getURI().getPath());
         
-        System.out.println();
+        section("lifecycle");
         
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG);
 
@@ -283,7 +284,31 @@ public class SiteCommand {
           if (page.getPublishTo() != null)
             pad("published until", df.format(page.getPublishTo()));
         }
+
+        section("header");
+
+        // subjects
+        StringBuffer subjectList = new StringBuffer();
+        for (String c : page.getSubjects()) {
+          if (subjectList.length() > 0)
+            subjectList.append(", ");
+          subjectList.append(c);
+        }
+        pad("composers", subjectList.toString());
+
+
+        section("content");
         
+        // composers
+        StringBuffer composerList = new StringBuffer();
+        for (Composer c : page.getComposers()) {
+          if (composerList.length() > 0)
+            composerList.append(", ");
+          composerList.append(c.getIdentifier());
+          composerList.append(" (").append(c.getPagelets().length).append(")");
+        }
+        pad("composers", composerList.toString());
+
       }
     } catch (ContentRepositoryException e) {
       System.err.println("Error trying access the content repository");
@@ -390,6 +415,30 @@ public class SiteCommand {
       else
         pad(null, info[i]);
     }
+  }
+
+  /**
+   * Returns a padded version of the title.
+   * 
+   * @param title
+   *          the title
+   */
+  private void title(String title) {
+    for (int i = 0; i < (15 - title.length()); i++)
+      System.out.print(" ");
+    System.out.println(title);
+  }
+
+  /**
+   * Returns a padded version of the section title.
+   * 
+   * @param title
+   *          the title
+   */
+  private void section(String title) {
+    for (int i = 0; i < (15 - title.length()); i++)
+      System.out.print(" ");
+    System.out.println(title);
   }
 
   /**
