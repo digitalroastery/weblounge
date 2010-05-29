@@ -30,12 +30,14 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MOD
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TEXT;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_TO;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
@@ -104,10 +106,15 @@ public class PageInputDocument extends SolrUpdateableInputDocument {
       }
       setField(MessageFormat.format(PAGELET_PROPERTIES, i), serializeProperties(p));
       setField(MessageFormat.format(PAGELET_XML, i), p.toXml());
+      setField(MessageFormat.format(PAGELET_TYPE, i), p.getModule() + "/" + p.getIdentifier());
     }
     
     // Preview information
-    // TODO: Add preview xml
+    StringBuffer preview = new StringBuffer();
+    for (Pagelet p : page.getPreview()) {
+      preview.append(p.toXml());
+    }
+    setField(PREVIEW_XML, preview.toString());
   }
 
   /**

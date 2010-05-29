@@ -75,6 +75,9 @@ public interface SolrFields {
   /** Pagelet xml field name */
   public static final String PAGELET_XML = "pagelet-xml-{0}";
 
+  /** Pagelet xml field name */
+  public static final String PAGELET_TYPE = "pagelet-type-{0}";
+
   /** Solr ranking score */
   public static final String SCORE = "score";
   

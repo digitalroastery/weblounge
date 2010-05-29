@@ -254,7 +254,8 @@
     <!-- Dynamic fields for pagelet texts and properties -->
     <dynamicField name="pagelet-text-*"  type="text"  indexed="true"  stored="true"/>
     <dynamicField name="pagelet-properties-*"  type="text"  indexed="true"  stored="true"/>
-    <dynamicField name="pagelet-xml-*"  type="text"  indexed="false"  stored="true"/>
+    <dynamicField name="pagelet-xml-*"  type="text" indexed="false" stored="true"/>
+    <dynamicField name="pagelet-type-*" type="text" indexed="true" stored="true"/>
 
     <!-- A fulltext copy field. -->
     <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
