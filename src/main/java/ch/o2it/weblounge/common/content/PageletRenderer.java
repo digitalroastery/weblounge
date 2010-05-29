@@ -48,6 +48,23 @@ public interface PageletRenderer extends Renderer {
   Module getModule();
 
   /**
+   * Defines the pagelet's preview mode.
+   * 
+   * @param mode
+   *          the preview mode
+   */
+  void setPreviewMode(PagePreviewMode mode);
+
+  /**
+   * Returns the preview mode, which defines whether a pagelet will be part of a
+   * page preview. If no preview mode has been set explicitly, the return value
+   * will default to {@link PagePreviewMode#None}.
+   * 
+   * @return the preview mode
+   */
+  PagePreviewMode getPreviewMode();
+
+  /**
    * Sets the url to the editor.
    * 
    * @param editor

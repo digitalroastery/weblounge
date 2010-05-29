@@ -517,6 +517,14 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   Pagelet[] getPagelets(String composer, String module, String id);
 
   /**
+   * Returns all pagelets from the main composer (stage) as defined by the page
+   * template that form the page preview.
+   * 
+   * @return the preview pagelets
+   */
+  Pagelet[] getPreview();
+
+  /**
    * Adds a <code>PageContentListener</code> to this page, who will be notified
    * (amongst others) about new, moved, deleted or altered pagelets.
    * 
