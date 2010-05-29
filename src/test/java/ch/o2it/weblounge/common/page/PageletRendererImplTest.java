@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Link;
+import ch.o2it.weblounge.common.content.PagePreviewMode;
 import ch.o2it.weblounge.common.content.PageletRenderer;
 import ch.o2it.weblounge.common.impl.content.LinkImpl;
 import ch.o2it.weblounge.common.impl.content.PageletRendererImpl;
@@ -68,6 +69,9 @@ public class PageletRendererImplTest {
   /** The valid time */
   protected long validTime = Times.MS_PER_WEEK + 2 * Times.MS_PER_DAY + Times.MS_PER_HOUR;
 
+  /** The preview mode */
+  protected PagePreviewMode previewMode = PagePreviewMode.First;
+  
   /** English pagelet name */
   protected String englishName = "Pagelet renderer";
 
@@ -96,6 +100,7 @@ public class PageletRendererImplTest {
     renderer.setRecheckTime(recheckTime);
     renderer.setValidTime(validTime);
     renderer.setComposeable(composeable);
+    renderer.setPreviewMode(previewMode);
     renderer.setName(germanName, german);
     renderer.setName(englishName, english);
     renderer.addHTMLHeader(css);
@@ -150,6 +155,16 @@ public class PageletRendererImplTest {
   @Test
   public void testIsComposeable() {
     assertEquals(composeable, renderer.isComposeable());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.PageletRendererImpl#getPreviewMode()}
+   * .
+   */
+  @Test
+  public void testGetPreviewMode() {
+    assertEquals(previewMode, renderer.getPreviewMode());
   }
 
   /**

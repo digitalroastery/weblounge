@@ -1,4 +1,4 @@
-<pagelet id="renderer" composeable="true">
+<pagelet id="renderer" composeable="true" preview="first">
   <name language="de">Darstellungselement</name>
   <name language="en">Pagelet renderer</name>
   <renderer>file://renderer/renderer.jsp</renderer>

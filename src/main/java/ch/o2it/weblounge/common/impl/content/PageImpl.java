@@ -23,8 +23,11 @@ package ch.o2it.weblounge.common.impl.content;
 import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageContentListener;
+import ch.o2it.weblounge.common.content.PagePreviewMode;
+import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.PageletRenderer;
 import ch.o2it.weblounge.common.content.PageletURI;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
@@ -35,21 +38,30 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
+import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A <code>Page</code> encapsulates all data that is attached with a site URL.
  */
 public class PageImpl extends LocalizableObject implements Page {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(PageImpl.class);
+  
   /** The uri */
   protected PageURI uri = null;
 
@@ -71,8 +83,8 @@ public class PageImpl extends LocalizableObject implements Page {
   /** True if the page contents should be indexed */
   protected boolean isIndexed = true;
 
-  /** The title pagelets */
-  protected List<Pagelet> headlines = null;
+  /** The preview pagelets */
+  protected List<Pagelet> preview = null;
 
   /** Current page editor (and owner) */
   protected User lockOwner = null;
@@ -121,7 +133,6 @@ public class PageImpl extends LocalizableObject implements Page {
     this.publishingCtx = new PublishingContext();
     this.securityCtx = new PageSecurityContext();
     this.subjects = new ArrayList<String>();
-    this.headlines = new ArrayList<Pagelet>();
     this.title = new LocalizableContent<String>(this);
     this.description = new LocalizableContent<String>(this);
     this.coverage = new LocalizableContent<String>(this);
@@ -624,23 +635,6 @@ public class PageImpl extends LocalizableObject implements Page {
   }
 
   /**
-   * @see java.lang.Object#hashCode()
-   */
-  public int hashCode() {
-    return uri.hashCode();
-  }
-
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Page) {
-      return uri.equals(((Page) obj).getURI());
-    }
-    return false;
-  }
-
-  /**
    * Returns the string representation of this page header.
    * 
    * @return the string representation
@@ -921,6 +915,64 @@ public class PageImpl extends LocalizableObject implements Page {
     }
     return pagelet;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Page#getPreview()
+   */
+  public Pagelet[] getPreview() {
+    Site site = getSite();
+    PageTemplate t = site.getTemplate(template);
+    if (preview == null && t == null) {
+      logger.warn("Can't calculate the page preview due to missing template");
+      return new Pagelet[] {};
+    } else if (preview == null && t.getStage() == null) {
+      logger.warn("Can't calculate the page preview due to missing stage definition");
+      return new Pagelet[] {};
+    } else if (preview == null) {
+      this.preview = new ArrayList<Pagelet>();
+      List<Pagelet> stage = composers.get(t.getStage());
+      Set<PageletRenderer> previewRenderers = new HashSet<PageletRenderer>();
+      if (stage != null) {
+        for (Pagelet p : stage) {
+  
+          // Load the pagelet's module
+          Module m = site.getModule(p.getModule());
+          if (m == null) {
+            logger.warn("Skipping pagelet '{}' for preview calculation: module '{}' can't be found", p, p.getModule());
+            continue;
+          }
+          
+          // Load the pagelet's renderer
+          PageletRenderer r = m.getRenderer(p.getIdentifier());
+          if (r == null) {
+            logger.warn("Skipping pagelet '{}' for preview calculation: pagelet renderer '{}' can't be found", p, p.getIdentifier());
+            continue;
+          }
+  
+          // Evaluate the preview mode
+          PagePreviewMode previewMode = r.getPreviewMode();
+          if (previewMode.equals(PagePreviewMode.First.equals(previewMode) && !previewRenderers.contains(r))) {
+            preview.add(p);
+            previewRenderers.add(r);
+          } else if (PagePreviewMode.All.equals(previewMode)) {
+            preview.add(p);
+            previewRenderers.add(r);
+          } else if (PagePreviewMode.Boundary.equals(previewMode)) {
+            preview.clear();
+            for (Pagelet p2 : stage) {
+              if (p2.equals(p))
+                break;
+              preview.add(p2);
+            }
+            break;
+          }
+        }
+      }
+    }
+    return preview.toArray(new Pagelet[preview.size()]);
+  }
 
   /**
    * Adds a <code>PageContentListener</code> to this page, who will be notified
@@ -1098,6 +1150,23 @@ public class PageImpl extends LocalizableObject implements Page {
      */
 
     return b.toString();
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  public int hashCode() {
+    return uri.hashCode();
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof Page) {
+      return uri.equals(((Page) obj).getURI());
+    }
+    return false;
   }
 
 }

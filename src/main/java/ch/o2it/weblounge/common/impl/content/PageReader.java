@@ -249,7 +249,7 @@ public final class PageReader extends WebloungeContentReader {
     // Pagelet
     if ("pagelet".equals(raw)) {
       if (isHeadline)
-        page.headlines.add(pageletReader.getPagelet());
+        page.preview.add(pageletReader.getPagelet());
       else {
         page.addPagelet(pageletReader.getPagelet(), composer, position);
         position++;

@@ -148,7 +148,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getModule()
    */
   public String getModule() {
@@ -157,7 +157,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getIdentifier()
    */
   public String getIdentifier() {
@@ -166,16 +166,16 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getPropertyNames()
    */
   public String[] getPropertyNames() {
     return properties.keySet().toArray(new String[properties.size()]);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getProperty(java.lang.String)
    */
   public String getProperty(String key) {
@@ -187,7 +187,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#isMultiValueProperty(java.lang.String)
    */
   public boolean isMultiValueProperty(String key) {
@@ -197,7 +197,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueProperty(java.lang.String)
    */
   public String[] getMultiValueProperty(String key) {
@@ -209,8 +209,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#setProperty(java.lang.String, java.lang.String)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#setProperty(java.lang.String,
+   *      java.lang.String)
    */
   public void setProperty(String key, String value) {
     String[] existing = properties.remove(key);
@@ -225,7 +226,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
    */
   public void setOwner(User owner) {
@@ -234,7 +235,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.security.Securable#getOwner()
    */
   public User getOwner() {
@@ -243,8 +244,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.security.Securable#allow(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#allow(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority)
    */
   public void allow(Permission permission, Authority authority) {
     securityCtx.allow(permission, authority);
@@ -252,8 +254,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.security.Securable#deny(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#deny(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority)
    */
   public void deny(Permission permission, Authority authority) {
     securityCtx.deny(permission, authority);
@@ -261,8 +264,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority)
    */
   public boolean check(Permission p, Authority a) {
     return securityCtx.check(p, a);
@@ -270,8 +274,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.PermissionSet,
+   *      ch.o2it.weblounge.common.security.Authority)
    */
   public boolean check(PermissionSet p, Authority a) {
     return securityCtx.check(p, a);
@@ -279,8 +284,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.security.Securable#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#checkOne(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority[])
    */
   public boolean checkOne(Permission permission, Authority[] authorities) {
     return securityCtx.checkOne(permission, authorities);
@@ -288,8 +294,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.security.Securable#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])
+   * 
+   * @see ch.o2it.weblounge.common.security.Securable#checkAll(ch.o2it.weblounge.common.security.Permission,
+   *      ch.o2it.weblounge.common.security.Authority[])
    */
   public boolean checkAll(Permission permission, Authority[] authorities) {
     return securityCtx.checkAll(permission, authorities);
@@ -297,7 +304,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.security.Securable#permissions()
    */
   public Permission[] permissions() {
@@ -306,7 +313,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.security.Securable#addSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)
    */
   public void addSecurityListener(SecurityListener listener) {
@@ -315,7 +322,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.security.Securable#removeSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)
    */
   public void removeSecurityListener(SecurityListener listener) {
@@ -324,7 +331,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#setURI(ch.o2it.weblounge.common.content.PageletURI)
    */
   public void setURI(PageletURI uri) {
@@ -333,7 +340,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getURI()
    */
   public PageletURI getURI() {
@@ -342,8 +349,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#setCreated(ch.o2it.weblounge.common.user.User, java.util.Date)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#setCreated(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
     creationCtx.setCreated(creator, creationDate);
@@ -351,7 +359,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#getCreationDate()
    */
   public Date getCreationDate() {
@@ -360,7 +368,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#getCreator()
    */
   public User getCreator() {
@@ -369,7 +377,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
    */
   public Date getPublishFrom() {
@@ -378,7 +386,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
    */
   public Date getPublishTo() {
@@ -387,7 +395,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
    */
   public User getPublisher() {
@@ -396,8 +404,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#setPublished(ch.o2it.weblounge.common.user.User, java.util.Date, java.util.Date)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#setPublished(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
     publishingCtx.setPublished(publisher, from, to);
@@ -405,16 +414,16 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
    */
   public boolean isPublished() {
     return publishingCtx.isPublished();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate()
    */
   public Date getModificationDate() {
@@ -423,7 +432,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier()
    */
   public User getModifier() {
@@ -432,7 +441,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
   public Date getLastModificationDate() {
@@ -441,7 +450,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModifier()
    */
   public User getLastModifier() {
@@ -450,7 +459,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
    */
   public Date getModificationDate(Language language) {
@@ -459,7 +468,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier(ch.o2it.weblounge.common.language.Language)
    */
   public User getModifier(Language language) {
@@ -468,8 +477,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#setModified(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
     modificationCtx.setModified(user, date, language);
@@ -477,7 +487,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getContentNames(ch.o2it.weblounge.common.language.Language)
    */
   public String[] getContentNames(Language language) {
@@ -486,10 +496,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       return new String[] {};
     return languageContent.keySet().toArray(new String[languageContent.size()]);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#isMultiValueContent(java.lang.String)
    */
   public boolean isMultiValueContent(String name) {
@@ -502,8 +512,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String, ch.o2it.weblounge.common.language.Language, boolean)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String,
+   *      ch.o2it.weblounge.common.language.Language, boolean)
    */
   public String getContent(String name, Language language, boolean force) {
     Map<String, String[]> languageContent = content.get(language, force);
@@ -515,8 +526,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String,
+   *      ch.o2it.weblounge.common.language.Language)
    */
   public String getContent(String name, Language language) {
     return getContent(name, language, false);
@@ -524,7 +536,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String)
    */
   public String getContent(String name) {
@@ -533,8 +545,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueContent(java.lang.String, ch.o2it.weblounge.common.language.Language, boolean)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueContent(java.lang.String,
+   *      ch.o2it.weblounge.common.language.Language, boolean)
    */
   public String[] getMultiValueContent(String name, Language language,
       boolean force) {
@@ -548,8 +561,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueContent(java.lang.String, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueContent(java.lang.String,
+   *      ch.o2it.weblounge.common.language.Language)
    */
   public String[] getMultiValueContent(String name, Language language) {
     return getMultiValueContent(name, language, false);
@@ -557,7 +571,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueContent(java.lang.String)
    */
   public String[] getMultiValueContent(String name) {
@@ -566,8 +580,9 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Pagelet#setContent(java.lang.String, java.lang.String, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.common.content.Pagelet#setContent(java.lang.String,
+   *      java.lang.String, ch.o2it.weblounge.common.language.Language)
    */
   public void setContent(String name, String value, Language language) {
     Map<String, String[]> languageContent = content.get(language, true);
@@ -588,7 +603,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
@@ -600,7 +615,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object o) {
@@ -637,7 +652,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#toString()
    */
   public String toString() {
@@ -646,15 +661,20 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Pagelet#toXml()
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();
 
     // Add root node
-    b.append("<pagelet module=\"" + moduleId + "\" id=\"" + pageletId + "\">");
-
+    b.append("<pagelet module=\"");
+    b.append(moduleId);
+    b.append("\" id=\"");
+    b.append(pageletId);
+    b.append("\"");
+    b.append(">");
+    
     // export security context
     b.append(securityCtx.toXml());
 

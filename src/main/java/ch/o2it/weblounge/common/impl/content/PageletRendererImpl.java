@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.Link;
+import ch.o2it.weblounge.common.content.PagePreviewMode;
 import ch.o2it.weblounge.common.content.PageletRenderer;
 import ch.o2it.weblounge.common.content.RenderException;
 import ch.o2it.weblounge.common.content.Script;
@@ -59,6 +60,9 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
   /** The defining module */
   protected Module module = null;
+
+  /** The preview mode */
+  protected PagePreviewMode previewMode = PagePreviewMode.None;
 
   /**
    * Creates a new page template that is backed by a Java Server Page located at
@@ -98,6 +102,24 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public Module getModule() {
     return module;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.PageletRenderer#setPreviewMode(ch.o2it.weblounge.common.content.Pagelet.PagePreviewMode)
+   */
+  public void setPreviewMode(PagePreviewMode mode) {
+    this.previewMode = mode;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.PageletRenderer#getPreviewMode()
+   */
+  public PagePreviewMode getPreviewMode() {
+    return previewMode;
   }
 
   /**
@@ -262,6 +284,11 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     // Composeable
     renderer.setComposeable("true".equals(XPathHelper.valueOf(node, "@composeable", xpath)));
 
+    // Preview mode
+    String previewMode = XPathHelper.valueOf(node, "@preview", xpath);
+    if (previewMode != null)
+      renderer.setPreviewMode(PagePreviewMode.parse(previewMode));
+
     // Editor url
     String editorUrlNode = XPathHelper.valueOf(node, "m:editor", xpath);
     try {
@@ -335,6 +362,11 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     buf.append("<pagelet");
     buf.append(" id=\"").append(identifier).append("\"");
     buf.append(" composeable=\"").append(composeable).append("\"");
+    if (!previewMode.equals(PagePreviewMode.None)) {
+      buf.append(" preview=\"");
+      buf.append(previewMode.toString().toLowerCase());
+      buf.append("\"");
+    }
     buf.append(">");
 
     // Names
