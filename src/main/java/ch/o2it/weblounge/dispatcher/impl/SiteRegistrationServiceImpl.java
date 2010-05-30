@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
@@ -151,16 +152,16 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#getSiteServlet(ch.o2it.weblounge.common.site.Site)
    */
   public Servlet getSiteServlet(Site site) {
     return siteServlets.get(site);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByIdentifier(java.lang.String)
    */
   public Site findSiteByIdentifier(String identifier) {
@@ -174,7 +175,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByName(java.lang.String)
    */
   public Site findSiteByName(String serverName) {
@@ -186,21 +187,30 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
     // wildcard match
     for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
       String alias = e.getKey();
-      if (serverName.matches(alias)) {
-        site = e.getValue();
-        log_.info("Registering {} for site ", serverName, site);
-        sitesByServerName.put(serverName, site);
-        return site;
+
+      try {
+        // convert the host wildcard (ex. *.domain.tld) to a valid regex (ex.
+        // .*\.domain\.tld)
+        alias = alias.replace(".", "\\.");
+        alias = alias.replace("*", ".*");
+        if (serverName.matches(alias)) {
+          site = e.getValue();
+          log_.info("Registering {} for site ", serverName, site);
+          sitesByServerName.put(serverName, site);
+          return site;
+        }
+      } catch (PatternSyntaxException ex) {
+        log_.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
       }
     }
-    
+
     log_.debug("Lookup for {} did not match any site", serverName);
     return null;
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByRequest(javax.servlet.http.HttpServletRequest)
    */
   public Site findSiteByRequest(HttpServletRequest request) {
@@ -209,11 +219,11 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
     return findSiteByName(request.getServerName());
   }
 
-  
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#addSite(ch.o2it.weblounge.common.site.Site, org.osgi.framework.ServiceReference)
+   * 
+   * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#addSite(ch.o2it.weblounge.common.site.Site,
+   *      org.osgi.framework.ServiceReference)
    */
   public void addSite(Site site, ServiceReference reference) {
     WebXml webXml = createWebXml(site, reference);
@@ -236,11 +246,11 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
     try {
       // Create the common http context
       BundleHttpContext bundleHttpContext = new BundleHttpContext(siteBundle, siteRoot, bundleEntry);
-      
+
       // Setup the servlet filters
       buildFilters(webXml);
 
-      // Register the site using jsp support (for tag libraries) and the site 
+      // Register the site using jsp support (for tag libraries) and the site
       // servlet.
       try {
         SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
@@ -250,19 +260,24 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
       } catch (NamespaceException e) {
         log_.error("The alias '{}' is already in use", siteRoot);
       } catch (Exception e) {
-        log_.error("Error registering resources for site '{}' at {}: {}", new Object[] { site, siteRoot, e.getMessage() });
+        log_.error("Error registering resources for site '{}' at {}: {}", new Object[] {
+            site,
+            siteRoot,
+            e.getMessage() });
         log_.error(e.getMessage(), e);
       }
 
       log_.debug("Site '{}' registered under site://{}", site, siteRoot);
 
     } catch (Exception e) {
-      log_.error("Error setting up site '{}' for http requests: {}", new Object[] { site, e.getMessage() });
+      log_.error("Error setting up site '{}' for http requests: {}", new Object[] {
+          site,
+          e.getMessage() });
       log_.error(e.getMessage(), e);
     }
-    
+
     httpRegistrations.put(site, webXml);
-    
+
     // Register this site for the findByXYZ() methods
     synchronized (sites) {
       sites.add(site);
@@ -274,15 +289,15 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
         sitesByServerName.put(name, site);
       }
     }
-    
+
     // TODO: register site dispatcher
-    
+
     log_.debug("Site {} registered", site);
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#removeSite(ch.o2it.weblounge.common.site.Site)
    */
   public void removeSite(Site site) {
@@ -311,9 +326,9 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
         sitesByServerName.remove(serverName);
       }
     }
-    
+
     // TODO: unregister site dispatcher
-    
+
     log_.debug("Site {} unregistered", site);
   }
 
@@ -442,7 +457,8 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
      * @param context
      *          the site dispatcher's bundle context
      */
-    public SiteTracker(SiteRegistrationServiceImpl dispatcher, BundleContext context) {
+    public SiteTracker(SiteRegistrationServiceImpl dispatcher,
+        BundleContext context) {
       super(context, Site.class.getName(), null);
       this.dispatcher = dispatcher;
     }
