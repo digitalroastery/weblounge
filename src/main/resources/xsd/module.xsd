@@ -36,15 +36,15 @@
   			<xsd:element name="editor" type="xsd:anyURI" minOccurs="0" />
   			<xsd:element name="recheck" type="durationType" minOccurs="0" />
   			<xsd:element name="valid" type="durationType" minOccurs="0" />
+        <xsd:element ref="preview" minOccurs="0" />
   			<xsd:element ref="includes" minOccurs="0" />
   		</xsd:sequence>
   		<xsd:attribute name="id" type="idType" use="required" />
   		<xsd:attribute name="composeable" type="xsd:boolean" />
-      <xsd:attribute name="preview" type="xsd:string" />
   	</xsd:complexType>
   </xsd:element>
 
-  <xsd:attribute name="preview">
+  <xsd:element name="preview">
     <xsd:simpleType>
       <xsd:restriction base="xsd:string">
         <xsd:enumeration value="none" />
@@ -53,7 +53,7 @@
         <xsd:enumeration value="boundary" />
       </xsd:restriction>
     </xsd:simpleType>
-  </xsd:attribute>
+  </xsd:element>
 
   <xsd:element name="actions">
     <xsd:complexType>

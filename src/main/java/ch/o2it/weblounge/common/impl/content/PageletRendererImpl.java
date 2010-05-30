@@ -285,7 +285,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     renderer.setComposeable("true".equals(XPathHelper.valueOf(node, "@composeable", xpath)));
 
     // Preview mode
-    String previewMode = XPathHelper.valueOf(node, "@preview", xpath);
+    String previewMode = XPathHelper.valueOf(node, "m:preview", xpath);
     if (previewMode != null)
       renderer.setPreviewMode(PagePreviewMode.parse(previewMode));
 
@@ -362,11 +362,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     buf.append("<pagelet");
     buf.append(" id=\"").append(identifier).append("\"");
     buf.append(" composeable=\"").append(composeable).append("\"");
-    if (!previewMode.equals(PagePreviewMode.None)) {
-      buf.append(" preview=\"");
-      buf.append(previewMode.toString().toLowerCase());
-      buf.append("\"");
-    }
     buf.append(">");
 
     // Names
@@ -398,6 +393,13 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       buf.append("<valid>");
       buf.append(ConfigurationUtils.toDuration(validTime));
       buf.append("</valid>");
+    }
+
+    // Preview
+    if (!previewMode.equals(PagePreviewMode.None)) {
+      buf.append("<preview>");
+      buf.append(previewMode.toString().toLowerCase());
+      buf.append("</preview>");
     }
 
     // Includes

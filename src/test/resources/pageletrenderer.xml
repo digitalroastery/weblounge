@@ -1,10 +1,11 @@
-<pagelet id="renderer" composeable="true" preview="first">
+<pagelet id="renderer" composeable="true">
   <name language="de">Darstellungselement</name>
   <name language="en">Pagelet renderer</name>
   <renderer>file://renderer/renderer.jsp</renderer>
   <editor>file://renderer/editor.jsp</editor>
   <recheck>1d10M</recheck>
   <valid>1w2d1H</valid>
+  <preview>first</preview>
   <includes>
     <link href="http://localhost/css.css"/>
   </includes>
