@@ -28,7 +28,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TEXT;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_ELEMENTS;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
@@ -38,6 +38,9 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUB
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.FULLTEXT;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.LOCALIZED_FULLTEXT;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
@@ -92,7 +95,7 @@ public class PageInputDocument extends SolrUpdateableInputDocument {
 
     // Language dependent fields
     for (Language l : page.languages()) {
-      setField(getLocalizedFieldName(DESCRIPTION, l), page.getDescription(l, true));
+      setFulltextField(getLocalizedFieldName(DESCRIPTION, l), page.getDescription(l, true), l);
       setField(getLocalizedFieldName(COVERAGE, l), page.getCoverage(l, true));
       setField(getLocalizedFieldName(RIGHTS, l), page.getRights(l, true));
       setField(getLocalizedFieldName(TITLE, l), page.getTitle(l, true));
@@ -102,13 +105,15 @@ public class PageInputDocument extends SolrUpdateableInputDocument {
     int i = 0;
     for (Pagelet p : page.getPagelets()) {
       for (Language l : p.languages()) {
-        setField(MessageFormat.format(PAGELET_TEXT, i) + "-" + l.getIdentifier(), serializeContent(p, l));
+        setFulltextField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeContent(p, l, false), l);
+        setFulltextField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeProperties(p, false), l);
+        setField(MessageFormat.format(PAGELET_ELEMENTS, i, l.getIdentifier()), serializeContent(p, l, true));
       }
-      setField(MessageFormat.format(PAGELET_PROPERTIES, i), serializeProperties(p));
+      setField(MessageFormat.format(PAGELET_PROPERTIES, i), serializeProperties(p, true));
       setField(MessageFormat.format(PAGELET_XML, i), p.toXml());
       setField(MessageFormat.format(PAGELET_TYPE, i), p.getModule() + "/" + p.getIdentifier());
     }
-    
+
     // Preview information
     StringBuffer preview = new StringBuffer();
     for (Pagelet p : page.getPreview()) {
@@ -134,6 +139,30 @@ public class PageInputDocument extends SolrUpdateableInputDocument {
     if (fieldValue == null)
       return;
     super.setField(fieldName, fieldValue);
+  }
+
+  /**
+   * Adds the field and its value to the indicated field of the search index as
+   * well as to the language-sensitive fulltext field. The implementation
+   * performs a <code>null</code> test and silently returns if <code>null</code>
+   * was passed in.
+   * 
+   * @param fieldName
+   *          the field name
+   * @param fieldValue
+   *          the value
+   * @param language
+   *          the language
+   */
+  public void setFulltextField(String fieldName, Object fieldValue,
+      Language language) {
+    if (fieldName == null)
+      throw new IllegalArgumentException("Field name cannot be null");
+    if (fieldValue == null)
+      return;
+    super.setField(fieldName, fieldValue);
+    super.setField(getLocalizedFieldName(LOCALIZED_FULLTEXT, language), fieldValue);
+    super.setField(FULLTEXT, fieldValue);
   }
 
   /**
@@ -178,45 +207,58 @@ public class PageInputDocument extends SolrUpdateableInputDocument {
    * @return the localized field name
    */
   private String getLocalizedFieldName(String fieldName, Language language) {
-    StringBuffer buf = new StringBuffer(fieldName);
-    buf.append("-").append(language.getIdentifier());
-    return buf.toString();
+    return MessageFormat.format(fieldName, language.getIdentifier());
   }
 
   /**
    * Returns a string representation of the pagelet's element content in the
-   * specified language.
+   * specified language. If <code>format</code> is <code>true</code> then the
+   * content is formatted as <code>field:=&lt;value&gt;;;</code>, otherwise just
+   * the values are added.
    * 
    * @param pagelet
    *          the pagelet
    * @param language
    *          the language
+   * @param format
+   *          <code>true</code> to include formatting
    * @return the serialized element content
    */
-  private String serializeContent(Pagelet pagelet, Language language) {
+  private String serializeContent(Pagelet pagelet, Language language,
+      boolean format) {
     StringBuffer buf = new StringBuffer();
     for (String element : pagelet.getContentNames(language)) {
       String[] content = pagelet.getMultiValueContent(element, language, true);
       for (String c : content) {
-        buf.append(element).append(":").append(c).append(" ;; ");
+        if (format)
+          buf.append(element).append(":=").append(c).append(";;");
+        else
+          buf.append(" ").append(c);
       }
     }
     return buf.toString();
   }
 
   /**
-   * Returns a string representation of the pagelet's element properties.
+   * Returns a string representation of the pagelet's element properties. If
+   * <code>format</code> is <code>true</code> then the property is formatted as
+   * <code>field:=&lt;value&gt;;;</code>, otherwise just the values are added.
    * 
    * @param pagelet
    *          the pagelet
+   * @param format
+   *          <code>true</code> to include formatting
    * @return the serialized element properties
    */
-  private String serializeProperties(Pagelet pagelet) {
+  private String serializeProperties(Pagelet pagelet, boolean format) {
     StringBuffer buf = new StringBuffer();
     for (String property : pagelet.getPropertyNames()) {
       String[] values = pagelet.getMultiValueProperty(property);
       for (String v : values) {
-        buf.append(property).append(":").append(v).append(" ;; ");
+        if (format)
+          buf.append(property).append(":").append(v).append(" ;; ");
+        else
+          buf.append(" ").append(v);
       }
     }
     return buf.toString();

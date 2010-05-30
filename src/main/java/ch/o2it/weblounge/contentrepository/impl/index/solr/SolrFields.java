@@ -34,16 +34,16 @@ public interface SolrFields {
   public static final String PREVIEW_XML = "preview-xml";
 
   /** Description field name */
-  public static final String DESCRIPTION = "description";
+  public static final String DESCRIPTION = "description-{0}";
 
   /** Coverage field name */
-  public static final String COVERAGE = "coverage";
+  public static final String COVERAGE = "coverage-{0}";
 
   /** Rights field name */
-  public static final String RIGHTS = "rights";
+  public static final String RIGHTS = "rights-{0}";
 
   /** Title field name */
-  public static final String TITLE = "title";
+  public static final String TITLE = "title-{0}";
 
   /** Created field name */
   public static final String CREATED = "created";
@@ -66,8 +66,11 @@ public interface SolrFields {
   /** Publisher field name */
   public static final String PUBLISHED_BY = "published-by";
 
+  /** Pagelet text and properties values */
+  public static final String PAGELET_CONTENTS = "pagelet-contents-{1}";
+
   /** Pagelet text field name */
-  public static final String PAGELET_TEXT = "pagelet-text-{0}-{1}";
+  public static final String PAGELET_ELEMENTS = "pagelet-elements-{0}-{1}";
 
   /** Pagelet properties field name */
   public static final String PAGELET_PROPERTIES = "pagelet-properties-{0}";
@@ -81,6 +84,9 @@ public interface SolrFields {
   /** Solr ranking score */
   public static final String SCORE = "score";
   
+  /** Accumulative, language-sensitive fulltext field */
+  public static final String LOCALIZED_FULLTEXT = "fulltext-{0}";
+
   /** Accumulative fulltext field */
   public static final String FULLTEXT = "fulltext";
 

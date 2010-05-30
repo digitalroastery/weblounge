@@ -60,6 +60,9 @@ public class SearchIndex {
 
   /** True if this is a readonly index */
   protected boolean isReadOnly = false;
+  
+  /** The solr root */
+  protected File solrRoot = null;
 
   /**
    * Creates a search index that puts solr into the given root directory. If the
@@ -71,6 +74,7 @@ public class SearchIndex {
    *          <code>true</code> to indicate a read only index
    */
   public SearchIndex(File solrRoot, boolean readOnly) {
+    this.solrRoot = solrRoot;
     setupSolr(solrRoot);
     this.isReadOnly = readOnly;
   }
@@ -114,11 +118,9 @@ public class SearchIndex {
    *           if an errors occurs while talking to solr
    */
   public void clear() throws IOException {
-    UpdateRequest solrRequest = new UpdateRequest();
-    solrRequest.deleteByQuery("*:*");
-    solrRequest.setAction(ACTION.COMMIT, true, true);
     try {
-      solrConnection.update(solrRequest);
+      solrConnection.destroy();
+      setupSolr(solrRoot);
     } catch (Exception e) {
       logger.error("Cannot clear solr index", e);
     }
@@ -218,7 +220,7 @@ public class SearchIndex {
       logger.debug("Setting up solr search index at {}", solrRoot);
       File solrConfigDir = new File(solrRoot, "conf");
 
-      // Create the config directory
+      // Create the configuration directory
       if (solrConfigDir.exists()) {
         logger.debug("Using solr search index at {}", solrRoot);
       } else {

@@ -234,13 +234,8 @@
     <field name="id" type="string" indexed="true" stored="true" required="true" /> 
     <field name="path" type="string" indexed="true" stored="true" required="true" />
 
+    <!-- Page preview -->
     <field name="preview-xml" type="string" indexed="false" stored="true" required="false" />
-
-
-    <field name="description" type="string" indexed="true" stored="true" required="false" />
-    <field name="coverage" type="string" indexed="true" stored="true" required="false" />
-    <field name="rights" type="string" indexed="true" stored="true" required="false" />
-    <field name="title" type="string" indexed="true" stored="true" required="false" />
 
     <!-- Workflow-specific fields -->
     <field name="created" type="date" indexed="true" stored="true" required="false" />
@@ -250,12 +245,22 @@
     <field name="published-from" type="date" indexed="true" stored="true" required="false" />
     <field name="published-to" type="date" indexed="true" stored="true" required="false" />
     <field name="published-by" type="string" indexed="true" stored="true" required="false" />
+
+    <!-- Language sensitive page-level content -->
+    <dynamicField name="description-*" type="string" indexed="true" stored="true" required="false" />
+    <dynamicField name="coverage-*" type="string" indexed="true" stored="true" required="false" />
+    <dynamicField name="rights-*" type="string" indexed="true" stored="true" required="false" />
+    <dynamicField name="title-*" type="string" indexed="true" stored="true" required="false" />
    
     <!-- Dynamic fields for pagelet texts and properties -->
-    <dynamicField name="pagelet-text-*"  type="text"  indexed="true"  stored="true"/>
-    <dynamicField name="pagelet-properties-*"  type="text"  indexed="true"  stored="true"/>
-    <dynamicField name="pagelet-xml-*"  type="text" indexed="false" stored="true"/>
     <dynamicField name="pagelet-type-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="pagelet-contents-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="pagelet-properties-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="pagelet-elements-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="pagelet-xml-*" type="text" indexed="false" stored="true"/>
+
+    <!-- Language sensitive fulltext search -->
+    <dynamicField name="fulltext-*" type="text" indexed="true" stored="true" multiValued="true"/>
 
     <!-- A fulltext copy field. -->
     <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
@@ -279,14 +284,10 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
    <copyField source="id" dest="fulltext"/>
    <copyField source="path" dest="fulltext"/>
-   <copyField source="description" dest="fulltext"/>
-   <copyField source="coverage" dest="fulltext"/>
-   <copyField source="title" dest="fulltext"/>
-   <copyField source="created-by" dest="fulltext"/>
-   <copyField source="modified-by" dest="fulltext"/>
-   <copyField source="published-by" dest="fulltext"/>
-   <copyField source="pagelet-text_*" dest="fulltext"/>
-   <copyField source="pagelet-properties-*" dest="fulltext"/>
+   <copyField source="description-*" dest="fulltext"/>
+   <copyField source="coverage-*" dest="fulltext"/>
+   <copyField source="title-*" dest="fulltext"/>
+   <copyField source="pagelet-content-*" dest="fulltext"/>
 
   <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
