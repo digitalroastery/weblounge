@@ -129,6 +129,15 @@ public interface SearchQuery {
   Language getLanguage();
 
   /**
+   * Only returns pages that contain the specified subject.
+   * 
+   * @param subject
+   *          the subject
+   * @return the query extended by this criterion
+   */
+  SearchQuery withSubject(String subject);
+
+  /**
    * Return only pages that have been created or modified by the specified
    * author.
    * 
