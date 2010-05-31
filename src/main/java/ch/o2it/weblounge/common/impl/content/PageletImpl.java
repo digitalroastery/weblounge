@@ -746,16 +746,6 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     b.append("</pagelet>");
 
     return b.toString();
-
-    /*
-     * try { InputSource is = new InputSource(new StringReader(b.toString()));
-     * DocumentBuilder docBuilder = XMLUtilities.getDocumentBuilder(); Document
-     * doc = docBuilder.parse(is); return doc.getFirstChild(); } catch
-     * (SAXException e) { log_.error("Error building dom tree for pagelet", e);
-     * } catch (IOException e) { log_.error("Error reading pagelet xml", e); }
-     * catch (ParserConfigurationException e) {
-     * log_.error("Error parsing pagelet xml", e); } return null;
-     */
   }
 
   /**

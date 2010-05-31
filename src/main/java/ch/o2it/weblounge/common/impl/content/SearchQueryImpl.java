@@ -223,6 +223,16 @@ public class SearchQueryImpl implements SearchQuery {
   
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withSubject(java.lang.String)
+   */
+  public SearchQuery withSubject(String subject) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withModificationDate(java.util.Date)
    */
