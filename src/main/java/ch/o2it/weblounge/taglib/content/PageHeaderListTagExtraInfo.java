@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Pagelet;
 
 import javax.servlet.jsp.tagext.TagData;
@@ -27,10 +28,10 @@ import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.VariableInfo;
 
 /**
- * This class provides runtime information about the <code>PageHeaderTag</code>
- * jsp tag.
+ * This class provides runtime information about the
+ * <code>PageHeaderListTag</code> jsp tag.
  */
-public class PageHeaderTagExtraInfo extends TagExtraInfo {
+public class PageHeaderListTagExtraInfo extends TagExtraInfo {
 
   /**
    * Returns the information on the exported tag variables.
@@ -39,14 +40,11 @@ public class PageHeaderTagExtraInfo extends TagExtraInfo {
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
-        new VariableInfo(PageHeaderTagVariables.HEADER, Pagelet.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(PageHeaderTagVariables.HEADLINES, Pagelet.class.getName() + "[]", true, VariableInfo.NESTED), };
+        new VariableInfo(PageHeaderListTagVariables.URI, PageURI.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(PageHeaderListTagVariables.PREVIEW, Pagelet.class.getName() + "[]", true, VariableInfo.NESTED) };
   }
 
   /**
-   * Returns <code>true</code> if the tag data is valid. This is the case if the
-   * <code>define</code> attribute can be parsed without exception.
-   * 
    * @see javax.servlet.jsp.tagext.TagExtraInfo#isValid(javax.servlet.jsp.tagext.TagData)
    */
   public boolean isValid(TagData tagData) {

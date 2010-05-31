@@ -21,9 +21,11 @@
 package ch.o2it.weblounge.taglib.content;
 
 /**
- * Holds the variable definitions for the <code>PageHeaderTag</code>.
+ * Holds the variable definitions for the <code>PageHeaderListTag</code>.
  */
-public class PageHeaderTagVariables {
+public class PageHeaderListTagVariables {
+
+  public static final String URI = "uri";
 
   public static final String PREVIEW = "preview";
 
