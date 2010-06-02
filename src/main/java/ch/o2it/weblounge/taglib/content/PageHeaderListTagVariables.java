@@ -25,7 +25,7 @@ package ch.o2it.weblounge.taglib.content;
  */
 public class PageHeaderListTagVariables {
 
-  public static final String URI = "uri";
+  public static final String URL = "url";
 
   public static final String PREVIEW = "preview";
 

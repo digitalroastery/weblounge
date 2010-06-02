@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
@@ -28,6 +27,7 @@ import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
@@ -159,7 +159,7 @@ public class PageHeaderListTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(PageHeaderListTagVariables.URI);
+    pageContext.removeAttribute(PageHeaderListTagVariables.URL);
     pageContext.removeAttribute(PageHeaderListTagVariables.PREVIEW);
     request.setAttribute(WebloungeRequest.PAGELET, pagelet);
     reset();
@@ -210,11 +210,11 @@ public class PageHeaderListTag extends WebloungeTag {
 
     // Set the headline in the request
     if (found) {
-      PageURI uri = item.getURI();
+      WebUrl url = item.getUrl();
       // TODO: How do we get the PREVIEW_XML out of the search result?
       // Pagelet[] preview = item.getPreview();
       Pagelet[] preview = new Pagelet[] {};
-      pageContext.setAttribute(PageHeaderListTagVariables.URI, uri);
+      pageContext.setAttribute(PageHeaderListTagVariables.URL, url);
       pageContext.setAttribute(PageHeaderListTagVariables.PREVIEW, preview);
     }
 
