@@ -189,7 +189,7 @@ public class ContentRepositoryIndex {
    * Adds all relevant entries for the given page uri to the index and returns
    * it, probably providing a newly created uri identifier.
    * 
-   * @param uri
+   * @param url
    *          the page uri
    * @return the uri
    * @throws IOException

@@ -20,13 +20,13 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
-import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
+import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.url.WebUrl;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -90,10 +90,9 @@ public class SolrRequester {
 
     // Prepare the solr query
     SolrQuery q = new SolrQuery(solrQuery.toString());
-    if (query.getOffset() > 0)
-      q.setStart(query.getOffset());
-    if (query.getLimit() > 0)
-      q.setRows(query.getLimit());
+    q.setStart(query.getOffset() > 0 ? query.getOffset() : 0);
+    q.setRows(query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE);
+    q.setIncludeScore(true);
     q.setFields("* score");
 
     // Execute the query and try to get hold of a query response
@@ -115,11 +114,12 @@ public class SolrRequester {
     for (SolrDocument doc : solrResponse.getResults()) {
       float score = (Float)doc.getFieldValue(SolrFields.SCORE);
 
-      String id = (String)doc.getFieldValue(SolrFields.ID);
       String path = (String)doc.getFieldValue(SolrFields.PATH);
-      PageURI uri = new PageURIImpl(site, path, id);
+      WebUrl url = new WebUrlImpl(site, path);
 
-      SearchResultItemImpl item = new SearchResultItemImpl(uri, site, score);
+      SearchResultItemImpl item = new SearchResultItemImpl(url, score, site);
+      item.setPreview(doc.getFieldValue(SolrFields.PREVIEW_XML));
+      item.setTitle((String)doc.getFieldValue(SolrFields.TITLE));
 
       // Add the item to the result set
       result.addResultItem(item);
