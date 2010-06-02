@@ -312,11 +312,11 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     buf.append(site.getHostName());
 
     // Path
-    buf.append(separatorChar).append(path);
+    buf.append(pathElementSeparatorChar).append(path);
     
     // Version
     if (includeVersion && version > 0) {
-      buf.append(separatorChar);
+      buf.append(pathElementSeparatorChar);
       if (version == Page.WORK)
         buf.append("work");
       else if (version >= 0)
@@ -337,12 +337,12 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     } else {
       // Language
       if (includeLanguage && language != null) {
-        buf.append(separatorChar).append(language.getIdentifier());
+        buf.append(pathElementSeparatorChar).append(language.getIdentifier());
       }
       
       // Flavor
       if (includeFlavor && flavor != null) {
-        buf.append(separatorChar).append(flavor.toExtension());
+        buf.append(pathElementSeparatorChar).append(flavor.toExtension());
       }
     }
     

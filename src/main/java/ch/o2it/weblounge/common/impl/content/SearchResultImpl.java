@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,10 +46,13 @@ public class SearchResultImpl implements SearchResult {
   protected long hitCount = 0;
 
   /** The total size of the search result set */
-  protected long size = 0;
+  protected long documentCount = 0;
 
   /** The time it took to do the search in ms */
   protected long time = 0;
+  
+  /** Flag to indicate the sorted state */
+  protected boolean sorted = true;
 
   /** The search result */
   protected List<SearchResultItem> result = new ArrayList<SearchResultItem>();
@@ -63,15 +67,15 @@ public class SearchResultImpl implements SearchResult {
    *          the query
    * @param hitCount
    *          the number of hits
-   * @param size
+   * @param documentCount
    *          the total size of the result set
    */
-  public SearchResultImpl(SearchQuery query, long hitCount, long size) {
+  public SearchResultImpl(SearchQuery query, long hitCount, long documentCount) {
     this.query = query;
     this.offset = query.getOffset();
     this.limit = query.getLimit();
     this.hitCount = hitCount;
-    this.size = size;
+    this.documentCount = documentCount;
   }
 
   /**
@@ -82,6 +86,7 @@ public class SearchResultImpl implements SearchResult {
    */
   public void addResultItem(SearchResultItem item) {
     result.add(item);
+    sorted = false;
   }
 
   /**
@@ -90,6 +95,10 @@ public class SearchResultImpl implements SearchResult {
    * @see ch.o2it.weblounge.common.content.SearchResult#getItems()
    */
   public SearchResultItem[] getItems() {
+    if (!sorted) {
+      Collections.sort(result);
+      sorted = true;
+    }
     return result.toArray(new SearchResultItem[result.size()]);
   }
 
@@ -171,10 +180,10 @@ public class SearchResultImpl implements SearchResult {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchResult#size()
+   * @see ch.o2it.weblounge.common.content.SearchResult#getDocumentCount()
    */
-  public long size() {
-    return size;
+  public long getDocumentCount() {
+    return documentCount;
   }
 
 }

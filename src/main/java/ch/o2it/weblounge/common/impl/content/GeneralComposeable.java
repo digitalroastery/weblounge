@@ -266,7 +266,7 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
    */
   public int hashCode() {
     if (identifier == null)
-      throw new IllegalStateException("Composeable object need an identifier");
+      throw new IllegalStateException("Composeable object needs an identifier");
     return identifier.hashCode();
   }
 
@@ -277,7 +277,7 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
    */
   public boolean equals(Object o) {
     if (identifier == null)
-      throw new IllegalStateException("Composeable object need an identifier");
+      throw new IllegalStateException("Composeable object needs an identifier");
     if (o instanceof Composeable) {
       Composeable c = (Composeable) o;
       return c.getIdentifier().equals(identifier);

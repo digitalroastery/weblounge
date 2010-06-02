@@ -20,26 +20,23 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.SearchResultItem;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
+import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
  * Default implementation of a {@link SearchResultItem}.
  */
-public class SearchResultItemImpl extends LocalizableObject implements SearchResultItem {
+public class SearchResultItemImpl implements SearchResultItem {
 
   /** The title */
   protected String title = null;
 
-  /** The preview */
-  protected String preview = null;
+  /** The preview data */
+  protected Object preview = null;
 
   /** The hit location */
-  protected PageURI uri = null;
+  protected WebUrl url = null;
 
   /** The renderer used to show the preview */
   protected Renderer previewRenderer = null;
@@ -55,17 +52,28 @@ public class SearchResultItemImpl extends LocalizableObject implements SearchRes
    * the object that created the item, usually, this will be the site itself but
    * it could very well be a module that added to a search result.
    * 
-   * @param uri
+   * @param url
    *          the url to show the hit
-   * @param source
-   *          the object that produced the result item
    * @param relevance
    *          the score inside the search result
+   * @param source
+   *          the object that produced the result item
    */
-  public SearchResultItemImpl(PageURI uri, Object source, double relevance) {
-    this.uri = uri;
+  public SearchResultItemImpl(WebUrl url, double relevance, Object source) {
+    this.url = url;
     this.source = source;
     this.score = relevance;
+  }
+
+  /**
+   * Sets the search result's title, which is used in place of a missing preview
+   * renderer.
+   * 
+   * @param title
+   *          the result item's title
+   */
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   /**
@@ -78,16 +86,38 @@ public class SearchResultItemImpl extends LocalizableObject implements SearchRes
   }
 
   /**
+   * Sets the url that points to the location of the search result.
+   * 
+   * @param url
+   *          the target url
+   */
+  public void setUrl(WebUrl url) {
+    if (url == null)
+      throw new IllegalArgumentException("The url must not be null");
+    this.url = url;
+  }
+
+  /**
    * @see ch.o2it.weblounge.common.content.SearchResultItem#getUrl()
    */
-  public PageURI getURI() {
-    return uri;
+  public WebUrl getUrl() {
+    return url;
+  }
+
+  /**
+   * Sets the result item's preview data.
+   * 
+   * @param preview
+   *          the preview
+   */
+  public void setPreview(Object preview) {
+    this.preview = preview;
   }
 
   /**
    * @see ch.o2it.weblounge.common.content.SearchResultItem#getPreview()
    */
-  public String getPreview() {
+  public Object getPreview() {
     return preview;
   }
 
@@ -125,19 +155,6 @@ public class SearchResultItemImpl extends LocalizableObject implements SearchRes
   }
 
   /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#switchTo(ch.o2it.weblounge.common.language.Language,
-   *      boolean)
-   */
-  @Override
-  public Language switchTo(Language language, boolean force) {
-    if (previewRenderer != null)
-      previewRenderer.switchTo(language);
-    return super.switchTo(language, force);
-  }
-
-  /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(SearchResultItem sr) {
@@ -145,29 +162,10 @@ public class SearchResultItemImpl extends LocalizableObject implements SearchRes
       return 1;
     else if (score > sr.getRelevance())
       return -1;
-    else
+    else if (getTitle() != null && sr.getTitle() != null)
       return getTitle().compareTo(sr.getTitle());
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
-   *      ch.o2it.weblounge.common.language.Language)
-   */
-  public int compareTo(Localizable o, Language l) {
-    if (o instanceof SearchResultItem) {
-      SearchResultItem r = (SearchResultItem) o;
-      if (score > r.getRelevance())
-        return 1;
-      else if (score < r.getRelevance())
-        return -1;
-      else {
-        // TODO: Return newest entry?
-        return 0;
-      }
-    }
-    return 0;
+    else
+      return 0;
   }
 
   /**
@@ -177,11 +175,7 @@ public class SearchResultItemImpl extends LocalizableObject implements SearchRes
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof SearchResultItem) {
-      SearchResultItem r = (SearchResultItem) obj;
-      return uri.equals(r.getURI()) && score == r.getRelevance();
-    }
-    return super.equals(obj);
+    return this == obj;
   }
 
   /**

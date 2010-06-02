@@ -65,11 +65,20 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   protected PagePreviewMode previewMode = PagePreviewMode.None;
 
   /**
-   * Creates a new page template that is backed by a Java Server Page located at
-   * <code>url</code>.
+   * Creates a new page template.
    */
   public PageletRendererImpl() {
     addFlavor(RequestFlavor.HTML);
+  }
+
+  /**
+   * Creates a new page template with the given identifier.
+   * 
+   * @param identifier
+   *          the template identifier
+   */
+  public PageletRendererImpl(String identifier) {
+    this(identifier, null);
   }
 
   /**

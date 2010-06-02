@@ -37,7 +37,7 @@ public class UrlImpl implements Url {
   protected String path = null;
 
   /** The path separator character */
-  protected char separatorChar = 0;
+  protected char pathElementSeparatorChar = 0;
 
   /**
    * Creates a new url from a given path using the default path separator
@@ -72,7 +72,7 @@ public class UrlImpl implements Url {
    *          the path separator
    */
   public UrlImpl(String path, char separator) {
-    this.separatorChar = separator;
+    this.pathElementSeparatorChar = separator;
     if (path != null)
       setPath(path);
   }
@@ -84,7 +84,7 @@ public class UrlImpl implements Url {
    *          the path separator character
    */
   protected UrlImpl(char separator) {
-    this.separatorChar = separator;
+    this.pathElementSeparatorChar = separator;
     this.path = "/";
   }
 
@@ -94,7 +94,7 @@ public class UrlImpl implements Url {
    * @see ch.o2it.weblounge.common.url.Url#getPathSeparator()
    */
   public char getPathSeparator() {
-    return separatorChar;
+    return pathElementSeparatorChar;
   }
   
   /**
@@ -104,8 +104,8 @@ public class UrlImpl implements Url {
    */
   public void setPath(String path) {
     this.path = trim(path);
-    if (!this.path.startsWith(Character.toString(separatorChar)))
-      this.path = separatorChar + this.path;
+    if (!this.path.startsWith(Character.toString(pathElementSeparatorChar)))
+      this.path = pathElementSeparatorChar + this.path;
   }
 
   /**
@@ -124,13 +124,13 @@ public class UrlImpl implements Url {
    * @return the parent path
    */
   protected String getParentPath() {
-    String separator = Character.toString(separatorChar);
+    String separator = Character.toString(pathElementSeparatorChar);
     if (path.equals(separator))
       return null;
     String p = path;
     if (p.endsWith(separator))
       p = path.substring(0, path.length() - 1);
-    int lastSeparator = p.lastIndexOf(separatorChar);
+    int lastSeparator = p.lastIndexOf(pathElementSeparatorChar);
     return (lastSeparator > 0) ? path.substring(0, lastSeparator) : separator;
   }
 
@@ -213,7 +213,7 @@ public class UrlImpl implements Url {
     if (url == null)
       throw new IllegalArgumentException("Url cannot be null");
     url = url.trim().toLowerCase();
-    String separator = Character.toString(separatorChar);
+    String separator = Character.toString(pathElementSeparatorChar);
     // TODO: this fails if the separator is the windows file separator
     //url = url.replaceAll(separator + separator, separator);
     if (url.endsWith(separator) || url.equals(separator))

@@ -72,13 +72,22 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    * 
    * @param identifier
    *          the renderer identifier
+   */
+  public AbstractRenderer(String identifier) {
+    this(identifier, null);
+  }
+
+  /**
+   * Creates a renderer with a recheck time of one day and a valid time of one
+   * week.
+   * 
+   * @param identifier
+   *          the renderer identifier
    * @param renderer
    *          url of the renderer
    */
   public AbstractRenderer(String identifier, URL renderer) {
     super(identifier, Times.MS_PER_DAY, Times.MS_PER_WEEK);
-    if (renderer == null)
-      throw new IllegalArgumentException("Renderer must not be null");
     this.renderer = renderer;
   }
 

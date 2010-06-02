@@ -20,13 +20,19 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
+import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.PageletURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -38,11 +44,62 @@ public class SearchQueryImpl implements SearchQuery {
   /** The site */
   protected Site site = null;
 
+  /** The search language */
+  protected Language language = null;
+
   /** Query configuration stack */
   protected Stack<Object> stack = new Stack<Object>();
 
   /** The object that needs to show up next */
-  protected Object expectation = null;
+  protected Class<?> expectation = null;
+
+  /** The list of required pagelets */
+  protected List<Pagelet> pagelets = new ArrayList<Pagelet>();
+
+  /** The list of required subjects */
+  protected List<String> subjects = new ArrayList<String>();
+  
+  /** The properties */
+  protected Map<String, String> properties = new HashMap<String, String>();
+
+  /** The elements */
+  protected Map<String, String> elements = new HashMap<String, String>();
+  
+  /** The last method called */
+  protected String lastMethod = null;
+
+  /** The creation date */
+  protected Date creationDateFrom = null;
+
+  /** The end of the range for the creation date */
+  protected Date creationDateTo = null;
+
+  /** The modification date */
+  protected Date modificationDateFrom = null;
+
+  /** The end of the range for the modification date */
+  protected Date modificationDateTo = null;
+
+  /** The publishing date */
+  protected Date publishingDateFrom = null;
+
+  /** The end of the range for the publishing date */
+  protected Date publishingDateTo = null;
+  
+  /** The author */
+  protected User author = null;
+
+  /** The creator */
+  protected User creator = null;
+
+  /** The modifier */
+  protected User modifier = null;
+
+  /** The publisher */
+  protected User publisher = null;
+
+  /** The path prefix */
+  protected String pathPrefix = null;
   
   /** Query terms */
   protected String text = null;
@@ -60,50 +117,63 @@ public class SearchQueryImpl implements SearchQuery {
    *          the site
    */
   public SearchQueryImpl(Site site) {
-    this.site = site;
+    this(site, site.getDefaultLanguage());
   }
-  
+
+  /**
+   * Creates a new search query that is operating on the given site.
+   * 
+   * @param site
+   *          the site
+   * @param language
+   *          the search language
+   */
+  public SearchQueryImpl(Site site, Language language) {
+    this.site = site;
+    this.language = language;
+  }
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getSite()
    */
   public Site getSite() {
     return site;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withLimit(int)
    */
   public SearchQuery withLimit(int limit) {
     this.limit = limit;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getLimit()
    */
   public int getLimit() {
     return limit;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withOffset(int)
    */
   public SearchQuery withOffset(int offset) {
     this.offset = offset;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getOffset()
    */
   public int getOffset() {
@@ -117,7 +187,16 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery and(Date date) {
     ensureExpectation(Date.class);
-    // TODO Auto-generated method stub
+    Date startDate = (Date)stack.peek();
+    if (startDate.equals(date) || startDate.after(date))
+      throw new IllegalStateException("End date must be after start date");
+    if ("withCreationDateBetween".equals(lastMethod))
+      creationDateTo = date;
+    else if ("withModificationDateBetween".equals(lastMethod))
+      modificationDateTo = date;
+    else if ("withPublishingDateBetween".equals(lastMethod))
+      publishingDateTo = date;
+    clearExpectations();
     return this;
   }
 
@@ -130,7 +209,8 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery andProperty(String propertyName, String propertyValue)
       throws IllegalStateException {
     ensureConfigurationObject(Pagelet.class);
-    // TODO Auto-generated method stub
+    Pagelet pagelet = (Pagelet) stack.peek();
+    pagelet.setProperty(propertyName, propertyValue);
     return this;
   }
 
@@ -143,7 +223,8 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery andText(String textName, String text)
       throws IllegalStateException {
     ensureConfigurationObject(Pagelet.class);
-    // TODO Auto-generated method stub
+    Pagelet pagelet = (Pagelet) stack.peek();
+    pagelet.setContent(textName, text, language);
     return this;
   }
 
@@ -154,21 +235,19 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery atPosition(int position) throws IllegalStateException {
     ensureConfigurationObject(Pagelet.class);
-    ensureConfigurationObject(String.class);
-    // TODO Auto-generated method stub
+    Pagelet pagelet = (Pagelet) stack.peek();
+    PageletURI uri = pagelet.getURI();
+    if (uri == null) {
+      PageTemplate template = site.getDefaultTemplate();
+      String stage = null;
+      if (template != null)
+        stage = template.getStage();
+      uri = new PageletURIImpl(null, stage, position);
+    }
+    pagelet.setURI(uri);
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.SearchQuery#getPosition()
-   */
-  public int getPosition() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  
   /**
    * {@inheritDoc}
    * 
@@ -176,19 +255,17 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery inComposer(String composer) throws IllegalStateException {
     ensureConfigurationObject(Pagelet.class);
+    Pagelet pagelet = (Pagelet) stack.peek();
+    PageletURI uri = pagelet.getURI();
+    if (uri == null) {
+      uri = new PageletURIImpl(null, composer, -1);
+    } else {
+      uri.setComposer(composer);
+    }
+    pagelet.setURI(uri);
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.SearchQuery#getComposer()
-   */
-  public String getComposer() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
   /**
    * {@inheritDoc}
    * 
@@ -196,8 +273,17 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withAuthor(User author) {
     clearExpectations();
-    // TODO Auto-generated method stub
+    this.author = author;
     return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getAuthor()
+   */
+  public User getAuthor() {
+    return author;
   }
 
   /**
@@ -207,28 +293,78 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withLanguage(Language language) {
     clearExpectations();
-    // TODO Auto-generated method stub
+    this.language = language;
     return this;
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getLanguage()
    */
   public Language getLanguage() {
-    // TODO Auto-generated method stub
-    return null;
+    return language;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withSubject(java.lang.String)
+   */
+  public SearchQuery withSubject(String subject) {
+    subjects.add(subject);
+    return this;
   }
   
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withSubject(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getSubjects()
    */
-  public SearchQuery withSubject(String subject) {
-    // TODO Auto-generated method stub
-    return null;
+  public String[] getSubjects() {
+    return subjects.toArray(new String[subjects.size()]);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withCreationDate(java.util.Date)
+   */
+  public SearchQuery withCreationDate(Date date) {
+    clearExpectations();
+    creationDateFrom = date;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withCreationDateBetween(java.util.Date)
+   */
+  public SearchQuery withCreationDateBetween(Date date) {
+    clearExpectations();
+    configure(date);
+    creationDateFrom = date;
+    expect(Date.class);
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getCreationDate()
+   */
+  public Date getCreationDate() {
+    return creationDateFrom;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getCreationDateEnd()
+   */
+  public Date getCreationDateEnd() {
+    return creationDateTo;
   }
   
   /**
@@ -238,7 +374,7 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withModificationDate(Date date) {
     clearExpectations();
-    // TODO Auto-generated method stub
+    modificationDateFrom = date;
     return this;
   }
 
@@ -250,21 +386,53 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withModificationDateBetween(Date date) {
     clearExpectations();
     configure(date);
+    modificationDateFrom = date;
     expect(Date.class);
-    // TODO Auto-generated method stub
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getModificationDate()
+   */
+  public Date getModificationDate() {
+    return modificationDateFrom;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getModificationDateEnd()
+   */
+  public Date getModificationDateEnd() {
+    return modificationDateTo;
+  }
+  
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withPagelet(ch.o2it.weblounge.common.content.Pagelet)
+   */
+  public SearchQuery withPagelet(String module, String id) {
+    clearExpectations();
+    if (module == null)
+      throw new IllegalArgumentException("Module identifier must not be null");
+    if (id == null)
+      throw new IllegalArgumentException("Pagelet identifier must not be null");
+    Pagelet pagelet = new PageletImpl(module, id);
+    pagelets.add(pagelet);
+    configure(pagelet);
     return this;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withPagelet(ch.o2it.weblounge.common.content.Pagelet)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getPagelets()
    */
-  public SearchQuery withPagelet(Pagelet pagelet) {
-    clearExpectations();
-    configure(pagelet);
-    // TODO Auto-generated method stub
-    return this;
+  public Pagelet[] getPagelets() {
+    return pagelets.toArray(new Pagelet[pagelets.size()]);
   }
 
   /**
@@ -274,18 +442,61 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withPathPrefix(String path) {
     clearExpectations();
-    // TODO Auto-generated method stub
+    this.pathPrefix = path;
+    if (pathPrefix == null)
+      throw new IllegalArgumentException("Path prefix must not be null");
+    if (!pathPrefix.startsWith(WebUrl.separator))
+      pathPrefix = WebUrl.separatorChar + pathPrefix;
     return this;
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getPathPrefix()
    */
   public String getPathPrefix() {
-    // TODO Auto-generated method stub
-    return null;
+    return pathPrefix;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withCreator(ch.o2it.weblounge.common.user.User)
+   */
+  public SearchQuery withCreator(User creator) {
+    clearExpectations();
+    this.creator = creator;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getCreator()
+   */
+  public User getCreator() {
+    return creator;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withModifier(ch.o2it.weblounge.common.user.User)
+   */
+  public SearchQuery withModifier(User modifier) {
+    clearExpectations();
+    this.modifier = modifier;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getModifier()
+   */
+  public User getModifier() {
+    return modifier;
   }
   
   /**
@@ -295,8 +506,17 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withPublisher(User publisher) {
     clearExpectations();
-    // TODO Auto-generated method stub
+    this.publisher = publisher;
     return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getPublisher()
+   */
+  public User getPublisher() {
+    return publisher;
   }
 
   /**
@@ -306,7 +526,7 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery withPublishingDate(Date date) {
     clearExpectations();
-    // TODO Auto-generated method stub
+    this.publishingDateFrom = date;
     return this;
   }
 
@@ -318,11 +538,29 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withPublishingDateBetween(Date date) {
     clearExpectations();
     configure(date);
+    this.publishingDateFrom = date;
     expect(Date.class);
-    // TODO Auto-generated method stub
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getPublishingDate()
+   */
+  public Date getPublishingDate() {
+    return publishingDateFrom;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getPublishingDateEnd()
+   */
+  public Date getPublishingDateEnd() {
+    return publishingDateTo;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -333,10 +571,10 @@ public class SearchQueryImpl implements SearchQuery {
     this.text = text;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getText()
    */
   public String getText() {
@@ -346,21 +584,40 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withProperty(java.lang.String, java.lang.String)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withElement(java.lang.String, java.lang.String)
    */
-  public SearchQuery withProperty(String property, String value) {
-    // TODO Auto-generated method stub
+  public SearchQuery withElement(String element, String value) {
+    elements.put(element, value);
     return this;
   }
   
   /**
    * {@inheritDoc}
    *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getElements()
+   */
+  public Map<String, String> getElements() {
+    return elements;
+  }
+  
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withProperty(java.lang.String,
+   *      java.lang.String)
+   */
+  public SearchQuery withProperty(String property, String value) {
+    properties.put(property, value);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getProperties()
    */
   public Map<String, String> getProperties() {
-    // TODO Auto-generated method stub
-    return null;
+    return properties;
   }
   
   /**
@@ -382,6 +639,7 @@ public class SearchQueryImpl implements SearchQuery {
    *          the class type
    */
   private void expect(Class<?> c) {
+    lastMethod = Thread.currentThread().getStackTrace()[2].getMethodName();
     this.expectation = c;
   }
 
@@ -411,7 +669,7 @@ public class SearchQueryImpl implements SearchQuery {
   private void ensureExpectation(Class<?> c) throws IllegalStateException {
     if (expectation == null)
       throw new IllegalStateException("Malformed query configuration. No " + c.getClass().getName() + " is expected at this time");
-    if (!expectation.getClass().getCanonicalName().equals(c.getCanonicalName()))
+    if (!expectation.getCanonicalName().equals(c.getCanonicalName()))
       throw new IllegalStateException("Malformed query configuration. Something of type " + c.getClass().getName() + " is expected at this time");
     expectation = null;
   }
