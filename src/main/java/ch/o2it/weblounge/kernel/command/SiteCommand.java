@@ -46,6 +46,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.Formatter;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -356,10 +357,20 @@ public class SiteCommand {
     // Is it a page?
     try {
       SearchResult result = repository.findPages(query);
+      
+      // Format the output
+      Formatter formatter = new Formatter(System.out);
+      StringBuffer format = new StringBuffer();
+      int padding = Long.toString(result.getDocumentCount()).length();
+      format.append("%1$#").append(padding).append("s. %2$s\n");
+      
+      // List results
+      int i = 1;
       for (SearchResultItem item : result.getItems()) {
-        System.out.println(item.getURI().getPath());
+        formatter.format(format.toString(), i++, item.getUrl());
       }
-      System.out.println("Found " + result.size() + " results (" + result.getSearchTime() + " ms)");
+
+      System.out.println("Found " + result.getDocumentCount() + " results (" + result.getSearchTime() + " ms)");
     } catch (ContentRepositoryException e) {
       System.err.println("Error trying to access the content repository");
       e.printStackTrace(System.err);

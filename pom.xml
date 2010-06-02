@@ -95,6 +95,7 @@
               ch.o2it.weblounge.common.content,
               ch.o2it.weblounge.common.language,
               ch.o2it.weblounge.common.site,
+              ch.o2it.weblounge.common.url,
               ch.o2it.weblounge.common.user,
               ch.o2it.weblounge.common.impl.content,
               ch.o2it.weblounge.common.impl.util,
