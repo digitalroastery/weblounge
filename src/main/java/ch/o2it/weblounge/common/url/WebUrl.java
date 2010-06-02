@@ -41,6 +41,12 @@ import ch.o2it.weblounge.common.site.Site;
  */
 public interface WebUrl extends Url {
 
+  /** The url separator character */
+  char separatorChar = '/';
+
+  /** The url separator as a string */
+  String separator = "/";
+
   /**
    * Returns the associated site.
    * 

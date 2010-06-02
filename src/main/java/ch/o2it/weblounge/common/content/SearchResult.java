@@ -42,9 +42,10 @@ public interface SearchResult {
 
   /**
    * Returns the total number of appearances of the search criteria in the
-   * search result, spread over <code>size()</code> number of documents.
+   * search result, spread over <code>getDocumentCount</code> number of
+   * documents.
    * 
-   * @return the overall hits
+   * @return the overall number of hits
    */
   long getHitCount();
 
@@ -55,9 +56,9 @@ public interface SearchResult {
    * {@link #getItems()}, which is likely to be limited by the value returned by
    * {@link #getLimit()}.
    * 
-   * @return the size of this search result
+   * @return the number of documents containing the hits
    */
-  long size();
+  long getDocumentCount();
 
   /**
    * Returns the number of items in this search result, possibly limited with

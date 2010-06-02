@@ -79,7 +79,8 @@ public interface SearchQuery {
   int getOffset();
 
   /**
-   * Return pages that contain the given text.
+   * Return pages that contain the given text either in the page header or in
+   * one of the pagelets.
    * 
    * @param text
    *          the text to look up
@@ -93,6 +94,25 @@ public interface SearchQuery {
    * @return the text
    */
   String getText();
+
+  /**
+   * Specifies an element within a pagelet.
+   * 
+   * @param element
+   *          the element name
+   * @param value
+   *          the element value
+   * @return the search query
+   */
+  SearchQuery withElement(String element, String value);
+
+  /**
+   * Returns the elements text or <code>null</code> if no elements were
+   * specified.
+   * 
+   * @return the text
+   */
+  Map<String, String> getElements();
 
   /**
    * Sets the search text.
@@ -129,13 +149,22 @@ public interface SearchQuery {
   Language getLanguage();
 
   /**
-   * Only returns pages that contain the specified subject.
+   * Only returns pages that contain the specified subject. Note that this
+   * method may be called multiple times in order to specify more than one
+   * subject.
    * 
    * @param subject
    *          the subject
    * @return the query extended by this criterion
    */
   SearchQuery withSubject(String subject);
+
+  /**
+   * Returns the subjects or an empty array if no subjects have been specified.
+   * 
+   * @return the subjects
+   */
+  String[] getSubjects();
 
   /**
    * Return only pages that have been created or modified by the specified
@@ -148,6 +177,46 @@ public interface SearchQuery {
   SearchQuery withAuthor(User author);
 
   /**
+   * Returns the author or <code>null</code> if no author has been specified.
+   * 
+   * @return the author
+   */
+  User getAuthor();
+
+  /**
+   * Return only pages that have been created by the specified user.
+   * 
+   * @param creator
+   *          the creator
+   * @return the query extended by this criterion
+   */
+  SearchQuery withCreator(User creator);
+
+  /**
+   * Returns the creator or <code>null</code> if no creator has been specified.
+   * 
+   * @return the creator
+   */
+  User getCreator();
+
+  /**
+   * Return only pages that have been modified by the specified user.
+   * 
+   * @param modifier
+   *          the modifier
+   * @return the query extended by this criterion
+   */
+  SearchQuery withModifier(User modifier);
+
+  /**
+   * Returns the modifier or <code>null</code> if no modifier has been
+   * specified.
+   * 
+   * @return the modifier
+   */
+  User getModifier();
+
+  /**
    * Return only pages that have been published by the specified publisher.
    * 
    * @param publisher
@@ -155,6 +224,14 @@ public interface SearchQuery {
    * @return the query extended by this criterion
    */
   SearchQuery withPublisher(User publisher);
+
+  /**
+   * Returns the publisher or <code>null</code> if no publisher has been
+   * specified.
+   * 
+   * @return the publisher
+   */
+  User getPublisher();
 
   /**
    * Return pages that have been published on the given date.
@@ -182,6 +259,22 @@ public interface SearchQuery {
   SearchQuery withPublishingDateBetween(Date date);
 
   /**
+   * Returns the publishing date or <code>null</code> if no publishing date has
+   * been specified.
+   * 
+   * @return the publishing date
+   */
+  Date getPublishingDate();
+
+  /**
+   * Returns the end of the range for the publishing date or <code>null</code>
+   * if no end date has been specified.
+   * 
+   * @return the publishing end date
+   */
+  Date getPublishingDateEnd();
+
+  /**
    * Return pages that have been modified on the given date.
    * <p>
    * Note that this method throws an <code>IllegalStateException</code> if used
@@ -207,9 +300,67 @@ public interface SearchQuery {
   SearchQuery withModificationDateBetween(Date date);
 
   /**
+   * Returns the modification date or <code>null</code> if no modification date
+   * has been specified.
+   * 
+   * @return the modification date
+   */
+  Date getModificationDate();
+
+  /**
+   * Returns the end of the range for the modification date or <code>null</code>
+   * if no end date has been specified.
+   * 
+   * @return the modification end date
+   */
+  Date getModificationDateEnd();
+
+  /**
+   * Return pages that have been created on the given date.
+   * <p>
+   * Note that this method throws an <code>IllegalStateException</code> if used
+   * in conjunction with {@link #withCreationDateBetween(Date)} or
+   * {@link #and(Date)}.
+   * 
+   * @param date
+   *          the Creation date
+   * @return the query extended by this criterion
+   */
+  SearchQuery withCreationDate(Date date);
+
+  /**
+   * Return pages with a Creation date of <code>date</code> or later.
+   * <p>
+   * Note that this method cannot be used without a subsequent call to
+   * {@link #and(Date)} in order to specify the end date.
+   * 
+   * @param date
+   *          the Creation start date
+   * @return the query extended by this criterion
+   */
+  SearchQuery withCreationDateBetween(Date date);
+
+  /**
+   * Returns the creation date or <code>null</code> if no creation date has been
+   * specified.
+   * 
+   * @return the creation date
+   */
+  Date getCreationDate();
+
+  /**
+   * Returns the end of the range for the creation date or <code>null</code> if
+   * no end date has been specified.
+   * 
+   * @return the creation end date
+   */
+  Date getCreationDateEnd();
+
+  /**
    * This method is used to specify the end of a date range, started by a call
-   * to either one of {@link #withPublishingDateBetween(Date)} or
-   * {@link #withModificationDateBetween(Date)}.
+   * to either one of {@link #withPublishingDateBetween(Date)},
+   * {@link #withModificationDateBetween(Date)} or
+   * {@link #withCreationDateBetween(Date)}.
    * 
    * @param date
    *          the end date
@@ -237,14 +388,26 @@ public interface SearchQuery {
   /**
    * Return pages that contain the specified pagelet.
    * <p>
-   * Note that you can specify the location where the pagelet needs to be by a
-   * subsequent call to {@link #inComposer(String)} and {@link #atPosition(int)}.
+   * Note that you can specify the location where the pagelet needs to be as
+   * additional elements or properties by a subsequent call to
+   * {@link #inComposer(String)} {@link #atPosition(int)},
+   * {@link #andText(String, String)} and {@link #andProperty(String, String)}.
    * 
-   * @param pagelet
-   *          the pagelet
+   * @param module
+   *          the module identifier
+   * @param id
+   *          the pagelet identifier
    * @return the query extended by this criterion
    */
-  SearchQuery withPagelet(Pagelet pagelet);
+  SearchQuery withPagelet(String module, String id);
+
+  /**
+   * Returns the list of required pagelets, along with their elements,
+   * properties and location information.
+   * 
+   * @return the pagelets
+   */
+  Pagelet[] getPagelets();
 
   /**
    * This method may be called after a call to {@link #withPagelet(Pagelet)} in
@@ -259,13 +422,6 @@ public interface SearchQuery {
   SearchQuery inComposer(String composer) throws IllegalStateException;
 
   /**
-   * Returns the composer.
-   * 
-   * @return the composer
-   */
-  String getComposer();
-
-  /**
    * This method may be called after a call to {@link #inComposer(String)} in
    * order to specify the pagelet's position within that composer.
    * 
@@ -276,13 +432,6 @@ public interface SearchQuery {
    *           if no composer has been specified before
    */
   SearchQuery atPosition(int position) throws IllegalStateException;
-
-  /**
-   * Returns the pagelet position.
-   * 
-   * @return the position
-   */
-  int getPosition();
 
   /**
    * Only return pages that contain a certain pagelet (see

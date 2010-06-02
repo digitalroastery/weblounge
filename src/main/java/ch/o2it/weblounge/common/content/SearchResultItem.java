@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.content;
 
-import ch.o2it.weblounge.common.language.Localizable;
+import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
  * The search result is what is delivered by the search function of weblounge.
@@ -30,14 +30,14 @@ import ch.o2it.weblounge.common.language.Localizable;
  * outside of the site's content repository. It is up to the module to decide
  * what the relevance value should be for the search results that it adds.
  */
-public interface SearchResultItem extends Localizable, Comparable<SearchResultItem> {
+public interface SearchResultItem extends Comparable<SearchResultItem> {
 
   /**
-   * Returns the uri that will lead to the location where the hit occurred.
+   * Returns the url that will lead to the location where the hit occurred.
    * 
    * @return the hit location
    */
-  PageURI getURI();
+  WebUrl getUrl();
 
   /**
    * Returns the title of this search result.
@@ -51,7 +51,7 @@ public interface SearchResultItem extends Localizable, Comparable<SearchResultIt
    * 
    * @return the preview
    */
-  String getPreview();
+  Object getPreview();
 
   /**
    * Returns the renderer that is used to render the search result. Depending on
