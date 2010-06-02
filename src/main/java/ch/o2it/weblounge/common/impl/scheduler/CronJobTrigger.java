@@ -171,13 +171,18 @@ public final class CronJobTrigger implements JobTrigger {
       c.add(Calendar.HOUR_OF_DAY, 1);
     }
 
-    // months
-    while (!matches(c, Calendar.MONTH, months)) {
-      c.set(Calendar.DAY_OF_MONTH, 1);
-      c.add(Calendar.MONTH, 1);
+    // days and weekdays
+    while (!matches(c, daysOfMonth, daysOfWeek)) {
+      c.add(Calendar.DAY_OF_MONTH, 1);
     }
 
-    // days and weekdays
+    // months
+    while (!matches(c, Calendar.MONTH, months)) {
+      c.add(Calendar.MONTH, 1);
+      c.set(Calendar.DAY_OF_MONTH, 1);
+    }
+
+    // re-adjust days and weekdays after month has changed
     while (!matches(c, daysOfMonth, daysOfWeek)) {
       c.add(Calendar.DAY_OF_MONTH, 1);
     }
