@@ -391,7 +391,7 @@ public interface SearchQuery {
    * Note that you can specify the location where the pagelet needs to be as
    * additional elements or properties by a subsequent call to
    * {@link #inComposer(String)} {@link #atPosition(int)},
-   * {@link #andText(String, String)} and {@link #andProperty(String, String)}.
+   * {@link #andElement(String, String)} and {@link #andProperty(String, String)}.
    * 
    * @param module
    *          the module identifier
@@ -480,7 +480,7 @@ public interface SearchQuery {
    * @throws IllegalStateException
    *           if the pagelet has not been specified before
    */
-  SearchQuery andText(String textName, String text)
+  SearchQuery andElement(String textName, String text)
       throws IllegalStateException;
 
 }
