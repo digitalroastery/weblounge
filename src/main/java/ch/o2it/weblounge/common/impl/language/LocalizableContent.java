@@ -143,6 +143,8 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    */
   @Override
   public void remove(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
     super.remove(language);
     content.remove(language);
   }
@@ -157,6 +159,11 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    *          the language
    */
   public T put(T content, Language language) {
+    if (content == null)
+      throw new IllegalArgumentException("Content must not be null");
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
+
     if (this.content.size() == 0)
       this.originalLanguage = language;
     enableLanguage(language);
@@ -199,6 +206,9 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    * @return the content
    */
   public T get(Language language, boolean force) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
+
     T c = content.get(language);
     if (c == null && !force) {
       Language l = null;
@@ -225,6 +235,8 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    *      ch.o2it.weblounge.common.language.Language)
    */
   public void switchedTo(Language language, Language requestedLanguage) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
     switchTo(language);
   }
 
@@ -265,6 +277,9 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
    * @return the object's string representation in the given language
    */
   public String toString(Language language, boolean force) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
+
     T c = content.get(language);
 
     // Not found? Try the fall back language

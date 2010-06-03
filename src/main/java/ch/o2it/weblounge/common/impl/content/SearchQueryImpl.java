@@ -217,11 +217,13 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#andText(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.SearchQuery#andElement(java.lang.String,
    *      java.lang.String)
    */
-  public SearchQuery andText(String textName, String text)
+  public SearchQuery andElement(String textName, String text)
       throws IllegalStateException {
+    if (language == null)
+      throw new IllegalStateException("You need to specify the query language first");
     ensureConfigurationObject(Pagelet.class);
     Pagelet pagelet = (Pagelet) stack.peek();
     pagelet.setContent(textName, text, language);
@@ -243,6 +245,8 @@ public class SearchQueryImpl implements SearchQuery {
       if (template != null)
         stage = template.getStage();
       uri = new PageletURIImpl(null, stage, position);
+    } else {
+      uri.setPosition(position);
     }
     pagelet.setURI(uri);
     return this;
@@ -684,7 +688,7 @@ public class SearchQueryImpl implements SearchQuery {
   private void ensureConfigurationObject(Class<?> c)
       throws IllegalStateException {
     for (Object o : stack) {
-      if (o.getClass().getCanonicalName().equals(c.getCanonicalName()))
+      if (c.isAssignableFrom(o.getClass()))
         return;
     }
     throw new IllegalStateException("Malformed query configuration. No " + c.getClass().getName() + " is expected at this time");

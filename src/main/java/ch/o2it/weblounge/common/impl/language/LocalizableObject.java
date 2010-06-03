@@ -152,6 +152,9 @@ public class LocalizableObject implements Localizable {
    *          the language to enable
    */
   public void enableLanguage(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
+
     if (!languages.contains(language)) {
       languages.add(language);
       if (languages.size() == 1) {
@@ -168,6 +171,9 @@ public class LocalizableObject implements Localizable {
    *          the language to be removed
    */
   public void remove(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
+
     if (behavior.equals(Original) && language.equals(originalLanguage))
       throw new IllegalStateException("Cannot disable original language!");
     else if (behavior.equals(Default) && language.equals(defaultLanguage))
@@ -379,7 +385,7 @@ public class LocalizableObject implements Localizable {
    */
   public void setOriginalLanguage(Language language) {
     if (language == null)
-      throw new IllegalArgumentException("Language may not be null!");
+      throw new IllegalArgumentException("Language must not be null!");
 
     originalLanguage = language;
   }
@@ -393,6 +399,8 @@ public class LocalizableObject implements Localizable {
    * @return <code>true</code> if the language is supported
    */
   public boolean supportsLanguage(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
     return languages.contains(language);
   }
 
@@ -411,6 +419,11 @@ public class LocalizableObject implements Localizable {
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable)
    */
   public int compareTo(Localizable o, Language l) {
+    if (o == null)
+      throw new IllegalArgumentException("Localizable must not be null");
+    if (l == null)
+      throw new IllegalArgumentException("Language must not be null");
+
     if (o instanceof LocalizableObject) {
       return toString(l).compareTo(((LocalizableObject) o).toString(l));
     }

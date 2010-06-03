@@ -585,6 +585,13 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    *      java.lang.String, ch.o2it.weblounge.common.language.Language)
    */
   public void setContent(String name, String value, Language language) {
+    if (name == null)
+      throw new IllegalArgumentException("Content element name must not be null");
+    if (value == null)
+      throw new IllegalArgumentException("Content element value must not be null");
+    if (language == null)
+      throw new IllegalArgumentException("Language must not be null");
+
     Map<String, String[]> languageContent = content.get(language, true);
     if (languageContent == null) {
       languageContent = new HashMap<String, String[]>();
