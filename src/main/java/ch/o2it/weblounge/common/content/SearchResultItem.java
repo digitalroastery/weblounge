@@ -33,6 +33,13 @@ import ch.o2it.weblounge.common.url.WebUrl;
 public interface SearchResultItem extends Comparable<SearchResultItem> {
 
   /**
+   * Returns the page identifier.
+   * 
+   * @return the identifier
+   */
+  String getId();
+
+  /**
    * Returns the url that will lead to the location where the hit occurred.
    * 
    * @return the hit location
@@ -62,6 +69,21 @@ public interface SearchResultItem extends Comparable<SearchResultItem> {
    * @return the renderer
    */
   Renderer getPreviewRenderer();
+
+  /**
+   * Sets the page xml.
+   * 
+   * @param xml
+   *          the xml
+   */
+  void setPageXml(String xml);
+
+  /**
+   * Returns the page.
+   * 
+   * @return the page
+   */
+  Page getPage();
 
   /**
    * Returns the relevance of this hit with respect to the search terms. Greater

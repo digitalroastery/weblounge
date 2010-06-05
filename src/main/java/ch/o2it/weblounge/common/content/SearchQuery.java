@@ -79,6 +79,54 @@ public interface SearchQuery {
   int getOffset();
 
   /**
+   * Return the page with the given identifier.
+   * 
+   * @param id
+   *          the identifier to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withId(String id);
+
+  /**
+   * Returns the identifier or <code>null</code> if no identifier was specified.
+   * 
+   * @return the identifier
+   */
+  String getId();
+
+  /**
+   * Return the page with the given path.
+   * 
+   * @param path
+   *          the path to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withPath(String path);
+
+  /**
+   * Returns the path or <code>null</code> if no path was specified.
+   * 
+   * @return the path
+   */
+  String getPath();
+
+  /**
+   * Return the pages with the given template.
+   * 
+   * @param template
+   *          the template to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withTemplate(String template);
+
+  /**
+   * Returns the template or <code>null</code> if no template was specified.
+   * 
+   * @return the template
+   */
+  String getTemplate();
+
+  /**
    * Return pages that contain the given text either in the page header or in
    * one of the pagelets.
    * 
@@ -391,7 +439,8 @@ public interface SearchQuery {
    * Note that you can specify the location where the pagelet needs to be as
    * additional elements or properties by a subsequent call to
    * {@link #inComposer(String)} {@link #atPosition(int)},
-   * {@link #andElement(String, String)} and {@link #andProperty(String, String)}.
+   * {@link #andElement(String, String)} and
+   * {@link #andProperty(String, String)}.
    * 
    * @param module
    *          the module identifier
