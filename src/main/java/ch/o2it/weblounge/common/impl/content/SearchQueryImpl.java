@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.PageletURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -52,6 +53,15 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The object that needs to show up next */
   protected Class<?> expectation = null;
+  
+  /** The uuid */
+  protected String id = null;
+  
+  /** The path */
+  protected String path = null;
+
+  /** The template */
+  protected String template = null;
 
   /** The list of required pagelets */
   protected List<Pagelet> pagelets = new ArrayList<Pagelet>();
@@ -180,6 +190,67 @@ public class SearchQueryImpl implements SearchQuery {
     return offset;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withId(java.lang.String)
+   */
+  public SearchQuery withId(String id) {
+    if (id == null)
+      throw new IllegalArgumentException("Id cannot be null");
+    this.id = id;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getId()
+   */
+  public String getId() {
+    return id;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withPath(java.lang.String)
+   */
+  public SearchQuery withPath(String path) {
+    if (path == null)
+      throw new IllegalArgumentException("Path cannot be null");
+    this.path = PathSupport.trim(path);
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getPath()
+   */
+  public String getPath() {
+    return path;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withTemplate(java.lang.String)
+   */
+  public SearchQuery withTemplate(String template) {
+    this.template = template;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getTemplate()
+   */
+  public String getTemplate() {
+    return template;
+  }
+  
   /**
    * {@inheritDoc}
    * 

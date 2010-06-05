@@ -77,10 +77,11 @@ public class SearchResultImplTest {
     result.setSearchTime(searchTime);
     
     Object source = new Object();
+    String id = "4bb19980-8f98-4873-a813-71b5dfac22af";
     WebUrl url = new WebUrlImpl(site, "/");
     for (int i=0; i < limit; i++) {
       double relevance = Math.random();
-      SearchResultItemImpl item = new SearchResultItemImpl(url, relevance, source);
+      SearchResultItemImpl item = new SearchResultItemImpl(site, id, url, relevance, source);
       result.addResultItem(item);
     }
   }

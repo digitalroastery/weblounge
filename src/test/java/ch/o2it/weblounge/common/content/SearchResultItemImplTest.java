@@ -21,14 +21,17 @@
 package ch.o2it.weblounge.common.content;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.content.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
+import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +50,9 @@ public class SearchResultItemImplTest {
   /** The preview data */
   protected Object previewData = null;
   
+  /** The page xml */
+  protected String pageXml = null;
+  
   /** THe pagelet renderer */
   protected PageletRenderer renderer = null;
   
@@ -55,6 +61,12 @@ public class SearchResultItemImplTest {
   
   /** The result title */
   protected String title = null;
+  
+  /** The page id */
+  protected String id = null;
+  
+  /** The page path */
+  protected String path = "/service/test";
   
   /** The url of the search result */
   protected WebUrl url = null;
@@ -75,11 +87,13 @@ public class SearchResultItemImplTest {
     title = "My search result";
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
-    url = new WebUrlImpl(site, "/");
-    item = new SearchResultItemImpl(url, relevance, source);
+    url = new WebUrlImpl(site, path);
+    pageXml = IOUtils.toString(getClass().getResourceAsStream("/page.xml"));
+    item = new SearchResultItemImpl(site, id, url, relevance, source);
     item.setTitle(title);
     item.setPreview(previewData);
     item.setPreviewRenderer(renderer);
+    item.setPageXml(pageXml);
   }
 
   /**
@@ -104,6 +118,15 @@ public class SearchResultItemImplTest {
   @Test
   public void testGetPreview() {
     assertEquals(previewData, item.getPreview());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultItemImpl#getPage()}.
+   */
+  @Test
+  public void testGetPage() {
+    assertNotNull(item.getPage());
+    assertEquals(UrlSupport.trim(path), item.getPage().getURI().getPath());
   }
 
   /**
@@ -135,7 +158,7 @@ public class SearchResultItemImplTest {
    */
   @Test
   public void testCompareToSearchResultItem() {
-    SearchResultItem nextItem = new SearchResultItemImpl(url, relevance + 1.0, source);
+    SearchResultItem nextItem = new SearchResultItemImpl(site, id, url, relevance + 1.0, source);
     assertTrue(item.compareTo(nextItem) > 0);
   }
 

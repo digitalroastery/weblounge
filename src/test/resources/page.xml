@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<page id="12345" path="/service/test/" version="live">
+<page id="4bb19980-8f98-4873-a813-71b6dfab22as" path="/service/test/" version="live">
   <head>
     <template>home</template>
     <layout>news</layout>

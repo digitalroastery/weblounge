@@ -28,6 +28,7 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.content.PageletImpl;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
@@ -119,6 +120,42 @@ public class SearchQueryImplTest {
   public void testWithOffset() {
     query.withOffset(offset);
     assertEquals(offset, query.getOffset());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withId(java.lang.String)}
+   * .
+   */
+  @Test
+  public void testWithId() {
+    String id = "4bb19980-8f98-4873-a813-71b6dfab22af";
+    query.withId(id);
+    assertEquals(id, query.getId());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withPath(java.lang.String)}
+   * .
+   */
+  @Test
+  public void testWithPath() {
+    String path = "/test";
+    query.withPath(path);
+    assertEquals(PathSupport.trim(path), query.getPath());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withPath(java.lang.String)}
+   * .
+   */
+  @Test
+  public void testWithTemplate() {
+    String template = "news";
+    query.withTemplate(template);
+    assertEquals(template, query.getTemplate());
   }
 
   /**

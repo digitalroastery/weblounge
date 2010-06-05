@@ -20,14 +20,35 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.SearchResultItem;
+import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Default implementation of a {@link SearchResultItem}.
  */
 public class SearchResultItemImpl implements SearchResultItem {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(SearchResultItemImpl.class);
+  
+  /** THe associated site */
+  protected Site site = null;
+
+  /** The page id */
+  protected String id = null;
 
   /** The title */
   protected String title = null;
@@ -41,6 +62,12 @@ public class SearchResultItemImpl implements SearchResultItem {
   /** The renderer used to show the preview */
   protected Renderer previewRenderer = null;
 
+  /** The page xml */
+  protected String pageXml = null;
+
+  /** The page */
+  protected Page page = null;
+
   /** Source of the search result */
   protected Object source = null;
 
@@ -52,6 +79,10 @@ public class SearchResultItemImpl implements SearchResultItem {
    * the object that created the item, usually, this will be the site itself but
    * it could very well be a module that added to a search result.
    * 
+   * @param site
+   *          the site
+   * @param id
+   *          the document id
    * @param url
    *          the url to show the hit
    * @param relevance
@@ -59,10 +90,22 @@ public class SearchResultItemImpl implements SearchResultItem {
    * @param source
    *          the object that produced the result item
    */
-  public SearchResultItemImpl(WebUrl url, double relevance, Object source) {
+  public SearchResultItemImpl(Site site, String id, WebUrl url,
+      double relevance, Object source) {
+    this.site = site;
+    this.id = id;
     this.url = url;
     this.source = source;
     this.score = relevance;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchResultItem#getId()
+   */
+  public String getId() {
+    return id;
   }
 
   /**
@@ -119,6 +162,38 @@ public class SearchResultItemImpl implements SearchResultItem {
    */
   public Object getPreview() {
     return preview;
+  }
+
+  /**
+   * Sets the page xml.
+   * 
+   * @param xml
+   *          the xml
+   */
+  public void setPageXml(String xml) {
+    this.pageXml = xml;
+  }
+
+  /**
+   * Returns the page object.
+   * 
+   * @return the page
+   */
+  public Page getPage() {
+    if (page == null) {
+      PageReader reader = new PageReader();
+      PageURI uri = new PageURIImpl(site, id, url.getPath());
+      try {
+        page = reader.read(new ByteArrayInputStream(pageXml.getBytes()), uri);
+      } catch (SAXException e) {
+        logger.error("SAX error while parsing page " + uri + " from search result", e);
+      } catch (IOException e) {
+        logger.error("IO error while parsing page " + uri + " from search result", e);
+      } catch (ParserConfigurationException e) {
+        logger.error("Parser configuration error while parsing page " + uri + " from search result", e);
+      }
+    }
+    return page;
   }
 
   /**
