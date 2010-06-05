@@ -24,9 +24,12 @@ import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.PageInputDocument;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.PageURIInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrConnection;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUpdateableInputDocument;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -34,6 +37,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.request.UpdateRequest.ACTION;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.core.SolrCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +64,7 @@ public class SearchIndex {
 
   /** True if this is a readonly index */
   protected boolean isReadOnly = false;
-  
+
   /** The solr root */
   protected File solrRoot = null;
 
@@ -120,6 +124,7 @@ public class SearchIndex {
   public void clear() throws IOException {
     try {
       solrConnection.destroy();
+      FileUtils.forceDelete(solrRoot);
       setupSolr(solrRoot);
     } catch (Exception e) {
       logger.error("Cannot clear solr index", e);
@@ -181,18 +186,30 @@ public class SearchIndex {
    */
   public boolean update(Page page) {
     logger.debug("Updating page {} in search index", page);
-    UpdateRequest solrRequest = new UpdateRequest();
-    solrRequest.setAction(ACTION.COMMIT, true, true);
-    solrRequest.add(new PageInputDocument(page));
-
-    // Post everything to the search index
     try {
-      solrConnection.update(solrRequest);
+      update(new PageInputDocument(page));
       return true;
     } catch (Exception e) {
       logger.error("Cannot update page " + page + " in index", e);
       return false;
     }
+  }
+
+  /**
+   * Posts the input document to the search index.
+   * 
+   * @param document
+   *          the input document
+   * @return the query response
+   * @throws Exception
+   *           posting to solr fails
+   */
+  protected QueryResponse update(SolrUpdateableInputDocument document)
+      throws Exception {
+    UpdateRequest solrRequest = new UpdateRequest();
+    solrRequest.setAction(ACTION.COMMIT, true, true);
+    solrRequest.add(document);
+    return solrConnection.update(solrRequest);
   }
 
   /**
@@ -202,11 +219,18 @@ public class SearchIndex {
    *          the page uri
    * @param path
    *          the new path
-   *          @return 
+   * @return
    */
   public boolean move(PageURI uri, String path) {
-    // TODO: Update the path field in the page identified by the uri
-    return false;
+    logger.debug("Updating path {} in search index to ", uri.getPath(), path);
+    try {
+      PageURIImpl newURI = new PageURIImpl(uri.getSite(), path, uri.getId());
+      update(new PageURIInputDocument(newURI));
+      return true;
+    } catch (Exception e) {
+      logger.error("Cannot update page uri " + uri + " in index", e);
+      return false;
+    }
   }
 
   /**

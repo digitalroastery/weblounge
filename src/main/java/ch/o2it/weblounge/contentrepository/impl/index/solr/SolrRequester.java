@@ -73,16 +73,35 @@ public class SolrRequester {
    */
   public SearchResult getByQuery(SearchQuery query) throws SolrServerException {
     Site site = query.getSite();
-    
+
     // Build the solr query string
     StringBuilder solrQuery = new StringBuilder();
-    if (query.getText() != null) {
-      solrQuery.append("(");
-      solrQuery.append(SolrFields.FULLTEXT);
-      solrQuery.append(":");
-      solrQuery.append(query.getText());
-      solrQuery.append(")");
+
+    // Id
+    if (query.getId() != null) {
+      and(solrQuery, SolrFields.ID, query.getId());
     }
+
+    // Path
+    if (query.getPath() != null) {
+      and(solrQuery, SolrFields.PATH, query.getPath());
+    }
+
+    // Subjects
+    if (query.getSubjects().length > 0) {
+      and(solrQuery, SolrFields.SUBJECTS, query.getSubjects());
+    }
+
+    // Template
+    if (query.getTemplate() != null) {
+      and(solrQuery, SolrFields.TEMPLATE, query.getTemplate());
+    }
+
+    // Fulltext
+    if (query.getText() != null) {
+      and(solrQuery, SolrFields.FULLTEXT, query.getText());
+    }
+
     if (solrQuery.length() == 0)
       solrQuery.append("*:*");
 
@@ -112,20 +131,73 @@ public class SolrRequester {
 
     // Walk through response and create new items with title, creator, etc:
     for (SolrDocument doc : solrResponse.getResults()) {
-      float score = (Float)doc.getFieldValue(SolrFields.SCORE);
+      float score = (Float) doc.getFieldValue(SolrFields.SCORE);
 
-      String path = (String)doc.getFieldValue(SolrFields.PATH);
+      String id = (String) doc.getFieldValue(SolrFields.ID);
+      String path = (String) doc.getFieldValue(SolrFields.PATH);
       WebUrl url = new WebUrlImpl(site, path);
 
-      SearchResultItemImpl item = new SearchResultItemImpl(url, score, site);
+      SearchResultItemImpl item = new SearchResultItemImpl(site, id, url, score, site);
       item.setPreview(doc.getFieldValue(SolrFields.PREVIEW_XML));
-      item.setTitle((String)doc.getFieldValue(SolrFields.TITLE));
+      item.setTitle((String) doc.getFieldValue(SolrFields.TITLE));
 
       // Add the item to the result set
       result.addResultItem(item);
     }
 
     return result;
+  }
+
+  /**
+   * Encodes field name and value as part of the AND clause of a solr query:
+   * <tt>AND fieldName : fieldValue</tt>.
+   * 
+   * @param buf
+   *          the <code>StringBuilder</code> to append to
+   * @param fieldName
+   *          the field name
+   * @param fieldValue
+   *          the field value
+   * @return the encoded query part
+   */
+  private StringBuilder and(StringBuilder buf, String fieldName, String fieldValue) {
+    if (buf.length() > 0)
+      buf.append(" AND ");
+    buf.append(fieldName);
+    buf.append(":");
+    buf.append(fieldValue);
+    return buf;
+  }
+
+  /**
+   * Encodes field name and values as part of a solr query:
+   * <tt>AND (fieldName : fieldValue[0] OR fieldName : fieldValue[1] ...)</tt>.
+   * 
+   * @param buf
+   *          the <code>StringBuilder</code> to append to
+   * @param fieldName
+   *          the field name
+   * @param fieldValue
+   *          the field value
+   * @return the encoded query part
+   */
+  private StringBuilder and(StringBuilder buf, String fieldName,
+      String[] fieldValue) {
+    if (buf.length() > 0)
+      buf.append(" AND ");
+    buf.append("(");
+    boolean first = true;
+    for (String value : fieldValue) {
+      if (!first)
+        buf.append(" OR ");
+      buf.append(fieldName);
+      buf.append(":");
+      buf.append(value);
+      buf.append(" ");
+      first = false;
+    }
+    buf.append(")");
+    return buf;
   }
 
   /**

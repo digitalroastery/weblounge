@@ -234,7 +234,12 @@
     <field name="id" type="string" indexed="true" stored="true" required="true" /> 
     <field name="path" type="string" indexed="true" stored="true" required="true" />
 
+    <!-- Page-level metadata -->
+    <field name="subjects" type="string" multiValued="true" indexed="true" stored="true" required="false" /> 
+    <field name="template" type="string" indexed="true" stored="true" required="false" /> 
+
     <!-- Page preview -->
+    <field name="page-xml" type="string" indexed="false" stored="true" required="false" />
     <field name="preview-xml" type="string" indexed="false" stored="true" required="false" />
 
     <!-- Workflow-specific fields -->
@@ -284,6 +289,7 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
    <copyField source="id" dest="fulltext"/>
    <copyField source="path" dest="fulltext"/>
+   <copyField source="subjects" dest="fulltext"/>
    <copyField source="description-*" dest="fulltext"/>
    <copyField source="coverage-*" dest="fulltext"/>
    <copyField source="title-*" dest="fulltext"/>

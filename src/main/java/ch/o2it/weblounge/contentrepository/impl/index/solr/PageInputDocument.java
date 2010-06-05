@@ -27,42 +27,36 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.DES
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_ELEMENTS;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGE_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_TO;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECTS;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.FULLTEXT;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.LOCALIZED_FULLTEXT;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.user.User;
 
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
  * posting weblounge pages to solr.
  */
-public class PageInputDocument extends SolrUpdateableInputDocument {
+public class PageInputDocument extends AbstractInputDocument {
 
   /** Serial version uid */
   private static final long serialVersionUID = 1812364663819822015L;
-
-  /** The solr supported date format. **/
-  private DateFormat dateFormat = new SimpleDateFormat(SolrFields.SOLR_DATE_FORMAT);
 
   /**
    * Creates an input document for the given page.
@@ -83,6 +77,11 @@ public class PageInputDocument extends SolrUpdateableInputDocument {
   private void init(Page page) {
     setField(ID, page.getURI().getId());
     setField(PATH, page.getURI().getPath());
+
+    // Page-level
+    for (String subject : page.getSubjects())
+      setField(SUBJECTS, subject);
+    setField(TEMPLATE, page.getTemplate());
 
     // Creation, modification and publishing information
     setField(CREATED, serializeDate(page.getCreationDate()));
@@ -120,148 +119,10 @@ public class PageInputDocument extends SolrUpdateableInputDocument {
       preview.append(p.toXml());
     }
     setField(PREVIEW_XML, preview.toString());
-  }
 
-  /**
-   * Adds the field and its value to the search index. This method is here for
-   * convenience so we don't need to do null check on each and every field
-   * value.
-   * 
-   * @param fieldName
-   *          the field name
-   * @param fieldValue
-   *          the value
-   */
-  @Override
-  public void setField(String fieldName, Object fieldValue) {
-    if (fieldName == null)
-      throw new IllegalArgumentException("Field name cannot be null");
-    if (fieldValue == null)
-      return;
-    super.setField(fieldName, fieldValue);
-  }
+    // The whole page
+    setField(PAGE_XML, page.toXml());
 
-  /**
-   * Adds the field and its value to the indicated field of the search index as
-   * well as to the language-sensitive fulltext field. The implementation
-   * performs a <code>null</code> test and silently returns if <code>null</code>
-   * was passed in.
-   * 
-   * @param fieldName
-   *          the field name
-   * @param fieldValue
-   *          the value
-   * @param language
-   *          the language
-   */
-  public void setFulltextField(String fieldName, Object fieldValue,
-      Language language) {
-    if (fieldName == null)
-      throw new IllegalArgumentException("Field name cannot be null");
-    if (fieldValue == null)
-      return;
-    super.setField(fieldName, fieldValue);
-    super.setField(getLocalizedFieldName(LOCALIZED_FULLTEXT, language), fieldValue);
-    super.setField(FULLTEXT, fieldValue);
-  }
-
-  /**
-   * Returns a serialized version of the date or <code>null</code> if
-   * <code>null</code> was passed in for the date.
-   * 
-   * @param date
-   *          the date
-   * @return the serialized date
-   */
-  private String serializeDate(Date date) {
-    if (date == null)
-      return null;
-    return dateFormat.format(date);
-  }
-
-  /**
-   * Serializes the user to a string or to <code>null</code> if
-   * <code>null</code> was passed to this method.
-   * 
-   * @param user
-   *          the user
-   * @return the serialized user
-   */
-  private String serializeUser(User user) {
-    if (user == null)
-      return null;
-    StringBuffer buf = new StringBuffer();
-    buf.append(user.getName());
-    buf.append(" <").append(user.getLogin()).append(">");
-    return buf.toString();
-  }
-
-  /**
-   * Returns the localized field name, which is the original field name extended
-   * by an underscore and the language identifier.
-   * 
-   * @param fieldName
-   *          the field name
-   * @param language
-   *          the language
-   * @return the localized field name
-   */
-  private String getLocalizedFieldName(String fieldName, Language language) {
-    return MessageFormat.format(fieldName, language.getIdentifier());
-  }
-
-  /**
-   * Returns a string representation of the pagelet's element content in the
-   * specified language. If <code>format</code> is <code>true</code> then the
-   * content is formatted as <code>field:=&lt;value&gt;;;</code>, otherwise just
-   * the values are added.
-   * 
-   * @param pagelet
-   *          the pagelet
-   * @param language
-   *          the language
-   * @param format
-   *          <code>true</code> to include formatting
-   * @return the serialized element content
-   */
-  private String serializeContent(Pagelet pagelet, Language language,
-      boolean format) {
-    StringBuffer buf = new StringBuffer();
-    for (String element : pagelet.getContentNames(language)) {
-      String[] content = pagelet.getMultiValueContent(element, language, true);
-      for (String c : content) {
-        if (format)
-          buf.append(element).append(":=").append(c).append(";;");
-        else
-          buf.append(" ").append(c);
-      }
-    }
-    return buf.toString();
-  }
-
-  /**
-   * Returns a string representation of the pagelet's element properties. If
-   * <code>format</code> is <code>true</code> then the property is formatted as
-   * <code>field:=&lt;value&gt;;;</code>, otherwise just the values are added.
-   * 
-   * @param pagelet
-   *          the pagelet
-   * @param format
-   *          <code>true</code> to include formatting
-   * @return the serialized element properties
-   */
-  private String serializeProperties(Pagelet pagelet, boolean format) {
-    StringBuffer buf = new StringBuffer();
-    for (String property : pagelet.getPropertyNames()) {
-      String[] values = pagelet.getMultiValueProperty(property);
-      for (String v : values) {
-        if (format)
-          buf.append(property).append(":").append(v).append(" ;; ");
-        else
-          buf.append(" ").append(v);
-      }
-    }
-    return buf.toString();
   }
 
 }

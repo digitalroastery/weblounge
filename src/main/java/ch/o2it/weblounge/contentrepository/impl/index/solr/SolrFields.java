@@ -30,6 +30,15 @@ public interface SolrFields {
   /** Path field name */
   public static final String PATH = "path";
 
+  /** Subjects field name */
+  public static final String SUBJECTS = "subjects";
+
+  /** Template field name */
+  public static final String TEMPLATE = "template";
+
+  /** Page field name */
+  public static final String PAGE_XML = "page-xml";
+
   /** Preview field name */
   public static final String PREVIEW_XML = "preview-xml";
 
