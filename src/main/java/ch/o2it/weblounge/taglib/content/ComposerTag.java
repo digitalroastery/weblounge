@@ -278,6 +278,8 @@ public class ComposerTag extends WebloungeTag {
           break;
         } else {
           pageUrl = pageUrl.substring(0, urlSeparator);
+          if ("".equals(pageUrl))
+            pageUrl = "/";
           PageURI pageURI = new PageURIImpl(site, pageUrl);
           try {
             p = contentRepository.getPage(pageURI, user, SystemPermission.READ);
