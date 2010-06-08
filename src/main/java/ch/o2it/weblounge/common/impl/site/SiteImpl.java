@@ -1008,7 +1008,7 @@ public class SiteImpl implements Site {
     log_.debug("Initializing site '{}'", this);
 
     // Load i18n dictionary
-    Enumeration<URL> i18nEnum = bundle.findEntries("site/i18n", "*.xml", false);
+    Enumeration<URL> i18nEnum = bundle.findEntries("site/i18n", "*.xml", true);
     while (i18nEnum != null && i18nEnum.hasMoreElements()) {
       i18n.addDictionary(i18nEnum.nextElement());
     }
@@ -1029,21 +1029,23 @@ public class SiteImpl implements Site {
 
     if (e != null) {
       while (e.hasMoreElements()) {
-        URL moduleUrl = e.nextElement();
-        log_.debug("Loading module '{}' for site '{}'", moduleUrl, this);
+        URL moduleXmlUrl = e.nextElement();
+        int endIndex = moduleXmlUrl.toExternalForm().lastIndexOf('/');
+        URL moduleUrl = new URL(moduleXmlUrl.toExternalForm().substring(0, endIndex));
+        log_.debug("Loading module '{}' for site '{}'", moduleXmlUrl, this);
         
         // Load and validate the module descriptor
-        ValidationErrorHandler errorHandler = new ValidationErrorHandler(moduleUrl);
+        ValidationErrorHandler errorHandler = new ValidationErrorHandler(moduleXmlUrl);
         docBuilder.setErrorHandler(errorHandler);
-        Document moduleXml = docBuilder.parse(moduleUrl.openStream());
+        Document moduleXml = docBuilder.parse(moduleXmlUrl.openStream());
         if (errorHandler.hasErrors()) {
-          log_.error("Errors found while validating module descriptor {}. Site '{}' is not loaded", moduleUrl, this);
-          throw new IllegalStateException("Errors found while validating module descriptor " + moduleUrl);
+          log_.error("Errors found while validating module descriptor {}. Site '{}' is not loaded", moduleXml, this);
+          throw new IllegalStateException("Errors found while validating module descriptor " + moduleXml);
         }
 
         // Load i18n dictionaries
         String i18nPath = UrlSupport.concat(moduleUrl.getPath(), "i18n");
-        i18nEnum = bundle.findEntries(i18nPath, "*.xml", false);
+        i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
         while (i18nEnum != null && i18nEnum.hasMoreElements()) {
           i18n.addDictionary(i18nEnum.nextElement());
         }

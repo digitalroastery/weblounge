@@ -182,7 +182,7 @@ public class SearchResultItemImpl implements SearchResultItem {
   public Page getPage() {
     if (page == null) {
       PageReader reader = new PageReader();
-      PageURI uri = new PageURIImpl(site, id, url.getPath());
+      PageURI uri = new PageURIImpl(site, url.getPath(), id);
       try {
         page = reader.read(new ByteArrayInputStream(pageXml.getBytes()), uri);
       } catch (SAXException e) {

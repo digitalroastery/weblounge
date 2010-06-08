@@ -40,7 +40,7 @@ public class PageUtils {
    * @return the version string
    */
   public static long getVersion(String version) {
-    if (version.equals("index")) {
+    if (version.equals("live") || version.equals("index")) {
       return Page.LIVE;
     } else if (version.equals("work")) {
       return Page.WORK;

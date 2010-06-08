@@ -120,7 +120,7 @@ public class SiteActivator {
 
       // Register it as a service
       logger.debug("Registering site '{}' in the service registry", site);
-      siteService = bundleContext.registerService(Site.class.getName(), site, null);
+      siteService = bundleContext.registerService(Site.class.getName(), site, context.getProperties());
 
       logger.info("Site '{}' loaded", site);
     } else {

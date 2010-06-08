@@ -165,6 +165,32 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   }
 
   /**
+   * Returns a page uri that references the page with the given identifier.
+   * 
+   * @param site
+   *          the site
+   * @param id
+   *          the page identifier
+   * @return the uri
+   */
+  public static PageURIImpl fromId(Site site, String id) {
+    return new PageURIImpl(site, null, id);
+  }
+
+  /**
+   * Returns a page uri that references the page with the given path.
+   * 
+   * @param site
+   *          the site
+   * @param path
+   *          the page path
+   * @return the uri
+   */
+  public static PageURIImpl fromPath(Site site, String path) {
+    return new PageURIImpl(site, path);
+  }
+
+  /**
    * Sets the page identifier.
    * 
    * @param id
