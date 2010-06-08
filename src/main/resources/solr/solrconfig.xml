@@ -65,7 +65,7 @@
       safely access a lucene index, and should be used with care.
     -->
     <unlockOnStartup>false</unlockOnStartup>
-        <lockType>single</lockType>
+    <lockType>single</lockType>
   </mainIndex>
 
   <!-- the default high-performance update handler -->
