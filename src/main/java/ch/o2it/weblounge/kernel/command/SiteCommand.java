@@ -250,7 +250,7 @@ public class SiteCommand {
       if (objectId.startsWith("/"))
         page = repository.getPage(new PageURIImpl(site, args[0]));
       else
-        page = repository.getPage(new PageURIImpl(site, null, args[0]));
+        page = repository.getPage(PageURIImpl.fromId(site, args[0]));
       if (page != null) {
         title("page");
         pad("id", page.getURI().getId().toString());
