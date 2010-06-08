@@ -31,6 +31,7 @@ import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository;
+import ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
@@ -69,6 +70,12 @@ public class BundleContentRepository extends AbstractContentRepository {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(BundleContentRepository.class);
 
+  /** Prefix for repository configuration keys */
+  private static final String CONF_PREFIX = ContentRepositoryServiceImpl.OPT_PREFIX + ".bundle.";
+
+  /** Option to cleanup temporary bundle index on shutdown */ 
+  private static final String OPT_CLEANUP = CONF_PREFIX + "cleanup";
+  
   /** The site bundle context */
   protected Bundle bundle = null;
 
@@ -85,7 +92,6 @@ public class BundleContentRepository extends AbstractContentRepository {
   protected File idxRootDir = null;
   
   /** Flag to indicate whether temporary indices should be removed on shutdown */
-  // TODO: Add configuration for this
   protected boolean cleanupTemporaryIndex = false;
 
   /**
@@ -114,6 +120,12 @@ public class BundleContentRepository extends AbstractContentRepository {
       FileUtils.forceMkdir(idxRootDir);
     } catch (IOException e) {
       throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
+    }
+    
+    // Cleanup on shutdown?
+    if (properties.get(OPT_CLEANUP) != null) {
+      cleanupTemporaryIndex = ConfigurationUtils.isTrue((String)properties.get(OPT_CLEANUP));
+      logger.info("Bundle content repository indices will {} removed on shutdown", (cleanupTemporaryIndex ? "be" : "not be"));
     }
 
     logger.info("Content repository connected to bundle {}", bundle);
@@ -293,9 +305,19 @@ public class BundleContentRepository extends AbstractContentRepository {
       Iterator<PageURI> pi = listPages(homeURI, Integer.MAX_VALUE, -1);
       while (pi.hasNext()) {
         PageURI uri = pi.next();
-        Page page = loadPage(uri);
-        if (page == null)
+        
+        // Load the page
+        Page page = null;
+        try {
+          page = loadPage(uri);
+          if (page == null)
+            continue;
+        } catch (Exception e) {
+          logger.error("Error loading page '{}' from bundle: {}", uri, e.getMessage());
           continue;
+        }
+
+        // Add it to the index
         index.add(page);
         pageVersionCount++;
         if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
@@ -360,6 +382,8 @@ public class BundleContentRepository extends AbstractContentRepository {
       throw new IOException("I/O error while reading page '" + uri + "'", e);
     } catch (ParserConfigurationException e) {
       throw new IllegalStateException("Parser configuration error while reading page '" + uri + "'", e);
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
     }
   }
 

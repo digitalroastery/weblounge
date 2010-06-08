@@ -84,13 +84,13 @@ public class PageInputDocument extends AbstractInputDocument {
     setField(TEMPLATE, page.getTemplate());
 
     // Creation, modification and publishing information
-    setField(CREATED, serializeDate(page.getCreationDate()));
-    setField(CREATED_BY, serializeUser(page.getCreator()));
-    setField(MODIFIED, serializeDate(page.getModificationDate()));
-    setField(MODIFIED_BY, serializeUser(page.getModifier()));
-    setField(PUBLISHED_FROM, serializeDate(page.getPublishFrom()));
-    setField(PUBLISHED_TO, serializeDate(page.getPublishTo()));
-    setField(PUBLISHED_BY, serializeUser(page.getPublisher()));
+    setField(CREATED, SolrUtils.serializeDate(page.getCreationDate()));
+    setField(CREATED_BY, SolrUtils.serializeUser(page.getCreator()));
+    setField(MODIFIED, SolrUtils.serializeDate(page.getModificationDate()));
+    setField(MODIFIED_BY, SolrUtils.serializeUser(page.getModifier()));
+    setField(PUBLISHED_FROM, SolrUtils.serializeDate(page.getPublishFrom()));
+    setField(PUBLISHED_TO, SolrUtils.serializeDate(page.getPublishTo()));
+    setField(PUBLISHED_BY, SolrUtils.serializeUser(page.getPublisher()));
 
     // Language dependent fields
     for (Language l : page.languages()) {

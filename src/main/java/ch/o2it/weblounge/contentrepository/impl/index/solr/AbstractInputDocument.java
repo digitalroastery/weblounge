@@ -25,12 +25,8 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.LOC
 
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.user.User;
 
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
@@ -42,9 +38,6 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
 
   /** Serial version uid */
   private static final long serialVersionUID = 1812364663819822015L;
-
-  /** The solr supported date format. **/
-  protected DateFormat dateFormat = new SimpleDateFormat(SolrFields.SOLR_DATE_FORMAT);
 
   /**
    * Adds the field and its value to the search index. This method is here for
@@ -87,37 +80,6 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
     super.setField(fieldName, fieldValue);
     super.setField(getLocalizedFieldName(LOCALIZED_FULLTEXT, language), fieldValue);
     super.setField(FULLTEXT, fieldValue);
-  }
-
-  /**
-   * Returns a serialized version of the date or <code>null</code> if
-   * <code>null</code> was passed in for the date.
-   * 
-   * @param date
-   *          the date
-   * @return the serialized date
-   */
-  protected String serializeDate(Date date) {
-    if (date == null)
-      return null;
-    return dateFormat.format(date);
-  }
-
-  /**
-   * Serializes the user to a string or to <code>null</code> if
-   * <code>null</code> was passed to this method.
-   * 
-   * @param user
-   *          the user
-   * @return the serialized user
-   */
-  protected String serializeUser(User user) {
-    if (user == null)
-      return null;
-    StringBuffer buf = new StringBuffer();
-    buf.append(user.getName());
-    buf.append(" <").append(user.getLogin()).append(">");
-    return buf.toString();
   }
 
   /**

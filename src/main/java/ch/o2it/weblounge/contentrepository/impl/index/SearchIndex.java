@@ -265,9 +265,10 @@ public class SearchIndex {
       File solrIndexDir = new File(solrRoot, "index");
       if (solrIndexDir.exists() && solrIndexDir.list().length == 0) {
         FileUtils.deleteDirectory(solrIndexDir);
+        FileUtils.forceMkdir(solrIndexDir);
       }
 
-      SolrCore.log.getParent().setLevel(Level.WARNING);
+      SolrCore.log.getParent().setLevel(Level.SEVERE);
       solrConnection = new SolrConnection(solrRoot.getAbsolutePath(), solrRoot.getAbsolutePath());
       solrRequester = new SolrRequester(solrConnection);
     } catch (IOException e) {

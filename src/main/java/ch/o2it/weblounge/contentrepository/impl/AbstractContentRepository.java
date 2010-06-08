@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.PageReader;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
+import ch.o2it.weblounge.common.impl.content.PageUtils;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
@@ -73,6 +74,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /** The xml transformer factory */
   protected final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
+  /** Regular expression to match the page id, path and version */
+  protected final static Pattern pageHeaderRegex = Pattern.compile(".*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*version=\"([^\"]*)\".*");
+  
   /**
    * {@inheritDoc}
    * 
@@ -485,12 +489,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
     InputStreamReader reader = new InputStreamReader(is);
     CharBuffer buf = CharBuffer.allocate(1024);
     reader.read(buf);
-    Pattern p = Pattern.compile(".*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*");
     String s = new String(buf.array());
     s = s.replace('\n', ' ');
-    Matcher m = p.matcher(s);
+    Matcher m = pageHeaderRegex.matcher(s);
     if (m.matches()) {
-      return new PageURIImpl(site, m.group(2), m.group(1));
+      long version = PageUtils.getVersion(m.group(3));
+      return new PageURIImpl(site, m.group(2), version, m.group(1));
     }
     return null;
   }

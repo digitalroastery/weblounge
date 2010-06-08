@@ -97,6 +97,36 @@ public class SolrRequester {
       and(solrQuery, SolrFields.TEMPLATE, query.getTemplate());
     }
 
+    // Creator
+    if (query.getCreator() != null) {
+      and(solrQuery, SolrFields.CREATED_BY, SolrUtils.serializeUser(query.getCreator()));
+    }
+
+    // Creation date
+    if (query.getCreationDate() != null) {
+      and(solrQuery, SolrFields.CREATED, SolrUtils.serializeDate(query.getCreationDate()));
+    }
+
+    // Modifier
+    if (query.getModifier() != null) {
+      and(solrQuery, SolrFields.MODIFIED_BY, SolrUtils.serializeUser(query.getModifier()));
+    }
+
+    // Modification date
+    if (query.getModificationDate() != null) {
+      and(solrQuery, SolrFields.MODIFIED, SolrUtils.serializeDate(query.getModificationDate()));
+    }
+
+    // Publisher
+    if (query.getPublisher() != null) {
+      and(solrQuery, SolrFields.PUBLISHED_BY, SolrUtils.serializeUser(query.getPublisher()));
+    }
+
+    // Publication date
+    if (query.getPublishingDate() != null) {
+      and(solrQuery, SolrFields.PUBLISHED_FROM, SolrUtils.serializeDate(query.getPublishingDate()));
+    }
+
     // Fulltext
     if (query.getText() != null) {
       and(solrQuery, SolrFields.FULLTEXT, query.getText());

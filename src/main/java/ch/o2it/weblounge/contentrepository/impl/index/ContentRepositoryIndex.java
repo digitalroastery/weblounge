@@ -228,9 +228,9 @@ public class ContentRepositoryIndex {
       }
     }
 
-    // Seems to be an existing site, so it's an update rather than an addition
+    // Seems to be an existing page, so it's an update rather than an addition
     else {
-      logger.warn("Existing page {} was passed to add() method, redirecting to update()");
+      logger.warn("Existing page '{}' was passed to add(), redirecting to update()", uri.getId());
       update(page);
     }
 

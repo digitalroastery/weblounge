@@ -84,7 +84,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
 
   /** Extended configuration properties */
   private Map<String, String> extendedProperties = new HashMap<String, String>();
-  
+
   /** The site tracker */
   private SiteTracker siteTracker = null;
 
@@ -118,13 +118,13 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
     // Try to get hold of the service configuration
     ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
     if (configAdminRef != null) {
-      ConfigurationAdmin configAdmin = (ConfigurationAdmin)bundleContext.getService(configAdminRef);
+      ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(configAdminRef);
       Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
       configure(config);
     } else {
       logger.warn("Unable to load content repository service configuration");
     }
-    
+
     // Check the configuration of the repository implementation
     if (prototype == null) {
       logger.info("No content repository implementation configured");
@@ -179,7 +179,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
         for (Site site : new ArrayList<Site>(repositories.keySet())) {
           Bundle bundle = bundles.get(site);
           unregisterSite(site);
-          registerSite(site, bundle);
+          registerSite(site, bundle, properties);
         }
       }
     } catch (ConfigurationException e) {
@@ -196,7 +196,8 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
    *           if configuration fails
    */
   @SuppressWarnings("unchecked")
-  private synchronized boolean configure(Dictionary<?, ?> config) throws ConfigurationException {
+  private synchronized boolean configure(Dictionary<?, ?> config)
+      throws ConfigurationException {
     boolean configurationChanged = false;
 
     // Repository type
@@ -211,7 +212,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
         throw new ConfigurationException(e.getMessage());
       }
     }
-    
+
     // Extended properties
     if (config.size() != extendedProperties.size())
       configurationChanged = true;
@@ -229,13 +230,13 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
       logger.info("Received updated but identical content repository service configuration");
       return false;
     }
-    
+
     // First, update the connection properties
     extendedProperties.clear();
-    for (Enumeration<?> keys = config.keys(); keys.hasMoreElements(); ) {
+    for (Enumeration<?> keys = config.keys(); keys.hasMoreElements();) {
       String key = keys.nextElement().toString();
       String value = config.get(key).toString();
-      
+
       // Do variable replacement using the system properties
       for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
         StringBuffer envKey = new StringBuffer("\\$\\{").append(entry.getKey()).append("\\}");
@@ -262,30 +263,54 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
    * 
    * @param site
    *          the site
+   * @param bundle
+   *          the bundle containing the site
+   * @param properties
+   *          the site properties
    */
   @SuppressWarnings("unchecked")
-  public void registerSite(Site site, Bundle bundle) {
+  public void registerSite(Site site, Bundle bundle,
+      Dictionary<String, Object> properties) {
+
     ContentRepository repository = null;
-    Dictionary properties = new Hashtable();
+
+    // Add well-known properties
     properties.put(Site.class.getName(), site);
     properties.put(Bundle.class.getName(), bundle);
-    
-    // Add the extended properties from either the bundle or the service configuration
+
+    // Determine the repository type, if configured
+    String repositoryType = (String) properties.get(OPT_REPOSITORY_TYPE);
+
+    // Add the extended properties from either the bundle or the service
+    // configuration
     for (Map.Entry<String, String> p : extendedProperties.entrySet()) {
       properties.put(p.getKey(), p.getValue());
     }
 
+    // Get the repository class
+    Class<? extends ContentRepository> repositoryClass = null;
+    if (repositoryType != null) {
+      try {
+        repositoryClass = (Class<? extends ContentRepository>) getClass().getClassLoader().loadClass(repositoryType);
+      } catch (ClassNotFoundException e) {
+        logger.error("Repository implementation class '" + repositoryType + "' not found for site '" + site + "'", e);
+        return;
+      }
+    } else {
+      repositoryClass = prototype;
+    }
+
     // Create and set up the repository
     try {
-      repository = prototype.newInstance();
+      repository = repositoryClass.newInstance();
       repositories.put(site, repository);
       bundles.put(site, bundle);
       repository.connect(properties);
     } catch (InstantiationException e) {
-      logger.error("Unable to instantiate content repository " + prototype + " for site '" + site + "'", e);
+      logger.error("Unable to instantiate content repository " + repositoryClass + " for site '" + site + "'", e);
       return;
     } catch (IllegalAccessException e) {
-      logger.error("Illegal access while instantiating content repository " + prototype + " for site '" + site + "'", e);
+      logger.error("Illegal access while instantiating content repository " + repositoryClass + " for site '" + site + "'", e);
       return;
     } catch (ContentRepositoryException e) {
       logger.error("Unable to connect content repository " + repository + " for site '" + site + "'", e);
@@ -355,7 +380,10 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
     @Override
     public Object addingService(ServiceReference reference) {
       Site site = (Site) super.addingService(reference);
-      factory.registerSite(site, reference.getBundle());
+      Dictionary<String, Object> properties = new Hashtable<String, Object>();
+      for (String key : reference.getPropertyKeys())
+        properties.put(key, reference.getProperty(key));
+      factory.registerSite(site, reference.getBundle(), properties);
       return site;
     }
 

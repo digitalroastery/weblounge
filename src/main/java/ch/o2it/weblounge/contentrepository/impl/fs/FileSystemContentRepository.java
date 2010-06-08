@@ -63,10 +63,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   private static final Logger logger = LoggerFactory.getLogger(FileSystemContentRepository.class);
 
   /** Prefix for repository configuration keys */
-  private static final String OPT_PREFIX = ContentRepositoryServiceImpl.OPT_PREFIX + ".fs";
+  private static final String CONF_PREFIX = ContentRepositoryServiceImpl.OPT_PREFIX + ".fs.";
 
   /** Configuration key for the repository's root directory */
-  public static final String OPT_ROOT_DIR = OPT_PREFIX + ".root";
+  public static final String OPT_ROOT_DIR = CONF_PREFIX + "root";
 
   /** The repository root directory */
   protected File repositoryRoot = null;

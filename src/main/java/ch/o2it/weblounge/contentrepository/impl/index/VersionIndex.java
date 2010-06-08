@@ -177,6 +177,7 @@ public class VersionIndex {
     try {
       this.bytesPerId = idx.readInt();
       this.versionsPerEntry = idx.readInt();
+      this.slots = idx.readLong();
       this.entries = idx.readLong();
       this.bytesPerEntry = bytesPerId + 4 + versionsPerEntry * 8;
       if (this.bytesPerId != idLengthInBytes || this.versionsPerEntry != versions)
@@ -246,7 +247,7 @@ public class VersionIndex {
    *           if writing to the index fails
    */
   public synchronized long add(String id, long version) throws IOException {
-    return add(entries, id, version);
+    return add(slots, id, version);
   }
 
   /**
@@ -283,20 +284,20 @@ public class VersionIndex {
     if (id != null && id.getBytes().length != bytesPerId)
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
-    boolean reusingSlot = false;
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     int existingVersions = 0;
+    boolean reuseSlot = false;
 
     // See if there is an empty slot (only if we are adding a whole new entry)
-    if (entry == entries) {
+    if (entry >= slots) {
       long address = IDX_HEADER_SIZE;
       long e = 0;
       idx.seek(address);
       while (address < startOfEntry) {
         if (idx.read() == '\n') {
           logger.debug("Found orphan line for reuse");
+          reuseSlot = true;
           startOfEntry = address;
-          reusingSlot = true;
           entry = e;
           break;
         }
@@ -330,19 +331,22 @@ public class VersionIndex {
     idx.skipBytes(existingVersions * 8);
     idx.writeLong(version);
 
+    entries ++;
+
     // Update the file header
-    if (entry == entries) {
-      if (!reusingSlot)
-        slots++;
-      entries++;
+    if (entry >= slots) {
+      slots++;
       idx.seek(IDX_SLOTS_HEADER_LOCATION);
       idx.writeLong(slots);
       idx.writeLong(entries);
       logger.debug("Added uri with id '{}' and initial version '{}' as entry no {}", new Object[] {
           id,
           PageUtils.getVersionString(version),
-          entries });
+          entries }
+      );
     } else {
+      idx.seek(IDX_ENTRIES_HEADER_LOCATION);
+      idx.writeLong(entries);
       logger.debug("Added version '{}' to uri with id '{}'", PageUtils.getVersionString(version), id);
     }
 
@@ -532,6 +536,7 @@ public class VersionIndex {
       // That's ok, we wanted to write until the very end
     }
 
+    this.slots = 0;
     this.entries = 0;
 
     logger.debug("Version index created");

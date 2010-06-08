@@ -159,15 +159,15 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#add(long, java.lang.String, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#add(long, long)}
    * .
    */
   @Test
-  public void testAddLongStringLong() {
+  public void testAddLongLong() {
     String uuid1 = UUID.randomUUID().toString();
     try {
       long address = idx.add(idx.add(uuid1, Page.LIVE), Page.WORK);
-      assertEquals(1, idx.getEntries());
+      assertEquals(2, idx.getEntries());
       int size = 24 + uuid1.getBytes().length + 4 + versionsPerEntry  * 8;
       assertEquals(size, idx.size());
       assertEquals(2, idx.getVersions(address).length);
@@ -194,7 +194,7 @@ public class VersionIndexTest {
       int size = 24 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry  * 8);
       idx.delete(0);
       assertEquals(size, idx.size());
-      assertEquals(1, idx.getEntries());
+      assertEquals(2, idx.getEntries());
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());

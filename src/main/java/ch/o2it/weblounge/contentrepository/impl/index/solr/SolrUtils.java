@@ -20,10 +20,19 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
+import ch.o2it.weblounge.common.user.User;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Utility class for the solr database.
  */
 public class SolrUtils {
+
+  /** The solr supported date format. **/
+  protected static DateFormat dateFormat = new SimpleDateFormat(SolrFields.SOLR_DATE_FORMAT);
 
   /** The regular filter expression */
   private static final String queryCleanerRegex = "[^0-9a-zA-ZöäüßÖÄÜ/\" +-.,]";
@@ -37,6 +46,34 @@ public class SolrUtils {
    */
   static String clean(String q) {
     return q.replaceAll(queryCleanerRegex, " ").trim();
+  }
+
+  /**
+   * Returns a serialized version of the date or <code>null</code> if
+   * <code>null</code> was passed in for the date.
+   * 
+   * @param date
+   *          the date
+   * @return the serialized date
+   */
+  public static String serializeDate(Date date) {
+    if (date == null)
+      return null;
+    return dateFormat.format(date);
+  }
+
+  /**
+   * Serializes the user to a string or to <code>null</code> if
+   * <code>null</code> was passed to this method.
+   * 
+   * @param user
+   *          the user
+   * @return the serialized user
+   */
+  public static String serializeUser(User user) {
+    if (user == null)
+      return null;
+    return user.getLogin();
   }
 
 }

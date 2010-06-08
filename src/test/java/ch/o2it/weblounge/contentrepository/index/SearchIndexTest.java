@@ -26,21 +26,28 @@ import static org.junit.Assert.fail;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.PageReader;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.impl.index.SearchIndex;
 
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -141,7 +148,193 @@ public class SearchIndexTest {
       assertEquals(1, idx.getByQuery(q).getItems().length);
     } catch (IOException e) {
       e.printStackTrace();
-      fail("Error querying by uuid");
+      fail("Error querying by path");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithTemplate() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site).withTemplate("default");
+      assertEquals(1, idx.getByQuery(q).getItems().length);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by template");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithAuthor() {
+    populateIndex();
+    try {
+      User amelie = new UserImpl("amelie");
+      SearchQuery q = new SearchQueryImpl(site).withAuthor(amelie);
+      SearchResult result = idx.getByQuery(q);
+      assertEquals(2, result.getItems().length);
+      assertEquals(2, result.getHitCount());
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by author");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithCreator() {
+    populateIndex();
+    try {
+      User hans = new UserImpl("hans");
+      SearchQuery q = new SearchQueryImpl(site).withCreator(hans);
+      SearchResult result = idx.getByQuery(q);
+      assertEquals(2, result.getItems().length);
+      assertEquals(2, result.getHitCount());
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by creator");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test @Ignore
+  public void testGetWithCreationDate() {
+    populateIndex();
+    try {
+      Date date = WebloungeDateFormat.parseStatic("2009-01-07T20:05:41Z");
+      SearchQuery q = new SearchQueryImpl(site).withCreationDate(date);
+      SearchResult result = idx.getByQuery(q);
+      assertEquals(1, result.getItems().length);
+      assertEquals(1, result.getHitCount());
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by creation date");
+    } catch (ParseException e) {
+      e.printStackTrace();
+      fail("Error parsing creation date");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithModifier() {
+    populateIndex();
+    try {
+      User amelie = new UserImpl("amelie");
+      SearchQuery q = new SearchQueryImpl(site).withModifier(amelie);
+      SearchResult result = idx.getByQuery(q);
+      assertEquals(2, result.getItems().length);
+      assertEquals(2, result.getHitCount());
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by modifier");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test @Ignore
+  public void testGetWithModificationDate() {
+    populateIndex();
+    try {
+      Date date = WebloungeDateFormat.parseStatic("2009-02-18T22:06:40Z");
+      SearchQuery q = new SearchQueryImpl(site).withModificationDate(date);
+      SearchResult result = idx.getByQuery(q);
+      assertEquals(1, result.getItems().length);
+      assertEquals(1, result.getHitCount());
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by modification date");
+    } catch (ParseException e) {
+      e.printStackTrace();
+      fail("Error parsing modification date");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithPublisher() {
+    populateIndex();
+    try {
+      User amelie = new UserImpl("amelie");
+      SearchQuery q = new SearchQueryImpl(site).withPublisher(amelie);
+      SearchResult result = idx.getByQuery(q);
+      assertEquals(1, result.getItems().length);
+      assertEquals(1, result.getHitCount());
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by publisher");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test @Ignore
+  public void testGetWithPublishingDate() {
+    populateIndex();
+    try {
+      Date date = WebloungeDateFormat.parseStatic("2006-05-05T17:58:21Z");
+      SearchQuery q = new SearchQueryImpl(site).withPublishingDate(date);
+      SearchResult result = idx.getByQuery(q);
+      assertEquals(1, result.getItems().length);
+      assertEquals(1, result.getHitCount());
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by publishing date");
+    } catch (ParseException e) {
+      e.printStackTrace();
+      fail("Error parsing publishing date");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithSubjects() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site);
+      String[] subjects = new String[] { "Other topic", "Topic a" };
+      for (String subject : subjects)
+        q.withSubject(subject);
+      assertEquals(2, idx.getByQuery(q).getItems().length);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by subject");
     }
   }
 
