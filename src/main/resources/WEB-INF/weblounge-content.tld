@@ -544,9 +544,7 @@
 		<body-content>JSP</body-content>
 		<display-name>Page Preview</display-name>
 		<description>Shows a preview of the page</description>
-		<attribute><name>partition</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>path</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>start</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>pageId</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>end</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
 	

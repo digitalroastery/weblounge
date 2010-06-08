@@ -60,14 +60,11 @@ public class PagePreviewTag extends WebloungeTag {
 
   /** Preview stop */
   private static enum Marker {
-    None, Lead, Marker
+    None, Preview, Marker
   };
 
   /** The page */
-  private String pagePath = null;
-
-  /** The start marker */
-  private Marker startMarker = Marker.None;
+  private String pageId = null;
 
   /** The stop marker */
   private Marker stopMarker = Marker.None;
@@ -78,23 +75,8 @@ public class PagePreviewTag extends WebloungeTag {
    * @param value
    *          the page identifier
    */
-  public void setPage(String value) {
-    pagePath = value;
-  }
-
-  /**
-   * Sets the start method.
-   * 
-   * @param value
-   *          the stop value
-   */
-  public void setStart(String value) {
-    if ("lead".equalsIgnoreCase(value))
-      startMarker = Marker.Lead;
-    else if ("marker".equalsIgnoreCase(value))
-      startMarker = Marker.Marker;
-    else
-      startMarker = Marker.None;
+  public void setPageId(String value) {
+    pageId = value;
   }
 
   /**
@@ -105,7 +87,7 @@ public class PagePreviewTag extends WebloungeTag {
    */
   public void setEnd(String value) {
     if ("lead".equalsIgnoreCase(value))
-      stopMarker = Marker.Lead;
+      stopMarker = Marker.Preview;
     else if ("marker".equalsIgnoreCase(value))
       stopMarker = Marker.Marker;
     else
@@ -137,7 +119,7 @@ public class PagePreviewTag extends WebloungeTag {
 
       // Load the page
       contentRepository = ContentRepositoryFactory.getRepository(site);
-      PageURI pageURI = new PageURIImpl(site, pagePath);
+      PageURI pageURI = PageURIImpl.fromId(site, pageId);
       Page page = contentRepository.getPage(pageURI, user, SystemPermission.READ);
       if (page == null) {
         log_.error("No data available for page '" + pageURI + "'");
@@ -146,6 +128,10 @@ public class PagePreviewTag extends WebloungeTag {
 
       WebUrl url = new WebUrlImpl(site, page.getURI().getPath());
       PageTemplate template = site.getTemplate(page.getTemplate());
+      if (template == null) {
+        log_.error("No template found for page '" + pageURI + "'");
+        return EVAL_PAGE;
+      }
       stage = template.getStage();
 
       // Add included page url to tags
@@ -153,14 +139,16 @@ public class PagePreviewTag extends WebloungeTag {
 
       // Read pagelets
       Pagelet[] pagelets = page.getPagelets(stage);
+      switch (stopMarker) {
+        case Preview:
+          pagelets = page.getPreview();
+          break;
+        case None:
+          pagelets = page.getPagelets(stage);
+      }
 
-      boolean start = startMarker.equals(Marker.None);
-      boolean done = false;
+      // Render the pagelets
       p: for (int i = 0; i < pagelets.length; i++) {
-
-        // Check if marker has been reached
-        if (done)
-          return EVAL_PAGE;
 
         Renderer renderer = null;
         Pagelet pagelet = pagelets[i];
@@ -201,41 +189,6 @@ public class PagePreviewTag extends WebloungeTag {
           if (renderer == null) {
             log_.warn("No suitable renderer '" + moduleId + "/" + rendererId + "' found to render on " + url);
             continue p;
-          }
-
-          // Handle stop marker
-          if (!start) {
-            switch (startMarker) {
-              case Lead:
-                // TODO: Check for existence of title element
-                if ("text".equalsIgnoreCase(moduleId) && "title".equalsIgnoreCase(rendererId)) {
-                  start = true;
-                }
-                break;
-              case Marker:
-                // TODO: Check for existence of preview marker
-                if ("navigation".equalsIgnoreCase(moduleId) && "previewmarker.start".equalsIgnoreCase(rendererId)) {
-                  start = true;
-                }
-                break;
-              case None:
-                break;
-            }
-            continue p;
-          }
-
-          // Handle stop marker
-          switch (stopMarker) {
-            case Lead:
-              if ("text".equalsIgnoreCase(moduleId) && "title".equalsIgnoreCase(rendererId))
-                done = true;
-              break;
-            case Marker:
-              if ("navigation".equalsIgnoreCase(moduleId) && "previewmarker.end".equalsIgnoreCase(rendererId))
-                return EVAL_PAGE;
-              break;
-            case None:
-              break;
           }
 
           // Render pagelet
@@ -285,7 +238,7 @@ public class PagePreviewTag extends WebloungeTag {
    */
   public void release() {
     super.release();
-    pagePath = null;
+    pageId = null;
     stopMarker = Marker.None;
   }
 

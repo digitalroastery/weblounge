@@ -73,7 +73,7 @@ public class PageHeaderTag extends WebloungeTag {
     }
 
     // Try to load the page
-    PageURI uri = new PageURIImpl(site, null, pageId);
+    PageURI uri = PageURIImpl.fromId(site, pageId);
     Page page = null;
     try {
       page = repository.getPage(uri);
