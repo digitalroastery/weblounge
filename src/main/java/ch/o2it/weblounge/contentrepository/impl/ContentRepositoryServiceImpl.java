@@ -120,9 +120,13 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
     if (configAdminRef != null) {
       ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(configAdminRef);
       Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
-      configure(config);
+      if (config != null) {
+        configure(config);
+      } else {
+        logger.warn("Unable to load content repository service configuration");
+      }
     } else {
-      logger.warn("Unable to load content repository service configuration");
+      logger.warn("Unable to get service reference for class ConfigurationAdmin");
     }
 
     // Check the configuration of the repository implementation
