@@ -61,8 +61,9 @@ public class I18nDictionaryImpl implements I18nDictionary {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.site.I18nDictionary#add(java.lang.String, java.lang.String)
+   * 
+   * @see ch.o2it.weblounge.common.site.I18nDictionary#add(java.lang.String,
+   *      java.lang.String)
    */
   public void add(String key, String value) {
     add(key, value, null);
@@ -95,10 +96,10 @@ public class I18nDictionaryImpl implements I18nDictionary {
       log_.warn("I18n key '{}' already defined", key);
     }
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.I18nDictionary#get(java.lang.String)
    */
   public String get(String key) {
@@ -246,14 +247,21 @@ public class I18nDictionaryImpl implements I18nDictionary {
         if (p.containsKey(key)) {
           log_.warn("I18n key '{}' redefined in {}", key, url);
         }
+        if (key == null) {
+          log_.warn("I18n dictionary {} contains invalid key (null)", url);
+          continue;
+        } else if (value == null) {
+          log_.warn("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
+          continue;
+        }
         p.put(key, value);
       }
     } catch (ParserConfigurationException e) {
-      log_.warn("Parser configuration error when reading i18n file {}: {}", url, e.getMessage());
+      log_.warn("Parser configuration error when reading i18n dictionary {}: {}", url, e.getMessage());
     } catch (SAXException e) {
-      log_.warn("SAX exception while parsing i18n file {}: {}", url, e.getMessage());
+      log_.warn("SAX exception while parsing i18n dictionary {}: {}", url, e.getMessage());
     } catch (IOException e) {
-      log_.warn("IO exception while parsing i18n file {}: {}", url, e.getMessage());
+      log_.warn("IO exception while parsing i18n dictionary {}: {}", url, e.getMessage());
     }
   }
 
