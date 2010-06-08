@@ -8,6 +8,7 @@
     <language>en</language>
   </languages>
   <domains>
+    <url>test</url>
     <url>127.0.0.1</url>
   </domains>
   <security>

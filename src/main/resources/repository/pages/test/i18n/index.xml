@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<page id="4bb19980-8f99-4873-a813-71b6dfbb22af" path="/test/i18n"
+  version="live">
+  <head>
+    <template>default</template>
+    <promote>false</promote>
+    <index>true</index>
+    <metadata>
+      <title language="en"><![CDATA[I18n Test Page]]></title>
+      <description language="en"><![CDATA[Test page for i18n internationalization]]></description>
+      <subject><![CDATA[test]]></subject>
+      <type><![CDATA[Text]]></type>
+    </metadata>
+    <created>
+      <user id="wunden" realm="testland">Tobias Wunden</user>
+      <date>2010-06-07T13:05:41Z</date>
+    </created>
+    <modified>
+      <user id="wunden" realm="testland">Tobias Wunden</user>
+      <date>2010-06-07T13:05:41Z</date>
+    </modified>
+    <published>
+      <user id="wunden" realm="testland">Tobias Wunden</user>
+      <from>2010-06-07T13:05:41Z</from>
+      <to>292278994-08-17T07:12:55Z</to>
+    </published>
+    <security>
+      <owner>
+        <user id="wunden" realm="testland">Tobias Wunden</user>
+      </owner>
+    </security>
+  </head>
+  <body>
+    <composer id="main">
+      <pagelet module="test" id="i18n">
+        <security>
+          <owner>
+            <user id="wunden" realm="testland">Tobias Wunden</user>
+          </owner>
+        </security>
+        <created>
+          <user id="wunden" realm="testland">Tobias Wunden</user>
+          <date>2009-01-07T19:05:41Z</date>
+        </created>
+        <published>
+          <user id="wunden" realm="testland">Tobias Wunden</user>
+          <from>2009-01-07T19:05:41Z</from>
+          <to>292278994-08-17T07:12:55Z</to>
+        </published>
+        <properties>
+          <property id="i18n_module_key"><![CDATA[ch.o2it.weblounge.test.i18n.modulekey]]></property>
+          <property id="i18n_page_key"><![CDATA[ch.o2it.weblounge.test.i18n.pagekey]]></property>
+        </properties>
+      </pagelet>
+    </composer>
+  </body>
+</page>

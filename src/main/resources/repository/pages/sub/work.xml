@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<page id="3cd56f47-76c8-4042-9acc-682fd6003ed8" path="/work/" version="work">
+<page id="3cd56f47-76c8-4042-9acc-682fd6003ed8" path="/sub/" version="work">
   <head>
     <template>home</template>
     <layout>news</layout>

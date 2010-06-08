@@ -23,6 +23,11 @@
         <link href="file://${module.root}/css/greeting.css" rel="stylesheet" type="text/css" />
       </includes>
     </pagelet>
+    <pagelet id="i18n" composeable="false">
+      <name language="de">I18n Internationalisierung</name>
+      <name language="en">I18n internationalization</name>
+      <renderer>file://${module.root}/pagelets/i18n.jsp</renderer>
+    </pagelet>
   </pagelets>
   <actions>
     <action id="greeter.html">
