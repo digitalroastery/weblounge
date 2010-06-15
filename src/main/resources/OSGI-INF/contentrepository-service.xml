@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component immediate="true" start="activate" stop="deactivate" name="Weblounge Content Repository Service">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  start="activate" 
+  stop="deactivate"
+  name="Weblounge Content Repository Service">	
+  
   <implementation class="ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl" />
   <property name="service.description" value="Weblounge Content Repository Service" />
   <property name="service.pid" value="ch.o2it.weblounge.contentrepository" />
@@ -7,4 +12,5 @@
     <provide interface="ch.o2it.weblounge.contentrepository.ContentRepositoryService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-</component>
+
+</scr:component>
