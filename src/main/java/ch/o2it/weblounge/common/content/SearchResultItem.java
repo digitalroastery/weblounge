@@ -40,6 +40,13 @@ public interface SearchResultItem extends Comparable<SearchResultItem> {
   String getId();
 
   /**
+   * Returns the page uri.
+   * 
+   * @return the page uri
+   */
+  PageURI getPageURI();
+
+  /**
    * Returns the url that will lead to the location where the hit occurred.
    * 
    * @return the hit location
