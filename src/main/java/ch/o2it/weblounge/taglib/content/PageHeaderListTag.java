@@ -20,10 +20,12 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
+import ch.o2it.weblounge.common.impl.content.PagePreviewReader;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
@@ -36,6 +38,8 @@ import ch.o2it.weblounge.taglib.WebloungeTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,7 +153,10 @@ public class PageHeaderListTag extends WebloungeTag {
   public int doAfterBody() throws JspException {
     index++;
     try {
-      return (loadNextHeadline()) ? EVAL_BODY_AGAIN : SKIP_BODY;
+      if (index < count && loadNextHeadline())
+        return EVAL_BODY_AGAIN;
+      else
+        return SKIP_BODY;
     } catch (ContentRepositoryException e) {
       throw new JspException(e);
     }
@@ -192,30 +199,50 @@ public class PageHeaderListTag extends WebloungeTag {
       pages = repository.findPages(query);
     }
 
-    // Look for the next header
     boolean found = false;
     SearchResultItem item = null;
-    while (index < pages.getItems().length && !found) {
-      found = true;
+    Composer preview = null;
+    WebUrl url = null;
+    
+    // Look for the next header
+    while (!found && index < pages.getItems().length) {
       item = pages.getItems()[index];
+      url = item.getUrl();
+
+      // Read the preview
+      PagePreviewReader previewReader = new PagePreviewReader();
+      try {
+        String previewXml = item.getPreview().toString();
+        InputStream previewIs = new ByteArrayInputStream(previewXml.getBytes()); 
+        preview = previewReader.read(previewIs, item.getPageURI());
+      } catch (Exception e) {
+        logger.error("Error reading page {} preview: " + e.getMessage(), e);
+        continue;
+      }
+
+      // Make sure all the required headlines are available
+      found = true;
       for (Map.Entry<String, String> h : requireHeadlines.entrySet()) {
-        // TODO: Add test for headline element availability
-        if (found && item.getPreview() == null) {
+        boolean headlineFound = false;
+        for (Pagelet p : preview.getPagelets()) {
+          if (h.getKey().equals(p.getModule()) && h.getValue().equals(p.getIdentifier())) {
+            headlineFound = true;
+            break;
+          }
+        }
+        if (!headlineFound) {
           found = false;
-          index++;
           break;
         }
       }
+      
+      index ++;
     }
 
     // Set the headline in the request
     if (found) {
-      WebUrl url = item.getUrl();
-      // TODO: How do we get the PREVIEW_XML out of the search result?
-      // Pagelet[] preview = item.getPreview();
-      Pagelet[] preview = new Pagelet[] {};
       pageContext.setAttribute(PageHeaderListTagVariables.URL, url);
-      pageContext.setAttribute(PageHeaderListTagVariables.PREVIEW, preview);
+      pageContext.setAttribute(PageHeaderListTagVariables.PREVIEW, preview.getPagelets());
     }
 
     return found;
