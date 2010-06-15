@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.content.PageImpl;
 import ch.o2it.weblounge.common.impl.content.PageURIImpl;
@@ -76,9 +77,17 @@ public class ContentRepositoryIndexTest {
     structuralIndexRootDirectory = new File(indexRootDirectory, "structure");
     FileUtils.deleteDirectory(indexRootDirectory);
     idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
+
+    PageTemplate t = EasyMock.createNiceMock(PageTemplate.class);
+    EasyMock.expect(t.getStage()).andReturn("main");
+    EasyMock.replay(t);
+
     site = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(site.getTemplate("home")).andReturn(t);
     EasyMock.replay(site);
+
     page = new PageImpl(new PageURIImpl(site, "/weblounge"));
+    page.setTemplate("home");
   }
 
   /**

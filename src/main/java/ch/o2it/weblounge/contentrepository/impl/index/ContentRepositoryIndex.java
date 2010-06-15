@@ -58,6 +58,9 @@ public class ContentRepositoryIndex {
 
   /** The search index */
   protected SearchIndex searchIdx = null;
+  
+  /** The index root directory */
+  protected File idxRootDir = null;
 
   /**
    * Creates a new index that is located in the indicated folder.
@@ -71,11 +74,12 @@ public class ContentRepositoryIndex {
    */
   public ContentRepositoryIndex(File rootDir, boolean readOnly)
       throws IOException {
+    this.idxRootDir = rootDir;
     this.uriIdx = new URIIndex(new File(rootDir, "structure"), false);
     this.idIdx = new IdIndex(new File(rootDir, "structure"), readOnly);
     this.pathIdx = new PathIndex(new File(rootDir, "structure"), readOnly);
     this.versionIdx = new VersionIndex(new File(rootDir, "structure"), readOnly);
-    this.searchIdx = new SearchIndex(rootDir, readOnly);
+    this.searchIdx = new SearchIndex(new File(rootDir, "fulltext"), readOnly);
   }
 
   /**

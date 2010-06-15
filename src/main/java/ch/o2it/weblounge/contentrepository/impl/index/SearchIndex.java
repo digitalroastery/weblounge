@@ -56,6 +56,12 @@ public class SearchIndex {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchIndex.class);
 
+  /** Directory name of the solr configuration directory */
+  private static final String CONF_DIR = "conf";
+
+  /** Directory name of the solr configuration directory */
+  private static final String DATA_DIR = "data";
+
   /** Connection to the solr database */
   private SolrConnection solrConnection = null;
 
@@ -76,11 +82,20 @@ public class SearchIndex {
    *          the solr root directory
    * @param readOnly
    *          <code>true</code> to indicate a read only index
+   * @throws IOException
+   *           if either loading or creating the index fails
    */
-  public SearchIndex(File solrRoot, boolean readOnly) {
+  public SearchIndex(File solrRoot, boolean readOnly) throws IOException {
     this.solrRoot = solrRoot;
-    setupSolr(solrRoot);
     this.isReadOnly = readOnly;
+    try {
+      loadSolr(solrRoot);
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
+
   }
 
   /**
@@ -124,8 +139,8 @@ public class SearchIndex {
   public void clear() throws IOException {
     try {
       solrConnection.destroy();
-      FileUtils.forceDelete(solrRoot);
-      setupSolr(solrRoot);
+      initSolr(solrRoot);
+      loadSolr(solrRoot);
     } catch (Exception e) {
       logger.error("Cannot clear solr index", e);
     }
@@ -234,23 +249,55 @@ public class SearchIndex {
   }
 
   /**
-   * Prepares the solr environment.
+   * Tries to load solr from the specified directory. If that directory is not
+   * there, or in the case where either one of solr config or data directory is
+   * missing, a preceding call to <code>initSolr()</code> is made.
+   * 
+   * @param solrRoot
+   *          the solr root directory
+   * @throws Exception
+   *           if loading or creating solr fails
+   */
+  private void loadSolr(File solrRoot) throws Exception {
+    logger.debug("Setting up solr search index at {}", solrRoot);
+    File configDir = new File(solrRoot, CONF_DIR);
+    File dataDir = new File(solrRoot, DATA_DIR);
+
+    boolean configExists = configDir.exists() && configDir.list().length >= 6;
+    boolean dataExists = dataDir.exists() && dataDir.list().length > 0;
+
+    // Create the configuration directory
+    if (configExists && dataExists) {
+      logger.debug("Using solr search index at {}", solrRoot);
+    } else {
+      initSolr(solrRoot);
+    }
+
+    SolrCore.log.getParent().setLevel(Level.SEVERE);
+    solrConnection = new SolrConnection(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
+    solrRequester = new SolrRequester(solrConnection);
+  }
+
+  /**
+   * Prepares the solr environment by creating the necessary directories and
+   * copying the configuration files into place.
    * 
    * @param solrRoot
    *          the solr root directory
    */
-  private void setupSolr(File solrRoot) {
+  private void initSolr(File solrRoot) {
     try {
-      logger.debug("Setting up solr search index at {}", solrRoot);
-      File solrConfigDir = new File(solrRoot, "conf");
+      logger.debug("Creating search index at {}", solrRoot);
+      File solrConfigDir = new File(solrRoot, CONF_DIR);
+      File solrDataDir = new File(solrRoot, DATA_DIR);
 
-      // Create the configuration directory
-      if (solrConfigDir.exists()) {
-        logger.debug("Using solr search index at {}", solrRoot);
-      } else {
-        logger.info("Creating search index at {}", solrConfigDir);
-        FileUtils.forceMkdir(solrConfigDir);
-      }
+      // Delete and re-create the config directory
+      FileUtils.deleteQuietly(solrConfigDir);
+      FileUtils.forceMkdir(solrConfigDir);
+
+      // Delete and re-create the data directory
+      FileUtils.deleteQuietly(solrDataDir);
+      FileUtils.forceMkdir(solrDataDir);
 
       // Make sure there is a configuration in place
       copyClasspathResourceToFile("/solr/protwords.txt", solrConfigDir);
@@ -259,18 +306,6 @@ public class SearchIndex {
       copyClasspathResourceToFile("/solr/solrconfig.xml", solrConfigDir);
       copyClasspathResourceToFile("/solr/stopwords.txt", solrConfigDir);
       copyClasspathResourceToFile("/solr/synonyms.txt", solrConfigDir);
-
-      // Test for the existence of the index. Note that an empty index directory
-      // will prevent solr from completing normal setup.
-      File solrIndexDir = new File(solrRoot, "index");
-      if (solrIndexDir.exists() && solrIndexDir.list().length == 0) {
-        FileUtils.deleteDirectory(solrIndexDir);
-        FileUtils.forceMkdir(solrIndexDir);
-      }
-
-      SolrCore.log.getParent().setLevel(Level.SEVERE);
-      solrConnection = new SolrConnection(solrRoot.getAbsolutePath(), solrRoot.getAbsolutePath());
-      solrRequester = new SolrRequester(solrConnection);
     } catch (IOException e) {
       throw new RuntimeException("Error setting up solr index at " + solrRoot, e);
     }

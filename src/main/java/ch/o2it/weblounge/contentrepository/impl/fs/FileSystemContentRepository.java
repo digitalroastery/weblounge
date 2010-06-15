@@ -128,7 +128,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     boolean success = false;
 
     try {
-      // Clear the current search index
+      // Clear the current index
       index.clear();
 
       logger.info("Populating site index '{}'...", site);
