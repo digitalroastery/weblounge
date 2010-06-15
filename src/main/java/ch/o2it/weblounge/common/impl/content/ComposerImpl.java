@@ -91,6 +91,30 @@ public class ComposerImpl implements Composer {
   }
 
   /**
+   * Adds a pagelet to the list of pagelets.
+   * 
+   * @param pagelet
+   *          the pagelet to add
+   */
+  public void addPagelet(Pagelet pagelet) {
+    if (pagelet == null)
+      throw new IllegalArgumentException("Pagelet must not be null");
+    this.pagelets.add(pagelet);
+  }
+  
+  /**
+   * Removes the pagelet from the list of pagelets.
+   * 
+   * @param pagelet
+   *          the pagelet to remove
+   */
+  public void removePagelet(Pagelet pagelet) {
+    if (pagelet == null)
+      throw new IllegalArgumentException("Pagelet must not be null");
+    this.pagelets.remove(pagelet);
+  }
+
+  /**
    * Sets this composer's pagelets.
    * 
    * @param pagelets
@@ -109,10 +133,10 @@ public class ComposerImpl implements Composer {
   public Pagelet[] getPagelets() {
     return pagelets.toArray(new Pagelet[pagelets.size()]);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

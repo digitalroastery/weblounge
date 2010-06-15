@@ -146,6 +146,15 @@ public class SearchResultItemImpl implements SearchResultItem {
   public WebUrl getUrl() {
     return url;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchResultItem#getPageURI()
+   */
+  public PageURI getPageURI() {
+    return new PageURIImpl(site, url.getPath(), id);
+  }
 
   /**
    * Sets the result item's preview data.
