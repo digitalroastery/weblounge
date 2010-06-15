@@ -31,6 +31,8 @@ SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
 REM # Create the debug config
 SET DEBUG_OPTS=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=%DEBUG_PORT%,server=y,suspend=%DEBUG_SUSPEND%
 
+REM # Remove the weblounge bundles from felix cache
+
 REM # Finally start felix
 java %DEBUG_OPTS% %MAVEN_OPTS% %FELIX_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %PAX_LOGGING_OPTS% -jar %FELIX_HOME%\bin\felix.jar %FELIX_CACHEDIR%
 ENDLOCAL

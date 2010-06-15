@@ -21,10 +21,15 @@ DEBUG_SUSPEND="n"
 MAVEN_OPTS="-DM2_REPO=$M2_REPO"
 FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX/load"
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf"
-PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN  -Dweblounge.logdir=$FELIX_LOGDIR"
+PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dweblounge.logdir=$FELIX_LOGDIR"
 
 # Create the debug config
 DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,server=y,suspend=$DEBUG_SUSPEND"
+
+# Make sure weblounge bundles are reloaded
+for bundle in `find cache -type f -name bundle.location | xargs grep --files-with-match -e weblounge | sed -e s/bundle.location// `; do
+  rm -r $bundle
+done
 
 # Finally start felix
 cd $FELIX
