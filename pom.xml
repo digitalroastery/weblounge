@@ -123,6 +123,7 @@
               ch.o2it.weblounge.common,
               ch.o2it.weblounge.common.content,
               ch.o2it.weblounge.common.impl.content,
+              ch.o2it.weblounge.common.impl.page,
               ch.o2it.weblounge.common.impl.request,
               ch.o2it.weblounge.common.impl.site, 
               ch.o2it.weblounge.common.impl.url,
