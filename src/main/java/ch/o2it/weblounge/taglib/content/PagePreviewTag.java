@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.Renderer;
-import ch.o2it.weblounge.common.impl.content.PageURIImpl;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -174,10 +174,7 @@ public class PagePreviewTag extends WebloungeTag {
             continue p;
           }
 
-          // Select the actual renderer by method and have it render the
-          // request. Since renderers are beeing pooled by the bundle, we
-          // have to return it after the request has finished.
-
+          // Select the renderer's module
           Module m = site.getModule(moduleId);
           if (m == null) {
             log_.warn("Unable to load renderer '" + rendererId + "' for " + url + ": module '" + moduleId + "' not found!");

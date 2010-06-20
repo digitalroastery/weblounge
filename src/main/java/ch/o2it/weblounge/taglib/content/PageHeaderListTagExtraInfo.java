@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.url.WebUrl;
 
 import javax.servlet.jsp.tagext.TagData;
@@ -40,8 +40,9 @@ public class PageHeaderListTagExtraInfo extends TagExtraInfo {
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
-        new VariableInfo(PageHeaderListTagVariables.URL, WebUrl.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(PageHeaderListTagVariables.PREVIEW, Pagelet.class.getName() + "[]", true, VariableInfo.NESTED) };
+      new VariableInfo(PageHeaderListTagVariables.URL, WebUrl.class.getName(), true, VariableInfo.NESTED),
+      new VariableInfo(PageHeaderListTagVariables.PREVIEW, Composer.class.getName(), true, VariableInfo.NESTED)
+    };
   }
 
   /**

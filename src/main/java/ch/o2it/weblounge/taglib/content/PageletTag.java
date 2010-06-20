@@ -21,8 +21,8 @@
 package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.content.Renderer;
-import ch.o2it.weblounge.common.impl.content.PageletImpl;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
+import ch.o2it.weblounge.common.impl.page.PageletImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Module;

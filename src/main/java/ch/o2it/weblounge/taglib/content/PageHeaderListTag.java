@@ -25,8 +25,8 @@ import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
-import ch.o2it.weblounge.common.impl.content.PagePreviewReader;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
+import ch.o2it.weblounge.common.impl.page.PagePreviewReader;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -242,7 +242,7 @@ public class PageHeaderListTag extends WebloungeTag {
     // Set the headline in the request
     if (found) {
       pageContext.setAttribute(PageHeaderListTagVariables.URL, url);
-      pageContext.setAttribute(PageHeaderListTagVariables.PREVIEW, preview.getPagelets());
+      pageContext.setAttribute(PageHeaderListTagVariables.PREVIEW, preview);
     }
 
     return found;
