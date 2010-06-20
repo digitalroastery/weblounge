@@ -115,9 +115,11 @@ public class PageInputDocument extends AbstractInputDocument {
 
     // Preview information
     StringBuffer preview = new StringBuffer();
+    preview.append("<composer id=\"stage\">");
     for (Pagelet p : page.getPreview()) {
       preview.append(p.toXml());
     }
+    preview.append("</composer>");
     setField(PREVIEW_XML, preview.toString());
 
     // The whole page

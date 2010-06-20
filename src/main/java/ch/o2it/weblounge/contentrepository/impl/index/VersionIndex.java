@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
-import ch.o2it.weblounge.common.impl.content.PageUtils;
+import ch.o2it.weblounge.common.impl.page.PageUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 
 import org.apache.commons.io.FilenameUtils;

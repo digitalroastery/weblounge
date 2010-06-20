@@ -22,7 +22,7 @@ package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.content.PageURIImpl;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
