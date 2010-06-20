@@ -29,10 +29,10 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Link;
 import ch.o2it.weblounge.common.content.Script;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
-import ch.o2it.weblounge.common.impl.content.LinkImpl;
-import ch.o2it.weblounge.common.impl.content.PageTemplateImpl;
-import ch.o2it.weblounge.common.impl.content.ScriptImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.page.LinkImpl;
+import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
+import ch.o2it.weblounge.common.impl.page.ScriptImpl;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.junit.Before;

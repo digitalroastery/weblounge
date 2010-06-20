@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.page;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.content.LinkImpl;
+import ch.o2it.weblounge.common.impl.page.LinkImpl;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -88,7 +88,7 @@ public class LinkImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LinkImpl#setModule(ch.o2it.weblounge.common.site.Module)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.LinkImpl#setModule(ch.o2it.weblounge.common.site.Module)}.
    */
   @Test
   @Ignore
@@ -99,7 +99,7 @@ public class LinkImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LinkImpl#getHref()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.LinkImpl#getHref()}.
    */
   @Test
   public void testGetHref() {
@@ -107,7 +107,7 @@ public class LinkImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LinkImpl#getCharset()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.LinkImpl#getCharset()}.
    */
   @Test
   public void testGetCharset() {
@@ -115,7 +115,7 @@ public class LinkImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LinkImpl#getMedia()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.LinkImpl#getMedia()}.
    */
   @Test
   public void testGetMedia() {
@@ -123,7 +123,7 @@ public class LinkImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LinkImpl#getRelation()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.LinkImpl#getRelation()}.
    */
   @Test
   public void testGetRelationship() {
@@ -131,7 +131,7 @@ public class LinkImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LinkImpl#getReverseRelation()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.LinkImpl#getReverseRelation()}.
    */
   @Test
   public void testGetReverseRelationship() {
@@ -139,7 +139,7 @@ public class LinkImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LinkImpl#getType()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.LinkImpl#getType()}.
    */
   @Test
   public void testGetType() {

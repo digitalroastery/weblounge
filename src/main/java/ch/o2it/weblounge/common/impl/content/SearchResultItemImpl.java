@@ -24,6 +24,8 @@ import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.SearchResultItem;
+import ch.o2it.weblounge.common.impl.page.PageReader;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 

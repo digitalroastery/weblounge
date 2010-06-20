@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.page;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.content.ScriptImpl;
+import ch.o2it.weblounge.common.impl.page.ScriptImpl;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -82,7 +82,7 @@ public class ScriptImplTest {
   }
   
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.ScriptImpl#getHref()
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.ScriptImpl#getHref()
    */
   @Test
   public void testGetHref() {
@@ -90,7 +90,7 @@ public class ScriptImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.ScriptImpl#getType()
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.ScriptImpl#getType()
    */
   @Test
   public void testGetType() {
@@ -98,7 +98,7 @@ public class ScriptImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.ScriptImpl#getCharset()
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.ScriptImpl#getCharset()
    */
   @Test
   public void testGetCharset() {
@@ -106,7 +106,7 @@ public class ScriptImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.ScriptImpl#isDeferred()
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.ScriptImpl#isDeferred()
    */
   @Test
   public void testGetDefer() {
@@ -114,7 +114,7 @@ public class ScriptImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.ScriptImpl#setModule(ch.o2it.weblounge.common.site.Module)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.ScriptImpl#setModule(ch.o2it.weblounge.common.site.Module)}.
    */
   @Test
   @Ignore

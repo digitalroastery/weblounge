@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.content;
+package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
@@ -29,6 +29,9 @@ import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.PageletRenderer;
 import ch.o2it.weblounge.common.content.PageletURI;
+import ch.o2it.weblounge.common.impl.content.CreationContext;
+import ch.o2it.weblounge.common.impl.content.ModificationContext;
+import ch.o2it.weblounge.common.impl.content.PublishingContext;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.SecurityContextImpl;

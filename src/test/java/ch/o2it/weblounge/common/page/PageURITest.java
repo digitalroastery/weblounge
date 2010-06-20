@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.content.PageURIImpl;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.site.Site;
 
@@ -97,7 +97,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageURIImpl#getId()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getId()}.
    */
   @Test
   public void testGetId() {
@@ -107,7 +107,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageURIImpl#getParentURI()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getParentURI()}.
    */
   @Test
   public void testGetParentURI() {
@@ -117,7 +117,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageURIImpl#getPath()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getPath()}.
    */
   @Test
   public void testGetPath() {
@@ -125,7 +125,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageURIImpl#getSite()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -135,7 +135,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageURIImpl#getVersion()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getVersion()}.
    */
   @Test
   public void testGetVersion() {
@@ -145,7 +145,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageURIImpl#switchToVersion(long)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#switchToVersion(long)}.
    */
   @Test
   public void testGetVersionLong() {

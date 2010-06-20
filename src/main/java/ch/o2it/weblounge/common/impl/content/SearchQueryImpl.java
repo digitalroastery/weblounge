@@ -24,6 +24,8 @@ import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.PageletURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.impl.page.PageletImpl;
+import ch.o2it.weblounge.common.impl.page.PageletURIImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;

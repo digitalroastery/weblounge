@@ -22,8 +22,8 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.content.PageLayout;
 import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.impl.content.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;

@@ -18,22 +18,21 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.content;
+package ch.o2it.weblounge.common.impl.page;
 
 import ch.o2it.weblounge.common.content.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.Link;
-import ch.o2it.weblounge.common.content.PagePreviewMode;
-import ch.o2it.weblounge.common.content.PageletRenderer;
+import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.RenderException;
 import ch.o2it.weblounge.common.content.Script;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Module;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,43 +41,35 @@ import org.w3c.dom.NodeList;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 /**
- * This renderer implements a pagelet renderer that is backed by a Java Server
+ * This renderer implements a page template that is backed by a Java Server
  * Page.
  */
-public class PageletRendererImpl extends AbstractRenderer implements PageletRenderer {
+public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /** The logging facility */
-  private Logger logger = LoggerFactory.getLogger(PageletRendererImpl.class);
+  private Logger logger = LoggerFactory.getLogger(PageTemplateImpl.class);
+
+  /** Default composer for action output */
+  protected String stage = DEFAULT_STAGE;
+
+  /** Default page layout */
+  protected String layout = null;
   
-  /** The editor url */
-  protected URL editor = null;
-
-  /** The defining module */
-  protected Module module = null;
-
-  /** The preview mode */
-  protected PagePreviewMode previewMode = PagePreviewMode.None;
+  /** Is this the default template? */
+  protected boolean isDefault = false;
 
   /**
    * Creates a new page template.
    */
-  public PageletRendererImpl() {
+  public PageTemplateImpl() {
     addFlavor(RequestFlavor.HTML);
-  }
-
-  /**
-   * Creates a new page template with the given identifier.
-   * 
-   * @param identifier
-   *          the template identifier
-   */
-  public PageletRendererImpl(String identifier) {
-    this(identifier, null);
   }
 
   /**
@@ -90,7 +81,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * @param url
    *          the renderer url
    */
-  public PageletRendererImpl(String identifier, URL url) {
+  public PageTemplateImpl(String identifier, URL url) {
     super(identifier, url);
     addFlavor(RequestFlavor.HTML);
   }
@@ -98,61 +89,61 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#setModule(ch.o2it.weblounge.common.site.Module)
+   * @see ch.o2it.weblounge.common.content.PageTemplate#setStage(java.lang.String)
    */
-  public void setModule(Module module) {
-    this.module = module;
+  public void setStage(String stage) {
+    this.stage = stage;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#getModule()
+   * @see ch.o2it.weblounge.common.content.PageTemplate#getStage()
    */
-  public Module getModule() {
-    return module;
+  public String getStage() {
+    return stage;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#setPreviewMode(ch.o2it.weblounge.common.content.Pagelet.PagePreviewMode)
+   * @see ch.o2it.weblounge.common.content.PageTemplate#getDefaultLayout()
    */
-  public void setPreviewMode(PagePreviewMode mode) {
-    this.previewMode = mode;
+  public String getDefaultLayout() {
+    return layout;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#getPreviewMode()
+   * @see ch.o2it.weblounge.common.content.PageTemplate#setDefaultLayout(java.lang.String)
    */
-  public PagePreviewMode getPreviewMode() {
-    return previewMode;
+  public void setDefaultLayout(String layout) {
+    this.layout = layout;
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#setEditor(java.net.URL)
+   *
+   * @see ch.o2it.weblounge.common.content.PageTemplate#setDefault(boolean)
    */
-  public void setEditor(URL editor) {
-    this.editor = editor;
+  public void setDefault(boolean v) {
+    isDefault = v;
   }
-
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.PageTemplate#isDefault()
+   */
+  public boolean isDefault() {
+    return isDefault;
+  }
+  
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#getEditor()
-   */
-  public URL getEditor() {
-    return editor;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Renderer#render(ch.o2it.weblounge.common.request.WebloungeRequest,
+   * @see ch.o2it.weblounge.common.content.PageTemplate#render(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
@@ -160,33 +151,13 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     String path = renderer.toExternalForm();
     if (path.matches(".*\\$\\{.*\\}.*")) {
       try {
-        renderer = new URL(ConfigurationUtils.processTemplate(path, request, module));
+        renderer = new URL(ConfigurationUtils.processTemplate(path, request));
       } catch (MalformedURLException e) {
         logger.error("Error processing renderer url '" + renderer + "'", e);
         throw new RenderException(this, e);
       }
     }
     includeJSP(request, response, renderer);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#renderAsEditor(ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse)
-   */
-  public void renderAsEditor(WebloungeRequest request,
-      WebloungeResponse response) throws RenderException {
-    String path = editor.toExternalForm();
-    if (path.matches(".*\\$\\{.*\\}.*")) {
-      try {
-        editor = new URL(ConfigurationUtils.processTemplate(path, request, module));
-      } catch (MalformedURLException e) {
-        logger.error("Error processing editor url '" + editor + "'", e);
-        throw new RenderException(this, e);
-      }
-    }
-    includeJSP(request, response, editor);
   }
 
   /**
@@ -211,55 +182,64 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   }
 
   /**
-   * Initializes this pagelet renderer from an XML node that was generated using
+   * Initializes this page template from an XML node that was generated using
    * {@link #toXml()}.
    * <p>
    * To speed things up, you might consider using the second signature that uses
    * an existing <code>XPath</code> instance instead of creating a new one.
    * 
    * @param node
-   *          the pagelet renderer node
+   *          the page template node
    * @throws IllegalStateException
-   *           if the pagelet renderer cannot be parsed
+   *           if the page template cannot be parsed
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
-  public static PageletRenderer fromXml(Node node)
-      throws IllegalStateException {
+  public static PageTemplate fromXml(Node node) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
+    
+    // Define the xml namespace
+    xpath.setNamespaceContext(new NamespaceContext() {
+      public String getNamespaceURI(String prefix) {
+        return "ns".equals(prefix) ? SiteImpl.SITE_XMLNS : null;
+      }
+      public String getPrefix(String namespaceURI) { return null; }
+      public Iterator<?> getPrefixes(String namespaceURI) { return null; }
+    });
+
     return fromXml(node, xpath);
   }
 
   /**
-   * Initializes this pagelet renderer from an XML node that was generated using
+   * Initializes this page template from an XML node that was generated using
    * {@link #toXml()}.
    * 
    * @param node
-   *          the pagelet renderer node
+   *          the page template node
    * @param xpath
    *          the xpath processor
    * @throws IllegalStateException
-   *           if the pagelet renderer cannot be parsed
+   *           if the page template cannot be parsed
    * @see #fromXml(Node)
    * @see #toXml()
    */
   @SuppressWarnings("unchecked")
-  public static PageletRenderer fromXml(Node node, XPath xpath)
+  public static PageTemplate fromXml(Node node, XPath xpath)
       throws IllegalStateException {
 
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
+    
     // Identifier
     String id = XPathHelper.valueOf(node, "@id", xpath);
     if (id == null)
       throw new IllegalStateException("Missing id in page template definition");
 
     // Class
-    String className = XPathHelper.valueOf(node, "m:class", xpath);
+    String className = XPathHelper.valueOf(node, "class", xpath);
 
     // Renderer url
     URL rendererUrl = null;
-    String rendererUrlNode = XPathHelper.valueOf(node, "m:renderer", xpath);
+    String rendererUrlNode = XPathHelper.valueOf(node, "ns:renderer", xpath); 
     if (rendererUrlNode == null)
       throw new IllegalStateException("Missing renderer in page template definition");
     try {
@@ -268,15 +248,15 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       throw new IllegalStateException("Malformed renderer url in page template definition: " + rendererUrlNode);
     }
 
-    // Create the pagelet renderer
-    PageletRenderer renderer = null;
+    // Create the page template
+    PageTemplate template = null;
     if (className != null) {
-      Class<? extends PageletRenderer> c = null;
+      Class<? extends PageTemplate> c = null;
       try {
-        c = (Class<? extends PageletRenderer>)classLoader.loadClass(className);
-        renderer = c.newInstance();
-        renderer.setIdentifier(id);
-        renderer.setRenderer(rendererUrl);
+        c = (Class<? extends PageTemplate>) classLoader.loadClass(className);
+        template = c.newInstance();
+        template.setIdentifier(id);
+        template.setRenderer(rendererUrl);
       } catch (ClassNotFoundException e) {
         throw new IllegalStateException("Pagelet renderer implementation " + className + " not found", e);
       } catch (InstantiationException e) {
@@ -285,80 +265,75 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
         throw new IllegalStateException("Access violation instantiating pagelet renderer " + className, e);
       }
     } else {
-      renderer = new PageletRendererImpl();
-      renderer.setIdentifier(id);
-      renderer.setRenderer(rendererUrl);
+      template = new PageTemplateImpl(id, rendererUrl);
     }
-    
+
     // Composeable
-    renderer.setComposeable("true".equals(XPathHelper.valueOf(node, "@composeable", xpath)));
+    template.setComposeable(ConfigurationUtils.isTrue(XPathHelper.valueOf(node, "@composeable", xpath)));
 
-    // Preview mode
-    String previewMode = XPathHelper.valueOf(node, "m:preview", xpath);
-    if (previewMode != null)
-      renderer.setPreviewMode(PagePreviewMode.parse(previewMode));
+    // Default
+    template.setDefault(ConfigurationUtils.isTrue(XPathHelper.valueOf(node, "@default", xpath)));
 
-    // Editor url
-    String editorUrlNode = XPathHelper.valueOf(node, "m:editor", xpath);
-    try {
-      if (editorUrlNode != null) {
-        URL editorUrl = new URL(editorUrlNode);
-        renderer.setEditor(editorUrl);
-      }
-    } catch (MalformedURLException e) {
-      throw new IllegalStateException("Malformed editor url in page template definition: " + editorUrlNode);
-    }
+    // Stage
+    String stage = XPathHelper.valueOf(node, "ns:stage", xpath);
+    if (stage != null)
+      template.setStage(stage);
+
+    // Layout
+    String layout = XPathHelper.valueOf(node, "ns:layout", xpath);
+    if (layout != null)
+      template.setDefaultLayout(layout);
 
     // recheck time
-    String recheck = XPathHelper.valueOf(node, "m:recheck", xpath);
+    String recheck = XPathHelper.valueOf(node, "ns:recheck", xpath);
     if (recheck != null) {
       try {
-        renderer.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
+        template.setRecheckTime(ConfigurationUtils.parseDuration(recheck));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The pagelet renderer valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The page template valid time '" + recheck + "' is malformed", e);
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("The pagelet renderer valid time '" + recheck + "' is malformed", e);
+        throw new IllegalStateException("The page template valid time '" + recheck + "' is malformed", e);
       }
     }
 
     // valid time
-    String valid = XPathHelper.valueOf(node, "m:valid", xpath);
+    String valid = XPathHelper.valueOf(node, "ns:valid", xpath);
     if (valid != null) {
       try {
-        renderer.setValidTime(ConfigurationUtils.parseDuration(valid));
+        template.setValidTime(ConfigurationUtils.parseDuration(valid));
       } catch (NumberFormatException e) {
-        throw new IllegalStateException("The pagelet renderer valid time '" + valid + "' is malformed", e);
+        throw new IllegalStateException("The page template valid time '" + valid + "' is malformed", e);
       } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("The pagelet renderer valid time '" + valid + "' is malformed", e);
+        throw new IllegalStateException("The page template valid time '" + valid + "' is malformed", e);
       }
     }
 
     // name
-    NodeList names = XPathHelper.selectList(node, "m:name", xpath);
+    NodeList names = XPathHelper.selectList(node, "ns:name", xpath);
     for (int i = 0; i < names.getLength(); i++) {
       Node localiziation = names.item(i);
       String language = XPathHelper.valueOf(localiziation, "@language", xpath);
       if (language == null)
-        throw new IllegalStateException("Found pagelet renderer name without language");
+        throw new IllegalStateException("Found page template name without language");
       String name = XPathHelper.valueOf(localiziation, "text()", xpath);
       if (name == null)
-        throw new IllegalStateException("Found empty pagelet name");
-      renderer.setName(name, LanguageSupport.getLanguage(language));
+        throw new IllegalStateException("Found empty page template name");
+      template.setName(name, LanguageSupport.getLanguage(language));
     }
 
     // scripts
-    NodeList scripts = XPathHelper.selectList(node, "m:includes/m:script", xpath);
+    NodeList scripts = XPathHelper.selectList(node, "ns:includes/ns:script", xpath);
     for (int i = 0; i < scripts.getLength(); i++) {
-      renderer.addHTMLHeader(ScriptImpl.fromXml(scripts.item(i)));
+      template.addHTMLHeader(ScriptImpl.fromXml(scripts.item(i)));
     }
 
     // links
-    NodeList includes = XPathHelper.selectList(node, "m:includes/m:link", xpath);
-    for (int i = 0; i < includes.getLength(); i++) {
-      renderer.addHTMLHeader(LinkImpl.fromXml(includes.item(i)));
+    NodeList links = XPathHelper.selectList(node, "ns:includes/ns:link", xpath);
+    for (int i = 0; i < links.getLength(); i++) {
+      template.addHTMLHeader(LinkImpl.fromXml(links.item(i)));
     }
 
-    return renderer;
+    return template;
   }
 
   /**
@@ -368,9 +343,11 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public String toXml() {
     StringBuffer buf = new StringBuffer();
-    buf.append("<pagelet");
+    buf.append("<template");
     buf.append(" id=\"").append(identifier).append("\"");
     buf.append(" composeable=\"").append(composeable).append("\"");
+    if (isDefault)
+      buf.append(" default=\"true\"");
     buf.append(">");
 
     // Names
@@ -381,14 +358,19 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     }
 
     // Renderer class
-    if (!this.getClass().equals(PageletRendererImpl.class))
+    if (!this.getClass().equals(PageTemplateImpl.class))
       buf.append("<class>").append(getClass().getName()).append("</class>");
 
     // Renderer url
     buf.append("<renderer>").append(renderer.toExternalForm()).append("</renderer>");
 
-    // Editor url
-    buf.append("<editor>").append(editor.toExternalForm()).append("</editor>");
+    // Stage name
+    if (stage != null && !DEFAULT_STAGE.equals(stage))
+      buf.append("<stage>").append(stage).append("</stage>");
+
+    // Default page layout
+    if (layout != null)
+      buf.append("<layout>").append(layout).append("</layout>");
 
     // Recheck time
     if (recheckTime >= 0) {
@@ -402,13 +384,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       buf.append("<valid>");
       buf.append(ConfigurationUtils.toDuration(validTime));
       buf.append("</valid>");
-    }
-
-    // Preview
-    if (!previewMode.equals(PagePreviewMode.None)) {
-      buf.append("<preview>");
-      buf.append(previewMode.toString().toLowerCase());
-      buf.append("</preview>");
     }
 
     // Includes
@@ -425,7 +400,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       buf.append("</includes>");
     }
 
-    buf.append("</pagelet>");
+    buf.append("</template>");
     return buf.toString();
   }
 

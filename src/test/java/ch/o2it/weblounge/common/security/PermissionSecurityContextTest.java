@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.security;
 
-import ch.o2it.weblounge.common.impl.content.PageSecurityContext;
+import ch.o2it.weblounge.common.impl.page.PageSecurityContext;
 import ch.o2it.weblounge.common.impl.security.SecurityContextImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;

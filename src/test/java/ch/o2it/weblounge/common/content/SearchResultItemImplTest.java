@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.content.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
+import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;

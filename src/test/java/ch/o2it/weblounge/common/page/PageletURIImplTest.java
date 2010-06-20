@@ -25,8 +25,8 @@ import static org.junit.Assert.assertFalse;
 
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.PageletURI;
-import ch.o2it.weblounge.common.impl.content.PageURIImpl;
-import ch.o2it.weblounge.common.impl.content.PageletURIImpl;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.page.PageletURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;
@@ -67,7 +67,7 @@ public class PageletURIImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageletURIImpl#getSite()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -75,7 +75,7 @@ public class PageletURIImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageletURIImpl#getPageURI()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#getPageURI()}.
    */
   @Test
   public void testGetURI() {
@@ -83,7 +83,7 @@ public class PageletURIImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageletURIImpl#getComposer()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#getComposer()}.
    */
   @Test
   public void testGetComposer() {
@@ -91,7 +91,7 @@ public class PageletURIImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageletURIImpl#getPosition()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#getPosition()}.
    */
   @Test
   public void testGetPosition() {
@@ -99,7 +99,7 @@ public class PageletURIImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageletURIImpl#equals(java.lang.Object)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
@@ -113,7 +113,7 @@ public class PageletURIImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageletURIImpl#compareTo(ch.o2it.weblounge.common.content.PageletURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletURIImpl#compareTo(ch.o2it.weblounge.common.content.PageletURI)}.
    */
   @Test
   public void testCompareTo() {

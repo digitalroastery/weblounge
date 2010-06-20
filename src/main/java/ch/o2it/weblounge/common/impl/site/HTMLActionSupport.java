@@ -31,7 +31,7 @@ import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.PageletRenderer;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.Script;
-import ch.o2it.weblounge.common.impl.content.PageURIImpl;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;

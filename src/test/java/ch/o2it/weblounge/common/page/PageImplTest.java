@@ -28,10 +28,10 @@ import static org.junit.Assert.fail;
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
-import ch.o2it.weblounge.common.impl.content.PageImpl;
-import ch.o2it.weblounge.common.impl.content.PageURIImpl;
-import ch.o2it.weblounge.common.impl.content.PageletImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.page.PageImpl;
+import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
@@ -186,7 +186,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#hashCode()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#hashCode()}.
    */
   @Test
   public void testHashCode() {
@@ -194,7 +194,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getSite()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -202,7 +202,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getVersion()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getVersion()}.
    */
   @Test
   public void testGetVersion() {
@@ -210,7 +210,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getType()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getType()}.
    */
   @Test
   public void testGetType() {
@@ -218,7 +218,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#removeSubject(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#removeSubject(java.lang.String)}.
    */
   @Test
   public void testRemoveSubject() {
@@ -227,7 +227,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getURI()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getURI()}.
    */
   @Test
   public void testGetURI() {
@@ -235,7 +235,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getPublisher()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getPublisher()}.
    */
   @Test
   public void testGetPublisher() {
@@ -243,7 +243,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getPublishFrom()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getPublishFrom()}.
    */
   @Test
   public void testGetPublishFrom() {
@@ -251,7 +251,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getPublishTo()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getPublishTo()}.
    */
   @Test
   public void testGetPublishTo() {
@@ -259,7 +259,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#isPromoted()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isPromoted()}.
    */
   @Test
   public void testIsPromoted() {
@@ -267,7 +267,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#isIndexed()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isIndexed()}.
    */
   @Test
   public void testIsIndexed() {
@@ -275,7 +275,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getCoverage()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCoverage()}.
    */
   @Test
   public void testGetCoverage() {
@@ -283,7 +283,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getCoverage(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCoverage(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetCoverageLanguage() {
@@ -293,7 +293,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getCoverage(ch.o2it.weblounge.common.language.Language, boolean)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCoverage(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
   public void testGetCoverageLanguageBoolean() {
@@ -306,7 +306,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getDescription()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getDescription()}.
    */
   @Test
   public void testGetDescription() {
@@ -314,7 +314,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getDescription(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getDescription(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetDescriptionLanguage() {
@@ -324,7 +324,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getDescription(ch.o2it.weblounge.common.language.Language, boolean)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getDescription(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
   public void testGetDescriptionLanguageBoolean() {
@@ -337,7 +337,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getRights()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getRights()}.
    */
   @Test
   public void testGetRights() {
@@ -345,7 +345,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getRights(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getRights(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetRightsLanguage() {
@@ -355,7 +355,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getRights(ch.o2it.weblounge.common.language.Language, boolean)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getRights(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
   public void testGetRightsLanguageBoolean() {
@@ -368,7 +368,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getTitle()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getTitle()}.
    */
   @Test
   public void testGetTitle() {
@@ -376,7 +376,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getTitle(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getTitle(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetTitleLanguage() {
@@ -386,7 +386,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getTitle(ch.o2it.weblounge.common.language.Language, boolean)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getTitle(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
   public void testGetTitleLanguageBoolean() {
@@ -399,7 +399,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getLayout()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getLayout()}.
    */
   @Test
   public void testGetLayout() {
@@ -407,7 +407,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getTemplate()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getTemplate()}.
    */
   @Test
   public void testGetTemplate() {
@@ -415,7 +415,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#hasSubject(String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#hasSubject(String)}.
    */
   @Test
   public void testHasSubject() {
@@ -424,7 +424,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getSubjects()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getSubjects()}.
    */
   @Test
   public void testGetSubjects() {
@@ -433,7 +433,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#allow(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#allow(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -442,7 +442,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#deny(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#deny(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -451,7 +451,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -460,7 +460,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -469,7 +469,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
    */
   @Test
   @Ignore
@@ -478,7 +478,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
    */
   @Test
   @Ignore
@@ -487,7 +487,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#permissions()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#permissions()}.
    */
   @Test
   @Ignore
@@ -496,7 +496,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getOwner()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getOwner()}.
    */
   @Test
   public void testGetOwner() {
@@ -504,7 +504,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#equals(java.lang.Object)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
@@ -514,7 +514,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#isPublished()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isPublished()}.
    */
   @Test
   public void testIsPublished() {
@@ -525,7 +525,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#isPublished(java.util.Date)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isPublished(java.util.Date)}.
    */
   @Test
   public void testIsPublishedDate() {
@@ -535,7 +535,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getCreationDate()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCreationDate()}.
    */
   @Test
   public void testGetCreationDate() {
@@ -543,7 +543,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getCreator()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getCreator()}.
    */
   @Test
   public void testGetCreator() {
@@ -551,7 +551,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#isCreatedAfter(java.util.Date)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isCreatedAfter(java.util.Date)}.
    */
   @Test
   public void testIsCreatedAfter() {
@@ -559,7 +559,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getModificationDate()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModificationDate()}.
    */
   @Test
   public void testGetModificationDate() {
@@ -567,7 +567,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getModifier()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getModifier()}.
    */
   @Test
   public void testGetModifier() {
@@ -575,7 +575,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getLockOwner()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getLockOwner()}.
    */
   @Test
   public void testGetLockOwner() {
@@ -583,7 +583,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#setUnlocked()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#setUnlocked()}.
    */
   @Test
   public void testSetUnlocked() {
@@ -592,7 +592,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#isLocked()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#isLocked()}.
    */
   @Test
   public void testIsLocked() {
@@ -600,7 +600,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#addPagelet(ch.o2it.weblounge.common.content.Pagelet, java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#addPagelet(ch.o2it.weblounge.common.content.Pagelet, java.lang.String)}.
    */
   @Test
   public void testAddPageletPageletString() {
@@ -614,7 +614,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#addPagelet(ch.o2it.weblounge.common.content.Pagelet, java.lang.String, int)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#addPagelet(ch.o2it.weblounge.common.content.Pagelet, java.lang.String, int)}.
    */
   @Test
   public void testAddPageletPageletStringInt() {
@@ -633,7 +633,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getPagelets(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getPagelets(java.lang.String)}.
    */
   @Test
   public void testGetPageletsString() {
@@ -642,7 +642,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#getPagelets(java.lang.String, java.lang.String, java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#getPagelets(java.lang.String, java.lang.String, java.lang.String)}.
    */
   @Test
   public void testGetPageletsStringStringString() {
@@ -652,7 +652,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#removePagelet(java.lang.String, int)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#removePagelet(java.lang.String, int)}.
    */
   @Test
   public void testRemovePagelet() {
@@ -673,7 +673,7 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.PageImpl#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageImpl#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testCompareTo() {
