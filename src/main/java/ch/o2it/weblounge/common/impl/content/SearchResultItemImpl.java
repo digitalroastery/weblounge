@@ -24,28 +24,16 @@ import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.SearchResultItem;
-import ch.o2it.weblounge.common.impl.page.PageReader;
+import ch.o2it.weblounge.common.impl.page.LazyPageImpl;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Default implementation of a {@link SearchResultItem}.
  */
 public class SearchResultItemImpl implements SearchResultItem {
 
-  /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SearchResultItemImpl.class);
-  
   /** THe associated site */
   protected Site site = null;
 
@@ -192,17 +180,8 @@ public class SearchResultItemImpl implements SearchResultItem {
    */
   public Page getPage() {
     if (page == null) {
-      PageReader reader = new PageReader();
       PageURI uri = new PageURIImpl(site, url.getPath(), id);
-      try {
-        page = reader.read(new ByteArrayInputStream(pageXml.getBytes()), uri);
-      } catch (SAXException e) {
-        logger.error("SAX error while parsing page " + uri + " from search result", e);
-      } catch (IOException e) {
-        logger.error("IO error while parsing page " + uri + " from search result", e);
-      } catch (ParserConfigurationException e) {
-        logger.error("Parser configuration error while parsing page " + uri + " from search result", e);
-      }
+      page = new LazyPageImpl(uri, pageXml.getBytes());
     }
     return page;
   }
