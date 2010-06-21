@@ -11,7 +11,7 @@
  	<display-name>Weblounge Content Tags</display-name>
 	<description>Tag library providing access to the Weblounge CMS content</description>
   
-  <tag>
+  	<tag>
 		<name>cachetag</name>
 		<tag-class>ch.o2it.weblounge.taglib.content.CacheTag</tag-class>
 		<body-content>empty</body-content>
@@ -512,8 +512,8 @@
     <!-- FINISH IMPLEMENTATION
 	<tag>
 		<name>pageheader</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PageHeaderTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.PageHeaderTagExtraInfo</tei-class>
+		<tag-class>ch.o2it.weblounge.taglib.content.PageListTag</tag-class>
+ 		<tei-class>ch.o2it.weblounge.taglib.content.PageListTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<display-name>Page Header</display-name>
 		<description>Extracts the page header from the database</description>
@@ -522,32 +522,30 @@
 	</tag>
     -->
 
-    <!-- FINISH IMPLEMENTATION
 	<tag>
-		<name>pageheaders</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PageHeaderListTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.PageHeaderTagExtraInfo</tei-class>
+		<name>pagelist</name>
+		<tag-class>ch.o2it.weblounge.taglib.content.PageListTag</tag-class>
+ 		<tei-class>ch.o2it.weblounge.taglib.content.PageListTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
-		<display-name>List of Page Headers</display-name>
-		<description>Extracts a number of page headers from the database</description>
+		<display-name>List of pages</display-name>
+		<description>Extracts a number of pages from the database</description>
 		<attribute><name>types</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>keywords</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>count</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>requireheadlines</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>loadheadlines</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
-    -->
 
 	<tag>
 		<name>pagepreview</name>
 		<tag-class>ch.o2it.weblounge.taglib.content.PagePreviewTag</tag-class>
+        <tei-class>ch.o2it.weblounge.taglib.content.PagePreviewTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<display-name>Page Preview</display-name>
 		<description>Shows a preview of the page</description>
-		<attribute><name>partition</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>path</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>start</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>pageId</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>end</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><name>lead</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+        <attribute><name>render</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
 	
 </taglib>
