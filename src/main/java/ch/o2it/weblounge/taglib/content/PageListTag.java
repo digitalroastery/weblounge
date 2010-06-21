@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.content.Composer;
+import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
@@ -53,7 +54,7 @@ import javax.servlet.jsp.JspException;
  * as the page type, search keywords etc.
  */
 
-public class PageHeaderListTag extends WebloungeTag {
+public class PageListTag extends WebloungeTag {
 
   /** Serial version UID */
   private static final long serialVersionUID = -1825541321489778143L;
@@ -76,16 +77,55 @@ public class PageHeaderListTag extends WebloungeTag {
   /** The pagelet from the request */
   private Pagelet pagelet = null;
 
+  /** The current page */
+  private Page page = null;
+
+  /** The current preview */
+  private Composer preview = null;
+
+  /** The current page's url */
+  private WebUrl url = null;
+
   /** List of required headlines */
   private Map<String, String> requireHeadlines = null;
 
   /**
    * Creates a new page header list tag.
    */
-  public PageHeaderListTag() {
+  public PageListTag() {
     requireHeadlines = new HashMap<String, String>();
     subjects = new ArrayList<String>();
     reset();
+  }
+
+  /**
+   * Returns the current page. This method serves as a way for embedded tags
+   * like the {@link PagePreviewTag} to get to their data.
+   * 
+   * @return the page
+   */
+  public Page getPage() {
+    return page;
+  }
+
+  /**
+   * Returns the current preview. This method serves as a way for embedded tags
+   * like the {@link PagePreviewTag} to get to their data.
+   * 
+   * @return the current page preview
+   */
+  public Composer getPagePreview() {
+    return preview;
+  }
+
+  /**
+   * Returns the current page's url. This method serves as a way for embedded
+   * tags like the {@link PagePreviewTag} to get to their data.
+   * 
+   * @return the page's url
+   */
+  public WebUrl getPageUrl() {
+    return url;
   }
 
   /**
@@ -141,7 +181,7 @@ public class PageHeaderListTag extends WebloungeTag {
     index = 0;
     pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
     try {
-      return (loadNextHeadline()) ? EVAL_BODY_INCLUDE : SKIP_BODY;
+      return (loadNextPage()) ? EVAL_BODY_INCLUDE : SKIP_BODY;
     } catch (ContentRepositoryException e) {
       throw new JspException(e);
     }
@@ -153,7 +193,7 @@ public class PageHeaderListTag extends WebloungeTag {
   public int doAfterBody() throws JspException {
     index++;
     try {
-      if (index < count && loadNextHeadline())
+      if (index < count && loadNextPage())
         return EVAL_BODY_AGAIN;
       else
         return SKIP_BODY;
@@ -166,22 +206,23 @@ public class PageHeaderListTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(PageHeaderListTagVariables.URL);
-    pageContext.removeAttribute(PageHeaderListTagVariables.PREVIEW);
+    pageContext.removeAttribute(PageListTagVariables.URL);
+    pageContext.removeAttribute(PageListTagVariables.PREVIEW);
+    pageContext.removeAttribute(PageListTagVariables.PAGE);
     request.setAttribute(WebloungeRequest.PAGELET, pagelet);
     reset();
     return super.doEndTag();
   }
 
   /**
-   * Loads the next headline, puts it into the request and returns
-   * <code>true</code> if a suitable headline was found, false otherwise.
+   * Loads the next page, puts it into the request and returns <code>true</code>
+   * if a suitable page was found, false otherwise.
    * 
-   * @return <code>true</code> if a headline was found
+   * @return <code>true</code> if a suitable page was found
    * @throws ContentRepositoryException
    *           if loading the pages fails
    */
-  private boolean loadNextHeadline() throws ContentRepositoryException {
+  private boolean loadNextPage() throws ContentRepositoryException {
     Site site = request.getSite();
 
     // Check if headers have already been loaded
@@ -201,19 +242,21 @@ public class PageHeaderListTag extends WebloungeTag {
 
     boolean found = false;
     SearchResultItem item = null;
+    Page page = null;
     Composer preview = null;
     WebUrl url = null;
-    
+
     // Look for the next header
     while (!found && index < pages.getItems().length) {
       item = pages.getItems()[index];
       url = item.getUrl();
+      page = item.getPage();
 
       // Read the preview
       PagePreviewReader previewReader = new PagePreviewReader();
       try {
         String previewXml = item.getPreview().toString();
-        InputStream previewIs = new ByteArrayInputStream(previewXml.getBytes()); 
+        InputStream previewIs = new ByteArrayInputStream(previewXml.getBytes());
         preview = previewReader.read(previewIs, item.getPageURI());
       } catch (Exception e) {
         logger.error("Error reading page {} preview: " + e.getMessage(), e);
@@ -235,14 +278,18 @@ public class PageHeaderListTag extends WebloungeTag {
           break;
         }
       }
-      
-      index ++;
+
+      index++;
     }
 
     // Set the headline in the request
     if (found) {
-      pageContext.setAttribute(PageHeaderListTagVariables.URL, url);
-      pageContext.setAttribute(PageHeaderListTagVariables.PREVIEW, preview);
+      pageContext.setAttribute(PageListTagVariables.URL, url);
+      pageContext.setAttribute(PageListTagVariables.PAGE, page);
+      pageContext.setAttribute(PageListTagVariables.PREVIEW, preview);
+      this.page = page;
+      this.preview = preview;
+      this.url = url;
     }
 
     return found;

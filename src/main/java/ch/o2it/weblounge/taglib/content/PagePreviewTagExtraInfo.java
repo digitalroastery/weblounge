@@ -21,6 +21,8 @@
 package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.content.Composer;
+import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.url.WebUrl;
 
 import javax.servlet.jsp.tagext.TagData;
@@ -28,10 +30,10 @@ import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.VariableInfo;
 
 /**
- * This class provides runtime information about the
- * <code>PageHeaderListTag</code> jsp tag.
+ * This class provides runtime information about the <code>PagePreviewTag</code>
+ * jsp tag.
  */
-public class PageHeaderListTagExtraInfo extends TagExtraInfo {
+public class PagePreviewTagExtraInfo extends TagExtraInfo {
 
   /**
    * Returns the information on the exported tag variables.
@@ -40,8 +42,10 @@ public class PageHeaderListTagExtraInfo extends TagExtraInfo {
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
-      new VariableInfo(PageHeaderListTagVariables.URL, WebUrl.class.getName(), true, VariableInfo.NESTED),
-      new VariableInfo(PageHeaderListTagVariables.PREVIEW, Composer.class.getName(), true, VariableInfo.NESTED)
+        new VariableInfo(PagePreviewTagVariables.URL, WebUrl.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(PagePreviewTagVariables.PREVIEW, Composer.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(PagePreviewTagVariables.PAGE, Page.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(PagePreviewTagVariables.PAGELET, Pagelet.class.getName(), true, VariableInfo.NESTED)
     };
   }
 
