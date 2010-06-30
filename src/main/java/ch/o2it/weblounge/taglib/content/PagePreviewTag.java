@@ -232,8 +232,11 @@ public class PagePreviewTag extends WebloungeTag {
     oldPagelet = request.getAttribute(WebloungeRequest.PAGELET);
 
     // Define the current values in the page context
+    request.setAttribute(PagePreviewTagVariables.URL, pageUrl);
+    request.setAttribute(PagePreviewTagVariables.PAGE, page);
+    request.setAttribute(PagePreviewTagVariables.PREVIEW, pagePreview);
+
     pageContext.setAttribute(PagePreviewTagVariables.URL, pageUrl);
-    pageContext.setAttribute(PagePreviewTagVariables.PAGE, page);
     pageContext.setAttribute(PagePreviewTagVariables.PREVIEW, pagePreview);
 
     // Add included page url to tags
@@ -272,7 +275,6 @@ public class PagePreviewTag extends WebloungeTag {
   public int doEndTag() throws JspException {
     pageContext.removeAttribute(PagePreviewTagVariables.URL);
     pageContext.removeAttribute(PagePreviewTagVariables.PREVIEW);
-    pageContext.removeAttribute(PagePreviewTagVariables.PAGE);
     pageContext.removeAttribute(PagePreviewTagVariables.PAGELET);
 
     request.setAttribute(WebloungeRequest.PAGE, oldPage);

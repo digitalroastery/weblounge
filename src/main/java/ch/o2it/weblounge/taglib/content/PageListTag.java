@@ -206,9 +206,8 @@ public class PageListTag extends WebloungeTag {
    * @see javax.servlet.jsp.tagext.Tag#doEndTag()
    */
   public int doEndTag() throws JspException {
-    pageContext.removeAttribute(PageListTagVariables.URL);
-    pageContext.removeAttribute(PageListTagVariables.PREVIEW);
-    pageContext.removeAttribute(PageListTagVariables.PAGE);
+    pageContext.removeAttribute(PageListTagExtraInfo.PREVIEW);
+    pageContext.removeAttribute(PageListTagExtraInfo.PREVIEW_PAGE);
     request.setAttribute(WebloungeRequest.PAGELET, pagelet);
     reset();
     return super.doEndTag();
@@ -250,7 +249,7 @@ public class PageListTag extends WebloungeTag {
     while (!found && index < pages.getItems().length) {
       item = pages.getItems()[index];
       url = item.getUrl();
-      page = item.getPage();
+      //page = item.getPage();
 
       // Read the preview
       PagePreviewReader previewReader = new PagePreviewReader();
@@ -284,9 +283,8 @@ public class PageListTag extends WebloungeTag {
 
     // Set the headline in the request
     if (found) {
-      pageContext.setAttribute(PageListTagVariables.URL, url);
-      pageContext.setAttribute(PageListTagVariables.PAGE, page);
-      pageContext.setAttribute(PageListTagVariables.PREVIEW, preview);
+      pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
+      pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
       this.page = page;
       this.preview = preview;
       this.url = url;

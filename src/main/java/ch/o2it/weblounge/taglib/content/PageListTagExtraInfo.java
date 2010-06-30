@@ -22,7 +22,6 @@ package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.url.WebUrl;
 
 import javax.servlet.jsp.tagext.TagData;
 import javax.servlet.jsp.tagext.TagExtraInfo;
@@ -34,6 +33,12 @@ import javax.servlet.jsp.tagext.VariableInfo;
  */
 public class PageListTagExtraInfo extends TagExtraInfo {
 
+  /** Script variable representing the preview composer */
+  public static final String PREVIEW = "previewComposer";
+
+  /** Script variable representing the previewed page */
+  public static final String PREVIEW_PAGE = "previewPage";
+
   /**
    * Returns the information on the exported tag variables.
    * 
@@ -41,9 +46,8 @@ public class PageListTagExtraInfo extends TagExtraInfo {
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
-      new VariableInfo(PageListTagVariables.URL, WebUrl.class.getName(), true, VariableInfo.NESTED),
-      new VariableInfo(PageListTagVariables.PREVIEW, Composer.class.getName(), true, VariableInfo.NESTED),
-      new VariableInfo(PageListTagVariables.PAGE, Page.class.getName(), true, VariableInfo.NESTED),
+      new VariableInfo(PageListTagExtraInfo.PREVIEW, Composer.class.getName(), true, VariableInfo.NESTED),
+      new VariableInfo(PageListTagExtraInfo.PREVIEW_PAGE, Page.class.getName(), true, VariableInfo.NESTED)
     };
   }
 
