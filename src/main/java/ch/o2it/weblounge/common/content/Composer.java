@@ -40,4 +40,17 @@ public interface Composer {
    */
   Pagelet[] getPagelets();
 
+  /**
+   * Returns the list of pagelets contained in the composer that match the type
+   * specified by <code>module</code> and <code>renderer</code>. If there are
+   * no matching pagelets, the method return an empty array.
+   * 
+   * @param module
+   *          the module
+   * @param renderer
+   *          the renderer
+   * @return the list of matching pagelets
+   */
+  Pagelet[] getPagelets(String module, String renderer);
+
 }
