@@ -1,29 +1,28 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="weblounge-site" version="2.5">
 
-	<display-name>Weblounge Tag Library</display-name>
-
-    <!-- =================================================================== -->
-    <!-- Taglibs		                                                     -->
-    <!-- =================================================================== -->
+	<display-name>Weblounge Site</display-name>
 
 	<jsp-config>
-      <taglib>
-        <taglib-uri>greeter.tld</taglib-uri>
-        <taglib-location>/WEB-INF/greeter.tld</taglib-location>
-      </taglib>
-      <taglib>
-        <taglib-uri>weblounge-content.tld</taglib-uri>
-        <taglib-location>/WEB-INF/weblounge-content.tld</taglib-location>
-      </taglib>
-      <taglib>
-        <taglib-uri>weblounge-security.tld</taglib-uri>
-        <taglib-location>/WEB-INF/weblounge-security.tld</taglib-location>
-      </taglib>
-      <taglib>
-        <taglib-uri>weblounge-util.tld</taglib-uri>
-        <taglib-location>/WEB-INF/weblounge-util.tld</taglib-location>
-      </taglib>
+		<taglib>
+			<taglib-uri>greeter.tld</taglib-uri>
+			<taglib-location>/WEB-INF/greeter.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>weblounge-content.tld</taglib-uri>
+			<taglib-location>/WEB-INF/weblounge-content.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>weblounge-security.tld</taglib-uri>
+			<taglib-location>/WEB-INF/weblounge-security.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>weblounge-util.tld</taglib-uri>
+			<taglib-location>/WEB-INF/weblounge-util.tld</taglib-location>
+		</taglib>
 	</jsp-config>
 
 </web-app>
