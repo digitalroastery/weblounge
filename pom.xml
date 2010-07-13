@@ -35,10 +35,10 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.common-api</Bundle-SymbolicName>
             <Import-Package>
-              org.apache.commons.lang,
+              org.apache.commons.lang;version="2.4",
               javax.security.auth.login,
               javax.security.auth.spi,
-              javax.servlet.http
+              javax.servlet.http;version="2.5"
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.common;version=${project.version},
