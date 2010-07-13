@@ -17,25 +17,25 @@
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-dispatcher-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-contentrepository-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-cache-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- osgi support -->
@@ -120,22 +120,22 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.dispatcher</Bundle-SymbolicName>
             <Import-Package>
-              ch.o2it.weblounge.common,
-              ch.o2it.weblounge.common.content,
-              ch.o2it.weblounge.common.impl.content,
-              ch.o2it.weblounge.common.impl.page,
-              ch.o2it.weblounge.common.impl.request,
-              ch.o2it.weblounge.common.impl.site, 
-              ch.o2it.weblounge.common.impl.url,
-              ch.o2it.weblounge.common.impl.util,
-              ch.o2it.weblounge.common.impl.util.classloader,
-              ch.o2it.weblounge.common.language,
-              ch.o2it.weblounge.common.request,
-              ch.o2it.weblounge.common.site,
-              ch.o2it.weblounge.common.url,
-              ch.o2it.weblounge.common.user,
-              ch.o2it.weblounge.contentrepository,
-              ch.o2it.weblounge.dispatcher,
+              ch.o2it.weblounge.common;version=${project.version},
+              ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.common.impl.content;version=${project.version},
+              ch.o2it.weblounge.common.impl.page;version=${project.version},
+              ch.o2it.weblounge.common.impl.request;version=${project.version},
+              ch.o2it.weblounge.common.impl.site;version=${project.version}, 
+              ch.o2it.weblounge.common.impl.url;version=${project.version},
+              ch.o2it.weblounge.common.impl.util;version=${project.version},
+              ch.o2it.weblounge.common.impl.util.classloader;version=${project.version},
+              ch.o2it.weblounge.common.language;version=${project.version},
+              ch.o2it.weblounge.common.request;version=${project.version},
+              ch.o2it.weblounge.common.site;version=${project.version},
+              ch.o2it.weblounge.common.url;version=${project.version},
+              ch.o2it.weblounge.common.user;version=${project.version},
+              ch.o2it.weblounge.contentrepository;version=${project.version},
+              ch.o2it.weblounge.dispatcher;version=${project.version},
               javax.activation,
               javax.el;version="2.0.0",
               javax.servlet;version="2.4.0",
@@ -156,7 +156,7 @@
               org.osgi.util.tracker
             </Import-Package>
             <Export-Package>
-          	  ch.o2it.weblounge.dispatcher.impl
+          	  ch.o2it.weblounge.dispatcher.impl;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/contentrepository-factory.xml,
