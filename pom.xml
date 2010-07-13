@@ -52,9 +52,9 @@
             <Import-Package>
               ch.o2it.weblounge.common.request;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},
-              javax.servlet,
-              javax.servlet.http,
-              org.osgi.framework
+              javax.servlet;version="2.5",
+              javax.servlet.http;version="2.5",
+              org.osgi.framework;version="1.4.0"
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.dispatcher;version=${project.version}
