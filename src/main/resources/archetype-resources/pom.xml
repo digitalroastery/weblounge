@@ -78,10 +78,10 @@
         <configuration>
           <instructions>
             <Import-Package>
-              ch.o2it.weblounge.common.site,
-              ch.o2it.weblounge.common.impl.site,
-              ch.o2it.weblounge.taglib,
-              ch.o2it.weblounge.taglib.content,
+              ch.o2it.weblounge.common.site;version=3.0-SNAPSHOT,
+              ch.o2it.weblounge.common.impl.site;version=3.0-SNAPSHOT,
+              ch.o2it.weblounge.taglib;version=3.0-SNAPSHOT,
+              ch.o2it.weblounge.taglib.content;version=3.0-SNAPSHOT,
               javax.servlet.jsp,
               javax.servlet.jsp.tagext,
               org.slf4j,
