@@ -17,19 +17,19 @@
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-cache-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- osgi support -->
@@ -86,12 +86,12 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.cache</Bundle-SymbolicName>
             <Import-Package>
-              ch.o2it.weblounge.cache,
-              ch.o2it.weblounge.common,
-              ch.o2it.weblounge.common.content,
-              ch.o2it.weblounge.common.impl.request,
-              ch.o2it.weblounge.common.impl.util.datatype,
-              ch.o2it.weblounge.common.request,
+              ch.o2it.weblounge.cache;version=${project.version},
+              ch.o2it.weblounge.common;version=${project.version},
+              ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.common.impl.request;version=${project.version},
+              ch.o2it.weblounge.common.impl.util.datatype;version=${project.version},
+              ch.o2it.weblounge.common.request;version=${project.version},
               org.apache.commons.lang,
               org.slf4j,
               javax.servlet,
@@ -100,7 +100,7 @@
               org.osgi.service.component,
             </Import-Package>
             <Export-Package>
-              ch.o2it.weblounge.cache.impl
+              ch.o2it.weblounge.cache.impl;version=${project.version}
             </Export-Package>
             <Private-Package>
               ch.o2it.weblounge.cache.impl.filter,
