@@ -82,9 +82,9 @@
               ch.o2it.weblounge.common.impl.site;version=3.0-SNAPSHOT,
               ch.o2it.weblounge.taglib;version=3.0-SNAPSHOT,
               ch.o2it.weblounge.taglib.content;version=3.0-SNAPSHOT,
-              javax.servlet.jsp,
-              javax.servlet.jsp.tagext,
-              org.slf4j,
+              javax.servlet.jsp;version="2.1.0",
+              javax.servlet.jsp.tagext;version="2.1.0",
+              org.slf4j;version="1.5.6",
               *;resolution:=optional
             </Import-Package>
             <Service-Component>
