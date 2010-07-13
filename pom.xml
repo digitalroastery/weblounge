@@ -17,19 +17,19 @@
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-contentrepository-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 	
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- osgi support -->
@@ -182,6 +182,18 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.contentrepository</Bundle-SymbolicName>
+            <Import-Package>
+              ch.o2it.weblounge.contentrepository;version=${project.version},
+              *;resolution:=optional
+            </Import-Package>
+            <Export-Package>
+              ch.o2it.weblounge.contentrepository.impl;version=${project.version},
+              ch.o2it.weblounge.contentrepository.impl.bundle;version=${project.version},
+              ch.o2it.weblounge.contentrepository.impl.fs;version=${project.version},
+              ch.o2it.weblounge.contentrepository.impl.index;version=${project.version},
+              ch.o2it.weblounge.contentrepository.impl.index.solr;version=${project.version},
+              ch.o2it.weblounge.contentrepository.impl.jcr;version=${project.version}
+            </Export-Package>
             <Embed-Dependency>
               jcr;inline=true,
               lucene-analyzers;inline=true,
@@ -203,18 +215,6 @@
               org.apache.solr.*;-split-package:=merge-first,
               org.apache.lucene.*;-split-package:=merge-first
             </Private-Package>
-            <Export-Package>
-              ch.o2it.weblounge.contentrepository.impl,
-              ch.o2it.weblounge.contentrepository.impl.bundle,
-              ch.o2it.weblounge.contentrepository.impl.fs,
-              ch.o2it.weblounge.contentrepository.impl.index,
-              ch.o2it.weblounge.contentrepository.impl.index.solr,
-              ch.o2it.weblounge.contentrepository.impl.jcr
-            </Export-Package>
-            <Import-Package>
-              ch.o2it.weblounge.contentrepository,
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/contentrepository-service.xml
             </Service-Component>
