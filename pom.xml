@@ -17,7 +17,7 @@
 	<dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   
     <!-- thirdparty -->
@@ -38,10 +38,10 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.cache-api</Bundle-SymbolicName>
             <Import-Package>
-              ch.o2it.weblounge.common.request
+              ch.o2it.weblounge.common.request;version=${project.version}
             </Import-Package>
             <Export-Package>
-              ch.o2it.weblounge.cache
+              ch.o2it.weblounge.cache;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
