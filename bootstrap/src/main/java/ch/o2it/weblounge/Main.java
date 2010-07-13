@@ -21,7 +21,7 @@
 package ch.o2it.weblounge;
 
 /**
- * This is a dummy java file for the opencast-bootstrap module. This module's
+ * This is a dummy java file for the weblounge-bootstrap module. This module's
  * purpose is to download runtime dependencies from maven repositories. It
  * provides no code itself.
  */
