@@ -51,7 +51,7 @@ import javax.xml.xpath.XPath;
 public class I18nDictionaryImpl implements I18nDictionary {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(I18nDictionaryImpl.class);
+  private final static Logger logger = LoggerFactory.getLogger(I18nDictionaryImpl.class);
 
   /** The i18n directories */
   protected Map<Language, Properties> i18n = new HashMap<Language, Properties>();
@@ -93,7 +93,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
     if (p.get(key) == null) {
       p.put(key, value);
     } else {
-      log_.warn("I18n key '{}' already defined", key);
+      logger.warn("I18n key '{}' already defined", key);
     }
   }
 
@@ -219,9 +219,9 @@ public class I18nDictionaryImpl implements I18nDictionary {
       Document doc = docBuilder.parse(url.openStream());
 
       if (language != null)
-        log_.debug("Reading i18n dictionary {} ({})", url.getFile(), language);
+        logger.debug("Reading i18n dictionary {} ({})", url.getFile(), language);
       else
-        log_.debug("Reading default i18n dictionary {}", url.getFile());
+        logger.debug("Reading default i18n dictionary {}", url.getFile());
 
       // Get the target properties
 
@@ -245,23 +245,23 @@ public class I18nDictionaryImpl implements I18nDictionary {
         String key = XPathHelper.valueOf(messageNode, "@name", path);
         String value = XPathHelper.valueOf(messageNode, "value/text()", path);
         if (p.containsKey(key)) {
-          log_.warn("I18n key '{}' redefined in {}", key, url);
+          logger.warn("I18n key '{}' redefined in {}", key, url);
         }
         if (key == null) {
-          log_.warn("I18n dictionary {} contains invalid key (null)", url);
+          logger.warn("I18n dictionary {} contains invalid key (null)", url);
           continue;
         } else if (value == null) {
-          log_.warn("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
+          logger.warn("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
           continue;
         }
         p.put(key, value);
       }
     } catch (ParserConfigurationException e) {
-      log_.warn("Parser configuration error when reading i18n dictionary {}: {}", url, e.getMessage());
+      logger.warn("Parser configuration error when reading i18n dictionary {}: {}", url, e.getMessage());
     } catch (SAXException e) {
-      log_.warn("SAX exception while parsing i18n dictionary {}: {}", url, e.getMessage());
+      logger.warn("SAX exception while parsing i18n dictionary {}: {}", url, e.getMessage());
     } catch (IOException e) {
-      log_.warn("IO exception while parsing i18n dictionary {}: {}", url, e.getMessage());
+      logger.warn("IO exception while parsing i18n dictionary {}: {}", url, e.getMessage());
     }
   }
 

@@ -47,7 +47,7 @@ import javax.xml.parsers.SAXParserFactory;
 public final class PageletReader extends WebloungeContentReader {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(PageletReader.class);
+  private final static Logger logger = LoggerFactory.getLogger(PageletReader.class);
 
   /** The pagelet data */
   private PageletImpl pagelet = null;
@@ -122,7 +122,7 @@ public final class PageletReader extends WebloungeContentReader {
       String module = attrs.getValue("module");
       String id = attrs.getValue("id");
       pagelet = new PageletImpl(pageletLocation, module, id);
-      log_.debug("Started reading pagelet {}", pagelet);
+      logger.debug("Started reading pagelet {}", pagelet);
     }
 
     // locale
@@ -159,7 +159,7 @@ public final class PageletReader extends WebloungeContentReader {
 
     // pagelet
     if ("pagelet".equals(raw)) {
-      log_.debug("Finished reading pagelet {}", pagelet);
+      logger.debug("Finished reading pagelet {}", pagelet);
     }
 
     // text
@@ -167,16 +167,16 @@ public final class PageletReader extends WebloungeContentReader {
       String id = (String) clipboard.get("text.id");
       Language l = (Language) clipboard.get("language");
       pagelet.setContent(id, getCharacters(), l);
-      if (log_.isTraceEnabled())
-        log_.trace("Adding " + l.toString().toLowerCase() + " text '" + getCharacters() + "'");
+      if (logger.isTraceEnabled())
+        logger.trace("Adding " + l.toString().toLowerCase() + " text '" + getCharacters() + "'");
     }
 
     // property
     else if ("property".equals(raw)) {
       String id = (String) clipboard.get("property.id");
       pagelet.setProperty(id, getCharacters());
-      if (log_.isTraceEnabled())
-        log_.trace("Setting property '" + id + " to '" + getCharacters() + "'");
+      if (logger.isTraceEnabled())
+        logger.trace("Setting property '" + id + " to '" + getCharacters() + "'");
     }
 
     super.endElement(uri, local, raw);

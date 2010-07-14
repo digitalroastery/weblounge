@@ -43,7 +43,7 @@ import javax.xml.xpath.XPathFactory;
 public final class LanguageSupport {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(LanguageSupport.class);
+  private final static Logger logger = LoggerFactory.getLogger(LanguageSupport.class);
 
   /** Globally available languages */
   private final static Map<String, Language> systemLanguages = new HashMap<String, Language>();
@@ -197,7 +197,7 @@ public final class LanguageSupport {
         String lAttrib = XPathHelper.valueOf(name, "@language", xpath);
         Language language = LanguageSupport.getLanguage(lAttrib);
         if (language == null) {
-          log_.debug("Found name in unsupported language {}", lAttrib);
+          logger.debug("Found name in unsupported language {}", lAttrib);
           continue;
         }
 
@@ -208,14 +208,14 @@ public final class LanguageSupport {
         }
 
         // Add the entry
-        log_.debug("Found description {}", description);
+        logger.debug("Found description {}", description);
         o.put(description, language);
         if (language.equals(defaultLanguage)) {
           o.setDefaultLanguage(defaultLanguage);
         }
       }
     } catch (Exception e1) {
-      log_.warn("Error when reading language versions");
+      logger.warn("Error when reading language versions");
     }
     return o;
   }

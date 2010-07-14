@@ -47,7 +47,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   private static final long serialVersionUID = -5815146954734580746L;
 
   /** The logging facility */
-  private static Logger log_ = LoggerFactory.getLogger(WebUrlImpl.class);
+  private static Logger logger = LoggerFactory.getLogger(WebUrlImpl.class);
 
   /** Regular expression for /path/to/resource/work_de.html */
   private final static Pattern pathInspector = Pattern.compile("^(.*)/(work|index|live|[0-9]*)(_[a-zA-Z]+)?\\.([a-zA-Z0-9]+)$");
@@ -210,7 +210,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       try {
         link_ = URLEncoder.encode(getLink(-1, null, null), "UTF-8");
       } catch (UnsupportedEncodingException e) {
-        log_.error("Unexpected error while urlencoding link {}", link_, e);
+        logger.error("Unexpected error while urlencoding link {}", link_, e);
       }
       link_ = link_.replaceAll("%2F", "/");
     }
@@ -461,7 +461,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
         try {
           this.flavor = RequestFlavor.parseString(f);
         } catch (IllegalArgumentException e) {
-          log_.debug("Found unknwon request flavor {}", f);
+          logger.debug("Found unknwon request flavor {}", f);
         }
       return trim(pathMatcher.group(1));
     }
@@ -491,7 +491,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
           this.flavor = RequestFlavor.parseString(f);
           group--;
         } catch (IllegalArgumentException e) {
-          log_.debug("Found unknown request flavor {}", f);
+          logger.debug("Found unknown request flavor {}", f);
         }
       }
 

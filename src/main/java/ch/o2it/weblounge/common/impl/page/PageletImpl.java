@@ -77,7 +77,7 @@ import java.util.Map.Entry;
 public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(Pagelet.class);
+  protected final static Logger logger = LoggerFactory.getLogger(Pagelet.class);
 
   /** Module that defined the pagelet */
   private String moduleId = null;

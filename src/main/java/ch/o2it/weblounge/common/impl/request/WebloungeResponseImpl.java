@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 public class WebloungeResponseImpl extends HttpServletResponseWrapper implements WebloungeResponse {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(WebloungeResponseImpl.class);
+  private final static Logger logger = LoggerFactory.getLogger(WebloungeResponseImpl.class);
 
   /** Flag for invalidated responses that should not be cached */
   private boolean isValid = false;
@@ -342,7 +342,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     try {
       handle = cache.startResponsePart(uniqueTags, this, validTime, recheckTime);
     } catch (Exception e) {
-      log_.warn("Error starting response part in cache", e);
+      logger.warn("Error starting response part in cache", e);
       return false;
     }
 
@@ -373,7 +373,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     try {
       cache.endResponse(this);
     } catch (Exception e) {
-      log_.warn("Error sending end of response to cache", e);
+      logger.warn("Error sending end of response to cache", e);
     } finally {
       cacheHandles.clear();
       cacheHandles = null;
@@ -394,7 +394,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     try {
       cache.endResponsePart(handle, this);
     } catch (Exception e) {
-      log_.warn("Error sending end of response part to cache", e);
+      logger.warn("Error sending end of response part to cache", e);
     }
   }
 

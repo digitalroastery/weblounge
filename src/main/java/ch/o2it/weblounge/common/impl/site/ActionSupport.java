@@ -80,7 +80,7 @@ import javax.xml.xpath.XPathFactory;
 public abstract class ActionSupport extends GeneralComposeable implements Action {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(ActionSupport.class);
+  private final static Logger logger = LoggerFactory.getLogger(ActionSupport.class);
 
   /** The action mountpoint */
   protected String mountpoint = null;
@@ -365,7 +365,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       try {
         files = upload.parseRequest(request);
       } catch (FileUploadException e) {
-        log_.error("Error parsing uploads: {}", e.getMessage(), e);
+        logger.error("Error parsing uploads: {}", e.getMessage(), e);
       }
     }
 
@@ -433,7 +433,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
     rendererTagSet.add(CacheTag.Parameters, Integer.toString(parameterCount));
     if (response.startResponsePart(rendererTagSet, validTime, recheckTime)) {
-      log_.debug("Action handler {} answered request for {} from cache", this, renderer);
+      logger.debug("Action handler {} answered request for {} from cache", this, renderer);
       return;
     }
 
@@ -548,7 +548,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       String msg = "Trying to include unknown renderer '" + renderer + "'";
       throw new ActionException(new IllegalArgumentException(msg));
     }
-    log_.debug("Including renderer {}", renderer);
+    logger.debug("Including renderer {}", renderer);
     include(request, response, r, data);
   }
 
@@ -591,7 +591,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.o2it.weblounge.common.site.Action#activate()
    */
   public void activate() {
-    log_.trace("Activating action {}", this);
+    logger.trace("Activating action {}", this);
   }
 
   /**
@@ -603,7 +603,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.o2it.weblounge.common.site.Action#passivate()
    */
   public void passivate() {
-    log_.trace("Passivating action {}", this);
+    logger.trace("Passivating action {}", this);
     flavor = null;
     files = null;
     includeCount = 0;

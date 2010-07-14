@@ -79,7 +79,7 @@ public final class QuartzJobTrigger extends Trigger {
   private static final int YEAR_TO_GIVEUP_SCHEDULING_AT = 2299;
 
   /** The logger */
-  private static final Logger log_ = LoggerFactory.getLogger(QuartzJobTrigger.class);
+  private static final Logger logger = LoggerFactory.getLogger(QuartzJobTrigger.class);
   
   /** Weblounge job trigger */
   private JobTrigger trigger = null;
@@ -239,7 +239,7 @@ public final class QuartzJobTrigger extends Trigger {
     try {
       return trigger.getNextExecutionAfter(date);
     } catch (Exception e) {
-      log_.error("Job implementation threw exception when asked for next trigger date", e);
+      logger.error("Job implementation threw exception when asked for next trigger date", e);
       return null;
     }
   }
@@ -306,7 +306,7 @@ public final class QuartzJobTrigger extends Trigger {
       previousFireTime = nextFireTime;
       trigger.triggered(previousFireTime);
     } catch (Exception e) {
-      log_.error("Job implementation threw exception on trigger callback", e);
+      logger.error("Job implementation threw exception on trigger callback", e);
     } finally {
       nextFireTime = getFireTimeAfter(nextFireTime);
     }

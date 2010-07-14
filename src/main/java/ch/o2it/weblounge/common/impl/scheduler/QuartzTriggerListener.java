@@ -38,7 +38,7 @@ import java.util.Date;
 public final class QuartzTriggerListener implements TriggerListener {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(QuartzTriggerListener.class);
+  protected final static Logger logger = LoggerFactory.getLogger(QuartzTriggerListener.class);
 
   /** Date formatter */
   private static DateFormat df = new SimpleDateFormat();
@@ -81,11 +81,11 @@ public final class QuartzTriggerListener implements TriggerListener {
     String jobName = ctx.getJobDetail().getName();
     Date nextExecution = ctx.getNextFireTime();
     if (nextExecution != null)
-      log_.debug("Job {} finished, next execution scheduled for ", new Object[] {
+      logger.debug("Job {} finished, next execution scheduled for ", new Object[] {
           jobName,
           df.format(nextExecution) });
     else
-      log_.debug("Job {} finished", jobName);
+      logger.debug("Job {} finished", jobName);
   }
 
   /**
@@ -96,7 +96,7 @@ public final class QuartzTriggerListener implements TriggerListener {
    */
   public void triggerFired(Trigger trigger, JobExecutionContext ctx) {
     String jobName = ctx.getJobDetail().getName();
-    log_.debug("Executing job {} of site {}", jobName, site);
+    logger.debug("Executing job {} of site {}", jobName, site);
   }
 
   /**
@@ -105,7 +105,7 @@ public final class QuartzTriggerListener implements TriggerListener {
    * @see org.quartz.TriggerListener#triggerMisfired(org.quartz.Trigger)
    */
   public void triggerMisfired(Trigger trigger) {
-    log_.error("Failed to fire job trigger {}", trigger.getName());
+    logger.error("Failed to fire job trigger {}", trigger.getName());
   }
 
   /**

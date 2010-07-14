@@ -51,7 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class AbstractRenderer extends GeneralComposeable implements Renderer {
 
   /** The logging facility */
-  private static final Logger log_ = LoggerFactory.getLogger(AbstractRenderer.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractRenderer.class);
 
   /** Renderer URL */
   protected URL renderer = null;
@@ -181,10 +181,10 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
         // Find the best match for the template
         String[] filePaths = LanguageSupport.getLanguageVariantsByPriority(renderer.toExternalForm(), language, site.getDefaultLanguage());
         for (String path : filePaths) {
-          log_.trace("Looking for jsp {}", path);
+          logger.trace("Looking for jsp {}", path);
           File f = new File(path);
           if (f.exists()) {
-            log_.debug("Found jsp at {}", path);
+            logger.debug("Found jsp at {}", path);
             jsp = f;
             break;
           }
@@ -222,11 +222,11 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
         throw new IllegalStateException("No dispatcher found for site '" + site + "'");
         
       // Finally serve the JSP
-      log_.debug("Including jsp {}", renderer);
+      logger.debug("Including jsp {}", renderer);
       dispatcher.include(siteRequest, response);
       
     } catch (IOException e) {
-      log_.error("Exception while including jsp {}", renderer, e);
+      logger.error("Exception while including jsp {}", renderer, e);
     } catch (Throwable t) {
       throw new RenderException(this, t);
     }

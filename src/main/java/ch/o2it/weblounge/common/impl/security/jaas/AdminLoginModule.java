@@ -41,7 +41,7 @@ import javax.security.auth.login.LoginException;
 public class AdminLoginModule extends AbstractLoginModule {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(AdminLoginModule.class);
+  private final static Logger logger = LoggerFactory.getLogger(AdminLoginModule.class);
 
   /**
    * @see ch.o2it.weblounge.core.security.jaas.AbstractLoginModule#checkUserAndPassword()
@@ -64,7 +64,7 @@ public class AdminLoginModule extends AbstractLoginModule {
 
       return false;
     } else {
-      log_.warn("Admin login module received unknown callback handler!");
+      logger.warn("Admin login module received unknown callback handler!");
       return false;
     }
   }

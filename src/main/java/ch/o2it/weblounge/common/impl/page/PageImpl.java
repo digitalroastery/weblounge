@@ -1146,10 +1146,10 @@ public class PageImpl extends LocalizableObject implements Page {
      * try { InputSource is = new InputSource(new StringReader(b.toString()));
      * DocumentBuilder docBuilder = XMLUtilities.getDocumentBuilder(); Document
      * doc = docBuilder.parse(is); return doc.getFirstChild(); } catch
-     * (SAXException e) { log_.error("Error building dom tree for pagelet", e);
-     * } catch (IOException e) { log_.error("Error reading pagelet xml", e); }
+     * (SAXException e) { logger.error("Error building dom tree for pagelet", e);
+     * } catch (IOException e) { logger.error("Error reading pagelet xml", e); }
      * catch (ParserConfigurationException e) {
-     * log_.error("Error parsing pagelet xml", e); }
+     * logger.error("Error parsing pagelet xml", e); }
      */
 
     return b.toString();

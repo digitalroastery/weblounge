@@ -41,7 +41,7 @@ import java.util.Map;
 public final class ActionPoolFactory extends BasePoolableObjectFactory {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(ActionPoolFactory.class);
+  private final static Logger logger = LoggerFactory.getLogger(ActionPoolFactory.class);
 
   /** The action blueprint */
   protected Action blueprint = null;
@@ -64,7 +64,7 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
    */
   @Override
   public Object makeObject() throws Exception {
-    log_.debug("Creating new action '{}'", blueprint.getIdentifier());
+    logger.debug("Creating new action '{}'", blueprint.getIdentifier());
     
     Action action = blueprint.getClass().newInstance();
     
@@ -128,11 +128,11 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
   @Override
   public void destroyObject(Object obj) throws Exception {
     Action action = (Action) obj;
-    log_.debug("Destroying action '{}'", action.getIdentifier());
+    logger.debug("Destroying action '{}'", action.getIdentifier());
     try {
       action.passivate();
     } catch (Throwable t) {
-      log_.error("Error destroying action: {}", t.getMessage(), t);
+      logger.error("Error destroying action: {}", t.getMessage(), t);
     }
     super.destroyObject(obj);
   }
@@ -145,11 +145,11 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
   @Override
   public void activateObject(Object obj) throws Exception {
     Action action = (Action) obj;
-    log_.debug("Activating action '{}'", action.getIdentifier());
+    logger.debug("Activating action '{}'", action.getIdentifier());
     try {
       action.activate();
     } catch (Throwable t) {
-      log_.error("Error destroying action: {}", t.getMessage(), t);
+      logger.error("Error destroying action: {}", t.getMessage(), t);
     }
     super.activateObject(obj);
   }
@@ -162,11 +162,11 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
   @Override
   public void passivateObject(Object obj) throws Exception {
     Action action = (Action) obj;
-    log_.debug("Passivating action '{}'", action.getIdentifier());
+    logger.debug("Passivating action '{}'", action.getIdentifier());
     try {
       action.passivate();
     } catch (Throwable t) {
-      log_.error("Error destroying action: {}", t.getMessage(), t);
+      logger.error("Error destroying action: {}", t.getMessage(), t);
     }
     super.passivateObject(obj);
   }

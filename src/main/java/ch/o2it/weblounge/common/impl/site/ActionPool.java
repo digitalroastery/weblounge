@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public final class ActionPool extends GenericObjectPool {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(ActionPool.class);
+  private final static Logger logger = LoggerFactory.getLogger(ActionPool.class);
   
   /** The action name */
   private String actionName = null;
@@ -65,16 +65,16 @@ public final class ActionPool extends GenericObjectPool {
   @Override
   public Object borrowObject() throws Exception {
     Action action = (Action) super.borrowObject();
-    log_.debug("Received request to borrow action '{}', {} remaining", action.getIdentifier(), this.getNumIdle());
+    logger.debug("Received request to borrow action '{}', {} remaining", action.getIdentifier(), this.getNumIdle());
 
     if (getNumActive() > reportedLimit + 10) {
       reportedLimit += 10;
-      log_.info("Action pool '{}' grew above {}", new Object[] {
+      logger.info("Action pool '{}' grew above {}", new Object[] {
           action,
           reportedLimit }
       );
     } else {
-      log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
+      logger.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
           action,
           this.getNumActive(),
           this.getNumIdle() });
@@ -91,19 +91,19 @@ public final class ActionPool extends GenericObjectPool {
   public void returnObject(Object obj) throws Exception {
     super.returnObject(obj);
     Action action = (Action)obj;
-    log_.debug("Borrowed action '{}' returned to pool", action.getIdentifier());
-    log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
+    logger.debug("Borrowed action '{}' returned to pool", action.getIdentifier());
+    logger.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
         action.getIdentifier(),
         this.getNumActive(),
         this.getNumIdle() });
     if (getNumActive() < reportedLimit - 10) {
       reportedLimit -= 10;
-      log_.info("Action pool '{}' dropped below {}", new Object[] {
+      logger.info("Action pool '{}' dropped below {}", new Object[] {
           action,
           reportedLimit }
       );
     } else {
-      log_.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
+      logger.debug("Action pool '{}' has {} members active, {} idle", new Object[] {
           action,
           this.getNumActive(),
           this.getNumIdle() });
@@ -118,7 +118,7 @@ public final class ActionPool extends GenericObjectPool {
   @Override
   public void invalidateObject(Object obj) throws Exception {
     Action action = (Action) super.borrowObject();
-    log_.debug("Invalidating action '{}'", action.getIdentifier());
+    logger.debug("Invalidating action '{}'", action.getIdentifier());
     super.invalidateObject(obj);
   }
   

@@ -58,7 +58,7 @@ import javax.servlet.http.HttpSession;
 public class WebloungeRequestImpl extends HttpServletRequestWrapper implements WebloungeRequest {
 
   /** Logging facility */
-  private Logger log_ = LoggerFactory.getLogger(WebloungeRequestImpl.class);
+  private Logger logger = LoggerFactory.getLogger(WebloungeRequestImpl.class);
 
   /** The language extraction regular expression */
   private static Pattern languageExtractor_ = Pattern.compile("_([a-zA-Z]+)\\.[\\w\\- ]+$");
@@ -143,7 +143,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       Matcher m = languageExtractor_.matcher(getRequestURI());
       if (m.find()) {
         language = LanguageSupport.getLanguage(m.group(1));
-        log_.trace("Selected language " + language + " from request uri");
+        logger.trace("Selected language " + language + " from request uri");
       }
     }
 
@@ -155,7 +155,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       while (localeEnum.hasMoreElements()) {
         String languageId = ((Locale) localeEnum.nextElement()).getLanguage();
         if ((language = site.getLanguage(languageId)) != null) {
-          log_.trace("Selected language " + languageId + " from browser preferences");
+          logger.trace("Selected language " + languageId + " from browser preferences");
           break;
         }
       }
@@ -164,13 +164,13 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // Still no valid language? Let's go with the site default.
     if (language == null) {
       language = site.getDefaultLanguage();
-      log_.trace("Selected default site language " + language);
+      logger.trace("Selected default site language " + language);
     }
 
     // This really looks like a configuration disaster!
     if (language == null) {
       language = new LanguageImpl(Locale.getDefault());
-      log_.trace("Selected default system language " + language);
+      logger.trace("Selected default system language " + language);
     }
 
     getSession().setAttribute(LANGUAGE, language);
@@ -242,7 +242,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // visitor's first access to this site. Therefore, he/she is automatically
     // being logged in as guest.
     if (user == null) {
-      log_.debug("New guest at {}", getLocalName());
+      logger.debug("New guest at {}", getLocalName());
       user = new Guest();
     }
 

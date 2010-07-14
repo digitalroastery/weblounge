@@ -56,7 +56,7 @@ import javax.xml.xpath.XPathFactory;
 public class WebloungeUserImpl extends AuthenticatedUserImpl implements WebloungeUser {
 
   /** Logging facility */
-  private static final Logger log_ = LoggerFactory.getLogger(WebloungeUserImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(WebloungeUserImpl.class);
 
   /** Enabled flag */
   protected boolean enabled = true;
@@ -451,7 +451,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       user.lastLoginSource = XPathHelper.valueOf(userNode, "security/lastlogin/ip", xpath);
     } catch (ParseException e) {
       // It's not important. Let's log and then forget about it
-      log_.error("Unable to parse last login date '{}'", lastLogin, e);
+      logger.error("Unable to parse last login date '{}'", lastLogin, e);
     }
 
     // Roles

@@ -38,7 +38,7 @@ import javax.xml.xpath.XPathFactory;
 public class XPathHelper {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(XPathHelper.class);
+  protected final static Logger logger = LoggerFactory.getLogger(XPathHelper.class);
 
   /**
    * Returns the query result or <code>null</code>.
@@ -138,7 +138,7 @@ public class XPathHelper {
       }
       return (value != null) ? value : defaultValue;
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '{}': {}", xpathExpression, e.getMessage());
+      logger.warn("Error when selecting '{}': {}", xpathExpression, e.getMessage());
       return null;
     }
   }
@@ -194,7 +194,7 @@ public class XPathHelper {
       }
       return result;
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '{}' from {}", new Object[] {
+      logger.warn("Error when selecting '{}' from {}", new Object[] {
           xpathExpression,
           node,
           e });
@@ -254,7 +254,7 @@ public class XPathHelper {
       return result;
 
     } catch (XPathExpressionException e) {
-      log_.warn("Error when selecting '{}' from {}", new Object[] {
+      logger.warn("Error when selecting '{}' from {}", new Object[] {
           xpathExpression,
           node,
           e });

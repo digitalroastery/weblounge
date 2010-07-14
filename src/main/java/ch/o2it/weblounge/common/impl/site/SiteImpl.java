@@ -99,7 +99,7 @@ public class SiteImpl implements Site {
   private static final long serialVersionUID = 5544198303137698222L;
 
   /** Logging facility */
-  final static Logger log_ = LoggerFactory.getLogger(SiteImpl.class);
+  final static Logger logger = LoggerFactory.getLogger(SiteImpl.class);
 
   /** Bundle property name of the site identifier */
   public static final String PROP_IDENTIFIER = "site.identifier";
@@ -271,9 +271,9 @@ public class SiteImpl implements Site {
    */
   public void setAdministrator(WebloungeUser administrator) {
     if (administrator != null)
-      log_.debug("Site administrator is {}", administrator);
+      logger.debug("Site administrator is {}", administrator);
     else
-      log_.debug("Site administrator is now undefined");
+      logger.debug("Site administrator is now undefined");
     this.administrator = administrator;
   }
 
@@ -312,11 +312,11 @@ public class SiteImpl implements Site {
   public void removeTemplate(PageTemplate template) {
     if (template == null)
       throw new IllegalArgumentException("Template must not be null");
-    log_.debug("Removing page template '{}'", template.getIdentifier());
+    logger.debug("Removing page template '{}'", template.getIdentifier());
     templates.remove(template.getIdentifier());
     if (template.equals(defaultTemplate)) {
       defaultTemplate = null;
-      log_.debug("Default template is now undefined");
+      logger.debug("Default template is now undefined");
     }
   }
 
@@ -346,9 +346,9 @@ public class SiteImpl implements Site {
   public void setDefaultTemplate(PageTemplate template) {
     if (template != null) {
       templates.put(template.getIdentifier(), template);
-      log_.debug("Default page template is '{}'", template.getIdentifier());
+      logger.debug("Default page template is '{}'", template.getIdentifier());
     } else
-      log_.debug("Default template is now undefined");
+      logger.debug("Default template is now undefined");
     this.defaultTemplate = template;
   }
 
@@ -697,7 +697,7 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#start()
    */
   public synchronized void start() throws SiteException, IllegalStateException {
-    log_.debug("Starting site {}", this);
+    logger.debug("Starting site {}", this);
     if (running)
       throw new IllegalStateException("Site is already running");
 
@@ -720,14 +720,14 @@ public class SiteImpl implements Site {
           // actions are being registered automatically
 
         } catch (Exception e) {
-          log_.error("Error starting module '{}'", module, e);
+          logger.error("Error starting module '{}'", module, e);
         }
       }
     }
 
     // Finally, mark this site as running
     running = true;
-    log_.info("Site '{}' started", this);
+    logger.info("Site '{}' started", this);
 
     // Tell listeners
     fireSiteStarted();
@@ -739,7 +739,7 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#stop()
    */
   public synchronized void stop() throws IllegalStateException {
-    log_.debug("Stopping site '{}'", this);
+    logger.debug("Stopping site '{}'", this);
     if (!running)
       throw new IllegalStateException("Site is not running");
 
@@ -756,17 +756,17 @@ public class SiteImpl implements Site {
     synchronized (modules) {
       for (Module module : modules.values()) {
         try {
-          log_.debug("Stopping module {}", module);
+          logger.debug("Stopping module {}", module);
           module.stop();
         } catch (Exception e) {
-          log_.error("Error stopping module {}", module, e);
+          logger.error("Error stopping module {}", module, e);
         }
       }
     }
 
     // Finally, mark this site as stopped
     running = false;
-    log_.info("Site '{}' stopped", this);
+    logger.info("Site '{}' stopped", this);
 
     // Tell listeners
     fireSiteStopped();
@@ -963,7 +963,7 @@ public class SiteImpl implements Site {
         }
       }
     } catch (SchedulerException e) {
-      log_.error("Error adding trigger listener to quartz scheduler", e);
+      logger.error("Error adding trigger listener to quartz scheduler", e);
     }
   }
 
@@ -974,7 +974,7 @@ public class SiteImpl implements Site {
    */
   void removeScheduler() {
     if (!isShutdownInProgress)
-      log_.info("Site '{}' can no longer execute jobs (scheduler was taken down)", this);
+      logger.info("Site '{}' can no longer execute jobs (scheduler was taken down)", this);
     this.quartzTriggerListener = null;
   }
 
@@ -1005,7 +1005,7 @@ public class SiteImpl implements Site {
       setIdentifier(identifier);
     }
 
-    log_.debug("Initializing site '{}'", this);
+    logger.debug("Initializing site '{}'", this);
 
     // Load i18n dictionary
     Enumeration<URL> i18nEnum = bundle.findEntries("site/i18n", "*.xml", true);
@@ -1032,14 +1032,14 @@ public class SiteImpl implements Site {
         URL moduleXmlUrl = e.nextElement();
         int endIndex = moduleXmlUrl.toExternalForm().lastIndexOf('/');
         URL moduleUrl = new URL(moduleXmlUrl.toExternalForm().substring(0, endIndex));
-        log_.debug("Loading module '{}' for site '{}'", moduleXmlUrl, this);
+        logger.debug("Loading module '{}' for site '{}'", moduleXmlUrl, this);
         
         // Load and validate the module descriptor
         ValidationErrorHandler errorHandler = new ValidationErrorHandler(moduleXmlUrl);
         docBuilder.setErrorHandler(errorHandler);
         Document moduleXml = docBuilder.parse(moduleXmlUrl.openStream());
         if (errorHandler.hasErrors()) {
-          log_.error("Errors found while validating module descriptor {}. Site '{}' is not loaded", moduleXml, this);
+          logger.error("Errors found while validating module descriptor {}. Site '{}' is not loaded", moduleXml, this);
           throw new IllegalStateException("Errors found while validating module descriptor " + moduleXml);
         }
 
@@ -1051,19 +1051,19 @@ public class SiteImpl implements Site {
         }
         
         Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());
-        log_.info("Module '{}' loaded for site '{}'", m, this);
+        logger.info("Module '{}' loaded for site '{}'", m, this);
         addModule(m);
       }
     } else {
-      log_.info("Site '{}' has no modules", this);
+      logger.info("Site '{}' has no modules", this);
     }
 
     // Look for a job scheduler
-    log_.debug("Signing up for a job scheduling services");
+    logger.debug("Signing up for a job scheduling services");
     schedulingServiceTracker = new SchedulingServiceTracker(bundleContext, this);
     schedulingServiceTracker.open();
 
-    log_.info("Site '{}' initialized", this);
+    logger.info("Site '{}' initialized", this);
   }
 
   /**
@@ -1082,10 +1082,10 @@ public class SiteImpl implements Site {
   public void deactivate(ComponentContext context) throws Exception {
     try {
       isShutdownInProgress = true;
-      log_.debug("Taking down site '{}'", this);
-      log_.debug("Stopped looking for a job scheduling services");
+      logger.debug("Taking down site '{}'", this);
+      logger.debug("Stopped looking for a job scheduling services");
       schedulingServiceTracker.close();
-      log_.info("Site '{}' deactivated", this);
+      logger.info("Site '{}' deactivated", this);
     } finally {
       isShutdownInProgress = false;
     }
@@ -1222,12 +1222,12 @@ public class SiteImpl implements Site {
       try {
         Date date = scheduler.scheduleJob(quartzJob, quartzTrigger);
         String repeat = trigger.getNextExecutionAfter(date) != null ? " first" : "";
-        log_.info("Job '{}' scheduled,{} execution at {}", new Object[] {
+        logger.info("Job '{}' scheduled,{} execution at {}", new Object[] {
             jobIdentifier,
             repeat,
             date });
       } catch (SchedulerException e) {
-        log_.error("Error trying to schedule job {}: {}", new Object[] {
+        logger.error("Error trying to schedule job {}: {}", new Object[] {
             jobIdentifier,
             e.getMessage(),
             e });
@@ -1249,9 +1249,9 @@ public class SiteImpl implements Site {
     String jobIdentifier = job.getIdentifier();
     try {
       if (scheduler.unscheduleJob(jobIdentifier, groupName))
-        log_.info("Job '{}' unscheduled", jobIdentifier);
+        logger.info("Job '{}' unscheduled", jobIdentifier);
     } catch (SchedulerException e) {
-      log_.error("Error trying to schedule job {}: {}", new Object[] {
+      logger.error("Error trying to schedule job {}: {}", new Object[] {
           jobIdentifier,
           e.getMessage(),
           e });

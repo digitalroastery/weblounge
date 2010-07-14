@@ -63,7 +63,7 @@ import javax.xml.xpath.XPathFactory;
 public class ModuleImpl implements Module {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(ModuleImpl.class);
+  protected final static Logger logger = LoggerFactory.getLogger(ModuleImpl.class);
 
   /** Regular expression to test the validity of a module identifier */
   private static final String MODULE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
@@ -442,7 +442,7 @@ public class ModuleImpl implements Module {
    * @see ch.o2it.weblounge.common.site.Module#start()
    */
   public void start() throws ModuleException {
-    log_.debug("Starting module {}", this);
+    logger.debug("Starting module {}", this);
     if (running)
       throw new IllegalStateException("Module is already running");
     if (!enabled)
@@ -450,7 +450,7 @@ public class ModuleImpl implements Module {
 
     // Finally, mark this module as running
     running = true;
-    log_.info("Module '{}' started", this);
+    logger.info("Module '{}' started", this);
 
     // Tell listeners
     fireModuleStarted();
@@ -462,13 +462,13 @@ public class ModuleImpl implements Module {
    * @see ch.o2it.weblounge.common.site.Module#stop()
    */
   public void stop() throws ModuleException {
-    log_.debug("Stopping module {}", this);
+    logger.debug("Stopping module {}", this);
     if (!running)
       throw new IllegalStateException("Module is not running");
 
     // Finally, mark this module as stopped
     running = false;
-    log_.info("Module '{}' stopped", this);
+    logger.info("Module '{}' stopped", this);
 
     // Tell listeners
     fireModuleStopped();

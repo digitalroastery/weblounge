@@ -65,7 +65,7 @@ import java.util.List;
 public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(HTMLActionSupport.class);
+  protected final static Logger logger = LoggerFactory.getLogger(HTMLActionSupport.class);
 
   /** The default path to render on */
   protected String targetPath = null;
@@ -374,7 +374,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       Renderer renderer) {
     if (renderer == null) {
       String msg = "Renderer to be included in action '" + this + "' on " + request.getUrl() + " was not found!";
-      log_.error(msg);
+      logger.error(msg);
       response.invalidate();
       return;
     }
@@ -386,9 +386,9 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       Throwable o = e.getCause();
       if (o != null) {
         msg += ": " + o.getMessage();
-        log_.error(msg, o);
+        logger.error(msg, o);
       } else {
-        log_.error(msg, e);
+        logger.error(msg, e);
       }
       response.invalidate();
     }

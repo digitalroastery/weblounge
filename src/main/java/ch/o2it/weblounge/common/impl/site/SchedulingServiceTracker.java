@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public final class SchedulingServiceTracker extends ServiceTracker {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(SchedulingServiceTracker.class);
+  private static final Logger logger = LoggerFactory.getLogger(SchedulingServiceTracker.class);
 
   /** The tracking site */
   private SiteImpl site = null;
@@ -63,9 +63,9 @@ public final class SchedulingServiceTracker extends ServiceTracker {
   @Override
   public Object addingService(ServiceReference reference) {
     Scheduler scheduler = (Scheduler) context.getService(reference);
-    log_.debug("Registering site {} with {}", site, scheduler.getClass().getName());
+    logger.debug("Registering site {} with {}", site, scheduler.getClass().getName());
     site.setScheduler(scheduler);
-    log_.debug("Registered {} with site {}", scheduler, site);
+    logger.debug("Registered {} with site {}", scheduler, site);
     return scheduler;
   }
 
@@ -77,7 +77,7 @@ public final class SchedulingServiceTracker extends ServiceTracker {
    */
   @Override
   public void modifiedService(ServiceReference reference, Object service) {
-    log_.info("Job scheduler was modified");
+    logger.info("Job scheduler was modified");
     super.modifiedService(reference, service);
   }
 
@@ -89,7 +89,7 @@ public final class SchedulingServiceTracker extends ServiceTracker {
    */
   @Override
   public void removedService(ServiceReference reference, Object service) {
-    log_.debug("Job scheduler disabled for site {}", site);
+    logger.debug("Job scheduler disabled for site {}", site);
     site.removeScheduler();
     super.removedService(reference, service);
   }

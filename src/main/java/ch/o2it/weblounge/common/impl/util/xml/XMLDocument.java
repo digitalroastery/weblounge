@@ -65,7 +65,7 @@ public class XMLDocument {
   private final static String className = XMLDocument.class.getName();
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(className);
+  protected final static Logger logger = LoggerFactory.getLogger(className);
 
   /**
    * Creates a new <code>XMLDocument</code>. Calling <code>save</code> on a
@@ -155,7 +155,7 @@ public class XMLDocument {
       try {
         file_.createNewFile();
       } catch (IOException e) {
-        log_.error("Unable to create file {}", file_);
+        logger.error("Unable to create file {}", file_);
         return false;
       }
     }
@@ -171,16 +171,16 @@ public class XMLDocument {
       fos.flush();
       fos.close();
     } catch (FileNotFoundException e) {
-      log_.error("File {} was not found!", file_);
+      logger.error("File {} was not found!", file_);
       return false;
     } catch (IOException e) {
-      log_.error("Error when serializing xml document to {}", file_);
+      logger.error("Error when serializing xml document to {}", file_);
       return false;
     } catch (TransformerConfigurationException e) {
-      log_.error("Transformer configuration error when serializing xml document to {}", file_);
+      logger.error("Transformer configuration error when serializing xml document to {}", file_);
       return false;
     } catch (TransformerException e) {
-      log_.error("Error when serializing xml document to {}", file_);
+      logger.error("Error when serializing xml document to {}", file_);
       return false;
     }
     isDirty = false;
@@ -368,15 +368,15 @@ public class XMLDocument {
         try {
           document = docBuilder.parse(file_);
         } catch (IOException e) {
-          log_.error("Unable to create file {}", file_);
+          logger.error("Unable to create file {}", file_);
           document = docBuilder.newDocument();
         } catch (SAXException e) {
-          log_.error("SAX error when parsing file {}", file_);
+          logger.error("SAX error when parsing file {}", file_);
           document = docBuilder.newDocument();
         }
       }
     } catch (ParserConfigurationException e) {
-      log_.error("Unable to create XML document builder! Check your xml settings!");
+      logger.error("Unable to create XML document builder! Check your xml settings!");
     }
     isDirty = false;
   }

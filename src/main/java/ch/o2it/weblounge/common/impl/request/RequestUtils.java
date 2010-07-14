@@ -43,7 +43,7 @@ import java.util.List;
 public final class RequestUtils {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(ActionSupport.class);
+  private final static Logger logger = LoggerFactory.getLogger(ActionSupport.class);
 
   /**
    * RequestSupport is a static class and therefore has no constructor.
@@ -241,7 +241,7 @@ public final class RequestUtils {
     try {
       p = URLDecoder.decode(p.trim(), "UTF-8");
     } catch (UnsupportedEncodingException e) {
-      log_.error("Encoding 'UTF-8' is not supported on this platform");
+      logger.error("Encoding 'UTF-8' is not supported on this platform");
     }
     return StringUtils.trimToNull(p);
   }
