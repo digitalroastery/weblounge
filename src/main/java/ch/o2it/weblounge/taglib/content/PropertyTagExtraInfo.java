@@ -41,7 +41,7 @@ import javax.servlet.jsp.tagext.VariableInfo;
 public class PropertyTagExtraInfo extends TagExtraInfo {
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(PropertyTagExtraInfo.class);
+  private final static Logger logger = LoggerFactory.getLogger(PropertyTagExtraInfo.class);
 
   /**
    * Returns the information on the exported tag variables.
@@ -58,7 +58,7 @@ public class PropertyTagExtraInfo extends TagExtraInfo {
         variables = TagVariableDefinitionParser.parse(definitions);
         size += variables.size();
       } catch (ParseException e) {
-        log_.error("Error parsing tag variable definitions: " + definitions);
+        logger.error("Error parsing tag variable definitions: " + definitions);
       }
     }
 

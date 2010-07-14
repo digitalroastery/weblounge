@@ -42,7 +42,7 @@ public class MessageTag extends WebloungeTag {
   private static final long serialVersionUID = -6915653732681218856L;
   
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(MessageTag.class);
+  private final static Logger logger = LoggerFactory.getLogger(MessageTag.class);
 
   /**
    * Process the end tag for this instance.
@@ -116,7 +116,7 @@ public class MessageTag extends WebloungeTag {
       try {
         writer.write(buf.toString());
       } catch (IOException e) {
-        log_.warn("Unable to write error list to the page: " + e.getMessage());
+        logger.warn("Unable to write error list to the page: " + e.getMessage());
       }
     }
 

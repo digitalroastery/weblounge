@@ -53,7 +53,7 @@ public class ElementTag extends WebloungeTag {
   private static final long serialVersionUID = -2005943868505143139L;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(ElementTag.class);
+  private final static Logger logger = LoggerFactory.getLogger(ElementTag.class);
 
   /** The element identifier */
   private String name = null;
@@ -93,7 +93,7 @@ public class ElementTag extends WebloungeTag {
       try {
         variables = TagVariableDefinitionParser.parse(value);
       } catch (ParseException ex) {
-        log_.error("Error parsing tag variable definitions: " + value);
+        logger.error("Error parsing tag variable definitions: " + value);
         throw new JspTagException(ex.getMessage());
       }
     }
@@ -182,7 +182,7 @@ public class ElementTag extends WebloungeTag {
         pageContext.getOut().flush();
         out.print(content);
       } catch (IOException e) {
-        log_.error("Unable to write to http response");
+        logger.error("Unable to write to http response");
       }
     }
 

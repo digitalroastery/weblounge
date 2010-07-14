@@ -132,7 +132,7 @@ public class ComposerTag extends WebloungeTag {
   private final static String className = ComposerTag.class.getName();
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(className);
+  private final static Logger logger = LoggerFactory.getLogger(className);
 
   /**
    * Sets the composer identifier.
@@ -287,7 +287,7 @@ public class ComposerTag extends WebloungeTag {
               content = p.getPagelets(composerName);
             originalContent = false;
           } catch (SecurityException e) {
-            log_.debug("Tried to load protected content from inherited page {} for composer {}", pageURI, composerName);
+            logger.debug("Tried to load protected content from inherited page {} for composer {}", pageURI, composerName);
           }
         }
       }
@@ -353,7 +353,7 @@ public class ComposerTag extends WebloungeTag {
    */
   @Override
   public int doEndTag() throws JspException {
-    log_.debug("Rendering composer " + composerName);
+    logger.debug("Rendering composer " + composerName);
     
     Site site = request.getSite();
     User user = request.getUser();
@@ -370,14 +370,14 @@ public class ComposerTag extends WebloungeTag {
       try {
         targetPage = contentRepository.getPage(homeURI, user, SystemPermission.READ);
         if (targetPage == null) {
-          log_.warn("No page was found while processing composer on " + url);
+          logger.warn("No page was found while processing composer on " + url);
           return EVAL_PAGE;
         }
       } catch (SecurityException e) {
-        log_.warn("Composer '" + composerName + "' was unable to choose homepage as fallback: " + e.getMessage());
+        logger.warn("Composer '" + composerName + "' was unable to choose homepage as fallback: " + e.getMessage());
         return EVAL_PAGE;
       } catch (ContentRepositoryException e) {
-        log_.warn("Composer '" + composerName + "' was unable to choose homepage as fallback: " + e.getMessage());
+        logger.warn("Composer '" + composerName + "' was unable to choose homepage as fallback: " + e.getMessage());
         return EVAL_PAGE;
       }
     }
@@ -467,7 +467,7 @@ public class ComposerTag extends WebloungeTag {
         // Check for action handler
         if (action != null && action instanceof HTMLAction) {
           HTMLAction htmlAction = (HTMLAction)action;
-          log_.debug("Action handler found");
+          logger.debug("Action handler found");
 
           if (targetPage != null) {
             String templateId = targetPage.getTemplate();
@@ -521,13 +521,13 @@ public class ComposerTag extends WebloungeTag {
             // Check access rights
 //            Permission p = SystemPermission.READ;
 //            if (!pagelet.checkOne(p, user.getRoleClosure()) && !pagelet.check(p, user)) {
-//              log_.debug("Skipping pagelet " + i + " in composer " + composer + " due to insufficient rights");
+//              logger.debug("Skipping pagelet " + i + " in composer " + composer + " due to insufficient rights");
 //              continue p;
 //            }
 
             // Check publishing dates
             if (!(request.getVersion() == Page.WORK) && !pagelet.isPublished()) {
-              log_.debug("Skipping pagelet " + i + " in composer " + composerName + " since it is not yet published");
+              logger.debug("Skipping pagelet " + i + " in composer " + composerName + " since it is not yet published");
               continue p;
             }
 
@@ -537,14 +537,14 @@ public class ComposerTag extends WebloungeTag {
 
             Module m = site.getModule(moduleId);
             if (m == null) {
-              log_.warn("Unable to render '{}' on {}://{}: module '{}' not installed", new Object[] { rendererId, site, request.getRequestedUrl(), moduleId });
+              logger.warn("Unable to render '{}' on {}://{}: module '{}' not installed", new Object[] { rendererId, site, request.getRequestedUrl(), moduleId });
               continue p;
             }
 
             // Load renderer
             renderer = m.getRenderer(rendererId);
             if (renderer == null) {
-              log_.warn("No suitable renderer '" + moduleId + "/" + rendererId + "' found to handle " + url);
+              logger.warn("No suitable renderer '" + moduleId + "/" + rendererId + "' found to handle " + url);
               continue p;
             }
 
@@ -615,12 +615,12 @@ public class ComposerTag extends WebloungeTag {
                   continue p;
                 }
               } catch (Exception e) {
-                log_.warn("Exception while rendering pagelet through action " + action + " on " + url, e);
+                logger.warn("Exception while rendering pagelet through action " + action + " on " + url, e);
                 response.invalidate();
               }
             }
 
-            log_.debug("Rendering pagelet " + renderer);
+            logger.debug("Rendering pagelet " + renderer);
 
             // Start editing support
 //            if (version == Page.WORK && isLockedByCurrentUser) {
@@ -644,9 +644,9 @@ public class ComposerTag extends WebloungeTag {
               if (o != null) {
                 reason = o.getMessage();
                 msg += ": " + reason;
-                log_.error(msg, o);
+                logger.error(msg, o);
               } else {
-                log_.error(msg, e);
+                logger.error(msg, e);
               }
 
               if (version == Page.WORK && isLockedByCurrentUser) {
@@ -731,14 +731,14 @@ public class ComposerTag extends WebloungeTag {
 
     } catch (IOException e) {
       response.invalidate();
-      log_.error("Unable to print to out", e);
+      logger.error("Unable to print to out", e);
       return EVAL_PAGE;
     } catch (Throwable t) {
       response.invalidate();
       String msg = "Exception when processing composer '" + composerName + "' on " + getRequest().getRequestedUrl();
       if (action != null)
         msg += " for action '" + action + "'";
-      log_.error(msg, t);
+      logger.error(msg, t);
       return EVAL_PAGE;
     } finally {
       reset();

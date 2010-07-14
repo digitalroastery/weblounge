@@ -50,7 +50,7 @@ public class HTMLHeaderTag extends WebloungeTag {
   private static final long serialVersionUID = -1813975272420106327L;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(HTMLHeaderTag.class);
+  private final static Logger logger = LoggerFactory.getLogger(HTMLHeaderTag.class);
 
   /**
    * Does the tag processing.
@@ -68,7 +68,7 @@ public class HTMLHeaderTag extends WebloungeTag {
         return EVAL_PAGE;
       }
     } catch (Exception e) {
-      log_.error("Error asking action '" + action + "' for headers", e);
+      logger.error("Error asking action '" + action + "' for headers", e);
     }
 
     // Start with the default processing
@@ -83,7 +83,7 @@ public class HTMLHeaderTag extends WebloungeTag {
         String moduleId = p.getModule();
         Module module = site.getModule(moduleId);
         if (module == null) {
-          log_.debug("Unable to load includes for renderer '{}': module '{}' not installed", new Object[] { p.getIdentifier(), site, request.getRequestedUrl(), moduleId });
+          logger.debug("Unable to load includes for renderer '{}': module '{}' not installed", new Object[] { p.getIdentifier(), site, request.getRequestedUrl(), moduleId });
           continue;
         }
         Renderer renderer = module.getRenderer(p.getIdentifier());
@@ -94,7 +94,7 @@ public class HTMLHeaderTag extends WebloungeTag {
             headElements.add(header);
           }
         } else {
-          log_.warn("Renderer '" + p + "' not found for " + request.getUrl() + "!");
+          logger.warn("Renderer '" + p + "' not found for " + request.getUrl() + "!");
           continue;
         }
       }

@@ -48,7 +48,7 @@ public class PageletTag extends WebloungeTag {
   private static final long serialVersionUID = 2814154234296626814L;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(PageletTag.class);
+  private final static Logger logger = LoggerFactory.getLogger(PageletTag.class);
 
   /** The module identifier */
   private Module module = null;
@@ -125,7 +125,7 @@ public class PageletTag extends WebloungeTag {
         request.setAttribute(WebloungeRequest.PAGELET, pagelet);
         renderer.render(request, response);
       } catch (Exception e) {
-        log_.warn("Unable to render '" + renderer + "': " + e.getMessage());
+        logger.warn("Unable to render '" + renderer + "': " + e.getMessage());
       } finally {
         request.removeAttribute(WebloungeRequest.PAGELET);
       }

@@ -49,7 +49,7 @@ public abstract class ElementCheckTag extends WebloungeTag {
   private static final long serialVersionUID = -2050782761487616751L;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(ElementCheckTag.class);
+  private final static Logger logger = LoggerFactory.getLogger(ElementCheckTag.class);
 
   /** The element identifier */
   private String name = null;
@@ -86,7 +86,7 @@ public abstract class ElementCheckTag extends WebloungeTag {
       try {
         variables = TagVariableDefinitionParser.parse(value);
       } catch (ParseException ex) {
-        log_.error("Error parsing tag variable definitions: " + value);
+        logger.error("Error parsing tag variable definitions: " + value);
         throw new JspTagException(ex.getMessage());
       }
     }

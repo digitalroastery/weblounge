@@ -47,7 +47,7 @@ public class ActionTag extends WebloungeTag {
   private static final long serialVersionUID = 2609596492681590569L;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(ActionTag.class);
+  private final static Logger logger = LoggerFactory.getLogger(ActionTag.class);
 
   /** the module identifier */
   private Module module = null;
@@ -133,7 +133,7 @@ public class ActionTag extends WebloungeTag {
   public int doStartTag() throws JspException {
     action = module.getAction(actionId);
     if (action == null) {
-      log_.warn("Action handler '" + actionId + "' not found for module '" + module + "' and site '" + request.getSite() + "'");
+      logger.warn("Action handler '" + actionId + "' not found for module '" + module + "' and site '" + request.getSite() + "'");
       return SKIP_BODY;
     }
     return EVAL_BODY_BUFFERED;
@@ -198,7 +198,7 @@ public class ActionTag extends WebloungeTag {
 
       super.doEndTag();
     } catch (IOException e) {
-      log_.warn("Error when writing action tag: " + e.getMessage());
+      logger.warn("Error when writing action tag: " + e.getMessage());
     } finally {
       reset();
     }

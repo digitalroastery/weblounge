@@ -62,7 +62,7 @@ public class PagePreviewTag extends WebloungeTag {
   private static final long serialVersionUID = 1313539327041640005L;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(PagePreviewTag.class);
+  private final static Logger logger = LoggerFactory.getLogger(PagePreviewTag.class);
 
   /** Preview stop */
   private static enum Marker {
@@ -180,7 +180,7 @@ public class PagePreviewTag extends WebloungeTag {
       try {
         page = contentRepository.getPage(pageURI, user, SystemPermission.READ);
         if (page == null) {
-          log_.error("No data available for page '" + pageURI + "'");
+          logger.error("No data available for page '" + pageURI + "'");
           return EVAL_PAGE;
         }
       } catch (SecurityException e) {
@@ -192,13 +192,13 @@ public class PagePreviewTag extends WebloungeTag {
       pageUrl = new WebUrlImpl(site, page.getURI().getPath());
       PageTemplate template = site.getTemplate(page.getTemplate());
       if (template == null) {
-        log_.error("No template found for page '" + pageURI + "'");
+        logger.error("No template found for page '" + pageURI + "'");
         return EVAL_PAGE;
       }
 
       String stage = template.getStage();
       if (stage == null) {
-        log_.error("No stage defined for template '" + template + "'");
+        logger.error("No stage defined for template '" + template + "'");
         return EVAL_PAGE;
       }
 
@@ -337,28 +337,28 @@ public class PagePreviewTag extends WebloungeTag {
           // Permission p = SystemPermission.READ;
           // if (!pagelet.checkOne(p, user.getRoleClosure()) &&
           // !pagelet.check(p, user)) {
-          // log_.debug("Skipping pagelet " + i + " in composer " + composer_ +
+          // logger.debug("Skipping pagelet " + i + " in composer " + composer_ +
           // " due to insufficient rights");
           // continue p;
           // }
 
           // Check publishing dates
           if (!(request.getVersion() == Page.WORK) && !pagelet.isPublished()) {
-            log_.debug("Skipping pagelet " + index + " in composer " + stage + " since it is not yet published");
+            logger.debug("Skipping pagelet " + index + " in composer " + stage + " since it is not yet published");
             return false;
           }
 
           // Select the renderer's module
           Module m = site.getModule(moduleId);
           if (m == null) {
-            log_.warn("Unable to load renderer '" + rendererId + "' for " + pageUrl + ": module '" + moduleId + "' not found!");
+            logger.warn("Unable to load renderer '" + rendererId + "' for " + pageUrl + ": module '" + moduleId + "' not found!");
             return false;
           }
 
           // Load renderer
           renderer = m.getRenderer(rendererId);
           if (renderer == null) {
-            log_.warn("No suitable renderer '" + moduleId + "/" + rendererId + "' found to render on " + pageUrl);
+            logger.warn("No suitable renderer '" + moduleId + "/" + rendererId + "' found to render on " + pageUrl);
             return false;
           }
 
@@ -374,9 +374,9 @@ public class PagePreviewTag extends WebloungeTag {
             if (o != null) {
               reason = o.getMessage();
               msg += ": " + reason;
-              log_.error(msg, o);
+              logger.error(msg, o);
             } else {
-              log_.error(msg, e);
+              logger.error(msg, e);
             }
           }
 
@@ -384,16 +384,16 @@ public class PagePreviewTag extends WebloungeTag {
 
       } catch (Throwable t) {
         String msg = "Exception when processing pagelet '" + pagelet.getURI() + "'";
-        log_.error(msg + ":" + t.getMessage());
-        log_.warn(msg, t);
+        logger.error(msg + ":" + t.getMessage());
+        logger.warn(msg, t);
       }
     } catch (IOException e) {
-      log_.error("Unable to print to out", e);
+      logger.error("Unable to print to out", e);
       return false;
     } catch (Throwable t) {
       String msg = "Exception when processing composer '" + stage + "'";
-      log_.error(msg + ":" + t.getMessage());
-      log_.warn(msg, t);
+      logger.error(msg + ":" + t.getMessage());
+      logger.warn(msg, t);
       return false;
     } finally {
       request.setAttribute(WebloungeRequest.PAGE, oldPage);

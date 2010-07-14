@@ -50,7 +50,7 @@ public class PropertyTag extends WebloungeTag {
   private static final long serialVersionUID = -4170115524572662846L;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(PropertyTag.class);
+  private final static Logger logger = LoggerFactory.getLogger(PropertyTag.class);
 
   /** The property identifier */
   private String name = null;
@@ -84,7 +84,7 @@ public class PropertyTag extends WebloungeTag {
       try {
         variables = TagVariableDefinitionParser.parse(value);
       } catch (ParseException ex) {
-        log_.error("Error parsing tag variable definitions: " + value);
+        logger.error("Error parsing tag variable definitions: " + value);
         throw new JspTagException(ex.getMessage());
       }
     }
@@ -132,7 +132,7 @@ public class PropertyTag extends WebloungeTag {
         String name = def.getName();
         String alias = def.getAlias();
         String value = getProperty(name, request.getSite());
-        log_.trace("Defining variable '" + alias + "': " + value);
+        logger.trace("Defining variable '" + alias + "': " + value);
         if (value == null)
           value = "";
         pageContext.setAttribute(alias, value);
@@ -149,7 +149,7 @@ public class PropertyTag extends WebloungeTag {
         pageContext.getOut().flush();
         out.print(property);
       } catch (IOException e) {
-        log_.error("Unable to write to http response");
+        logger.error("Unable to write to http response");
       }
     }
 
