@@ -20,7 +20,9 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.dispatcher.DispatcherConfiguration;
 import ch.o2it.weblounge.dispatcher.SiteRegistrationService;
@@ -28,17 +30,24 @@ import ch.o2it.weblounge.dispatcher.impl.http.WebXml;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlFilter;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlServlet;
 
+import org.apache.commons.lang.StringUtils;
 import org.ops4j.pax.web.service.WebContainer;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +63,7 @@ import javax.servlet.http.HttpServletRequest;
  * The site tracker watches site services coming and going and registers them
  * with the weblounge dispatcher.
  */
-public class SiteRegistrationServiceImpl implements SiteRegistrationService {
+public class SiteRegistrationServiceImpl implements SiteRegistrationService, ManagedService {
 
   /** Logging facility */
   private static final Logger log_ = LoggerFactory.getLogger(SiteRegistrationServiceImpl.class);
@@ -68,8 +77,20 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
   /** Default value for the <code>BUNDLE_ENTRY</code> property */
   public static final String DEFAULT_BUNDLE_ENTRY = "/site";
 
+  /** Service pid, used to look up the service configuration */
+  public static final String SERVICE_PID = "ch.o2it.weblounge.siteregistration";
+
+  /** Configuration key prefix for jasper configuration values */
+  public static final String OPT_JASPER_PREFIX = "jasper.";
+
+  /** Default value for jasper's <code>scratchDir</code> compiler context setting */
+  public static final String DEFAULT_JASPER_WORK_DIR = "/weblounge/jasper";
+
   /** The http service */
   private WebContainer paxHttpService = null;
+
+  /** Init parameters for jetty */
+  private TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
 
   /** The site tracker */
   private SiteTracker siteTracker = null;
@@ -100,10 +121,34 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
    * 
    * @param context
    *          the component context
+   * @throws IOException
+   *           if reading from the configuration admin service fails
+   * @throws ConfigurationException
+   *           if service configuration fails
    */
-  public void activate(ComponentContext context) {
+  public void activate(ComponentContext context) throws IOException,
+      ConfigurationException {
     BundleContext bundleContext = context.getBundleContext();
     log_.info("Starting site dispatcher");
+
+    // Configure the default jasper directory
+    String tmpDir = System.getProperty("java.io.tmpdir");
+    String scratchDir = PathSupport.concat(tmpDir, DEFAULT_JASPER_WORK_DIR);
+    jasperConfig.put("scratchdir", scratchDir);
+    
+    // Try to get hold of the service configuration
+    ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
+    if (configAdminRef != null) {
+      ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(configAdminRef);
+      Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
+      if (config != null) {
+        configure(config);
+      } else {
+        log_.warn("Unable to load site dispatcher service configuration");
+      }
+    } else {
+      log_.info("The site dispatcher will be using a default configuration");
+    }
 
     httpRegistrations = new HashMap<Site, WebXml>();
     siteTracker = new SiteTracker(this, bundleContext);
@@ -128,6 +173,48 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
     siteTracker = null;
 
     log_.info("Site dispatcher stopped");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @SuppressWarnings("unchecked")
+  public void updated(Dictionary properties) throws ConfigurationException {
+    configure(properties);
+  }
+
+  /**
+   * Configures this service using the given configuration properties.
+   * 
+   * @param config
+   *          the service configuration
+   * @throws ConfigurationException
+   *           if configuration fails
+   */
+  private synchronized boolean configure(Dictionary<?, ?> config)
+      throws ConfigurationException {
+    log_.info("Configuring the site registration service");
+    boolean configurationChanged = true;
+    Enumeration<?> keys = config.keys();
+    while (keys.hasMoreElements()) {
+      String key = (String) keys.nextElement();
+      if (key.startsWith(OPT_JASPER_PREFIX) && key.length() > OPT_JASPER_PREFIX.length()) {
+        String value = (String) config.get(key);
+        if (StringUtils.trimToNull(value) == null)
+          continue;
+        value = ConfigurationUtils.processTemplate(value);
+        key = key.substring(OPT_JASPER_PREFIX.length());
+        log_.debug("Jetty jsp parameter '{}' configured to '{}'", key, value);
+        jasperConfig.put(key, value);
+        // This is a work around for jasper's horrible implementation of the
+        // compiler context configuration. Some keys are camel case, others are
+        // lower case.
+        jasperConfig.put(key.toLowerCase(), value);
+      }
+    }
+    return configurationChanged;
   }
 
   /**
@@ -232,6 +319,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
 
     // Prepare the init parameters
     initParameters.putAll(webXml.getContextParams());
+    initParameters.putAll(jasperConfig);
 
     // Create the site URI
     String contextRoot = webXml.getContextParam(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT, DEFAULT_WEBAPP_CONTEXT_ROOT);
@@ -254,7 +342,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
       // servlet.
       try {
         SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
-        paxHttpService.registerServlet(siteRoot, siteServlet, null, bundleHttpContext);
+        paxHttpService.registerServlet(siteRoot, siteServlet, initParameters, bundleHttpContext);
         siteServlets.put(site, siteServlet);
         log_.info("Site '{}' registered under site://{}", site, siteRoot);
       } catch (NamespaceException e) {
@@ -289,8 +377,6 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService {
         sitesByServerName.put(name, site);
       }
     }
-
-    // TODO: register site dispatcher
 
     log_.debug("Site {} registered", site);
   }

@@ -64,11 +64,13 @@ public class BundleHttpContext implements HttpContext {
 
   /**
    * Creates a new <code>HttpContext</code> which will be able to load resources
-   * located as a child of path <code>bundlePath</code> from the bundle
-   * <code>bundle</code>.
+   * either located as a child of path <code>bundlePath</code> from the bundle
+   * <code>bundle</code> or inside jasper's site work directory.
    * 
    * @param bundle
    *          the bundle
+   * @param siteURI
+   *          the site's mountpoint, e. g. <code>/weblounge-sites/mysite</code>
    * @param bundlePath
    *          the context path inside the bundle
    */
