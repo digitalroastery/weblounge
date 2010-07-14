@@ -30,6 +30,7 @@ import ch.o2it.weblounge.dispatcher.impl.http.WebXml;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlFilter;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlServlet;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.ops4j.pax.web.service.WebContainer;
 import org.osgi.framework.Bundle;
@@ -44,6 +45,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -83,8 +85,11 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /** Configuration key prefix for jasper configuration values */
   public static final String OPT_JASPER_PREFIX = "jasper.";
 
+  /** Configuration option for jasper's scratch directory */
+  public static final String OPT_JASPER_SCRATCHDIR = "scratchdir";
+  
   /** Default value for jasper's <code>scratchDir</code> compiler context setting */
-  public static final String DEFAULT_JASPER_WORK_DIR = "/weblounge/jasper";
+  public static final String DEFAULT_JASPER_WORK_DIR = "/weblounge/tmp/jasper";
 
   /** The http service */
   private WebContainer paxHttpService = null;
@@ -134,7 +139,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
     // Configure the default jasper directory
     String tmpDir = System.getProperty("java.io.tmpdir");
     String scratchDir = PathSupport.concat(tmpDir, DEFAULT_JASPER_WORK_DIR);
-    jasperConfig.put("scratchdir", scratchDir);
+    jasperConfig.put(OPT_JASPER_SCRATCHDIR, scratchDir);
     
     // Try to get hold of the service configuration
     ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
@@ -195,8 +200,11 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
    */
   private synchronized boolean configure(Dictionary<?, ?> config)
       throws ConfigurationException {
+
     log_.info("Configuring the site registration service");
     boolean configurationChanged = true;
+    
+    // Store the keys
     Enumeration<?> keys = config.keys();
     while (keys.hasMoreElements()) {
       String key = (String) keys.nextElement();
@@ -206,7 +214,12 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
           continue;
         value = ConfigurationUtils.processTemplate(value);
         key = key.substring(OPT_JASPER_PREFIX.length());
-        log_.debug("Jetty jsp parameter '{}' configured to '{}'", key, value);
+        
+        boolean optionChanged = value.equalsIgnoreCase(jasperConfig.get(key));
+        configurationChanged |= !optionChanged;
+        if (optionChanged)
+          log_.debug("Jetty jsp parameter '{}' configured to '{}'", key, value);
+
         jasperConfig.put(key, value);
         // This is a work around for jasper's horrible implementation of the
         // compiler context configuration. Some keys are camel case, others are
@@ -214,6 +227,18 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
         jasperConfig.put(key.toLowerCase(), value);
       }
     }
+    
+    // Create the scratch directory if specified, otherwise jasper will complain
+    String scratchDir = jasperConfig.get(OPT_JASPER_SCRATCHDIR);
+    if (scratchDir != null) {
+      try {
+        FileUtils.forceMkdir(new File(scratchDir));
+        log_.debug("Temporary jsp source files and classes go to {}", scratchDir);
+      } catch (IOException e) {
+        throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper sratch directory at " + scratchDir + ": " + e.getMessage());
+      }
+    }
+ 
     return configurationChanged;
   }
 
