@@ -56,7 +56,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   private long cacheSize_ = CacheManager.DEFAULT_CACHE_SIZE;
 
   /** Logging facility provided by log4j */
-  private final static Logger log_ = LoggerFactory.getLogger(CacheServiceImpl.class);
+  private final static Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
   /**
    * Creates a new cache service.
@@ -168,10 +168,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     /* check whether the response has already been wrapped */
     if (unwrapResponse(response) != null) {
-      log_.warn("Response already wrapped!");
+      logger.warn("Response already wrapped!");
       return false;
     } else if (!(response instanceof HttpServletResponseWrapper)) {
-      log_.warn("Cached response is not properly wrapped");
+      logger.warn("Cached response is not properly wrapped");
       return false;
     }
     
