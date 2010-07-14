@@ -126,4 +126,14 @@ public class ConfigurationUtilsTest {
     assertEquals(2*Times.MS_PER_MIN, ConfigurationUtils.parseDuration("2M"));
   }
 
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#processTemplate(java.lang.String)}.
+   */
+  @Test
+  public void testProcessTemplateString() {
+    System.setProperty("test", "testvalue");
+    assertEquals("testvalue", ConfigurationUtils.processTemplate("${test}"));
+    assertEquals("embedded testvalue", ConfigurationUtils.processTemplate("embedded ${test}"));
+  }
+
 }

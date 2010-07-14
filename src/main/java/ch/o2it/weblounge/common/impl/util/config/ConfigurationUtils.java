@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -339,6 +340,34 @@ public class ConfigurationUtils {
   }
 
   /**
+   * Processes the given text by replacing placeholders in the form of
+   * <code>${key}</code> with their actual values as found in the system
+   * properties, e. g.
+   * <ul>
+   * <li><code>${java.io.tmpdir}</code> becomes <code>/tmp</li>
+   * </ul>
+   * 
+   * @param text
+   *          the text to process
+   * @return the processed text
+   */
+  public static String processTemplate(String text) {
+    if (text.indexOf("${") >= 0 && text.indexOf("}") > 2) {
+      for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
+        String variable = "\\$\\{" + (String)entry.getKey() + "\\}";
+        String replacement = (String)entry.getValue(); 
+        text = text.replaceAll(variable, replacement);
+      }
+      for (Entry<String, String> entry : System.getenv().entrySet()) {
+        String variable = "\\$\\{" + (String)entry.getKey() + "\\}";
+        String replacement = (String)entry.getValue(); 
+        text = text.replaceAll(variable, replacement);
+      }
+    }
+    return text;
+  }
+
+  /**
    * Processes the given text by replacing these placeholders with their actual
    * values:
    * <ul>
@@ -352,6 +381,8 @@ public class ConfigurationUtils {
    * @return the processed text
    */
   public static String processTemplate(String text, WebloungeRequest request) {
+    text = processTemplate(text);
+
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
     String hostname = site.getHostName();
@@ -385,6 +416,8 @@ public class ConfigurationUtils {
    * @return the processed text
    */
   public static String processTemplate(String text, WebloungeRequest request, Module module) {
+    text = processTemplate(text);
+    
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
     String hostname = site.getHostName();
