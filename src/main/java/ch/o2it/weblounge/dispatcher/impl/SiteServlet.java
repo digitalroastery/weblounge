@@ -33,7 +33,7 @@ import ch.o2it.weblounge.common.site.Site;
 import org.apache.commons.io.FilenameUtils;
 import org.mortbay.resource.Resource;
 import org.ops4j.pax.web.jsp.JspServletWrapper;
-import org.osgi.service.http.HttpContext;
+import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,9 +66,9 @@ public class SiteServlet extends HttpServlet {
 
   /** The site */
   private final Site site;
-  
+
   /** The http context */
-  private final HttpContext siteHttpContext;
+  private final BundleHttpContext siteHttpContext;
 
   /** The Jasper servlet */
   protected final Servlet jasperServlet;
@@ -122,7 +122,35 @@ public class SiteServlet extends HttpServlet {
   }
 
   /**
-   * Delegates to jasper servlet.
+   * Returns the site that is serving content through this servlet.
+   * 
+   * @return the site
+   */
+  public Site getSite() {
+    return site;
+  }
+
+  /**
+   * Returns the site's bundle.
+   * 
+   * @return the bundle
+   */
+  public Bundle getBundle() {
+    return siteHttpContext.getBundle();
+  }
+
+  /**
+   * Returns the bundle context that is used by this servlet to load the actual
+   * content for delivery.
+   * 
+   * @return the bundle context
+   */
+  public BundleHttpContext getBundleContext() {
+    return siteHttpContext;
+  }
+
+  /**
+   * Delegates to the jasper servlet.
    * 
    * @see JspServletWrapper#getServletConfig()
    */
@@ -153,11 +181,12 @@ public class SiteServlet extends HttpServlet {
    * @see JspServletWrapper#service(HttpServletRequest, HttpServletResponse)
    */
   public void serviceJavaServerPage(final HttpServletRequest httpRequest,
-      final HttpServletResponse httpResponse) throws ServletException, IOException {
+      final HttpServletResponse httpResponse) throws ServletException,
+      IOException {
 
     final HttpServletRequest request;
     final HttpServletResponse response;
-    
+
     // Wrap request and response if necessary
     if (httpRequest instanceof WebloungeRequest) {
       request = httpRequest;
@@ -165,10 +194,10 @@ public class SiteServlet extends HttpServlet {
     } else {
       request = new WebloungeRequestImpl(httpRequest);
       response = new WebloungeResponseImpl(httpResponse);
-      ((WebloungeRequestImpl)request).init(site);
-      ((WebloungeResponseImpl)response).setRequest((WebloungeRequestImpl)request);
+      ((WebloungeRequestImpl) request).init(site);
+      ((WebloungeResponseImpl) response).setRequest((WebloungeRequestImpl) request);
     }
-    
+
     // Configure request and response objects
 
     try {

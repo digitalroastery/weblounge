@@ -98,6 +98,24 @@ public class BundleHttpContext implements HttpContext {
   }
 
   /**
+   * Returns the path to the site's content inside the bundle.
+   * 
+   * @return the path to the site content
+   */
+  public String getBundlePath() {
+    return bundlePath;
+  }
+
+  /**
+   * Returns the uri that is mapped to the bundle content.
+   * 
+   * @return the uri
+   */
+  public String getSiteURI() {
+    return siteURI;
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see org.osgi.service.http.HttpContext#getMimeType(java.lang.String)

@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.WeakHashMap;
 import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.Filter;
@@ -81,6 +82,9 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
 
   /** Service pid, used to look up the service configuration */
   public static final String SERVICE_PID = "ch.o2it.weblounge.siteregistration";
+
+  /** Configuration key prefix for jsp precompilation */
+  public static final String OPT_PRECOMPILE = "precompile";
 
   /** Configuration key prefix for jasper configuration values */
   public static final String OPT_JASPER_PREFIX = "jasper.";
@@ -117,6 +121,12 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   private TreeMap<String, Filter> filterNameInstances = new TreeMap<String, Filter>();
 
   private TreeMap<String, ArrayList<String>> filterNameMappings = new TreeMap<String, ArrayList<String>>();
+  
+  /** The precompiler for java server pages */
+  private boolean precompile = true;
+  
+  /** List of precompilers */
+  private WeakHashMap<Site, Precompiler> precompilers = new WeakHashMap<Site, Precompiler>();
 
   /**
    * Callback from the OSGi environment to activate the service.
@@ -176,6 +186,12 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
 
     siteTracker.close();
     siteTracker = null;
+    
+    // Stop precompilers
+    for (Precompiler compiler : precompilers.values()) {
+      if (compiler != null)
+        compiler.stop();
+    }
 
     logger.info("Site dispatcher stopped");
   }
@@ -204,7 +220,12 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
     logger.info("Configuring the site registration service");
     boolean configurationChanged = true;
     
-    // Store the keys
+    // Activate precompilation?
+    String precompileSetting = StringUtils.trimToNull((String)config.get(OPT_PRECOMPILE));
+    precompile = precompileSetting == null || "true".equalsIgnoreCase(precompileSetting);
+    logger.debug("Jsp precompilation {}", precompile ? "activated" : "deactivated");
+    
+    // Store the jasper configuration keys
     Enumeration<?> keys = config.keys();
     while (keys.hasMoreElements()) {
       String key = (String) keys.nextElement();
@@ -365,19 +386,41 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
 
       // Register the site using jsp support (for tag libraries) and the site
       // servlet.
+      SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
       try {
-        SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
         paxHttpService.registerServlet(siteRoot, siteServlet, initParameters, bundleHttpContext);
-        siteServlets.put(site, siteServlet);
-        logger.info("Site '{}' registered under site://{}", site, siteRoot);
       } catch (NamespaceException e) {
         logger.error("The alias '{}' is already in use", siteRoot);
+        return;
       } catch (Exception e) {
         logger.error("Error registering resources for site '{}' at {}: {}", new Object[] {
             site,
             siteRoot,
             e.getMessage() });
         logger.error(e.getMessage(), e);
+      }
+
+      siteServlets.put(site, siteServlet);
+      httpRegistrations.put(site, webXml);
+      logger.info("Site '{}' registered under site://{}", site, siteRoot);
+
+      // Register this site for the findByXYZ() methods
+      synchronized (sites) {
+        sites.add(site);
+        for (String name : site.getHostNames()) {
+          if (site.equals(sitesByServerName.get(name))) {
+            logger.error("Another site is already registered to " + name);
+            continue;
+          }
+          sitesByServerName.put(name, site);
+        }
+      }
+      
+      // Start the precompiler if requested
+      if (precompile) {
+        Precompiler precompiler = new Precompiler(siteServlet);
+        precompilers.put(site, precompiler);
+        precompiler.precompile();
       }
 
       logger.debug("Site '{}' registered under site://{}", site, siteRoot);
@@ -389,21 +432,6 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
       logger.error(e.getMessage(), e);
     }
 
-    httpRegistrations.put(site, webXml);
-
-    // Register this site for the findByXYZ() methods
-    synchronized (sites) {
-      sites.add(site);
-      for (String name : site.getHostNames()) {
-        if (site.equals(sitesByServerName.get(name))) {
-          logger.error("Another site is already registered to " + name);
-          continue;
-        }
-        sitesByServerName.put(name, site);
-      }
-    }
-
-    logger.debug("Site {} registered", site);
   }
 
   /**
