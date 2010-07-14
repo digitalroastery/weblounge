@@ -68,7 +68,7 @@ import javax.servlet.http.HttpServletRequest;
 public class SiteRegistrationServiceImpl implements SiteRegistrationService, ManagedService {
 
   /** Logging facility */
-  private static final Logger log_ = LoggerFactory.getLogger(SiteRegistrationServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(SiteRegistrationServiceImpl.class);
 
   /** Default value for the <code>WEBAPP_CONTEXT_ROOT</code> property */
   public static final String DEFAULT_WEBAPP_CONTEXT_ROOT = "/";
@@ -134,7 +134,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   public void activate(ComponentContext context) throws IOException,
       ConfigurationException {
     BundleContext bundleContext = context.getBundleContext();
-    log_.info("Starting site dispatcher");
+    logger.info("Starting site dispatcher");
 
     // Configure the default jasper directory
     String tmpDir = System.getProperty("java.io.tmpdir");
@@ -149,17 +149,17 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
       if (config != null) {
         configure(config);
       } else {
-        log_.warn("Unable to load site dispatcher service configuration");
+        logger.warn("Unable to load site dispatcher service configuration");
       }
     } else {
-      log_.info("The site dispatcher will be using a default configuration");
+      logger.info("The site dispatcher will be using a default configuration");
     }
 
     httpRegistrations = new HashMap<Site, WebXml>();
     siteTracker = new SiteTracker(this, bundleContext);
     siteTracker.open();
 
-    log_.debug("Site dispatcher activated");
+    logger.debug("Site dispatcher activated");
   }
 
   /**
@@ -172,12 +172,12 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
    *          the component context
    */
   public void deactivate(ComponentContext context) {
-    log_.debug("Deactivating site dispatcher");
+    logger.debug("Deactivating site dispatcher");
 
     siteTracker.close();
     siteTracker = null;
 
-    log_.info("Site dispatcher stopped");
+    logger.info("Site dispatcher stopped");
   }
 
   /**
@@ -201,7 +201,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   private synchronized boolean configure(Dictionary<?, ?> config)
       throws ConfigurationException {
 
-    log_.info("Configuring the site registration service");
+    logger.info("Configuring the site registration service");
     boolean configurationChanged = true;
     
     // Store the keys
@@ -218,7 +218,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
         boolean optionChanged = value.equalsIgnoreCase(jasperConfig.get(key));
         configurationChanged |= !optionChanged;
         if (optionChanged)
-          log_.debug("Jetty jsp parameter '{}' configured to '{}'", key, value);
+          logger.debug("Jetty jsp parameter '{}' configured to '{}'", key, value);
 
         jasperConfig.put(key, value);
         // This is a work around for jasper's horrible implementation of the
@@ -233,7 +233,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
     if (scratchDir != null) {
       try {
         FileUtils.forceMkdir(new File(scratchDir));
-        log_.debug("Temporary jsp source files and classes go to {}", scratchDir);
+        logger.debug("Temporary jsp source files and classes go to {}", scratchDir);
       } catch (IOException e) {
         throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper sratch directory at " + scratchDir + ": " + e.getMessage());
       }
@@ -307,16 +307,16 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
         alias = alias.replace("*", ".*");
         if (serverName.matches(alias)) {
           site = e.getValue();
-          log_.info("Registering {} for site ", serverName, site);
+          logger.info("Registering {} for site ", serverName, site);
           sitesByServerName.put(serverName, site);
           return site;
         }
       } catch (PatternSyntaxException ex) {
-        log_.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
+        logger.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
       }
     }
 
-    log_.debug("Lookup for {} did not match any site", serverName);
+    logger.debug("Lookup for {} did not match any site", serverName);
     return null;
   }
 
@@ -369,24 +369,24 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
         SiteServlet siteServlet = new SiteServlet(site, bundleHttpContext);
         paxHttpService.registerServlet(siteRoot, siteServlet, initParameters, bundleHttpContext);
         siteServlets.put(site, siteServlet);
-        log_.info("Site '{}' registered under site://{}", site, siteRoot);
+        logger.info("Site '{}' registered under site://{}", site, siteRoot);
       } catch (NamespaceException e) {
-        log_.error("The alias '{}' is already in use", siteRoot);
+        logger.error("The alias '{}' is already in use", siteRoot);
       } catch (Exception e) {
-        log_.error("Error registering resources for site '{}' at {}: {}", new Object[] {
+        logger.error("Error registering resources for site '{}' at {}: {}", new Object[] {
             site,
             siteRoot,
             e.getMessage() });
-        log_.error(e.getMessage(), e);
+        logger.error(e.getMessage(), e);
       }
 
-      log_.debug("Site '{}' registered under site://{}", site, siteRoot);
+      logger.debug("Site '{}' registered under site://{}", site, siteRoot);
 
     } catch (Exception e) {
-      log_.error("Error setting up site '{}' for http requests: {}", new Object[] {
+      logger.error("Error setting up site '{}' for http requests: {}", new Object[] {
           site,
           e.getMessage() });
-      log_.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
 
     httpRegistrations.put(site, webXml);
@@ -396,14 +396,14 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
       sites.add(site);
       for (String name : site.getHostNames()) {
         if (site.equals(sitesByServerName.get(name))) {
-          log_.error("Another site is already registered to " + name);
+          logger.error("Another site is already registered to " + name);
           continue;
         }
         sitesByServerName.put(name, site);
       }
     }
 
-    log_.debug("Site {} registered", site);
+    logger.debug("Site {} registered", site);
   }
 
   /**
@@ -440,7 +440,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
 
     // TODO: unregister site dispatcher
 
-    log_.debug("Site {} unregistered", site);
+    logger.debug("Site {} unregistered", site);
   }
 
   /**

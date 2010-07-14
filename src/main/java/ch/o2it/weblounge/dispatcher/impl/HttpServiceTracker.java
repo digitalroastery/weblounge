@@ -41,7 +41,7 @@ import javax.servlet.ServletException;
 public class HttpServiceTracker extends ServiceTracker {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(HttpServiceTracker.class);
+  private static final Logger logger = LoggerFactory.getLogger(HttpServiceTracker.class);
 
   /** Main dispatcher */
   private WebloungeDispatcherServlet dispatcher = null;
@@ -75,19 +75,19 @@ public class HttpServiceTracker extends ServiceTracker {
 
     // Register the weblounge dispatcher
     try {
-      log_.debug("Registering weblounge dispatcher with http service {}", reference.getBundle().getSymbolicName());
+      logger.debug("Registering weblounge dispatcher with http service {}", reference.getBundle().getSymbolicName());
       httpService = (HttpService) context.getService(reference);
 
       HttpContext httpContext = httpService.createDefaultHttpContext();
       Dictionary<?, ?> initParams = new Properties();
       httpService.registerServlet(contextPath, dispatcher, initParams, httpContext);
-      log_.info("Weblounge dispatcher hooked up with http service {}", httpService.getClass().getName());
+      logger.info("Weblounge dispatcher hooked up with http service {}", httpService.getClass().getName());
 
     } catch (ServletException e) {
-      log_.error("Error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
+      logger.error("Error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
       httpService = null;
     } catch (NamespaceException e) {
-      log_.error("Namespace error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
+      logger.error("Namespace error registering weblounge dispatcher with {}: {}", httpService, e.getMessage());
       httpService = null;
     }
 
@@ -102,7 +102,7 @@ public class HttpServiceTracker extends ServiceTracker {
    */
   @Override
   public void modifiedService(ServiceReference reference, Object service) {
-    log_.info("Http service was modified");
+    logger.info("Http service was modified");
     super.modifiedService(reference, service);
   }
 
@@ -114,7 +114,7 @@ public class HttpServiceTracker extends ServiceTracker {
    */
   @Override
   public void removedService(ServiceReference reference, Object service) {
-    log_.info("Weblounge dispatcher disconnected from {}", service.getClass().getName());
+    logger.info("Weblounge dispatcher disconnected from {}", service.getClass().getName());
     ((HttpService) service).unregister(contextPath);
     super.removedService(reference, service);
   }

@@ -65,7 +65,7 @@ import javax.servlet.http.HttpServletResponse;
 public final class PageRequestHandlerImpl implements PageRequestHandler {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(PageRequestHandlerImpl.class);
+  protected final static Logger logger = LoggerFactory.getLogger(PageRequestHandlerImpl.class);
 
   /** The singleton handler instance */
   private final static PageRequestHandlerImpl handler = new PageRequestHandlerImpl();
@@ -85,7 +85,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
    */
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
 
-    log_.debug("Page handler agrees to handle {}", request.getUrl());
+    logger.debug("Page handler agrees to handle {}", request.getUrl());
 
     Mode processingMode = Mode.Default;
     WebUrl url = request.getUrl();
@@ -96,14 +96,14 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     // TODO: Think about performance, page lookup is expensive
     // TODO: Add support for XML and JSON
     if (!HTML.equals(request.getFlavor())) {
-      log_.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
+      logger.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
       return false;
     }
 
     // Check the request method
     String requestMethod = request.getMethod();
     if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
-      log_.debug("Page handler answered head request for {}", request.getUrl());
+      logger.debug("Page handler answered head request for {}", request.getUrl());
       return true;
     }
 
@@ -121,7 +121,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
       // Check if the page is already part of the cache
       if (response.startResponse(cacheTags, validTime, recheckTime)) {
-        log_.debug("Page handler answered request for {} from cache", request.getUrl());
+        logger.debug("Page handler answered request for {} from cache", request.getUrl());
         return true;
       }
 
@@ -155,7 +155,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       else {
         ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
         if (contentRepository == null) {
-          log_.warn("Content repository not available while trying to access {}", pageURI);
+          logger.warn("Content repository not available while trying to access {}", pageURI);
           return false;
         }
 
@@ -167,7 +167,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
             pageURI = new PageURIImpl(request);
           page = contentRepository.getPage(pageURI);
         } catch (ContentRepositoryException e) {
-          log_.error("Unable to load page {}: {}", new Object[] {
+          logger.error("Unable to load page {}: {}", new Object[] {
               pageURI,
               e.getMessage(),
               e });
@@ -178,14 +178,14 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
         // Does it exist at all?
         if (page == null) {
-          log_.debug("No page found for {}", pageURI);
+          logger.debug("No page found for {}", pageURI);
           return false;
         }
       }
 
       // Is it published?
       if (!page.isPublished()) {
-        log_.debug("Access to unpublished page {}", pageURI);
+        logger.debug("Access to unpublished page {}", pageURI);
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
         return true;
       }
@@ -197,7 +197,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         // PagePermission p = new PagePermission(page, user);
         // AccessController.checkPermission(p);
       } catch (SecurityException e) {
-        log_.warn("Accessed to page {} denied for user {}", pageURI, user);
+        logger.warn("Accessed to page {} denied for user {}", pageURI, user);
         DispatchUtils.sendAccessDenied(request, response);
         return true;
       }
@@ -216,7 +216,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
       // Does the template support the requested flavor?
       if (!template.supportsFlavor(contentFlavor)) {
-        log_.warn("Template {} does not support requested flavor {}", template, contentFlavor);
+        logger.warn("Template {} does not support requested flavor {}", template, contentFlavor);
         DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, request, response);
         return true;
       }
@@ -237,7 +237,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         response.setRecheckTime(template.getRecheckTime());
         response.setValidTime(template.getValidTime());
 
-        log_.debug("Rendering {} using page template '{}'", path, template);
+        logger.debug("Rendering {} using page template '{}'", path, template);
         template.render(request, response);
       } catch (Exception e) {
         String params = RequestUtils.dumpParameters(request);
@@ -245,15 +245,15 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         Throwable o = e.getCause();
         if (o != null) {
           msg += ": " + o.getMessage();
-          log_.error(msg, o);
+          logger.error(msg, o);
         } else {
-          log_.error(msg, e);
+          logger.error(msg, e);
         }
         DispatchUtils.sendInternalError(request, response);
       }
       return true;
     } catch (IOException e) {
-      log_.error("I/O exception while sending error status: {}", e.getMessage(), e);
+      logger.error("I/O exception while sending error status: {}", e.getMessage(), e);
       return true;
     } finally {
       if (action == null) {
@@ -297,7 +297,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
         target = new PageURIImpl(site, decocedTargetUrl);
       } catch (UnsupportedEncodingException e) {
-        log_.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
+        logger.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
         target = new PageURIImpl(site, "/");
       }
     }

@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 public class WelcomeFileFilter implements javax.servlet.Filter {
 
   /** Logging facility */
-  private static final Logger log_ = LoggerFactory.getLogger(WelcomeFileFilter.class);
+  private static final Logger logger = LoggerFactory.getLogger(WelcomeFileFilter.class);
 
   /** The application root path */
   private String appRoot = null;
@@ -57,11 +57,11 @@ public class WelcomeFileFilter implements javax.servlet.Filter {
     String uri = hreq.getRequestURI();
     String contextPath = hreq.getContextPath();
     String servletPath = hreq.getServletPath();
-    log_.debug("WelcomeFileFilter.URI=" + uri);
-    log_.debug("WelcomeFileFilter.contextPath=" + contextPath);
-    log_.debug("WelcomeFileFilter.servletPath=" + servletPath);
+    logger.debug("WelcomeFileFilter.URI=" + uri);
+    logger.debug("WelcomeFileFilter.contextPath=" + contextPath);
+    logger.debug("WelcomeFileFilter.servletPath=" + servletPath);
     if ((appRoot + bundleUriNamespace).equals(uri)) {
-      log_.debug(uri + " is welcomeURL");
+      logger.debug(uri + " is welcomeURL");
     }
     chain.doFilter(req, res);
   }

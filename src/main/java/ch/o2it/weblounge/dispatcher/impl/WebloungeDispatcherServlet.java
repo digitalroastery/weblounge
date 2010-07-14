@@ -59,7 +59,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private static final long serialVersionUID = 8939686825567275614L;
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(WebloungeDispatcherServlet.class);
+  private static final Logger logger = LoggerFactory.getLogger(WebloungeDispatcherServlet.class);
 
   /** Value of the X-Powered-By header */
   private static final String poweredBy = "Weblounge Content Mangement System";
@@ -202,7 +202,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   protected void service(HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) throws ServletException, IOException {
 
-    log_.debug("Serving {}", httpRequest.getRequestURI());
+    logger.debug("Serving {}", httpRequest.getRequestURI());
 
     // Get the site dispatcher
     Site site = getSiteByRequest(httpRequest);
@@ -214,11 +214,11 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     // See if a site dispatcher was found, and if so, if it's enabled
     if (site == null) {
-      log_.warn("No dispatcher found for {}", request);
+      logger.warn("No dispatcher found for {}", request);
       DispatchUtils.sendNotFound("Not found", request, response);
       return;
     } else if (!site.isRunning()) {
-      log_.warn("Dispatcher for site {} is temporarily not available", site);
+      logger.warn("Dispatcher for site {} is temporarily not available", site);
       DispatchUtils.sendServiceUnavailable("Site is temporarily unavailable", request, response);
       return;
     }
@@ -237,13 +237,13 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // TODO: Synchronize
     for (RequestHandler handler : requestHandler) {
       try {
-        log_.trace("Asking {} to serve {}", handler, request);
+        logger.trace("Asking {} to serve {}", handler, request);
         if (handler.service(request, response)) {
-          log_.debug("{} served request {}", handler, request);
+          logger.debug("{} served request {}", handler, request);
           
           // Notify listeners about finished request
           if (response.hasError()) {
-            log_.info("Request processing failed on {}", request);
+            logger.info("Request processing failed on {}", request);
             fireRequestFailed(request, response, site);
           } else {
             fireRequestDelivered(request, response, site);
@@ -256,19 +256,19 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         if (t.getCause() != null) {
           t = t.getCause();
         }
-        log_.error("Request handler '{}' failed to handle {} {}", new Object[] {
+        logger.error("Request handler '{}' failed to handle {} {}", new Object[] {
             handler,
             request,
             params });
-        log_.error(t.getMessage(), t);
+        logger.error(t.getMessage(), t);
         DispatchUtils.sendInternalError(t.getMessage(), request, response);
       } finally {
-        log_.debug("Finished processing of {}", httpRequest.getRequestURI());
+        logger.debug("Finished processing of {}", httpRequest.getRequestURI());
       }
     }
     
     // Apparently, nobody felt responsible for this request
-    log_.debug("No handler found to handle {}", request);
+    logger.debug("No handler found to handle {}", request);
     DispatchUtils.sendNotFound(request, response);
     fireRequestFailed(request, response, site);
   }
@@ -299,7 +299,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       return null;
     Site site = sites.findSiteByRequest(request);
     if (site != null && !site.isRunning()) {
-      log_.debug("Ignoring request for disabled site {}", site);
+      logger.debug("Ignoring request for disabled site {}", site);
       return null;
     }
     return site;

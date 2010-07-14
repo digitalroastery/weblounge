@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class CacheServiceTracker extends ServiceTracker {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(CacheServiceTracker.class);
+  private static final Logger logger = LoggerFactory.getLogger(CacheServiceTracker.class);
 
   /** Main dispatcher */
   private WebloungeDispatcherServlet dispatcher = null;
@@ -65,9 +65,9 @@ public class CacheServiceTracker extends ServiceTracker {
   @Override
   public Object addingService(ServiceReference reference) {
     ResponseCache cache = (ResponseCache) context.getService(reference);
-    log_.info("Enabling response caching through {}", cache.getClass().getName());
+    logger.info("Enabling response caching through {}", cache.getClass().getName());
     dispatcher.setResponseCache(cache);
-    log_.debug("Registering weblounge dispatcher with {}", cache.getClass().getName());
+    logger.debug("Registering weblounge dispatcher with {}", cache.getClass().getName());
     return cache;
   }
 
@@ -79,7 +79,7 @@ public class CacheServiceTracker extends ServiceTracker {
    */
   @Override
   public void modifiedService(ServiceReference reference, Object service) {
-    log_.info("Cache service was modified");
+    logger.info("Cache service was modified");
     super.modifiedService(reference, service);
   }
 
@@ -91,7 +91,7 @@ public class CacheServiceTracker extends ServiceTracker {
    */
   @Override
   public void removedService(ServiceReference reference, Object service) {
-    log_.info("Response caching disabled ({} disappeared)", service.getClass().getName());
+    logger.info("Response caching disabled ({} disappeared)", service.getClass().getName());
     dispatcher.setResponseCache(null);
     super.removedService(reference, service);
   }

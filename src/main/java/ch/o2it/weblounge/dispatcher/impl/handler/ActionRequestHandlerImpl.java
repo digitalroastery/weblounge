@@ -75,7 +75,7 @@ import javax.servlet.http.HttpServletResponse;
 public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(ActionRequestHandlerImpl.class);
+  private final static Logger logger = LoggerFactory.getLogger(ActionRequestHandlerImpl.class);
 
   /** The registered actions */
   private Map<UrlMatcher, ActionPool> actions = null;
@@ -120,11 +120,11 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         if (flavors.length() > 0)
           flavors.append(",");
         flavors.append(flavor.toString().toLowerCase());
-        log_.debug("Caching action '{}' for url {}", action, normalizedUrl);
+        logger.debug("Caching action '{}' for url {}", action, normalizedUrl);
       }
     }
 
-    log_.info("Action '{}' ({}) registered for site://{}", new Object[] { action, flavors.toString(), registration.toString() });
+    logger.info("Action '{}' ({}) registered for site://{}", new Object[] { action, flavors.toString(), registration.toString() });
   }
 
   /**
@@ -140,7 +140,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       UrlMatcher matcher = new UrlMatcherImpl(action);
       pool = actions.remove(matcher);
       if (pool == null) {
-        log_.warn("Tried to unregister unknown action '{}'", action);
+        logger.warn("Tried to unregister unknown action '{}'", action);
         return false;
       }
     }
@@ -151,13 +151,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       while (cacheIterator.hasNext()) {
         ActionPool candidate = cacheIterator.next().getValue();
         if (candidate.equals(pool)) {
-          log_.debug("Removing '{}' from action url cache", action);
+          logger.debug("Removing '{}' from action url cache", action);
           cacheIterator.remove();
         }
       }
     }
 
-    log_.info("Unregistering action '{}' from {}", action, new WebUrlImpl(action.getSite(), action.getPath()).normalize());
+    logger.info("Unregistering action '{}' from {}", action, new WebUrlImpl(action.getSite(), action.getPath()).normalize());
     return true;
   }
 
@@ -176,7 +176,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     ActionPool pool = null;
     pool = getActionForUrl(url);
     if (pool == null) {
-      log_.debug("No action found to handle {}", url);
+      logger.debug("No action found to handle {}", url);
       return false;
     }
 
@@ -195,7 +195,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // Check the request method. We won't handle just everything
       String requestMethod = request.getMethod();
       if (!Http11Utils.checkDefaultMethods(requestMethod, response)) {
-        log_.debug("Actions are not supposed to handle {} requests", requestMethod);
+        logger.debug("Actions are not supposed to handle {} requests", requestMethod);
         DispatchUtils.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request, response);
         return true;
       }
@@ -211,7 +211,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
         // Check if the page is already part of the cache
         if (response.startResponse(cacheTags, validTime, recheckTime)) {
-          log_.debug("Action answered request for {} from cache", request.getUrl());
+          logger.debug("Action answered request for {} from cache", request.getUrl());
           return true;
         }
 
@@ -227,7 +227,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         response.setHeader("Pragma", "no-cache");
       }
 
-      log_.debug("Action {} will handle {}", action, url);
+      logger.debug("Action {} will handle {}", action, url);
 
       // Call the service method depending on the flavor
       switch (flavor) {
@@ -266,7 +266,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         // action.passivate();
         pool.returnObject(action);
       } catch (Exception e) {
-        log_.error("Error returning action {} to pool: {}", new Object[] {
+        logger.error("Error returning action {} to pool: {}", new Object[] {
             action,
             e.getMessage(),
             e });
@@ -298,7 +298,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       request.setAttribute(WebloungeRequest.PAGE, page);
       // TODO: Check access rights with action configuration
     } catch (ContentRepositoryException e) {
-      log_.error("Error loading target page for action {} at {}", action, url);
+      logger.error("Error loading target page for action {} at {}", action, url);
       DispatchUtils.sendInternalError(request, response);
       return;
     }
@@ -308,7 +308,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     try {
       template = getPageTemplate(page, request);
     } catch (IllegalStateException e) {
-      log_.warn(e.getMessage());
+      logger.warn(e.getMessage());
       DispatchUtils.sendInternalError(request, response);
     }
 
@@ -329,10 +329,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // Have the content delivered
       if (action.startResponse(request, response) == Action.EVAL_REQUEST) {
         if (page != null) {
-          log_.trace("Rendering action '{}' on page {}", action, page);
+          logger.trace("Rendering action '{}' on page {}", action, page);
           PageRequestHandlerImpl.getInstance().service(request, response);
         } else {
-          log_.trace("Rendering action '{}' on ad-hoc page", action);
+          logger.trace("Rendering action '{}' on ad-hoc page", action);
           response.getWriter().println("<!DOCTYPE HTML>");
           response.getWriter().println("<html>\n\t<head>");
           if (action instanceof HTMLAction) {
@@ -348,16 +348,16 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         }
       }
     } catch (IOException e) {
-      log_.error("Error writing action output to client: {}", e.getMessage());
+      logger.error("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
-      log_.error("Error processing action '{}' for {}: {}", new Object[] {
+      logger.error("Error processing action '{}' for {}: {}", new Object[] {
           action,
           request.getUrl(),
           e.getMessage() });
       DispatchUtils.sendError(e.getStatusCode(), request, response);
     } catch (Throwable e) {
-      log_.error("Error processing action '{}' for {}", action, request.getUrl());
-      log_.error(e.getMessage(), e);
+      logger.error("Error processing action '{}' for {}", action, request.getUrl());
+      logger.error(e.getMessage(), e);
       DispatchUtils.sendInternalError(request, response);
     } finally {
       request.removeAttribute(WebloungeRequest.ACTION);
@@ -385,16 +385,16 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         }
       }
     } catch (IOException e) {
-      log_.debug("Error writing action output to client: {}", e.getMessage());
+      logger.debug("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
-      log_.error("Error processing action '{}' for {}: {}", new Object[] {
+      logger.error("Error processing action '{}' for {}: {}", new Object[] {
           action,
           request.getUrl(),
           e.getMessage() });
       DispatchUtils.sendError(e.getStatusCode(), request, response);
     } catch (Throwable e) {
-      log_.error("Error processing action '{}' for {}", action, request.getUrl());
-      log_.error(e.getMessage(), e);
+      logger.error("Error processing action '{}' for {}", action, request.getUrl());
+      logger.error(e.getMessage(), e);
       DispatchUtils.sendInternalError(request, response);
     }
   }
@@ -419,16 +419,16 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         }
       }
     } catch (IOException e) {
-      log_.debug("Error writing action output to client: {}", e.getMessage());
+      logger.debug("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
-      log_.error("Error processing action '{}' for {}: {}", new Object[] {
+      logger.error("Error processing action '{}' for {}: {}", new Object[] {
           action,
           request.getUrl(),
           e.getMessage() });
       DispatchUtils.sendError(e.getStatusCode(), request, response);
     } catch (Throwable e) {
-      log_.error("Error processing action '{}' for {}", action, request.getUrl());
-      log_.error(e.getMessage(), e);
+      logger.error("Error processing action '{}' for {}", action, request.getUrl());
+      logger.error(e.getMessage(), e);
       DispatchUtils.sendInternalError(request, response);
     }
   }
@@ -535,7 +535,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
         target = new PageURIImpl(site, decocedTargetUrl);
       } catch (UnsupportedEncodingException e) {
-        log_.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
+        logger.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
         target = new PageURIImpl(site, "/");
       }
     }
@@ -559,7 +559,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     // otherwise the user will get a 404.
     ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
     if (contentRepository == null) {
-      log_.warn("Content repository not available to read target page for action '{}'", action, target);
+      logger.warn("Content repository not available to read target page for action '{}'", action, target);
       return null;
     }
     
@@ -567,7 +567,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     page = contentRepository.getPage(target);
     if (page == null) {
       if (targetForced) {
-        log_.warn("Output of action '{}' is configured to render on non existing page {}", action, target);
+        logger.warn("Output of action '{}' is configured to render on non existing page {}", action, target);
         return null;
       }
 
@@ -575,7 +575,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       target = new PageURIImpl(site, "/");
       page = contentRepository.getPage(target);
       if (page == null) {
-        log_.debug("Site {} has no homepage as fallback to render actions", site);
+        logger.debug("Site {} has no homepage as fallback to render actions", site);
         return null;
       }
     }
@@ -610,7 +610,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
     // Still nothing?
     if (actionPool == null) {
-      log_.debug("No action registered to handle {}", url);
+      logger.debug("No action registered to handle {}", url);
       return null;
     }
 

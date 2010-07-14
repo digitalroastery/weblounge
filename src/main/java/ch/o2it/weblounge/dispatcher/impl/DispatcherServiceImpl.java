@@ -44,7 +44,7 @@ import java.util.Dictionary;
 public class DispatcherServiceImpl implements DispatcherService, ManagedService {
 
   /** Logging instance */
-  private static final Logger log_ = LoggerFactory.getLogger(DispatcherServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(DispatcherServiceImpl.class);
 
   /** The main dispatcher servlet */
   private WebloungeDispatcherServlet dispatcher = null;
@@ -60,7 +60,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    */
   @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
-    log_.debug("Updating dispatcher service properties");
+    logger.debug("Updating dispatcher service properties");
   }
 
   /**
@@ -74,20 +74,20 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    */
   public void activate(ComponentContext context) {
     BundleContext bundleContext = context.getBundleContext();
-    log_.debug("Activating weblounge dispatcher");
+    logger.debug("Activating weblounge dispatcher");
 
     // Create an http tracker and make sure it forwards to our servlet
     dispatcher = new WebloungeDispatcherServlet();
-    log_.trace("Start looking for http service implementations");
+    logger.trace("Start looking for http service implementations");
     httpTracker = new HttpServiceTracker(bundleContext, dispatcher);
     httpTracker.open();
 
     // Start looking for a cache service
-    log_.trace("Start looking for response cache service implementations");
+    logger.trace("Start looking for response cache service implementations");
     cacheTracker = new CacheServiceTracker(bundleContext, dispatcher);
     cacheTracker.open();
 
-    log_.debug("Weblounge dispatcher activated");
+    logger.debug("Weblounge dispatcher activated");
   }
 
   /**
@@ -100,7 +100,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    *          the component context
    */
   public void deactivate(ComponentContext context) {
-    log_.debug("Deactivating weblounge dispatcher");
+    logger.debug("Deactivating weblounge dispatcher");
 
     // Get rid of the http tracker
     httpTracker.close();
@@ -110,7 +110,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     cacheTracker.close();
     cacheTracker = null;
 
-    log_.debug("Weblounge dispatcher deactivated");
+    logger.debug("Weblounge dispatcher deactivated");
   }
 
   /**
@@ -140,7 +140,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    *          the request handler
    */
   public void addRequestHandler(RequestHandler handler) {
-    log_.info("Registering {}", handler);
+    logger.info("Registering {}", handler);
     dispatcher.addRequestHandler(handler);
   }
 
@@ -151,7 +151,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    *          the request handler
    */
   public void removeRequestHandler(RequestHandler handler) {
-    log_.info("Unregistering {}", handler);
+    logger.info("Unregistering {}", handler);
     dispatcher.removeRequestHandler(handler);
   }
 

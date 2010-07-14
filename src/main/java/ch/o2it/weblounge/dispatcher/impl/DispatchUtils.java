@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 public class DispatchUtils {
 
   /** Logging facility */
-  private final static Logger log_ = LoggerFactory.getLogger(DispatchUtils.class);
+  private final static Logger logger = LoggerFactory.getLogger(DispatchUtils.class);
 
   /** List of dispatcher listeners */
   private final static List<DispatchListener> dispatcher = new ArrayList<DispatchListener>();
@@ -103,7 +103,7 @@ public class DispatchUtils {
 
     // If we get here, then no dispatcher seems to be responsible for handling
     // the request.
-    log_.debug("No dispatch listener took the request.");
+    logger.debug("No dispatch listener took the request.");
     sendError(HttpServletResponse.SC_NOT_FOUND, null, request, response);
   }
 
@@ -143,7 +143,7 @@ public class DispatchUtils {
 
     // If we get here, then no dispatcher seems to be responsible for handling
     // the request.
-    log_.debug("No dispatch listener took the request.");
+    logger.debug("No dispatch listener took the request.");
     sendError(HttpServletResponse.SC_NOT_FOUND, null, request, response);
   }
 
@@ -302,7 +302,7 @@ public class DispatchUtils {
       if (!response.isCommitted())
         response.sendError(status, msg);
     } catch (Exception e2) {
-      log_.error("I/O Error when sending back error message {}: {}", status, e2.getMessage());
+      logger.error("I/O Error when sending back error message {}: {}", status, e2.getMessage());
     }
   }
 
