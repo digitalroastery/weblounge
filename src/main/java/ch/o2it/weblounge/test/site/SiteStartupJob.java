@@ -37,7 +37,7 @@ import java.util.Dictionary;
 public class SiteStartupJob implements JobWorker {
 
   /** Logging facility */
-  protected final static Logger log_ = LoggerFactory.getLogger(SiteStartupJob.class);
+  protected final static Logger logger = LoggerFactory.getLogger(SiteStartupJob.class);
 
   /**
    * {@inheritDoc}
@@ -49,9 +49,9 @@ public class SiteStartupJob implements JobWorker {
       throws JobException {
     Site site = (Site)ctx.get(Site.class.getName());
     if (site != null)
-      log_.info("Site '" + site + "' started");
+      logger.info("Site '" + site + "' started");
     else
-      log_.warn("Site not found in context");
+      logger.warn("Site not found in context");
   }
 
 }

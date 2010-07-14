@@ -51,7 +51,7 @@ import java.util.List;
 public final class TestCommand {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(TestCommand.class);
+  private static final Logger logger = LoggerFactory.getLogger(TestCommand.class);
 
   /** The tests */
   private List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
@@ -157,11 +157,11 @@ public final class TestCommand {
 
     // Print the test header
     Date startDate = new Date();
-    log_.info("------------------------------------------------------------------------");
-    log_.info("Running Integration Tests");
-    log_.info("------------------------------------------------------------------------");
-    log_.info("Tests: " + tests.size());
-    log_.info("Started at: " + WebloungeDateFormat.formatStatic(startDate));
+    logger.info("------------------------------------------------------------------------");
+    logger.info("Running Integration Tests");
+    logger.info("------------------------------------------------------------------------");
+    logger.info("Tests: " + tests.size());
+    logger.info("Started at: " + WebloungeDateFormat.formatStatic(startDate));
     
     // Execute the tests
     for (IntegrationTest test : tests) {
@@ -175,11 +175,11 @@ public final class TestCommand {
     long time = endDate.getTime() - startDate.getTime();
       
     // Print the summary
-    log_.info(" ");
-    log_.info(" ");
-    log_.info("------------------------------------------------------------------------");
-    log_.info("Test Summary:");
-    log_.info("------------------------------------------------------------------------");
+    logger.info(" ");
+    logger.info(" ");
+    logger.info("------------------------------------------------------------------------");
+    logger.info("Test Summary:");
+    logger.info("------------------------------------------------------------------------");
     for (IntegrationTest test : tests) {
       StringBuffer buf = new StringBuffer(test.getName());
       buf.append(" ");
@@ -193,18 +193,18 @@ public final class TestCommand {
           buf.append(".");
         buf.append(" FAILURE");
       }
-      log_.info(buf.toString());
+      logger.info(buf.toString());
     }
-    log_.info("------------------------------------------------------------------------");
-    log_.info("------------------------------------------------------------------------");
+    logger.info("------------------------------------------------------------------------");
+    logger.info("------------------------------------------------------------------------");
     if (failed.size() == 0)
-      log_.info("SUCCESS: " + succeeded.size() + " TEST" + (succeeded.size() > 1 ? "S" : "") + " PASSED");
+      logger.info("SUCCESS: " + succeeded.size() + " TEST" + (succeeded.size() > 1 ? "S" : "") + " PASSED");
     else
-      log_.info("FAILURE: " + failed.size() + " TEST"  + (succeeded.size() > 1 ? "S" : "") + " FAILED");
-    log_.info("------------------------------------------------------------------------");
-    log_.info("Total time: " + ConfigurationUtils.toHumanReadableDuration(time));
-    log_.info("Finished at: " + WebloungeDateFormat.formatStatic(endDate));
-    log_.info("------------------------------------------------------------------------");
+      logger.info("FAILURE: " + failed.size() + " TEST"  + (succeeded.size() > 1 ? "S" : "") + " FAILED");
+    logger.info("------------------------------------------------------------------------");
+    logger.info("Total time: " + ConfigurationUtils.toHumanReadableDuration(time));
+    logger.info("Finished at: " + WebloungeDateFormat.formatStatic(endDate));
+    logger.info("------------------------------------------------------------------------");
   }
 
   /**
@@ -216,15 +216,15 @@ public final class TestCommand {
    * @return <code>true</code> if the test passed
    */
   private boolean execute(IntegrationTest test) {
-    log_.info("------------------------------------------------------------------------");
-    log_.info("Running test '" + test + "'");
-    log_.info("------------------------------------------------------------------------");
+    logger.info("------------------------------------------------------------------------");
+    logger.info("Running test '" + test + "'");
+    logger.info("------------------------------------------------------------------------");
     try {
       test.execute("http://127.0.0.1:8080");
-      log_.info("Test '" + test + "' succeeded");
+      logger.info("Test '" + test + "' succeeded");
       return true;
     } catch (Throwable t) {
-      log_.warn("Test '" + test + "' failed: {}", t.getMessage(), t);
+      logger.warn("Test '" + test + "' failed: {}", t.getMessage(), t);
       return false;
     }
   }
@@ -237,7 +237,7 @@ public final class TestCommand {
    */
   public void activate(ComponentContext context) {
     BundleContext bundleContext = context.getBundleContext();
-    log_.debug("Registering test commands");
+    logger.debug("Registering test commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
     commands.put(CommandProcessor.COMMAND_SCOPE, "weblounge");
     commands.put(CommandProcessor.COMMAND_FUNCTION, new String[] {
