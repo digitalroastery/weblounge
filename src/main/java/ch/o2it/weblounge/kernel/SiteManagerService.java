@@ -41,7 +41,7 @@ import java.util.List;
 public final class SiteManagerService implements SiteListener {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(SiteManagerService.class);
+  private static final Logger logger = LoggerFactory.getLogger(SiteManagerService.class);
 
   /** The action request handler */
   private ActionRequestHandler actionRequestHandler = null;
@@ -83,12 +83,12 @@ public final class SiteManagerService implements SiteListener {
     site.addSiteListener(this);
     if (site.isStartedAutomatically()) {
       try {
-        log_.debug("Starting site '{}'", site);
+        logger.debug("Starting site '{}'", site);
         site.start();
       } catch (IllegalStateException e) {
-        log_.error("Site '{}' could not be started: {}", e.getMessage(), e);
+        logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
       } catch (SiteException e) {
-        log_.error("Site '{}' could not be started: {}", e.getMessage(), e);
+        logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
       }
     }
   }
@@ -105,7 +105,7 @@ public final class SiteManagerService implements SiteListener {
       if (site.isRunning())
         site.stop();
     } catch (Exception e) {
-      log_.error("Error stopping site '{}'", e);
+      logger.error("Error stopping site '{}'", e);
     }
   }
 
@@ -117,7 +117,7 @@ public final class SiteManagerService implements SiteListener {
    *          the action request handler
    */
   public void addActionRequestHandler(ActionRequestHandler handler) {
-    log_.debug("Registering {}", handler);
+    logger.debug("Registering {}", handler);
     actionRequestHandler = handler;
     registerAllSites();
   }
@@ -130,7 +130,7 @@ public final class SiteManagerService implements SiteListener {
    *          the action request handler
    */
   public void removeActionRequestHandler(ActionRequestHandler handler) {
-    log_.debug("Unregistering {}", handler);
+    logger.debug("Unregistering {}", handler);
     unregisterAllSites();
     actionRequestHandler = null;
   }

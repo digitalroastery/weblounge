@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class WebloungeKernel {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(WebloungeKernel.class);
+  private static final Logger logger = LoggerFactory.getLogger(WebloungeKernel.class);
 
   /** The weblounge scheduler */
   private Scheduler scheduler = null;
@@ -48,17 +48,17 @@ public class WebloungeKernel {
    */
   public void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
-    log_.info("Starting common weblounge services", this);
+    logger.info("Starting common weblounge services", this);
 
     // Start and register the quartz scheduler
     try {
-      log_.info("Starting job scheduler");
+      logger.info("Starting job scheduler");
       StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
       scheduler = schedulerFactory.getScheduler();
       scheduler.start();
       bundleContext.registerService(Scheduler.class.getName(), scheduler, null);
     } catch (SchedulerException e) {
-      log_.error("Error starting job scheduler: {}", e.getMessage());
+      logger.error("Error starting job scheduler: {}", e.getMessage());
       throw e;
     }
   }
@@ -70,9 +70,9 @@ public class WebloungeKernel {
    *          the component context
    */
   public void deactivate(ComponentContext context) throws Exception {
-    log_.info("Stopping common weblounge services", this);
+    logger.info("Stopping common weblounge services", this);
     scheduler.shutdown();
-    log_.info("Job scheduler stopped");
+    logger.info("Job scheduler stopped");
   }
 
 }

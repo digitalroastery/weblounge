@@ -56,7 +56,7 @@ import java.util.List;
 public class SiteCommand {
 
   /** Logger */
-  private static final Logger log_ = LoggerFactory.getLogger(SiteCommand.class);
+  private static final Logger logger = LoggerFactory.getLogger(SiteCommand.class);
 
   /** The list of registered sites */
   private List<Site> sites = new ArrayList<Site>();
@@ -598,7 +598,7 @@ public class SiteCommand {
    */
   public void activate(ComponentContext context) {
     BundleContext bundleContext = context.getBundleContext();
-    log_.debug("Registering site commands");
+    logger.debug("Registering site commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
     commands.put(CommandProcessor.COMMAND_SCOPE, "weblounge");
     commands.put(CommandProcessor.COMMAND_FUNCTION, new String[] {
