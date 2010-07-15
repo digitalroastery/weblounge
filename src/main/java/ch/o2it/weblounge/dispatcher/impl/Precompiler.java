@@ -44,7 +44,7 @@ public class Precompiler {
 
   /** The site servlet */
   protected SiteServlet servlet = null;
-  
+
   /** The worker */
   protected PrecompileWorker worker = null;
 
@@ -76,7 +76,7 @@ public class Precompiler {
     workerThread.setDaemon(true);
     workerThread.start();
   }
-  
+
   /**
    * Stops the current precompilation work.
    */
@@ -89,11 +89,12 @@ public class Precompiler {
 
     /** The servlet to use */
     private SiteServlet servlet = null;
- 
+
     /**
      * Creates a new jsp precompilation worker.
      * 
-     * @param servlet the servlet
+     * @param servlet
+     *          the servlet
      */
     public PrecompileWorker(SiteServlet servlet) {
       this.servlet = servlet;
@@ -133,15 +134,14 @@ public class Precompiler {
         request.setPathInfo(pathInfo);
         request.setRequestURI(UrlSupport.concat(httpContextURI, pathInfo));
         try {
-          logger.info("Precompiling {}:/{}", site, pathInfo);
+          logger.debug("Precompiling {}:/{}", site, pathInfo);
           servlet.service(request, response);
         } catch (Throwable t) {
           logger.warn("Error precompiling " + site + ":/" + pathInfo, t);
         }
       }
-      
-      if (!keepGoing)
-        logger.info("Jsp precompilation for '{}' canceled", site);
+
+      logger.info("Jsp precompilation for '{}' {}", site, keepGoing ? "finished" : "canceled");
     }
 
   }
