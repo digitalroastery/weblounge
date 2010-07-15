@@ -29,22 +29,32 @@ public class ContentRepositoryException extends Exception {
   private static final long serialVersionUID = -8768389027972761077L;
 
   /**
+   * Creates a new repository exception with the given error message.
+   * 
    * @param message
+   *          the error message
    */
   public ContentRepositoryException(String message) {
     super(message);
   }
 
   /**
+   * Creates a new repository exception with the given cause.
+   * 
    * @param cause
+   *          the reason of failure
    */
   public ContentRepositoryException(Throwable cause) {
     super(cause);
   }
 
   /**
+   * Creates a new repository exception with the given error message and cause.
+   * 
    * @param message
+   *          the error message
    * @param cause
+   *          the reason of failure
    */
   public ContentRepositoryException(String message, Throwable cause) {
     super(message, cause);
