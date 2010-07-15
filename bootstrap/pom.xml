@@ -10,9 +10,4 @@
     <artifactId>weblounge-base</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-
-  <dependencies/>
-
-  <build/>
-
 </project>
