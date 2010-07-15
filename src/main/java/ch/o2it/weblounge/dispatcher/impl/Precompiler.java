@@ -141,7 +141,7 @@ public class Precompiler {
         }
       }
 
-      logger.info("Jsp precompilation for '{}' {}", site, keepGoing ? "finished" : "canceled");
+      logger.info("Precompilation for '{}' {}", site, keepGoing ? "finished" : "canceled");
     }
 
   }
