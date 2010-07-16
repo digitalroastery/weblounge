@@ -35,8 +35,6 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.command.CommandProcessor;
-import org.osgi.service.command.CommandSession;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,12 +74,10 @@ public class SiteCommand {
    * <li><code>site &lt;id&gt; search &lt;terms&gt;</code></li>
    * </ul>
    * 
-   * @param session
-   *          the command session
    * @param args
    *          the list of arguments to this command
    */
-  public void site(CommandSession session, String[] args) {
+  public void site(String[] args) {
     if (args.length == 0) {
       list();
       return;
@@ -255,9 +251,9 @@ public class SiteCommand {
         title("page");
         pad("id", page.getURI().getId().toString());
         pad("path", page.getURI().getPath());
-        
+
         section("lifecycle");
-        
+
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG);
 
         // Created
@@ -306,9 +302,8 @@ public class SiteCommand {
         }
         pad("subjects", subjectList.toString());
 
-
         section("content");
-        
+
         // composers
         StringBuffer composerList = new StringBuffer();
         for (Composer c : page.getComposers()) {
@@ -357,13 +352,13 @@ public class SiteCommand {
     // Is it a page?
     try {
       SearchResult result = repository.findPages(query);
-      
+
       // Format the output
       Formatter formatter = new Formatter(System.out);
       StringBuffer format = new StringBuffer();
       int padding = Long.toString(result.getDocumentCount()).length();
       format.append("%1$#").append(padding).append("s. %2$s\n");
-      
+
       // List results
       int i = 1;
       for (SearchResultItem item : result.getItems()) {
@@ -600,10 +595,8 @@ public class SiteCommand {
     BundleContext bundleContext = context.getBundleContext();
     logger.debug("Registering site commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
-    commands.put(CommandProcessor.COMMAND_SCOPE, "weblounge");
-    commands.put(CommandProcessor.COMMAND_FUNCTION, new String[] {
-        "site",
-        "sites" });
+    commands.put("osgi.command.scope", "weblounge");
+    commands.put("osgi.command.function", new String[] { "site", "sites" });
     bundleContext.registerService(getClass().getName(), this, commands);
   }
 
