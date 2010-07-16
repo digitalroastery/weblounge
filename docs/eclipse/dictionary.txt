@@ -61,3 +61,5 @@ transactional
 readonly
 validator
 solr
+precompilation
+jsp
