@@ -86,6 +86,9 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /** Configuration key prefix for jsp precompilation */
   public static final String OPT_PRECOMPILE = "precompile";
 
+  /** Configuration key prefix for jsp precompilation logging */
+  public static final String OPT_PRECOMPILE_LOGGING = "precompile.logerrors";
+
   /** Configuration key prefix for jasper configuration values */
   public static final String OPT_JASPER_PREFIX = "jasper.";
 
@@ -128,6 +131,9 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /** List of precompilers */
   private WeakHashMap<Site, Precompiler> precompilers = new WeakHashMap<Site, Precompiler>();
 
+  /** True to log errors that appear during precompilation */
+  private boolean logCompileErrors = false;
+  
   /**
    * Callback from the OSGi environment to activate the service.
    * <p>
@@ -224,7 +230,12 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
     String precompileSetting = StringUtils.trimToNull((String)config.get(OPT_PRECOMPILE));
     precompile = precompileSetting == null || "true".equalsIgnoreCase(precompileSetting);
     logger.debug("Jsp precompilation {}", precompile ? "activated" : "deactivated");
-    
+
+    // Log compilation errors?
+    String logPrecompileErrors = StringUtils.trimToNull((String)config.get(OPT_PRECOMPILE_LOGGING));
+    logCompileErrors = logPrecompileErrors != null && "true".equalsIgnoreCase(logPrecompileErrors);
+    logger.debug("Precompilation errors will {} logged", logCompileErrors ? "be" : "not be");
+
     // Store the jasper configuration keys
     Enumeration<?> keys = config.keys();
     while (keys.hasMoreElements()) {
@@ -418,7 +429,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
       
       // Start the precompiler if requested
       if (precompile) {
-        Precompiler precompiler = new Precompiler(siteServlet);
+        Precompiler precompiler = new Precompiler(siteServlet, logCompileErrors);
         precompilers.put(site, precompiler);
         precompiler.precompile();
       }

@@ -51,14 +51,20 @@ public class Precompiler {
   /** Flag to indicate whether to keep working or not */
   protected boolean keepGoing = true;
 
+  /** Switch for precompiler error logging */
+  protected boolean logErrors = true;
+
   /**
    * Creates a new precompiler for the site identified by the servlet.
    * 
    * @param servlet
    *          the site servlet
+   * @param logErrors
+   *          <code>true</code> to log precompilation errors
    */
-  public Precompiler(SiteServlet servlet) {
+  public Precompiler(SiteServlet servlet, boolean logErrors) {
     this.servlet = servlet;
+    this.logErrors = logErrors;
   }
 
   /**
@@ -119,7 +125,7 @@ public class Precompiler {
       request.setServletPath(httpContextURI);
       MockHttpServletResponse response = new MockHttpServletResponse();
 
-      // Collect all jsp files and ask for precompiliation
+      // Collect all jsp files and ask for precompilation
       Enumeration<URL> jspEntries = bundle.findEntries(bundlePath, "*.jsp", true);
       if (jspEntries == null) {
         logger.debug("No java server pages found to precompile for {}", site);
@@ -127,6 +133,7 @@ public class Precompiler {
       }
 
       logger.info("Precompiling java server pages for '{}'", site);
+      int errorCount = 0;
       while (keepGoing && jspEntries.hasMoreElements()) {
         URL entry = jspEntries.nextElement();
         String path = entry.getPath();
@@ -137,11 +144,24 @@ public class Precompiler {
           logger.debug("Precompiling {}:/{}", site, pathInfo);
           servlet.service(request, response);
         } catch (Throwable t) {
-          logger.warn("Error precompiling " + site + ":/" + pathInfo, t);
+          if (logErrors)
+            logger.warn("Error precompiling " + site + ":/" + pathInfo, t);
+          errorCount ++;
         }
       }
 
-      logger.info("Precompilation for '{}' {}", site, keepGoing ? "finished" : "canceled");
+      // Log the precompilation results
+      if (!keepGoing) {
+        logger.info("Precompilation for '{}' canceled", site);
+      } else if (!logErrors && errorCount > 0) {
+        String compilationResult = "finished";
+        compilationResult += " with " + errorCount + " errors";
+        logger.info("Precompilation for '{}' {}", site, compilationResult);
+        if (!logErrors)
+          logger.info("Precompilation error logging can be enabled in the site registration service");
+      } else {
+        logger.info("Precompilation for '{}' finished", site);
+      }
     }
 
   }
