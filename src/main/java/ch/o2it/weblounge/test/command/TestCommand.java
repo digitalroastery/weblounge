@@ -32,8 +32,6 @@ import ch.o2it.weblounge.test.harness.StaticResourcesTest;
 import ch.o2it.weblounge.test.harness.XMLActionTest;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.command.CommandProcessor;
-import org.osgi.service.command.CommandSession;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,36 +62,37 @@ public final class TestCommand {
    * <li><code>test <id></li>
    * </ul>
    * 
-   * @param session
-   *          the command session
    * @param args
    *          the list of arguments to this command
    */
-  public void test(CommandSession session, String[] args) {
+  public void test(String[] args) {
     if (args.length == 0) {
       list();
       return;
     } else if (args.length == 1) {
       if ("list".equals(args[0])) {
         list();
-      } else if ("all".equals(args[0])) {
-        executeAll(tests);
-      } else {
-        String id = args[0];
-
-        // Look up the test
-        IntegrationTest test = null;
-        try {
-          test = tests.get(Integer.parseInt(id) - 1);
-          List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
-          tests.add(test);
+    } else if (args.length == 2) {
+      if ("run".equals(args[0])) {
+        if ("all".equals(args[1]))
           executeAll(tests);
-        } catch (NumberFormatException e) {
-          System.out.println("Unknown test: " + id);
-          return;
-        } catch (IndexOutOfBoundsException e) {
-          System.out.println("Unknown test: " + id + " Please choose between [1.." + tests.size() + "]");
-          return;
+        } else {
+          String id = args[0];
+
+          // Look up the test
+          IntegrationTest test = null;
+          try {
+            test = tests.get(Integer.parseInt(id) - 1);
+            List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+            tests.add(test);
+            executeAll(tests);
+          } catch (NumberFormatException e) {
+            System.out.println("Unknown test: " + id);
+            return;
+          } catch (IndexOutOfBoundsException e) {
+            System.out.println("Unknown test: " + id + " Please choose between [1.." + tests.size() + "]");
+            return;
+          }
         }
       }
     } else {
@@ -239,8 +238,8 @@ public final class TestCommand {
     BundleContext bundleContext = context.getBundleContext();
     logger.debug("Registering test commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
-    commands.put(CommandProcessor.COMMAND_SCOPE, "weblounge");
-    commands.put(CommandProcessor.COMMAND_FUNCTION, new String[] {
+    commands.put("osgi.command.scope", "weblounge");
+    commands.put("osgi.command.function", new String[] {
         "test",
         "tests" });
     bundleContext.registerService(getClass().getName(), this, commands);
