@@ -22,8 +22,10 @@ package ch.o2it.weblounge.contentrepository;
 
 import org.junit.Ignore;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +36,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utility implementation for bundle related tests.
@@ -274,6 +277,56 @@ public class StandaloneBundle implements Bundle {
    * @see org.osgi.framework.Bundle#update(java.io.InputStream)
    */
   public void update(InputStream in) throws BundleException {
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.framework.Bundle#getBundleContext()
+   */
+  public BundleContext getBundleContext() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.framework.Bundle#getSignerCertificates(int)
+   */
+  public Map getSignerCertificates(int signersType) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.framework.Bundle#getVersion()
+   */
+  public Version getVersion() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.framework.Bundle#start(int)
+   */
+  public void start(int options) throws BundleException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.framework.Bundle#stop(int)
+   */
+  public void stop(int options) throws BundleException {
+    // TODO Auto-generated method stub
+    
   }
 
 }
