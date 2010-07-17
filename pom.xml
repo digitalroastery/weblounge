@@ -88,7 +88,6 @@
       </activation>
       <modules>
       <module>bootstrap</module>
-      <module>modules/weblounge-admin</module>
       <module>modules/weblounge-cache-api</module>
       <module>modules/weblounge-cache</module>
       <module>modules/weblounge-common-api</module>
