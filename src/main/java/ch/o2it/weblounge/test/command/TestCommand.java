@@ -70,14 +70,14 @@ public final class TestCommand {
       list();
       return;
     } else if (args.length == 1) {
-      if ("list".equals(args[0])) {
+      if ("list".equals(args[0]))
         list();
     } else if (args.length == 2) {
       if ("run".equals(args[0])) {
-        if ("all".equals(args[1]))
+        if ("all".equals(args[1])) {
           executeAll(tests);
         } else {
-          String id = args[0];
+          String id = args[1];
 
           // Look up the test
           IntegrationTest test = null;
@@ -161,7 +161,7 @@ public final class TestCommand {
     logger.info("------------------------------------------------------------------------");
     logger.info("Tests: " + tests.size());
     logger.info("Started at: " + WebloungeDateFormat.formatStatic(startDate));
-    
+
     // Execute the tests
     for (IntegrationTest test : tests) {
       if (execute(test))
@@ -169,10 +169,10 @@ public final class TestCommand {
       else
         failed.add(test);
     }
-    
+
     Date endDate = new Date();
     long time = endDate.getTime() - startDate.getTime();
-      
+
     // Print the summary
     logger.info(" ");
     logger.info(" ");
@@ -199,7 +199,7 @@ public final class TestCommand {
     if (failed.size() == 0)
       logger.info("SUCCESS: " + succeeded.size() + " TEST" + (succeeded.size() > 1 ? "S" : "") + " PASSED");
     else
-      logger.info("FAILURE: " + failed.size() + " TEST"  + (succeeded.size() > 1 ? "S" : "") + " FAILED");
+      logger.info("FAILURE: " + failed.size() + " TEST" + (succeeded.size() > 1 ? "S" : "") + " FAILED");
     logger.info("------------------------------------------------------------------------");
     logger.info("Total time: " + ConfigurationUtils.toHumanReadableDuration(time));
     logger.info("Finished at: " + WebloungeDateFormat.formatStatic(endDate));
@@ -239,9 +239,7 @@ public final class TestCommand {
     logger.debug("Registering test commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
     commands.put("osgi.command.scope", "weblounge");
-    commands.put("osgi.command.function", new String[] {
-        "test",
-        "tests" });
+    commands.put("osgi.command.function", new String[] { "test", "tests" });
     bundleContext.registerService(getClass().getName(), this, commands);
 
     // Load the tests
