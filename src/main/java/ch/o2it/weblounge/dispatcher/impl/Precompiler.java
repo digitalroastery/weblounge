@@ -40,7 +40,7 @@ import java.util.Enumeration;
 public class Precompiler {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SiteRegistrationServiceImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(SiteRegistrationServiceImpl.class);
 
   /** The site servlet */
   protected SiteServlet servlet = null;
@@ -156,7 +156,7 @@ public class Precompiler {
       } else if (!logErrors && errorCount > 0) {
         String compilationResult = "finished";
         compilationResult += " with " + errorCount + " errors";
-        logger.info("Precompilation for '{}' {}", site, compilationResult);
+        logger.warn("Precompilation for '{}' {}", site, compilationResult);
         if (!logErrors)
           logger.info("Precompilation error logging can be enabled in the site registration service");
       } else {
