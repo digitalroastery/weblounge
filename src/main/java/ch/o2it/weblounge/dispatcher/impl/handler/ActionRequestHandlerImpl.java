@@ -115,7 +115,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     synchronized (urlCache) {
       for (RequestFlavor flavor : action.getFlavors()) {
         WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Page.LIVE, flavor);
-        String normalizedUrl = actionUrl.normalize(false, false, true);
+        String normalizedUrl = actionUrl.normalize(true, false, false, true);
         urlCache.put(normalizedUrl, pool);
         if (flavors.length() > 0)
           flavors.append(",");
@@ -232,20 +232,31 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // Call the service method depending on the flavor
       switch (flavor) {
         case HTML:
-          if (!action.supportsFlavor(flavor))
+          if (!action.supportsFlavor(flavor) && !(action instanceof HTMLAction))
             return false;
           serveHTML(action, request, response);
           break;
         case XML:
-          if (!action.supportsFlavor(flavor))
+          if (!action.supportsFlavor(flavor) && !(action instanceof XMLAction))
             return false;
           serveXML(action, request, response);
           break;
         case JSON:
-          if (!action.supportsFlavor(flavor))
+          if (!action.supportsFlavor(flavor) && !(action instanceof JSONAction))
             return false;
           serveJSON(action, request, response);
           break;
+        default:
+          if (action.supportsFlavor(RequestFlavor.HTML) || action instanceof HTMLAction)
+            serveHTML(action, request, response);
+          else if (action.supportsFlavor(RequestFlavor.XML) || action instanceof XMLAction)
+            serveXML(action, request, response);
+          else if (action.supportsFlavor(RequestFlavor.JSON) || action instanceof JSONAction)
+            serveJSON(action, request, response);
+          else {
+            logger.warn("Unable to serve {}: flavor mismatch");
+            DispatchUtils.sendError(HttpServletResponse.SC_NOT_FOUND, request, response);
+          }
       }
 
       // Finish cache handling
@@ -592,7 +603,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
    * @return the handler
    */
   private ActionPool getActionForUrl(WebUrl url) {
-    String normalizedUrl = url.normalize(false, false, true);
+    String normalizedUrl = url.normalize(true, false, false, true);
 
     // Try to use the url cache
     ActionPool actionPool = urlCache.get(normalizedUrl);
@@ -601,13 +612,19 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
     // Nothing is in the cache, let's see if this is simply the first time
     // that this action is being called
+    int maxMatchLength = 0;
     for (Entry<UrlMatcher, ActionPool> entry : actions.entrySet()) {
-      if (entry.getKey().matches(url)) {
-        actionPool = entry.getValue();
-        break;
+      UrlMatcher matcher = entry.getKey();
+      if (matcher.matches(url)) {
+        ActionPool pool = entry.getValue();
+        int matchLength = matcher.getMountpoint().length();
+        if (matchLength > maxMatchLength) {
+          maxMatchLength = matchLength;
+          actionPool = pool;
+        }
       }
     }
-
+    
     // Still nothing?
     if (actionPool == null) {
       logger.debug("No action registered to handle {}", url);
