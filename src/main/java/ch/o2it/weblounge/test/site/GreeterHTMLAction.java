@@ -81,6 +81,8 @@ public class GreeterHTMLAction extends HTMLActionSupport {
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws ActionException {
     try {
+      response.setCharacterEncoding("UTF-8");
+
       String htmlGreeting = StringEscapeUtils.escapeHtml(greeting);
       IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getWriter());
 

@@ -97,7 +97,7 @@ public class HTMLActionTest extends IntegrationTestBase {
           assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
           
           // Look at the document contents
-          String responseHTML = IOUtils.toString(response.getEntity().getContent());
+          String responseHTML = IOUtils.toString(response.getEntity().getContent(), "utf-8");
           String responseXML = TestSiteUtils.unescapeHtml(responseHTML);
           DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
           factory.setCoalescing(true);
@@ -137,7 +137,6 @@ public class HTMLActionTest extends IntegrationTestBase {
         }
       }
     }
-
   }
 
 }
