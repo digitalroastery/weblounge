@@ -271,7 +271,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       flavor = url.getFlavor();
     else
       flavor = getUrl().getFlavor();
-    return flavor != null ? flavor : RequestFlavor.HTML;
+    // TODO: Look at accepts-header (text/json, text/xml, text/...)
+    return flavor != null ? flavor : RequestFlavor.ANY;
   }
 
   /**

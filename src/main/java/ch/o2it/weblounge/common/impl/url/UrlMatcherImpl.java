@@ -71,11 +71,33 @@ public class UrlMatcherImpl implements UrlMatcher {
   public boolean matches(WebUrl url) {
     if (!site.equals(url.getSite()))
       return false;
-    if (!url.getPath().startsWith(this.path))
+    String path = url.normalize(false, false, false, false);
+    String normalizedPath = url.normalize(false, false, false, true);
+    if (!path.startsWith(this.path) && !normalizedPath.startsWith(this.path))
       return false;
-    if (!flavors.contains(url.getFlavor()))
+    // TODO: check for extension
+    RequestFlavor flavor = url.getFlavor();
+    if (!flavors.contains(flavor) && !flavor.equals(RequestFlavor.ANY))
       return false;
     return true;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.url.UrlMatcher#getMountpoint()
+   */
+  public String getMountpoint() {
+    return path;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.url.UrlMatcher#getExtension()
+   */
+  public String getExtension() {
+    return extension;
   }
   
   /**

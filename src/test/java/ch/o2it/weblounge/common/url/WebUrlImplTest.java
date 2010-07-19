@@ -306,7 +306,7 @@ public class WebUrlImplTest {
    */
   @Test
   public void testGetFlavor() {
-    assertEquals(RequestFlavor.HTML, liveUrl.getFlavor());
+    assertEquals(RequestFlavor.ANY, liveUrl.getFlavor());
     assertEquals(RequestFlavor.JSON, flavoredSegmentedLiveUrl.getFlavor());
     assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/json").getFlavor());
     assertEquals(RequestFlavor.JSON, new WebUrlImpl(siteMock, "/test/work/json").getFlavor());
@@ -318,7 +318,7 @@ public class WebUrlImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean)}
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean, boolean)}
    * .
    */
   @Test
@@ -331,34 +331,34 @@ public class WebUrlImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean)}
+   * {@link ch.o2it.weblounge.common.impl.url.WebUrlImpl#normalize(boolean, boolean, boolean, boolean)}
    * .
    */
   @Test
   public void testNormalizeBooleanBooleanBoolean() {
     WebUrl url = flavoredLocalizedVersionedUrl;
     String fullUrl = UrlSupport.concat(hostname, flavoredLocalizedVersionedPath);
-    assertEquals(fullUrl, url.normalize(true, true, true));
+    assertEquals(fullUrl, url.normalize(true, true, true, true));
 
     // Everything
-    assertTrue(url.normalize(true, true, true).indexOf(Long.toString(url.getVersion())) > 0);
-    assertTrue(url.normalize(true, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
-    assertTrue(url.normalize(true, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+    assertTrue(url.normalize(true, true, true, true).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, true, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(true, true, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
 
     // Everything but the version
-    assertTrue(url.normalize(false, true, true).indexOf(Long.toString(url.getVersion())) < 0);
-    assertTrue(url.normalize(false, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
-    assertTrue(url.normalize(false, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+    assertTrue(url.normalize(true, false, true, true).indexOf(Long.toString(url.getVersion())) < 0);
+    assertTrue(url.normalize(true, false, true, true).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(true, false, true, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
 
     // Everything but the language
-    assertTrue(url.normalize(true, false, true).indexOf(Long.toString(url.getVersion())) > 0);
-    assertTrue(url.normalize(true, false, true).indexOf(url.getLanguage().getIdentifier().toString()) == -1);
-    assertTrue(url.normalize(true, false, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
+    assertTrue(url.normalize(true, true, false, true).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, true, false, true).indexOf(url.getLanguage().getIdentifier().toString()) == -1);
+    assertTrue(url.normalize(true, true, false, true).indexOf(url.getFlavor().toString().toLowerCase()) > 0);
 
     // Everything but the flavor
-    assertTrue(url.normalize(true, true, false).indexOf(Long.toString(url.getVersion())) > 0);
-    assertTrue(url.normalize(true, true, false).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
-    assertTrue(url.normalize(true, true, false).indexOf(url.getFlavor().toString().toLowerCase()) == -1);
+    assertTrue(url.normalize(true, true, true, false).indexOf(Long.toString(url.getVersion())) > 0);
+    assertTrue(url.normalize(true, true, true, false).indexOf(url.getLanguage().getIdentifier().toString()) > 0);
+    assertTrue(url.normalize(true, true, true, false).indexOf(url.getFlavor().toString().toLowerCase()) == -1);
   }
 
 }

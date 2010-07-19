@@ -56,7 +56,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   private final static Pattern segmentInspector = Pattern.compile("^(.*://)?(.*?)(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
 
   /** The default request flavor */
-  private RequestFlavor defaultFlavor = RequestFlavor.HTML;
+  private RequestFlavor defaultFlavor = RequestFlavor.ANY;
   
   /** The associated site */
   protected Site site = null;
@@ -296,20 +296,21 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @see ch.o2it.weblounge.common.url.WebUrl#normalize()
    */
   public String normalize() {
-    return normalize(true, true, true);
+    return normalize(true, true, true, true);
   }
   
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.url.WebUrl#normalize(boolean, boolean, boolean)
+   * @see ch.o2it.weblounge.common.url.WebUrl#normalize(boolean, boolean, boolean, boolean)
    */
-  public String normalize(boolean includeVersion, boolean includeLanguage,
-      boolean includeFlavor) {
+  public String normalize(boolean includeHost, boolean includeVersion,
+      boolean includeLanguage, boolean includeFlavor) {
     StringBuffer buf = new StringBuffer();
     
     // Site
-    buf.append(site.getHostName());
+    if (includeHost)
+      buf.append(site.getHostName());
 
     // Path
     buf.append(pathElementSeparatorChar).append(path);
