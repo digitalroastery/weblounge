@@ -21,32 +21,37 @@
 package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.common.content.Composer;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionException;
+import ch.o2it.weblounge.common.site.HTMLAction;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Simple test action that is able to render a greeting on the site template.
  */
-public class GreeterAction extends HTMLActionSupport {
+public class GreeterHTMLAction extends HTMLActionSupport {
 
   /** Name of the language parameter */
   public static final String LANGUAGE_PARAM = "language";
 
   /** The greetings */
-  protected Map<String, String> greetings = new HashMap<String, String>();
-  
+  protected String greeting = null;
+
+  /** The greeting's language */
+  protected String language = null;
+
   /**
    * {@inheritDoc}
    * 
@@ -54,19 +59,13 @@ public class GreeterAction extends HTMLActionSupport {
    *      ch.o2it.weblounge.common.request.WebloungeResponse,
    *      ch.o2it.weblounge.common.request.RequestFlavor)
    */
-  @Override
   public void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException {
     super.configure(request, response, flavor);
     Map<String, String> allGreetings = TestSiteUtils.loadGreetings();
     try {
-      String language = RequestUtils.getRequiredParameter(request, LANGUAGE_PARAM);
-      String greeting = allGreetings.get(language);
-      if (greeting == null)
-        // TODO: How do we indicate a 404 instead of 500? Different exceptions?
-        // Like this, a json action could not return an empty result set
-        throw new ActionException("Unfortunately, we are not fluent in " + language);
-      greetings.put(language, greeting);
+      language = getLanguage(request);
+      greeting = allGreetings.get(language);
     } catch (IllegalStateException e) {
       throw new ActionException("Language parameter '" + LANGUAGE_PARAM + "' was not specified");
     }
@@ -74,34 +73,43 @@ public class GreeterAction extends HTMLActionSupport {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse, ch.o2it.weblounge.common.content.Composer)
+   * 
+   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse,
+   *      ch.o2it.weblounge.common.content.Composer)
    */
-  @Override
-  public int startStage(WebloungeRequest request, WebloungeResponse response, Composer composer)
-      throws ActionException {
+  public int startStage(WebloungeRequest request, WebloungeResponse response,
+      Composer composer) throws ActionException {
     try {
-      String language = greetings.keySet().iterator().next();
-      String htmlGreeting = StringEscapeUtils.escapeHtml(greetings.get(language));
+      String htmlGreeting = StringEscapeUtils.escapeHtml(greeting);
       IOUtils.write("<h1>" + htmlGreeting + "</h1>", response.getWriter());
 
       // Include another pagelet
       include(request, response, "include", null);
-      return SKIP_COMPOSER;
+      return HTMLAction.SKIP_COMPOSER;
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
     }
   }
-  
+
   /**
-   * {@inheritDoc}
+   * Returns the language, which is either taken from the request parameter
+   * <code>language</code> or from the language sent by the client browser.
+   * The final fallback is <code>English</code>.
    * 
-   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#passivate()
+   * @param request the request
+   * @return the language name
    */
-  @Override
-  public void passivate() {
-    greetings.clear();
-    super.passivate();
+  protected String getLanguage(WebloungeRequest request) {
+    String language = RequestUtils.getParameter(request, LANGUAGE_PARAM);
+    if (language == null) {
+      Language en = LanguageSupport.getLanguage("en");
+      language = request.getLanguage().getDescription(en).toLowerCase();
+      if (language == null) {
+        language = "english";
+      }
+    }
+    return language;
   }
 
 }

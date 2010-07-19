@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.test.harness;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
@@ -137,15 +138,6 @@ public class HTMLActionTest extends IntegrationTestBase {
       }
     }
 
-  }
-
-  /**
-   * @param string
-   * @param valueOf
-   */
-  private void assertNull(String string, String valueOf) {
-    // TODO Auto-generated method stub
-    
   }
 
 }

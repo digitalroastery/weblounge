@@ -49,7 +49,7 @@ public class TestModule extends ModuleImpl {
     List<Action> actions = new ArrayList<Action>();
     
     // HTML greeter action
-    Action greeterHTMLAction = new GreeterAction();
+    Action greeterHTMLAction = new GreeterHTMLAction();
     greeterHTMLAction.setIdentifier("greeter.html");
     greeterHTMLAction.setPath("greeting");
     greeterHTMLAction.setModule(this);

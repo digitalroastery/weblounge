@@ -32,11 +32,13 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Simple test action that is able to render a greeting on the site template.
  */
-public class GreeterJSONAction extends GreeterAction implements JSONAction {
+public class GreeterJSONAction extends GreeterHTMLAction implements JSONAction {
 
   /**
    * Creates an extension of the <code>GreeterAction</code> that can handle
@@ -46,7 +48,7 @@ public class GreeterJSONAction extends GreeterAction implements JSONAction {
     clearFlavors();
     addFlavor(RequestFlavor.JSON);
   }
-
+  
   /**
    * {@inheritDoc}
    * 
@@ -57,7 +59,11 @@ public class GreeterJSONAction extends GreeterAction implements JSONAction {
       throws IOException, ActionException {
     try {
       JSONObject json = new JSONObject();
-      json.put("greetings", greetings);
+      if (greeting != null) {
+        Map<String, String> g = new HashMap<String, String>();
+        g.put(language, greeting);
+        json.put("greetings", g);
+      }
       IOUtils.copy(new StringReader(json.toString()), response.getWriter());
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);

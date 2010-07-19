@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.test.util;
 
-import ch.o2it.weblounge.test.site.GreeterAction;
+import ch.o2it.weblounge.test.site.GreeterHTMLAction;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
@@ -78,7 +78,7 @@ public class TestSiteUtils {
     Map<String, String> greetings = new HashMap<String, String>();
     try {
       Properties props = new Properties();
-      props.load(GreeterAction.class.getResourceAsStream(GREETING_PROPS));
+      props.load(GreeterHTMLAction.class.getResourceAsStream(GREETING_PROPS));
       for (Entry<Object, Object> entry : props.entrySet()) {
         try {
           String isoLatin1Value = entry.getValue().toString();

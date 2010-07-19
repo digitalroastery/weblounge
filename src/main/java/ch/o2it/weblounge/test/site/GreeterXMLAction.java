@@ -30,7 +30,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,7 +41,7 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Simple test action that is able to render a greeting on the site template.
  */
-public class GreeterXMLAction extends GreeterAction implements XMLAction {
+public class GreeterXMLAction extends GreeterHTMLAction implements XMLAction {
 
   /**
    * Creates an extension of the <code>GreeterAction</code> that can handle
@@ -56,7 +55,7 @@ public class GreeterXMLAction extends GreeterAction implements XMLAction {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.test.site.GreeterAction#startXMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   * @see ch.o2it.weblounge.test.site.GreeterActionSupport#startXMLResponse(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public void startXML(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
@@ -66,12 +65,10 @@ public class GreeterXMLAction extends GreeterAction implements XMLAction {
       doc.setXmlStandalone(true);
       Element root = doc.createElement("greetings");
       doc.appendChild(root);
-      for (Map.Entry<String, String> greeting : greetings.entrySet()) {
-        Element greetingNode = doc.createElement("greeting");
-        greetingNode.setAttribute("language", greeting.getKey());
-        greetingNode.appendChild(doc.createTextNode(greeting.getValue()));
-        root.appendChild(greetingNode);
-      }
+      Element greetingNode = doc.createElement("greeting");
+      greetingNode.setAttribute("language", language);
+      greetingNode.appendChild(doc.createTextNode(greeting));
+      root.appendChild(greetingNode);
       TransformerFactory factory = TransformerFactory.newInstance();
       Transformer transformer = factory.newTransformer();
       transformer.transform(new DOMSource(doc), new StreamResult(response.getWriter()));

@@ -32,7 +32,7 @@
   <actions>
     <action id="greeter.html">
       <name language="en">Greetings</name>
-      <class>ch.o2it.weblounge.test.site.GreeterAction</class>
+      <class>ch.o2it.weblounge.test.site.GreeterHTMLAction</class>
       <mountpoint>/greeting/</mountpoint>
       <includes>
         <script src="file://${module.root}/scripts/greeting.js" type="javascript"/>
@@ -41,12 +41,12 @@
     <action id="greeter.xml">
       <name language="en">XML Greetings</name>
       <class>ch.o2it.weblounge.test.site.GreeterXMLAction</class>
-      <mountpoint>/greeting/</mountpoint>
+      <mountpoint>/greeting/xml</mountpoint>
     </action>
     <action id="greeter.json">
       <name language="en">JSON Greetings</name>
       <class>ch.o2it.weblounge.test.site.GreeterJSONAction</class>
-      <mountpoint>/greeting/</mountpoint>
+      <mountpoint>/greeting/json</mountpoint>
     </action>
   </actions>
   <jobs>
