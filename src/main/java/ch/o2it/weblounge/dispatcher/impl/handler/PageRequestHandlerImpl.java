@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import static ch.o2it.weblounge.common.request.RequestFlavor.HTML;
+import static ch.o2it.weblounge.common.request.RequestFlavor.ANY;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageTemplate;
@@ -90,12 +91,15 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     Mode processingMode = Mode.Default;
     WebUrl url = request.getUrl();
     String path = url.getPath();
-
+    RequestFlavor contentFlavor = request.getFlavor();
+    
+    if (contentFlavor == null || contentFlavor.equals(ANY))
+      contentFlavor = RequestFlavor.HTML;
+    
     // Check the request flavor
     // TODO: Criteria would be loading the page from the repository
     // TODO: Think about performance, page lookup is expensive
-    // TODO: Add support for XML and JSON
-    if (!HTML.equals(request.getFlavor())) {
+    if (!HTML.equals(contentFlavor)) {
       logger.debug("Skipping request for {}, flavor {} is not supported", path, request.getFlavor());
       return false;
     }
@@ -143,7 +147,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       Page page = null;
       PageURI pageURI = null;
       Site site = request.getSite();
-      RequestFlavor contentFlavor = request.getFlavor();
 
       // Check if a page was passed as an attribute
       if (request.getAttribute(WebloungeRequest.PAGE) != null) {
@@ -216,7 +219,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
       // Does the template support the requested flavor?
       if (!template.supportsFlavor(contentFlavor)) {
-        logger.warn("Template {} does not support requested flavor {}", template, contentFlavor);
+        logger.warn("Template '{}' does not support requested flavor {}", template, contentFlavor);
         DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, request, response);
         return true;
       }
