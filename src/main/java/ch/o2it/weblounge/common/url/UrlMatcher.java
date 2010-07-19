@@ -38,5 +38,19 @@ public interface UrlMatcher {
    *         space
    */
   boolean matches(WebUrl url);
+  
+  /**
+   * Returns the url's mountpoint.
+   * 
+   * @return the mountpoint
+   */
+  String getMountpoint();
+
+  /**
+   * Returns the url's extension.
+   * 
+   * @return the extension
+   */
+  String getExtension();
 
 }

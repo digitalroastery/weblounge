@@ -26,6 +26,12 @@ package ch.o2it.weblounge.common.request;
 public enum RequestFlavor {
 
   /**
+   * <code>ANY</code> is the flavor of choice if no concrete flavor can be
+   * determined.
+   */
+  ANY,
+
+  /**
    * <code>HTML</code> or <code>XHTML</code> output as produced by Java server
    * pages or actions by default.
    */

@@ -154,6 +154,8 @@ public interface WebUrl extends Url {
    * <code>includeLanguage</code> and <code>includeFlavor</code>, the version,
    * language and flavor of that normalization can be left out.
    * 
+   * @param includeHost
+   *          <code>true</code> to include the hostname
    * @param includeVersion
    *          <code>true</code> to include the version
    * @param includeLanguage
@@ -164,7 +166,7 @@ public interface WebUrl extends Url {
    * @return the normalized version of the url
    * @see #normalize()
    */
-  String normalize(boolean includeVersion, boolean includeLanguage,
-      boolean includeFlavor);
+  String normalize(boolean includeHost, boolean includeVersion,
+      boolean includeLanguage, boolean includeFlavor);
 
 }
