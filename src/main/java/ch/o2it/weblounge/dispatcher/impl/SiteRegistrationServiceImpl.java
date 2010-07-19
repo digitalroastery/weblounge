@@ -228,12 +228,12 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
     
     // Activate precompilation?
     String precompileSetting = StringUtils.trimToNull((String)config.get(OPT_PRECOMPILE));
-    precompile = precompileSetting == null || "true".equalsIgnoreCase(precompileSetting);
+    precompile = precompileSetting == null || ConfigurationUtils.isTrue(precompileSetting);
     logger.debug("Jsp precompilation {}", precompile ? "activated" : "deactivated");
 
     // Log compilation errors?
     String logPrecompileErrors = StringUtils.trimToNull((String)config.get(OPT_PRECOMPILE_LOGGING));
-    logCompileErrors = logPrecompileErrors != null && "true".equalsIgnoreCase(logPrecompileErrors);
+    logCompileErrors = logPrecompileErrors != null && ConfigurationUtils.isTrue(logPrecompileErrors);
     logger.debug("Precompilation errors will {} logged", logCompileErrors ? "be" : "not be");
 
     // Store the jasper configuration keys
