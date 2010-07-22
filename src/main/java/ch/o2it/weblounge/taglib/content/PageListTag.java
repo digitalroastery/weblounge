@@ -26,8 +26,9 @@ import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
+import ch.o2it.weblounge.common.content.SearchResultPageItem;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
-import ch.o2it.weblounge.common.impl.page.PagePreviewReader;
+import ch.o2it.weblounge.common.impl.page.ComposerImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -39,8 +40,6 @@ import ch.o2it.weblounge.taglib.WebloungeTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -240,33 +239,26 @@ public class PageListTag extends WebloungeTag {
     }
 
     boolean found = false;
-    SearchResultItem item = null;
+    SearchResultPageItem item = null;
     Page page = null;
-    Composer preview = null;
     WebUrl url = null;
 
     // Look for the next header
     while (!found && index < pages.getItems().length) {
-      item = pages.getItems()[index];
-      url = item.getUrl();
-      //page = item.getPage();
-
-      // Read the preview
-      PagePreviewReader previewReader = new PagePreviewReader();
-      try {
-        String previewXml = item.getPreview().toString();
-        InputStream previewIs = new ByteArrayInputStream(previewXml.getBytes());
-        preview = previewReader.read(previewIs, item.getPageURI());
-      } catch (Exception e) {
-        logger.error("Error reading page {} preview: " + e.getMessage(), e);
+      SearchResultItem candidateItem = pages.getItems()[index];
+      if (!(candidateItem instanceof SearchResultPageItem))
         continue;
-      }
+      item = (SearchResultPageItem)candidateItem;
+      
+      // Store the important properties
+      url = item.getUrl();
+      page = item.getPage();
 
       // Make sure all the required headlines are available
       found = true;
       for (Map.Entry<String, String> h : requireHeadlines.entrySet()) {
         boolean headlineFound = false;
-        for (Pagelet p : preview.getPagelets()) {
+        for (Pagelet p : page.getPreview()) {
           if (h.getKey().equals(p.getModule()) && h.getValue().equals(p.getIdentifier())) {
             headlineFound = true;
             break;
@@ -286,7 +278,7 @@ public class PageListTag extends WebloungeTag {
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
       this.page = page;
-      this.preview = preview;
+      this.preview = new ComposerImpl("stage", page.getPreview());
       this.url = url;
     }
 
