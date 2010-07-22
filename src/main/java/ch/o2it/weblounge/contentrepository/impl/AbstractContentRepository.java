@@ -465,8 +465,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   protected Page loadPage(Site site, URL url) throws IOException {
     BufferedInputStream is = new BufferedInputStream(url.openStream());
-    PageReader reader = new PageReader();
     try {
+      PageReader reader = new PageReader();
       return reader.read(is, new PageURIImpl(site));
     } catch (SAXException e) {
       throw new IOException("Error reading page from " + url);

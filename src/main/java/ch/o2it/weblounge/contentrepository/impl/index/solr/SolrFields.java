@@ -37,7 +37,10 @@ public interface SolrFields {
   public static final String TEMPLATE = "template";
 
   /** Page field name */
-  public static final String PAGE_XML = "page-xml";
+  public static final String XML = "page-xml";
+
+  /** Page header field name */
+  public static final String HEADER_XML = "page-header-xml";
 
   /** Preview field name */
   public static final String PREVIEW_XML = "preview-xml";

@@ -32,7 +32,8 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAG
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGE_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
@@ -46,6 +47,8 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TIT
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 
@@ -113,6 +116,16 @@ public class PageInputDocument extends AbstractInputDocument {
       setField(MessageFormat.format(PAGELET_TYPE, i), p.getModule() + "/" + p.getIdentifier());
     }
 
+    // The whole page
+    String pageXml = page.toXml();
+    setField(XML, pageXml);
+
+    // Page header
+    String headerXml = pageXml.replaceAll("<body[^>]*>[\\s\\S]+?<\\/body>", "");
+    if (!StringUtils.isBlank(headerXml)) {
+      setField(HEADER_XML, headerXml);
+    }
+    
     // Preview information
     StringBuffer preview = new StringBuffer();
     preview.append("<composer id=\"stage\">");
@@ -121,9 +134,6 @@ public class PageInputDocument extends AbstractInputDocument {
     }
     preview.append("</composer>");
     setField(PREVIEW_XML, preview.toString());
-
-    // The whole page
-    setField(PAGE_XML, page.toXml());
 
   }
 

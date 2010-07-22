@@ -294,7 +294,7 @@ public class StandaloneBundle implements Bundle {
    *
    * @see org.osgi.framework.Bundle#getSignerCertificates(int)
    */
-  public Map getSignerCertificates(int signersType) {
+  public Map<?,?> getSignerCertificates(int signersType) {
     // TODO Auto-generated method stub
     return null;
   }

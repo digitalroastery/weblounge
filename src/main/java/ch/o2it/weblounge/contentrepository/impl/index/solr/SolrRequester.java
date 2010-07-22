@@ -23,7 +23,7 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.SearchResultImpl;
-import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
+import ch.o2it.weblounge.common.impl.content.SearchResultPageItemImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -167,8 +167,10 @@ public class SolrRequester {
       String path = (String) doc.getFieldValue(SolrFields.PATH);
       WebUrl url = new WebUrlImpl(site, path);
 
-      SearchResultItemImpl item = new SearchResultItemImpl(site, id, url, score, site);
-      item.setPreview(doc.getFieldValue(SolrFields.PREVIEW_XML));
+      SearchResultPageItemImpl item = new SearchResultPageItemImpl(site, id, url, score, site);
+      item.setPageXml((String)doc.getFieldValue(SolrFields.XML));
+      item.setPageHeaderXml((String)doc.getFieldValue(SolrFields.HEADER_XML));
+      item.setPagePreviewXml((String)doc.getFieldValue(SolrFields.PREVIEW_XML));
       item.setTitle((String) doc.getFieldValue(SolrFields.TITLE));
 
       // Add the item to the result set

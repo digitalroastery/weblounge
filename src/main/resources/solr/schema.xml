@@ -238,8 +238,9 @@
     <field name="subjects" type="string" multiValued="true" indexed="true" stored="true" required="false" /> 
     <field name="template" type="string" indexed="true" stored="true" required="false" /> 
 
-    <!-- Page preview -->
+    <!-- Page, page header and page preview -->
     <field name="page-xml" type="string" indexed="false" stored="true" required="false" />
+    <field name="page-header-xml" type="string" indexed="false" stored="true" required="false" />
     <field name="preview-xml" type="string" indexed="false" stored="true" required="false" />
 
     <!-- Workflow-specific fields -->

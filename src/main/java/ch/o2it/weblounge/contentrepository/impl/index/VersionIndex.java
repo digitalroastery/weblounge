@@ -286,7 +286,6 @@ public class VersionIndex {
 
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     int existingVersions = 0;
-    boolean reuseSlot = false;
 
     // See if there is an empty slot (only if we are adding a whole new entry)
     if (entry >= slots) {
@@ -296,7 +295,6 @@ public class VersionIndex {
       while (address < startOfEntry) {
         if (idx.read() == '\n') {
           logger.debug("Found orphan line for reuse");
-          reuseSlot = true;
           startOfEntry = address;
           entry = e;
           break;
