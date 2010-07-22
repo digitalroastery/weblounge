@@ -37,9 +37,11 @@ import org.xml.sax.SAXParseException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
@@ -49,6 +51,12 @@ public final class PageReader extends WebloungeContentReader {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(PageReader.class);
+
+  /** Parser factory */
+  private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+
+  /** The SAX parser */
+  private WeakReference<SAXParser> parserRef = null;
 
   /** The page object */
   private PageImpl page = null;
@@ -62,22 +70,56 @@ public final class PageReader extends WebloungeContentReader {
   /** The pagelet position within the composer */
   private int position = 0;
 
-  /** True if reading pagelets in the headline section */
-  private boolean isHeadline = false;
+  /** Flag to indicate whether the page header should be read */
+  private boolean readHeader = true;
+
+  /** Flag to indicate whether the page body should be read */
+  private boolean readBody = true;
 
   private enum ParserContext {
     Document, Page, Head, Body, Pagelet
   };
 
   /** The parser context */
-  private ParserContext context_ = ParserContext.Document;
+  private ParserContext parserContext = ParserContext.Document;
 
   /**
    * Creates a new page data reader that will parse the XML data and store it in
    * the <code>Page</code> object that is returned by the {@link #read} method.
+   * 
+   * @throws ParserConfigurationException
+   *           if the SAX parser setup failed
+   * @throws SAXException
+   *           if an error occurs while parsing
    */
-  public PageReader() {
+  public PageReader() throws ParserConfigurationException, SAXException {
+    parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
     pageletReader = new PageletReader();
+  }
+
+  /**
+   * This method is called when a <code>Page</code> object is instantiated.
+   * 
+   * @param is
+   *          the xml input stream
+   * @param uri
+   *          the page uri
+   * @throws IOException
+   *           if reading the input stream fails
+   */
+  public PageImpl read(InputStream is, PageURI uri) throws SAXException,
+      IOException, ParserConfigurationException {
+    reset();
+    page = new PageImpl(uri);
+    readHeader = true;
+    readBody = true;
+    SAXParser parser = parserRef.get();
+    if (parser == null) {
+      parser = parserFactory.newSAXParser();
+      parserRef = new WeakReference<SAXParser>(parser);
+    }
+    parser.parse(is, this);
+    return page;
   }
 
   /**
@@ -94,12 +136,77 @@ public final class PageReader extends WebloungeContentReader {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public PageImpl read(InputStream is, PageURI uri) throws SAXException,
+  public PageImpl readHeader(InputStream is, PageURI uri) throws SAXException,
       IOException, ParserConfigurationException {
-    page = new PageImpl(uri);
-    SAXParserFactory factory = SAXParserFactory.newInstance();
-    factory.newSAXParser().parse(is, this);
+    if (page == null || !page.getURI().equals(uri)) {
+      reset();
+      page = new PageImpl(uri);
+    }
+    readHeader = true;
+    readBody = false;
+    SAXParser parser = parserRef.get();
+    if (parser == null) {
+      parser = parserFactory.newSAXParser();
+      parserRef = new WeakReference<SAXParser>(parser);
+    }
+    parser.parse(is, this);
     return page;
+  }
+
+  /**
+   * This method is called when a <code>Page</code> object is instantiated.
+   * 
+   * @param is
+   *          the xml input stream
+   * @param uri
+   *          the page uri
+   * @throws ParserConfigurationException
+   *           if the SAX parser setup failed
+   * @throws IOException
+   *           if reading the input stream fails
+   * @throws SAXException
+   *           if an error occurs while parsing
+   */
+  public PageImpl readBody(InputStream is, PageURI uri) throws SAXException,
+      IOException, ParserConfigurationException {
+    if (page == null || !page.getURI().equals(uri)) {
+      reset();
+      page = new PageImpl(uri);
+    }
+    readHeader = false;
+    readBody = true;
+    SAXParser parser = parserRef.get();
+    if (parser == null) {
+      parser = parserFactory.newSAXParser();
+      parserRef = new WeakReference<SAXParser>(parser);
+    }
+    parser.parse(is, this);
+    return page;
+  }
+
+  /**
+   * Sets the page that needs to be further enriched with content from an xml
+   * document.
+   * 
+   * @param page
+   *          the page
+   */
+  public void init(PageImpl page) {
+    this.page = page;
+  }
+
+  /**
+   * Resets this parser instance.
+   */
+  void reset() {
+    this.page = null;
+    this.composer = null;
+    this.parserContext = ParserContext.Document;
+    this.position = 0;
+    this.pageletReader.reset();
+    SAXParser parser = parserRef.get();
+    if (parser != null)
+      parser.reset();
   }
 
   /**
@@ -109,7 +216,7 @@ public final class PageReader extends WebloungeContentReader {
    */
   @Override
   protected void setOwner(User owner) {
-    if (context_.equals(ParserContext.Pagelet))
+    if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.setOwner(owner);
     else
       page.securityCtx.setOwner(owner);
@@ -123,7 +230,7 @@ public final class PageReader extends WebloungeContentReader {
    */
   @Override
   protected void allow(Permission permission, Authority authority) {
-    if (context_.equals(ParserContext.Pagelet))
+    if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.allow(permission, authority);
     else
       page.securityCtx.allow(permission, authority);
@@ -137,7 +244,7 @@ public final class PageReader extends WebloungeContentReader {
    */
   @Override
   protected void setCreated(User user, Date date) {
-    if (context_.equals(ParserContext.Pagelet))
+    if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.setCreated(user, date);
     else
       page.setCreated(user, date);
@@ -151,7 +258,7 @@ public final class PageReader extends WebloungeContentReader {
    */
   @Override
   protected void setModified(User modifier, Date date) {
-    if (context_.equals(ParserContext.Pagelet))
+    if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.setModified(modifier, date);
     else
       page.setModified(modifier, date);
@@ -165,7 +272,7 @@ public final class PageReader extends WebloungeContentReader {
    */
   @Override
   protected void setPublished(User publisher, Date startDate, Date endDate) {
-    if (context_.equals(ParserContext.Pagelet))
+    if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.setPublished(publisher, startDate, endDate);
     else
       page.setPublished(publisher, startDate, endDate);
@@ -189,51 +296,58 @@ public final class PageReader extends WebloungeContentReader {
 
     // read the page url
     if ("page".equals(raw)) {
-      context_ = ParserContext.Page;
-      ((PageURIImpl)page.uri).id = attrs.getValue("id");
+      parserContext = ParserContext.Page;
+      ((PageURIImpl) page.uri).id = attrs.getValue("id");
       if (attrs.getValue("path") != null)
-        ((PageURIImpl)page.uri).setPath(attrs.getValue("path"));
+        ((PageURIImpl) page.uri).setPath(attrs.getValue("path"));
     }
 
     // in the header
     else if ("head".equals(raw)) {
-      context_ = ParserContext.Head;
+      parserContext = ParserContext.Head;
     }
 
     // in the body
     else if ("body".equals(raw)) {
-      context_ = ParserContext.Body;
+      parserContext = ParserContext.Body;
     }
 
-    // pagelet or headline
-    else if ("pagelet".equals(raw) || "headline".equals(raw)) {
-      context_ = ParserContext.Pagelet;
-      PageletURI l = new PageletURIImpl(page.getURI(), composer, position);
-      pageletReader.setPageletLocation(l);
-      if ("headline".equals(raw))
-        isHeadline = true;
-    }
+    if (readHeader) {
 
-    // composer
-    else if ("composer".equals(raw)) {
-      composer = attrs.getValue("id");
-      position = 0;
-    }
-
-    // title, subject and the like
-    else if ("title".equals(raw) || "subject".equals(raw) || "description".equals(raw) || "coverage".equals(raw) || "rights".equals(raw)) {
-      String language = attrs.getValue("language");
-      if (language != null) {
-        Language l = LanguageSupport.getLanguage(language);
-        clipboard.put("language", l);
-      } else {
-        clipboard.remove("language");
+      // title, subject and the like
+      if ("title".equals(raw) || "subject".equals(raw) || "description".equals(raw) || "coverage".equals(raw) || "rights".equals(raw)) {
+        String language = attrs.getValue("language");
+        if (language != null) {
+          Language l = LanguageSupport.getLanguage(language);
+          clipboard.put("language", l);
+        } else {
+          clipboard.remove("language");
+        }
       }
+
+    }
+
+    if (readBody) {
+
+      // composer
+      if ("composer".equals(raw)) {
+        composer = attrs.getValue("id");
+        position = 0;
+      }
+
+      // pagelet
+      else if ("pagelet".equals(raw)) {
+        parserContext = ParserContext.Pagelet;
+        PageletURI l = new PageletURIImpl(page.getURI(), composer, position);
+        pageletReader.setPageletLocation(l);
+      }
+
     }
 
     // Forward to pagelet reader if the context matches
-    if (context_.equals(ParserContext.Pagelet)) {
-      pageletReader.startElement(uri, local, raw, attrs);
+    if (parserContext.equals(ParserContext.Pagelet)) {
+      if (readBody)
+        pageletReader.startElement(uri, local, raw, attrs);
     } else {
       super.startElement(uri, local, raw, attrs);
     }
@@ -247,95 +361,96 @@ public final class PageReader extends WebloungeContentReader {
   public void endElement(String uri, String local, String raw)
       throws SAXException {
 
-    // Pagelet
-    if ("pagelet".equals(raw)) {
-      if (isHeadline)
-        page.preview.add(pageletReader.getPagelet());
-      else {
+    if (readBody && parserContext == ParserContext.Pagelet) {
+
+      // Pagelet
+      if ("pagelet".equals(raw)) {
         page.addPagelet(pageletReader.getPagelet(), composer, position);
         position++;
+        parserContext = ParserContext.Body;
       }
-      context_ = isHeadline ? ParserContext.Page : ParserContext.Body;
+
     }
 
-    // Headline
-    if ("headline".equals(raw)) {
-      context_ = ParserContext.Page;
-      isHeadline = false;
-    }
+    if (readHeader && parserContext.equals(ParserContext.Head)) {
 
-    // Template
-    else if (context_.equals(ParserContext.Head) && "template".equals(raw)) {
-      page.template = characters.toString();
-    }
+      // Template
+      if ("template".equals(raw)) {
+        page.template = characters.toString();
+      }
 
-    // Layout
-    else if (context_.equals(ParserContext.Head) && "layout".equals(raw)) {
-      page.layout = characters.toString();
-    }
+      // Layout
+      else if ("layout".equals(raw)) {
+        page.layout = characters.toString();
+      }
 
-    // Indexed
-    else if (context_.equals(ParserContext.Head) && "index".equals(raw)) {
-      page.isIndexed = "true".equals(characters.toString());
-    }
+      // Indexed
+      else if ("index".equals(raw)) {
+        page.isIndexed = "true".equals(characters.toString());
+      }
 
-    // Promote
-    else if (context_.equals(ParserContext.Head) && "promote".equals(raw)) {
-      page.isPromoted = "true".equals(characters.toString());
-    }
+      // Promote
+      else if ("promote".equals(raw)) {
+        page.isPromoted = "true".equals(characters.toString());
+      }
 
-    // Type
-    else if (context_.equals(ParserContext.Head) && "type".equals(raw)) {
-      page.type = characters.toString();
-    }
+      // Type
+      else if ("type".equals(raw)) {
+        page.type = characters.toString();
+      }
 
-    // Title
-    else if ("title".equals(raw)) {
-      Language l = (Language) clipboard.get("language");
-      page.setTitle(characters.toString(), l);
-    }
+      // Title
+      else if ("title".equals(raw)) {
+        Language l = (Language) clipboard.get("language");
+        page.setTitle(characters.toString(), l);
+      }
 
-    // Description
-    else if ("description".equals(raw)) {
-      Language l = (Language) clipboard.get("language");
-      page.setDescription(characters.toString(), l);
-    }
+      // Description
+      else if ("description".equals(raw)) {
+        Language l = (Language) clipboard.get("language");
+        page.setDescription(characters.toString(), l);
+      }
 
-    // Coverage
-    else if ("coverage".equals(raw)) {
-      Language l = (Language) clipboard.get("language");
-      page.setCoverage(characters.toString(), l);
-    }
+      // Coverage
+      else if ("coverage".equals(raw)) {
+        Language l = (Language) clipboard.get("language");
+        page.setCoverage(characters.toString(), l);
+      }
 
-    // Rights
-    else if ("rights".equals(raw)) {
-      Language l = (Language) clipboard.get("language");
-      page.setRights(characters.toString(), l);
-    }
+      // Rights
+      else if ("rights".equals(raw)) {
+        Language l = (Language) clipboard.get("language");
+        page.setRights(characters.toString(), l);
+      }
 
-    // Subject
-    else if ("subject".equals(raw)) {
-      page.addSubject(characters.toString());
-    }
+      // Subject
+      else if ("subject".equals(raw)) {
+        page.addSubject(characters.toString());
+      }
 
-    // Pagelock
-    else if (context_.equals(ParserContext.Head) && "locked".equals(raw)) {
-      User user = (User) clipboard.get("user");
-      if (user != null)
-        page.lockOwner = user;
+      // Pagelock
+      else if ("locked".equals(raw)) {
+        User user = (User) clipboard.get("user");
+        if (user != null)
+          page.lockOwner = user;
+      }
+
     }
 
     // Head
-    else if (context_.equals(ParserContext.Head) && "head".equals(raw))
-      context_ = ParserContext.Page;
+    if ("head".equals(raw)) {
+      parserContext = ParserContext.Page;
+    }
 
     // Body
-    else if (context_.equals(ParserContext.Head) && "body".equals(raw))
-      context_ = ParserContext.Page;
+    else if ("body".equals(raw)) {
+      parserContext = ParserContext.Page;
+    }
 
     // Forward to pagelet reader if the context matches
-    if (context_.equals(ParserContext.Pagelet)) {
-      pageletReader.endElement(uri, local, raw);
+    if (parserContext.equals(ParserContext.Pagelet)) {
+      if (readBody)
+        pageletReader.endElement(uri, local, raw);
     } else {
       super.endElement(uri, local, raw);
     }
@@ -346,10 +461,12 @@ public final class PageReader extends WebloungeContentReader {
    * @see org.xml.sax.ContentHandler#characters(char[], int, int)
    */
   public void characters(char[] chars, int start, int end) throws SAXException {
-    if (context_.equals(ParserContext.Pagelet))
-      pageletReader.characters(chars, start, end);
-    else
+    if (parserContext.equals(ParserContext.Pagelet)) {
+      if (readBody)
+        pageletReader.characters(chars, start, end);
+    } else {
       super.characters(chars, start, end);
+    }
   }
 
   /**

@@ -40,7 +40,7 @@ public class TestUtils {
    * @param path the resource path
    * @return the contents of the resource
    */
-  public static String loadXmlFromFile(String path) {
+  public static String loadXmlFromResource(String path) {
     File templateFile = new File(TestUtils.class.getResource(path).getPath());
     String template = null;
     try {

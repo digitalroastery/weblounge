@@ -69,7 +69,7 @@ public class LocalizedModificationContextImplXmlTest extends LocalizedModificati
    */
   @Test
   public void testToXml() {
-    String testXml = TestUtils.loadXmlFromFile(testFile);
+    String testXml = TestUtils.loadXmlFromResource(testFile);
     ctx.enableLanguage(german);
     ctx.enableLanguage(french);
     StringBuffer content = new StringBuffer("<content>");

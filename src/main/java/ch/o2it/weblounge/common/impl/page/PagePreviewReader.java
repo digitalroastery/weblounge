@@ -36,9 +36,11 @@ import org.xml.sax.SAXParseException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
@@ -49,6 +51,12 @@ public final class PagePreviewReader extends WebloungeContentReader {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(PagePreviewReader.class);
+
+  /** Parser factory */
+  private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+
+  /** The SAX parser */
+  private WeakReference<SAXParser> parserRef = null;
 
   /** The page uri */
   private PageURI pageURI = null;
@@ -65,10 +73,15 @@ public final class PagePreviewReader extends WebloungeContentReader {
   /**
    * Creates a new page data reader that will parse the XML data and store it in
    * the <code>Page</code> object that is returned by the {@link #read} method.
+   * 
+   * @throws ParserConfigurationException
+   *           if the SAX parser setup failed
+   * @throws SAXException
+   *           if an error occurs while parsing
    */
-  public PagePreviewReader() {
+  public PagePreviewReader() throws ParserConfigurationException, SAXException {
+    parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
     pageletReader = new PageletReader();
-    composer = new ComposerImpl("stage");
   }
 
   /**
@@ -89,10 +102,29 @@ public final class PagePreviewReader extends WebloungeContentReader {
    */
   public Composer read(InputStream is, PageURI uri) throws SAXException,
       IOException, ParserConfigurationException {
+    reset();
     this.pageURI = uri;
-    SAXParserFactory factory = SAXParserFactory.newInstance();
-    factory.newSAXParser().parse(is, this);
+    this.composer = new ComposerImpl("stage");
+    SAXParser parser = parserRef.get();
+    if (parser == null) {
+      parser = parserFactory.newSAXParser();
+      parserRef = new WeakReference<SAXParser>(parser);
+    }
+    parser.parse(is, this);
     return composer;
+  }
+
+  /**
+   * Resets this parser instance.
+   */
+  void reset() {
+    this.pageURI = null;
+    this.composer = null;
+    this.position = 0;
+    this.pageletReader.reset();
+    SAXParser parser = parserRef.get();
+    if (parser != null)
+      parser.reset();
   }
 
   /**

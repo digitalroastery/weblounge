@@ -21,17 +21,14 @@
 package ch.o2it.weblounge.common.content;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
 import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
-import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,9 +46,6 @@ public class SearchResultItemImplTest {
   
   /** The preview data */
   protected Object previewData = null;
-  
-  /** The page xml */
-  protected String pageXml = null;
   
   /** THe pagelet renderer */
   protected PageletRenderer renderer = null;
@@ -81,6 +75,17 @@ public class SearchResultItemImplTest {
    */
   @Before
   public void setUp() throws Exception {
+    setUpPrerequisites();
+    item = new SearchResultItemImpl(site, id, url, relevance, source);
+    item.setTitle(title);
+    item.setPreview(previewData);
+    item.setPreviewRenderer(renderer);
+  }
+  
+  /**
+   * Sets up data that is used by the setUp() method.
+   */
+  protected void setUpPrerequisites() {
     previewData = new Object();
     renderer = new PageletRendererImpl("id");
     source = new Object();
@@ -88,12 +93,6 @@ public class SearchResultItemImplTest {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
     url = new WebUrlImpl(site, path);
-    pageXml = IOUtils.toString(getClass().getResourceAsStream("/page.xml"));
-    item = new SearchResultItemImpl(site, id, url, relevance, source);
-    item.setTitle(title);
-    item.setPreview(previewData);
-    item.setPreviewRenderer(renderer);
-    item.setPageXml(pageXml);
   }
 
   /**
@@ -118,15 +117,6 @@ public class SearchResultItemImplTest {
   @Test
   public void testGetPreview() {
     assertEquals(previewData, item.getPreview());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultItemImpl#getPage()}.
-   */
-  @Test
-  public void testGetPage() {
-    assertNotNull(item.getPage());
-    assertEquals(UrlSupport.trim(path), item.getPage().getURI().getPath());
   }
 
   /**

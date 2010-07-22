@@ -71,7 +71,7 @@ public class QuartzJobXmlTest extends QuartzJobTest {
    */
   @Test
   public void testFromXmlNode() {
-    String testXml = TestUtils.loadXmlFromFile(testFile);
+    String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
       assertEquals(testXml, new String(quartzJob.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {

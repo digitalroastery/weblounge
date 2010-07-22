@@ -70,7 +70,7 @@ public class PublishingContextImplXmlTest extends PublishingContextImplTest {
    */
   @Test
   public void testFromXmlNode() {
-    String testXml = TestUtils.loadXmlFromFile(testFile);
+    String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
       assertEquals(testXml, new String(ctx.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {

@@ -371,6 +371,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
+   */
+  public boolean isCreatedAfter(Date date) {
+    return creationCtx.isCreatedAfter(date);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Creatable#getCreator()
    */
@@ -422,6 +431,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    */
   public boolean isPublished() {
     return publishingCtx.isPublished();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
+   */
+  public boolean isPublished(Date date) {
+    return publishingCtx.isPublished(date);
   }
 
   /**

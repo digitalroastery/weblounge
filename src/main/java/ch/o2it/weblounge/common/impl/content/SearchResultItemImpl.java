@@ -21,11 +21,8 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.SearchResultItem;
-import ch.o2it.weblounge.common.impl.page.LazyPageImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -52,9 +49,6 @@ public class SearchResultItemImpl implements SearchResultItem {
   /** The renderer used to show the preview */
   protected Renderer previewRenderer = null;
 
-  /** The page xml */
-  protected String pageXml = null;
-
   /** The page */
   protected Page page = null;
 
@@ -65,9 +59,10 @@ public class SearchResultItemImpl implements SearchResultItem {
   protected double score = 0.0d;
 
   /**
-   * Creates a new search result with the given uri. The <code>source</code> is
-   * the object that created the item, usually, this will be the site itself but
-   * it could very well be a module that added to a search result.
+   * Creates a new search result item with the given uri. The
+   * <code>source</code> is the object that created the item, usually, this will
+   * be the site itself but it could very well be a module that added to a
+   * search result.
    * 
    * @param site
    *          the site
@@ -136,15 +131,6 @@ public class SearchResultItemImpl implements SearchResultItem {
   public WebUrl getUrl() {
     return url;
   }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.SearchResultItem#getPageURI()
-   */
-  public PageURI getPageURI() {
-    return new PageURIImpl(site, url.getPath(), id);
-  }
 
   /**
    * Sets the result item's preview data.
@@ -161,29 +147,6 @@ public class SearchResultItemImpl implements SearchResultItem {
    */
   public Object getPreview() {
     return preview;
-  }
-
-  /**
-   * Sets the page xml.
-   * 
-   * @param xml
-   *          the xml
-   */
-  public void setPageXml(String xml) {
-    this.pageXml = xml;
-  }
-
-  /**
-   * Returns the page object.
-   * 
-   * @return the page
-   */
-  public Page getPage() {
-    if (page == null) {
-      PageURI uri = new PageURIImpl(site, url.getPath(), id);
-      page = new LazyPageImpl(uri, pageXml.getBytes());
-    }
-    return page;
   }
 
   /**

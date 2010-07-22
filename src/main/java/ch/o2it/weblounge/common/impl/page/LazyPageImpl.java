@@ -33,10 +33,11 @@ import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
 import ch.o2it.weblounge.common.user.User;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
+import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.Set;
 
@@ -47,12 +48,30 @@ public class LazyPageImpl implements Page {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(LazyPageImpl.class);
-  
+
   /** The page content as a byte array containing the page's xml */
-  protected byte[] pageXml = null;
+  protected String pageXml = null;
+
+  /** The page content as a byte array containing the page header's xml */
+  protected String headerXml = null;
+
+  /** The page content as a byte array containing the page preview's xml */
+  protected String previewXml = null;
 
   /** The backing page */
   protected PageImpl page = null;
+
+  /** The preview composer */
+  protected Composer previewComposer = null;
+
+  /** True if the page header was loaded */
+  protected boolean isHeaderLoaded = false;
+
+  /** True if the page body was loaded */
+  protected boolean isBodyLoaded = false;
+
+  /** The page reader */
+  protected WeakReference<PageReader> readerRef = null;
 
   /** The page uri */
   protected PageURI uri = null;
@@ -62,25 +81,154 @@ public class LazyPageImpl implements Page {
    * 
    * @param uri
    *          the page uri
-   * @param data
-   *          the page's data
+   * @param pageXml
+   *          the full page xml
+   * @param headerXml
+   *          the head section's xml
+   * @param previewXml
+   *          the page preview's xml
    */
-  public LazyPageImpl(PageURI uri, byte[] data) {
+  public LazyPageImpl(PageURI uri, String pageXml, String headerXml,
+      String previewXml) {
     this.uri = uri;
-    this.pageXml = data;
+    this.pageXml = pageXml;
+    this.headerXml = headerXml;
+    this.previewXml = previewXml;
   }
-  
+
   /**
-   * Loads the page.
+   * Loads the complete page.
    */
   protected void loadPage() {
-    PageReader reader = new PageReader();
     try {
-      page = reader.read(new ByteArrayInputStream(pageXml), uri);
+
+      // Get a hold of the page reader
+      PageReader reader = null;
+      if (readerRef == null || readerRef.get() == null) {
+        reader = new PageReader();
+        // No need to keep the reference, since we're done after this
+      }
+
+      // Load the page
+      page = reader.read(IOUtils.toInputStream(pageXml), uri);
+      isHeaderLoaded = true;
+      isBodyLoaded = true;
+      cleanupAfterLoading();
     } catch (Exception e) {
-      logger.error("Failed to lazy-load {}", uri);
+      logger.error("Failed to lazy-load body of {}", uri);
       throw new IllegalStateException(e);
     }
+  }
+
+  /**
+   * Loads the page header only.
+   */
+  protected void loadPageHeader() {
+    try {
+
+      // Get a hold of the page reader
+      PageReader reader = null;
+      if (readerRef == null || readerRef.get() == null) {
+        reader = new PageReader();
+        readerRef = new WeakReference<PageReader>(reader);
+      }
+
+      // If no separate header was given, then we need to load the whole thing
+      // instead.
+      if (headerXml == null) {
+        loadPage();
+        return;
+      }
+
+      // Load the page header
+      page = reader.readHeader(IOUtils.toInputStream(headerXml), uri);
+      isHeaderLoaded = true;
+      if (isHeaderLoaded && isBodyLoaded)
+        cleanupAfterLoading();
+      else
+        headerXml = null;
+
+    } catch (Exception e) {
+      logger.error("Failed to lazy-load header of {}", uri);
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Loads the page body only.
+   */
+  protected void loadPageBody() {
+    try {
+
+      // Get a hold of the page reader
+      PageReader reader = null;
+      if (readerRef == null || readerRef.get() == null) {
+        reader = new PageReader();
+        readerRef = new WeakReference<PageReader>(reader);
+      }
+
+      // Load the page body
+      page = reader.readBody(IOUtils.toInputStream(pageXml), uri);
+      isBodyLoaded = true;
+      if (isHeaderLoaded && isBodyLoaded)
+        cleanupAfterLoading();
+      else if (headerXml != null)
+        pageXml = null;
+
+    } catch (Exception e) {
+      logger.error("Failed to lazy-load body of {}", uri);
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Loads the page preview only.
+   */
+  protected void loadPagePreview() {
+    // If no separate preview data was given, then we need to load the whole
+    // thing instead.
+    if (previewXml == null) {
+      loadPageBody();
+      return;
+    }
+
+    try {
+      PagePreviewReader reader = new PagePreviewReader();
+      previewComposer = reader.read(IOUtils.toInputStream(previewXml, "UTF-8"), uri);
+      previewXml = null;
+    } catch (Exception e) {
+      logger.error("Failed to lazy-load preview of {}", uri);
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Removes all data that was being held for lazy loading purposes.
+   */
+  protected void cleanupAfterLoading() {
+    headerXml = null;
+    pageXml = null;
+    previewXml = null;
+    previewComposer = null;
+    readerRef.clear();
+  }
+
+  /**
+   * Returns <code>true</code> if the page header has been loaded already.
+   * 
+   * @return <code>true</code> if the page header has been loaded
+   */
+  public boolean isHeaderLoaded() {
+    return isHeaderLoaded;
+  }
+
+  /**
+   * Returns <code>true</code> if the page body has been loaded already.
+   * 
+   * @return <code>true</code> if the page body has been loaded
+   */
+  public boolean isBodyLoaded() {
+    return isBodyLoaded;
   }
 
   /**
@@ -89,8 +237,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#addPageContentListener(ch.o2it.weblounge.common.content.PageContentListener)
    */
   public void addPageContentListener(PageContentListener listener) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.addPageContentListener(listener);
   }
 
@@ -101,8 +249,8 @@ public class LazyPageImpl implements Page {
    *      java.lang.String)
    */
   public Pagelet addPagelet(Pagelet pagelet, String composer) {
-    if (page == null)
-      loadPage();
+    if (!isBodyLoaded)
+      loadPageBody();
     return page.addPagelet(pagelet, composer);
   }
 
@@ -114,8 +262,8 @@ public class LazyPageImpl implements Page {
    */
   public Pagelet addPagelet(Pagelet pagelet, String composer, int index)
       throws IndexOutOfBoundsException {
-    if (page == null)
-      loadPage();
+    if (!isBodyLoaded)
+      loadPageBody();
     return page.addPagelet(pagelet, composer, index);
   }
 
@@ -125,8 +273,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#addSubject(java.lang.String)
    */
   public void addSubject(String subject) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.addSubject(subject);
   }
 
@@ -136,8 +284,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getComposers()
    */
   public Composer[] getComposers() {
-    if (page == null)
-      loadPage();
+    if (!isBodyLoaded)
+      loadPageBody();
     return page.getComposers();
   }
 
@@ -147,9 +295,9 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getCoverage()
    */
   public String getCoverage() {
-    if (page == null)
-      loadPage();
-    return getCoverage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.getCoverage();
   }
 
   /**
@@ -158,8 +306,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getCoverage(ch.o2it.weblounge.common.language.Language)
    */
   public String getCoverage(Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getCoverage(language);
   }
 
@@ -170,8 +318,8 @@ public class LazyPageImpl implements Page {
    *      boolean)
    */
   public String getCoverage(Language language, boolean force) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getCoverage(language, force);
   }
 
@@ -181,8 +329,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getDescription()
    */
   public String getDescription() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getDescription();
   }
 
@@ -192,8 +340,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getDescription(ch.o2it.weblounge.common.language.Language)
    */
   public String getDescription(Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getDescription(language);
   }
 
@@ -204,9 +352,9 @@ public class LazyPageImpl implements Page {
    *      boolean)
    */
   public String getDescription(Language language, boolean force) {
-    if (page == null)
-      loadPage();
-    return getDescription(language, force);
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.getDescription(language, force);
   }
 
   /**
@@ -215,8 +363,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getLayout()
    */
   public String getLayout() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getLayout();
   }
 
@@ -226,8 +374,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getLockOwner()
    */
   public User getLockOwner() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getLockOwner();
   }
 
@@ -237,8 +385,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getPagelets()
    */
   public Pagelet[] getPagelets() {
-    if (page == null)
-      loadPage();
+    if (!isBodyLoaded)
+      loadPageBody();
     return page.getPagelets();
   }
 
@@ -248,8 +396,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getPagelets(java.lang.String)
    */
   public Pagelet[] getPagelets(String composer) {
-    if (page == null)
-      loadPage();
+    if (!isBodyLoaded)
+      loadPageBody();
     return page.getPagelets(composer);
   }
 
@@ -260,8 +408,8 @@ public class LazyPageImpl implements Page {
    *      java.lang.String, java.lang.String)
    */
   public Pagelet[] getPagelets(String composer, String module, String id) {
-    if (page == null)
-      loadPage();
+    if (!isBodyLoaded)
+      loadPageBody();
     return page.getPagelets(composer, module, id);
   }
 
@@ -271,8 +419,10 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getPreview()
    */
   public Pagelet[] getPreview() {
-    if (page == null)
-      loadPage();
+    if (previewComposer != null)
+      return previewComposer.getPagelets();
+    if (!isBodyLoaded)
+      loadPagePreview();
     return page.getPreview();
   }
 
@@ -282,8 +432,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getRights()
    */
   public String getRights() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getRights();
   }
 
@@ -293,8 +443,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getRights(ch.o2it.weblounge.common.language.Language)
    */
   public String getRights(Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getRights(language);
   }
 
@@ -305,8 +455,8 @@ public class LazyPageImpl implements Page {
    *      boolean)
    */
   public String getRights(Language language, boolean force) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getRights(language, force);
   }
 
@@ -316,8 +466,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getSubjects()
    */
   public String[] getSubjects() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getSubjects();
   }
 
@@ -327,8 +477,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getTemplate()
    */
   public String getTemplate() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getTemplate();
   }
 
@@ -338,8 +488,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getTitle()
    */
   public String getTitle() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getTitle();
   }
 
@@ -349,8 +499,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getTitle(ch.o2it.weblounge.common.language.Language)
    */
   public String getTitle(Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getTitle(language);
   }
 
@@ -361,8 +511,8 @@ public class LazyPageImpl implements Page {
    *      boolean)
    */
   public String getTitle(Language language, boolean force) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getTitle(language, force);
   }
 
@@ -372,8 +522,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#getType()
    */
   public String getType() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getType();
   }
 
@@ -392,8 +542,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#hasSubject(java.lang.String)
    */
   public boolean hasSubject(String subject) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.hasSubject(subject);
   }
 
@@ -403,8 +553,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#isIndexed()
    */
   public boolean isIndexed() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.isIndexed();
   }
 
@@ -414,8 +564,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#isLocked()
    */
   public boolean isLocked() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.isLocked();
   }
 
@@ -425,8 +575,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#isPromoted()
    */
   public boolean isPromoted() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.isPromoted();
   }
 
@@ -436,8 +586,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#removePageContentListener(ch.o2it.weblounge.common.content.PageContentListener)
    */
   public void removePageContentListener(PageContentListener listener) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.removePageContentListener(listener);
   }
 
@@ -449,8 +599,8 @@ public class LazyPageImpl implements Page {
    */
   public Pagelet removePagelet(String composer, int index)
       throws IndexOutOfBoundsException {
-    if (page == null)
-      loadPage();
+    if (!isBodyLoaded)
+      loadPageBody();
     return page.removePagelet(composer, index);
   }
 
@@ -460,8 +610,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#removeSubject(java.lang.String)
    */
   public void removeSubject(String subject) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.removeSubject(subject);
   }
 
@@ -472,8 +622,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.language.Language)
    */
   public void setCoverage(String coverage, Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setCoverage(coverage, language);
   }
 
@@ -484,8 +634,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.language.Language)
    */
   public void setDescription(String description, Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setDescription(description, language);
   }
 
@@ -495,8 +645,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#setIndexed(boolean)
    */
   public void setIndexed(boolean index) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setIndexed(index);
   }
 
@@ -506,8 +656,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#setLayout(java.lang.String)
    */
   public void setLayout(String layout) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setLayout(layout);
   }
 
@@ -517,8 +667,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#setLocked(ch.o2it.weblounge.common.user.User)
    */
   public void setLocked(User user) throws IllegalStateException {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setLocked(user);
   }
 
@@ -529,8 +679,8 @@ public class LazyPageImpl implements Page {
    *      java.util.Date)
    */
   public void setModified(User user, Date date) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setModified(user, date);
   }
 
@@ -540,8 +690,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#setPromoted(boolean)
    */
   public void setPromoted(boolean promoted) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setPromoted(promoted);
   }
 
@@ -552,8 +702,8 @@ public class LazyPageImpl implements Page {
    *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setPublished(publisher, from, to);
   }
 
@@ -564,8 +714,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.language.Language)
    */
   public void setRights(String rights, Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setRights(rights, language);
   }
 
@@ -575,8 +725,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#setTemplate(java.lang.String)
    */
   public void setTemplate(String template) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setTemplate(template);
   }
 
@@ -587,8 +737,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.language.Language)
    */
   public void setTitle(String title, Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setTitle(title, language);
   }
 
@@ -598,8 +748,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#setType(java.lang.String)
    */
   public void setType(String type) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setType(type);
   }
 
@@ -609,8 +759,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#setUnlocked()
    */
   public User setUnlocked() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.setUnlocked();
   }
 
@@ -620,8 +770,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Page#toXml()
    */
   public String toXml() {
-    if (page == null)
-      loadPage();
+    if (!isBodyLoaded)
+      loadPageBody();
     return page.toXml();
   }
 
@@ -632,8 +782,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.language.Language)
    */
   public int compareTo(Localizable o, Language l) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.compareTo(o, l);
   }
 
@@ -643,8 +793,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.language.Localizable#languages()
    */
   public Set<Language> languages() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.languages();
   }
 
@@ -654,8 +804,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.language.Localizable#supportsLanguage(ch.o2it.weblounge.common.language.Language)
    */
   public boolean supportsLanguage(Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.supportsLanguage(language);
   }
 
@@ -665,8 +815,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.language.Localizable#switchTo(ch.o2it.weblounge.common.language.Language)
    */
   public Language switchTo(Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.switchTo(language);
   }
 
@@ -676,8 +826,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.language.Localizable#toString(ch.o2it.weblounge.common.language.Language)
    */
   public String toString(Language language) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.toString(language);
   }
 
@@ -688,8 +838,8 @@ public class LazyPageImpl implements Page {
    *      boolean)
    */
   public String toString(Language language, boolean force) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.toString(language, force);
   }
 
@@ -699,9 +849,20 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Creatable#getCreationDate()
    */
   public Date getCreationDate() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getCreationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
+   */
+  public boolean isCreatedAfter(Date date) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.isCreatedAfter(date);
   }
 
   /**
@@ -710,8 +871,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Creatable#getCreator()
    */
   public User getCreator() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getCreator();
   }
 
@@ -721,8 +882,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Modifiable#getModificationDate()
    */
   public Date getModificationDate() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getModificationDate();
   }
 
@@ -732,8 +893,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Modifiable#getModifier()
    */
   public User getModifier() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getModifier();
   }
 
@@ -743,8 +904,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
    */
   public Date getPublishFrom() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getPublishFrom();
   }
 
@@ -754,8 +915,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
    */
   public Date getPublishTo() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getPublishTo();
   }
 
@@ -765,8 +926,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
    */
   public User getPublisher() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getPublisher();
   }
 
@@ -776,9 +937,20 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
    */
   public boolean isPublished() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.isPublished();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
+   */
+  public boolean isPublished(Date date) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    return page.isPublished(date);
   }
 
   /**
@@ -787,8 +959,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.security.Securable#addSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)
    */
   public void addSecurityListener(SecurityListener listener) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.addSecurityListener(listener);
   }
 
@@ -799,8 +971,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.security.Authority)
    */
   public void allow(Permission permission, Authority authority) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.allow(permission, authority);
   }
 
@@ -811,8 +983,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.security.Authority)
    */
   public boolean check(Permission permission, Authority authority) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.check(permission, authority);
   }
 
@@ -823,8 +995,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.security.Authority)
    */
   public boolean check(PermissionSet permissions, Authority authority) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.check(permissions, authority);
   }
 
@@ -835,8 +1007,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.security.Authority[])
    */
   public boolean checkAll(Permission permission, Authority[] authorities) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.checkAll(permission, authorities);
   }
 
@@ -847,8 +1019,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.security.Authority[])
    */
   public boolean checkOne(Permission permission, Authority[] authorities) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.checkOne(permission, authorities);
   }
 
@@ -859,8 +1031,8 @@ public class LazyPageImpl implements Page {
    *      ch.o2it.weblounge.common.security.Authority)
    */
   public void deny(Permission permission, Authority authority) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.deny(permission, authority);
   }
 
@@ -870,8 +1042,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.security.Securable#getOwner()
    */
   public User getOwner() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.getOwner();
   }
 
@@ -881,8 +1053,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.security.Securable#permissions()
    */
   public Permission[] permissions() {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     return page.permissions();
   }
 
@@ -892,8 +1064,8 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.security.Securable#removeSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)
    */
   public void removeSecurityListener(SecurityListener listener) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.removeSecurityListener(listener);
   }
 
@@ -903,9 +1075,32 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
    */
   public void setOwner(User owner) {
-    if (page == null)
-      loadPage();
+    if (!isHeaderLoaded)
+      loadPageHeader();
     page.setOwner(owner);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof Page) {
+      return uri.equals(((Page) obj).getURI());
+    }
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return uri.hashCode();
+  }
+  
 }

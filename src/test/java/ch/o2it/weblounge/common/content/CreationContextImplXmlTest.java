@@ -70,7 +70,7 @@ public class CreationContextImplXmlTest extends CreationContextImplTest {
    */
   @Test
   public void testToXml() {
-    String testXml = TestUtils.loadXmlFromFile(testFile);
+    String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
       assertEquals(testXml, new String(ctx.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {

@@ -36,9 +36,11 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
@@ -48,6 +50,12 @@ public final class PageletReader extends WebloungeContentReader {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(PageletReader.class);
+
+  /** Parser factory */
+  private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+
+  /** The SAX parser */
+  private WeakReference<SAXParser> parserRef = null;
 
   /** The pagelet data */
   private PageletImpl pagelet = null;
@@ -60,9 +68,15 @@ public final class PageletReader extends WebloungeContentReader {
    * pagelet and store it in the {@link Pagelet} that is returned by the
    * {@link #read} method.
    * 
+   * @throws ParserConfigurationException
+   *           if the SAX parser setup failed
+   * @throws SAXException
+   *           if an error occurs while parsing
+   * 
    * @see #read(InputStream)
    */
-  public PageletReader() {
+  public PageletReader() throws ParserConfigurationException, SAXException {
+    parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
   /**
@@ -80,9 +94,24 @@ public final class PageletReader extends WebloungeContentReader {
   public PageletImpl read(InputStream is) throws SAXException, IOException,
       ParserConfigurationException {
 
-    SAXParserFactory factory = SAXParserFactory.newInstance();
-    factory.newSAXParser().parse(is, this);
+    SAXParser parser = parserRef.get();
+    if (parser == null) {
+      parser = parserFactory.newSAXParser();
+      parserRef = new WeakReference<SAXParser>(parser);
+    }
+    parser.parse(is, this);
     return pagelet;
+  }
+
+  /**
+   * Resets the pagelet parser.
+   */
+  public void reset() {
+    pagelet = null;
+    pageletLocation = null;
+    SAXParser parser = parserRef.get();
+    if (parser != null)
+      parser.reset();
   }
 
   /**
@@ -109,8 +138,9 @@ public final class PageletReader extends WebloungeContentReader {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+   * 
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#startElement(java.lang.String,
+   *      java.lang.String, java.lang.String, org.xml.sax.Attributes)
    */
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
@@ -151,8 +181,9 @@ public final class PageletReader extends WebloungeContentReader {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#endElement(java.lang.String, java.lang.String, java.lang.String)
+   * 
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#endElement(java.lang.String,
+   *      java.lang.String, java.lang.String)
    */
   public void endElement(String uri, String local, String raw)
       throws SAXException {
@@ -189,6 +220,8 @@ public final class PageletReader extends WebloungeContentReader {
    *      java.util.Date)
    */
   protected void setModified(User user, Date date) {
+    if (pagelet == null)
+      return;
     Language language = (Language) clipboard.get("language");
     pagelet.setModified(user, date, language);
   }
@@ -199,6 +232,8 @@ public final class PageletReader extends WebloungeContentReader {
    * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.user.User)
    */
   protected void setOwner(User user) {
+    if (pagelet == null)
+      return;
     pagelet.setOwner(user);
   }
 
@@ -208,6 +243,8 @@ public final class PageletReader extends WebloungeContentReader {
    * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOriginalLanguage(ch.o2it.weblounge.common.language.Language)
    */
   protected void setOriginalLanguage(Language language) {
+    if (pagelet == null)
+      return;
     pagelet.setOriginalLanguage(language);
   }
 
@@ -219,6 +256,8 @@ public final class PageletReader extends WebloungeContentReader {
    */
   @Override
   protected void allow(Permission permission, Authority authority) {
+    if (pagelet == null)
+      return;
     pagelet.securityCtx.allow(permission, authority);
   }
 
@@ -230,6 +269,8 @@ public final class PageletReader extends WebloungeContentReader {
    */
   @Override
   protected void setCreated(User user, Date date) {
+    if (pagelet == null)
+      return;
     pagelet.creationCtx.setCreator(user);
     pagelet.creationCtx.setCreationDate(date);
   }
@@ -242,6 +283,8 @@ public final class PageletReader extends WebloungeContentReader {
    */
   @Override
   protected void setPublished(User publisher, Date startDate, Date endDate) {
+    if (pagelet == null)
+      return;
     pagelet.publishingCtx.setPublished(publisher, startDate, endDate);
   }
 

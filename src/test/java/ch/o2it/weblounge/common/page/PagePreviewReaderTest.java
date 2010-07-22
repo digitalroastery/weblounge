@@ -111,10 +111,10 @@ public class PagePreviewReaderTest {
    */
   @Test
   public void testRead() {
-    PagePreviewReader reader = new PagePreviewReader();
     InputStream is = getClass().getResourceAsStream(previewFile);
     Composer preview = null;
     try {
+      PagePreviewReader reader = new PagePreviewReader();
       preview = reader.read(is, pageURI);
     } catch (Exception e) {
       e.printStackTrace();

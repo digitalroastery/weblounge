@@ -52,7 +52,7 @@ import java.util.Locale;
 public class PageImplTest {
 
   /** The page that was read in */
-  protected PageImpl page = null;
+  protected Page page = null;
   
   /** The page uri */
   protected PageURIImpl pageURI = null;
@@ -155,7 +155,7 @@ public class PageImplTest {
     page.setPromoted(isPromoted);
     page.setCoverage(germanCoverage, german);
     page.setCoverage(frenchCoverage, french);
-    page.setCreated(hans, creationDate);
+    ((PageImpl)page).setCreated(hans, creationDate);
     page.setDescription(germanDescription, german);
     page.setDescription(frenchDescription, french);
     page.setLayout(layout);
@@ -198,7 +198,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetSite() {
-    assertEquals(site, page.getSite());
+    assertEquals(site, page.getURI().getSite());
   }
 
   /**
@@ -206,7 +206,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetVersion() {
-    assertEquals(pageURI.getVersion(), page.getVersion());
+    assertEquals(pageURI.getVersion(), page.getURI().getVersion());
   }
 
   /**
@@ -508,8 +508,8 @@ public class PageImplTest {
    */
   @Test
   public void testEqualsObject() {
-    assertEquals(page, page);
-    assertEquals(page, new PageImpl(pageURI));
+    assertTrue(page.equals(page));
+    assertTrue(page.equals(new PageImpl(pageURI)));
     assertFalse(page.equals(new PageImpl(new PageURIImpl(site, "/test/2", Page.LIVE))));
   }
 
