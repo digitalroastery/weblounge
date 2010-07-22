@@ -63,4 +63,12 @@ public interface Publishable {
    */
   boolean isPublished();
 
+  /**
+   * Returns <code>true</code> if the object is published with respect to the
+   * given date.
+   * 
+   * @return <code>true</code> if the object is published
+   */
+  boolean isPublished(Date date);
+
 }

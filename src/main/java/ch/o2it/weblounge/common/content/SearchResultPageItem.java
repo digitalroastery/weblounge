@@ -20,39 +20,24 @@
 
 package ch.o2it.weblounge.common.content;
 
-import ch.o2it.weblounge.common.user.User;
-
-import java.util.Date;
-
 /**
- * A <code>Creatable</code> describes objects that have a creator and a creation
- * date.
- * <p>
- * Prominent examples of such an object are pages or binary resources.
+ * This extended <code>SearchResultItem</code> interface is intended for pages
+ * that were found in the weblounge search index.
  */
-public interface Creatable {
+public interface SearchResultPageItem extends SearchResultItem {
 
   /**
-   * Returns the object's creation date.
+   * Returns the page uri.
    * 
-   * @return the creation date
+   * @return the page uri
    */
-  Date getCreationDate();
+  PageURI getPageURI();
 
   /**
-   * Returns <code>true</code> if this context was created after the given date.
+   * Returns the page.
    * 
-   * @param date
-   *          the date to compare to
-   * @return <code>true</code> is this context was created after the given date
+   * @return the page
    */
-  boolean isCreatedAfter(Date date);
-
-  /**
-   * Returns the user that created the object.
-   * 
-   * @return the creator
-   */
-  User getCreator();
+  Page getPage();
 
 }
