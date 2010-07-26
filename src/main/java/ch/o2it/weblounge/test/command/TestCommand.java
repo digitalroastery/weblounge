@@ -229,12 +229,14 @@ public final class TestCommand {
   }
 
   /**
-   * Callback from the OSGi environment to activate the commands.
+   * Callback for OSGi's declarative services component activation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component activation fails
    */
-  public void activate(ComponentContext context) {
+  void activate(ComponentContext context) {
     BundleContext bundleContext = context.getBundleContext();
     logger.debug("Registering test commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
