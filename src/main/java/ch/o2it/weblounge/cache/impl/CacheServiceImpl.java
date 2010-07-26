@@ -66,22 +66,26 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   }
 
   /**
-   * Activates the cache.
+   * Callback for OSGi's declarative services component activation.
    * 
    * @param context
+   *          the component context
    * @throws Exception
+   *           if component activation fails
    */
-  public void activate(ComponentContext context) throws Exception {
+  void activate(ComponentContext context) throws Exception {
     CacheManager.setEnabled(true);
   }
 
   /**
-   * Deactivates the cache.
+   * Callback for OSGi's declarative services component dactivation.
    * 
    * @param context
+   *          the component context
    * @throws Exception
+   *           if component inactivation fails
    */
-  public void deactivate(ComponentContext context) throws Exception {
+  void deactivate(ComponentContext context) throws Exception {
     CacheManager.shutdown();
   }
 
@@ -150,8 +154,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponse(java.lang.Iterable, ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse, long, long)
+   * 
+   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponse(java.lang.Iterable,
+   *      ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse, long, long)
    */
   public CacheHandle startResponse(Iterable<CacheTag> uniqueTags,
       WebloungeRequest request, WebloungeResponse response, long validTime,
@@ -162,8 +168,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponse(ch.o2it.weblounge.common.request.CacheHandle, ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)
+   * 
+   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponse(ch.o2it.weblounge.common.request.CacheHandle,
+   *      ch.o2it.weblounge.common.request.WebloungeRequest,
+   *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public boolean startResponse(CacheHandle handle, WebloungeRequest request,
       WebloungeResponse response) {
@@ -176,14 +184,14 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       logger.warn("Cached response is not properly wrapped");
       return false;
     }
-    
+
     /* start the cache transaction */
     HttpServletResponse resp = CacheManager.startCacheableResponse(handle, request, (HttpServletResponse) ((HttpServletResponseWrapper) response).getResponse());
     if (resp == null)
       return true;
 
     /* wrap the response */
-      ((HttpServletResponseWrapper) response).setResponse(resp);
+    ((HttpServletResponseWrapper) response).setResponse(resp);
 
     return false;
   }
@@ -251,7 +259,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateEntry(ch.o2it.weblounge.common.request.CacheHandle)
    */
   public Set<CacheHandle> invalidateEntry(CacheHandle handle) {
