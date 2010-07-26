@@ -64,7 +64,7 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PageImpl.class);
-  
+
   /** The uri */
   protected PageURI uri = null;
 
@@ -772,7 +772,20 @@ public class PageImpl extends LocalizableObject implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.o2it.weblounge.common.content.Page#getComposer(java.lang.String)
+   */
+  public Composer getComposer(String composerId) {
+    Composer composer = null;
+    List<Pagelet> pagelets = composers.get(composerId);
+    if (pagelets != null)
+      composer = new ComposerImpl(composerId, pagelets);
+    return composer;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Page#getComposers()
    */
   public Composer[] getComposers() {
@@ -918,10 +931,10 @@ public class PageImpl extends LocalizableObject implements Page {
     }
     return pagelet;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Page#getPreview()
    */
   public Pagelet[] getPreview() {
@@ -939,21 +952,21 @@ public class PageImpl extends LocalizableObject implements Page {
       Set<PageletRenderer> previewRenderers = new HashSet<PageletRenderer>();
       if (stage != null) {
         for (Pagelet p : stage) {
-  
+
           // Load the pagelet's module
           Module m = site.getModule(p.getModule());
           if (m == null) {
             logger.warn("Skipping pagelet '{}' for preview calculation: module '{}' can't be found", p, p.getModule());
             continue;
           }
-          
+
           // Load the pagelet's renderer
           PageletRenderer r = m.getRenderer(p.getIdentifier());
           if (r == null) {
             logger.warn("Skipping pagelet '{}' for preview calculation: pagelet renderer '{}' can't be found", p, p.getIdentifier());
             continue;
           }
-  
+
           // Evaluate the preview mode
           PagePreviewMode previewMode = r.getPreviewMode();
           if (previewMode.equals(PagePreviewMode.First.equals(previewMode) && !previewRenderers.contains(r))) {
@@ -1146,9 +1159,9 @@ public class PageImpl extends LocalizableObject implements Page {
      * try { InputSource is = new InputSource(new StringReader(b.toString()));
      * DocumentBuilder docBuilder = XMLUtilities.getDocumentBuilder(); Document
      * doc = docBuilder.parse(is); return doc.getFirstChild(); } catch
-     * (SAXException e) { logger.error("Error building dom tree for pagelet", e);
-     * } catch (IOException e) { logger.error("Error reading pagelet xml", e); }
-     * catch (ParserConfigurationException e) {
+     * (SAXException e) { logger.error("Error building dom tree for pagelet",
+     * e); } catch (IOException e) { logger.error("Error reading pagelet xml",
+     * e); } catch (ParserConfigurationException e) {
      * logger.error("Error parsing pagelet xml", e); }
      */
 

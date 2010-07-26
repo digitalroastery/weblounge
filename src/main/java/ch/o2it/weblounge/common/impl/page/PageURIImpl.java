@@ -286,5 +286,15 @@ public class PageURIImpl extends UrlImpl implements PageURI {
     }
     return super.equals(obj);
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.url.UrlImpl#toString()
+   */
+  @Override
+  public String toString() {
+    return (path != null) ? path : id;
+  }
 
 }

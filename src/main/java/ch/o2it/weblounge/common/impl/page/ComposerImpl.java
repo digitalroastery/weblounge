@@ -152,6 +152,45 @@ public class ComposerImpl implements Composer {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.Composer#getPagelet(int)
+   */
+  public Pagelet getPagelet(int index) {
+    return pagelets.get(index);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Composer#size()
+   */
+  public int size() {
+    return pagelets.size();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Composer#toXml()
+   */
+  public String toXml() {
+    StringBuffer b = new StringBuffer();
+
+    b.append("<composer id=\"");
+    b.append(identifier);
+    b.append("\">");
+
+    for (Pagelet pagelet : pagelets) {
+      b.append(pagelet.toXml());
+    }
+
+    b.append("</composer>");
+
+    return b.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

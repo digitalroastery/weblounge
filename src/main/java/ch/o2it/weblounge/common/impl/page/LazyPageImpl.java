@@ -103,8 +103,8 @@ public class LazyPageImpl implements Page {
     try {
 
       // Get a hold of the page reader
-      PageReader reader = null;
-      if (readerRef == null || readerRef.get() == null) {
+      PageReader reader = (readerRef != null) ? readerRef.get() : null;
+      if (reader == null) {
         reader = new PageReader();
         // No need to keep the reference, since we're done after this
       }
@@ -127,8 +127,8 @@ public class LazyPageImpl implements Page {
     try {
 
       // Get a hold of the page reader
-      PageReader reader = null;
-      if (readerRef == null || readerRef.get() == null) {
+      PageReader reader = (readerRef != null) ? readerRef.get() : null;
+      if (reader == null) {
         reader = new PageReader();
         readerRef = new WeakReference<PageReader>(reader);
       }
@@ -161,8 +161,8 @@ public class LazyPageImpl implements Page {
     try {
 
       // Get a hold of the page reader
-      PageReader reader = null;
-      if (readerRef == null || readerRef.get() == null) {
+      PageReader reader = (readerRef != null) ? readerRef.get() : null;
+      if (reader == null) {
         reader = new PageReader();
         readerRef = new WeakReference<PageReader>(reader);
       }
@@ -289,6 +289,17 @@ public class LazyPageImpl implements Page {
     return page.getComposers();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Page#getComposer(java.lang.String)
+   */
+  public Composer getComposer(String composerId) {
+    if (!isBodyLoaded)
+      loadPageBody();
+    return page.getComposer(composerId);
+  }
+  
   /**
    * {@inheritDoc}
    * 
