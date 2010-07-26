@@ -94,8 +94,10 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
 
   /** Configuration option for jasper's scratch directory */
   public static final String OPT_JASPER_SCRATCHDIR = "scratchdir";
-  
-  /** Default value for jasper's <code>scratchDir</code> compiler context setting */
+
+  /**
+   * Default value for jasper's <code>scratchDir</code> compiler context setting
+   */
   public static final String DEFAULT_JASPER_WORK_DIR = "/weblounge/tmp/jasper";
 
   /** The http service */
@@ -124,21 +126,18 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   private TreeMap<String, Filter> filterNameInstances = new TreeMap<String, Filter>();
 
   private TreeMap<String, ArrayList<String>> filterNameMappings = new TreeMap<String, ArrayList<String>>();
-  
+
   /** The precompiler for java server pages */
   private boolean precompile = true;
-  
+
   /** List of precompilers */
   private WeakHashMap<Site, Precompiler> precompilers = new WeakHashMap<Site, Precompiler>();
 
   /** True to log errors that appear during precompilation */
   private boolean logCompileErrors = false;
-  
+
   /**
-   * Callback from the OSGi environment to activate the service.
-   * <p>
-   * This method is configured in the <tt>Dynamic Services</tt> section of the
-   * bundle.
+   * Callback for OSGi's declarative services component activation.
    * 
    * @param context
    *          the component context
@@ -147,16 +146,16 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
    * @throws ConfigurationException
    *           if service configuration fails
    */
-  public void activate(ComponentContext context) throws IOException,
+  void activate(ComponentContext context) throws IOException,
       ConfigurationException {
     BundleContext bundleContext = context.getBundleContext();
     logger.info("Starting site dispatcher");
 
-    // Configure the default jasper directory
+    // Configure the default jasper work directory where compiled java classes go
     String tmpDir = System.getProperty("java.io.tmpdir");
     String scratchDir = PathSupport.concat(tmpDir, DEFAULT_JASPER_WORK_DIR);
     jasperConfig.put(OPT_JASPER_SCRATCHDIR, scratchDir);
-    
+
     // Try to get hold of the service configuration
     ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
     if (configAdminRef != null) {
@@ -179,20 +178,19 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   }
 
   /**
-   * Callback from the OSGi environment to deactivate the service.
-   * <p>
-   * This method is configured in the <tt>Dynamic Services</tt> section of the
-   * bundle.
+   * Callback for OSGi's declarative services component dactivation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component inactivation fails
    */
-  public void deactivate(ComponentContext context) {
+  void deactivate(ComponentContext context) {
     logger.debug("Deactivating site dispatcher");
 
     siteTracker.close();
     siteTracker = null;
-    
+
     // Stop precompilers
     for (Precompiler compiler : precompilers.values()) {
       if (compiler != null)
@@ -227,14 +225,14 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
 
     logger.info("Configuring the site registration service");
     boolean configurationChanged = true;
-    
+
     // Activate precompilation?
-    String precompileSetting = StringUtils.trimToNull((String)config.get(OPT_PRECOMPILE));
+    String precompileSetting = StringUtils.trimToNull((String) config.get(OPT_PRECOMPILE));
     precompile = precompileSetting == null || ConfigurationUtils.isTrue(precompileSetting);
     logger.debug("Jsp precompilation {}", precompile ? "activated" : "deactivated");
 
     // Log compilation errors?
-    String logPrecompileErrors = StringUtils.trimToNull((String)config.get(OPT_PRECOMPILE_LOGGING));
+    String logPrecompileErrors = StringUtils.trimToNull((String) config.get(OPT_PRECOMPILE_LOGGING));
     logCompileErrors = logPrecompileErrors != null && ConfigurationUtils.isTrue(logPrecompileErrors);
     logger.debug("Precompilation errors will {} logged", logCompileErrors ? "be" : "not be");
 
@@ -248,7 +246,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
           continue;
         value = ConfigurationUtils.processTemplate(value);
         key = key.substring(OPT_JASPER_PREFIX.length());
-        
+
         boolean optionChanged = value.equalsIgnoreCase(jasperConfig.get(key));
         configurationChanged |= !optionChanged;
         if (optionChanged)
@@ -261,7 +259,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
         jasperConfig.put(key.toLowerCase(), value);
       }
     }
-    
+
     // Create the scratch directory if specified, otherwise jasper will complain
     String scratchDir = jasperConfig.get(OPT_JASPER_SCRATCHDIR);
     if (scratchDir != null) {
@@ -272,7 +270,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
         throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper sratch directory at " + scratchDir + ": " + e.getMessage());
       }
     }
- 
+
     return configurationChanged;
   }
 
@@ -282,7 +280,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
    * @param paxHttpService
    *          the site locator
    */
-  public void setHttpService(WebContainer paxHttpService) {
+  void setHttpService(WebContainer paxHttpService) {
     this.paxHttpService = paxHttpService;
   }
 
@@ -292,7 +290,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
    * @param paxHttpService
    *          the http service
    */
-  public void removeHttpService(WebContainer paxHttpService) {
+  void removeHttpService(WebContainer paxHttpService) {
     this.paxHttpService = null;
   }
 
@@ -428,7 +426,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
           sitesByServerName.put(name, site);
         }
       }
-      
+
       // Start the precompiler if requested
       if (precompile) {
         Precompiler precompiler = new Precompiler(siteServlet, logCompileErrors);

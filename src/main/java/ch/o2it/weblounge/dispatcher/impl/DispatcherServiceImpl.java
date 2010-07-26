@@ -66,15 +66,14 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   }
 
   /**
-   * Callback from the OSGi environment to activate the service.
-   * <p>
-   * This method is configured in the <tt>Dynamic Services</tt> section of the
-   * bundle.
+   * Callback for OSGi's declarative services component activation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component activation fails
    */
-  public void activate(ComponentContext context) {
+  void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
     logger.debug("Activating weblounge dispatcher");
 
@@ -93,15 +92,14 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   }
 
   /**
-   * Callback from the OSGi environment to deactivate the service.
-   * <p>
-   * This method is configured in the <tt>Dynamic Services</tt> section of the
-   * bundle.
+   * Callback for OSGi's declarative services component dactivation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component inactivation fails
    */
-  public void deactivate(ComponentContext context) {
+  void deactivate(ComponentContext context) throws Exception {
     logger.debug("Deactivating weblounge dispatcher");
 
     // Get rid of the http tracker
@@ -121,7 +119,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    * @param siteLocator
    *          the site locator
    */
-  public void setSiteLocator(SiteRegistrationService siteLocator) {
+  void setSiteLocator(SiteRegistrationService siteLocator) {
     dispatcher.setSiteLocator(siteLocator);
   }
 
@@ -131,7 +129,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    * @param siteLocator
    *          the site locator service
    */
-  public void removeSiteLocator(SiteRegistrationService siteLocator) {
+  void removeSiteLocator(SiteRegistrationService siteLocator) {
     dispatcher.setSiteLocator(null);
   }
 
@@ -141,7 +139,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    * @param handler
    *          the request handler
    */
-  public void addRequestHandler(RequestHandler handler) {
+  void addRequestHandler(RequestHandler handler) {
     logger.info("Registering {}", handler);
     dispatcher.addRequestHandler(handler);
   }
@@ -152,7 +150,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    * @param handler
    *          the request handler
    */
-  public void removeRequestHandler(RequestHandler handler) {
+  void removeRequestHandler(RequestHandler handler) {
     logger.info("Unregistering {}", handler);
     dispatcher.removeRequestHandler(handler);
   }

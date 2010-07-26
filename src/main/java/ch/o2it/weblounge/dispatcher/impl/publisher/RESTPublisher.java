@@ -100,13 +100,14 @@ public class RESTPublisher implements ManagedService {
   }
 
   /**
-   * OSGi declarative services (DS) callback to indicate that this service is
-   * about to start.
+   * Callback for OSGi's declarative services component activation.
    * 
-   * @param componentContext
-   *          the OSGi component context
+   * @param context
+   *          the component context
+   * @throws Exception
+   *           if component activation fails
    */
-  public void activate(ComponentContext componentContext) throws Exception {
+  void activate(ComponentContext componentContext) throws Exception {
     this.componentContext = componentContext;
     BundleContext bundleContext = componentContext.getBundleContext();
 
@@ -143,13 +144,14 @@ public class RESTPublisher implements ManagedService {
   }
 
   /**
-   * OSGi declarative services (DS) callback to indicate that this service is
-   * going to be deactivated.
+   * Callback for OSGi's declarative services component dactivation.
    * 
-   * @param componentContext
-   *          the OSGi component context
+   * @param context
+   *          the component context
+   * @throws Exception
+   *           if component inactivation fails
    */
-  public void deactivate(ComponentContext componentContext) {
+  void deactivate(ComponentContext componentContext) throws Exception {
     if (jsr311ServiceListener != null) {
       componentContext.getBundleContext().removeServiceListener(jsr311ServiceListener);
     }
