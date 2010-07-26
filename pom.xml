@@ -32,6 +32,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>ch.o2it.weblounge</groupId>
+      <artifactId>weblounge-dispatcher-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- osgi support -->
 
     <dependency>
@@ -42,6 +48,12 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+      <version>1.1.A</version>
     </dependency>
 
     <!-- thirdparty -->
@@ -185,6 +197,7 @@
             <Bundle-SymbolicName>${project.groupId}.contentrepository</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.contentrepository;version=${project.version},
+              ch.o2it.weblounge.dispatcher;version=${project.version},
               org.apache.commons.io;version="1.4",
               org.apache.commons.lang;version="2.4",
               org.slf4j;version="1.5.6",
@@ -193,6 +206,9 @@
               org.osgi.service.component;version="1.1.0",
               org.osgi.util.tracker;version="1.4.0",
               javax.servlet;version="2.5",
+              javax.servlet.http;version="2.5",
+              javax.ws.rs,
+              javax.ws.rs.core,
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
@@ -201,7 +217,8 @@
               ch.o2it.weblounge.contentrepository.impl.fs;version=${project.version},
               ch.o2it.weblounge.contentrepository.impl.index;version=${project.version},
               ch.o2it.weblounge.contentrepository.impl.index.solr;version=${project.version},
-              ch.o2it.weblounge.contentrepository.impl.jcr;version=${project.version}
+              ch.o2it.weblounge.contentrepository.impl.jcr;version=${project.version},
+              ch.o2it.weblounge.contentrepository.impl.endpoint;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
               jcr;inline=true,
@@ -225,7 +242,9 @@
               org.apache.lucene.*;-split-package:=merge-first
             </Private-Package>
             <Service-Component>
-              OSGI-INF/contentrepository-service.xml
+              OSGI-INF/contentrepository-service.xml,
+              OSGI-INF/page-rest-service.xml,
+              OSGI-INF/file-rest-service.xml
             </Service-Component>
           </instructions>
         </configuration>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  name="Weblounge Page Endpoint">	
+  
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.PageEndpoint" />
+  <property name="service.description" value="Weblounge Page Endpoint" />
+  <property name="rest.path" value="pages" />
+  <service>
+    <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.PageEndpoint" />
+  </service>
+
+  <reference name="siteregistration" interface="ch.o2it.weblounge.dispatcher.SiteRegistrationService" cardinality="0..1" policy="dynamic" bind="setSiteLocator" unbind="removeSiteLocator" />
+
+</scr:component>

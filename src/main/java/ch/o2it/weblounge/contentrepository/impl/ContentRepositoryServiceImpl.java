@@ -149,7 +149,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
 
     factoryTracker = new ContentRepositoryFactoryTracker(this, bundleContext);
     factoryTracker.open();
-
+    
     logger.debug("Content repository service activated");
   }
 
@@ -178,6 +178,8 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
    */
   @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) {
+    if (properties == null)
+      return;
     try {
       if (configure(properties)) {
         for (Site site : new ArrayList<Site>(repositories.keySet())) {
