@@ -40,7 +40,7 @@ import java.util.Enumeration;
 public class Precompiler {
 
   /** Logging facility */
-  protected static final Logger logger = LoggerFactory.getLogger(SiteRegistrationServiceImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(SiteDispatcherServiceImpl.class);
 
   /** The site servlet */
   protected SiteServlet servlet = null;

@@ -23,9 +23,13 @@ package ch.o2it.weblounge.dispatcher.impl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.site.Action;
+import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.site.SiteListener;
+import ch.o2it.weblounge.dispatcher.ActionRequestHandler;
 import ch.o2it.weblounge.dispatcher.DispatcherConfiguration;
-import ch.o2it.weblounge.dispatcher.SiteRegistrationService;
+import ch.o2it.weblounge.dispatcher.SiteDispatcherService;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXml;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlFilter;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlServlet;
@@ -63,13 +67,13 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * The site tracker watches site services coming and going and registers them
+ * The site dispatcher watches sites coming and going and registers them
  * with the weblounge dispatcher.
  */
-public class SiteRegistrationServiceImpl implements SiteRegistrationService, ManagedService {
+public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteListener, ManagedService {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SiteRegistrationServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(SiteDispatcherServiceImpl.class);
 
   /** Default value for the <code>WEBAPP_CONTEXT_ROOT</code> property */
   public static final String DEFAULT_WEBAPP_CONTEXT_ROOT = "/";
@@ -95,13 +99,14 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /** Configuration option for jasper's scratch directory */
   public static final String OPT_JASPER_SCRATCHDIR = "scratchdir";
 
-  /**
-   * Default value for jasper's <code>scratchDir</code> compiler context setting
-   */
+  /** Default value for jasper's <code>scratchDir</code> compiler context */
   public static final String DEFAULT_JASPER_WORK_DIR = "/weblounge/tmp/jasper";
 
   /** The http service */
   private WebContainer paxHttpService = null;
+
+  /** The action request handler */
+  private ActionRequestHandler actionRequestHandler = null;
 
   /** Init parameters for jetty */
   private TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
@@ -295,9 +300,51 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   }
 
   /**
+   * Callback from the OSGi environment which registers the request handler with
+   * the site observer.
+   * 
+   * @param handler
+   *          the action request handler
+   */
+  void setActionRequestHandler(ActionRequestHandler handler) {
+    logger.debug("Registering {}", handler);
+    this.actionRequestHandler = handler;
+    synchronized (sites) {
+      for (Site site : sites) {
+        for (Module module : site.getModules()) {
+          for (Action action : module.getActions()) {
+            actionRequestHandler.register(action);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Callback from the OSGi environment which removes the action request handler
+   * from the site observer.
+   * 
+   * @param handler
+   *          the action request handler
+   */
+  void removeActionRequestHandler(ActionRequestHandler handler) {
+    logger.debug("Unregistering {}", handler);
+    synchronized (sites) {
+      for (Site site : sites) {
+        for (Module module : site.getModules()) {
+          for (Action action : module.getActions()) {
+            actionRequestHandler.unregister(action);
+          }
+        }
+      }
+    }
+    this.actionRequestHandler = null;
+  }
+
+  /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#getSiteServlet(ch.o2it.weblounge.common.site.Site)
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#getSiteServlet(ch.o2it.weblounge.common.site.Site)
    */
   public Servlet getSiteServlet(Site site) {
     return siteServlets.get(site);
@@ -306,7 +353,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByIdentifier(java.lang.String)
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByIdentifier(java.lang.String)
    */
   public Site findSiteByIdentifier(String identifier) {
     for (Site site : sites) {
@@ -320,7 +367,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByName(java.lang.String)
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByName(java.lang.String)
    */
   public Site findSiteByName(String serverName) {
     Site site = sitesByServerName.get(serverName);
@@ -355,7 +402,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteLocatorService#findSiteByRequest(javax.servlet.http.HttpServletRequest)
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByRequest(javax.servlet.http.HttpServletRequest)
    */
   public Site findSiteByRequest(HttpServletRequest request) {
     if (request == null)
@@ -366,7 +413,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#addSite(ch.o2it.weblounge.common.site.Site,
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#addSite(ch.o2it.weblounge.common.site.Site,
    *      org.osgi.framework.ServiceReference)
    */
   public void addSite(Site site, ServiceReference reference) {
@@ -418,6 +465,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
       // Register this site for the findByXYZ() methods
       synchronized (sites) {
         sites.add(site);
+        site.addSiteListener(this);
         for (String name : site.getHostNames()) {
           if (site.equals(sitesByServerName.get(name))) {
             logger.error("Another site is already registered to " + name);
@@ -448,7 +496,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteRegistrationService#removeSite(ch.o2it.weblounge.common.site.Site)
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#removeSite(ch.o2it.weblounge.common.site.Site)
    */
   public void removeSite(Site site) {
     // Remove site dispatcher servlet
@@ -465,6 +513,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
 
     // Remove site registration
     synchronized (sites) {
+      site.removeSiteListener(this);
       sites.remove(site);
       List<String> namesToRemove = new ArrayList<String>();
       for (Map.Entry<String, Site> entry : sitesByServerName.entrySet()) {
@@ -480,6 +529,36 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
     // TODO: unregister site dispatcher
 
     logger.debug("Site {} unregistered", site);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.SiteListener#siteStarted(ch.o2it.weblounge.common.site.Site)
+   */
+  public void siteStarted(Site site) {
+    if (actionRequestHandler != null) {
+      for (Module module : site.getModules()) {
+        for (Action action : module.getActions()) {
+          actionRequestHandler.register(action);
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.SiteListener#siteStopped(ch.o2it.weblounge.common.site.Site)
+   */
+  public void siteStopped(Site site) {
+    if (actionRequestHandler != null) {
+      for (Module module : site.getModules()) {
+        for (Action action : module.getActions()) {
+          actionRequestHandler.unregister(action);
+        }
+      }
+    }
   }
 
   /**
@@ -597,7 +676,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
   private final class SiteTracker extends ServiceTracker {
 
     /** The site dispatcher */
-    private SiteRegistrationServiceImpl dispatcher = null;
+    private SiteDispatcherServiceImpl dispatcher = null;
 
     /**
      * Creates a new <code>SiteTracker</code>.
@@ -607,7 +686,7 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
      * @param context
      *          the site dispatcher's bundle context
      */
-    public SiteTracker(SiteRegistrationServiceImpl dispatcher,
+    public SiteTracker(SiteDispatcherServiceImpl dispatcher,
         BundleContext context) {
       super(context, Site.class.getName(), null);
       this.dispatcher = dispatcher;

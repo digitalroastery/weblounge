@@ -29,7 +29,7 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.dispatcher.DispatchListener;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.SiteRegistrationService;
+import ch.o2it.weblounge.dispatcher.SiteDispatcherService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private transient ResponseCache cache = null;
 
   /** The sites that are online */
-  private transient SiteRegistrationService sites = null;
+  private transient SiteDispatcherService sites = null;
 
   /** List of request listeners */
   private List<RequestListener> requestListeners = null;
@@ -91,20 +91,20 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   /**
    * Sets the site locator.
    * 
-   * @param siteLocator
+   * @param siteDispatcher
    *          the site locator
    */
-  public void setSiteLocator(SiteRegistrationService siteLocator) {
-    this.sites = siteLocator;
+  public void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
+    this.sites = siteDispatcher;
   }
   
   /**
    * Removes the site locator.
    * 
-   * @param siteLocator
+   * @param siteDispatcher
    *          the site locator
    */
-  public void removeSiteLocator(SiteRegistrationService siteLocator) {
+  public void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
     this.sites = null;
   }
 

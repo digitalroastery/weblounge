@@ -21,7 +21,7 @@ package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.dispatcher.DispatcherService;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.SiteRegistrationService;
+import ch.o2it.weblounge.dispatcher.SiteDispatcherService;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -114,23 +114,23 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   }
 
   /**
-   * Callback from the OSGi environment when the site locator is activated.
+   * Callback from the OSGi environment when the site dispatcher is activated.
    * 
-   * @param siteLocator
-   *          the site locator
+   * @param siteDispatcher
+   *          the site dispatcher
    */
-  void setSiteLocator(SiteRegistrationService siteLocator) {
-    dispatcher.setSiteLocator(siteLocator);
+  void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
+    dispatcher.setSiteDispatcher(siteDispatcher);
   }
 
   /**
-   * Callback from the OSGi environment when the site locator is deactivated.
+   * Callback from the OSGi environment when the site dispatcher is deactivated.
    * 
-   * @param siteLocator
-   *          the site locator service
+   * @param siteDispatcher
+   *          the site dispatcher service
    */
-  void removeSiteLocator(SiteRegistrationService siteLocator) {
-    dispatcher.setSiteLocator(null);
+  void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
+    dispatcher.setSiteDispatcher(null);
   }
 
   /**
