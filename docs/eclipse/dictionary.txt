@@ -64,3 +64,4 @@ solr
 precompilation
 jsp
 endpoint
+dactivation
