@@ -209,6 +209,8 @@ public class SiteRegistrationServiceImpl implements SiteRegistrationService, Man
    */
   @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
+    if (properties == null)
+      return;
     configure(properties);
   }
 

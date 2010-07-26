@@ -60,6 +60,8 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
    */
   @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
+    if (properties == null)
+      return;
     logger.debug("Updating dispatcher service properties");
   }
 

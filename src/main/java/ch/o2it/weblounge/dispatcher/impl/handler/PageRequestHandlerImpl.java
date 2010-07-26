@@ -158,7 +158,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       else {
         ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
         if (contentRepository == null) {
-          logger.warn("Content repository not available while trying to access {}", pageURI);
+          logger.warn("No content repository found for site '{}'", site);
           return false;
         }
 

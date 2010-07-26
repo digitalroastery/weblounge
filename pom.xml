@@ -95,6 +95,17 @@
       <version>0.7.2</version>
     </dependency>
   
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
+  
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-bundle-jaxrs</artifactId>
+      <version>2.2.9</version>
+    </dependency>
+  
     <!-- testing -->
     
     <dependency>
@@ -137,14 +148,43 @@
               ch.o2it.weblounge.common.user;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
               ch.o2it.weblounge.dispatcher;version=${project.version},
-              javax.activation,
               javax.el;version="2.0.0",
               javax.servlet;version="2.5.0",
               javax.servlet.http;version="2.5.0",
               javax.servlet.jsp;version="2.1.0",
               javax.servlet.resources;version="2.5.0",
+              javax.ws.rs;version="1.0",
               org.apache.commons.io;version="1.4",
               org.apache.commons.lang;version="2.4",
+              META-INF.cxf,
+              META-INF.cxf.osgi,
+              org.apache.cxf,
+              org.apache.cxf.resource,
+              org.apache.cxf.bus,
+              org.apache.cxf.bus.extension,
+              org.apache.cxf.endpoint,
+              org.apache.cxf.phase,
+              org.apache.cxf.workqueue,
+              org.apache.cxf.buslifecycle,
+              org.apache.cxf.transport,
+              org.apache.cxf.transport.http,
+              org.apache.cxf.transports.http,
+              org.apache.cxf.transport.http_jetty,
+              org.apache.cxf.transport.servlet,
+              org.apache.cxf.transport.jms,
+              org.apache.cxf.management,
+              org.apache.cxf.management.jmx,
+              org.apache.cxf.binding,
+              org.apache.cxf.binding.soap,
+              org.apache.cxf.binding.xml,
+              org.apache.cxf.headers,
+              org.apache.cxf.catalog,
+              org.apache.cxf.jaxrs,
+              org.apache.cxf.jaxrs.lifecycle,
+              org.apache.cxf.jaxrs.utils,
+              org.apache.cxf.jaxrs.impl,
+              org.apache.cxf.wsdl,
+              org.apache.cxf.wsdl11,
               org.mortbay.jetty;version="6.1.19",
               org.mortbay.resource;version="6.1.19",
               org.ops4j.pax.web.jsp;version="0.7.2",
@@ -164,6 +204,7 @@
               OSGI-INF/dispatcher-service.xml,
               OSGI-INF/action-requesthandler.xml,
               OSGI-INF/page-requesthandler.xml,
+              OSGI-INF/rest-publisher-service.xml,
               OSGI-INF/site-registration-service.xml
             </Service-Component>
           </instructions>

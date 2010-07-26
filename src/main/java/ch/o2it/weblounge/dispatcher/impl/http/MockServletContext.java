@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.activation.FileTypeMap;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
@@ -47,7 +46,6 @@ import javax.servlet.ServletContext;
 /**
  * Mock implementation of the {@link javax.servlet.ServletContext} interface.
  */
-@SuppressWarnings("restriction")
 public class MockServletContext implements ServletContext {
 
   /** The java temp dir property name */
@@ -494,8 +492,15 @@ public class MockServletContext implements ServletContext {
    * dependency when actually asked to resolve a MIME type.
    */
   private static class MimeTypeResolver {
+    /**
+     * 
+     * @param filePath
+     * @return
+     */
     public static String getMimeType(String filePath) {
-      return FileTypeMap.getDefaultFileTypeMap().getContentType(filePath);
+      return null;
+      // TODO Reactive java action framework (and solve bundle management)
+//      return FileTypeMap.getDefaultFileTypeMap().getContentType(filePath);
     }
   }
 

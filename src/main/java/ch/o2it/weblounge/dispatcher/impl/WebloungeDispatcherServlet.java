@@ -97,6 +97,16 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   public void setSiteLocator(SiteRegistrationService siteLocator) {
     this.sites = siteLocator;
   }
+  
+  /**
+   * Removes the site locator.
+   * 
+   * @param siteLocator
+   *          the site locator
+   */
+  public void removeSiteLocator(SiteRegistrationService siteLocator) {
+    this.sites = null;
+  }
 
   /**
    * {@inheritDoc}
