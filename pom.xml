@@ -28,12 +28,6 @@
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
-      <artifactId>weblounge-dispatcher-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-contentrepository-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -101,7 +95,6 @@
               ch.o2it.weblounge.common.impl.page;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
-              ch.o2it.weblounge.dispatcher;version=${project.version},
               org.quartz;version="1.5.2",
               org.quartz.impl;version="1.5.2",
               org.osgi.framework;version="1.4.0",

@@ -3,9 +3,10 @@
   immediate="true"
   name="Weblounge Site Manager Service">
 
-  <implementation class="ch.o2it.weblounge.kernel.SiteManagerService" />
+  <implementation class="ch.o2it.weblounge.kernel.SiteManager" />
   <property name="service.description" value="Weblounge Site Manager Service" />
-  <reference name="site" interface="ch.o2it.weblounge.common.site.Site" cardinality="0..n" policy="dynamic" bind="addSite" unbind="removeSite" />
-  <reference name="actionrequesthandler" interface="ch.o2it.weblounge.dispatcher.ActionRequestHandler" cardinality="0..1" policy="dynamic" bind="addActionRequestHandler" unbind="removeActionRequestHandler" />
+  <service>
+    <provide interface="ch.o2it.weblounge.kernel.SiteManager" />
+  </service>
 
 </scr:component>
