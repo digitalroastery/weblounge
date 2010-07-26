@@ -101,16 +101,15 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
   }
 
   /**
-   * Callback from the OSGi environment to activate the service.
-   * <p>
-   * This method is configured in the <tt>Dynamic Services</tt> section of the
-   * bundle.
+   * Callback for OSGi's declarative services component activation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component activation fails
    */
   @SuppressWarnings("unchecked")
-  public void activate(ComponentContext context) throws Exception {
+  void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
 
     logger.info("Starting content repository service");
@@ -149,20 +148,19 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
 
     factoryTracker = new ContentRepositoryFactoryTracker(this, bundleContext);
     factoryTracker.open();
-    
+
     logger.debug("Content repository service activated");
   }
 
   /**
-   * Callback from the OSGi environment to deactivate the service.
-   * <p>
-   * This method is configured in the <tt>Dynamic Services</tt> section of the
-   * bundle.
+   * Callback for OSGi's declarative services component dactivation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component inactivation fails
    */
-  public void deactivate(ComponentContext context) {
+  void deactivate(ComponentContext context) throws Exception {
     logger.debug("Deactivating content repository service");
     siteTracker.close();
     factoryTracker.close();
