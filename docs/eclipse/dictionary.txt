@@ -63,3 +63,4 @@ validator
 solr
 precompilation
 jsp
+endpoint
