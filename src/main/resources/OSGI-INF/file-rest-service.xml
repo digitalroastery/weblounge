@@ -10,6 +10,6 @@
     <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.FileEndpoint" />
   </service>
 
-  <reference name="siteregistration" interface="ch.o2it.weblounge.dispatcher.SiteRegistrationService" cardinality="0..1" policy="dynamic" bind="setSiteLocator" unbind="removeSiteLocator" />
+  <reference name="sites" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
 
 </scr:component>

@@ -28,7 +28,7 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
-import ch.o2it.weblounge.dispatcher.SiteRegistrationService;
+import ch.o2it.weblounge.kernel.SiteManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class PageEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(PageEndpoint.class);
 
   /** The sites that are online */
-  private transient SiteRegistrationService sites = null;
+  private transient SiteManager sites = null;
 
   @GET
   @Path("/{pageid}")
@@ -167,7 +167,7 @@ public class PageEndpoint {
     }
 
     // Extract the site
-    Site site = sites.findSiteByRequest(request);
+    Site site = sites.findSiteByName(request.getServerName());
     if (site == null) {
       logger.debug("Unable to load page '{}': site not found", pageId);
       return null;
@@ -186,22 +186,22 @@ public class PageEndpoint {
   }
 
   /**
-   * Callback for OSGi to set the site locator.
+   * Callback for OSGi to set the site manager.
    * 
-   * @param siteLocator
-   *          the site locator
+   * @param siteManager
+   *          the site manager
    */
-  void setSiteLocator(SiteRegistrationService siteLocator) {
-    this.sites = siteLocator;
+  void setSiteManager(SiteManager siteManager) {
+    this.sites = siteManager;
   }
 
   /**
-   * Callback for OSGi to remove the site locator.
+   * Callback for OSGi to remove the site manager.
    * 
-   * @param siteLocator
-   *          the site locator
+   * @param siteManager
+   *          the site manager
    */
-  void removeSiteLocator(SiteRegistrationService siteLocator) {
+  void removeSiteManager(SiteManager siteManager) {
     this.sites = null;
   }
 

@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
-import ch.o2it.weblounge.dispatcher.SiteRegistrationService;
+import ch.o2it.weblounge.kernel.SiteManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,14 +44,12 @@ public class FileEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(FileEndpoint.class);
 
   /** The sites that are online */
-  private transient SiteRegistrationService sites = null;
+  private transient SiteManager sites = null;
 
   @GET
   @Path("/{fileid}")
   public Response getPage(@PathParam("fileid") String fileId) {
 
-    logger.info("File rest endpoint hit!");
-    
     if (fileId == null)
       return Response.status(Status.BAD_REQUEST).build();
 
@@ -61,22 +59,22 @@ public class FileEndpoint {
   }
   
   /**
-   * Callback for OSGi to set the site locator.
+   * Callback for OSGi to set the site manager.
    * 
-   * @param siteLocator
-   *          the site locator
+   * @param siteManager
+   *          the site manager
    */
-  void setSiteLocator(SiteRegistrationService siteLocator) {
-    this.sites = siteLocator;
+  void setSiteManager(SiteManager siteManager) {
+    this.sites = siteManager;
   }
 
   /**
-   * Callback for OSGi to remove the site locator.
+   * Callback for OSGi to remove the site manager.
    * 
-   * @param siteLocator
-   *          the site locator
+   * @param siteManager
+   *          the site manager
    */
-  void removeSiteLocator(SiteRegistrationService siteLocator) {
+  void removeSiteManager(SiteManager siteManager) {
     this.sites = null;
   }
 
