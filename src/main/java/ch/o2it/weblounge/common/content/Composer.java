@@ -42,8 +42,8 @@ public interface Composer {
 
   /**
    * Returns the list of pagelets contained in the composer that match the type
-   * specified by <code>module</code> and <code>renderer</code>. If there are
-   * no matching pagelets, the method return an empty array.
+   * specified by <code>module</code> and <code>renderer</code>. If there are no
+   * matching pagelets, the method return an empty array.
    * 
    * @param module
    *          the module
@@ -52,5 +52,30 @@ public interface Composer {
    * @return the list of matching pagelets
    */
   Pagelet[] getPagelets(String module, String renderer);
+
+  /**
+   * Returns the pagelet at index <code>index</code>.
+   * 
+   * @param index
+   *          the pagelet's position
+   * @return the pagelet
+   * @throws IndexOutOfBoundsException
+   *           if there is no element at position <code>index</code>
+   */
+  Pagelet getPagelet(int index);
+
+  /**
+   * Returns the number of pagelets in the composer.
+   * 
+   * @return the composer's size
+   */
+  int size();
+
+  /**
+   * Returns an XML representation of this composer.
+   * 
+   * @return an XML representation of this composer
+   */
+  String toXml();
 
 }

@@ -427,6 +427,14 @@ public interface Page extends Localizable, Creatable, Modifiable, Publishable, S
   String getTemplate();
 
   /**
+   * Returns the composer identified by <code>composerId</code> or
+   * <code>null</code> if that composer is not found.
+   * 
+   * @return the composer
+   */
+  Composer getComposer(String composerId);
+
+  /**
    * Returns a list of composers on this page. Note that there is no way of
    * knowing for sure whether this list is complete, since it only lists those
    * composers that have at least one pagelet in them.
