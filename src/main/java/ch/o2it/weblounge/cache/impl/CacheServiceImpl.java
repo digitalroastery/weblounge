@@ -97,6 +97,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   @SuppressWarnings("unchecked")
   public void updated(Dictionary properties)
       throws org.osgi.service.cm.ConfigurationException {
+    if (properties == null)
+      return;
     String cacheSize = (String) properties.get("size");
     if (cacheSize != null) {
       try {
