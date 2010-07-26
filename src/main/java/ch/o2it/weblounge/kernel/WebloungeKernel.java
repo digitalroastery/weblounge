@@ -41,12 +41,14 @@ public class WebloungeKernel {
   private Scheduler scheduler = null;
 
   /**
-   * Callback from the OSGi environment to activate the bundle.
+   * Callback for OSGi's declarative services component dactivation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component inactivation fails
    */
-  public void activate(ComponentContext context) throws Exception {
+  void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
     logger.info("Starting common weblounge services", this);
 
@@ -64,12 +66,14 @@ public class WebloungeKernel {
   }
 
   /**
-   * Callback from the OSGi environment to deactivate the bundle.
+   * Callback for OSGi's declarative services component dactivation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component inactivation fails
    */
-  public void deactivate(ComponentContext context) throws Exception {
+  void deactivate(ComponentContext context) throws Exception {
     logger.info("Stopping common weblounge services", this);
     scheduler.shutdown();
     logger.info("Job scheduler stopped");

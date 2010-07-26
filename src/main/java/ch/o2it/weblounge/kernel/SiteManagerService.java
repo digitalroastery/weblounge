@@ -79,7 +79,7 @@ public final class SiteManagerService implements SiteListener {
    * @param site
    *          the site
    */
-  public void addSite(Site site) {
+  void addSite(Site site) {
     site.addSiteListener(this);
     if (site.isStartedAutomatically()) {
       try {
@@ -99,7 +99,7 @@ public final class SiteManagerService implements SiteListener {
    * @param site
    *          the site
    */
-  public void removeSite(Site site) {
+  void removeSite(Site site) {
     site.removeSiteListener(this);
     try {
       if (site.isRunning())
@@ -116,7 +116,7 @@ public final class SiteManagerService implements SiteListener {
    * @param handler
    *          the action request handler
    */
-  public void addActionRequestHandler(ActionRequestHandler handler) {
+  void addActionRequestHandler(ActionRequestHandler handler) {
     logger.debug("Registering {}", handler);
     actionRequestHandler = handler;
     registerAllSites();
@@ -129,7 +129,7 @@ public final class SiteManagerService implements SiteListener {
    * @param handler
    *          the action request handler
    */
-  public void removeActionRequestHandler(ActionRequestHandler handler) {
+  void removeActionRequestHandler(ActionRequestHandler handler) {
     logger.debug("Unregistering {}", handler);
     unregisterAllSites();
     actionRequestHandler = null;

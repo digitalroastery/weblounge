@@ -586,12 +586,14 @@ public class SiteCommand {
   }
 
   /**
-   * Callback from the OSGi environment to activate the commands.
+   * Callback for OSGi's declarative services component dactivation.
    * 
    * @param context
    *          the component context
+   * @throws Exception
+   *           if component inactivation fails
    */
-  public void activate(ComponentContext context) {
+  void activate(ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
     logger.debug("Registering site commands");
     Dictionary<String, Object> commands = new Hashtable<String, Object>();
