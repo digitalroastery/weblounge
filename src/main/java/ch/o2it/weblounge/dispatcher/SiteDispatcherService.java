@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
  * This service registers sites with the
  * <code>org.osgi.service.HttpService</code>.
  */
-public interface SiteRegistrationService {
+public interface SiteDispatcherService {
 
   /**
    * Returns the site associated with the given server name.
