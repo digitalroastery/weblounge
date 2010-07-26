@@ -75,7 +75,7 @@ public class SiteActivator {
    *           if the site activation fails
    */
   @SuppressWarnings("unchecked")
-  public void activate(final ComponentContext context) throws Exception {
+  void activate(final ComponentContext context) throws Exception {
     BundleContext bundleContext = context.getBundleContext();
 
     logger.debug("Scanning bundle '{}' for site.xml", bundleContext.getBundle().getSymbolicName());
@@ -142,7 +142,7 @@ public class SiteActivator {
    * @throws Exception
    *           if the site deactivation fails
    */
-  public void deactivate(ComponentContext context) throws Exception {
+  void deactivate(ComponentContext context) throws Exception {
     if (site != null && site instanceof SiteImpl) {
       ((SiteImpl) site).deactivate(context);
     }
