@@ -87,6 +87,7 @@
             <Bundle-SymbolicName>${project.groupId}.kernel</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.dispatcher;version=${project.version},
               ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.url;version=${project.version},
@@ -102,7 +103,9 @@
               org.osgi.util.tracker;version="1.4.0",
               org.slf4j;version="1.5.6"
             </Import-Package>
-            <Export-Package></Export-Package>
+            <Export-Package>
+              ch.o2it.weblounge.kernel;version=${project.version}
+            </Export-Package>
             <Service-Component>
               OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/kernel-service.xml,
