@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
@@ -63,6 +64,9 @@ public class SearchIndexTest {
 
   /** Flag to indicate read only index */
   protected boolean isReadOnly = false;
+  
+  /** Page template */
+  protected PageTemplate template = null;
 
   /** The mock site */
   protected Site site = null;
@@ -93,7 +97,14 @@ public class SearchIndexTest {
     String rootPath = PathSupport.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
     idxRoot = new File(rootPath);
     idx = new SearchIndex(idxRoot, isReadOnly);
+
+    template = EasyMock.createNiceMock(PageTemplate.class);
+    EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
+    EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
+    EasyMock.replay(template);
+    
     site = EasyMock.createNiceMock(Site.class);
+    EasyMock.expect(site.getTemplate((String)EasyMock.anyObject())).andReturn(template).anyTimes();
     EasyMock.replay(site);
 
     // Prepare the page
