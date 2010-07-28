@@ -122,10 +122,10 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
       if (config != null) {
         configure(config);
       } else {
-        logger.warn("Unable to load content repository service configuration");
+        logger.debug("No customized configuration for content repository found");
       }
     } else {
-      logger.warn("Unable to get service reference for class ConfigurationAdmin");
+      logger.debug("No configuration admin service found while looking for content repository configuration");
     }
 
     // Check the configuration of the repository implementation

@@ -20,10 +20,21 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
+import static ch.o2it.weblounge.common.impl.util.doc.Status.BAD_REQUEST;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.NOT_FOUND;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.OK;
+
 import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
+import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentation;
+import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentationGenerator;
+import ch.o2it.weblounge.common.impl.util.doc.Format;
+import ch.o2it.weblounge.common.impl.util.doc.Parameter;
+import ch.o2it.weblounge.common.impl.util.doc.TestForm;
+import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -56,6 +67,19 @@ public class PageEndpoint {
   /** The sites that are online */
   private transient SiteManager sites = null;
 
+  /** The endpoint documentation */
+  private String docs = null;
+
+  /**
+   * Returns the page with the given identifier or a <code>404</code> if the
+   * page could not be found.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @return the page
+   */
   @GET
   @Path("/{pageid}")
   public Response getPage(@Context HttpServletRequest request,
@@ -79,10 +103,24 @@ public class PageEndpoint {
     }
   }
 
+  /**
+   * Returns the composer specified by <code>composerId</code> and
+   * <code>pageletIndex</code> or a <code>404</code> if either the page or the
+   * composer does not exist.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @param composerId
+   *          the composer identifier
+   * @return the composer
+   */
   @GET
-  @Path("/{pageid}/composer/{composerid}")
+  @Path("/{pageid}/composers/{composerid}")
   public Response getComposer(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId, @PathParam("composerid") String composerId) {
+      @PathParam("pageid") String pageId,
+      @PathParam("composerid") String composerId) {
 
     if (pageId == null)
       return Response.status(Status.BAD_REQUEST).build();
@@ -110,10 +148,27 @@ public class PageEndpoint {
     }
   }
 
+  /**
+   * Returns the pagelet specified by <code>pageId</code>,
+   * <code>composerId</code> and <code>pageletIndex</code> or a <code>404</code>
+   * if either of the the page, the composer or the pagelet does not exist.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @param composerId
+   *          the composer identifier
+   * @param pageletIndex
+   *          the pagelet index within the composer
+   * @return the pagelet
+   */
   @GET
-  @Path("/{pageid}/composer/{composerid}/pagelet/{pageletindex}")
+  @Path("/{pageid}/composers/{composerid}/pagelets/{pageletindex}")
   public Response getPagelet(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId, @PathParam("composerid") String composerId, @PathParam("pageletindex") int pageletIndex) {
+      @PathParam("pageid") String pageId,
+      @PathParam("composerid") String composerId,
+      @PathParam("pageletindex") int pageletIndex) {
 
     if (pageId == null)
       return Response.status(Status.BAD_REQUEST).build();
@@ -134,7 +189,7 @@ public class PageEndpoint {
       if (composer == null) {
         return Response.status(Status.NOT_FOUND).build();
       }
-      
+
       if (composer.size() < pageletIndex) {
         return Response.status(Status.NOT_FOUND).build();
       }
@@ -143,6 +198,51 @@ public class PageEndpoint {
     } catch (Exception e) {
       return Response.serverError().build();
     }
+  }
+
+  /**
+   * Returns the endpoint documentation.
+   * 
+   * @return the endpoint documentation
+   */
+  @GET
+  @Path("/docs")
+  @Produces(MediaType.TEXT_HTML)
+  public String getDocumentation() {
+    if (docs != null)
+      return docs;
+
+    String endpointUrl = "/system/contentrepository/pages";
+    EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "pages");
+    docs.setTitle("Weblounge Pages");
+
+    // GET /{pageid}
+    Endpoint pageEndpoint = new Endpoint("/{pageid}", Method.GET, "page");
+    pageEndpoint.setDescription("Returns the page with the given id");
+    pageEndpoint.addFormat(Format.xml());
+    pageEndpoint.addStatus(OK("the page was found and is returned as part of the response"));
+    pageEndpoint.addStatus(NOT_FOUND("the page was not found or could not be loaded"));
+    pageEndpoint.addStatus(BAD_REQUEST("an invalid page identifier was received"));
+    pageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
+    pageEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, pageEndpoint);
+
+    // GET /{pageid}/composers/{composerId}
+    Endpoint composerEndpoint = new Endpoint("/{pageid}/composers/{composerid}", Method.GET, "composer");
+    composerEndpoint.setDescription("Returns the composer with the given id from the indicated page");
+    composerEndpoint.addFormat(Format.xml());
+    composerEndpoint.addStatus(OK("the composer was found and is returned as part of the response"));
+    composerEndpoint.addStatus(NOT_FOUND("the composer was not found or could not be loaded"));
+    composerEndpoint.addStatus(BAD_REQUEST("an invalid page or composer identifier was received"));
+    composerEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
+    composerEndpoint.addPathParameter(new Parameter("composerid", Parameter.Type.STRING, "The composer identifier"));
+    composerEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, composerEndpoint);
+
+    // GET /{pageid}/composers/{composerId}/pagelets/{pageletIndex}
+
+    this.docs = EndpointDocumentationGenerator.generate(docs);
+    return this.docs;
   }
 
   /**

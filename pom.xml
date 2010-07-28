@@ -196,6 +196,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.contentrepository</Bundle-SymbolicName>
             <Import-Package>
+              ch.o2it.weblounge.common.impl.util.doc;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
               ch.o2it.weblounge.kernel;version=${project.version},
               org.apache.commons.io;version="1.4",
