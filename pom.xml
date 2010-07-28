@@ -84,6 +84,12 @@
       <artifactId>json</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>2.3.15</version>
+    </dependency>
+
     <!-- testing -->
 
     <dependency>
@@ -156,7 +162,8 @@
               javax.xml.xpath,
               org.osgi.framework;version="1.4.0",
               org.osgi.service.component;version="1.1.0",
-              org.osgi.util.tracker;version="1.4.0"
+              org.osgi.util.tracker;version="1.4.0",
+              *;resolution:=optional
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.common.impl.content;version=${project.version},
@@ -173,6 +180,7 @@
               ch.o2it.weblounge.common.impl.util.*;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
+              freemarker,
               json
             </Embed-Dependency>
           </instructions>

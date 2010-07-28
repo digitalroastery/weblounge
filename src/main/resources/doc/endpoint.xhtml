@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>${metadata.title} Endpoint Documentation</title>
+  <style type="text/css">
+  /* styles for the page */
+  HTML {
+    font: 13px/1.231 arial,helvetica,clean,sans-serif;
+  }
+  FIELDSET {
+    margin-bottom: 2em;
+    margin-top: 0.5em;
+    padding-bottom: 1em;
+    width: 90%;
+  }
+  PRE {
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  }
+  TABLE.method {
+    width: 100%;
+  }
+  TABLE.testing {
+    width: 96%;
+    border: 2px solid #CCC;
+  }
+  UL {
+    margin: 0.2em;
+    padding-left: 1em;
+  }
+  DIV.table_spacer {
+    height: 2em;
+  }
+  DIV.footer {
+    padding-top: 1em;
+    font-weight: bold;
+  }
+  .method_set_header {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-size: 1.4em;
+    font-weight: bold;
+  }
+  .method_header TH {
+    background: #069 none repeat scroll 0 0;
+    color: white;
+    font-size: 0.9em;
+    font-weight: bold;
+    padding: 0.6em 0.3em;
+    text-align: left;
+    vertical-align: top;
+  }
+  TH.method_header_left {
+    text-align: right;
+    padding: 0.6em 1em;
+  }
+  TR.method TH {
+    font-family: sans-serif;
+    font-weight: normal;
+    padding: 0.5em 1.0em;
+    text-align: right;
+    vertical-align: top;
+  }
+  TR.method TH.method_important {
+    font-weight: bold;
+  }
+  TR.method TD {
+    border-bottom: 1px solid #CCC;
+    padding-bottom: 6px;
+    padding-left: 4px;
+    padding-top: 6px;
+    vertical-align: top;
+  }
+  TR.testform TD {
+  }
+  TR.testform A {
+  }
+  DIV.hidden {
+    display: none;
+  }
+  DIV.spaced {
+    margin: 4px 0px;
+  }
+  TD.form_label {
+    width: 10%;
+    font-size: 1.1em !important;
+  }
+  .form_field_description {
+    font-size: 0.9em !important;
+  }
+  TD.form_submit {
+    border: none !important;
+  }
+  test_form_response TEXTAREA {
+    font-size: small;
+    font-family: monospace;
+    width: 100%;
+  }
+  </style>
+</head>
+<body>
+<h2>${metadata.title} Endpoint Documentation</h2>
+<span class="meta_url"><code>${metadata.url}</code></span>
+<#if metadata.abstract??>
+<div class="meta_abstract">${metadata.abstract}</div>
+</#if>
+
+<#list endpointCollections as endpointCollection>
+<fieldset id="endpoint_holder_${endpointCollection.name}">
+<legend class="method_set_header">${endpointCollection.title} methods</legend>
+<#if (endpointCollection.endpoints?size <= 0)>
+<em>NONE</em>
+<#else>
+<#list endpointCollection.endpoints as endpoint>
+<table id="${endpoint.name}" class="method" cellpadding="0px" cellspacing="0px"
+  summary="${endpointCollection.title} function for the ${endpoint.method} ${endpoint.path} endpoint, Name of the attribute followed by the value">
+  <thead>
+    <tr class="method_header">
+      <th width="20%" scope="col" class="method_header_left">Name</th>
+      <th scope="col">Value and Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="method">
+      <th class="row" scope="row">Method / Path:</th>
+      <td><tt title="${metadata.url}${endpoint.path}${endpoint.pathFormat!}"><b>${endpoint.method} ${endpoint.path}${endpoint.pathFormatHtml!}</b></tt></td>
+    </tr>
+    <#if endpoint.description??>
+    <tr class="method">
+      <th scope="row">Description:</th>
+      <td>${endpoint.description}</td>
+    </tr>
+    </#if>
+    <#if (endpoint.pathParameters?size > 0)>
+    <tr class="method">
+      <th class="row" scope="row">Path parameters:</th>
+      <td>
+        <#list endpoint.pathParameters as param>
+        <tt>${param.name}<#if param.defaultValue??>=${param.defaultValueHtml}</#if></tt>: ${param.description!"<em>NONE</em>"}<#if param_has_next> <br/></#if>
+        </#list>
+      </td>
+    </tr>
+    </#if>
+    <#if (endpoint.requiredParameters?size > 0)>
+    <tr class="method">
+      <th class="row" scope="row">Required (form) parameters:</th>
+      <td>
+        <#list endpoint.requiredParameters as param>
+        <tt>${param.name}<#if param.defaultValue??>=${param.defaultValueHtml}</#if></tt>: ${param.description!"<em>NONE</em>"}<#if param_has_next> <br/></#if>
+        </#list>
+      </td>
+    </tr>
+    </#if>
+    <#if endpoint.bodyParameter??>
+    <tr class="method">
+      <th class="row" scope="row">Body (upload) param:</th>
+      <td>
+        <#if endpoint.bodyParameter.defaultValue??><tt>DEFAULT=${endpoint.bodyParameter.defaultValueHtml}</tt>: </#if>${endpoint.bodyParameter.description!"<em>NONE</em>"}
+      </td>
+    </tr>
+    </#if>
+        <#if (endpoint.optionalParameters?size > 0)>
+    <tr class="method">
+      <th scope="row">Optional (<#if (endpoint.method == "GET")>query<#else>form</#if>) parameters:</th>
+      <td>
+        <#list endpoint.optionalParameters as param>
+        <tt>${param.name}<#if param.defaultValue??>=${param.defaultValueHtml}</#if></tt>: ${param.description!"<em>NONE</em>"}<#if param_has_next> <br/></#if>
+        </#list>
+      </td>
+    </tr>
+    </#if>
+    <#if (endpoint.outputFormats?size > 0)>
+    <tr class="method">
+      <th scope="row">Response formats:</th>
+      <td>
+        <#list endpoint.outputFormats as format>
+        <#if format.url??><a href="${format.url}">${format.name}</a><#else>${format.name}</#if> <#if format.description??>(${format.description})</#if><#if format_has_next> <br/></#if>
+        </#list>
+      </td>
+    </tr>
+    </#if>
+    <#if (endpoint.responseStatuses?size > 0)>
+    <tr class="method">
+      <th scope="row">Status codes:</th>
+      <td>
+        <#list endpoint.responseStatuses as status>
+        <tt>${status.code}: ${status.name}</tt>&nbsp;&mdash;&nbsp;${status.description!"<em>NONE</em>"}<#if status_has_next> <br/></#if>
+        </#list>
+      </td>
+    </tr>
+    </#if>
+    <#if (endpoint.notes?size > 0)>
+    <tr class="method">
+      <th scope="row">Notes:</th>
+      <td>
+        <ul>
+          <#list endpoint.notes as note>
+          <li>${note}</li>
+          </#list>
+        </ul>
+      </td>
+    </tr>
+    </#if>
+    <tr class="method testform">
+      <th scope="row">Testing:</th>
+      <td>
+        <#if endpoint.form??>
+        <#if endpoint.form.html??><#-- just dump the html value -->
+        ${endpoint.form.html}
+        <#elseif (endpoint.form.basic)><#-- link to the basic endpoint path -->
+        <a href="${endpoint.path}${endpoint.queryString!}">${endpoint.path}${endpoint.queryString!}</a>
+        <#elseif endpoint.form.url??><#-- just create a link to the form -->
+        <a href="${endpoint.form.url}" target="_new">${endpoint.form.title!"Go to Testing form"}</a>
+        <#else>
+        <a href="#" class="form_link">${endpoint.form.title!"Testing form"} (click to reveal)</a>
+        <div class="hidden_form hidden">
+          <form id="form_${endpoint.name}" class="form_test_form" action="${metadata.url}${endpoint.path}" 
+                method="${endpoint.method?lower_case}"<#if endpoint.form.fileUpload> enctype="multipart/form-data"</#if>>
+            <input class="form_action_holder" type="hidden" value="${metadata.url}${endpoint.path}" />
+            <input class="form_endpoint_name" type="hidden" value="${endpoint.name}" />
+            <input class="form_method" type="hidden" value="${endpoint.method}" />
+            <#if (endpoint.form.ajaxSubmit)>
+            <input class="form_ajax_submit" type="hidden" value="1" />
+            </#if>
+            <div class="spaced">
+                <strong>Form action:</strong> <tt class="form_path">${metadata.url}${endpoint.path}</tt>
+                <#if (endpoint.form.usesPathFormat)>
+                  [<label for="${endpoint.name}_FORMAT">Format</label>:
+                  <select id="${endpoint.name}_FORMAT" name="form_path_format">
+                    <option value="{FORMAT}">format</option>
+                    <#list endpoint.outputFormas as format>
+                    <option value="${format}">${format}</option>
+                    </#list>
+                  </select>]
+                </#if>
+            </div>
+            <table class="testing" cellpadding="0" cellspacing="0">
+              <#list endpoint.form.parameters as item>
+              <tr class="form_field <#if item.required>form_required<#else>form_optional</#if>">
+                <#if item.type == "text">
+                <td class="form_textarea" colspan="3">
+                  <label for="${endpoint.name}_${item.name}">${item.name}</label>:<br/>
+                  <textarea id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_text form_param_submit<#if item.required> form_param_required</#if>" 
+                    rows="${(item.attributes.rows)!'3'}" cols="${(item.attributes.cols)!'80'}">${item.defaultValue!}</textarea>
+                  <div class="form_field_description">${item.description!}</div>
+                </td>
+                <#elseif item.type == "boolean">
+                <td class="form_label">
+                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                </td>
+                <td>
+                  <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" 
+                    type="checkbox" value="${item.defaultValue!}" />
+                </td>
+                <td class="form_field_description">${item.description!}</td>
+                <#elseif item.type == "file">
+                <td class="form_label">
+                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                </td>
+                <td>
+                  <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_file" class="form_field form_param_upload<#if item.required> form_param_required</#if>" type="file" />
+                </td>
+                <td class="form_field_description">${item.description!}</td>
+                <#elseif item.type == "enum">
+                <td class="form_label">
+                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                </td>
+                <td>
+                  <select id="${endpoint.name}_${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" name="${item.name}">
+                    <#list item.choices as choice>
+                    <option value="${choice}"<#if (choice == item.defaultValue)> selected="selected"</#if>>${choice}</option>
+                    </#list>
+                  </select>
+                </td>
+                <td class="form_field_description">${item.description!}</td>
+                <#else>
+                <td class="form_label">
+                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                </td>
+                <td>
+                  <input id="${endpoint.name}_${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" name="${item.name}" 
+                    type="text" value="${item.defaultValue!}" size="${(item.attributes.size)!'30'}" />
+                </td>
+                <td class="form_field_description">${item.description!}</td>
+                </#if>
+              </tr>
+              </#list>
+              <tr>
+                <td colspan="3">
+                  <div class="form_submit">
+                    <input type="submit" value="SUBMIT" />
+                    <input type="button" value="CANCEL" />
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </form>
+          <#if (endpoint.form.ajaxSubmit)>
+          <div class="test_form_working hidden">... WORKING ...</div>
+          <div class="test_form_response hidden">
+            <div>Response:</div>
+            <pre style="width: 100%; border-left: 4px solid #999; padding-left: 10px;"></pre>
+            <input type="button" value="HIDE" />
+          </div>
+          </#if>
+        </div>
+        </#if>
+      </td>
+    </tr>
+    </#if>
+  </tbody>
+</table>
+
+<#if endpoint_has_next>
+<div class="table_spacer"></div>
+</#if>
+
+</#list>
+</#if>
+</fieldset>
+</#list>
+
+
+<#if (notes?size > 0)>
+<fieldset>
+<legend class="method_set_header">General Notes</legend>
+<ul>
+  <#list notes as note>
+  <li>${note}</li>
+  </#list>
+</ul>
+</fieldset>
+</#if>
+
+<!-- JAVASCRIPT below here -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+<script type="text/javascript">
+/*global alert, jQuery  */
+(function($) {
+    $("a.form_link").click(
+        function() {
+            var $this = $(this);
+            var $form = $this.parent().find("div.hidden_form");
+            $form.toggle(400);
+            $this.parent().find("div.form_submit input[type='button']").click(
+                function() {
+                    $form.hide(200);
+                    $this.show();
+                }
+            );
+            $this.hide();
+            return false;
+        }
+    );
+    /**
+     * Takes a path and integrates the pathParameters values into it
+     * @param {String} path the path with keys (e.g. /my/{thing}/{stuff})
+     * @param {Array} parameters the parameters to put into the path (e.g. {'thing':'apple'})
+     */
+    function updatePath(path, parameters) {
+        var newPath = path;
+        for (var key in parameters) {
+            if (parameters.hasOwnProperty(key)) {
+                var value = parameters[key];
+                if (value !== undefined && value !== null && value !== '') {
+                    newPath = newPath.replace('{' + key + '}', value);
+                }
+            }
+        }
+        return newPath;
+    }
+    function checkPath($form) {
+        var parameters = [];
+        $form.find(".form_param_path").each( function() {
+            var $param = $(this);
+            parameters[$param.attr('name')] = $param.val();
+        });
+        var form_path = $form.find("input.form_action_holder").val();
+        var path = updatePath(form_path, parameters);
+        // update form and display
+        $form.attr('action', path);
+        $form.find(".form_path").html(path);
+        if (path.indexOf("{") >= 0 && path.indexOf("}") >= 0) {
+            return false;
+        }
+        return true;
+    }
+    function checkRequired($form) {
+        // check all required items
+        var $required = $form.find(".form_param_required");
+        var total = $required.length;
+        var counter = 0;
+        $required.each( function() {
+            var $this = $(this);
+            if ($this.val() !== null && $this.val() !== '') {
+                counter++;
+            }
+        });
+        var $formInputs = $form.find("div.form_submit input");
+        if (counter >= total) {
+            // submit is ok
+            $formInputs.removeAttr('disabled');
+            return true;
+        } else {
+            // disable form submit until required options at set
+            $formInputs.attr('disabled', 'disabled');
+            return false;
+        }
+    }
+    // do operation on all testing forms
+    $("form.form_test_form").each( function() {
+        var $form = $(this);
+        if ($form.find("input.form_action_holder").length >= 1) {
+            // now find and put the event handler on all path parameters
+            $form.find(".form_param_path").change( function() {
+                checkPath($form);
+            });
+            // run the checkPath method
+            checkPath($form);
+            var $reqParameters = $form.find(".form_param_required");
+            if ($reqParameters.length > 0) {
+                // add required options checks
+                $reqParameters.change( function(){
+                    checkRequired($form);
+                });
+            }
+            // run the check required
+            checkRequired($form);
+            // handle the ajax submissions
+            if ($form.find("input.form_ajax_submit").length >= 1) {
+              // the form will use ajax submit
+              //var form_key = $form.find("input.form_endpoint_name").val();
+              // add an event handler to the form submit
+              $form.bind('submit', function() {
+                  if ( checkRequired($form) ) {
+                      var submitParameters = {};
+                      $form.find(".form_param_submit").each( function() {
+                          var $param = $(this);
+                          submitParameters[$param.attr('name')] = $param.val();
+                      });
+                      //alert("parameters: " + $.param(submitParameters));
+                      var method = $form.find(".form_method").val();
+                      var url = $form.attr('action');
+                      $form.parent().find(".test_form_working").show();
+                      $form.parent().find(".test_form_response input").click(function(){
+                          $(this).parent.hide();
+                      });
+                      $.ajax({
+                          type: method,
+                          url: url,
+                          processData: true,
+                          dataType: 'text',
+                          data: submitParameters,
+                          success: function(data, textStatus) {
+                              $form.parent().find(".test_form_working").hide();
+                              $form.parent().find(".test_form_response").show()
+                                  .find("pre").text(data);
+                          },
+                          error: function(xhr, textStatus, errorThrown){
+                              $form.parent().find(".test_form_working").hide();
+                              var msg = textStatus + " : " + errorThrown + "\n" + 
+                                  xhr.status + " " + xhr.statusText + " :\n" + xhr.responseText();
+                              $form.parent().find(".test_form_response").show()
+                                  .find("pre").text(msg);
+                          }
+                      });
+                  } else {
+                      alert("Fill out all required fields first");
+                  }
+                  return false;
+              });
+            }
+        }
+    });
+}(jQuery));
+</script>
+
+</body>
+</html>
