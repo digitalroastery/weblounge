@@ -96,6 +96,9 @@
   TD.form_submit {
     border: none !important;
   }
+  A.hidden {
+    display: none;
+  }
   test_form_response TEXTAREA {
     font-size: small;
     font-family: monospace;
@@ -217,7 +220,7 @@
         <#elseif endpoint.form.url??><#-- just create a link to the form -->
         <a href="${endpoint.form.url}" target="_new">${endpoint.form.title!"Go to Testing form"}</a>
         <#else>
-        <a href="#" class="form_link">${endpoint.form.title!"Testing form"} (click to reveal)</a>
+        <a href="#" class="link_show_testform">${endpoint.form.title!"Test form"} (click to reveal)</a>
         <div class="hidden_form hidden">
           <form id="form_${endpoint.name}" class="form_test_form" action="${metadata.url}${endpoint.path}" 
                 method="${endpoint.method?lower_case}"<#if endpoint.form.fileUpload> enctype="multipart/form-data"</#if>>
@@ -305,10 +308,10 @@
           <div class="test_form_response hidden">
             <div>Response:</div>
             <pre style="width: 100%; border-left: 4px solid #999; padding-left: 10px;"></pre>
-            <input type="button" value="HIDE" />
           </div>
           </#if>
         </div>
+        <a href="#" class="link_hide_testform hidden">Hide</a>          
         </#if>
       </td>
     </tr>
@@ -338,27 +341,42 @@
 </#if>
 
 <!-- JAVASCRIPT below here -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript">
-/*global alert, jQuery  */
 (function($) {
-    $("a.form_link").click(
+    $("a.link_show_testform").click(
         function() {
-            var $this = $(this);
-            var $form = $this.parent().find("div.hidden_form");
-            $form.toggle(400);
-            $this.parent().find("div.form_submit input[type='button']").click(
-                function() {
-                    $form.hide(200);
-                    $this.show();
-                }
-            );
-            $this.hide();
-            return false;
+           var $this = $(this);
+           var $form = $this.parent().find("div.hidden_form");
+           var $hidectrl = $this.parent().find("a.link_hide_testform");
+           $form.toggle(400);
+           $hidectrl.show();
+           $this.parent().find("div.form_submit input[type='button']").click(
+              function() {
+                 $form.hide(200);
+                 $this.show();
+              }
+           );
+           $this.hide();
+           return false;
         }
     );
+
+    $("a.link_hide_testform").click(
+        function() {
+           var $this = $(this);
+           var $form = $this.parent().find("div.hidden_form");
+           var $show_form_ctrl = $this.parent().find("a.link_show_testform");
+           $form.hide(200);
+           $show_form_ctrl.show();
+           $this.hide();
+           return false;
+        }
+     );
+
     /**
-     * Takes a path and integrates the pathParameters values into it
+     * Takes a path and integrates the pathParameters values into it.
+     
      * @param {String} path the path with keys (e.g. /my/{thing}/{stuff})
      * @param {Array} parameters the parameters to put into the path (e.g. {'thing':'apple'})
      */
@@ -374,9 +392,10 @@
         }
         return newPath;
     }
+    
     function checkPath($form) {
         var parameters = [];
-        $form.find(".form_param_path").each( function() {
+        $form.find(".form_param_path").each(function() {
             var $param = $(this);
             parameters[$param.attr('name')] = $param.val();
         });
@@ -390,12 +409,17 @@
         }
         return true;
     }
+
+    /**
+     * Checks the form for required parameters and disables the form's submit
+     * button if a required parameter is missing.
+     */
     function checkRequired($form) {
         // check all required items
         var $required = $form.find(".form_param_required");
         var total = $required.length;
         var counter = 0;
-        $required.each( function() {
+        $required.each(function() {
             var $this = $(this);
             if ($this.val() !== null && $this.val() !== '') {
                 counter++;
@@ -412,34 +436,35 @@
             return false;
         }
     }
+ 
     // do operation on all testing forms
-    $("form.form_test_form").each( function() {
+    $("form.form_test_form").each(function() {
         var $form = $(this);
         if ($form.find("input.form_action_holder").length >= 1) {
-            // now find and put the event handler on all path parameters
-            $form.find(".form_param_path").change( function() {
-                checkPath($form);
-            });
-            // run the checkPath method
+
+            // wire path parameters
+            var $formParams = $form.find(".form_param_path");
+            if ($formParams.length > 0) {
+		            $formParams.change(function() { checkPath($form); });
+		            $formParams.keypress(function() { checkPath($form); });
+            }
             checkPath($form);
+
+            // wire required parameters
             var $reqParameters = $form.find(".form_param_required");
             if ($reqParameters.length > 0) {
-                // add required options checks
-                $reqParameters.change( function(){
-                    checkRequired($form);
-                });
+                $reqParameters.change(function() { checkRequired($form); });
+                $reqParameters.keypress(function() { checkPath($form); });
             }
-            // run the check required
             checkRequired($form);
+
             // handle the ajax submissions
             if ($form.find("input.form_ajax_submit").length >= 1) {
-              // the form will use ajax submit
-              //var form_key = $form.find("input.form_endpoint_name").val();
               // add an event handler to the form submit
               $form.bind('submit', function() {
                   if ( checkRequired($form) ) {
                       var submitParameters = {};
-                      $form.find(".form_param_submit").each( function() {
+                      $form.find(".form_param_submit").each(function() {
                           var $param = $(this);
                           submitParameters[$param.attr('name')] = $param.val();
                       });
@@ -450,23 +475,32 @@
                       $form.parent().find(".test_form_response input").click(function(){
                           $(this).parent.hide();
                       });
+
+                      // clear previous responses
+                      var responseBody = $form.parent().find(".test_form_response");
+                      responseBody.hide();
+                      responseBody.find("pre").text("");
+
+                      // make the request
                       $.ajax({
                           type: method,
                           url: url,
                           processData: true,
                           dataType: 'text',
                           data: submitParameters,
-                          success: function(data, textStatus) {
+                          success: function(data, textStatus, request) {
                               $form.parent().find(".test_form_working").hide();
-                              $form.parent().find(".test_form_response").show()
-                                  .find("pre").text(data);
+                              var responseBody = $form.parent().find(".test_form_response");
+                              responseBody.show();
+                              var msg = "Status: " + request.status + " (" + request.statusText + ")\n\n" + data;
+                              responseBody.find("pre").text(msg);
                           },
-                          error: function(xhr, textStatus, errorThrown){
+                          error: function(request, textStatus, errorThrown) {
                               $form.parent().find(".test_form_working").hide();
-                              var msg = textStatus + " : " + errorThrown + "\n" + 
-                                  xhr.status + " " + xhr.statusText + " :\n" + xhr.responseText();
-                              $form.parent().find(".test_form_response").show()
-                                  .find("pre").text(msg);
+                              var responseBody = $form.parent().find(".test_form_response");
+                              var msg = "Status: " + request.status + " (" + request.statusText + ")";
+                              responseBody.show();
+                              responseBody.find("pre").text(msg);
                           }
                       });
                   } else {
