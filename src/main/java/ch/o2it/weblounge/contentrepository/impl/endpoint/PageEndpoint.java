@@ -44,11 +44,14 @@ import ch.o2it.weblounge.kernel.SiteManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -85,22 +88,23 @@ public class PageEndpoint {
   public Response getPage(@Context HttpServletRequest request,
       @PathParam("pageid") String pageId) {
 
+    // Check the parameters
     if (pageId == null)
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    try {
-      Page page = loadPage(request, pageId);
-      if (page == null) {
-        return Response.status(Status.NOT_FOUND).build();
-      }
-
-      // TODO: Check page for modification date and return NOT_MODIFIED
-
-      return Response.ok(page.toXml()).build();
-    } catch (Exception e) {
-      return Response.serverError().build();
+    Page page = loadPage(request, pageId);
+    if (page == null) {
+      return Response.status(Status.NOT_FOUND).build();
     }
+
+    // Is there an up-to-date, cached version on the client side?
+    if (!isModidifed(page, request)) {
+      return Response.notModified().build();
+    }
+
+    // Return the full page
+    return Response.ok(page.toXml()).lastModified(page.getModificationDate()).build();
   }
 
   /**
@@ -122,30 +126,31 @@ public class PageEndpoint {
       @PathParam("pageid") String pageId,
       @PathParam("composerid") String composerId) {
 
+    // Check the parameters
     if (pageId == null)
       return Response.status(Status.BAD_REQUEST).build();
     else if (composerId == null)
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    try {
-      Page page = loadPage(request, pageId);
-      if (page == null) {
-        return Response.status(Status.NOT_FOUND).build();
-      }
-
-      // TODO: Check page for modification date and return NOT_MODIFIED
-
-      // Load the composer
-      Composer composer = page.getComposer(composerId);
-      if (composer == null) {
-        return Response.status(Status.NOT_FOUND).build();
-      }
-
-      return Response.ok(composer.toXml()).build();
-    } catch (Exception e) {
-      return Response.serverError().build();
+    Page page = loadPage(request, pageId);
+    if (page == null) {
+      return Response.status(Status.NOT_FOUND).build();
     }
+
+    // Is there an up-to-date, cached version on the client side?
+    if (!isModidifed(page, request)) {
+      return Response.notModified().build();
+    }
+
+    // Load the composer
+    Composer composer = page.getComposer(composerId);
+    if (composer == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+
+    // Return the composer
+    return Response.ok(composer.toXml()).lastModified(page.getModificationDate()).build();
   }
 
   /**
@@ -176,28 +181,24 @@ public class PageEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    try {
-      Page page = loadPage(request, pageId);
-      if (page == null) {
-        return Response.status(Status.NOT_FOUND).build();
-      }
-
-      // TODO: Check page for modification date and return NOT_MODIFIED
-
-      // Load the composer
-      Composer composer = page.getComposer(composerId);
-      if (composer == null) {
-        return Response.status(Status.NOT_FOUND).build();
-      }
-
-      if (composer.size() < pageletIndex) {
-        return Response.status(Status.NOT_FOUND).build();
-      }
-
-      return Response.ok(composer.getPagelet(pageletIndex).toXml()).build();
-    } catch (Exception e) {
-      return Response.serverError().build();
+    Page page = loadPage(request, pageId);
+    if (page == null) {
+      return Response.status(Status.NOT_FOUND).build();
     }
+
+    // Is there an up-to-date, cached version on the client side?
+    if (!isModidifed(page, request)) {
+      return Response.notModified().build();
+    }
+
+    // Load the composer
+    Composer composer = page.getComposer(composerId);
+    if (composer == null || composer.size() < pageletIndex) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+
+    // Return the pagelet
+    return Response.ok(composer.getPagelet(pageletIndex).toXml()).build();
   }
 
   /**
@@ -246,6 +247,31 @@ public class PageEndpoint {
   }
 
   /**
+   * Returns <code>true</code> if the page either is more recent than the cached
+   * version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param page
+   *          the page
+   * @param request
+   *          the client request
+   * @return <code>true</code> if the page is more recent than the version that
+   *         is cached at the client.
+   * @throws WebApplicationException
+   *           if the <code>If-Modified-Since</code> cannot be converted to a
+   *           date.
+   */
+  protected boolean isModidifed(Page page, HttpServletRequest request) {
+    try {
+      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
+      Date pageModificationDate = page.getModificationDate();
+      return cachedModificationDate < pageModificationDate.getTime();
+    } catch (IllegalArgumentException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+  }
+
+  /**
    * Returns the page identified by the given request and page identifier or
    * <code>null</code> if either one of the site, the site's content repository
    * or the page itself is not available.
@@ -255,11 +281,8 @@ public class PageEndpoint {
    * @param pageId
    *          the page identifier
    * @return the page
-   * @throws ContentRepositoryException
-   *           if accessing the content repository fails
    */
-  protected Page loadPage(HttpServletRequest request, String pageId)
-      throws ContentRepositoryException {
+  protected Page loadPage(HttpServletRequest request, String pageId) {
 
     if (sites == null) {
       logger.debug("Unable to load page '{}': no sites registered", pageId);
@@ -277,12 +300,17 @@ public class PageEndpoint {
     ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
     if (contentRepository == null) {
       logger.warn("No content repository found for site '{}'", site);
-      return null;
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
 
-    PageURI pageURI = new PageURIImpl(site, null, pageId);
-    Page page = contentRepository.getPage(pageURI);
-    return page;
+    // Load the page and return it
+    try {
+      PageURI pageURI = new PageURIImpl(site, null, pageId);
+      Page page = contentRepository.getPage(pageURI);
+      return page;
+    } catch (ContentRepositoryException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
