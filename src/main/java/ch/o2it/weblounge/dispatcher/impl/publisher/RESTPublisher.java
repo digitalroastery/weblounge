@@ -68,7 +68,7 @@ public class RESTPublisher implements ManagedService {
   public static final String OPT_PATH = OPT_PREFIX + ".path";
 
   /** Configuration key used to configure the endpoint's alias */
-  public static final String DEFAULT_PATH = "/rest";
+  public static final String DEFAULT_PATH = "/system";
 
   /** The context path option used to override the default context path */
   public static final String OPT_CONTEXTPATH = "rest.path";
@@ -121,10 +121,10 @@ public class RESTPublisher implements ManagedService {
       if (config != null) {
         configure(config);
       } else {
-        logger.warn("Unable to load rest publisher service configuration");
+        logger.debug("No customized configuration for rest publisher found");
       }
     } else {
-      logger.warn("Unable to get service reference for class ConfigurationAdmin");
+      logger.debug("No configuration admin service found while looking for rest publisher configuration");
     }
 
     // Make sure we are notified in case of new services

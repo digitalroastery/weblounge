@@ -169,10 +169,10 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       if (config != null) {
         configure(config);
       } else {
-        logger.warn("Unable to load site dispatcher service configuration");
+        logger.debug("No customized configuration for site dispatcher found");
       }
     } else {
-      logger.info("The site dispatcher will be using a default configuration");
+      logger.debug("No configuration admin service found while looking for site dispatcher configuration");
     }
 
     httpRegistrations = new HashMap<Site, WebXml>();
