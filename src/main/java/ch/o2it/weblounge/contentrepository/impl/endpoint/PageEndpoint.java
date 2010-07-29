@@ -218,7 +218,7 @@ public class PageEndpoint {
     docs.setTitle("Weblounge Pages");
 
     // GET /{pageid}
-    Endpoint pageEndpoint = new Endpoint("/{pageid}", Method.GET, "page");
+    Endpoint pageEndpoint = new Endpoint("/{pageid}", Method.GET, "getpage");
     pageEndpoint.setDescription("Returns the page with the given id");
     pageEndpoint.addFormat(Format.xml());
     pageEndpoint.addStatus(OK("the page was found and is returned as part of the response"));
@@ -229,7 +229,7 @@ public class PageEndpoint {
     docs.addEndpoint(Endpoint.Type.READ, pageEndpoint);
 
     // GET /{pageid}/composers/{composerId}
-    Endpoint composerEndpoint = new Endpoint("/{pageid}/composers/{composerid}", Method.GET, "composer");
+    Endpoint composerEndpoint = new Endpoint("/{pageid}/composers/{composerid}", Method.GET, "getcomposer");
     composerEndpoint.setDescription("Returns the composer with the given id from the indicated page");
     composerEndpoint.addFormat(Format.xml());
     composerEndpoint.addStatus(OK("the composer was found and is returned as part of the response"));
@@ -241,6 +241,17 @@ public class PageEndpoint {
     docs.addEndpoint(Endpoint.Type.READ, composerEndpoint);
 
     // GET /{pageid}/composers/{composerId}/pagelets/{pageletIndex}
+    Endpoint pageletEndpoint = new Endpoint("/{pageid}/composers/{composerid}/pagelets/{pageletindex}", Method.GET, "getpagelet");
+    pageletEndpoint.setDescription("Returns the pagelet at the given index from the indicated composer on the page");
+    pageletEndpoint.addFormat(Format.xml());
+    pageletEndpoint.addStatus(OK("the pagelet was found and is returned as part of the response"));
+    pageletEndpoint.addStatus(NOT_FOUND("the pagelet was not found or could not be loaded"));
+    pageletEndpoint.addStatus(BAD_REQUEST("an invalid page, composer identifier or pagelet index was received"));
+    pageletEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
+    pageletEndpoint.addPathParameter(new Parameter("composerid", Parameter.Type.STRING, "The composer identifier"));
+    pageletEndpoint.addPathParameter(new Parameter("pageletindex", Parameter.Type.STRING, "The zero-based pagelet index"));
+    pageletEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, pageletEndpoint);
 
     this.docs = EndpointDocumentationGenerator.generate(docs);
     return this.docs;
@@ -340,7 +351,7 @@ public class PageEndpoint {
    */
   @Override
   public String toString() {
-    return "page rest endpoint";
+    return "pages rest endpoint";
   }
 
 }
