@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  name="Weblounge Search Endpoint">	
+  
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.SearchEndpoint" />
+  <property name="service.description" value="Weblounge Search Endpoint" />
+  <property name="rest.path" value="contentrepository/search" />
+  <service>
+    <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.SearchEndpoint" />
+  </service>
+
+  <reference name="sites" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+
+</scr:component>

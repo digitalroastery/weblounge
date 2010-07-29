@@ -340,7 +340,7 @@ public class PageEndpoint {
    */
   @Override
   public String toString() {
-    return "pages rest endpoint";
+    return "page rest endpoint";
   }
 
 }
