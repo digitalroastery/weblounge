@@ -34,6 +34,7 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -331,18 +332,15 @@ public class SiteCommand {
    *          search terms
    */
   private void search(Site site, String[] args) {
-    StringBuffer text = new StringBuffer();
     if (args.length == 0) {
       System.out.println("Please specify a search term");
       System.err.println("Usage: site <id> search <terms>");
       return;
-    } else {
-      for (String s : args) {
-        if (text.length() > 0)
-          text.append(" ");
-        text.append(s);
-      }
     }
+
+    // Build the search expression
+    // TODO: Use AND?
+    String text = StringUtils.join(args, " ");
 
     // Get hold of the content repository
     ContentRepository repository = ContentRepositoryFactory.getRepository(site);

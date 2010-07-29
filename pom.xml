@@ -44,13 +44,12 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.felix.karaf.shell</groupId>
-      <artifactId>org.apache.felix.karaf.shell.console</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
     <!-- thirdparty -->
+    
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
     
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -96,6 +95,7 @@
               ch.o2it.weblounge.common.impl.page;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
+              org.apache.commons.lang;version="2.4",
               org.quartz;version="1.5.2",
               org.quartz.impl;version="1.5.2",
               org.osgi.framework;version="1.4.0",
