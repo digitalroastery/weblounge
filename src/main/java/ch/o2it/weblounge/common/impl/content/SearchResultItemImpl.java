@@ -26,11 +26,20 @@ import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Default implementation of a {@link SearchResultItem}.
  */
 public class SearchResultItemImpl implements SearchResultItem {
 
+  /** Logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(SearchResultImpl.class);
+  
   /** THe associated site */
   protected Site site = null;
 
@@ -214,6 +223,55 @@ public class SearchResultItemImpl implements SearchResultItem {
   @Override
   public int hashCode() {
     return Double.toString(score).hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchResultItem#toXml()
+   */
+  public String toXml() {
+    StringBuffer buf = new StringBuffer();
+
+    buf.append("<result ");
+    buf.append("relevance=\"").append(getRelevance()).append("\"");
+    buf.append(">");
+
+    // Query and execution time
+    buf.append("<id>").append(getId()).append("</id>");
+    buf.append("<url>").append(getUrl()).append("</url>");
+    if (getTitle() != null)
+      buf.append("<title>").append(getTitle()).append("</title>");
+    if (getSource() != null)
+      buf.append("<source>").append(getSource()).append("</source>");
+    if (getPreviewRenderer() != null)
+      buf.append("<renderer>").append(getPreviewRenderer().toXml()).append("</renderer>");
+    if (getPreview() != null) {
+      Object preview = getPreview();
+      try {
+        Class<?> previewClass = preview.getClass();
+        Method toXmlMethod = previewClass.getMethod("toXml", new Class<?>[] {});
+        if (toXmlMethod != null) {
+          Object xml = toXmlMethod.invoke(preview, new Object[] {});
+          if (xml != null) {
+            buf.append("<preview>").append(xml).append("</preview>");
+          }
+        } else {
+          buf.append("<preview>").append(preview.toString()).append("</preview>");
+        }
+      } catch (NoSuchMethodException e) {
+        buf.append("<preview>").append(preview.toString()).append("</preview>");
+      } catch (IllegalArgumentException e) {
+        logger.error("Parameter error while trying to invoke toXml() on " + preview, e);
+      } catch (IllegalAccessException e) {
+        logger.error("Access denied while trying to invoke toXml() on " + preview, e);
+      } catch (InvocationTargetException e) {
+        logger.error("Error trying to invoke toXml() on " + preview, e);
+      }
+    }
+    
+    buf.append("</result>");
+    return buf.toString();
   }
 
 }

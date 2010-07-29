@@ -117,7 +117,7 @@ public class SearchQueryImpl implements SearchQuery {
   protected String text = null;
 
   /** The query offset */
-  protected int offset = -1;
+  protected int offset = 0;
 
   /** The query limit */
   protected int limit = -1;
@@ -179,7 +179,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.o2it.weblounge.common.content.SearchQuery#withOffset(int)
    */
   public SearchQuery withOffset(int offset) {
-    this.offset = offset;
+    this.offset = Math.max(0, offset);
     return this;
   }
 
@@ -767,4 +767,14 @@ public class SearchQueryImpl implements SearchQuery {
     throw new IllegalStateException("Malformed query configuration. No " + c.getClass().getName() + " is expected at this time");
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "*: " + (text != null ? text : "*");
+  }
+  
 }

@@ -185,5 +185,35 @@ public class SearchResultImpl implements SearchResult {
   public long getDocumentCount() {
     return documentCount;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchResult#toXml()
+   */
+  public String toXml() {
+    StringBuffer buf = new StringBuffer();
+    buf.append("<searchresult ");
+    buf.append("documents=\"").append(getDocumentCount()).append("\" ");
+    buf.append("hits=\"").append(getHitCount()).append("\" ");
+    buf.append("offset=\"").append(getOffset()).append("\" ");
+    if (limit > 0)
+      buf.append("limit=\"").append(getLimit()).append("\" ");
+    buf.append("page=\"").append(getPage()).append("\" ");
+    buf.append("pagesize=\"").append(getPageSize()).append("\"");
+    buf.append(">");
+    
+    // Query and execution time
+    buf.append("<time>").append(getSearchTime()).append("</time>");
+    buf.append("<query>").append(getQuery()).append("</query>");
+
+    // Result items
+    for (SearchResultItem item : getItems()) {
+      buf.append(item.toXml());
+    }
+    
+    buf.append("</searchresult>");
+    return buf.toString();
+  }
 
 }

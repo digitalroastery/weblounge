@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.impl.util.doc;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,6 +205,15 @@ public class Parameter {
    */
   public String getDefaultValue() {
     return defaultValue;
+  }
+
+  /**
+   * Returns an <code>HTML</code> escaped version of the default value.
+   * 
+   * @return the escaped default value
+   */
+  public String getDefaultValueHtml() {
+    return StringEscapeUtils.escapeHtml(defaultValue);
   }
 
   /**

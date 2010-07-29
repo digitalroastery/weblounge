@@ -36,9 +36,15 @@
   DIV.table_spacer {
     height: 2em;
   }
+  DIV.hidden_form {
+    padding-bottom: 0.5em;
+  }
   DIV.footer {
     padding-top: 1em;
     font-weight: bold;
+  }
+  SPAN.required {
+    color: red;
   }
   .method_set_header {
     padding-left: 0.5em;
@@ -58,6 +64,7 @@
   TH.method_header_left {
     text-align: right;
     padding: 0.6em 1em;
+    width: 200px;
   }
   TR.method TH {
     font-family: sans-serif;
@@ -87,11 +94,19 @@
     margin: 4px 0px;
   }
   TD.form_label {
-    width: 10%;
-    font-size: 1.1em !important;
+    width: 20%;
+    padding-right: 4px;
+    padding-top: 10px;
+    vertical-align: top;
+    text-align: right;
+    white-space: nowrap;
   }
   .form_field_description {
     font-size: 0.9em !important;
+    padding-top: 11px;
+    padding-left: 4px;
+    vertical-align: top;
+    text-align: left;
   }
   TD.form_submit {
     border: none !important;
@@ -124,7 +139,7 @@
   summary="${endpointCollection.title} function for the ${endpoint.method} ${endpoint.path} endpoint, Name of the attribute followed by the value">
   <thead>
     <tr class="method_header">
-      <th width="20%" scope="col" class="method_header_left">Name</th>
+      <th width="200px" scope="col" class="method_header_left">Name</th>
       <th scope="col">Value and Notes</th>
     </tr>
   </thead>
@@ -144,7 +159,7 @@
       <th class="row" scope="row">Path parameters:</th>
       <td>
         <#list endpoint.pathParameters as param>
-        <tt>${param.name}<#if param.defaultValue??>=${param.defaultValueHtml}</#if></tt>: ${param.description!"<em>NONE</em>"}<#if param_has_next> <br/></#if>
+        <tt>${param.name}</tt>: ${param.description!"<em>NONE</em>"} <#if param.defaultValue??><tt>[${param.defaultValueHtml}]</tt></#if><#if param_has_next> <br/></#if>
         </#list>
       </td>
     </tr>
@@ -154,7 +169,7 @@
       <th class="row" scope="row">Required (form) parameters:</th>
       <td>
         <#list endpoint.requiredParameters as param>
-        <tt>${param.name}<#if param.defaultValue??>=${param.defaultValueHtml}</#if></tt>: ${param.description!"<em>NONE</em>"}<#if param_has_next> <br/></#if>
+        <tt>${param.name}</tt>: ${param.description!"<em>NONE</em>"} <#if param.defaultValue??><tt>[${param.defaultValueHtml}]</tt></#if><#if param_has_next> <br/></#if>
         </#list>
       </td>
     </tr>
@@ -163,7 +178,7 @@
     <tr class="method">
       <th class="row" scope="row">Body (upload) param:</th>
       <td>
-        <#if endpoint.bodyParameter.defaultValue??><tt>DEFAULT=${endpoint.bodyParameter.defaultValueHtml}</tt>: </#if>${endpoint.bodyParameter.description!"<em>NONE</em>"}
+        <#if endpoint.bodyParameter.defaultValue??>: </#if>${endpoint.bodyParameter.description!"<em>NONE</em>"}
       </td>
     </tr>
     </#if>
@@ -172,7 +187,7 @@
       <th scope="row">Optional (<#if (endpoint.method == "GET")>query<#else>form</#if>) parameters:</th>
       <td>
         <#list endpoint.optionalParameters as param>
-        <tt>${param.name}<#if param.defaultValue??>=${param.defaultValueHtml}</#if></tt>: ${param.description!"<em>NONE</em>"}<#if param_has_next> <br/></#if>
+        <tt>${param.name}</tt>: ${param.description!"<em>NONE</em>"} <#if param.defaultValue??><tt>[${param.defaultValueHtml}]</tt></#if><#if param_has_next> <br/></#if>
         </#list>
       </td>
     </tr>
@@ -247,14 +262,14 @@
               <tr class="form_field <#if item.required>form_required<#else>form_optional</#if>">
                 <#if item.type == "text">
                 <td class="form_textarea" colspan="3">
-                  <label for="${endpoint.name}_${item.name}">${item.name}</label>:<br/>
+                  <label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:<br/>
                   <textarea id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_text form_param_submit<#if item.required> form_param_required</#if>" 
                     rows="${(item.attributes.rows)!'3'}" cols="${(item.attributes.cols)!'80'}">${item.defaultValue!}</textarea>
                   <div class="form_field_description">${item.description!}</div>
                 </td>
                 <#elseif item.type == "boolean">
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:
                 </td>
                 <td>
                   <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" 
@@ -263,7 +278,7 @@
                 <td class="form_field_description">${item.description!}</td>
                 <#elseif item.type == "file">
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:
                 </td>
                 <td>
                   <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_file" class="form_field form_param_upload<#if item.required> form_param_required</#if>" type="file" />
@@ -271,7 +286,7 @@
                 <td class="form_field_description">${item.description!}</td>
                 <#elseif item.type == "enum">
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:
                 </td>
                 <td>
                   <select id="${endpoint.name}_${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" name="${item.name}">
@@ -283,7 +298,7 @@
                 <td class="form_field_description">${item.description!}</td>
                 <#else>
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:
                 </td>
                 <td>
                   <input id="${endpoint.name}_${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" name="${item.name}" 
@@ -445,8 +460,8 @@
             // wire path parameters
             var $formParams = $form.find(".form_param_path");
             if ($formParams.length > 0) {
-		            $formParams.change(function() { checkPath($form); });
-		            $formParams.keypress(function() { checkPath($form); });
+		        $formParams.change(function() { checkPath($form); });
+		        $formParams.keyup(function() { checkPath($form); });
             }
             checkPath($form);
 
@@ -454,7 +469,7 @@
             var $reqParameters = $form.find(".form_param_required");
             if ($reqParameters.length > 0) {
                 $reqParameters.change(function() { checkRequired($form); });
-                $reqParameters.keypress(function() { checkPath($form); });
+                $reqParameters.keyup(function() { checkRequired($form); });
             }
             checkRequired($form);
 
