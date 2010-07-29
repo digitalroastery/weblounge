@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
+import static ch.o2it.weblounge.common.impl.util.doc.Status.SERVICE_UNAVAILABLE;
+
 import static ch.o2it.weblounge.common.impl.util.doc.Status.BAD_REQUEST;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.NOT_FOUND;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.OK;
@@ -224,6 +226,7 @@ public class PageEndpoint {
     pageEndpoint.addStatus(OK("the page was found and is returned as part of the response"));
     pageEndpoint.addStatus(NOT_FOUND("the page was not found or could not be loaded"));
     pageEndpoint.addStatus(BAD_REQUEST("an invalid page identifier was received"));
+    pageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
     pageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
     pageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, pageEndpoint);
@@ -235,6 +238,7 @@ public class PageEndpoint {
     composerEndpoint.addStatus(OK("the composer was found and is returned as part of the response"));
     composerEndpoint.addStatus(NOT_FOUND("the composer was not found or could not be loaded"));
     composerEndpoint.addStatus(BAD_REQUEST("an invalid page or composer identifier was received"));
+    composerEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
     composerEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
     composerEndpoint.addPathParameter(new Parameter("composerid", Parameter.Type.STRING, "The composer identifier"));
     composerEndpoint.setTestForm(new TestForm());
@@ -247,6 +251,7 @@ public class PageEndpoint {
     pageletEndpoint.addStatus(OK("the pagelet was found and is returned as part of the response"));
     pageletEndpoint.addStatus(NOT_FOUND("the pagelet was not found or could not be loaded"));
     pageletEndpoint.addStatus(BAD_REQUEST("an invalid page, composer identifier or pagelet index was received"));
+    pageletEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
     pageletEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
     pageletEndpoint.addPathParameter(new Parameter("composerid", Parameter.Type.STRING, "The composer identifier"));
     pageletEndpoint.addPathParameter(new Parameter("pageletindex", Parameter.Type.STRING, "The zero-based pagelet index"));
@@ -305,6 +310,8 @@ public class PageEndpoint {
     if (site == null) {
       logger.debug("Unable to load page '{}': site not found", pageId);
       return null;
+    } else if (!site.isRunning()) {
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
 
     // Look for the content repository

@@ -103,6 +103,8 @@ public class SearchEndpoint {
     Site site = sites.findSiteByName(request.getServerName());
     if (site == null) {
       return Response.status(Status.NOT_FOUND).build();
+    } else if (!site.isRunning()) {
+      return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
     
     // Load the content repository
@@ -151,7 +153,7 @@ public class SearchEndpoint {
     searchEndpoint.addStatus(OK("the search query was executed and the result is returned as part of the response"));
     searchEndpoint.addStatus(BAD_REQUEST("no search terms have been specified"));
     searchEndpoint.addStatus(ERROR("executing the query resulted in an error"));
-    searchEndpoint.addStatus(SERVICE_UNAVAILABLE("the content repository for the site is temporarily offline"));
+    searchEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
     searchEndpoint.addPathParameter(new Parameter("searchterms", Parameter.Type.STRING, "The search terms"));
     searchEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.STRING, "Offset within the result set", "-1"));
     searchEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.STRING, "Number of result items to include", "-1"));
