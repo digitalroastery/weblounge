@@ -311,8 +311,8 @@
               <tr>
                 <td colspan="3">
                   <div class="form_submit">
-                    <input type="submit" value="SUBMIT" />
-                    <input type="button" value="CANCEL" />
+                    <input type="submit" value="Submit" title="Submit" />
+                    <input type="reset" value="Reset" title="Reset" />
                   </div>
                 </td>
               </tr>
@@ -366,12 +366,6 @@
            var $hidectrl = $this.parent().find("a.link_hide_testform");
            $form.toggle(400);
            $hidectrl.show();
-           $this.parent().find("div.form_submit input[type='button']").click(
-              function() {
-                 $form.hide(200);
-                 $this.show();
-              }
-           );
            $this.hide();
            return false;
         }
@@ -407,7 +401,10 @@
         }
         return newPath;
     }
-    
+
+    /**
+     * Checks the path parameters.
+     */
     function checkPath($form) {
         var parameters = [];
         $form.find(".form_param_path").each(function() {
