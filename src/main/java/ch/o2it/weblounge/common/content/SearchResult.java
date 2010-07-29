@@ -105,4 +105,11 @@ public interface SearchResult {
    */
   long getSearchTime();
 
+  /**
+   * Returns the xml version of this search result.
+   * 
+   * @return the serialized search result
+   */
+  String toXml();
+
 }

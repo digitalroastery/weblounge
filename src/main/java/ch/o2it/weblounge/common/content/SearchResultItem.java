@@ -87,4 +87,11 @@ public interface SearchResultItem extends Comparable<SearchResultItem> {
    */
   Object getSource();
 
+  /**
+   * Returns the xml version of this search result item.
+   * 
+   * @return the serialized result item
+   */
+  String toXml();
+
 }
