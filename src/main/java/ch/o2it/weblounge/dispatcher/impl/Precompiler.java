@@ -158,7 +158,7 @@ public class Precompiler {
         compilationResult += " with " + errorCount + " errors";
         logger.warn("Precompilation for '{}' {}", site, compilationResult);
         if (!logErrors)
-          logger.info("Precompilation error logging can be enabled in the site registration service");
+          logger.info("Precompilation error logging can be enabled in the site dispatcher service");
       } else {
         logger.info("Precompilation for '{}' finished", site);
       }
