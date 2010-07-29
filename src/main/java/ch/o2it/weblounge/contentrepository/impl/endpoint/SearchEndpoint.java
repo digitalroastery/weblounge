@@ -21,10 +21,9 @@
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import static ch.o2it.weblounge.common.impl.util.doc.Status.BAD_REQUEST;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.NOT_FOUND;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.ERROR;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.OK;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.SERVICE_UNAVAILABLE;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.ERROR;
 
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
@@ -141,7 +140,7 @@ public class SearchEndpoint {
     if (docs != null)
       return docs;
 
-    String endpointUrl = "/system/contentrepository/search";
+    String endpointUrl = "/system/search";
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "search");
     docs.setTitle("Weblounge Search");
 

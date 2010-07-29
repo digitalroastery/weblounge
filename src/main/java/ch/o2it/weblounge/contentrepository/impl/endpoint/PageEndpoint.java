@@ -213,7 +213,7 @@ public class PageEndpoint {
     if (docs != null)
       return docs;
 
-    String endpointUrl = "/system/contentrepository/pages";
+    String endpointUrl = "/system/pages";
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "pages");
     docs.setTitle("Weblounge Pages");
 

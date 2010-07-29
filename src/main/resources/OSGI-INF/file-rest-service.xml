@@ -5,7 +5,7 @@
   
   <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.FileEndpoint" />
   <property name="service.description" value="Weblounge File Endpoint" />
-  <property name="rest.path" value="contentrepository/files" />
+  <property name="rest.path" value="files" />
   <service>
     <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.FileEndpoint" />
   </service>
