@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Default implementation of a {@link SearchResultItem}.
@@ -248,26 +250,38 @@ public class SearchResultItemImpl implements SearchResultItem {
       buf.append("<renderer>").append(getPreviewRenderer().toXml()).append("</renderer>");
     if (getPreview() != null) {
       Object preview = getPreview();
-      try {
-        Class<?> previewClass = preview.getClass();
-        Method toXmlMethod = previewClass.getMethod("toXml", new Class<?>[] {});
-        if (toXmlMethod != null) {
-          Object xml = toXmlMethod.invoke(preview, new Object[] {});
-          if (xml != null) {
-            buf.append("<preview>").append(xml).append("</preview>");
-          }
-        } else {
-          buf.append("<preview>").append(preview.toString()).append("</preview>");
+      List<Object> previewParts = new ArrayList<Object>();
+      if (preview.getClass().isArray()) {
+        for (Object previewPart : (Object[])preview) {
+          previewParts.add(previewPart);
         }
-      } catch (NoSuchMethodException e) {
-        buf.append("<preview>").append(preview.toString()).append("</preview>");
-      } catch (IllegalArgumentException e) {
-        logger.error("Parameter error while trying to invoke toXml() on " + preview, e);
-      } catch (IllegalAccessException e) {
-        logger.error("Access denied while trying to invoke toXml() on " + preview, e);
-      } catch (InvocationTargetException e) {
-        logger.error("Error trying to invoke toXml() on " + preview, e);
+      } else {
+        previewParts.add(preview);
       }
+      buf.append("<preview>");
+      for (Object previewPart : previewParts) {
+        try {
+          Class<?> previewClass = previewPart.getClass();
+          Method toXmlMethod = previewClass.getMethod("toXml", new Class<?>[] {});
+          if (toXmlMethod != null) {
+            Object xml = toXmlMethod.invoke(previewPart, new Object[] {});
+            if (xml != null) {
+              buf.append(xml);
+            }
+          } else {
+            buf.append("<![CDATA[").append(previewPart.toString()).append("]]>");
+          }
+        } catch (NoSuchMethodException e) {
+          buf.append(preview.toString());
+        } catch (IllegalArgumentException e) {
+          logger.error("Parameter error while trying to invoke toXml() on " + preview, e);
+        } catch (IllegalAccessException e) {
+          logger.error("Access denied while trying to invoke toXml() on " + preview, e);
+        } catch (InvocationTargetException e) {
+          logger.error("Error trying to invoke toXml() on " + preview, e);
+        }
+      }
+      buf.append("</preview>");
     }
     
     buf.append("</result>");
