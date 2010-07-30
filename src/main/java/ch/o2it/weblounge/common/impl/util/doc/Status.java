@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.util.doc;
 
+
 /**
  * Represents a possible status result for an endpoint with a code and an
  * optional description of that status code.
@@ -122,6 +123,42 @@ public class Status {
    */
   public static Status NOT_FOUND(String description) {
     return new Status(404, description);
+  }
+
+  /**
+   * Creates a return status <code>405</code> with the given optional
+   * description.
+   * 
+   * @param description
+   *          detailed meaning of this response status code
+   * @return the status
+   */
+  public static Status METHOD_NOT_ALLOWED(String description) {
+    return new Status(405, description);
+  }
+
+  /**
+   * Creates a return status <code>409</code> with the given optional
+   * description.
+   * 
+   * @param description
+   *          detailed meaning of this response status code
+   * @return the status
+   */
+  public static Status CONFLICT(String description) {
+    return new Status(409, description);
+  }
+
+  /**
+   * Creates a return status <code>412</code> with the given optional
+   * description.
+   * 
+   * @param description
+   *          detailed meaning of this response status code
+   * @return the status
+   */
+  public static Status PRECONDITION_FAILED(String description) {
+    return new Status(412, description);
   }
 
   /**
