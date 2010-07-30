@@ -569,10 +569,11 @@
 			                          },
 			                          error: function(request, textStatus, errorThrown) {
 			                              form.parent().find(".test_form_working").hide();
-                                          // response status 
-			                              var status = "<b>Status:</b> <tt>" + request.status + " (" + request.statusText + ")</tt>";
-                                          responseBody.find("div.response_status").html(status);
+                                          // response status
+			                              var statusText = "<b>Status:</b> <tt>" + request.status + " (" + request.statusText + ")</tt>";
+                                          responseBody.find("div.response_status").html(statusText);
                                           // response headers
+			                              var headers = request.getAllResponseHeaders();
                                           if (headers !== undefined) {
                                             var headersText = "";
                                             var headerLines = headers.split("\n");
