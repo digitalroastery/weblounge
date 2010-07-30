@@ -212,6 +212,11 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   protected void service(HttpServletRequest httpRequest,
       HttpServletResponse httpResponse) throws ServletException, IOException {
 
+    if (sites == null) {
+      httpResponse.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+      return;
+    }
+    
     logger.debug("Serving {}", httpRequest.getRequestURI());
 
     // Get the site dispatcher
