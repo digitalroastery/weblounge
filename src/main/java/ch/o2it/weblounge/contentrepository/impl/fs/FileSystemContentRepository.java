@@ -397,7 +397,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     InputStream is = null;
     OutputStream os = null;
     try {
-      FileUtils.forceDelete(pageUrl);
+      FileUtils.forceMkdir(pageUrl.getParentFile());
+      if (!pageUrl.exists())
+        pageUrl.createNewFile();
       is = new ByteArrayInputStream(page.toXml().getBytes());
       os = new FileOutputStream(pageUrl);
       IOUtils.copy(is, os);

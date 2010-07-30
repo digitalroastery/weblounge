@@ -20,36 +20,37 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
-import static ch.o2it.weblounge.common.impl.util.doc.Status.SERVICE_UNAVAILABLE;
-
-import static ch.o2it.weblounge.common.impl.util.doc.Status.BAD_REQUEST;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.NOT_FOUND;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.OK;
-
 import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.impl.page.PageImpl;
+import ch.o2it.weblounge.common.impl.page.PageReader;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
-import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentation;
-import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentationGenerator;
-import ch.o2it.weblounge.common.impl.util.doc.Format;
-import ch.o2it.weblounge.common.impl.util.doc.Parameter;
-import ch.o2it.weblounge.common.impl.util.doc.TestForm;
-import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
+import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 import ch.o2it.weblounge.kernel.SiteManager;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -58,6 +59,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This class implements the <code>REST</code> endpoint for page data.
@@ -107,6 +109,165 @@ public class PageEndpoint {
 
     // Return the full page
     return Response.ok(page.toXml()).lastModified(page.getModificationDate()).build();
+  }
+
+  /**
+   * Updates the indicated page.
+   * 
+   * @param request
+   *          the http request
+   * @param pageId
+   *          the page identifier
+   * @param pageXml
+   *          the updated page
+   * @return response an empty response
+   * @throws WebApplicationException
+   *           if the update fails
+   */
+  @POST
+  @Path("/{pageid}")
+  public Response updatePage(@Context HttpServletRequest request,
+      @PathParam("pageid") String pageId, @FormParam("page") String pageXml) {
+
+    // Check the parameters
+    if (pageId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+    if (pageXml == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    // Extract the site
+    Site site = getSite(request);
+    User user = null; // TODO: Extract user
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    PageURI pageURI = new PageURIImpl(site, null, pageId);
+
+    // Parse the page and update it in the repository
+    Page page = null;
+    try {
+      PageReader pageReader = new PageReader();
+      page = pageReader.read(IOUtils.toInputStream(pageXml), pageURI);
+      contentRepository.update(pageURI, page, user);
+    } catch (SecurityException e) {
+      logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IOException e) {
+      logger.warn("Error reading udpated page {} from request", pageURI);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error configuring parser to read udpated page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (SAXException e) {
+      logger.warn("Error parsing udpated page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    return Response.noContent().build();
+  }
+
+  /**
+   * Creates a page at the site's content repository and returns the location to
+   * post updates to.
+   * 
+   * @param request
+   *          the http request
+   * @param pageXml
+   *          the new page
+   * @param path
+   *          the path to store the page at
+   * @return response the page location
+   */
+  @POST
+  @Path("/")
+  public Response addPage(@Context HttpServletRequest request,
+      @FormParam("page") String pageXml, @FormParam("path") String path) {
+
+    Site site = getSite(request);
+    User user = null; // TODO: Extract user
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+
+    // Create the page uri
+    PageURIImpl pageURI = null;
+    if (!StringUtils.isBlank(path)) {
+      // TODO: check path, make sure it's absolute and valid in all ways
+      pageURI = new PageURIImpl(site, path);
+    } else {
+      String uuid = UUID.randomUUID().toString();
+      pageURI = new PageURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
+    }
+
+    // Make sure the page doesn't exist
+    try {
+      if (contentRepository.exists(pageURI)) {
+        logger.warn("Tried to create already existing page {} in site '{}'", pageURI, site);
+        throw new WebApplicationException(Status.CONFLICT);
+      }
+    } catch (ContentRepositoryException e) {
+      logger.warn("Page lookup {} failed for site '{}'", pageURI, site);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Parse the page and store it
+    PageImpl page = null;
+    URI uri = null;
+    if (!StringUtils.isBlank(pageXml)) {
+      logger.debug("Adding page to {}", pageURI);
+      try {
+        PageReader pageReader = new PageReader();
+        page = pageReader.read(IOUtils.toInputStream(pageXml), pageURI);
+      } catch (IOException e) {
+        logger.warn("Error reading page {} from request", pageURI);
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      } catch (ParserConfigurationException e) {
+        logger.warn("Error configuring parser to read udpated page {}: {}", pageURI, e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      } catch (SAXException e) {
+        logger.warn("Error parsing udpated page {}: {}", pageURI, e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
+    } else {
+      logger.debug("Creating new page at {}", pageURI);
+      page = new PageImpl(pageURI);
+      page.setTemplate(site.getDefaultTemplate().getIdentifier());
+      page.setCreated(site.getAdministrator(), new Date());
+    }
+
+    // Store the new page
+    try {
+      contentRepository.put(pageURI, page, user);
+      uri = new URI(request.getRequestURL().append(pageURI.getId()).toString());
+    } catch (URISyntaxException e) {
+      logger.warn("Error creating a uri for page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (SecurityException e) {
+      logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IOException e) {
+      logger.warn("Error writing new page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    return Response.created(uri).build();
+  }
+
+  /**
+   * Removes the indicated page from the site.
+   * 
+   * @param request
+   *          the http request
+   * @param pageId
+   *          the page identifier
+   * @return response an empty response
+   */
+  @DELETE
+  @Path("/{pageid}")
+  public Response deletePage(@Context HttpServletRequest request,
+      @PathParam("pageid") String pageId) {
+
+    // Check the parameters
+    if (pageId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    return Response.noContent().build();
   }
 
   /**
@@ -212,54 +373,12 @@ public class PageEndpoint {
   @Path("/docs")
   @Produces(MediaType.TEXT_HTML)
   public String getDocumentation() {
-    if (docs != null)
-      return docs;
-
-    String endpointUrl = "/system/pages";
-    EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "pages");
-    docs.setTitle("Weblounge Pages");
-
-    // GET /{pageid}
-    Endpoint pageEndpoint = new Endpoint("/{pageid}", Method.GET, "getpage");
-    pageEndpoint.setDescription("Returns the page with the given id");
-    pageEndpoint.addFormat(Format.xml());
-    pageEndpoint.addStatus(OK("the page was found and is returned as part of the response"));
-    pageEndpoint.addStatus(NOT_FOUND("the page was not found or could not be loaded"));
-    pageEndpoint.addStatus(BAD_REQUEST("an invalid page identifier was received"));
-    pageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    pageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
-    pageEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, pageEndpoint);
-
-    // GET /{pageid}/composers/{composerId}
-    Endpoint composerEndpoint = new Endpoint("/{pageid}/composers/{composerid}", Method.GET, "getcomposer");
-    composerEndpoint.setDescription("Returns the composer with the given id from the indicated page");
-    composerEndpoint.addFormat(Format.xml());
-    composerEndpoint.addStatus(OK("the composer was found and is returned as part of the response"));
-    composerEndpoint.addStatus(NOT_FOUND("the composer was not found or could not be loaded"));
-    composerEndpoint.addStatus(BAD_REQUEST("an invalid page or composer identifier was received"));
-    composerEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    composerEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
-    composerEndpoint.addPathParameter(new Parameter("composerid", Parameter.Type.STRING, "The composer identifier"));
-    composerEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, composerEndpoint);
-
-    // GET /{pageid}/composers/{composerId}/pagelets/{pageletIndex}
-    Endpoint pageletEndpoint = new Endpoint("/{pageid}/composers/{composerid}/pagelets/{pageletindex}", Method.GET, "getpagelet");
-    pageletEndpoint.setDescription("Returns the pagelet at the given index from the indicated composer on the page");
-    pageletEndpoint.addFormat(Format.xml());
-    pageletEndpoint.addStatus(OK("the pagelet was found and is returned as part of the response"));
-    pageletEndpoint.addStatus(NOT_FOUND("the pagelet was not found or could not be loaded"));
-    pageletEndpoint.addStatus(BAD_REQUEST("an invalid page, composer identifier or pagelet index was received"));
-    pageletEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    pageletEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
-    pageletEndpoint.addPathParameter(new Parameter("composerid", Parameter.Type.STRING, "The composer identifier"));
-    pageletEndpoint.addPathParameter(new Parameter("pageletindex", Parameter.Type.STRING, "The zero-based pagelet index"));
-    pageletEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, pageletEndpoint);
-
-    this.docs = EndpointDocumentationGenerator.generate(docs);
-    return this.docs;
+    if (docs == null) {
+      String endpointUrl = "/system/pages";
+      // TODO: determine endpoint url
+      docs = PageEndpointDocs.createDocumentation(endpointUrl);
+    }
+    return docs;
   }
 
   /**
@@ -288,6 +407,64 @@ public class PageEndpoint {
   }
 
   /**
+   * Extracts the site from the request and returns it. If the site is not found
+   * or it's not running, a corresponding <code>WebApplicationException</code>
+   * is thrown.
+   * 
+   * @param request
+   *          the http request
+   * @return the site
+   * @throws WebApplicationException
+   *           if the site is not found or is not running
+   */
+  protected Site getSite(HttpServletRequest request)
+      throws WebApplicationException {
+    Site site = sites.findSiteByName(request.getServerName());
+    if (site == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    } else if (!site.isRunning()) {
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+    }
+    return site;
+  }
+
+  /**
+   * Tries to locate the content repository for the given site. If
+   * <code>writable</code> is <code>true</code>, the method tries to cast the
+   * repository to a <code>WritableContentRepository</code>.
+   * <p>
+   * This method throws a corresponding <code>WebApplicationException</code> in
+   * case of failure.
+   * 
+   * @param site
+   *          the site
+   * @param writable
+   *          <code>true</code> to request a writable repository
+   * @return the repository
+   * @throws WebApplicationException
+   *           if the repository can't be located or if it's not writable
+   */
+  protected ContentRepository getContentRepository(Site site, boolean writable) {
+    ContentRepository contentRepository = null;
+    try {
+      contentRepository = ContentRepositoryFactory.getRepository(site);
+      if (contentRepository == null) {
+        logger.warn("No content repository found for site '{}'", site);
+        throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+      }
+      if (writable) {
+        WritableContentRepository wcr = (WritableContentRepository) contentRepository;
+        return wcr;
+      } else {
+        return contentRepository;
+      }
+    } catch (ClassCastException e) {
+      logger.warn("Content repository '{}' is not writable", site);
+      throw new WebApplicationException(Status.NOT_ACCEPTABLE);
+    }
+  }
+
+  /**
    * Returns the page identified by the given request and page identifier or
    * <code>null</code> if either one of the site, the site's content repository
    * or the page itself is not available.
@@ -306,13 +483,7 @@ public class PageEndpoint {
     }
 
     // Extract the site
-    Site site = sites.findSiteByName(request.getServerName());
-    if (site == null) {
-      logger.debug("Unable to load page '{}': site not found", pageId);
-      return null;
-    } else if (!site.isRunning()) {
-      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
-    }
+    Site site = getSite(request);
 
     // Look for the content repository
     ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
