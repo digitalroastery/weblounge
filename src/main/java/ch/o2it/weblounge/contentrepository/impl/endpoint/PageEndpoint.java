@@ -51,14 +51,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -108,8 +112,11 @@ public class PageEndpoint {
       return Response.notModified().build();
     }
 
-    // Return the full page
-    return Response.ok(page.toXml()).lastModified(page.getModificationDate()).build();
+    // Create the response
+    ResponseBuilder response = Response.ok(page.toXml());
+    response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    response.lastModified(page.getModificationDate());
+    return response.build();
   }
 
   /**
@@ -125,10 +132,14 @@ public class PageEndpoint {
    * @throws WebApplicationException
    *           if the update fails
    */
-  @POST
+  @PUT
   @Path("/{pageid}")
-  public Response updatePage(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId, @FormParam("page") String pageXml) {
+  public Response updatePage(
+      @Context HttpServletRequest request,
+      @PathParam("pageid") String pageId, 
+      @FormParam("page") String pageXml,
+      @HeaderParam("If-Match") String ifMatchHeader
+    ) {
 
     // Check the parameters
     if (pageId == null)
@@ -142,11 +153,29 @@ public class PageEndpoint {
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     PageURI pageURI = new PageURIImpl(site, null, pageId);
 
+    // Check the value of the If-Match header against the etag
+    if (ifMatchHeader != null) {
+      try {
+        Page currentPage = contentRepository.getPage(pageURI);
+        String etag = Long.toString(currentPage.getModificationDate().getTime());
+        if (!etag.equals(ifMatchHeader)) {
+          throw new WebApplicationException(Status.PRECONDITION_FAILED);
+        }
+      } catch (ContentRepositoryException e) {
+        logger.warn("Error reading current page {} from repository: {}", pageURI, e.getMessage());
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
+    }
+    
     // Parse the page and update it in the repository
     Page page = null;
     try {
       PageReader pageReader = new PageReader();
       page = pageReader.read(IOUtils.toInputStream(pageXml), pageURI);
+      // TODO: Replace this with current user
+      User admin = site.getAdministrator();
+      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName()); 
+      page.setModified(modifier, new Date());
       contentRepository.update(pageURI, page, user);
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
@@ -162,7 +191,10 @@ public class PageEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
-    return Response.noContent().build();
+    // Create the response
+    ResponseBuilder response = Response.ok();
+    response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    return response.build();
   }
 
   /**
@@ -249,7 +281,10 @@ public class PageEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
-    return Response.created(uri).build();
+    // Create the response
+    ResponseBuilder response = Response.created(uri);
+    response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    return response.build();
   }
 
   /**

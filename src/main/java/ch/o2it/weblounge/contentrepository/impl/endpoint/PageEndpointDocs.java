@@ -63,7 +63,7 @@ public final class PageEndpointDocs {
     pageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, pageEndpoint);
 
-    // POST /{path}
+    // POST /{pageid}
     Endpoint createPageEndpoint = new Endpoint("/", Method.POST, "createpage");
     createPageEndpoint.setDescription("Creates a new page, either at the given path or at a random location and returns the REST url of the created resource.");
     createPageEndpoint.addFormat(Format.xml());
@@ -77,7 +77,22 @@ public final class PageEndpointDocs {
     createPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, createPageEndpoint);
 
-    // DELETE /{path}
+    // PUT /{pageid}
+    Endpoint updatePageEndpoint = new Endpoint("/{pageid}", Method.PUT, "updatepage");
+    updatePageEndpoint.setDescription("Updates the specified page. If the client supplies an If-Match header, the update is processed only if the header value matches the page's ETag");
+    updatePageEndpoint.addFormat(Format.xml());
+    updatePageEndpoint.addStatus(OK("the page was updated"));
+    updatePageEndpoint.addStatus(BAD_REQUEST("the page content was not specified"));
+    updatePageEndpoint.addStatus(BAD_REQUEST("the page's ETag does not match the required value as specified by the If-Match header"));
+    updatePageEndpoint.addStatus(NOT_FOUND("the site or the page to update were not found"));
+    updatePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
+    updatePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
+    updatePageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
+    updatePageEndpoint.addRequiredParameter(new Parameter("page", Parameter.Type.STRING, "The page content"));
+    updatePageEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, updatePageEndpoint);
+
+    // DELETE /{pageid}
     Endpoint deletePageEndpoint = new Endpoint("/{pageid}", Method.DELETE, "deletepage");
     deletePageEndpoint.setDescription("Deletes the specified page.");
     deletePageEndpoint.addFormat(Format.xml());

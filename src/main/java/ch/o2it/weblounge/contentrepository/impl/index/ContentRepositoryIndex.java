@@ -529,10 +529,12 @@ public class ContentRepositoryIndex {
 
     // Locate the entry in question
     for (long a : addresses) {
-      if (id != null && id.equals(uriIdx.getId(a))) {
-        return a;
-      } else if (path != null && path.equals(uriIdx.getPath(a))) {
-        return a;
+      if (id != null) {
+        if (id.equals(uriIdx.getId(a)))
+          return a;
+      } else {
+        if (path.equals(uriIdx.getPath(a)))
+          return a;
       }
     }
 
