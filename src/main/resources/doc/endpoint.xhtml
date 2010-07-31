@@ -135,9 +135,9 @@
             width: 100%;
             font-family: monospace;
             border-left: 4px solid #999;
-            padding-top: 10px;
-            padding-bottom: 10px;
             padding-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
           }
 	  </style>
 	</head>
@@ -344,7 +344,7 @@
 		            <div style="padding-top:10px"><b>Response:</b></div>
                     <div class="response_status"></div>
                     <div class="response_headers"></div>
-                    <div class="response_body"></div>
+                    <pre class="response_body"></pre>
 		          </div>
 		          </#if>
 		        </div>
@@ -476,7 +476,66 @@
 			            return false;
 			        }
 			    }
-			 
+          
+                /**
+                 * Returns a pretty-printed version of an xml response body.
+                 */
+                function prettify(content, contentType) {
+                    if (contentType !== "text/xml")
+                        return content;
+
+                    var reg = /(>)(<)(\/*)/g;
+                    var wsexp = / *(.*) +\n/g;
+                    var contexp = /(<.+>)(.+\n)/g;
+                    content = content.replace(reg, "$1\n$2$3").replace(wsexp, "$1\n").replace(contexp, "$1\n$2");
+                    var pad = 0;
+                    var formatted = "";
+                    var lines = content.split("\n");
+                    var indent = 0;
+                    var lastType = "other";
+                    // 4 types of tags - single, closing, opening, other (text, doctype, comment) - 4*4 = 16 transitions 
+                    var transitions = {
+                        "single->single": 0,
+                        "single->closing": -1,
+                        "single->opening": 0,
+                        "single->other": 0,
+                        "closing->single": 0,
+                        "closing->closing": -1,
+                        "closing->opening": 0,
+                        "closing->other": 0,
+                        "opening->single": 1,
+                        "opening->closing": 0,
+                        "opening->opening": 1,
+                        "opening->other": 1,
+                        "other->single": 0,
+                        "other->closing": -1,
+                        "other->opening": 0,
+                        "other->other": 0
+                    };
+            
+                    for (var i = 0; i < lines.length; i++) {
+                        var ln = lines[i];
+                        var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
+                        var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
+                        var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that"s not <!something>)
+                        var type = single ? "single" : closing ? "closing" : opening ? "opening" : "other";
+                        var fromTo = lastType + "->" + type;
+                        lastType = type;
+                        var padding = "";
+            
+                        indent += transitions[fromTo];
+                        for (var j = 0; j < indent; j++) {
+                            padding += "  ";
+                        }
+                        if (fromTo == "opening->closing")
+                            formatted = formatted.substr(0, formatted.length - 1) + ln + "\n"; // substr removes line break (\n) from prev loop
+                        else
+                            formatted += padding + ln + "\n";
+                    }
+                    
+                    return formatted;
+                }
+                
 			    /**
 			     * Loops through all the test forms and wires the input fields with the
 			     * checkXYZ() - methods.
@@ -532,7 +591,7 @@
 			                      responseBody.hide();
 			                      responseBody.find("div.response_status").text("");
                                   responseBody.find("div.response_headers").text("");
-                                  responseBody.find("div.response_body").text("");
+                                  responseBody.find("pre.response_body").text("");
 			
 			                      // make the request
 			                      $.ajax({
@@ -548,22 +607,27 @@
                                           responseBody.find("div.response_status").html(statusText);
                                           // response headers
 			                              var headers = request.getAllResponseHeaders();
+                                          var contentType = null;
                                           if (headers !== undefined) {
                                             var headersText = "";
                                             var headerLines = headers.split("\n");
                                             for (var i = 0; i < headerLines.length; i++) {
                                               if (headerLines[i] !== "") {
-                                                var header = headerLines[i].split("\: ");
+                                                var header = headerLines[i].replace("\r", "").split("\: ");
                                                 headersText += "<b>" + header[0] + "</b>: " + header[1] + "<br/>";
+                                                if (header[0] == "Content-Type") {
+                                                    contentType = header[1];
+                                                }
                                               }
                                             }
                                             responseBody.find("div.response_headers").html(headersText);
                                           }
                                           // response body
                                           if (data !== undefined && data != "") {
-                                            responseBody.find("div.response_body").text(data);
+                                            responseBody.find("pre.response_body").text(prettify(data, contentType));
+                                            responseBody.find("pre.response_body").show();
                                           } else {
-                                            responseBody.find("div.response_body").html("<i>Empty response boy</i>");
+                                            responseBody.find("pre.response_body").hide();
                                           }
 			                              responseBody.show();
 			                          },
@@ -585,6 +649,7 @@
                                             }
                                             responseBody.find("div.response_headers").html(headersText);
                                           }
+                                          responseBody.find("pre.response_body").hide();
 			                              responseBody.show();
 			                          }
 			                      });
