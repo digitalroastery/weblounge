@@ -22,6 +22,7 @@ package ch.o2it.weblounge.test.command;
 
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.test.harness.ContentRepositoryEndpointTest;
 import ch.o2it.weblounge.test.harness.HTMLActionTest;
 import ch.o2it.weblounge.test.harness.I18nTest;
 import ch.o2it.weblounge.test.harness.IntegrationTest;
@@ -53,6 +54,37 @@ public final class TestCommand {
 
   /** The tests */
   private List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
+
+  /**
+   * Creates a new test command.
+   */
+  public TestCommand() {
+    tests.add(new HTMLActionTest());
+    tests.add(new XMLActionTest());
+    tests.add(new JSONActionTest());
+    tests.add(new StaticResourcesTest());
+    tests.add(new ProtectedStaticResourcesTest());
+    tests.add(new JavaServerPagesTest());
+    tests.add(new I18nTest());
+    tests.add(new ContentRepositoryEndpointTest());
+  }
+  
+  /**
+   * Callback for OSGi's declarative services component activation.
+   * 
+   * @param context
+   *          the component context
+   * @throws Exception
+   *           if component activation fails
+   */
+  void activate(ComponentContext context) {
+    BundleContext bundleContext = context.getBundleContext();
+    logger.debug("Registering test commands");
+    Dictionary<String, Object> commands = new Hashtable<String, Object>();
+    commands.put("osgi.command.scope", "weblounge");
+    commands.put("osgi.command.function", new String[] { "test", "tests" });
+    bundleContext.registerService(getClass().getName(), this, commands);
+  }
 
   /**
    * Command signature that allows to do
@@ -226,32 +258,6 @@ public final class TestCommand {
       logger.warn("Test '" + test + "' failed: {}", t.getMessage(), t);
       return false;
     }
-  }
-
-  /**
-   * Callback for OSGi's declarative services component activation.
-   * 
-   * @param context
-   *          the component context
-   * @throws Exception
-   *           if component activation fails
-   */
-  void activate(ComponentContext context) {
-    BundleContext bundleContext = context.getBundleContext();
-    logger.debug("Registering test commands");
-    Dictionary<String, Object> commands = new Hashtable<String, Object>();
-    commands.put("osgi.command.scope", "weblounge");
-    commands.put("osgi.command.function", new String[] { "test", "tests" });
-    bundleContext.registerService(getClass().getName(), this, commands);
-
-    // Load the tests
-    tests.add(new HTMLActionTest());
-    tests.add(new XMLActionTest());
-    tests.add(new JSONActionTest());
-    tests.add(new StaticResourcesTest());
-    tests.add(new ProtectedStaticResourcesTest());
-    tests.add(new JavaServerPagesTest());
-    tests.add(new I18nTest());
   }
 
 }
