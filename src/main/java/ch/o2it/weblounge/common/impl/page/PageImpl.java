@@ -1050,9 +1050,11 @@ public class PageImpl extends LocalizableObject implements Page {
     b.append(template);
     b.append("</template>");
 
-    b.append("<layout>");
-    b.append(layout);
-    b.append("</layout>");
+    if (layout != null) {
+      b.append("<layout>");
+      b.append(layout);
+      b.append("</layout>");
+    }
 
     b.append("<promote>");
     b.append(Boolean.toString(isPromoted));
@@ -1092,9 +1094,11 @@ public class PageImpl extends LocalizableObject implements Page {
     }
 
     // Type
-    b.append("<type><![CDATA[");
-    b.append(type);
-    b.append("]]></type>");
+    if (type != null) {
+      b.append("<type><![CDATA[");
+      b.append(type);
+      b.append("]]></type>");
+    }
 
     // Coverage
     for (Language language : coverage.languages()) {
