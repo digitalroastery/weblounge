@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.page.PageImpl;
 import ch.o2it.weblounge.common.impl.page.PageReader;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -228,7 +229,9 @@ public class PageEndpoint {
       logger.debug("Creating new page at {}", pageURI);
       page = new PageImpl(pageURI);
       page.setTemplate(site.getDefaultTemplate().getIdentifier());
-      page.setCreated(site.getAdministrator(), new Date());
+      User admin = site.getAdministrator();
+      User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName()); 
+      page.setCreated(creator, new Date());
     }
 
     // Store the new page
@@ -267,7 +270,34 @@ public class PageEndpoint {
     if (pageId == null)
       return Response.status(Status.BAD_REQUEST).build();
 
-    return Response.noContent().build();
+    Site site = getSite(request);
+    User user = null; // TODO: Extract user
+    PageURI pageURI = new PageURIImpl(site, null, pageId);
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+
+    // Make sure the page doesn't exist
+    try {
+      if (!contentRepository.exists(pageURI)) {
+        logger.warn("Tried to delete non existing page {} in site '{}'", pageURI, site);
+        throw new WebApplicationException(Status.NOT_FOUND);
+      }
+    } catch (ContentRepositoryException e) {
+      logger.warn("Page lookup {} failed for site '{}'", pageURI, site);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Delete the page
+    try {
+      contentRepository.delete(pageURI, user);
+    } catch (SecurityException e) {
+      logger.warn("Tried to delete page {} of site '{}' without permission", pageURI, site);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IOException e) {
+      logger.warn("Error deleting page {} from site '{}': {}", new Object[] { pageURI, site, e.getMessage() });
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+    
+    return Response.ok().build();
   }
 
   /**

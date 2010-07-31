@@ -77,6 +77,19 @@ public final class PageEndpointDocs {
     createPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, createPageEndpoint);
 
+    // DELETE /{path}
+    Endpoint deletePageEndpoint = new Endpoint("/{pageid}", Method.DELETE, "deletepage");
+    deletePageEndpoint.setDescription("Deletes the specified page.");
+    deletePageEndpoint.addFormat(Format.xml());
+    deletePageEndpoint.addStatus(OK("the page was deleted"));
+    deletePageEndpoint.addStatus(BAD_REQUEST("the page was not specified"));
+    deletePageEndpoint.addStatus(NOT_FOUND("the page was not found"));
+    deletePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
+    deletePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
+    deletePageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
+    deletePageEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
+
     // GET /{pageid}/composers/{composerId}
     Endpoint composerEndpoint = new Endpoint("/{pageid}/composers/{composerid}", Method.GET, "getcomposer");
     composerEndpoint.setDescription("Returns the composer with the given id from the indicated page");

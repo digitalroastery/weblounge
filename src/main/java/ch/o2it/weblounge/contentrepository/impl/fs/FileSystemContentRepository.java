@@ -67,6 +67,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
   /** Configuration key for the repository's root directory */
   public static final String OPT_ROOT_DIR = CONF_PREFIX + "root";
+  
+  /** Name of the pages path element right below the repository root */
+  public static final String PAGES_PATH = "pages";
 
   /** The repository root directory */
   protected File repositoryRoot = null;
@@ -139,7 +142,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       boolean restructured = false;
       
       Stack<File> uris = new Stack<File>();
-      String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), "pages");
+      String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), PAGES_PATH);
       File siteRootDirectory = new File(homePath);
       FileUtils.forceMkdir(siteRootDirectory);
       
@@ -243,7 +246,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   protected File uriToFile(PageURI uri) throws IOException {
     StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
-    path.append("/pages");
+    path.append("/").append(PAGES_PATH);
     String id = null;
     if (uri.getId() != null) {
       id = uri.getId();
@@ -270,6 +273,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   protected File uriToDirectory(PageURI uri) throws IOException {
     StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
+    path.append("/").append(PAGES_PATH);
     String id = null;
     if (uri.getId() != null) {
       id = uri.getId();
@@ -377,10 +381,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throw new IOException("Unable to get directory for page " + uri + ", supposedly located at " + f);
     }
 
-    // Remove the file
+    // Remove the enclosing directories
     try {
-      if (f.listFiles().length == 0)
+      while (!PAGES_PATH.equals(f.getName()) && f.listFiles().length == 0) {
         FileUtils.deleteDirectory(f);
+        f = f.getParentFile();
+      }
     } catch (IOException e) {
       throw new IOException("Unable to delete directory for page " + uri, e);
     }
