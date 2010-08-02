@@ -299,7 +299,7 @@ public class VersionIndex {
           entry = e;
           break;
         }
-        idx.skipBytes(bytesPerEntry - 2);
+        idx.skipBytes(bytesPerEntry - 1);
         address += bytesPerEntry;
         e++;
       }
@@ -373,7 +373,7 @@ public class VersionIndex {
     idx.seek(IDX_ENTRIES_HEADER_LOCATION);
     idx.writeLong(entries);
 
-    logger.debug("Removed uri at address '{}' from index", entry);
+    logger.debug("Removed all versions at address '{}' from index", entry);
   }
 
   /**

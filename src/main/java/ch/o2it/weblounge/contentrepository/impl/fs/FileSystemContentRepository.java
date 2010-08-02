@@ -163,24 +163,28 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
           if (f.isDirectory()) {
             uris.push(f);
           } else {
-            Page page = loadPage(site, f.toURI().toURL());
-            PageURI uri = page.getURI();
-            if (uri == null)
-              throw new IllegalStateException("Page " + f + " has no uri");
-            index.add(page);
-            pageVersionCount ++;
-            if (!foundPage) {
-              logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());
-              pageCount ++;
-              foundPage = true;
-            }
-            
-            // Make sure the page is in the correct place
-            File expectedFile = uriToFile(uri);
-            String tempPath = expectedFile.getAbsolutePath().substring(homePath.length());
-            FileUtils.copyFile(f, new File(restructuredSite, tempPath));
-            if (!f.equals(expectedFile)) {
-              restructured = true;
+            try {
+              Page page = loadPage(site, f.toURI().toURL());
+              PageURI uri = page.getURI();
+              if (uri == null)
+                throw new IllegalStateException("Page " + f + " has no uri");
+              index.add(page);
+              pageVersionCount ++;
+              if (!foundPage) {
+                logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());
+                pageCount ++;
+                foundPage = true;
+              }
+              
+              // Make sure the page is in the correct place
+              File expectedFile = uriToFile(uri);
+              String tempPath = expectedFile.getAbsolutePath().substring(homePath.length());
+              FileUtils.copyFile(f, new File(restructuredSite, tempPath));
+              if (!f.equals(expectedFile)) {
+                restructured = true;
+              }
+            } catch (Throwable t) {
+              logger.error("Error indexing page {}: {}", f, t.getMessage());
             }
           }
         }

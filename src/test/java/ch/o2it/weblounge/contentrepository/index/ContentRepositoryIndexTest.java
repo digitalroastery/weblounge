@@ -65,6 +65,9 @@ public class ContentRepositoryIndexTest {
   /** The sample page */
   protected Page page = null;
 
+  /** The other sample page */
+  protected Page otherPage = null;
+
   /** The site */
   protected Site site = null;
   
@@ -88,6 +91,9 @@ public class ContentRepositoryIndexTest {
 
     page = new PageImpl(new PageURIImpl(site, "/weblounge"));
     page.setTemplate("home");
+
+    otherPage = new PageImpl(new PageURIImpl(site, "/weblounge/other"));
+    otherPage.setTemplate("home");
   }
 
   /**
@@ -249,4 +255,24 @@ public class ContentRepositoryIndexTest {
     }
   }
 
+  /**
+   * Test method to add, delete, add and update a page to make sure indexing
+   * structures are reused in a consistent way.
+   */
+  @Test
+  public void testAddDeleteAddUpdate() {
+    try {
+      idx.add(page);
+      idx.add(otherPage);
+      idx.update(page);
+      idx.update(otherPage);
+      idx.delete(otherPage.getURI());
+      idx.update(page);
+      assertTrue(idx.exists(page.getURI()));
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
+  
 }

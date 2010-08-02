@@ -26,6 +26,7 @@ import static ch.o2it.weblounge.common.impl.util.doc.Status.METHOD_NOT_ALLOWED;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.NOT_FOUND;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.OK;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.SERVICE_UNAVAILABLE;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.PRECONDITION_FAILED;
 
 import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
 import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentation;
@@ -69,6 +70,7 @@ public final class PageEndpointDocs {
     createPageEndpoint.addFormat(Format.xml());
     createPageEndpoint.addStatus(OK("the page was created and the response body contains it's resource url"));
     createPageEndpoint.addStatus(BAD_REQUEST("the path was not specified"));
+    createPageEndpoint.addStatus(BAD_REQUEST("the page content is malformed"));
     createPageEndpoint.addStatus(CONFLICT("a page already exists at the specified path"));
     createPageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     createPageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
@@ -83,8 +85,9 @@ public final class PageEndpointDocs {
     updatePageEndpoint.addFormat(Format.xml());
     updatePageEndpoint.addStatus(OK("the page was updated"));
     updatePageEndpoint.addStatus(BAD_REQUEST("the page content was not specified"));
-    updatePageEndpoint.addStatus(BAD_REQUEST("the page's ETag does not match the required value as specified by the If-Match header"));
+    createPageEndpoint.addStatus(BAD_REQUEST("the page content is malformed"));
     updatePageEndpoint.addStatus(NOT_FOUND("the site or the page to update were not found"));
+    updatePageEndpoint.addStatus(PRECONDITION_FAILED("the page's etag does not match the value specified in the If-Match header"));
     updatePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     updatePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
     updatePageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));

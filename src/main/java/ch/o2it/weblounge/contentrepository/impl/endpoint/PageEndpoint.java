@@ -152,6 +152,16 @@ public class PageEndpoint {
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     PageURI pageURI = new PageURIImpl(site, null, pageId);
+    
+    // Does the page exist?
+    try {
+      if (!contentRepository.exists(pageURI)) {
+        throw new WebApplicationException(Status.NOT_FOUND);
+      }
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
 
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
@@ -188,7 +198,7 @@ public class PageEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } catch (SAXException e) {
       logger.warn("Error parsing udpated page {}: {}", pageURI, e.getMessage());
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      throw new WebApplicationException(Status.BAD_REQUEST);
     }
 
     // Create the response
@@ -221,7 +231,7 @@ public class PageEndpoint {
     // Create the page uri
     PageURIImpl pageURI = null;
     if (!StringUtils.isBlank(path)) {
-      // TODO: check path, make sure it's absolute and valid in all ways
+      // TODO: check path (regex), make sure it's absolute and valid in all ways
       pageURI = new PageURIImpl(site, path);
     } else {
       String uuid = UUID.randomUUID().toString();
@@ -255,7 +265,7 @@ public class PageEndpoint {
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       } catch (SAXException e) {
         logger.warn("Error parsing udpated page {}: {}", pageURI, e.getMessage());
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        throw new WebApplicationException(Status.BAD_REQUEST);
       }
     } else {
       logger.debug("Creating new page at {}", pageURI);
