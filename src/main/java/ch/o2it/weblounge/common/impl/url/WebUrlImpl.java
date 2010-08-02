@@ -57,7 +57,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
 
   /** The default request flavor */
   private RequestFlavor defaultFlavor = RequestFlavor.ANY;
-  
+
   /** The associated site */
   protected Site site = null;
 
@@ -89,6 +89,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the associated site
    * @param path
    *          the url path
+   * @throws IllegalArgumentException
+   *           if either one of <code>site</code> or <code>path</code> are
+   *           <code>null</code> or the path is malformed
    */
   public WebUrlImpl(Site site, String path) {
     super('/');
@@ -292,29 +295,30 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.url.WebUrl#normalize()
    */
   public String normalize() {
     return normalize(true, true, true, true);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.url.WebUrl#normalize(boolean, boolean, boolean, boolean)
+   * 
+   * @see ch.o2it.weblounge.common.url.WebUrl#normalize(boolean, boolean,
+   *      boolean, boolean)
    */
   public String normalize(boolean includeHost, boolean includeVersion,
       boolean includeLanguage, boolean includeFlavor) {
     StringBuffer buf = new StringBuffer();
-    
+
     // Site
     if (includeHost)
       buf.append(site.getHostName());
 
     // Path
     buf.append(pathElementSeparatorChar).append(path);
-    
+
     // Version
     if (includeVersion && version > 0) {
       buf.append(pathElementSeparatorChar);
@@ -322,12 +326,12 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
         buf.append("work");
       else if (version >= 0)
         buf.append(Long.toString(version));
-      
+
       // Language
       if (includeLanguage && language != null) {
         buf.append("_").append(language.getIdentifier());
       }
-      
+
       // Flavor
       if (includeFlavor && flavor != null) {
         buf.append(".").append(flavor.toExtension());
@@ -340,16 +344,16 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       if (includeLanguage && language != null) {
         buf.append(pathElementSeparatorChar).append(language.getIdentifier());
       }
-      
+
       // Flavor
       if (includeFlavor && flavor != null) {
         buf.append(pathElementSeparatorChar).append(flavor.toExtension());
       }
     }
-    
+
     return UrlSupport.trim(buf.toString());
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -471,7 +475,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     Matcher segmentMatcher = segmentInspector.matcher(path);
     if (segmentMatcher.matches()) {
       int group = segmentMatcher.groupCount();
-      
+
       while (segmentMatcher.group(group) == null || "".equals(segmentMatcher.group(group)))
         group--;
 
@@ -536,7 +540,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       }
       return trim(rest.toString());
     }
-    return trim(path);
+
+    // TODO: We still don't know what we are looking at. Could be
+    // www.weblounge.org or some malformed path (i. e. not absolute etc)
+    return path;
   }
 
   /**
