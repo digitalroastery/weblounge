@@ -26,8 +26,10 @@ import ch.o2it.weblounge.common.content.PageURI;
 import ch.o2it.weblounge.common.impl.page.PageImpl;
 import ch.o2it.weblounge.common.impl.page.PageReader;
 import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -134,12 +136,9 @@ public class PageEndpoint {
    */
   @PUT
   @Path("/{pageid}")
-  public Response updatePage(
-      @Context HttpServletRequest request,
-      @PathParam("pageid") String pageId, 
-      @FormParam("page") String pageXml,
-      @HeaderParam("If-Match") String ifMatchHeader
-    ) {
+  public Response updatePage(@Context HttpServletRequest request,
+      @PathParam("pageid") String pageId, @FormParam("page") String pageXml,
+      @HeaderParam("If-Match") String ifMatchHeader) {
 
     // Check the parameters
     if (pageId == null)
@@ -152,7 +151,7 @@ public class PageEndpoint {
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     PageURI pageURI = new PageURIImpl(site, null, pageId);
-    
+
     // Does the page exist?
     try {
       if (!contentRepository.exists(pageURI)) {
@@ -176,7 +175,7 @@ public class PageEndpoint {
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
     }
-    
+
     // Parse the page and update it in the repository
     Page page = null;
     try {
@@ -184,7 +183,7 @@ public class PageEndpoint {
       page = pageReader.read(IOUtils.toInputStream(pageXml), pageURI);
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
-      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName()); 
+      User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       page.setModified(modifier, new Date());
       contentRepository.update(pageURI, page, user);
     } catch (SecurityException e) {
@@ -230,23 +229,28 @@ public class PageEndpoint {
 
     // Create the page uri
     PageURIImpl pageURI = null;
+    String uuid = UUID.randomUUID().toString();
     if (!StringUtils.isBlank(path)) {
-      // TODO: check path (regex), make sure it's absolute and valid in all ways
-      pageURI = new PageURIImpl(site, path);
-    } else {
-      String uuid = UUID.randomUUID().toString();
-      pageURI = new PageURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
-    }
+      try {
+        if (!path.startsWith("/"))
+          path = "/" + path;
+        WebUrl url = new WebUrlImpl(site, path);
+        pageURI = new PageURIImpl(site, url.getPath(), uuid);
 
-    // Make sure the page doesn't exist
-    try {
-      if (contentRepository.exists(pageURI)) {
-        logger.warn("Tried to create already existing page {} in site '{}'", pageURI, site);
-        throw new WebApplicationException(Status.CONFLICT);
+        // Make sure the page doesn't exist
+        if (contentRepository.exists(new PageURIImpl(site, url.getPath()))) {
+          logger.warn("Tried to create already existing page {} in site '{}'", pageURI, site);
+          throw new WebApplicationException(Status.CONFLICT);
+        }
+      } catch (IllegalArgumentException e) {
+        logger.warn("Tried to create a page with an invalid path '{}': {}", path, e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      } catch (ContentRepositoryException e) {
+        logger.warn("Page lookup {} failed for site '{}'", pageURI, site);
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
-    } catch (ContentRepositoryException e) {
-      logger.warn("Page lookup {} failed for site '{}'", pageURI, site);
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } else {
+      pageURI = new PageURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
     }
 
     // Parse the page and store it
@@ -272,7 +276,7 @@ public class PageEndpoint {
       page = new PageImpl(pageURI);
       page.setTemplate(site.getDefaultTemplate().getIdentifier());
       User admin = site.getAdministrator();
-      User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName()); 
+      User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       page.setCreated(creator, new Date());
     }
 
@@ -338,10 +342,13 @@ public class PageEndpoint {
       logger.warn("Tried to delete page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
-      logger.warn("Error deleting page {} from site '{}': {}", new Object[] { pageURI, site, e.getMessage() });
+      logger.warn("Error deleting page {} from site '{}': {}", new Object[] {
+          pageURI,
+          site,
+          e.getMessage() });
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-    
+
     return Response.ok().build();
   }
 
