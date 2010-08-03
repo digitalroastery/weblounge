@@ -44,6 +44,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEM
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 
+import ch.o2it.weblounge.common.content.Composer;
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
@@ -78,52 +79,56 @@ public class PageInputDocument extends AbstractInputDocument {
    *          the page
    */
   private void init(Page page) {
-    setField(ID, page.getURI().getId());
-    setField(PATH, page.getURI().getPath());
+    setField(ID, page.getURI().getId(), true);
+    setField(PATH, page.getURI().getPath(), true);
 
     // Page-level
     for (String subject : page.getSubjects())
-      setField(SUBJECTS, subject);
-    setField(TEMPLATE, page.getTemplate());
+      setField(SUBJECTS, subject, true);
+    setField(TEMPLATE, page.getTemplate(), false);
 
     // Creation, modification and publishing information
-    setField(CREATED, SolrUtils.serializeDate(page.getCreationDate()));
-    setField(CREATED_BY, SolrUtils.serializeUser(page.getCreator()));
-    setField(MODIFIED, SolrUtils.serializeDate(page.getModificationDate()));
-    setField(MODIFIED_BY, SolrUtils.serializeUser(page.getModifier()));
-    setField(PUBLISHED_FROM, SolrUtils.serializeDate(page.getPublishFrom()));
-    setField(PUBLISHED_TO, SolrUtils.serializeDate(page.getPublishTo()));
-    setField(PUBLISHED_BY, SolrUtils.serializeUser(page.getPublisher()));
+    setField(CREATED, SolrUtils.serializeDate(page.getCreationDate()), false);
+    setField(CREATED_BY, SolrUtils.serializeUser(page.getCreator()), false);
+    setField(MODIFIED, SolrUtils.serializeDate(page.getModificationDate()), false);
+    setField(MODIFIED_BY, SolrUtils.serializeUser(page.getModifier()), false);
+    setField(PUBLISHED_FROM, SolrUtils.serializeDate(page.getPublishFrom()), false);
+    setField(PUBLISHED_TO, SolrUtils.serializeDate(page.getPublishTo()), false);
+    setField(PUBLISHED_BY, SolrUtils.serializeUser(page.getPublisher()), false);
 
     // Language dependent fields
     for (Language l : page.languages()) {
-      setFulltextField(getLocalizedFieldName(DESCRIPTION, l), page.getDescription(l, true), l);
-      setField(getLocalizedFieldName(COVERAGE, l), page.getCoverage(l, true));
-      setField(getLocalizedFieldName(RIGHTS, l), page.getRights(l, true));
-      setField(getLocalizedFieldName(TITLE, l), page.getTitle(l, true));
+      setField(getLocalizedFieldName(DESCRIPTION, l), page.getDescription(l, true), l, true);
+      setField(getLocalizedFieldName(COVERAGE, l), page.getCoverage(l, true), l, false);
+      setField(getLocalizedFieldName(RIGHTS, l), page.getRights(l, true), l, false);
+      setField(getLocalizedFieldName(TITLE, l), page.getTitle(l, true), l, true);
     }
 
     // Pagelet elements and properties
-    int i = 0;
-    for (Pagelet p : page.getPagelets()) {
-      for (Language l : p.languages()) {
-        setFulltextField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeContent(p, l, false), l);
-        setFulltextField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeProperties(p, false), l);
-        setField(MessageFormat.format(PAGELET_ELEMENTS, i, l.getIdentifier()), serializeContent(p, l, true));
+    for (Composer composer : page.getComposers()) {
+      int i = 0;
+      for (Pagelet p : composer.getPagelets()) {
+        String location = composer.getIdentifier() + "-" + i;
+        for (Language l : p.languages()) {
+          setField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeContent(p, l, false), l, true);
+          setField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeProperties(p, false), l, true);
+          setField(MessageFormat.format(PAGELET_ELEMENTS, location, l.getIdentifier()), serializeContent(p, l, true), l, false);
+        }
+        setField(MessageFormat.format(PAGELET_PROPERTIES, location), serializeProperties(p, true), false);
+        setField(MessageFormat.format(PAGELET_XML, location), p.toXml(), false);
+        setField(MessageFormat.format(PAGELET_TYPE, location), p.getModule() + "/" + p.getIdentifier(), false);
+        i++;
       }
-      setField(MessageFormat.format(PAGELET_PROPERTIES, i), serializeProperties(p, true));
-      setField(MessageFormat.format(PAGELET_XML, i), p.toXml());
-      setField(MessageFormat.format(PAGELET_TYPE, i), p.getModule() + "/" + p.getIdentifier());
     }
 
     // The whole page
     String pageXml = page.toXml();
-    setField(XML, pageXml);
+    setField(XML, pageXml, false);
 
     // Page header
     String headerXml = pageXml.replaceAll("<body[^>]*>[\\s\\S]+?<\\/body>", "");
     if (!StringUtils.isBlank(headerXml)) {
-      setField(HEADER_XML, headerXml);
+      setField(HEADER_XML, headerXml, false);
     }
     
     // Preview information
@@ -133,7 +138,7 @@ public class PageInputDocument extends AbstractInputDocument {
       preview.append(p.toXml());
     }
     preview.append("</composer>");
-    setField(PREVIEW_XML, preview.toString());
+    setField(PREVIEW_XML, preview.toString(), false);
 
   }
 

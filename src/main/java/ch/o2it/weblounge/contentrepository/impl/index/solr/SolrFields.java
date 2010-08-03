@@ -79,7 +79,7 @@ public interface SolrFields {
   public static final String PUBLISHED_BY = "published-by";
 
   /** Pagelet text and properties values */
-  public static final String PAGELET_CONTENTS = "pagelet-contents-{1}";
+  public static final String PAGELET_CONTENTS = "pagelet-contents-{0}";
 
   /** Pagelet text field name */
   public static final String PAGELET_ELEMENTS = "pagelet-elements-{0}-{1}";

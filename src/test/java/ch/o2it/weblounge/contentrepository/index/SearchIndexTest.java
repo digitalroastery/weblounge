@@ -38,6 +38,7 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.impl.index.SearchIndex;
 
+import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -124,6 +125,7 @@ public class SearchIndexTest {
   public void tearDown() {
     try {
       idx.close();
+      FileUtils.deleteQuietly(idxRoot);
     } catch (IOException e) {
       fail("Error closing search index: " + e.getMessage());
     }

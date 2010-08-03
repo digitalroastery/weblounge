@@ -259,17 +259,17 @@
     <dynamicField name="title-*" type="string" indexed="true" stored="true" required="false" />
    
     <!-- Dynamic fields for pagelet texts and properties -->
-    <dynamicField name="pagelet-type-*" type="text" indexed="true" stored="true"/>
-    <dynamicField name="pagelet-contents-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="pagelet-type-*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet-contents-*" type="text" indexed="true" stored="true" multiValued="true"/>
     <dynamicField name="pagelet-properties-*" type="text" indexed="true" stored="true"/>
     <dynamicField name="pagelet-elements-*" type="text" indexed="true" stored="true"/>
-    <dynamicField name="pagelet-xml-*" type="text" indexed="false" stored="true"/>
+    <dynamicField name="pagelet-xml-*" type="text" indexed="false" stored="true" multiValued="true"/>
 
     <!-- Language sensitive fulltext search -->
-    <dynamicField name="fulltext-*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="fulltext-*" type="text" indexed="true" stored="false"/>
 
     <!-- A fulltext copy field. -->
-    <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
+    <field name="fulltext" type="text" indexed="true" stored="false"/>
      
   </fields>
 
@@ -288,13 +288,16 @@
   <!-- copyField commands copy one field to another at the time a document
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
+   <!-- Weblounge is already dealing with the following fields:
    <copyField source="id" dest="fulltext"/>
    <copyField source="path" dest="fulltext"/>
    <copyField source="subjects" dest="fulltext"/>
    <copyField source="description-*" dest="fulltext"/>
    <copyField source="coverage-*" dest="fulltext"/>
+   <copyField source="rights-*" dest="fulltext"/>
    <copyField source="title-*" dest="fulltext"/>
-   <copyField source="pagelet-content-*" dest="fulltext"/>
+   <copyField source="pagelet-contents-*" dest="fulltext"/>
+   -->
 
   <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine

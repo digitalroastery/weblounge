@@ -357,8 +357,8 @@ public class ContentRepositoryIndex {
 
     // Locate the entry in question
     for (long a : addresses) {
-      String idxPath = uriIdx.getPath(a);
-      if (idxPath.equals(id)) {
+      String idxId = uriIdx.getId(a);
+      if (idxId.equals(id)) {
         return uriIdx.getPath(a);
       }
     }

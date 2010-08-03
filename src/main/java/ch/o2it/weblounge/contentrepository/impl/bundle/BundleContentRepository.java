@@ -157,27 +157,22 @@ public class BundleContentRepository extends AbstractContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * TODO: Move to BundleContentRepositoryIndex
-   * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.PageURI)
    */
-  @SuppressWarnings( { "unchecked" })
   public PageURI[] getVersions(PageURI uri) throws ContentRepositoryException {
     if (uri == null)
       throw new IllegalArgumentException("Page uri cannot be null");
-    String entryPath = UrlSupport.concat(pagesPathPrefix, uri.getPath());
-    Enumeration<URL> entries = bundle.findEntries(entryPath, "*.xml", false);
-    List<PageURI> versions = new ArrayList<PageURI>();
-    while (entries.hasMoreElements()) {
-      URL entry = entries.nextElement();
-      String filename = FilenameUtils.getBaseName(entry.getPath());
-      long version = PageUtils.getVersion(filename);
-      if (version != -1) {
-        logger.trace("Found revision '{}' of page {}", entry, uri);
-        versions.add(new PageURIImpl(uri, version));
+    try {
+      List<PageURI> uris = new ArrayList<PageURI>();
+      long[] versions = index.getRevisions(uri);
+      for (long version : versions) {
+        uris.add(new PageURIImpl(uri, version));
       }
+      return uris.toArray(new PageURI[uris.size()]);
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
     }
-    return versions.toArray(new PageURI[versions.size()]);
+
   }
 
   /**

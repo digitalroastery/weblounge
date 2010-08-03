@@ -28,6 +28,7 @@ import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -196,9 +197,9 @@ public class SolrRequester {
   private StringBuilder and(StringBuilder buf, String fieldName, String fieldValue) {
     if (buf.length() > 0)
       buf.append(" AND ");
-    buf.append(fieldName);
+    buf.append(StringUtils.trim(fieldName));
     buf.append(":");
-    buf.append(fieldValue);
+    buf.append(StringUtils.trim(fieldValue));
     return buf;
   }
 

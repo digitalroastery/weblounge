@@ -20,11 +20,12 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.FULLTEXT;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.LOCALIZED_FULLTEXT;
 
 import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 
@@ -48,14 +49,24 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
    *          the field name
    * @param fieldValue
    *          the value
+   * @param addToFulltext
+   *          <code>true</code> to add the contents to the fulltext field as
+   *          well
    */
-  @Override
-  public void setField(String fieldName, Object fieldValue) {
+  public void setField(String fieldName, Object fieldValue,
+      boolean addToFulltext) {
     if (fieldName == null)
       throw new IllegalArgumentException("Field name cannot be null");
     if (fieldValue == null)
       return;
     super.setField(fieldName, fieldValue);
+
+    // Add to fulltext
+    if (addToFulltext) {
+      String fulltext = (String) super.getFieldValue(SolrFields.FULLTEXT);
+      fulltext = StringUtils.join(new Object[] { fulltext, fieldValue.toString() }, " ");
+      super.setField(SolrFields.FULLTEXT, fulltext);
+    }
   }
 
   /**
@@ -70,16 +81,34 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
    *          the value
    * @param language
    *          the language
+   * @param addToFulltext
+   *          <code>true</code> to add the contents to the fulltext field as
+   *          well
    */
-  public void setFulltextField(String fieldName, Object fieldValue,
-      Language language) {
+  public void setField(String fieldName, Object fieldValue, Language language, boolean addToFulltext) {
     if (fieldName == null)
       throw new IllegalArgumentException("Field name cannot be null");
     if (fieldValue == null)
       return;
     super.setField(fieldName, fieldValue);
-    super.setField(getLocalizedFieldName(LOCALIZED_FULLTEXT, language), fieldValue);
-    super.setField(FULLTEXT, fieldValue);
+
+    // Add to fulltext
+    if (addToFulltext) {
+
+      // Update the localized fulltext
+      String localizedFieldName = getLocalizedFieldName(LOCALIZED_FULLTEXT, language);
+      String localizedFulltext = (String) super.getFieldValue(localizedFieldName);
+      localizedFulltext = StringUtils.join(new Object[] {
+          localizedFulltext,
+          fieldValue.toString() }, " ");
+      super.setField(localizedFieldName, localizedFulltext);
+
+      // Add to fulltext
+      String fulltext = (String) super.getFieldValue(SolrFields.FULLTEXT);
+      fulltext = StringUtils.join(new Object[] { fulltext, fieldValue.toString() }, " ");
+      super.setField(SolrFields.FULLTEXT, fulltext);
+
+    }
   }
 
   /**
