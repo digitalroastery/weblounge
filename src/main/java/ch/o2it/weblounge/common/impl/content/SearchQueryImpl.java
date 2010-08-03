@@ -774,7 +774,7 @@ public class SearchQueryImpl implements SearchQuery {
    */
   @Override
   public String toString() {
-    return "*: " + (text != null ? text : "*");
+    return "*:" + (text != null ? text : "*");
   }
   
 }
