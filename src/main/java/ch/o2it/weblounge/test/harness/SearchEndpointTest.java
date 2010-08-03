@@ -85,20 +85,42 @@ public class SearchEndpointTest extends IntegrationTestBase {
     String searchTerms = "xyz";
     httpClient = new DefaultHttpClient();
     searchRequest = new HttpGet(UrlSupport.concat(requestUrl, searchTerms));
-    logger.debug("Sending get request to {}", requestUrl);
+    logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
     try {
       HttpResponse response = TestSiteUtils.request(httpClient, searchRequest, null);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       Document xml = TestSiteUtils.parseXMLResponse(response);
-      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@documents"));    
-      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@hits"));    
-      assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@page"));    
-      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@pagesize"));    
-      assertEquals("0", XPathHelper.valueOf(xml, "count(/searchresult/result)"));    
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@documents"));
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@hits"));
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@offset"));
+      assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@page"));
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@pagesize"));
+      assertEquals("0", XPathHelper.valueOf(xml, "count(/searchresult/result)"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
+    // Check for search terms that should yield a result
+    searchTerms = "Nietzsche";
+    httpClient = new DefaultHttpClient();
+    searchRequest = new HttpGet(UrlSupport.concat(requestUrl, searchTerms));
+    String[][] params = new String[][] {{"limit", "5"}};
+    logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
+    try {
+      HttpResponse response = TestSiteUtils.request(httpClient, searchRequest, params);
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      Document xml = TestSiteUtils.parseXMLResponse(response);
+      assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@documents"));
+      assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@hits"));
+      assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@offset"));
+      assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@page"));
+      assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@pagesize"));
+      assertEquals("1", XPathHelper.valueOf(xml, "count(/searchresult/result)"));
+      assertEquals("4bb19980-8f98-4873-a813-71b6dfab22ad", XPathHelper.valueOf(xml, "/searchresult/result/id"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
   }
 
 }
