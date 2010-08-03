@@ -67,3 +67,4 @@ endpoint
 dactivation
 metadata
 endpoints
+fulltext
