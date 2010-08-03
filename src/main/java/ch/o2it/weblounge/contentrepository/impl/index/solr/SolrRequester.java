@@ -141,6 +141,7 @@ public class SolrRequester {
     SolrQuery q = new SolrQuery(solrQuery.toString());
     q.setStart(query.getOffset() > 0 ? query.getOffset() : 0);
     q.setRows(query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE);
+    q.setSortField(SolrFields.SCORE, SolrQuery.ORDER.desc);
     q.setIncludeScore(true);
     q.setFields("* score");
 

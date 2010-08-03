@@ -96,7 +96,7 @@ public class SearchEndpoint {
     ) {
 
     // Check the search terms
-    if (terms == null || terms.size() == 0)
+    if (terms == null || terms.size() == 0 || StringUtils.isBlank(terms.get(0)))
       return Response.status(Status.BAD_REQUEST).build();
 
     // Find the site

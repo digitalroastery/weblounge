@@ -36,7 +36,7 @@ public class PageURIInputDocument extends AbstractInputDocument {
 
   /**
    * Creates an input document for the given uri. On update, only the uri will
-   * change (namely the path), and the rest of the page will remain empty.
+   * change (namely the path), and the rest of the page will remain unchanged.
    * 
    * @param uri
    *          the page uri
@@ -46,10 +46,10 @@ public class PageURIInputDocument extends AbstractInputDocument {
   }
 
   /**
-   * Populates this input document with the page data.
+   * Populates this input document with the uri data.
    * 
    * @param uri
-   *          the page
+   *          the page uri
    */
   private void init(PageURI uri) {
     setField(ID, uri.getId());

@@ -27,7 +27,7 @@ import org.apache.solr.common.SolrInputDocument;
  */
 public class SolrUpdateableInputDocument extends SolrInputDocument {
 
-  /** Serieal version id */
+  /** Serial version id */
   private static final long serialVersionUID = -1984560839468950690L;
 
   /**

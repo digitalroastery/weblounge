@@ -24,6 +24,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.COV
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.DESCRIPTION;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
@@ -32,8 +33,6 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAG
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
@@ -43,6 +42,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIG
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECTS;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 
 import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Pagelet;
