@@ -26,8 +26,10 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -118,8 +120,17 @@ public class TestSiteUtils {
         URI uri = URIUtils.createURI(requestURI.getScheme(), requestURI.getHost(), requestURI.getPort(), requestURI.getPath(), URLEncodedUtils.format(qparams, "UTF-8"), null);
         request = new HttpGet(uri);
       } else if (request instanceof HttpPost) {
+        List<NameValuePair> formparams = new ArrayList<NameValuePair>();
         for (String[] param : params)
-          request.getParams().setParameter(param[0], param[1]);
+          formparams.add(new BasicNameValuePair(param[0], param[1]));
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+        ((HttpPost)request).setEntity(entity);
+      } else if (request instanceof HttpPut) {
+        List<NameValuePair> formparams = new ArrayList<NameValuePair>();
+        for (String[] param : params)
+          formparams.add(new BasicNameValuePair(param[0], param[1]));
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+        ((HttpPut)request).setEntity(entity);
       }
     }
     return httpClient.execute(request);
