@@ -204,7 +204,7 @@ public class BundleContentRepository extends AbstractContentRepository {
           if (pageURI == null)
             throw new IllegalStateException("Page " + entry + " has no uri");
           pages.add(pageURI);
-          logger.trace("Found revision '{}' of page {}", entry, uri);
+          logger.trace("Found revision '{}' of page {}", v, entry);
         } catch (IOException e) {
           throw new ContentRepositoryException("Unable to read id from page at " + entry, e);
         }
