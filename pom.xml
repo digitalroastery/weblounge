@@ -86,15 +86,16 @@
             <Bundle-SymbolicName>${project.groupId}.kernel</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common.content;version=${project.version},
-              ch.o2it.weblounge.dispatcher;version=${project.version},
+              ch.o2it.weblounge.common.content.page;version=${project.version},
               ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.url;version=${project.version},
               ch.o2it.weblounge.common.user;version=${project.version},
               ch.o2it.weblounge.common.impl.content;version=${project.version},
-              ch.o2it.weblounge.common.impl.page;version=${project.version},
+              ch.o2it.weblounge.common.impl.content.page;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
+              ch.o2it.weblounge.dispatcher;version=${project.version},
               org.apache.commons.lang;version="2.4",
               org.quartz;version="1.5.2",
               org.quartz.impl;version="1.5.2",

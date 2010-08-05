@@ -20,13 +20,13 @@
 
 package ch.o2it.weblounge.kernel.command;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -245,9 +245,9 @@ public class SiteCommand {
     try {
       String objectId = args[0];
       if (objectId.startsWith("/"))
-        page = repository.getPage(new PageURIImpl(site, args[0]));
+        page = repository.getPage(new ResourceURIImpl(site, args[0]));
       else
-        page = repository.getPage(PageURIImpl.fromId(site, args[0]));
+        page = repository.getPage(ResourceURIImpl.fromId(site, args[0]));
       if (page != null) {
         title("page");
         pad("id", page.getURI().getId().toString());
