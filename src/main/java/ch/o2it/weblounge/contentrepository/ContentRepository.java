@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
@@ -187,8 +188,8 @@ public interface ContentRepository {
    * Returns an iteration of all pages with version <code>version</code> and
    * their uri containing <code>uri</code> as a prefix.
    * <p>
-   * Live versions of pages are returned using {@link Page#LIVE}, while work
-   * pages are specified using {@link Page#WORK}.
+   * Live versions of pages are returned using {@link Resource#LIVE}, while work
+   * pages are specified using {@link Resource#WORK}.
    * 
    * @param uri
    *          the root uri
@@ -230,8 +231,8 @@ public interface ContentRepository {
    * <code>1</code> will return pages located at <code>uri</code> as well as
    * those that are one level below it.
    * <p>
-   * Live versions of pages are returned using {@link Page#LIVE}, while work
-   * pages are specified using {@link Page#WORK}.
+   * Live versions of pages are returned using {@link Resource#LIVE}, while work
+   * pages are specified using {@link Resource#WORK}.
    * 
    * @return the page uris
    * @param versions
