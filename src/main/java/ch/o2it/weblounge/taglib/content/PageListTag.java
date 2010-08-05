@@ -20,15 +20,15 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.content.SearchResultPageItem;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
-import ch.o2it.weblounge.common.impl.page.ComposerImpl;
+import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;

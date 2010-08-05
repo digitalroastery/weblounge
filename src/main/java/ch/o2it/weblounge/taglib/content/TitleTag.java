@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.taglib.WebloungeTag;

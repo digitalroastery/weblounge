@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;

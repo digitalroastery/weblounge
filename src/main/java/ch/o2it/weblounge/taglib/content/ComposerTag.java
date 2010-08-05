@@ -21,13 +21,13 @@
 package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.Pagelet;
-import ch.o2it.weblounge.common.content.PageletRenderer;
-import ch.o2it.weblounge.common.impl.page.ComposerImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -280,7 +280,7 @@ public class ComposerTag extends WebloungeTag {
           pageUrl = pageUrl.substring(0, urlSeparator);
           if ("".equals(pageUrl))
             pageUrl = "/";
-          PageURI pageURI = new PageURIImpl(site, pageUrl);
+          ResourceURI pageURI = new ResourceURIImpl(site, pageUrl);
           try {
             p = contentRepository.getPage(pageURI, user, SystemPermission.READ);
             if (p != null)
@@ -366,7 +366,7 @@ public class ComposerTag extends WebloungeTag {
 
     // If no page was specified, take homepage instead.
     if (targetPage == null) {
-      PageURI homeURI = new PageURIImpl(site, "/");
+      ResourceURI homeURI = new ResourceURIImpl(site, "/");
       try {
         targetPage = contentRepository.getPage(homeURI, user, SystemPermission.READ);
         if (targetPage == null) {

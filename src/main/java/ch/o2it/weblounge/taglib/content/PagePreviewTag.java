@@ -20,14 +20,14 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.Renderer;
-import ch.o2it.weblounge.common.impl.page.ComposerImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -175,7 +175,7 @@ public class PagePreviewTag extends WebloungeTag {
     } else {
       ContentRepository contentRepository = null;
       contentRepository = ContentRepositoryFactory.getRepository(site);
-      PageURI pageURI = PageURIImpl.fromId(site, pageId);
+      ResourceURI pageURI = ResourceURIImpl.fromId(site, pageId);
 
       try {
         page = contentRepository.getPage(pageURI, user, SystemPermission.READ);

@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.url.WebUrl;
 
 import javax.servlet.jsp.tagext.TagData;

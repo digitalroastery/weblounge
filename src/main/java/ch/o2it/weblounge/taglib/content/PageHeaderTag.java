@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.Pagelet;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -73,7 +73,7 @@ public class PageHeaderTag extends WebloungeTag {
     }
 
     // Try to load the page
-    PageURI uri = PageURIImpl.fromId(site, pageId);
+    ResourceURI uri = ResourceURIImpl.fromId(site, pageId);
     Page page = null;
     try {
       page = repository.getPage(uri);

@@ -20,11 +20,11 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement;
-import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.Pagelet;
 import ch.o2it.weblounge.common.content.Renderer;
+import ch.o2it.weblounge.common.content.page.DeclarativeHTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.HTMLAction;
 import ch.o2it.weblounge.common.site.Module;

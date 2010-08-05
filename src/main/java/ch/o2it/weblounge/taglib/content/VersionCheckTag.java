@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.impl.page.PageUtils;
+import ch.o2it.weblounge.common.impl.content.page.PageUtils;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import javax.servlet.jsp.JspException;

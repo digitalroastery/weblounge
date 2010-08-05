@@ -80,9 +80,10 @@
             <Import-Package>
               ch.o2it.weblounge.common;version=${project.version},
               ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.common.content.page;version=${project.version},
               ch.o2it.weblounge.common.impl.content;version=${project.version},
+              ch.o2it.weblounge.common.impl.content.page;version=${project.version},
               ch.o2it.weblounge.common.impl.language;version=${project.version},
-              ch.o2it.weblounge.common.impl.page;version=${project.version},
               ch.o2it.weblounge.common.impl.request;version=${project.version},
               ch.o2it.weblounge.common.impl.url;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
