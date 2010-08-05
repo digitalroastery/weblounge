@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.content;
 
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.Url;
 
@@ -48,8 +47,8 @@ public interface ResourceURI extends Url {
    * Returns the page version. The version represents the various editing stages
    * of a page. Note that there are two special version values:
    * <ul>
-   * <li>{@link Page#LIVE}: the live version of the page</li>
-   * <li>{@link Page#WORK}: the work version of the page</li>
+   * <li>{@link Resource#LIVE}: the live version of the page</li>
+   * <li>{@link Resource#WORK}: the work version of the page</li>
    * </ul>
    * 
    * @return the version

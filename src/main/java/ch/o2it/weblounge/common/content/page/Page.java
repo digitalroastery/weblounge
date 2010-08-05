@@ -38,12 +38,6 @@ import ch.o2it.weblounge.common.content.Resource;
  */
 public interface Page extends Resource {
 
-  /** Live version of a page */
-  long LIVE = 0;
-
-  /** Work version of a page */
-  long WORK = 1;
-
   /**
    * Sets the layout that should be applied to this page. The layout controls
    * which pagelets to place into a composer by default, which ones to protect
