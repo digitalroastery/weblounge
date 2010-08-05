@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.page.Composer;
@@ -343,7 +344,7 @@ public class PagePreviewTag extends WebloungeTag {
           // }
 
           // Check publishing dates
-          if (!(request.getVersion() == Page.WORK) && !pagelet.isPublished()) {
+          if (!(request.getVersion() == Resource.WORK) && !pagelet.isPublished()) {
             logger.debug("Skipping pagelet " + index + " in composer " + stage + " since it is not yet published");
             return false;
           }

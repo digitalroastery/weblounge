@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
@@ -195,7 +196,7 @@ public class ComposerTag extends WebloungeTag {
    */
   protected void beforeComposer(JspWriter writer) throws IOException {
     StringBuffer buf = new StringBuffer("<div ");
-    if (request.getVersion() == Page.WORK && targetPage.isLocked()) {
+    if (request.getVersion() == Resource.WORK && targetPage.isLocked()) {
       addCssClass(CLASS_LOCKED);
     }
     buf.append(getStandardAttributes());
@@ -267,7 +268,7 @@ public class ComposerTag extends WebloungeTag {
 
     // If composer is empty and ghost content is enabled, go up the page
     // hierarchy and try to find content for this composer
-    if (inheritFromParent && !(version == Page.WORK && isLockedByCurrentUser)) {
+    if (inheritFromParent && !(version == Resource.WORK && isLockedByCurrentUser)) {
       String pageUrl = p.getURI().getPath();
       while (content.length == 0 && pageUrl.length() > 1) {
         if (pageUrl.endsWith("/") && !"/".equals(pageUrl))
@@ -294,7 +295,7 @@ public class ComposerTag extends WebloungeTag {
     }
 
     // Mark inherited composer and ghost content in locked work mode
-    if (version == Page.WORK && isLockedByCurrentUser) {
+    if (version == Resource.WORK && isLockedByCurrentUser) {
       if (inheritFromParent)
         addCssClass(CLASS_INHERIT_CONTENT);
       if (!originalContent)
@@ -413,7 +414,7 @@ public class ComposerTag extends WebloungeTag {
         request.setAttribute(WebloungeRequest.COMPOSER, composerName);
 
         // Check if this composer is already in the cache
-        if (request.getVersion() == Page.LIVE) {
+        if (request.getVersion() == Resource.LIVE) {
 
           composerCacheTags = new CacheTagSet();
           long validTime = Times.MS_PER_DAY;
@@ -526,7 +527,7 @@ public class ComposerTag extends WebloungeTag {
 //            }
 
             // Check publishing dates
-            if (!(request.getVersion() == Page.WORK) && !pagelet.isPublished()) {
+            if (!(request.getVersion() == Resource.WORK) && !pagelet.isPublished()) {
               logger.debug("Skipping pagelet " + i + " in composer " + composerName + " since it is not yet published");
               continue p;
             }
@@ -555,7 +556,7 @@ public class ComposerTag extends WebloungeTag {
             // Create a new cache handle with the configured times
             long validTime = renderer.getValidTime();
             long recheckTime = renderer.getRecheckTime();
-            if (request.getVersion() == Page.LIVE) {
+            if (request.getVersion() == Resource.LIVE) {
 
               // Create tagset
               pageletCacheTags.add("webl:url", url.getPath());
@@ -649,7 +650,7 @@ public class ComposerTag extends WebloungeTag {
                 logger.error(msg, e);
               }
 
-              if (version == Page.WORK && isLockedByCurrentUser) {
+              if (version == Resource.WORK && isLockedByCurrentUser) {
                 // TODO: Read error message from labels
                 writer.println("Error while rendering &quot;" + renderer + "&quot;<br />");
               }
@@ -680,7 +681,7 @@ public class ComposerTag extends WebloungeTag {
               writer.flush();
             }
 
-            if (version == Page.WORK && isLockedByCurrentUser) {
+            if (version == Resource.WORK && isLockedByCurrentUser) {
               writer.println("</div>");
             }
 
@@ -691,7 +692,7 @@ public class ComposerTag extends WebloungeTag {
 //            request.removeAttribute(PageletEditorTag.ID);
 
             // Finish cache response
-            if (request.getVersion() == Page.LIVE) {
+            if (request.getVersion() == Resource.LIVE) {
               writer.println("<!-- end cache content of pagelet " + i + " -->");
               writer.flush();
               response.endResponsePart();
@@ -719,7 +720,7 @@ public class ComposerTag extends WebloungeTag {
         request.removeAttribute(WebloungeRequest.COMPOSER);
 
         // Close composer cache handle
-        if (request.getVersion() == Page.LIVE) {
+        if (request.getVersion() == Resource.LIVE) {
           writer.println("<!-- end generated content of composer '" + composerName + "' -->");
           writer.flush();
           response.endResponsePart();

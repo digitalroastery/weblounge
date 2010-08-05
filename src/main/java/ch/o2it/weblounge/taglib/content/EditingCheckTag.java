@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.user.User;
@@ -42,7 +43,7 @@ public abstract class EditingCheckTag extends WebloungeTag {
   protected boolean isEditing() {
     User user = request.getUser();
     Page page = (Page) request.getAttribute(WebloungeRequest.PAGE);
-    return page.getLockOwner().equals(user) && request.getVersion() == Page.WORK;
+    return page.getLockOwner().equals(user) && request.getVersion() == Resource.WORK;
   }
 
 }
