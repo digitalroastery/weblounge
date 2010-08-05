@@ -25,6 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
@@ -152,18 +153,18 @@ public class ContentRepositoryIndexTest {
   public void testGetRevisions() {
     ResourceURI uri1 = new ResourceURIImpl(site, "/weblounge");
     ResourceURI uri2Live = new ResourceURIImpl(site, "/etc/weblounge");
-    ResourceURI uri2Work = new ResourceURIImpl(site, "/etc/weblounge", Page.WORK);
+    ResourceURI uri2Work = new ResourceURIImpl(site, "/etc/weblounge", Resource.WORK);
     try {
       idx.add(new PageImpl(uri1));
       idx.add(new PageImpl(uri2Live));
       idx.add(new PageImpl(uri2Work));
       long[] revisions = idx.getRevisions(uri1);
       assertEquals(1, revisions.length);
-      assertEquals(Page.LIVE, revisions[0]);
+      assertEquals(Resource.LIVE, revisions[0]);
       revisions = idx.getRevisions(uri2Live);
       assertEquals(2, revisions.length);
-      assertEquals(Page.LIVE, revisions[0]);
-      assertEquals(Page.WORK, revisions[1]);
+      assertEquals(Resource.LIVE, revisions[0]);
+      assertEquals(Resource.WORK, revisions[1]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());

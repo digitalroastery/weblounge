@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
@@ -219,7 +220,7 @@ public class ContentRepositoryIndex {
       idIdx.add(id, address);
       pathIdx.add(path, address);
       versionIdx.add(id, uri.getVersion());
-      if (uri.getVersion() == Page.LIVE) {
+      if (uri.getVersion() == Resource.LIVE) {
         searchIdx.add(page);
       }
     }
@@ -227,7 +228,7 @@ public class ContentRepositoryIndex {
     // Otherwise, it's just a new version
     else if (!versionIdx.hasVersion(address, uri.getVersion())) {
       versionIdx.add(address, uri.getVersion());
-      if (uri.getVersion() == Page.LIVE) {
+      if (uri.getVersion() == Resource.LIVE) {
         searchIdx.add(page);
       }
     }
@@ -376,7 +377,7 @@ public class ContentRepositoryIndex {
    */
   public synchronized void update(Page page) throws IOException {
     ResourceURI uri = page.getURI();
-    if (uri.getVersion() == Page.LIVE) {
+    if (uri.getVersion() == Resource.LIVE) {
       searchIdx.update(page);
     }
   }
@@ -407,7 +408,7 @@ public class ContentRepositoryIndex {
     pathIdx.delete(oldPath, address);
     pathIdx.add(uri.getPath(), address);
     uriIdx.update(address, uri.getPath());
-    if (uri.getVersion() == Page.LIVE) {
+    if (uri.getVersion() == Resource.LIVE) {
       searchIdx.move(uri, path);
     }
   }

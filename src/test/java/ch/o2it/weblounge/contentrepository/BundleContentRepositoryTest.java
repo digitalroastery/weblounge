@@ -23,8 +23,8 @@ package ch.o2it.weblounge.contentrepository;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository;
@@ -75,9 +75,9 @@ public class BundleContentRepositoryTest {
   public void setUp() throws Exception {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
-    liveHomeURI = new ResourceURIImpl(site, homePath, Page.LIVE);
-    workHomeURI = new ResourceURIImpl(site, homePath, Page.WORK);
-    workSubURI = new ResourceURIImpl(site, subPath, Page.WORK);
+    liveHomeURI = new ResourceURIImpl(site, homePath, Resource.LIVE);
+    workHomeURI = new ResourceURIImpl(site, homePath, Resource.WORK);
+    workSubURI = new ResourceURIImpl(site, subPath, Resource.WORK);
     bundle = new StandaloneBundle(BundleContentRepositoryTest.class.getClassLoader());
     
     repository = new BundleContentRepository();

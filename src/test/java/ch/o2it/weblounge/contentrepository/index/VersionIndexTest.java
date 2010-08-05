@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.contentrepository.impl.index.VersionIndex;
 
 import org.apache.commons.io.FileUtils;
@@ -120,7 +120,7 @@ public class VersionIndexTest {
   public void testGetEntries() {
     try {
       assertEquals(0, idx.getEntries());
-      idx.add(UUID.randomUUID().toString(), Page.LIVE);
+      idx.add(UUID.randomUUID().toString(), Resource.LIVE);
       assertEquals(1, idx.getEntries());
     } catch (IOException e) {
       e.printStackTrace();
@@ -139,8 +139,8 @@ public class VersionIndexTest {
     String uuid2 = UUID.randomUUID().toString();
     String uuid3 = UUID.randomUUID().toString();
     try {
-      idx.add(uuid1, Page.LIVE);
-      idx.add(uuid2, Page.LIVE);
+      idx.add(uuid1, Resource.LIVE);
+      idx.add(uuid2, Resource.LIVE);
       assertEquals(2, idx.getEntries());
       int size = 24 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry  * 8);
       assertEquals(size, idx.size());
@@ -148,7 +148,7 @@ public class VersionIndexTest {
       // test reusing slots
       idx.delete(0);
       assertEquals(size, idx.size());
-      long address = idx.add(uuid3, Page.LIVE);
+      long address = idx.add(uuid3, Resource.LIVE);
       assertEquals(0, address);
       assertEquals(size, idx.size());
     } catch (IOException e) {
@@ -166,7 +166,7 @@ public class VersionIndexTest {
   public void testAddLongLong() {
     String uuid1 = UUID.randomUUID().toString();
     try {
-      long address = idx.add(idx.add(uuid1, Page.LIVE), Page.WORK);
+      long address = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
       assertEquals(2, idx.getEntries());
       int size = 24 + uuid1.getBytes().length + 4 + versionsPerEntry  * 8;
       assertEquals(size, idx.size());
@@ -189,8 +189,8 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      idx.add(idx.add(uuid1, Page.LIVE), Page.WORK);
-      idx.add(uuid2, Page.LIVE);
+      idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      idx.add(uuid2, Resource.LIVE);
       int size = 24 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry  * 8);
       idx.delete(0);
       assertEquals(size, idx.size());
@@ -210,10 +210,10 @@ public class VersionIndexTest {
   public void testDeleteLongLong() {
     String uuid1 = UUID.randomUUID().toString();
     try {
-      long address = idx.add(idx.add(uuid1, Page.LIVE), Page.WORK);
-      idx.delete(address, Page.LIVE);
+      long address = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      idx.delete(address, Resource.LIVE);
       assertEquals(1, idx.getVersions(address).length);
-      assertEquals(Page.WORK, idx.getVersions(address)[0]);
+      assertEquals(Resource.WORK, idx.getVersions(address)[0]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -250,13 +250,13 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, Page.LIVE), Page.WORK);
-      long address2 = idx.add(uuid2, Page.LIVE);
+      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address2 = idx.add(uuid2, Resource.LIVE);
       assertEquals(2, idx.getVersions(address1).length);
-      assertEquals(Page.LIVE, idx.getVersions(address1)[0]);
-      assertEquals(Page.WORK, idx.getVersions(address1)[1]);
+      assertEquals(Resource.LIVE, idx.getVersions(address1)[0]);
+      assertEquals(Resource.WORK, idx.getVersions(address1)[1]);
       assertEquals(1, idx.getVersions(address2).length);
-      assertEquals(Page.LIVE, idx.getVersions(address2)[0]);
+      assertEquals(Resource.LIVE, idx.getVersions(address2)[0]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -273,13 +273,13 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, Page.LIVE), Page.WORK);
-      long address2 = idx.add(uuid2, Page.WORK);
-      assertTrue(idx.hasVersion(address1, Page.LIVE));
-      assertTrue(idx.hasVersion(address1, Page.WORK));
+      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address2 = idx.add(uuid2, Resource.WORK);
+      assertTrue(idx.hasVersion(address1, Resource.LIVE));
+      assertTrue(idx.hasVersion(address1, Resource.WORK));
       assertFalse(idx.hasVersion(address1, 27));
-      assertTrue(idx.hasVersion(address2, Page.WORK));
-      assertFalse(idx.hasVersion(address2, Page.LIVE));
+      assertTrue(idx.hasVersion(address2, Resource.WORK));
+      assertFalse(idx.hasVersion(address2, Resource.LIVE));
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -296,9 +296,9 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, Page.LIVE), Page.WORK);
-      long address2 = idx.add(uuid2, Page.WORK);
-      idx.delete(address2, Page.WORK);
+      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address2 = idx.add(uuid2, Resource.WORK);
+      idx.delete(address2, Resource.WORK);
       assertTrue(idx.hasVersions(address1));
       assertFalse(idx.hasVersions(address2));
     } catch (IOException e) {
