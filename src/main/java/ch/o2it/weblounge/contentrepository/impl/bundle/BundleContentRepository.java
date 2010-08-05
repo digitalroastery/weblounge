@@ -21,11 +21,11 @@
 package ch.o2it.weblounge.contentrepository.impl.bundle;
 
 import ch.o2it.weblounge.common.content.MalformedPageURIException;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageReader;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.page.PageUtils;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.page.PageUtils;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -157,18 +157,18 @@ public class BundleContentRepository extends AbstractContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.PageURI)
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public PageURI[] getVersions(PageURI uri) throws ContentRepositoryException {
+  public ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException {
     if (uri == null)
       throw new IllegalArgumentException("Page uri cannot be null");
     try {
-      List<PageURI> uris = new ArrayList<PageURI>();
+      List<ResourceURI> uris = new ArrayList<ResourceURI>();
       long[] versions = index.getRevisions(uri);
       for (long version : versions) {
-        uris.add(new PageURIImpl(uri, version));
+        uris.add(new ResourceURIImpl(uri, version));
       }
-      return uris.toArray(new PageURI[uris.size()]);
+      return uris.toArray(new ResourceURI[uris.size()]);
     } catch (IOException e) {
       throw new ContentRepositoryException(e);
     }
@@ -178,15 +178,15 @@ public class BundleContentRepository extends AbstractContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
    *      int, long)
    */
   @SuppressWarnings("unchecked")
-  public Iterator<PageURI> listPages(PageURI uri, int level, long version)
+  public Iterator<ResourceURI> listPages(ResourceURI uri, int level, long version)
       throws ContentRepositoryException {
     String entryPath = UrlSupport.concat(pagesPathPrefix, uri.getPath());
     int startLevel = StringUtils.countMatches(uri.getPath(), "/");
-    List<PageURI> pages = new ArrayList<PageURI>();
+    List<ResourceURI> pages = new ArrayList<ResourceURI>();
     Enumeration<URL> entries = bundle.findEntries(entryPath, "*.xml", level > 0);
     if (entries != null) {
       while (entries.hasMoreElements()) {
@@ -200,7 +200,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         if (version != -1 && v != version)
           continue;
         try {
-          PageURI pageURI = loadPageURI(site, entry);
+          ResourceURI pageURI = loadPageURI(site, entry);
           if (pageURI == null)
             throw new IllegalStateException("Page " + entry + " has no uri");
           pages.add(pageURI);
@@ -295,11 +295,11 @@ public class BundleContentRepository extends AbstractContentRepository {
       long time = System.currentTimeMillis();
       long pageCount = 0;
       long pageVersionCount = 0;
-      PageURI previousURI = null;
-      PageURI homeURI = new PageURIImpl(getSite(), "/");
-      Iterator<PageURI> pi = listPages(homeURI, Integer.MAX_VALUE, -1);
+      ResourceURI previousURI = null;
+      ResourceURI homeURI = new ResourceURIImpl(getSite(), "/");
+      Iterator<ResourceURI> pi = listPages(homeURI, Integer.MAX_VALUE, -1);
       while (pi.hasNext()) {
-        PageURI uri = pi.next();
+        ResourceURI uri = pi.next();
         
         // Load the page
         Page page = null;
@@ -350,7 +350,7 @@ public class BundleContentRepository extends AbstractContentRepository {
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
    */
   @Override
-  protected Page loadPage(PageURI uri) throws IOException {
+  protected Page loadPage(ResourceURI uri) throws IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path

@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
@@ -42,10 +42,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.user.User)
    */
-  public boolean delete(PageURI uri, User user) throws SecurityException,
+  public boolean delete(ResourceURI uri, User user) throws SecurityException,
       IOException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -56,10 +56,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.user.User, boolean)
    */
-  public boolean delete(PageURI uri, User user, boolean allRevisions)
+  public boolean delete(ResourceURI uri, User user, boolean allRevisions)
       throws SecurityException, IOException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -76,7 +76,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Remove all page revisions from the index
     for (long revision : revisions) {
-      PageURI u = new PageURIImpl(uri, revision);
+      ResourceURI u = new ResourceURIImpl(uri, revision);
       index.delete(u);
     }
 
@@ -86,11 +86,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#move(ch.o2it.weblounge.common.content.PageURI,
-   *      ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#move(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.user.User)
    */
-  public boolean move(PageURI uri, PageURI target, User user)
+  public boolean move(ResourceURI uri, ResourceURI target, User user)
       throws SecurityException, IOException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -104,10 +104,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.PageURI,
-   *      ch.o2it.weblounge.common.content.Page)
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.content.page.Page)
    */
-  public Page put(PageURI uri, Page page, User user) throws SecurityException,
+  public Page put(ResourceURI uri, Page page, User user) throws SecurityException,
       IOException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -128,10 +128,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#update(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#update(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.user.User)
    */
-  public boolean update(PageURI uri, Page page, User user)
+  public boolean update(ResourceURI uri, Page page, User user)
       throws SecurityException, IOException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -156,7 +156,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the page can't be written to the storage
    */
-  abstract protected void storePage(PageURI uri, Page page) throws IOException;
+  abstract protected void storePage(ResourceURI uri, Page page) throws IOException;
 
   /**
    * Updates an existing page in the repository storage.
@@ -168,7 +168,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the page can't be written to the storage
    */
-  abstract protected void updatePage(PageURI uri, Page page) throws IOException;
+  abstract protected void updatePage(ResourceURI uri, Page page) throws IOException;
 
   /**
    * Deletes the indicated revisions of page <code>uri</code> from the
@@ -180,6 +180,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @param revisions
    *          the revisions to remove
    */
-  protected abstract void deletePage(PageURI uri, long[] revisions) throws IOException;
+  protected abstract void deletePage(ResourceURI uri, long[] revisions) throws IOException;
 
 }

@@ -23,9 +23,9 @@ package ch.o2it.weblounge.contentrepository;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository;
 
@@ -60,13 +60,13 @@ public class BundleContentRepositoryTest {
   protected String subPath = "/sub";
 
   /** Page URI for the home page's live version */
-  protected PageURI liveHomeURI = null;
+  protected ResourceURI liveHomeURI = null;
 
   /** Page URI for the home page's work version */
-  protected PageURI workHomeURI = null;
+  protected ResourceURI workHomeURI = null;
 
   /** Page URI for the sub page's work version */
-  protected PageURI workSubURI = null;
+  protected ResourceURI workSubURI = null;
 
   /**
    * @throws java.lang.Exception
@@ -75,9 +75,9 @@ public class BundleContentRepositoryTest {
   public void setUp() throws Exception {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
-    liveHomeURI = new PageURIImpl(site, homePath, Page.LIVE);
-    workHomeURI = new PageURIImpl(site, homePath, Page.WORK);
-    workSubURI = new PageURIImpl(site, subPath, Page.WORK);
+    liveHomeURI = new ResourceURIImpl(site, homePath, Page.LIVE);
+    workHomeURI = new ResourceURIImpl(site, homePath, Page.WORK);
+    workSubURI = new ResourceURIImpl(site, subPath, Page.WORK);
     bundle = new StandaloneBundle(BundleContentRepositoryTest.class.getClassLoader());
     
     repository = new BundleContentRepository();
@@ -120,7 +120,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#exists(ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testExistsPageURI() {
@@ -133,7 +133,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#exists(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)}.
    */
   @Test
   public void testExistsPageURIUserPermission() {
@@ -149,7 +149,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#getPage(ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#getPage(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testGetPagePageURI() {
@@ -157,7 +157,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#getPage(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#getPage(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)}.
    */
   @Test
   public void testGetPagePageURIUserPermission() {
@@ -165,7 +165,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#getVersions(ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#getVersions(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testGetVersions() {
@@ -189,7 +189,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testListPagesPageURI() {
@@ -197,7 +197,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, long[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI, long[])}.
    */
   @Test
   public void testListPagesPageURILongArray() {
@@ -205,7 +205,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, int)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI, int)}.
    */
   @Test
   public void testListPagesPageURIInt() {
@@ -213,7 +213,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI, int, long[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI, int, long[])}.
    */
   @Test
   public void testListPagesPageURIIntLongArray() {

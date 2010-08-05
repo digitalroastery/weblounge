@@ -25,11 +25,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
@@ -89,10 +89,10 @@ public class ContentRepositoryIndexTest {
     EasyMock.expect(site.getTemplate("home")).andReturn(t);
     EasyMock.replay(site);
 
-    page = new PageImpl(new PageURIImpl(site, "/weblounge"));
+    page = new PageImpl(new ResourceURIImpl(site, "/weblounge"));
     page.setTemplate("home");
 
-    otherPage = new PageImpl(new PageURIImpl(site, "/weblounge/other"));
+    otherPage = new PageImpl(new ResourceURIImpl(site, "/weblounge/other"));
     otherPage.setTemplate("home");
   }
 
@@ -117,7 +117,7 @@ public class ContentRepositoryIndexTest {
   }
   
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#add(ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#add(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testAdd() {
@@ -131,7 +131,7 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#delete(ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#delete(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testDelete() {
@@ -146,13 +146,13 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getRevisions(ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getRevisions(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testGetRevisions() {
-    PageURI uri1 = new PageURIImpl(site, "/weblounge");
-    PageURI uri2Live = new PageURIImpl(site, "/etc/weblounge");
-    PageURI uri2Work = new PageURIImpl(site, "/etc/weblounge", Page.WORK);
+    ResourceURI uri1 = new ResourceURIImpl(site, "/weblounge");
+    ResourceURI uri2Live = new ResourceURIImpl(site, "/etc/weblounge");
+    ResourceURI uri2Work = new ResourceURIImpl(site, "/etc/weblounge", Page.WORK);
     try {
       idx.add(new PageImpl(uri1));
       idx.add(new PageImpl(uri2Live));
@@ -171,7 +171,7 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#move(ch.o2it.weblounge.common.content.PageURI, java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#move(ch.o2it.weblounge.common.content.ResourceURI, java.lang.String)}.
    */
   @Test
   public void testMove() {
@@ -180,7 +180,7 @@ public class ContentRepositoryIndexTest {
       String id = idx.add(page).getId();
       idx.move(page.getURI(), newPath);
       assertEquals(1, idx.size());
-      assertEquals(id, idx.toId(new PageURIImpl(site, newPath)));
+      assertEquals(id, idx.toId(new ResourceURIImpl(site, newPath)));
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -203,7 +203,7 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#exists(ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#exists(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testExists() {
@@ -211,11 +211,11 @@ public class ContentRepositoryIndexTest {
       assertFalse(idx.exists(page.getURI()));
       String id = idx.add(page).getId();
       assertTrue(idx.exists(page.getURI()));
-      assertTrue(idx.exists(new PageURIImpl(site, "/weblounge")));
-      assertFalse(idx.exists(new PageURIImpl(site, "/xxx")));
+      assertTrue(idx.exists(new ResourceURIImpl(site, "/weblounge")));
+      assertFalse(idx.exists(new ResourceURIImpl(site, "/xxx")));
       
       // This seems strange, but if there is an identifier, we take it
-      assertTrue(idx.exists(new PageURIImpl(site, "/xxx", id)));
+      assertTrue(idx.exists(new ResourceURIImpl(site, "/xxx", id)));
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -223,7 +223,7 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#list(ch.o2it.weblounge.common.content.PageURI, int)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#list(ch.o2it.weblounge.common.content.ResourceURI, int)}.
    */
   @Test
   @Ignore
@@ -232,7 +232,7 @@ public class ContentRepositoryIndexTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#list(ch.o2it.weblounge.common.content.PageURI, int, long)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#list(ch.o2it.weblounge.common.content.ResourceURI, int, long)}.
    */
   @Test
   @Ignore

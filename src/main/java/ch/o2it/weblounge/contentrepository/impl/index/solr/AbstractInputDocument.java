@@ -22,7 +22,7 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.LOCALIZED_FULLTEXT;
 
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;

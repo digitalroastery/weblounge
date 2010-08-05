@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.Page;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.contentrepository.impl.index.VersionIndex;
 
 import org.apache.commons.io.FileUtils;

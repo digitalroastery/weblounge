@@ -44,9 +44,9 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEM
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;

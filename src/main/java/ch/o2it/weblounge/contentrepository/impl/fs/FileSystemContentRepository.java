@@ -21,11 +21,11 @@
 package ch.o2it.weblounge.contentrepository.impl.fs;
 
 import ch.o2it.weblounge.common.content.MalformedPageURIException;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageReader;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.page.PageUtils;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.page.PageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -165,7 +165,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
           } else {
             try {
               Page page = loadPage(site, f.toURI().toURL());
-              PageURI uri = page.getURI();
+              ResourceURI uri = page.getURI();
               if (uri == null)
                 throw new IllegalStateException("Page " + f + " has no uri");
               index.add(page);
@@ -248,7 +248,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *          the page uri
    * @return the file
    */
-  protected File uriToFile(PageURI uri) throws IOException {
+  protected File uriToFile(ResourceURI uri) throws IOException {
     StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
     path.append("/").append(PAGES_PATH);
     String id = null;
@@ -275,7 +275,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *          the page uri
    * @return the parent directory
    */
-  protected File uriToDirectory(PageURI uri) throws IOException {
+  protected File uriToDirectory(ResourceURI uri) throws IOException {
     StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
     path.append("/").append(PAGES_PATH);
     String id = null;
@@ -339,7 +339,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
    */
   @Override
-  protected Page loadPage(PageURI uri) throws IOException {
+  protected Page loadPage(ResourceURI uri) throws IOException {
     File pageFile = uriToFile(uri);
     if (pageFile == null || !pageFile.isFile())
       return null;
@@ -364,14 +364,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deletePage(ch.o2it.weblounge.common.content.PageURI, long[])
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deletePage(ch.o2it.weblounge.common.content.ResourceURI, long[])
    */
   @Override
-  protected void deletePage(PageURI uri, long[] revisions) throws IOException {
+  protected void deletePage(ResourceURI uri, long[] revisions) throws IOException {
 
     // Remove the pages
     for (long r : revisions) {
-      PageURI pageURI = new PageURIImpl(uri, r);
+      ResourceURI pageURI = new ResourceURIImpl(uri, r);
       File f = uriToFile(uri);
       if (f.exists() && !f.delete()) {
         logger.warn("Tried to remove non-existing page '{}' from repository", uri);
@@ -399,10 +399,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storePage(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.content.Page)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storePage(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.page.Page)
    */
   @Override
-  protected void storePage(PageURI uri, Page page) throws IOException {
+  protected void storePage(ResourceURI uri, Page page) throws IOException {
     File pageUrl = uriToFile(uri);
     InputStream is = null;
     OutputStream os = null;
@@ -424,10 +424,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#updatePage(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.content.Page)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#updatePage(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.page.Page)
    */
   @Override
-  protected void updatePage(PageURI uri, Page page) throws IOException {
+  protected void updatePage(ResourceURI uri, Page page) throws IOException {
     storePage(uri, page);
   }
 

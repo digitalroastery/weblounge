@@ -23,7 +23,7 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
@@ -41,7 +41,7 @@ public class PageURIInputDocument extends AbstractInputDocument {
    * @param uri
    *          the page uri
    */
-  public PageURIInputDocument(PageURI uri) {
+  public PageURIInputDocument(ResourceURI uri) {
     init(uri);
   }
 
@@ -51,7 +51,7 @@ public class PageURIInputDocument extends AbstractInputDocument {
    * @param uri
    *          the page uri
    */
-  private void init(PageURI uri) {
+  private void init(ResourceURI uri) {
     setField(ID, uri.getId());
     setField(PATH, uri.getPath());
   }

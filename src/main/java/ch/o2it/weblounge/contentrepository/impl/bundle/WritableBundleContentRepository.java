@@ -20,11 +20,11 @@
 
 package ch.o2it.weblounge.contentrepository.impl.bundle;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageReader;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.page.PageUtils;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.page.PageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -108,8 +108,8 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     // what's there already.
     logger.info("Loading pages for '{}' from bundle {}", site, bundle);
     WebloungeUser user = site.getAdministrator();
-    for (Iterator<PageURI> pi = getURIsFromBundle(); pi.hasNext();) {
-      PageURI uri = pi.next();
+    for (Iterator<ResourceURI> pi = getURIsFromBundle(); pi.hasNext();) {
+      ResourceURI uri = pi.next();
       try {
         Page page = loadPageFromBundle(uri);
         put(uri, page, user);
@@ -132,11 +132,11 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
    *           if reading from the repository fails
    */
   @SuppressWarnings("unchecked")
-  protected Iterator<PageURI> getURIsFromBundle()
+  protected Iterator<ResourceURI> getURIsFromBundle()
       throws ContentRepositoryException {
-    PageURI homeURI = new PageURIImpl(getSite(), "/");
+    ResourceURI homeURI = new ResourceURIImpl(getSite(), "/");
     String entryPath = UrlSupport.concat(pagesPathPrefix, homeURI.getPath());
-    List<PageURI> pageURIs = new ArrayList<PageURI>();
+    List<ResourceURI> pageURIs = new ArrayList<ResourceURI>();
     Enumeration<URL> entries = bundle.findEntries(entryPath, "*.xml", true);
     if (entries != null) {
       while (entries.hasMoreElements()) {
@@ -144,7 +144,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
         String path = FilenameUtils.getPath(entry.getPath());
         path = path.substring(pagesPathPrefix.length() - 1);
         long v = PageUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
-        PageURI pageURI = new PageURIImpl(site, path, v);
+        ResourceURI pageURI = new ResourceURIImpl(site, path, v);
         pageURIs.add(pageURI);
         logger.trace("Found revision '{}' of page {}", v, entry);
       }
@@ -162,7 +162,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
    * @throws IOException
    *           if reading the page fails
    */
-  protected Page loadPageFromBundle(PageURI uri) throws IOException {
+  protected Page loadPageFromBundle(ResourceURI uri) throws IOException {
     String uriPath = uri.getPath();
 
     if (uriPath == null)

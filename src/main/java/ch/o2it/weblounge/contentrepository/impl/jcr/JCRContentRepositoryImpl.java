@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository.impl.jcr;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
@@ -36,10 +36,10 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deletePage(ch.o2it.weblounge.common.content.PageURI, long[])
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deletePage(ch.o2it.weblounge.common.content.ResourceURI, long[])
    */
   @Override
-  protected void deletePage(PageURI uri, long[] revisions) throws IOException {
+  protected void deletePage(ResourceURI uri, long[] revisions) throws IOException {
     // TODO Auto-generated method stub
     
   }
@@ -47,10 +47,10 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storePage(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.content.Page)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storePage(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.page.Page)
    */
   @Override
-  protected void storePage(PageURI uri, Page page) throws IOException {
+  protected void storePage(ResourceURI uri, Page page) throws IOException {
     // TODO Auto-generated method stub
     
   }
@@ -58,10 +58,10 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#updatePage(ch.o2it.weblounge.common.content.PageURI, ch.o2it.weblounge.common.content.Page)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#updatePage(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.page.Page)
    */
   @Override
-  protected void updatePage(PageURI uri, Page page) throws IOException {
+  protected void updatePage(ResourceURI uri, Page page) throws IOException {
     // TODO Auto-generated method stub
     
   }
@@ -80,9 +80,9 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage(ch.o2it.weblounge.common.content.PageURI)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  protected Page loadPage(PageURI uri) throws IOException {
+  protected Page loadPage(ResourceURI uri) throws IOException {
     // TODO Auto-generated method stub
     return null;
   }

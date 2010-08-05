@@ -20,11 +20,11 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.PageInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.PageURIInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrConnection;
@@ -155,7 +155,7 @@ public class SearchIndex {
    * @throws IOException
    *           if an errors occurs while talking to solr
    */
-  public boolean delete(PageURI uri) throws IOException {
+  public boolean delete(ResourceURI uri) throws IOException {
     logger.debug("Removing element with id '{}' from searching index", uri.getId());
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.deleteById(uri.getId());
@@ -236,10 +236,10 @@ public class SearchIndex {
    *          the new path
    * @return
    */
-  public boolean move(PageURI uri, String path) {
+  public boolean move(ResourceURI uri, String path) {
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
     try {
-      PageURIImpl newURI = new PageURIImpl(uri.getSite(), path, uri.getId());
+      ResourceURIImpl newURI = new ResourceURIImpl(uri.getSite(), path, uri.getId());
       update(new PageURIInputDocument(newURI));
       return true;
     } catch (Exception e) {

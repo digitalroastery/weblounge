@@ -196,6 +196,11 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.contentrepository</Bundle-SymbolicName>
             <Import-Package>
+              ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.common.content.image;version=${project.version},
+              ch.o2it.weblounge.common.impl.content;version=${project.version},
+              ch.o2it.weblounge.common.impl.content.image;version=${project.version},
+              ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.impl.util.doc;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
               ch.o2it.weblounge.kernel;version=${project.version},
@@ -245,6 +250,7 @@
             <Service-Component>
               OSGI-INF/contentrepository-service.xml,
               OSGI-INF/file-rest-service.xml,
+              OSGI-INF/image-rest-service.xml,
               OSGI-INF/page-rest-service.xml,
               OSGI-INF/search-rest-service.xml
             </Service-Component>

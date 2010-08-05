@@ -23,14 +23,14 @@ package ch.o2it.weblounge.contentrepository.index;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
-import ch.o2it.weblounge.common.impl.page.PageReader;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
@@ -112,7 +112,7 @@ public class SearchIndexTest {
     PageReader pageReader = new PageReader();
     pages = new Page[2];
     for (int i = 0; i < pages.length; i++) {
-      PageURI uri = new PageURIImpl(site, "/");
+      ResourceURI uri = new ResourceURIImpl(site, "/");
       InputStream is = this.getClass().getResourceAsStream("/page" + (i+1) + ".xml");
       pages[i] = pageReader.read(is, uri);
     }
@@ -378,7 +378,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#delete(ch.o2it.weblounge.common.content.PageURI)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#delete(ch.o2it.weblounge.common.content.ResourceURI)}
    * .
    */
   @Test
@@ -404,7 +404,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#add(ch.o2it.weblounge.common.content.Page)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#add(ch.o2it.weblounge.common.content.page.Page)}
    * .
    */
   @Test
@@ -421,7 +421,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#update(ch.o2it.weblounge.common.content.Page)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#update(ch.o2it.weblounge.common.content.page.Page)}
    * .
    */
   @Test
@@ -442,7 +442,7 @@ public class SearchIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#move(ch.o2it.weblounge.common.content.PageURI, java.lang.String)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#move(ch.o2it.weblounge.common.content.ResourceURI, java.lang.String)}
    * .
    */
   @Test

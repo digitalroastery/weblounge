@@ -20,11 +20,11 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,8 +199,8 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public synchronized PageURI add(Page page) throws IOException {
-    PageURI uri = page.getURI();
+  public synchronized ResourceURI add(Page page) throws IOException {
+    ResourceURI uri = page.getURI();
     if (uri.getPath() == null)
       throw new IllegalArgumentException("Uri must contain a path");
 
@@ -211,8 +211,8 @@ public class ContentRepositoryIndex {
       String id = uri.getId();
       if (id == null) {
         id = UUID.randomUUID().toString();
-        uri = new PageURIImpl(uri.getSite(), uri.getPath(), uri.getVersion(), id);
-        ((PageURIImpl)page.getURI()).setIdentifier(id);
+        uri = new ResourceURIImpl(uri.getSite(), uri.getPath(), uri.getVersion(), id);
+        ((ResourceURIImpl)page.getURI()).setIdentifier(id);
       }
       String path = uri.getPath();
       address = uriIdx.add(id, path);
@@ -249,7 +249,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public synchronized void delete(PageURI uri) throws IOException {
+  public synchronized void delete(ResourceURI uri) throws IOException {
     String id = uri.getId();
     String path = uri.getPath();
 
@@ -282,7 +282,7 @@ public class ContentRepositoryIndex {
    *          the page uri
    * @return the revisions
    */
-  public long[] getRevisions(PageURI uri) throws IOException {
+  public long[] getRevisions(ResourceURI uri) throws IOException {
     // Locate the entry in question
     long address = toURIEntry(uri);
 
@@ -305,7 +305,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public String toId(PageURI uri) throws IOException {
+  public String toId(ResourceURI uri) throws IOException {
     String path = uri.getPath();
     if (path == null)
       throw new IllegalArgumentException("PageURI must contain a path");
@@ -342,7 +342,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public String toPath(PageURI uri) throws IOException {
+  public String toPath(ResourceURI uri) throws IOException {
     String id = uri.getId();
     if (id == null)
       throw new IllegalArgumentException("PageURI must contain an identifier");
@@ -375,7 +375,7 @@ public class ContentRepositoryIndex {
    *           if updating the index fails
    */
   public synchronized void update(Page page) throws IOException {
-    PageURI uri = page.getURI();
+    ResourceURI uri = page.getURI();
     if (uri.getVersion() == Page.LIVE) {
       searchIdx.update(page);
     }
@@ -391,7 +391,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if updating the index fails
    */
-  public synchronized void move(PageURI uri, String path) throws IOException {
+  public synchronized void move(ResourceURI uri, String path) throws IOException {
     String oldPath = uri.getPath();
 
     // Locate the entry in question
@@ -402,7 +402,7 @@ public class ContentRepositoryIndex {
       throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
 
     // Do it this way to make sure we have identical path trimming
-    uri = new PageURIImpl(uri.getSite(), path, uri.getVersion(), uri.getId());
+    uri = new ResourceURIImpl(uri.getSite(), path, uri.getVersion(), uri.getId());
 
     pathIdx.delete(oldPath, address);
     pathIdx.add(uri.getPath(), address);
@@ -433,7 +433,7 @@ public class ContentRepositoryIndex {
    *          the uri
    * @return <code>true</code> if the uri exists
    */
-  public boolean exists(PageURI uri) throws IOException {
+  public boolean exists(ResourceURI uri) throws IOException {
     long address = toURIEntry(uri);
     if (address == -1)
       return false;
@@ -452,7 +452,7 @@ public class ContentRepositoryIndex {
    *          the maximum nesting, <code>0</code> to return direct children only
    * @return an iteration of the resulting uris
    */
-  public Iterator<PageURI> list(PageURI uri, int level) {
+  public Iterator<ResourceURI> list(ResourceURI uri, int level) {
     return list(uri, level, -1);
   }
 
@@ -470,7 +470,7 @@ public class ContentRepositoryIndex {
    *          the requested version, <code>-1</code> for any version
    * @return an iteration of the resulting uris
    */
-  public Iterator<PageURI> list(PageURI uri, int level, long version) {
+  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version) {
     throw new UnsupportedOperationException("Not yet implemented");
   }
 
@@ -508,7 +508,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  protected long toURIEntry(PageURI uri) throws IOException {
+  protected long toURIEntry(ResourceURI uri) throws IOException {
     String id = uri.getId();
     String path = uri.getPath();
 

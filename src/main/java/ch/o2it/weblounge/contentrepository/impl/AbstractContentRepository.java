@@ -20,13 +20,13 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.impl.page.PageReader;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.page.PageUtils;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.page.PageUtils;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
@@ -136,9 +136,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.PageURI)
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public boolean exists(PageURI uri) throws ContentRepositoryException {
+  public boolean exists(ResourceURI uri) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
     try {
@@ -151,11 +151,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.user.User,
    *      ch.o2it.weblounge.common.security.Permission)
    */
-  public boolean exists(PageURI uri, User user, Permission p)
+  public boolean exists(ResourceURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -188,9 +188,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPage(ch.o2it.weblounge.common.content.PageURI)
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPage(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public Page getPage(PageURI uri) throws ContentRepositoryException {
+  public Page getPage(ResourceURI uri) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
     try {
@@ -203,11 +203,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPage(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPage(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.user.User,
    *      ch.o2it.weblounge.common.security.Permission)
    */
-  public Page getPage(PageURI uri, User user, Permission p)
+  public Page getPage(ResourceURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -222,18 +222,18 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.PageURI)
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public PageURI[] getVersions(PageURI uri) throws ContentRepositoryException {
+  public ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
     try {
       long[] revisions = index.getRevisions(uri);
-      PageURI[] uris = new PageURI[revisions.length];
+      ResourceURI[] uris = new ResourceURI[revisions.length];
       int i = 0;
       for (long r : revisions) {
-        uris[i++] = new PageURIImpl(uri, r);
+        uris[i++] = new ResourceURIImpl(uri, r);
       }
       return uris;
     } catch (IOException e) {
@@ -244,9 +244,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI)
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public Iterator<PageURI> listPages(PageURI uri)
+  public Iterator<ResourceURI> listPages(ResourceURI uri)
       throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -256,10 +256,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
    *      long[])
    */
-  public Iterator<PageURI> listPages(PageURI uri, long version)
+  public Iterator<ResourceURI> listPages(ResourceURI uri, long version)
       throws ContentRepositoryException {
     return listPages(uri, Integer.MAX_VALUE, version);
   }
@@ -267,10 +267,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
    *      int)
    */
-  public Iterator<PageURI> listPages(PageURI uri, int level)
+  public Iterator<ResourceURI> listPages(ResourceURI uri, int level)
       throws ContentRepositoryException {
     return listPages(uri, level, -1);
   }
@@ -280,10 +280,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * This implementation uses the index to get the list.
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.PageURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
    *      int, long)
    */
-  public Iterator<PageURI> listPages(PageURI uri, int level, long version)
+  public Iterator<ResourceURI> listPages(ResourceURI uri, int level, long version)
       throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -408,7 +408,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @throws IOException
    *           if the page could not be loaded
    */
-  protected abstract Page loadPage(PageURI uri) throws IOException;
+  protected abstract Page loadPage(ResourceURI uri) throws IOException;
 
   /**
    * Loads the repository index. Depending on the concrete implementation, the
@@ -467,7 +467,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     BufferedInputStream is = new BufferedInputStream(url.openStream());
     try {
       PageReader reader = new PageReader();
-      return reader.read(is, new PageURIImpl(site));
+      return reader.read(is, new ResourceURIImpl(site));
     } catch (SAXException e) {
       throw new IOException("Error reading page from " + url);
     } catch (ParserConfigurationException e) {
@@ -484,7 +484,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    *          location of the page file
    * @return the page uri
    */
-  protected PageURI loadPageURI(Site site, URL url) throws IOException {
+  protected ResourceURI loadPageURI(Site site, URL url) throws IOException {
     BufferedInputStream is = new BufferedInputStream(url.openStream());
     InputStreamReader reader = new InputStreamReader(is);
     CharBuffer buf = CharBuffer.allocate(1024);
@@ -494,7 +494,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     Matcher m = pageHeaderRegex.matcher(s);
     if (m.matches()) {
       long version = PageUtils.getVersion(m.group(3));
-      return new PageURIImpl(site, m.group(2), version, m.group(1));
+      return new ResourceURIImpl(site, m.group(2), version, m.group(1));
     }
     return null;
   }

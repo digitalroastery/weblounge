@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageImpl;
-import ch.o2it.weblounge.common.impl.page.PageReader;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
@@ -151,7 +151,7 @@ public class PageEndpoint {
     Site site = getSite(request);
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    PageURI pageURI = new PageURIImpl(site, null, pageId);
+    ResourceURI pageURI = new ResourceURIImpl(site, null, pageId);
 
     // Does the page exist?
     try {
@@ -229,17 +229,17 @@ public class PageEndpoint {
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Create the page uri
-    PageURIImpl pageURI = null;
+    ResourceURIImpl pageURI = null;
     String uuid = UUID.randomUUID().toString();
     if (!StringUtils.isBlank(path)) {
       try {
         if (!path.startsWith("/"))
           path = "/" + path;
         WebUrl url = new WebUrlImpl(site, path);
-        pageURI = new PageURIImpl(site, url.getPath(), uuid);
+        pageURI = new ResourceURIImpl(site, url.getPath(), uuid);
 
         // Make sure the page doesn't exist
-        if (contentRepository.exists(new PageURIImpl(site, url.getPath()))) {
+        if (contentRepository.exists(new ResourceURIImpl(site, url.getPath()))) {
           logger.warn("Tried to create already existing page {} in site '{}'", pageURI, site);
           throw new WebApplicationException(Status.CONFLICT);
         }
@@ -251,7 +251,7 @@ public class PageEndpoint {
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
     } else {
-      pageURI = new PageURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
+      pageURI = new ResourceURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
     }
 
     // Parse the page and store it
@@ -322,7 +322,7 @@ public class PageEndpoint {
 
     Site site = getSite(request);
     User user = null; // TODO: Extract user
-    PageURI pageURI = new PageURIImpl(site, null, pageId);
+    ResourceURI pageURI = new ResourceURIImpl(site, null, pageId);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Make sure the page doesn't exist
@@ -577,7 +577,7 @@ public class PageEndpoint {
 
     // Load the page and return it
     try {
-      PageURI pageURI = new PageURIImpl(site, null, pageId);
+      ResourceURI pageURI = new ResourceURIImpl(site, null, pageId);
       Page page = contentRepository.getPage(pageURI);
       return page;
     } catch (ContentRepositoryException e) {
