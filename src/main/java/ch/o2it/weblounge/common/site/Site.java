@@ -21,8 +21,8 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.Customizable;
-import ch.o2it.weblounge.common.content.PageLayout;
-import ch.o2it.weblounge.common.content.PageTemplate;
+import ch.o2it.weblounge.common.content.page.PageLayout;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.security.AuthenticationModule;

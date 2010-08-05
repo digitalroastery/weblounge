@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.Url;
 
@@ -27,7 +28,7 @@ import ch.o2it.weblounge.common.url.Url;
  * A page uri defines the location of a page within a <code>Site</code>. In
  * addition, it provides a unique identifier and a page version.
  */
-public interface PageURI extends Url {
+public interface ResourceURI extends Url {
 
   /**
    * Returns the page identifier.
@@ -60,7 +61,7 @@ public interface PageURI extends Url {
    * 
    * @return the page uri
    */
-  PageURI getVersion(long version);
+  ResourceURI getVersion(long version);
 
   /**
    * Returns the associated site.
@@ -79,6 +80,6 @@ public interface PageURI extends Url {
    * 
    * @return the parent uri
    */
-  PageURI getParentURI();
+  ResourceURI getParentURI();
 
 }

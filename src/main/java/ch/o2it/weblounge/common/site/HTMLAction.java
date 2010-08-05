@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.common.site;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.Renderer;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -118,7 +118,7 @@ public interface HTMLAction extends Action {
    * @return either <code>EVAL_HEADER</code> or <code>SKIP_HEADER</code>
    *         depending on whether the action wants to render the header on its
    *         own or have the template do the rendering.
-   * @see ch.o2it.weblounge.common.content.HTMLHeadElement
+   * @see ch.o2it.weblounge.common.content.page.HTMLHeadElement
    */
   int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException;
@@ -211,7 +211,7 @@ public interface HTMLAction extends Action {
    * @param uri
    *          the page uri
    */
-  void setPageURI(PageURI uri);
+  void setPageURI(ResourceURI uri);
 
   /**
    * Returns the uri of the page that is used to deliver the initial content for
@@ -219,7 +219,7 @@ public interface HTMLAction extends Action {
    * 
    * @return the page uri
    */
-  PageURI getPageURI();
+  ResourceURI getPageURI();
 
   /**
    * Sets the page that is used to render the action. This method is called

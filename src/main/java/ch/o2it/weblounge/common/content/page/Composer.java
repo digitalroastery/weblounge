@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content;
+package ch.o2it.weblounge.common.content.page;
 
 /**
  * The composer describes a content area on a page template, that can take a

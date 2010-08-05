@@ -18,24 +18,19 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.resource;
+package ch.o2it.weblounge.common.content.page;
 
 /**
- * Interface for a class that is able to filter a list of repository
- * collections.
+ * This interface describes elements that are included in the &lt;head&gt;
+ * section of an <code>HTML</code> page, namely &lt;link&gt; and &lt;script&gt;.
  */
-public interface CollectionFilter {
+public interface HTMLHeadElement {
 
   /**
-   * Whether to accept the collection, i.e. whether the collection should be
-   * included in the filtered collection list.
+   * Returns the xml representation of this script.
    * 
-   * @param collection
-   *          the collection to test
-   * @return <code>true</code> if the collection passes the filter <code>false
-	 * </code>
-   *         otherwise.
+   * @return the xml representation
    */
-  boolean accept(Collection collection);
+  String toXml();
 
 }

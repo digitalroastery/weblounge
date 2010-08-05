@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 

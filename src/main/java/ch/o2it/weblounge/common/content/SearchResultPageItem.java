@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.content.page.Page;
+
 /**
  * This extended <code>SearchResultItem</code> interface is intended for pages
  * that were found in the weblounge search index.
@@ -31,7 +33,7 @@ public interface SearchResultPageItem extends SearchResultItem {
    * 
    * @return the page uri
    */
-  PageURI getPageURI();
+  ResourceURI getPageURI();
 
   /**
    * Returns the page.

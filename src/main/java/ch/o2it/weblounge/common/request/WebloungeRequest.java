@@ -106,8 +106,8 @@ public interface WebloungeRequest extends HttpServletRequest {
   /**
    * Returns the requested version, which is one of
    * <ul>
-   * <li>{@link ch.o2it.weblounge.common.content.Page#LIVE}</li>
-   * <li>{@link ch.o2it.weblounge.common.content.Page#WORK}</li>
+   * <li>{@link ch.o2it.weblounge.common.content.page.Page#LIVE}</li>
+   * <li>{@link ch.o2it.weblounge.common.content.page.Page#WORK}</li>
    * </ul>
    * 
    * @return the requested version

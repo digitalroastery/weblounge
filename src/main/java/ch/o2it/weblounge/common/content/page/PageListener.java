@@ -18,8 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content;
+package ch.o2it.weblounge.common.content.page;
 
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.user.User;
 
 /**
@@ -38,7 +39,7 @@ public interface PageListener {
    * @param user
    *          the creating user
    */
-  void pageCreated(PageURI uri, User user);
+  void pageCreated(ResourceURI uri, User user);
 
   /**
    * This method is called if the page at location <code>url</code> has been
@@ -49,7 +50,7 @@ public interface PageListener {
    * @param user
    *          the removing user
    */
-  void pageRemoved(PageURI uri, User user);
+  void pageRemoved(ResourceURI uri, User user);
 
   /**
    * This method is called if the page at location <code>from</code> has been
@@ -62,7 +63,7 @@ public interface PageListener {
    * @param user
    *          the user moving the page
    */
-  void pageMoved(PageURI from, PageURI to, User user);
+  void pageMoved(ResourceURI from, ResourceURI to, User user);
 
   /**
    * This method is called if the page at location <code>url</code> has been
@@ -73,7 +74,7 @@ public interface PageListener {
    * @param user
    *          the user publishing the page
    */
-  void pagePublished(PageURI uri, User user);
+  void pagePublished(ResourceURI uri, User user);
 
   /**
    * This method is called if the page at location <code>url</code> has been
@@ -84,7 +85,7 @@ public interface PageListener {
    * @param user
    *          the user that unpublished the page
    */
-  void pageUnpublished(PageURI uri, User user);
+  void pageUnpublished(ResourceURI uri, User user);
 
   /**
    * This method is called if the page at location <code>url</code> has been
@@ -95,7 +96,7 @@ public interface PageListener {
    * @param user
    *          the user locking the page
    */
-  void pageLocked(PageURI uri, User user);
+  void pageLocked(ResourceURI uri, User user);
 
   /**
    * This method is called if the page at location <code>url</code> has been
@@ -106,6 +107,6 @@ public interface PageListener {
    * @param user
    *          the user releasing the page lock
    */
-  void pageUnlocked(PageURI uri, User user);
+  void pageUnlocked(ResourceURI uri, User user);
 
 }

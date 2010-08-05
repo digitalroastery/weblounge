@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2010 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -18,33 +18,43 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.resource;
+package ch.o2it.weblounge.common.content.image;
+
+import ch.o2it.weblounge.common.content.resource.File;
 
 /**
- * This interface defines fields and methods for a repository collection or item
- * transaction.
+ * Object representation of an image resource.
  */
-public interface RepositoryTransaction {
+public interface Image extends File {
 
   /**
-   * Causes this transaction to be stopped and rolled back.
+   * Sets the image's width in pixels.
    * 
-   * <code>RepositoryTransactionListener</code>s can call this method to cancel
-   * an ongoing transaction.
-   * 
-   * @param listener
-   *          the aborting <code>RepositoryTransactionListener</code>
-   * @param reason
-   *          ideally, this is the i18n - key to the error message, but a string
-   *          will also be fine
+   * @param width
+   *          the image width
    */
-  void abort(RepositoryTransactionListener listener, String reason);
+  void setWidth(int width);
 
   /**
-   * Returns the transaction subject.
+   * Returns the image width in pixels.
    * 
-   *@return uri of the repository item that is affected by this transaction
+   * @return the image width
    */
-  RepositoryURI getURI();
+  int getWidth();
+
+  /**
+   * Sets the image's height in pixels.
+   * 
+   * @param height
+   *          the image height
+   */
+  void setHeight(int height);
+
+  /**
+   * Returns the image height in pixels.
+   * 
+   * @return the image height
+   */
+  int getHeight();
 
 }

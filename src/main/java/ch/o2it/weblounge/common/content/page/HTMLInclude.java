@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2010 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -18,31 +18,16 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.resource;
+package ch.o2it.weblounge.common.content.page;
 
 /**
- * TODO: Comment RepositoryIterator
+ * Base interface for <code>HTMLHeadElement</code> representing includes into
+ * the page, such as the <code>&lt;link&gt;</code> or
+ * <code>&lt;script&gt;</code> element.
  */
-public interface RepositoryIterator {
+public interface HTMLInclude extends HTMLHeadElement {
 
-  /**
-   * Callback for the visitor. After calling <code>accept</code> on the visited
-   * <code>RepositoryCollection</code>, the collection will call this method, so
-   * that the iterator may perform some operations on it.
-   * 
-   * @param collection
-   *          the visited repository collection
-   */
-  void visit(Collection collection);
-
-  /**
-   * Callback for the visitor. After calling <code>accept</code> on the visited
-   * <code>RepositoryItem</code>, the item will call this method, so that the
-   * iterator may perform some operations on it.
-   * 
-   * @param item
-   *          the visited repository item
-   */
-  void visit(Resource item);
-
+  /** Returns the <code>href</code> attribute */
+  String getHref();
+  
 }

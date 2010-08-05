@@ -43,9 +43,11 @@
             <Export-Package>
               ch.o2it.weblounge.common;version=${project.version},
               ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.common.content.image;version=${project.version},
+              ch.o2it.weblounge.common.content.page;version=${project.version},
+              ch.o2it.weblounge.common.content.resource;version=${project.version},
               ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.request;version=${project.version},
-              ch.o2it.weblounge.common.resource;version=${project.version},
               ch.o2it.weblounge.common.scheduler;version=${project.version},
               ch.o2it.weblounge.common.security;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},

@@ -106,8 +106,8 @@ public interface WebUrl extends Url {
   /**
    * Returns the version of this url. Possible versions are:
    * <ul>
-   * <li>{@link ch.o2it.weblounge.common.content.Page#LIVE}</li>
-   * <li>{@link ch.o2it.weblounge.common.content.Page#WORK}</li>
+   * <li>{@link ch.o2it.weblounge.common.content.page.Page#LIVE}</li>
+   * <li>{@link ch.o2it.weblounge.common.content.page.Page#WORK}</li>
    * </ul>
    * 
    * @return the url version

@@ -18,8 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content;
+package ch.o2it.weblounge.common.content.page;
 
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.site.Site;
 
 /**
@@ -41,14 +42,14 @@ public interface PageletURI extends Comparable<PageletURI> {
    * @param uri
    *          the page uri
    */
-  void setURI(PageURI uri);
+  void setURI(ResourceURI uri);
 
   /**
    * Returns the page where this pagelet is situated.
    * 
    * @return the pagelet uri
    */
-  PageURI getPageURI();
+  ResourceURI getPageURI();
 
   /**
    * Sets the composer containing the pagelet.

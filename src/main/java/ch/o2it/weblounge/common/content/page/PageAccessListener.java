@@ -18,8 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content;
+package ch.o2it.weblounge.common.content.page;
 
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.user.User;
 
@@ -42,6 +43,6 @@ public interface PageAccessListener {
    * @param version
    *          the requested version
    */
-  void access(PageURI uri, User user, Language language, String version);
+  void access(ResourceURI uri, User user, Language language, String version);
 
 }
