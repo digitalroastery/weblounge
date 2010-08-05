@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.user.User;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           if adding fails due to a database error
    * @return the page with the given uri
    */
-  Page put(PageURI uri, Page page, User user) throws SecurityException, IOException;
+  Page put(ResourceURI uri, Page page, User user) throws SecurityException, IOException;
 
   /**
    * Updates the given page. This method writes the page header to the database
@@ -66,7 +66,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if updating fails due to a database error
    */
-  boolean update(PageURI uri, Page page, User user) throws SecurityException, IOException;
+  boolean update(ResourceURI uri, Page page, User user) throws SecurityException, IOException;
 
   /**
    * This method moves the given page to the new uri.
@@ -83,7 +83,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if moving fails due to a database error
    */
-  boolean move(PageURI uri, PageURI target, User user)
+  boolean move(ResourceURI uri, ResourceURI target, User user)
       throws SecurityException, IOException;
 
   /**
@@ -100,7 +100,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if removal fails due to a database error
    */
-  boolean delete(PageURI uri, User user) throws SecurityException, IOException;
+  boolean delete(ResourceURI uri, User user) throws SecurityException, IOException;
 
   /**
    * This method removes the given page in the specified version from the
@@ -120,7 +120,7 @@ public interface WritableContentRepository extends ContentRepository {
    * @throws IOException
    *           if removal fails due to a database error
    */
-  boolean delete(PageURI uri, User user, boolean allRevisions)
+  boolean delete(ResourceURI uri, User user, boolean allRevisions)
       throws SecurityException, IOException;
 
   /**

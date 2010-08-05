@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository;
 
-import ch.o2it.weblounge.common.content.PageListener;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.PageListener;
 import ch.o2it.weblounge.common.user.User;
 
 import java.io.IOException;
@@ -67,7 +67,7 @@ public interface PageManager {
    * @throws IOException
    *           if locking fails due to a database error
    */
-  boolean lock(PageURI uri, User user) throws SecurityException, IOException;
+  boolean lock(ResourceURI uri, User user) throws SecurityException, IOException;
 
   /**
    * Unlocks the given page if it has been locked by this user and returns
@@ -79,7 +79,7 @@ public interface PageManager {
    * @throws IOException
    *           if unlocking fails due to a database error
    */
-  boolean unlock(PageURI uri, User user) throws SecurityException, IOException;
+  boolean unlock(ResourceURI uri, User user) throws SecurityException, IOException;
 
   /**
    * This method copies the work page to the live version if the user has
@@ -94,7 +94,7 @@ public interface PageManager {
    * @throws IOException
    *           if publishing fails due to a database error
    */
-  boolean publish(PageURI uri, User user) throws SecurityException, IOException;
+  boolean publish(ResourceURI uri, User user) throws SecurityException, IOException;
 
   /**
    * This method removes the current live version from the database.
@@ -108,7 +108,7 @@ public interface PageManager {
    * @throws IOException
    *           if unpublishing fails due to a database error
    */
-  boolean unpublish(PageURI uri, User user) throws SecurityException,
+  boolean unpublish(ResourceURI uri, User user) throws SecurityException,
       IOException;
 
 }

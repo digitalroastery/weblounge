@@ -38,8 +38,9 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.contentrepository-api</Bundle-SymbolicName>
             <Import-Package>
-              ch.o2it.weblounge.common.language;version=${project.version},
+              ch.o2it.weblounge.common.content.page;version=${project.version},
               ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.security;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.user;version=${project.version},

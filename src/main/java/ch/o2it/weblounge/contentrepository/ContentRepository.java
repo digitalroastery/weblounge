@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.contentrepository;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.user.User;
 
@@ -107,7 +107,7 @@ public interface ContentRepository {
    *           if reading the page from the repository fails
    * @return the page
    */
-  Page getPage(PageURI uri) throws ContentRepositoryException;
+  Page getPage(ResourceURI uri) throws ContentRepositoryException;
 
   /**
    * Returns the requested page or <code>null</code> if the page is not
@@ -126,7 +126,7 @@ public interface ContentRepository {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    */
-  Page getPage(PageURI uri, User user, Permission p)
+  Page getPage(ResourceURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException;
 
   /**
@@ -138,7 +138,7 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if looking up the page from the repository fails
    */
-  boolean exists(PageURI uri) throws ContentRepositoryException;
+  boolean exists(ResourceURI uri) throws ContentRepositoryException;
 
   /**
    * Returns <code>true</code> if the requested page exists for the given user
@@ -157,7 +157,7 @@ public interface ContentRepository {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    */
-  boolean exists(PageURI uri, User user, Permission p)
+  boolean exists(ResourceURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException;
 
   /**
@@ -169,7 +169,7 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if looking up the page versions from the repository fails
    */
-  PageURI[] getVersions(PageURI uri) throws ContentRepositoryException;
+  ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException;
 
   /**
    * Returns an iteration of all pages with their uri containing
@@ -181,7 +181,7 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if listing the repository fails
    */
-  Iterator<PageURI> listPages(PageURI uri) throws ContentRepositoryException;
+  Iterator<ResourceURI> listPages(ResourceURI uri) throws ContentRepositoryException;
 
   /**
    * Returns an iteration of all pages with version <code>version</code> and
@@ -198,7 +198,7 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if listing the repository fails
    */
-  Iterator<PageURI> listPages(PageURI uri, long version)
+  Iterator<ResourceURI> listPages(ResourceURI uri, long version)
       throws ContentRepositoryException;
 
   /**
@@ -216,7 +216,7 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if listing the repository fails
    */
-  Iterator<PageURI> listPages(PageURI uri, int level)
+  Iterator<ResourceURI> listPages(ResourceURI uri, int level)
       throws ContentRepositoryException;
 
   /**
@@ -239,7 +239,7 @@ public interface ContentRepository {
    * @throws ContentRepositoryException
    *           if listing the repository fails
    */
-  Iterator<PageURI> listPages(PageURI uri, int level, long versions)
+  Iterator<ResourceURI> listPages(ResourceURI uri, int level, long versions)
       throws ContentRepositoryException;
 
   /**
