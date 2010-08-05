@@ -28,8 +28,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.site.Site;
@@ -139,7 +139,7 @@ public class PageURITest {
    */
   @Test
   public void testGetVersion() {
-    assertEquals(Page.LIVE, simpleURI.getVersion());
+    assertEquals(Resource.LIVE, simpleURI.getVersion());
     assertEquals(defaultRandomVersion, versionedURI.getVersion());
     assertEquals(defaultRandomVersion, identifyableVersionedURI.getVersion());
   }

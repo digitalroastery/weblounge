@@ -26,8 +26,8 @@ import static org.junit.Assert.assertNotNull;
 
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.page.Composer;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
@@ -101,7 +101,7 @@ public class PagePreviewReaderTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);
     EasyMock.replay(site);
-    pageURI = new ResourceURIImpl(site, "/test", Page.LIVE);
+    pageURI = new ResourceURIImpl(site, "/test", Resource.LIVE);
   }
 
   /**

@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
@@ -182,7 +183,7 @@ public class PageImplTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));    
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
     EasyMock.replay(site);
-    pageURI = new ResourceURIImpl(site, "/test", Page.LIVE);
+    pageURI = new ResourceURIImpl(site, "/test", Resource.LIVE);
   }
 
   /**
@@ -510,7 +511,7 @@ public class PageImplTest {
   public void testEqualsObject() {
     assertTrue(page.equals(page));
     assertTrue(page.equals(new PageImpl(pageURI)));
-    assertFalse(page.equals(new PageImpl(new ResourceURIImpl(site, "/test/2", Page.LIVE))));
+    assertFalse(page.equals(new PageImpl(new ResourceURIImpl(site, "/test/2", Resource.LIVE))));
   }
 
   /**
@@ -677,7 +678,7 @@ public class PageImplTest {
    */
   @Test
   public void testCompareTo() {
-    Page p2 = new PageImpl(new ResourceURIImpl(site, "/test/2", Page.LIVE));
+    Page p2 = new PageImpl(new ResourceURIImpl(site, "/test/2", Resource.LIVE));
     p2.setTitle(germanTitle, german);
     assertEquals(0, page.compareTo(p2, german));
   }
