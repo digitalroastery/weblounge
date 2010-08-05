@@ -23,6 +23,7 @@ package ch.o2it.weblounge.dispatcher.impl.handler;
 import static ch.o2it.weblounge.common.request.RequestFlavor.HTML;
 import static ch.o2it.weblounge.common.request.RequestFlavor.ANY;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.page.Page;
@@ -116,7 +117,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
     // Check if the page is already part of the cache. If so, our task is
     // already done!
-    if (request.getVersion() == Page.LIVE && action == null) {
+    if (request.getVersion() == Resource.LIVE && action == null) {
       long validTime = Renderer.DEFAULT_VALID_TIME;
       long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
 
@@ -134,7 +135,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       // handle HEAD requests
       Http11Utils.startHeadResponse(response);
       processingMode = Mode.Head;
-    } else if (request.getVersion() == Page.WORK) {
+    } else if (request.getVersion() == Resource.WORK) {
       response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
       response.setHeader("Pragma", "no-cache");
       response.setHeader("Expires", "0");

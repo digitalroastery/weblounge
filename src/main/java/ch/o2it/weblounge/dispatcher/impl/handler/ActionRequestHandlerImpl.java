@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.page.Composer;
@@ -114,7 +115,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     StringBuffer flavors = new StringBuffer();
     synchronized (urlCache) {
       for (RequestFlavor flavor : action.getFlavors()) {
-        WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Page.LIVE, flavor);
+        WebUrl actionUrl = new WebUrlImpl(action.getSite(), action.getPath(), Resource.LIVE, flavor);
         String normalizedUrl = actionUrl.normalize(true, false, false, true);
         urlCache.put(normalizedUrl, pool);
         if (flavors.length() > 0)
@@ -202,7 +203,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
       // Check if the page is already part of the cache. If so, our task is
       // already done!
-      if (request.getVersion() == Page.LIVE) {
+      if (request.getVersion() == Resource.LIVE) {
         long validTime = Renderer.DEFAULT_VALID_TIME;
         long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
 
@@ -220,7 +221,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         // handle HEAD requests
         Http11Utils.startHeadResponse(response);
         processingMode = Mode.Head;
-      } else if (request.getVersion() == Page.WORK) {
+      } else if (request.getVersion() == Resource.WORK) {
         response.setHeader("Expires", "0");
         response.setHeader("Last-Modified", WebloungeDateFormat.formatStatic(new Date()));
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
