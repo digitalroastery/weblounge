@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.Pagelet;
-import ch.o2it.weblounge.common.content.PageletURI;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.CreationContext;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.impl.content.PublishingContext;
@@ -152,7 +152,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getModule()
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getModule()
    */
   public String getModule() {
     return moduleId;
@@ -161,7 +161,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getIdentifier()
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getIdentifier()
    */
   public String getIdentifier() {
     return pageletId;
@@ -170,7 +170,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getPropertyNames()
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getPropertyNames()
    */
   public String[] getPropertyNames() {
     return properties.keySet().toArray(new String[properties.size()]);
@@ -179,7 +179,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getProperty(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getProperty(java.lang.String)
    */
   public String getProperty(String key) {
     String[] values = properties.get(key);
@@ -191,7 +191,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#isMultiValueProperty(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#isMultiValueProperty(java.lang.String)
    */
   public boolean isMultiValueProperty(String key) {
     String[] values = properties.get(key);
@@ -201,7 +201,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueProperty(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getMultiValueProperty(java.lang.String)
    */
   public String[] getMultiValueProperty(String key) {
     String[] values = properties.get(key);
@@ -213,7 +213,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#setProperty(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setProperty(java.lang.String,
    *      java.lang.String)
    */
   public void setProperty(String key, String value) {
@@ -335,7 +335,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#setURI(ch.o2it.weblounge.common.content.PageletURI)
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setURI(ch.o2it.weblounge.common.content.page.PageletURI)
    */
   public void setURI(PageletURI uri) {
     this.uri = uri;
@@ -344,7 +344,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getURI()
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getURI()
    */
   public PageletURI getURI() {
     return uri;
@@ -353,7 +353,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setCreated(ch.o2it.weblounge.common.user.User,
    *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
@@ -417,7 +417,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#setPublished(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setPublished(ch.o2it.weblounge.common.user.User,
    *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
@@ -499,7 +499,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setModified(ch.o2it.weblounge.common.user.User,
    *      java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
@@ -509,7 +509,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getContentNames(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getContentNames(ch.o2it.weblounge.common.language.Language)
    */
   public String[] getContentNames(Language language) {
     Map<String, String[]> languageContent = content.get(language, true);
@@ -521,7 +521,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#isMultiValueContent(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#isMultiValueContent(java.lang.String)
    */
   public boolean isMultiValueContent(String name) {
     Map<String, String[]> languageContent = content.get();
@@ -534,7 +534,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getContent(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language, boolean)
    */
   public String getContent(String name, Language language, boolean force) {
@@ -548,7 +548,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getContent(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public String getContent(String name, Language language) {
@@ -558,7 +558,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getContent(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getContent(java.lang.String)
    */
   public String getContent(String name) {
     return getContent(name, getLanguage(), false);
@@ -567,7 +567,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueContent(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language, boolean)
    */
   public String[] getMultiValueContent(String name, Language language,
@@ -583,7 +583,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueContent(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public String[] getMultiValueContent(String name, Language language) {
@@ -593,7 +593,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#getMultiValueContent(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String)
    */
   public String[] getMultiValueContent(String name) {
     return getMultiValueContent(name, getLanguage(), false);
@@ -602,7 +602,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#setContent(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setContent(java.lang.String,
    *      java.lang.String, ch.o2it.weblounge.common.language.Language)
    */
   public void setContent(String name, String value, Language language) {
@@ -667,7 +667,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
    * 
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
    *      ch.o2it.weblounge.common.language.Language)
-   * @see ch.o2it.weblounge.common.content.PageletURI#compareTo(PageletURI)
+   * @see ch.o2it.weblounge.common.content.page.PageletURI#compareTo(PageletURI)
    */
   public int compareTo(Localizable o, Language l) {
     if (uri != null && o instanceof Pagelet) {
@@ -690,7 +690,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Pagelet#toXml()
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#toXml()
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();

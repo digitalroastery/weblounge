@@ -20,11 +20,10 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchResultItem;
-import ch.o2it.weblounge.common.impl.page.LazyPageImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.page.LazyPageImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -69,8 +68,8 @@ public class SearchResultPageItemImpl extends SearchResultItemImpl {
    * 
    * @see ch.o2it.weblounge.common.content.SearchResultItem#getPageURI()
    */
-  public PageURI getPageURI() {
-    return new PageURIImpl(site, url.getPath(), id);
+  public ResourceURI getPageURI() {
+    return new ResourceURIImpl(site, url.getPath(), id);
   }
 
   /**
@@ -110,7 +109,7 @@ public class SearchResultPageItemImpl extends SearchResultItemImpl {
    */
   public Page getPage() {
     if (page == null) {
-      PageURI uri = new PageURIImpl(site, url.getPath(), id);
+      ResourceURI uri = new ResourceURIImpl(site, url.getPath(), id);
       page = new LazyPageImpl(uri, pageXml, headerXml, previewXml);
     }
     return page;

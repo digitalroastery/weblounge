@@ -27,11 +27,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.ImageStyle;
-import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.Renderer;
+import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
@@ -281,7 +281,7 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#addTemplate(ch.o2it.weblounge.common.content.PageTemplate)}
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#addTemplate(ch.o2it.weblounge.common.content.page.PageTemplate)}
    * .
    */
   @Test
@@ -294,7 +294,7 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeTemplate(ch.o2it.weblounge.common.content.PageTemplate)}
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeTemplate(ch.o2it.weblounge.common.content.page.PageTemplate)}
    * .
    */
   @Test

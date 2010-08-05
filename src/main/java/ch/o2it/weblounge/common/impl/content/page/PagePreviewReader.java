@@ -18,11 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.PageletURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
@@ -59,7 +59,7 @@ public final class PagePreviewReader extends WebloungeContentReader {
   private WeakReference<SAXParser> parserRef = null;
 
   /** The page uri */
-  private PageURI pageURI = null;
+  private ResourceURI pageURI = null;
 
   /** Reader used to process pagelet data */
   private PageletReader pageletReader = null;
@@ -100,7 +100,7 @@ public final class PagePreviewReader extends WebloungeContentReader {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public Composer read(InputStream is, PageURI uri) throws SAXException,
+  public Composer read(InputStream is, ResourceURI uri) throws SAXException,
       IOException, ParserConfigurationException {
     reset();
     this.pageURI = uri;

@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 
 import org.junit.Before;
@@ -58,7 +58,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageTemplateImpl#getStage()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl#getStage()}.
    */
   @Test
   public void testGetStage() {
@@ -66,7 +66,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.AbstractRenderer#removeFlavor(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#removeFlavor(java.lang.String)}.
    */
   @Test
   public void testRemoveFlavor() {
@@ -77,7 +77,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.AbstractRenderer#getFlavors()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#getFlavors()}.
    */
   @Test
   public void testGetFlavors() {
@@ -86,7 +86,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.AbstractRenderer#supportsFlavor(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#supportsFlavor(java.lang.String)}.
    */
   @Test
   public void testSupportsFlavor() {
@@ -95,7 +95,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.AbstractRenderer#getRenderer()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#getRenderer()}.
    */
   @Test
   public void testGetRenderer() {
@@ -103,7 +103,7 @@ public class PageTemplateImplTest extends GeneralComposeableTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageTemplateImpl#getDefaultLayout()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl#getDefaultLayout()}.
    */
   @Test
   public void testGetDefaultLayout() {

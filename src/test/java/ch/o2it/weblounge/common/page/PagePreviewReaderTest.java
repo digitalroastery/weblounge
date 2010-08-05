@@ -26,14 +26,14 @@ import static org.junit.Assert.assertNotNull;
 
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
+import ch.o2it.weblounge.common.impl.content.page.PagePreviewReader;
+import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.page.ComposerImpl;
-import ch.o2it.weblounge.common.impl.page.PagePreviewReader;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
@@ -54,7 +54,7 @@ public class PagePreviewReaderTest {
   protected String previewFile = "/pagepreview.xml";
 
   /** The page uri */
-  protected PageURIImpl pageURI = null;
+  protected ResourceURIImpl pageURI = null;
 
   /** The German language */
   protected Language german = new LanguageImpl(new Locale("de"));
@@ -101,12 +101,12 @@ public class PagePreviewReaderTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);
     EasyMock.replay(site);
-    pageURI = new PageURIImpl(site, "/test", Page.LIVE);
+    pageURI = new ResourceURIImpl(site, "/test", Page.LIVE);
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PagePreviewReader#read(java.io.InputStream, ch.o2it.weblounge.common.content.PageURI)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PagePreviewReader#read(java.io.InputStream, ch.o2it.weblounge.common.content.PageURI)}
    * .
    */
   @Test

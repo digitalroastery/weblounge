@@ -18,20 +18,20 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.MalformedPageURIException;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.url.UrlImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
- * Implementation of the {@link PageURI} interface.
+ * Implementation of the {@link ResourceURI} interface.
  */
-public class PageURIImpl extends UrlImpl implements PageURI {
+public class ResourceURIImpl extends UrlImpl implements ResourceURI {
 
   /** Serial version UID */
   private static final long serialVersionUID = -686750395794924219L;
@@ -51,35 +51,35 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    * @param site
    *          the associated site
    */
-  public PageURIImpl(Site site) {
+  public ResourceURIImpl(Site site) {
     this(site, "/", Page.LIVE, null);
   }
 
   /**
-   * Creates a new {@link PageURI} from the given request, which is used to
+   * Creates a new {@link ResourceURI} from the given request, which is used to
    * determine <code>site</code>, <code>path</code> and <code>version</code>.
    * 
    * @param request
    *          the request
    */
-  public PageURIImpl(WebloungeRequest request) {
+  public ResourceURIImpl(WebloungeRequest request) {
     this(request.getSite(), request.getUrl().getPath(), request.getVersion(), null);
   }
 
   /**
-   * Creates a new {@link PageURI} from the given url, which is used to
+   * Creates a new {@link ResourceURI} from the given url, which is used to
    * determine <code>site</code> and <code>path</code>. The uri will default to
    * the live version.
    * 
    * @param url
    *          the url
    */
-  public PageURIImpl(WebUrl url) {
+  public ResourceURIImpl(WebUrl url) {
     this(url.getSite(), url.getPath(), Page.LIVE, null);
   }
 
   /**
-   * Creates a new {@link PageURI} that is equal to <code>uri</code> except for
+   * Creates a new {@link ResourceURI} that is equal to <code>uri</code> except for
    * the version which is switched to <code>version</code>.
    * 
    * @param uri
@@ -87,12 +87,12 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    * @param version
    *          the version
    */
-  public PageURIImpl(PageURI uri, long version) {
+  public ResourceURIImpl(ResourceURI uri, long version) {
     this(uri.getSite(), uri.getPath(), version, uri.getId());
   }
 
   /**
-   * Creates a new {@link PageURI} pointing to the live version of the page
+   * Creates a new {@link ResourceURI} pointing to the live version of the page
    * identified by <code>site</code> and <code>path</code>.
    * 
    * @param site
@@ -100,12 +100,12 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    * @param path
    *          the path
    */
-  public PageURIImpl(Site site, String path) throws MalformedPageURIException {
+  public ResourceURIImpl(Site site, String path) throws MalformedPageURIException {
     this(site, path, Page.LIVE, null);
   }
 
   /**
-   * Creates a new {@link PageURI} pointing to a specific version of the page
+   * Creates a new {@link ResourceURI} pointing to a specific version of the page
    * identified by <code>site</code>, <code>path</code> and <code>version</code>
    * .
    * 
@@ -116,13 +116,13 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    * @param version
    *          the version
    */
-  public PageURIImpl(Site site, String path, long version)
+  public ResourceURIImpl(Site site, String path, long version)
       throws MalformedPageURIException {
     this(site, path, version, null);
   }
 
   /**
-   * Creates a new {@link PageURI} pointing to a specific version of the page
+   * Creates a new {@link ResourceURI} pointing to a specific version of the page
    * identified by <code>id<code>, <code>site</code>, <code>path</code> and
    * <code>version</code>.
    * 
@@ -133,13 +133,13 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    * @param id
    *          the page identifier
    */
-  public PageURIImpl(Site site, String path, String id)
+  public ResourceURIImpl(Site site, String path, String id)
       throws MalformedPageURIException {
     this(site, path, Page.LIVE, id);
   }
 
   /**
-   * Creates a new {@link PageURI} pointing to a specific version of the page
+   * Creates a new {@link ResourceURI} pointing to a specific version of the page
    * identified by <code>id<code>, <code>site</code>, <code>path</code> and
    * <code>version</code>.
    * 
@@ -152,7 +152,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    * @param id
    *          the page identifier
    */
-  public PageURIImpl(Site site, String path, long version, String id)
+  public ResourceURIImpl(Site site, String path, long version, String id)
       throws MalformedPageURIException {
     super(path, '/');
     if (site == null)
@@ -173,8 +173,8 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    *          the page identifier
    * @return the uri
    */
-  public static PageURIImpl fromId(Site site, String id) {
-    return new PageURIImpl(site, null, id);
+  public static ResourceURIImpl fromId(Site site, String id) {
+    return new ResourceURIImpl(site, null, id);
   }
 
   /**
@@ -186,8 +186,8 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    *          the page path
    * @return the uri
    */
-  public static PageURIImpl fromPath(Site site, String path) {
-    return new PageURIImpl(site, path);
+  public static ResourceURIImpl fromPath(Site site, String path) {
+    return new ResourceURIImpl(site, path);
   }
 
   /**
@@ -203,7 +203,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageURI#getId()
+   * @see ch.o2it.weblounge.common.content.ResourceURI#getId()
    */
   public String getId() throws MalformedPageURIException {
     return id;
@@ -212,19 +212,19 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageURI#getParentURI()
+   * @see ch.o2it.weblounge.common.content.ResourceURI#getParentURI()
    */
-  public PageURI getParentURI() throws MalformedPageURIException {
+  public ResourceURI getParentURI() throws MalformedPageURIException {
     String parentPath = getParentPath();
     if (parentPath == null)
       return null;
-    return new PageURIImpl(site, parentPath, version, id);
+    return new ResourceURIImpl(site, parentPath, version, id);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageURI#getPath()
+   * @see ch.o2it.weblounge.common.content.ResourceURI#getPath()
    */
   public String getPath() throws MalformedPageURIException {
     return path;
@@ -233,7 +233,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageURI#getSite()
+   * @see ch.o2it.weblounge.common.content.ResourceURI#getSite()
    */
   public Site getSite() throws MalformedPageURIException {
     return site;
@@ -242,7 +242,7 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageURI#getVersion()
+   * @see ch.o2it.weblounge.common.content.ResourceURI#getVersion()
    */
   public long getVersion() throws MalformedPageURIException {
     return version;
@@ -251,10 +251,10 @@ public class PageURIImpl extends UrlImpl implements PageURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageURI#getVersion(long)
+   * @see ch.o2it.weblounge.common.content.ResourceURI#getVersion(long)
    */
-  public PageURI getVersion(long version) throws MalformedPageURIException {
-    return new PageURIImpl(site, path, version);
+  public ResourceURI getVersion(long version) throws MalformedPageURIException {
+    return new ResourceURIImpl(site, path, version);
   }
 
   /**
@@ -274,8 +274,8 @@ public class PageURIImpl extends UrlImpl implements PageURI {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof PageURI) {
-      PageURI uri = (PageURI) obj;
+    if (obj instanceof ResourceURI) {
+      ResourceURI uri = (ResourceURI) obj;
       if (!site.equals(uri.getSite()))
         return false;
       if (!path.equals(uri.getPath()))

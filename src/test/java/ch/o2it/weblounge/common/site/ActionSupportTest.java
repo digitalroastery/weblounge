@@ -25,8 +25,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.content.Link;
-import ch.o2it.weblounge.common.impl.page.LinkImpl;
+import ch.o2it.weblounge.common.content.page.Link;
+import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.site.ActionSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;

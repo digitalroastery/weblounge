@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.Pagelet;
-import ch.o2it.weblounge.common.content.PageletURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
-import ch.o2it.weblounge.common.impl.page.PageletImpl;
-import ch.o2it.weblounge.common.impl.page.PageletURIImpl;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.page.PageletURI;
+import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
@@ -489,7 +489,7 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withPagelet(ch.o2it.weblounge.common.content.Pagelet)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withPagelet(ch.o2it.weblounge.common.content.page.Pagelet)
    */
   public SearchQuery withPagelet(String module, String id) {
     clearExpectations();

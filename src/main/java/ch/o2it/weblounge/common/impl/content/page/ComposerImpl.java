@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -84,7 +84,7 @@ public class ComposerImpl implements Composer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Composer#getIdentifier()
+   * @see ch.o2it.weblounge.common.content.page.Composer#getIdentifier()
    */
   public String getIdentifier() {
     return identifier;
@@ -128,7 +128,7 @@ public class ComposerImpl implements Composer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Composer#getPagelets()
+   * @see ch.o2it.weblounge.common.content.page.Composer#getPagelets()
    */
   public Pagelet[] getPagelets() {
     return pagelets.toArray(new Pagelet[pagelets.size()]);
@@ -137,7 +137,7 @@ public class ComposerImpl implements Composer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Composer#getPagelets(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.Composer#getPagelets(java.lang.String,
    *      java.lang.String)
    */
   public Pagelet[] getPagelets(String module, String renderer) {
@@ -152,7 +152,7 @@ public class ComposerImpl implements Composer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Composer#getPagelet(int)
+   * @see ch.o2it.weblounge.common.content.page.Composer#getPagelet(int)
    */
   public Pagelet getPagelet(int index) {
     return pagelets.get(index);
@@ -161,7 +161,7 @@ public class ComposerImpl implements Composer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Composer#size()
+   * @see ch.o2it.weblounge.common.content.page.Composer#size()
    */
   public int size() {
     return pagelets.size();
@@ -170,7 +170,7 @@ public class ComposerImpl implements Composer {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Composer#toXml()
+   * @see ch.o2it.weblounge.common.content.page.Composer#toXml()
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();

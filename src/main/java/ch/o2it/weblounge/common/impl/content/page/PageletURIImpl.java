@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.PageletURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.site.Site;
 
 /**
@@ -31,7 +31,7 @@ import ch.o2it.weblounge.common.site.Site;
 public class PageletURIImpl implements PageletURI {
 
   /** The pagelet's url */
-  private PageURI pageURI;
+  private ResourceURI pageURI;
 
   /** The pagelet's composer */
   private String composer;
@@ -50,7 +50,7 @@ public class PageletURIImpl implements PageletURI {
    *@param position
    *          the position within the composer
    */
-  public PageletURIImpl(PageURI pageURI, String composer, int position) {
+  public PageletURIImpl(ResourceURI pageURI, String composer, int position) {
     this.pageURI = pageURI;
     this.composer = composer;
     this.position = position;
@@ -59,7 +59,7 @@ public class PageletURIImpl implements PageletURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletURI#getSite()
+   * @see ch.o2it.weblounge.common.content.page.PageletURI#getSite()
    */
   public Site getSite() {
     return pageURI.getSite();
@@ -68,16 +68,16 @@ public class PageletURIImpl implements PageletURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletURI#getPageURI()
+   * @see ch.o2it.weblounge.common.content.page.PageletURI#getPageURI()
    */
-  public PageURI getPageURI() {
+  public ResourceURI getPageURI() {
     return pageURI;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletURI#getComposer()
+   * @see ch.o2it.weblounge.common.content.page.PageletURI#getComposer()
    */
   public String getComposer() {
     return composer;
@@ -86,7 +86,7 @@ public class PageletURIImpl implements PageletURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletURI#getPosition()
+   * @see ch.o2it.weblounge.common.content.page.PageletURI#getPosition()
    */
   public int getPosition() {
     return position;
@@ -95,16 +95,16 @@ public class PageletURIImpl implements PageletURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletURI#setURI(ch.o2it.weblounge.common.content.PageURI)
+   * @see ch.o2it.weblounge.common.content.page.PageletURI#setURI(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public void setURI(PageURI uri) {
+  public void setURI(ResourceURI uri) {
     this.pageURI = uri;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletURI#setComposer(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.PageletURI#setComposer(java.lang.String)
    */
   public void setComposer(String composer) {
     this.composer = composer;
@@ -113,7 +113,7 @@ public class PageletURIImpl implements PageletURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletURI#setPosition(int)
+   * @see ch.o2it.weblounge.common.content.page.PageletURI#setPosition(int)
    */
   public void setPosition(int position) {
     this.position = position;

@@ -18,11 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement;
-import ch.o2it.weblounge.common.content.Link;
+import ch.o2it.weblounge.common.content.page.DeclarativeHTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.Link;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -125,7 +125,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement#configure(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.site.Site, ch.o2it.weblounge.common.site.Module)
+   * @see ch.o2it.weblounge.common.content.page.DeclarativeHTMLHeadElement#configure(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.site.Site, ch.o2it.weblounge.common.site.Module)
    */
   public void configure(WebloungeRequest request, Site site, Module module)
       throws IllegalStateException {
@@ -137,7 +137,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.HTMLHeadElement#getHref()
+   * @see ch.o2it.weblounge.common.content.page.HTMLHeadElement#getHref()
    */
   public String getHref() {
     return href;
@@ -146,7 +146,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#setCharset(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Link#setCharset(java.lang.String)
    */
   public void setCharset(String charset) {
     this.charset = charset;
@@ -155,7 +155,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#getCharset()
+   * @see ch.o2it.weblounge.common.content.page.Link#getCharset()
    */
   public String getCharset() {
     return charset;
@@ -164,7 +164,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#setMedia(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Link#setMedia(java.lang.String)
    */
   public void setMedia(String media) {
     this.media = media;
@@ -173,7 +173,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#getMedia()
+   * @see ch.o2it.weblounge.common.content.page.Link#getMedia()
    */
   public String getMedia() {
     return media;
@@ -182,7 +182,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#setRelation(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Link#setRelation(java.lang.String)
    */
   public void setRelation(String relation) {
     this.relation = relation;
@@ -191,7 +191,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#getRelation()
+   * @see ch.o2it.weblounge.common.content.page.Link#getRelation()
    */
   public String getRelation() {
     return relation;
@@ -200,7 +200,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#setReverseRelation(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Link#setReverseRelation(java.lang.String)
    */
   public void setReverseRelation(String relation) {
     this.reverseRelation = relation;
@@ -209,7 +209,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#getReverseRelation()
+   * @see ch.o2it.weblounge.common.content.page.Link#getReverseRelation()
    */
   public String getReverseRelation() {
     return reverseRelation;
@@ -218,7 +218,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#setType(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Link#setType(java.lang.String)
    */
   public void setType(String type) {
     this.type = type;
@@ -227,7 +227,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Link#getType()
+   * @see ch.o2it.weblounge.common.content.page.Link#getType()
    */
   public String getType() {
     return type;
@@ -285,7 +285,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.HTMLHeadElement#toXml()
+   * @see ch.o2it.weblounge.common.content.page.HTMLHeadElement#toXml()
    */
   public String toXml() {
     StringBuilder sb = new StringBuilder("<link ");

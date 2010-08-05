@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.page.LinkImpl;
+import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 
 import org.junit.Before;
@@ -64,7 +64,7 @@ public class LinkImplXmlTest extends LinkImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.LinkImpl#toXml()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.LinkImpl#toXml()}.
    */
   @Test
   public void testToXml() {

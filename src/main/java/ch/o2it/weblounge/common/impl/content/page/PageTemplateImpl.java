@@ -18,13 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.Link;
-import ch.o2it.weblounge.common.content.PageTemplate;
 import ch.o2it.weblounge.common.content.RenderException;
-import ch.o2it.weblounge.common.content.Script;
+import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.Link;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.Script;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -89,7 +89,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageTemplate#setStage(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.PageTemplate#setStage(java.lang.String)
    */
   public void setStage(String stage) {
     this.stage = stage;
@@ -98,7 +98,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageTemplate#getStage()
+   * @see ch.o2it.weblounge.common.content.page.PageTemplate#getStage()
    */
   public String getStage() {
     return stage;
@@ -107,7 +107,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageTemplate#getDefaultLayout()
+   * @see ch.o2it.weblounge.common.content.page.PageTemplate#getDefaultLayout()
    */
   public String getDefaultLayout() {
     return layout;
@@ -116,7 +116,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageTemplate#setDefaultLayout(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.PageTemplate#setDefaultLayout(java.lang.String)
    */
   public void setDefaultLayout(String layout) {
     this.layout = layout;
@@ -125,7 +125,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.PageTemplate#setDefault(boolean)
+   * @see ch.o2it.weblounge.common.content.page.PageTemplate#setDefault(boolean)
    */
   public void setDefault(boolean v) {
     isDefault = v;
@@ -134,7 +134,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.PageTemplate#isDefault()
+   * @see ch.o2it.weblounge.common.content.page.PageTemplate#isDefault()
    */
   public boolean isDefault() {
     return isDefault;
@@ -143,7 +143,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageTemplate#render(ch.o2it.weblounge.common.request.WebloungeRequest,
+   * @see ch.o2it.weblounge.common.content.page.PageTemplate#render(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public void render(WebloungeRequest request, WebloungeResponse response)

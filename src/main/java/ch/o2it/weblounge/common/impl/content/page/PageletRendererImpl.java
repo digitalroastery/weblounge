@@ -18,14 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.Link;
-import ch.o2it.weblounge.common.content.PagePreviewMode;
-import ch.o2it.weblounge.common.content.PageletRenderer;
 import ch.o2it.weblounge.common.content.RenderException;
-import ch.o2it.weblounge.common.content.Script;
+import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.Link;
+import ch.o2it.weblounge.common.content.page.PagePreviewMode;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.content.page.Script;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -98,7 +98,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#setModule(ch.o2it.weblounge.common.site.Module)
+   * @see ch.o2it.weblounge.common.content.page.PageletRenderer#setModule(ch.o2it.weblounge.common.site.Module)
    */
   public void setModule(Module module) {
     this.module = module;
@@ -107,7 +107,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#getModule()
+   * @see ch.o2it.weblounge.common.content.page.PageletRenderer#getModule()
    */
   public Module getModule() {
     return module;
@@ -116,7 +116,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#setPreviewMode(ch.o2it.weblounge.common.content.Pagelet.PagePreviewMode)
+   * @see ch.o2it.weblounge.common.content.page.PageletRenderer#setPreviewMode(ch.o2it.weblounge.common.content.Pagelet.PagePreviewMode)
    */
   public void setPreviewMode(PagePreviewMode mode) {
     this.previewMode = mode;
@@ -125,7 +125,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#getPreviewMode()
+   * @see ch.o2it.weblounge.common.content.page.PageletRenderer#getPreviewMode()
    */
   public PagePreviewMode getPreviewMode() {
     return previewMode;
@@ -134,7 +134,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#setEditor(java.net.URL)
+   * @see ch.o2it.weblounge.common.content.page.PageletRenderer#setEditor(java.net.URL)
    */
   public void setEditor(URL editor) {
     this.editor = editor;
@@ -143,7 +143,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#getEditor()
+   * @see ch.o2it.weblounge.common.content.page.PageletRenderer#getEditor()
    */
   public URL getEditor() {
     return editor;
@@ -172,7 +172,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.PageletRenderer#renderAsEditor(ch.o2it.weblounge.common.request.WebloungeRequest,
+   * @see ch.o2it.weblounge.common.content.page.PageletRenderer#renderAsEditor(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public void renderAsEditor(WebloungeRequest request,

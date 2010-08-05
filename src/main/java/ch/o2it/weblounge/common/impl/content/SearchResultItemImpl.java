@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.Page;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.SearchResultItem;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 

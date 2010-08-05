@@ -18,10 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.PageletURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.PageletURI;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
@@ -107,7 +108,7 @@ public final class PageReader extends WebloungeContentReader {
    * @throws IOException
    *           if reading the input stream fails
    */
-  public PageImpl read(InputStream is, PageURI uri) throws SAXException,
+  public PageImpl read(InputStream is, ResourceURI uri) throws SAXException,
       IOException, ParserConfigurationException {
     reset();
     page = new PageImpl(uri);
@@ -136,7 +137,7 @@ public final class PageReader extends WebloungeContentReader {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public PageImpl readHeader(InputStream is, PageURI uri) throws SAXException,
+  public PageImpl readHeader(InputStream is, ResourceURI uri) throws SAXException,
       IOException, ParserConfigurationException {
     if (page == null || !page.getURI().equals(uri)) {
       reset();
@@ -167,7 +168,7 @@ public final class PageReader extends WebloungeContentReader {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public PageImpl readBody(InputStream is, PageURI uri) throws SAXException,
+  public PageImpl readBody(InputStream is, ResourceURI uri) throws SAXException,
       IOException, ParserConfigurationException {
     if (page == null || !page.getURI().equals(uri)) {
       reset();
@@ -219,7 +220,7 @@ public final class PageReader extends WebloungeContentReader {
     if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.setOwner(owner);
     else
-      page.securityCtx.setOwner(owner);
+      page.setOwner(owner);
   }
 
   /**
@@ -233,7 +234,7 @@ public final class PageReader extends WebloungeContentReader {
     if (parserContext.equals(ParserContext.Pagelet))
       pageletReader.allow(permission, authority);
     else
-      page.securityCtx.allow(permission, authority);
+      page.allow(permission, authority);
   }
 
   /**
@@ -297,9 +298,9 @@ public final class PageReader extends WebloungeContentReader {
     // read the page url
     if ("page".equals(raw)) {
       parserContext = ParserContext.Page;
-      ((PageURIImpl) page.uri).id = attrs.getValue("id");
+      ((ResourceURIImpl) page.getURI()).setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
-        ((PageURIImpl) page.uri).setPath(attrs.getValue("path"));
+        ((ResourceURIImpl) page.getURI()).setPath(attrs.getValue("path"));
     }
 
     // in the header
@@ -386,17 +387,17 @@ public final class PageReader extends WebloungeContentReader {
 
       // Indexed
       else if ("index".equals(raw)) {
-        page.isIndexed = "true".equals(characters.toString());
+        page.setIndexed("true".equals(characters.toString()));
       }
 
       // Promote
       else if ("promote".equals(raw)) {
-        page.isPromoted = "true".equals(characters.toString());
+        page.setPromoted("true".equals(characters.toString()));
       }
 
       // Type
       else if ("type".equals(raw)) {
-        page.type = characters.toString();
+        page.setType(characters.toString());
       }
 
       // Title
@@ -432,7 +433,7 @@ public final class PageReader extends WebloungeContentReader {
       else if ("locked".equals(raw)) {
         User user = (User) clipboard.get("user");
         if (user != null)
-          page.lockOwner = user;
+          page.setLocked(user);
       }
 
     }

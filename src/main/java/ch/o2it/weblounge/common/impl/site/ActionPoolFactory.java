@@ -20,9 +20,9 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.HTMLAction;
@@ -98,8 +98,8 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
 
       // Page URI
       if (htmlBlueprint.getPageURI() != null) {
-        PageURI uri = htmlBlueprint.getPageURI();
-        htmlAction.setPageURI(new PageURIImpl(uri.getSite(), uri.getPath()));
+        ResourceURI uri = htmlBlueprint.getPageURI();
+        htmlAction.setPageURI(new ResourceURIImpl(uri.getSite(), uri.getPath()));
       }
   
       // Page template

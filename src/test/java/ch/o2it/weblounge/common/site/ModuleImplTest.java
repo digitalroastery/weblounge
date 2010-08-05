@@ -27,11 +27,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.ImageStyle;
-import ch.o2it.weblounge.common.content.PageletRenderer;
-import ch.o2it.weblounge.common.impl.content.ImageStyleImpl;
+import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.site.ModuleImpl;
 import ch.o2it.weblounge.common.language.Language;
 

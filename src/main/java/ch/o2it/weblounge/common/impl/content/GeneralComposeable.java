@@ -22,8 +22,8 @@ package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Composeable;
-import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.HTMLInclude;
+import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.HTMLInclude;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.language.Language;

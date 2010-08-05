@@ -18,20 +18,12 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageContentListener;
-import ch.o2it.weblounge.common.content.PagePreviewMode;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.Pagelet;
-import ch.o2it.weblounge.common.content.PageletRenderer;
-import ch.o2it.weblounge.common.content.PageletURI;
-import ch.o2it.weblounge.common.impl.content.CreationContext;
-import ch.o2it.weblounge.common.impl.content.ModificationContext;
-import ch.o2it.weblounge.common.impl.content.PublishingContext;
+import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.impl.content.page.PageSecurityContext;
+import ch.o2it.weblounge.common.impl.content.page.PageUtils;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.SecurityContextImpl;
@@ -41,53 +33,34 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
- * A <code>Page</code> encapsulates all data that is attached with a site URL.
+ * A <code>Resource</code> encapsulates all data that is attached with a
+ * resource URL.
  */
-public class PageImpl extends LocalizableObject implements Page {
-
-  /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(PageImpl.class);
+public abstract class ResourceImpl extends LocalizableObject implements Resource {
 
   /** The uri */
-  protected PageURI uri = null;
+  protected ResourceURI uri = null;
 
-  /** PageHeader type */
+  /** Resource type */
   protected String type = null;
 
-  /** PageHeader keywords */
+  /** Keywords */
   protected List<String> subjects = null;
-
-  /** Renderer identifier */
-  protected String template = null;
-
-  /** Layout identifier */
-  protected String layout = null;
 
   /** True if this page should show up on the sitemap */
   protected boolean isPromoted = false;
 
   /** True if the page contents should be indexed */
   protected boolean isIndexed = true;
-
-  /** The preview pagelets */
-  protected List<Pagelet> preview = null;
 
   /** Current page editor (and owner) */
   protected User lockOwner = null;
@@ -116,19 +89,13 @@ public class PageImpl extends LocalizableObject implements Page {
   /** The rights declaration */
   protected LocalizableContent<String> rights = null;
 
-  /** The pagelet container */
-  protected Map<String, List<Pagelet>> composers = null;
-
-  /** The page content listeners */
-  private List<PageContentListener> contentListeners = null;
-
   /**
    * Creates a new page for the given page uri.
    * 
    * @param uri
    *          the page uri
    */
-  public PageImpl(PageURI uri) {
+  public ResourceImpl(ResourceURI uri) {
     super(uri.getSite().getDefaultLanguage());
     this.uri = uri;
     this.creationCtx = new CreationContext();
@@ -140,7 +107,6 @@ public class PageImpl extends LocalizableObject implements Page {
     this.description = new LocalizableContent<String>(this);
     this.coverage = new LocalizableContent<String>(this);
     this.rights = new LocalizableContent<String>(this);
-    this.composers = new HashMap<String, List<Pagelet>>();
   }
 
   /**
@@ -164,7 +130,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#setPromoted(boolean)
+   * @see ch.o2it.weblounge.common.content.Resource#setPromoted(boolean)
    */
   public void setPromoted(boolean anchor) {
     this.isPromoted = anchor;
@@ -173,7 +139,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#setIndexed(boolean)
+   * @see ch.o2it.weblounge.common.content.Resource#setIndexed(boolean)
    */
   public void setIndexed(boolean index) {
     this.isIndexed = index;
@@ -202,7 +168,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#addSubject(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.Resource#addSubject(java.lang.String)
    */
   public void addSubject(String subject) {
     subjects.add(subject);
@@ -211,7 +177,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#removeSubject(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.Resource#removeSubject(java.lang.String)
    */
   public void removeSubject(String subject) {
     subjects.remove(subject);
@@ -220,7 +186,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#hasSubject(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.Resource#hasSubject(java.lang.String)
    */
   public boolean hasSubject(String subject) {
     return subjects.contains(subject);
@@ -231,7 +197,7 @@ public class PageImpl extends LocalizableObject implements Page {
    * 
    * @return the page uri
    */
-  public PageURI getURI() {
+  public ResourceURI getURI() {
     return uri;
   }
 
@@ -275,7 +241,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#isPromoted()
+   * @see ch.o2it.weblounge.common.content.Resource#isPromoted()
    */
   public boolean isPromoted() {
     return isPromoted;
@@ -284,7 +250,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#isIndexed()
+   * @see ch.o2it.weblounge.common.content.Resource#isIndexed()
    */
   public boolean isIndexed() {
     return isIndexed;
@@ -293,7 +259,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#setCoverage(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.Resource#setCoverage(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public void setCoverage(String coverage, Language language) {
@@ -303,7 +269,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getCoverage()
+   * @see ch.o2it.weblounge.common.content.Resource#getCoverage()
    */
   public String getCoverage() {
     return coverage.get();
@@ -312,7 +278,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getCoverage(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.content.Resource#getCoverage(ch.o2it.weblounge.common.language.Language)
    */
   public String getCoverage(Language language) {
     return coverage.get(language);
@@ -321,7 +287,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getCoverage(ch.o2it.weblounge.common.language.Language,
+   * @see ch.o2it.weblounge.common.content.Resource#getCoverage(ch.o2it.weblounge.common.language.Language,
    *      boolean)
    */
   public String getCoverage(Language language, boolean force) {
@@ -331,7 +297,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#setDescription(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.Resource#setDescription(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public void setDescription(String description, Language language) {
@@ -341,7 +307,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getDescription()
+   * @see ch.o2it.weblounge.common.content.Resource#getDescription()
    */
   public String getDescription() {
     return description.get();
@@ -350,7 +316,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getDescription(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.content.Resource#getDescription(ch.o2it.weblounge.common.language.Language)
    */
   public String getDescription(Language language) {
     return description.get(language);
@@ -359,7 +325,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getDescription(ch.o2it.weblounge.common.language.Language,
+   * @see ch.o2it.weblounge.common.content.Resource#getDescription(ch.o2it.weblounge.common.language.Language,
    *      boolean)
    */
   public String getDescription(Language language, boolean force) {
@@ -369,7 +335,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#setRights(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.Resource#setRights(java.lang.String,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public void setRights(String rights, Language language) {
@@ -379,7 +345,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getRights()
+   * @see ch.o2it.weblounge.common.content.Resource#getRights()
    */
   public String getRights() {
     return rights.get();
@@ -388,7 +354,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getRights(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.content.Resource#getRights(ch.o2it.weblounge.common.language.Language)
    */
   public String getRights(Language language) {
     return rights.get(language);
@@ -397,7 +363,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getRights(ch.o2it.weblounge.common.language.Language,
+   * @see ch.o2it.weblounge.common.content.Resource#getRights(ch.o2it.weblounge.common.language.Language,
    *      boolean)
    */
   public String getRights(Language language, boolean force) {
@@ -451,45 +417,6 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public String getTitle(Language language, boolean force) {
     return title.get(language, force);
-  }
-
-  /**
-   * Returns the layout associated with this page.
-   * 
-   * @return the associated layout
-   */
-  public String getLayout() {
-    return layout;
-  }
-
-  /**
-   * Sets the layout that is used to determine default content and initial
-   * layout.
-   * 
-   * @param layout
-   *          the layout identifier
-   */
-  public void setLayout(String layout) {
-    this.layout = layout;
-  }
-
-  /**
-   * Returns the template that is used to render this page.
-   * 
-   * @return the renderer
-   */
-  public String getTemplate() {
-    return template;
-  }
-
-  /**
-   * Sets the renderer that is used to render this page.
-   * 
-   * @param template
-   *          the template identifier
-   */
-  public void setTemplate(String template) {
-    this.template = template;
   }
 
   /**
@@ -753,7 +680,7 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#setUnlocked()
+   * @see ch.o2it.weblounge.common.content.Resource#setUnlocked()
    */
   public User setUnlocked() {
     User previousLockOwner = lockOwner;
@@ -773,257 +700,12 @@ public class PageImpl extends LocalizableObject implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Page#getComposer(java.lang.String)
-   */
-  public Composer getComposer(String composerId) {
-    Composer composer = null;
-    List<Pagelet> pagelets = composers.get(composerId);
-    if (pagelets != null)
-      composer = new ComposerImpl(composerId, pagelets);
-    return composer;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Page#getComposers()
-   */
-  public Composer[] getComposers() {
-    List<Composer> composerList = new ArrayList<Composer>();
-    for (String name : composers.keySet()) {
-      composerList.add(new ComposerImpl(name, composers.get(name)));
-    }
-    return composerList.toArray(new Composer[composerList.size()]);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Page#addPagelet(ch.o2it.weblounge.common.content.Pagelet,
-   *      java.lang.String)
-   */
-  public Pagelet addPagelet(Pagelet pagelet, String composer) {
-    List<Pagelet> c = composers.get(composer);
-    int position = (c == null) ? 0 : c.size();
-    return addPagelet(pagelet, composer, position);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Page#addPagelet(ch.o2it.weblounge.common.content.Pagelet,
-   *      java.lang.String, int)
-   */
-  public Pagelet addPagelet(Pagelet pagelet, String composer, int position) {
-    List<Pagelet> c = composers.get(composer);
-    if (c == null) {
-      c = new ArrayList<Pagelet>();
-      composers.put(composer, c);
-    }
-
-    // Test position
-    if (position < 0 || position > c.size())
-      throw new IndexOutOfBoundsException("There are only " + c.size() + " pagelets in the composer");
-
-    // Insert
-    if (position < c.size()) {
-      c.add(position, pagelet);
-      for (int i = position + 1; i < c.size(); i++) {
-        c.get(i).getURI().setPosition(i);
-      }
-    }
-
-    // Append
-    else {
-      c.add(pagelet);
-    }
-
-    // Adjust pagelet location
-    PageletURI location = pagelet.getURI();
-    if (location == null) {
-      location = new PageletURIImpl(uri, composer, position);
-      pagelet.setURI(location);
-    } else {
-      location.setURI(uri);
-      location.setComposer(composer);
-      location.setPosition(position);
-    }
-    return pagelet;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Page#getPagelets()
-   */
-  public Pagelet[] getPagelets() {
-    List<Pagelet> result = new ArrayList<Pagelet>();
-    for (List<Pagelet> pagelets : composers.values()) {
-      result.addAll(pagelets);
-    }
-    return result.toArray(new Pagelet[result.size()]);
-  }
-
-  /**
-   * Returns the pagelets that are contained in the specified composer.
-   * 
-   * @param composer
-   *          the composer identifier
-   * @return the pagelets
-   */
-  public Pagelet[] getPagelets(String composer) {
-    List<Pagelet> c = composers.get(composer);
-    if (c == null) {
-      c = new ArrayList<Pagelet>();
-    }
-    Pagelet[] pagelets = new Pagelet[c.size()];
-    return c.toArray(pagelets);
-  }
-
-  /**
-   * Returns a copy of the pagelets of the given module and renderer that are
-   * contained in the specified composer.
-   * 
-   * @param composer
-   *          the composer identifier
-   * @param module
-   *          the module identifier
-   * @param id
-   *          the renderer id
-   * @return the pagelets
-   */
-  public Pagelet[] getPagelets(String composer, String module, String id) {
-    List<Pagelet> l = new ArrayList<Pagelet>();
-    List<Pagelet> c = composers.get(composer);
-    if (c != null) {
-      l.addAll(c);
-      int i = 0;
-      while (i < l.size()) {
-        Pagelet p = l.get(i);
-        if (!p.getModule().equals(module) || !p.getIdentifier().equals(id)) {
-          l.remove(i);
-        } else {
-          i++;
-        }
-      }
-    }
-    Pagelet[] pagelets = new Pagelet[l.size()];
-    return l.toArray(pagelets);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Page#removePagelet(java.lang.String,
-   *      int)
-   */
-  public Pagelet removePagelet(String composer, int position) {
-    List<Pagelet> pagelets = composers.get(composer);
-
-    // Test index
-    if (pagelets == null || pagelets.size() < position)
-      throw new IndexOutOfBoundsException("No pagelet found at position " + position);
-
-    // Remove the pagelet and update uris of following pagelets
-    Pagelet pagelet = pagelets.remove(position);
-    for (int i = position; i < pagelets.size(); i++) {
-      pagelets.get(i).getURI().setPosition(i);
-    }
-    return pagelet;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Page#getPreview()
-   */
-  public Pagelet[] getPreview() {
-    Site site = getSite();
-    PageTemplate t = site.getTemplate(template);
-    if (preview == null && t == null) {
-      logger.warn("Can't calculate the page preview due to missing template");
-      return new Pagelet[] {};
-    } else if (preview == null && t.getStage() == null) {
-      logger.warn("Can't calculate the page preview due to missing stage definition");
-      return new Pagelet[] {};
-    } else if (preview == null) {
-      this.preview = new ArrayList<Pagelet>();
-      List<Pagelet> stage = composers.get(t.getStage());
-      Set<PageletRenderer> previewRenderers = new HashSet<PageletRenderer>();
-      if (stage != null) {
-        for (Pagelet p : stage) {
-
-          // Load the pagelet's module
-          Module m = site.getModule(p.getModule());
-          if (m == null) {
-            logger.warn("Skipping pagelet '{}' for preview calculation: module '{}' can't be found", p, p.getModule());
-            continue;
-          }
-
-          // Load the pagelet's renderer
-          PageletRenderer r = m.getRenderer(p.getIdentifier());
-          if (r == null) {
-            logger.warn("Skipping pagelet '{}' for preview calculation: pagelet renderer '{}' can't be found", p, p.getIdentifier());
-            continue;
-          }
-
-          // Evaluate the preview mode
-          PagePreviewMode previewMode = r.getPreviewMode();
-          if (previewMode.equals(PagePreviewMode.First.equals(previewMode) && !previewRenderers.contains(r))) {
-            preview.add(p);
-            previewRenderers.add(r);
-          } else if (PagePreviewMode.All.equals(previewMode)) {
-            preview.add(p);
-            previewRenderers.add(r);
-          } else if (PagePreviewMode.Boundary.equals(previewMode)) {
-            preview.clear();
-            for (Pagelet p2 : stage) {
-              if (p2.equals(p))
-                break;
-              preview.add(p2);
-            }
-            break;
-          }
-        }
-      }
-    }
-    return preview.toArray(new Pagelet[preview.size()]);
-  }
-
-  /**
-   * Adds a <code>PageContentListener</code> to this page, who will be notified
-   * (amongst others) about new, moved, deleted or altered pagelets.
-   * 
-   * @param listener
-   *          the new page content listener
-   */
-  public void addPageContentListener(PageContentListener listener) {
-    if (contentListeners == null)
-      contentListeners = new ArrayList<PageContentListener>();
-    contentListeners.add(listener);
-  }
-
-  /**
-   * Removes a <code>PageContentListener</code> from this page.
-   * 
-   * @param listener
-   *          the page content listener
-   */
-  public void removePageContentListener(PageContentListener listener) {
-    if (contentListeners == null)
-      return;
-    contentListeners.remove(listener);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public int compareTo(Localizable o, Language l) {
-    if (o instanceof Page)
-      return title.get(l).compareTo(((Page) o).getTitle(l));
+    if (o instanceof Resource)
+      return title.get(l).compareTo(((Resource) o).getTitle(l));
     return title.compareTo(o, l);
   }
 
@@ -1034,8 +716,10 @@ public class PageImpl extends LocalizableObject implements Page {
    */
   public String toXml() {
     StringBuffer b = new StringBuffer();
+    String rootTag = toXmlRootTag();
 
-    b.append("<page id=\"");
+    b.append("<").append(rootTag);
+    b.append(" id=\"");
     b.append(uri.getId());
     b.append("\" path=\"");
     b.append(uri.getPath());
@@ -1046,15 +730,8 @@ public class PageImpl extends LocalizableObject implements Page {
     // Add header
     b.append("<head>");
 
-    b.append("<template>");
-    b.append(template);
-    b.append("</template>");
-
-    if (layout != null) {
-      b.append("<layout>");
-      b.append(layout);
-      b.append("</layout>");
-    }
+    // Add custom header data
+    toXmlHead(b);
 
     b.append("<promote>");
     b.append(Boolean.toString(isPromoted));
@@ -1132,7 +809,7 @@ public class PageImpl extends LocalizableObject implements Page {
     // Security
     b.append(securityCtx.toXml());
 
-    // Pagelock
+    // Lock
     if (lockOwner != null) {
       b.append("<locked>");
       b.append(lockOwner.toXml());
@@ -1140,36 +817,56 @@ public class PageImpl extends LocalizableObject implements Page {
     }
 
     b.append("</head>");
-
-    b.append("<body>");
-
-    for (Map.Entry<String, List<Pagelet>> entry : composers.entrySet()) {
-      b.append("<composer id=\"");
-      b.append(entry.getKey());
-      b.append("\">");
-
-      for (Pagelet pagelet : entry.getValue()) {
-        b.append(pagelet.toXml());
-      }
-
-      b.append("</composer>");
+    
+    // Add custom body
+    StringBuffer body = new StringBuffer();
+    toXmlBody(body);
+    if (body.length() > 0) {
+      b.append("<body>");
+      b.append(body);
+      b.append("</body>");
     }
 
-    b.append("</body>");
-
-    b.append("</page>");
-
-    /**
-     * try { InputSource is = new InputSource(new StringReader(b.toString()));
-     * DocumentBuilder docBuilder = XMLUtilities.getDocumentBuilder(); Document
-     * doc = docBuilder.parse(is); return doc.getFirstChild(); } catch
-     * (SAXException e) { logger.error("Error building dom tree for pagelet",
-     * e); } catch (IOException e) { logger.error("Error reading pagelet xml",
-     * e); } catch (ParserConfigurationException e) {
-     * logger.error("Error parsing pagelet xml", e); }
-     */
+    b.append("</").append(rootTag).append(">");
 
     return b.toString();
+  }
+
+  /**
+   * Returns the name of the root tag as used in {@link #toXml()}.
+   * 
+   * @return the root tag
+   */
+  protected String toXmlRootTag() {
+    return "resource";
+  }
+
+  /**
+   * Optionally adds additional pieces to the <tt>&lt;head&gt;</tt> section of
+   * the resource's xml serialization.
+   * <p>
+   * Subclasses that need to store additional content in that section should
+   * overwrite this method and add that information to the buffer.
+   * 
+   * @param buffer
+   *          the string buffer
+   */
+  protected void toXmlHead(StringBuffer buffer) {
+    return;
+  }
+
+  /**
+   * Optionally adds additional pieces to the <tt>&lt;body&gt;</tt> section of
+   * the resource's xml serialization.
+   * <p>
+   * Subclasses that need to store additional content in that section should
+   * overwrite this method and add that information to the buffer.
+   * 
+   * @param buffer
+   *          the string buffer
+   */
+  protected void toXmlBody(StringBuffer buffer) {
+    return;
   }
 
   /**
@@ -1183,8 +880,8 @@ public class PageImpl extends LocalizableObject implements Page {
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Page) {
-      return uri.equals(((Page) obj).getURI());
+    if (obj != null && obj instanceof Resource) {
+      return uri.equals(((Resource) obj).getURI());
     }
     return false;
   }

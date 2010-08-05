@@ -20,18 +20,18 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.content.Composer;
-import ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement;
-import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.Link;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.Pagelet;
-import ch.o2it.weblounge.common.content.PageletRenderer;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.Renderer;
-import ch.o2it.weblounge.common.content.Script;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.page.Composer;
+import ch.o2it.weblounge.common.content.page.DeclarativeHTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.Link;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.content.page.Script;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
@@ -71,7 +71,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   protected String targetPath = null;
 
   /** The page uri, deducted from targetPath */
-  protected PageURI pageURI = null;
+  protected ResourceURI pageURI = null;
 
   /** The page template id */
   protected String templateId = null;
@@ -129,7 +129,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       return;
 
     if (targetPath != null)
-      this.pageURI = new PageURIImpl(site, targetPath);
+      this.pageURI = new ResourceURIImpl(site, targetPath);
     if (templateId != null)
       this.template = site.getTemplate(templateId);
   }
@@ -172,9 +172,9 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Action#setPageURI(ch.o2it.weblounge.common.content.PageURI)
+   * @see ch.o2it.weblounge.common.site.Action#setPageURI(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public void setPageURI(PageURI uri) {
+  public void setPageURI(ResourceURI uri) {
     this.pageURI = uri;
   }
 
@@ -185,7 +185,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * 
    * @param uri
    *          the target path
-   * @see #setPageURI(PageURI)
+   * @see #setPageURI(ResourceURI)
    */
   void setPageURI(String uri) {
     this.targetPath = uri;
@@ -196,14 +196,14 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * 
    * @see ch.o2it.weblounge.common.site.Action#getPageURI()
    */
-  public PageURI getPageURI() {
+  public ResourceURI getPageURI() {
     return pageURI;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Action#setTemplate(ch.o2it.weblounge.common.content.PageTemplate)
+   * @see ch.o2it.weblounge.common.site.Action#setTemplate(ch.o2it.weblounge.common.content.page.PageTemplate)
    */
   public void setTemplate(PageTemplate template) {
     this.template = template;
@@ -301,7 +301,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
    * leaves rendering to the actual content of the composer. This means that if
    * this action is rendered on an existing page, a call to
-   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.Pagelet)}
+   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.page.Pagelet)}
    * for each of them will be issued.
    * 
    * @param request
@@ -311,7 +311,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * @return <code>EVAL_COMPOSER</code>
    * @see ch.o2it.weblounge.common.site.HTMLAction#startStage(ch.o2it.weblounge.api.request.WebloungeRequest,
    *      ch.o2it.weblounge.api.request.WebloungeResponse,
-   *      ch.o2it.weblounge.common.content.Composer)
+   *      ch.o2it.weblounge.common.content.page.Composer)
    */
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws IOException, ActionException {
@@ -322,7 +322,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
    * leaves rendering to the actual content of the composer. This means that if
    * this action is rendered on an existing page, a call to
-   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.Pagelet)}
+   * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.page.Pagelet)}
    * for each of them will be issued.
    * 
    * @param request
@@ -332,7 +332,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * @return <code>EVAL_COMPOSER</code>
    * @see ch.o2it.weblounge.common.site.HTMLAction#startComposer(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse,
-   *      ch.o2it.weblounge.common.content.Composer)
+   *      ch.o2it.weblounge.common.content.page.Composer)
    */
   public int startComposer(WebloungeRequest request,
       WebloungeResponse response, Composer composer) throws IOException,
@@ -353,7 +353,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * @return <code>EVAL_PAGELET</code>
    * @see ch.o2it.weblounge.common.site.HTMLAction#startPagelet(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse,
-   *      ch.o2it.weblounge.common.content.Pagelet)
+   *      ch.o2it.weblounge.common.content.page.Pagelet)
    */
   public int startPagelet(WebloungeRequest request, WebloungeResponse response,
       Pagelet pagelet) throws IOException, ActionException {

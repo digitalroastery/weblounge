@@ -23,9 +23,9 @@ package ch.o2it.weblounge.common.page;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.impl.page.PageReader;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;
@@ -43,7 +43,7 @@ public class PageReaderTest {
   protected Page page = null;
   
   /** The page uri */
-  protected PageURIImpl pageURI = null;
+  protected ResourceURIImpl pageURI = null;
 
   /** Name of the test file */
   protected String testFile = "/page.xml";
@@ -61,12 +61,12 @@ public class PageReaderTest {
   public void setUp() throws Exception {
     Site site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
-    pageURI = new PageURIImpl(site, "/test", Page.LIVE);
+    pageURI = new ResourceURIImpl(site, "/test", Page.LIVE);
     reader = new PageReader();
   }
   
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageReader#read(java.io.InputStream, ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageReader#read(java.io.InputStream, ch.o2it.weblounge.common.content.PageURI)}.
    */
   @Test
   public void testResetPageReader() throws Exception {

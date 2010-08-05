@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.content.PageLayout;
-import ch.o2it.weblounge.common.content.PageTemplate;
+import ch.o2it.weblounge.common.content.page.PageLayout;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
@@ -298,7 +298,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#addTemplate(ch.o2it.weblounge.common.content.PageTemplate)
+   * @see ch.o2it.weblounge.common.site.Site#addTemplate(ch.o2it.weblounge.common.content.page.PageTemplate)
    */
   public void addTemplate(PageTemplate template) {
     templates.put(template.getIdentifier(), template);
@@ -307,7 +307,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#removeTemplate(ch.o2it.weblounge.common.content.PageTemplate)
+   * @see ch.o2it.weblounge.common.site.Site#removeTemplate(ch.o2it.weblounge.common.content.page.PageTemplate)
    */
   public void removeTemplate(PageTemplate template) {
     if (template == null)
@@ -341,7 +341,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#setDefaultTemplate(ch.o2it.weblounge.common.content.PageTemplate)
+   * @see ch.o2it.weblounge.common.site.Site#setDefaultTemplate(ch.o2it.weblounge.common.content.page.PageTemplate)
    */
   public void setDefaultTemplate(PageTemplate template) {
     if (template != null) {
@@ -433,7 +433,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#addLayout(ch.o2it.weblounge.common.content.PageLayout)
+   * @see ch.o2it.weblounge.common.site.Site#addLayout(ch.o2it.weblounge.common.content.page.PageLayout)
    */
   public void addLayout(PageLayout layout) {
     if (layout == null)

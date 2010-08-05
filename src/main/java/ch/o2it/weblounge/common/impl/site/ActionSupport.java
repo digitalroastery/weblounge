@@ -20,15 +20,15 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.content.HTMLHeadElement;
-import ch.o2it.weblounge.common.content.Link;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageletRenderer;
-import ch.o2it.weblounge.common.content.Script;
+import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.Link;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.content.page.Script;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
+import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
+import ch.o2it.weblounge.common.impl.content.page.ScriptImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.page.ScriptImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;

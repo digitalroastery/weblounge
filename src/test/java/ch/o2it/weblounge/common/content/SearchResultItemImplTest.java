@@ -23,8 +23,9 @@ package ch.o2it.weblounge.common.content;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
-import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;

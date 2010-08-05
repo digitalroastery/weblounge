@@ -18,10 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.PageLayout;
-import ch.o2it.weblounge.common.content.Pagelet;
+import ch.o2it.weblounge.common.content.page.PageLayout;
+import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.language.Language;
@@ -57,7 +57,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    * implementation, this method always returns <tt>default</tt>.
    * 
    * @return the layout identifier
-   * @see ch.o2it.weblounge.common.PageLayout.content.Layout#getIdentifier()
+   * @see ch.o2it.weblounge.common.content.page.PageLayout.content.Layout#getIdentifier()
    */
   public String getIdentifier() {
     return identifier;
@@ -92,7 +92,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    * @param user
    *          the user
    * @return <code>true</code>
-   * @see ch.o2it.weblounge.common.content.PageLayout#isEditable(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.PageLayout#isEditable(java.lang.String,
    *      ch.o2it.weblounge.common.user.User)
    */
   public boolean isEditable(String composer, User user) {
@@ -109,7 +109,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    *          the pagelet position within the composer
    * @param user
    *          the user
-   * @see ch.o2it.weblounge.common.content.PageLayout#isEditable(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.PageLayout#isEditable(java.lang.String,
    *      int, ch.o2it.weblounge.common.user.User)
    */
   public boolean isEditable(String composer, int position, User user) {
@@ -127,7 +127,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    * @param user
    *          the user
    * 
-   * @see ch.o2it.weblounge.common.content.PageLayout#isMovable(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.PageLayout#isMovable(java.lang.String,
    *      int, ch.o2it.weblounge.common.user.User)
    */
   public boolean isMovable(String composer, int position, User user) {
@@ -144,7 +144,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    *          the pagelet position within the composer
    * @param user
    *          the user
-   * @see ch.o2it.weblounge.common.content.PageLayout#isRemovable(java.lang.String,
+   * @see ch.o2it.weblounge.common.content.page.PageLayout#isRemovable(java.lang.String,
    *      int, ch.o2it.weblounge.common.user.User)
    */
   public boolean isRemovable(String composer, int position, User user) {

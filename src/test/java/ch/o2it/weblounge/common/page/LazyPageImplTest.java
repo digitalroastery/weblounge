@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.page.LazyPageImpl;
+import ch.o2it.weblounge.common.impl.content.page.LazyPageImpl;
 
 import org.junit.Before;
 

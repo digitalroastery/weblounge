@@ -18,11 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.page;
+package ch.o2it.weblounge.common.impl.content.page;
 
 import ch.o2it.weblounge.common.ConfigurationException;
-import ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement;
-import ch.o2it.weblounge.common.content.Script;
+import ch.o2it.weblounge.common.content.page.DeclarativeHTMLHeadElement;
+import ch.o2it.weblounge.common.content.page.Script;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -116,7 +116,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.DeclarativeHTMLHeadElement#configure(ch.o2it.weblounge.common.request.WebloungeRequest,
+   * @see ch.o2it.weblounge.common.content.page.DeclarativeHTMLHeadElement#configure(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.site.Site,
    *      ch.o2it.weblounge.common.site.Module)
    */
@@ -130,7 +130,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.HTMLHeadElement#getHref()
+   * @see ch.o2it.weblounge.common.content.page.HTMLHeadElement#getHref()
    */
   public String getHref() {
     return href;
@@ -139,7 +139,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Script#setType(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Script#setType(java.lang.String)
    */
   public void setType(String type) {
     this.type = type;
@@ -148,7 +148,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Script#getType()
+   * @see ch.o2it.weblounge.common.content.page.Script#getType()
    */
   public String getType() {
     return type;
@@ -157,7 +157,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Script#setCharset(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.page.Script#setCharset(java.lang.String)
    */
   public void setCharset(String charset) {
     this.charset = charset;
@@ -166,7 +166,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Script#getCharset()
+   * @see ch.o2it.weblounge.common.content.page.Script#getCharset()
    */
   public String getCharset() {
     return charset;
@@ -175,7 +175,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Script#setDeferred(boolean)
+   * @see ch.o2it.weblounge.common.content.page.Script#setDeferred(boolean)
    */
   public void setDeferred(boolean deferred) {
     this.defer = deferred;
@@ -184,7 +184,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Script#isDeferred()
+   * @see ch.o2it.weblounge.common.content.page.Script#isDeferred()
    */
   public boolean isDeferred() {
     return defer;
@@ -239,7 +239,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Script#toXml()
+   * @see ch.o2it.weblounge.common.content.page.Script#toXml()
    */
   public String toXml() {
     StringBuilder sb = new StringBuilder("<script ");

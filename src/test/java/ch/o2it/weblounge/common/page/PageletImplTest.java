@@ -26,12 +26,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.content.PageletURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.PageletURI;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.page.PageletImpl;
-import ch.o2it.weblounge.common.impl.page.PageletURIImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
@@ -58,7 +58,7 @@ import java.util.Locale;
 public class PageletImplTest {
 
   /** Page identifier */
-  protected PageURI uri = null;
+  protected ResourceURI uri = null;
 
   /** Associated site */
   protected Site site = null;
@@ -192,13 +192,13 @@ public class PageletImplTest {
    */
   public void setupPreliminaries() {
     site = EasyMock.createNiceMock(Site.class);
-    uri = new PageURIImpl(site, path);
+    uri = new ResourceURIImpl(site, path);
     location = new PageletURIImpl(uri, composer, position);
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#hashCode()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#hashCode()}.
    */
   @Test
   public void testHashCode() {
@@ -207,7 +207,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getModule()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getModule()}.
    */
   @Test
   public void testGetModule() {
@@ -216,7 +216,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getIdentifier()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getIdentifier()}.
    */
   @Test
   public void testGetIdentifier() {
@@ -225,7 +225,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getPropertyNames()}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getPropertyNames()}
    * .
    */
   @Test
@@ -235,7 +235,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getProperty(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getProperty(java.lang.String)}
    * .
    */
   @Test
@@ -245,7 +245,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#isMultiValueProperty(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#isMultiValueProperty(java.lang.String)}
    * .
    */
   @Test
@@ -256,7 +256,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getMultiValueProperty(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getMultiValueProperty(java.lang.String)}
    * .
    */
   @Test
@@ -268,7 +268,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getOwner()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getOwner()}.
    */
   @Test
   public void testGetCreator() {
@@ -276,7 +276,7 @@ public class PageletImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getPublishFrom()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getPublishFrom()}.
    */
   @Test
   public void testGetPublishFrom() {
@@ -284,7 +284,7 @@ public class PageletImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getPublishTo()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getPublishTo()}.
    */
   @Test
   public void testGetPublishTo() {
@@ -292,7 +292,7 @@ public class PageletImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getPublisher()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getPublisher()}.
    */
   @Test
   public void testGetPublisher() {
@@ -301,7 +301,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}
    * .
    */
   @Test
@@ -312,7 +312,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)}
    * .
    */
   @Test
@@ -323,7 +323,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}
    * .
    */
   @Test
@@ -334,7 +334,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}
    * .
    */
   @Test
@@ -345,7 +345,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#permissions()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#permissions()}.
    */
   @Test
   @Ignore
@@ -355,7 +355,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#addSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#addSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)}
    * .
    */
   @Test
@@ -378,7 +378,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#removeSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#removeSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)}
    * .
    */
   @Test
@@ -402,7 +402,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getURI()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getURI()}.
    */
   @Test
   public void testGetLocation() {
@@ -411,7 +411,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getContentNames(Language)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getContentNames(Language)}
    * .
    */
   @Test
@@ -422,7 +422,7 @@ public class PageletImplTest {
   
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#isMultiValueContent(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#isMultiValueContent(java.lang.String)}
    * .
    */
   @Test
@@ -433,7 +433,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getContent(java.lang.String, ch.o2it.weblounge.common.language.Language, boolean)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getContent(java.lang.String, ch.o2it.weblounge.common.language.Language, boolean)}
    * .
    */
   @Test
@@ -458,7 +458,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getContent(java.lang.String, ch.o2it.weblounge.common.language.Language)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getContent(java.lang.String, ch.o2it.weblounge.common.language.Language)}
    * .
    */
   @Test
@@ -477,7 +477,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getContent(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getContent(java.lang.String)}
    * .
    */
   @Test
@@ -498,7 +498,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getMultiValueContent(java.lang.String, ch.o2it.weblounge.common.language.Language, boolean)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getMultiValueContent(java.lang.String, ch.o2it.weblounge.common.language.Language, boolean)}
    * .
    */
   @Test
@@ -527,7 +527,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getMultiValueContent(java.lang.String, ch.o2it.weblounge.common.language.Language)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getMultiValueContent(java.lang.String, ch.o2it.weblounge.common.language.Language)}
    * .
    */
   @Test
@@ -549,7 +549,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#getMultiValueContent(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#getMultiValueContent(java.lang.String)}
    * .
    */
   @Test
@@ -574,7 +574,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#equals(java.lang.Object)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#equals(java.lang.Object)}
    * .
    */
   @Test
@@ -589,7 +589,7 @@ public class PageletImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletImpl#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)}
    * .
    */
   @Test

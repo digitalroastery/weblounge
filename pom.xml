@@ -167,8 +167,10 @@
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.common.impl.content;version=${project.version},
+              ch.o2it.weblounge.common.impl.content.image;version=${project.version},
+              ch.o2it.weblounge.common.impl.content.page;version=${project.version},
+              ch.o2it.weblounge.common.impl.content.resource;version=${project.version},
               ch.o2it.weblounge.common.impl.language;version=${project.version},
-              ch.o2it.weblounge.common.impl.page;version=${project.version},
               ch.o2it.weblounge.common.impl.request;version=${project.version},
               ch.o2it.weblounge.common.impl.scheduler;version=${project.version},
               ch.o2it.weblounge.common.impl.security;version=${project.version},

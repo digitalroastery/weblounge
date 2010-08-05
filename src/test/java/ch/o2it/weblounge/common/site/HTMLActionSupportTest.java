@@ -24,12 +24,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageImpl;
-import ch.o2it.weblounge.common.impl.page.PageTemplateImpl;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.site.ActionSupport;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
@@ -53,7 +53,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
   protected String pageURIPath = "/testpage/";
 
   /** The page uri */
-  protected PageURI pageURI = null;
+  protected ResourceURI pageURI = null;
 
   /** The page */
   protected Page page = null;
@@ -95,7 +95,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
     module = EasyMock.createNiceMock(Module.class);
     EasyMock.replay(module);
 
-    pageURI = new PageURIImpl(site, pageURIPath);
+    pageURI = new ResourceURIImpl(site, pageURIPath);
     page = new PageImpl(pageURI);
     actionUrl = new WebUrlImpl(site, UrlSupport.concat(siteUrl, mountpoint));
   }
@@ -117,8 +117,8 @@ public class HTMLActionSupportTest extends ActionSupportTest {
   @Test
   public void testGetPageURI() {
     assertEquals(pageURI, htmlAction.getPageURI());
-    htmlAction.setPageURI(new PageURIImpl(site, "/testpage"));
-    assertEquals(new PageURIImpl(site, "/testpage/"), htmlAction.getPageURI());
+    htmlAction.setPageURI(new ResourceURIImpl(site, "/testpage"));
+    assertEquals(new ResourceURIImpl(site, "/testpage/"), htmlAction.getPageURI());
   }
 
   /**

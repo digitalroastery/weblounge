@@ -28,9 +28,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageURI;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.site.Site;
 
@@ -47,22 +47,22 @@ public class PageURITest {
   protected static Site site = null;
 
   /** The uri instance under test */
-  protected PageURI simpleURI = null;
+  protected ResourceURI simpleURI = null;
 
   /** The uri instance under test */
-  protected PageURI versionedURI = null;
+  protected ResourceURI versionedURI = null;
 
   /** The uri instance under test */
-  protected PageURI identifyableVersionedURI = null;
+  protected ResourceURI identifyableVersionedURI = null;
 
   /** The parent uri instance under test */
-  protected PageURI simpleParentURI = null;
+  protected ResourceURI simpleParentURI = null;
 
   /** The parent uri instance under test */
-  protected PageURI versionedParentURI = null;
+  protected ResourceURI versionedParentURI = null;
 
   /** The parent uri instance under test */
-  protected PageURI identifyableParentURI = null;
+  protected ResourceURI identifyableParentURI = null;
 
   /** The default path */
   protected String defaultPath = "/test";
@@ -88,16 +88,16 @@ public class PageURITest {
    */
   @Before
   public void setUp() throws Exception {
-    simpleURI = new PageURIImpl(site, defaultPath);
-    versionedURI = new PageURIImpl(site, defaultPath, defaultRandomVersion);
-    identifyableVersionedURI = new PageURIImpl(site, defaultPath, defaultRandomVersion, defaultId);
-    simpleParentURI = new PageURIImpl(site, defaultParentPath);
-    versionedParentURI = new PageURIImpl(site, defaultParentPath, defaultRandomVersion);
-    identifyableParentURI = new PageURIImpl(site, defaultParentPath, defaultRandomVersion, defaultId);
+    simpleURI = new ResourceURIImpl(site, defaultPath);
+    versionedURI = new ResourceURIImpl(site, defaultPath, defaultRandomVersion);
+    identifyableVersionedURI = new ResourceURIImpl(site, defaultPath, defaultRandomVersion, defaultId);
+    simpleParentURI = new ResourceURIImpl(site, defaultParentPath);
+    versionedParentURI = new ResourceURIImpl(site, defaultParentPath, defaultRandomVersion);
+    identifyableParentURI = new ResourceURIImpl(site, defaultParentPath, defaultRandomVersion, defaultId);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getId()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceURIImpl#getId()}.
    */
   @Test
   public void testGetId() {
@@ -107,7 +107,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getParentURI()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceURIImpl#getParentURI()}.
    */
   @Test
   public void testGetParentURI() {
@@ -117,7 +117,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getPath()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceURIImpl#getPath()}.
    */
   @Test
   public void testGetPath() {
@@ -125,7 +125,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getSite()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceURIImpl#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -135,7 +135,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#getVersion()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceURIImpl#getVersion()}.
    */
   @Test
   public void testGetVersion() {
@@ -145,7 +145,7 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.page.PageURIImpl#switchToVersion(long)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceURIImpl#switchToVersion(long)}.
    */
   @Test
   public void testGetVersionLong() {

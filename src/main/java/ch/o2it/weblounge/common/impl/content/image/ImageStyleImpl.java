@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.content;
+package ch.o2it.weblounge.common.impl.content.image;
 
 import static ch.o2it.weblounge.common.site.ScalingMode.Box;
 import static ch.o2it.weblounge.common.site.ScalingMode.Cover;
@@ -27,7 +27,8 @@ import static ch.o2it.weblounge.common.site.ScalingMode.Height;
 import static ch.o2it.weblounge.common.site.ScalingMode.None;
 import static ch.o2it.weblounge.common.site.ScalingMode.Width;
 
-import ch.o2it.weblounge.common.content.ImageStyle;
+import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -105,7 +106,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.ImageStyle#setScalingMode(ch.o2it.weblounge.common.site.ScalingMode)
+   * @see ch.o2it.weblounge.common.content.image.ImageStyle#setScalingMode(ch.o2it.weblounge.common.site.ScalingMode)
    */
   public void setScalingMode(ScalingMode mode) {
     this.scalingMode = mode;
@@ -114,7 +115,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.ImageStyle#getScalingMode()
+   * @see ch.o2it.weblounge.common.content.image.ImageStyle#getScalingMode()
    */
   public ScalingMode getScalingMode() {
     return scalingMode;
@@ -123,7 +124,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.ImageStyle#setHeight(int)
+   * @see ch.o2it.weblounge.common.content.image.ImageStyle#setHeight(int)
    */
   public void setHeight(int height) {
     this.height = height;
@@ -141,7 +142,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.ImageStyle#setWidth(int)
+   * @see ch.o2it.weblounge.common.content.image.ImageStyle#setWidth(int)
    */
   public void setWidth(int width) {
     this.width = width;
@@ -150,7 +151,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.ImageStyle#getWidth()
+   * @see ch.o2it.weblounge.common.content.image.ImageStyle#getWidth()
    */
   public int getWidth() {
     return width;
@@ -275,7 +276,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.ImageStyle#toXml()
+   * @see ch.o2it.weblounge.common.content.image.ImageStyle#toXml()
    */
   public String toXml() {
     StringBuffer buf = new StringBuffer();

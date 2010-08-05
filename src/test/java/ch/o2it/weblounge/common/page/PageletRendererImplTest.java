@@ -23,12 +23,12 @@ package ch.o2it.weblounge.common.page;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.Link;
-import ch.o2it.weblounge.common.content.PagePreviewMode;
-import ch.o2it.weblounge.common.content.PageletRenderer;
+import ch.o2it.weblounge.common.content.page.Link;
+import ch.o2it.weblounge.common.content.page.PagePreviewMode;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.junit.Before;
@@ -159,7 +159,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#getPreviewMode()}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl#getPreviewMode()}
    * .
    */
   @Test
@@ -189,7 +189,7 @@ public class PageletRendererImplTest {
   
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#getEditor()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl#getEditor()}.
    */
   @Test
   public void testGetEditor() {
@@ -198,7 +198,7 @@ public class PageletRendererImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.page.PageletRendererImpl#render(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl#render(ch.o2it.weblounge.common.request.WebloungeRequest, ch.o2it.weblounge.common.request.WebloungeResponse)}
    * .
    */
   @Test
