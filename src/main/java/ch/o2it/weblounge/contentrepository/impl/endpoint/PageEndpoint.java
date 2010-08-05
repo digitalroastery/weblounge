@@ -131,6 +131,8 @@ public class PageEndpoint {
    *          the page identifier
    * @param pageXml
    *          the updated page
+   * @param ifMatchHeader
+   *          the page's <code>etag</code> value
    * @return response an empty response
    * @throws WebApplicationException
    *           if the update fails
