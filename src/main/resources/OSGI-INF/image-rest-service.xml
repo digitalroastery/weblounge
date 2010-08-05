@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  name="Weblounge Image Endpoint">	
+  
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.ImageEndpoint" />
+  <property name="service.description" value="Weblounge Image Endpoint" />
+  <property name="rest.path" value="images" />
+  <service>
+    <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.ImageEndpoint" />
+  </service>
+
+  <reference name="sites" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+
+</scr:component>
