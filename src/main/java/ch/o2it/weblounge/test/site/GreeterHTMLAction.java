@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.test.site;
 
-import ch.o2it.weblounge.common.content.Composer;
+import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
@@ -76,7 +76,7 @@ public class GreeterHTMLAction extends HTMLActionSupport {
    * 
    * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse,
-   *      ch.o2it.weblounge.common.content.Composer)
+   *      ch.o2it.weblounge.common.content.page.Composer)
    */
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws ActionException {
