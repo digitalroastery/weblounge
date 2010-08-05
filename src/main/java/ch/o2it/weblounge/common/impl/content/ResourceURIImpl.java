@@ -21,8 +21,8 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.MalformedPageURIException;
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.url.UrlImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
@@ -43,7 +43,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
   Site site = null;
 
   /** The page */
-  long version = Page.LIVE;
+  long version = Resource.LIVE;
 
   /**
    * Constructor for a URI pointing to the live version of the root document.
@@ -52,7 +52,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    *          the associated site
    */
   public ResourceURIImpl(Site site) {
-    this(site, "/", Page.LIVE, null);
+    this(site, "/", Resource.LIVE, null);
   }
 
   /**
@@ -75,7 +75,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    *          the url
    */
   public ResourceURIImpl(WebUrl url) {
-    this(url.getSite(), url.getPath(), Page.LIVE, null);
+    this(url.getSite(), url.getPath(), Resource.LIVE, null);
   }
 
   /**
@@ -101,7 +101,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    *          the path
    */
   public ResourceURIImpl(Site site, String path) throws MalformedPageURIException {
-    this(site, path, Page.LIVE, null);
+    this(site, path, Resource.LIVE, null);
   }
 
   /**
@@ -135,7 +135,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    */
   public ResourceURIImpl(Site site, String path, String id)
       throws MalformedPageURIException {
-    this(site, path, Page.LIVE, id);
+    this(site, path, Resource.LIVE, id);
   }
 
   /**

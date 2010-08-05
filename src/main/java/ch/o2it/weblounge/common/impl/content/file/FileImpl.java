@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.content.resource;
+package ch.o2it.weblounge.common.impl.content.file;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.resource.File;
@@ -42,6 +42,17 @@ public class FileImpl extends ResourceImpl implements File {
   
   /** The mime type */
   protected String mimeType = null;
+
+  /**
+   * Creates a new file with the given uri and the data at
+   * <code>contentUrl</code>.
+   * 
+   * @param uri
+   *          the file uri
+   */
+  public FileImpl(ResourceURI uri) {
+    this(uri, null);
+  }
 
   /**
    * Creates a new file with the given uri and the data at

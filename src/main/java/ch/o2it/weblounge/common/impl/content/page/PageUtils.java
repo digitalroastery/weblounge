@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.Resource;
 
 /**
  * This class contains utility methods intended to facilitate dealing with page
@@ -32,8 +32,8 @@ public class PageUtils {
    * Returns the version for the given version identifier. Available versions
    * are:
    * <ul>
-   * <li>{@link Page#LIVE}</li>
-   * <li>{@link Page#WORK}</li>
+   * <li>{@link Resource#LIVE}</li>
+   * <li>{@link Resource#WORK}</li>
    * 
    * @param version
    *          the version identifier
@@ -41,9 +41,9 @@ public class PageUtils {
    */
   public static long getVersion(String version) {
     if (version.equals("live") || version.equals("index")) {
-      return Page.LIVE;
+      return Resource.LIVE;
     } else if (version.equals("work")) {
-      return Page.WORK;
+      return Resource.WORK;
     } else {
       try {
         return Long.parseLong(version);
@@ -57,17 +57,17 @@ public class PageUtils {
    * Returns the document name for the given version. For the live version, this
    * method will return <code>index.xml</code>. Available versions are:
    * <ul>
-   * <li>{@link Page#LIVE}</li>
-   * <li>{@link Page#WORK}</li>
+   * <li>{@link Resource#LIVE}</li>
+   * <li>{@link Resource#WORK}</li>
    * 
    * @param version
    *          the version identifier
    * @return the version string
    */
   public static String getDocument(long version) {
-    if (version == Page.LIVE)
+    if (version == Resource.LIVE)
       return "index.xml";
-    else if (version == Page.WORK)
+    else if (version == Resource.WORK)
       return "work.xml";
     else
       return Long.toString(version) + ".xml";
@@ -77,17 +77,17 @@ public class PageUtils {
    * Returns the version identifier for the given version. Available versions
    * are:
    * <ul>
-   * <li>{@link Page#LIVE}</li>
-   * <li>{@link Page#WORK}</li>
+   * <li>{@link Resource#LIVE}</li>
+   * <li>{@link Resource#WORK}</li>
    * 
    * @param version
    *          the version identifier
    * @return the version string
    */
   public static String getVersionString(long version) {
-    if (version == Page.LIVE)
+    if (version == Resource.LIVE)
       return "live";
-    else if (version == Page.WORK)
+    else if (version == Resource.WORK)
       return "work";
     else
       return Long.toString(version);

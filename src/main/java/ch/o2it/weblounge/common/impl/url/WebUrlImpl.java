@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
@@ -101,7 +101,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       throw new IllegalArgumentException("Path must not be null");
     this.site = site;
     this.path = analyzePath(path, '/');
-    version = Math.max(Page.LIVE, version);
+    version = Math.max(Resource.LIVE, version);
   }
 
   /**
@@ -259,9 +259,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     if (version >= 0 || this.version > 0 || language != null || this.language != null || flavor != null || this.flavor != null) {
       if (version < 0)
         version = this.version;
-      if (version == Page.LIVE)
+      if (version == Resource.LIVE)
         selector.append("index");
-      else if (version == Page.WORK) {
+      else if (version == Resource.WORK) {
         selector.append("work");
       } else if (version >= 0) {
         selector.append(Long.toString(version));
@@ -322,7 +322,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     // Version
     if (includeVersion && version > 0) {
       buf.append(pathElementSeparatorChar);
-      if (version == Page.WORK)
+      if (version == Resource.WORK)
         buf.append("work");
       else if (version >= 0)
         buf.append(Long.toString(version));
@@ -438,9 +438,9 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       // Version
       String v = pathMatcher.group(2);
       if ("index".equals(v) || "live".equals(v)) {
-        this.version = Page.LIVE;
+        this.version = Resource.LIVE;
       } else if ("work".equals(v)) {
-        this.version = Page.WORK;
+        this.version = Resource.WORK;
       } else if (v != null && !"".equals(v)) {
         try {
           this.version = Long.parseLong(v);

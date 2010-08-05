@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.image.Image;
-import ch.o2it.weblounge.common.impl.content.resource.FileImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileImpl;
 
 import java.net.URL;
 
