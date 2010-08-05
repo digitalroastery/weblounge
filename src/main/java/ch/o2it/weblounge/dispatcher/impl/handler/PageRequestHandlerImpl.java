@@ -23,11 +23,11 @@ package ch.o2it.weblounge.dispatcher.impl.handler;
 import static ch.o2it.weblounge.common.request.RequestFlavor.HTML;
 import static ch.o2it.weblounge.common.request.RequestFlavor.ANY;
 
-import ch.o2it.weblounge.common.content.Page;
-import ch.o2it.weblounge.common.content.PageTemplate;
-import ch.o2it.weblounge.common.content.PageURI;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.Renderer;
-import ch.o2it.weblounge.common.impl.page.PageURIImpl;
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
@@ -145,7 +145,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     // bundle.
     try {
       Page page = null;
-      PageURI pageURI = null;
+      ResourceURI pageURI = null;
       Site site = request.getSite();
 
       // Check if a page was passed as an attribute
@@ -167,7 +167,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
           if (action != null)
             pageURI = getPageURIForAction(action, request);
           else
-            pageURI = new PageURIImpl(request);
+            pageURI = new ResourceURIImpl(request);
           page = contentRepository.getPage(pageURI);
         } catch (ContentRepositoryException e) {
           logger.error("Unable to load page {}: {}", new Object[] {
@@ -285,8 +285,8 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
    *          the weblounge request
    * @return the target page
    */
-  protected PageURI getPageURIForAction(Action action, WebloungeRequest request) {
-    PageURI target = null;
+  protected ResourceURI getPageURIForAction(Action action, WebloungeRequest request) {
+    ResourceURI target = null;
     Site site = request.getSite();
 
     // Check if a target-page parameter was passed
@@ -298,16 +298,16 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         if (encoding == null)
           encoding = "utf-8";
         decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
-        target = new PageURIImpl(site, decocedTargetUrl);
+        target = new ResourceURIImpl(site, decocedTargetUrl);
       } catch (UnsupportedEncodingException e) {
         logger.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
-        target = new PageURIImpl(site, "/");
+        target = new ResourceURIImpl(site, "/");
       }
     }
 
     // Nothing found, let's choose the site's homepage
     if (target == null) {
-      target = new PageURIImpl(site, "/");
+      target = new ResourceURIImpl(site, "/");
     }
 
     return target;
