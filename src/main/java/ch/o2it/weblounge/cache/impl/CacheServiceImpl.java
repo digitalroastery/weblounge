@@ -98,7 +98,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties)
       throws org.osgi.service.cm.ConfigurationException {
     if (properties == null)
