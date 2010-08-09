@@ -78,24 +78,18 @@ public class BundleContentRepository extends AbstractContentRepository {
   /** Prefix for repository configuration keys */
   private static final String CONF_PREFIX = ContentRepositoryServiceImpl.OPT_PREFIX + ".bundle.";
 
-  /** Option to cleanup temporary bundle index on shutdown */ 
+  /** Option to cleanup temporary bundle index on shutdown */
   private static final String OPT_CLEANUP = CONF_PREFIX + "cleanup";
-  
+
   /** The site bundle context */
   protected Bundle bundle = null;
 
   /** Prefix into the bundle */
   protected String bundlePathPrefix = "/repository";
 
-  /** Prefix into the bundle */
-  protected String pagesPathPrefix = bundlePathPrefix + "/pages";
-
-  /** Prefix into the bundle */
-  protected String resourcesPathPrefix = bundlePathPrefix + "/resources";
-
   /** The root directory for the temporary bundle index */
   protected File idxRootDir = null;
-  
+
   /** Flag to indicate whether temporary indices should be removed on shutdown */
   protected boolean cleanupTemporaryIndex = false;
 
@@ -126,10 +120,10 @@ public class BundleContentRepository extends AbstractContentRepository {
     } catch (IOException e) {
       throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
     }
-    
+
     // Cleanup on shutdown?
     if (properties.get(OPT_CLEANUP) != null) {
-      cleanupTemporaryIndex = ConfigurationUtils.isTrue((String)properties.get(OPT_CLEANUP));
+      cleanupTemporaryIndex = ConfigurationUtils.isTrue((String) properties.get(OPT_CLEANUP));
       logger.info("Bundle content repository indices will {} removed on shutdown", (cleanupTemporaryIndex ? "be" : "not be"));
     }
 
@@ -164,7 +158,8 @@ public class BundleContentRepository extends AbstractContentRepository {
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException {
+  public ResourceURI[] getVersions(ResourceURI uri)
+      throws ContentRepositoryException {
     if (uri == null)
       throw new IllegalArgumentException("Page uri cannot be null");
     try {
@@ -189,15 +184,15 @@ public class BundleContentRepository extends AbstractContentRepository {
   @SuppressWarnings("unchecked")
   public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
       throws ContentRepositoryException {
-    String entryPath = UrlSupport.concat(pagesPathPrefix, uri.getPath());
+    String entryPath = uri.getPath();
+    if (!entryPath.startsWith("/"))
+      throw new IllegalArgumentException("Resource uri must be absolute");
     int startLevel = StringUtils.countMatches(uri.getPath(), "/");
     List<ResourceURI> resources = new ArrayList<ResourceURI>();
     Enumeration<URL> entries = bundle.findEntries(entryPath, "*.xml", level > 0);
     if (entries != null) {
       while (entries.hasMoreElements()) {
         URL entry = entries.nextElement();
-        String path = FilenameUtils.getPath(entry.getPath());
-        path = path.substring(pagesPathPrefix.length() - 1);
         int currentLevel = StringUtils.countMatches(uri.getPath(), "/");
         if (level > -1 && level < Integer.MAX_VALUE && currentLevel > (startLevel + level))
           continue;
@@ -225,49 +220,11 @@ public class BundleContentRepository extends AbstractContentRepository {
    */
   public void setURI(String repositoryURI) {
     super.setURI(repositoryURI);
+    if (repositoryURI == null)
+      throw new IllegalArgumentException("Repository uri cannot be null");
+    if (repositoryURI.startsWith("/"))
+      throw new IllegalArgumentException("Repository uri Must be absolute");
     this.bundlePathPrefix = repositoryURI;
-    this.pagesPathPrefix = UrlSupport.concat(bundlePathPrefix, "/pages");
-    this.resourcesPathPrefix = UrlSupport.concat(bundlePathPrefix, "/resources");
-  }
-
-  /**
-   * Sets the pages uri to the specified value.
-   * <p>
-   * Note that this uri must be absolute. Also note that it will be overwritten
-   * by subsequent calls to <code>setURI()</code>.
-   * 
-   * @param pagesURI
-   *          the uri to the pages section of the repository
-   * @throws IllegalArgumentException
-   *           if the uri is either <code>null</code> or relative instead of
-   *           absolute
-   */
-  public void setPagesURI(String pagesURI) {
-    if (pagesURI == null)
-      throw new IllegalArgumentException("Pages uri cannot be null");
-    if (pagesURI.startsWith("/"))
-      throw new IllegalArgumentException("Pages uri Must be absolute");
-    this.pagesPathPrefix = pagesURI;
-  }
-
-  /**
-   * Sets the resources uri to the specified value.
-   * <p>
-   * Note that this uri must be absolute. Also note that it will be overwritten
-   * by subsequent calls to <code>setURI()</code>.
-   * 
-   * @param resourcesURI
-   *          the uri to the pages section of the repository
-   * @throws IllegalArgumentException
-   *           if the uri is either <code>null</code> or relative instead of
-   *           absolute
-   */
-  public void setResourcesURI(String resourcesURI) {
-    if (resourcesURI == null)
-      throw new IllegalArgumentException("Pages uri cannot be null");
-    if (resourcesURI.startsWith("/"))
-      throw new IllegalArgumentException("Pages uri Must be absolute");
-    this.resourcesPathPrefix = resourcesURI;
   }
 
   /**
@@ -289,7 +246,7 @@ public class BundleContentRepository extends AbstractContentRepository {
     // Make sure the version matches the implementation
     if (index.getIndexVersion() != VersionedContentRepositoryIndex.IDX_VERSION) {
       logger.warn("Index version does not match implementation, triggering reindex");
-    } 
+    }
 
     // Is there an existing index?
     else if (index.getResourceCount() > 0) {
@@ -307,7 +264,7 @@ public class BundleContentRepository extends AbstractContentRepository {
       long pageVersionCount = 0;
       Map<String, ResourceSerializer<?>> serializers = new HashMap<String, ResourceSerializer<?>>();
       ResourceURI previousURI = null;
-      
+
       ResourceURI homeURI = new PageURIImpl(getSite(), "/");
       Iterator<ResourceURI> pi = list(homeURI, Integer.MAX_VALUE, -1);
       // TODO: Add file uris
@@ -327,11 +284,11 @@ public class BundleContentRepository extends AbstractContentRepository {
             serializers.put(resourceType, serializer);
           }
         }
-        
+
         // Load the resource
         Resource resource = null;
         try {
-          ResourceReader<?> reader = serializer.getReader();        
+          ResourceReader<?> reader = serializer.getReader();
           InputStream is = loadResource(uri);
           resource = reader.read(uri, is);
           if (resource == null) {
@@ -354,7 +311,7 @@ public class BundleContentRepository extends AbstractContentRepository {
       }
 
       success = true;
-      
+
       if (pageCount > 0) {
         time = System.currentTimeMillis() - time;
         logger.info("Site index populated in {} ms", ConfigurationUtils.toHumanReadableDuration(time));
@@ -371,7 +328,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         }
       }
     }
-    
+
     return index;
   }
 
@@ -392,10 +349,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         return null;
     }
 
-    String entryPath = UrlSupport.concat(new String[] {
-        pagesPathPrefix,
-        uriPath,
-        ResourceUtils.getDocument(uri.getVersion()) });
+    String entryPath = UrlSupport.concat(uriPath, ResourceUtils.getDocument(uri.getVersion()));
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
@@ -410,14 +364,34 @@ public class BundleContentRepository extends AbstractContentRepository {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.language.Language)
    */
   @Override
   protected InputStream loadResourceContent(ResourceURI uri, Language language)
       throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+    String uriPath = uri.getPath();
+
+    // This repository is path based, so let's make sure we have a path
+    // or get one, if that's not the case.
+    if (uriPath == null) {
+      uriPath = index.getPath(uri);
+      if (uriPath == null)
+        return null;
+    }
+
+    String entryPath = UrlSupport.concat(uriPath, ResourceUtils.getDocument(uri.getVersion()));
+    URL url = bundle.getEntry(entryPath);
+    if (url == null)
+      return null;
+    try {
+      return url.openStream();
+    } catch (IOException e) {
+      throw new IOException("I/O error while reading page '" + uri + "'", e);
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   /**

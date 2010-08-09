@@ -118,7 +118,10 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     storeResource(resource);
 
     // Add entry to index
-    index.add(resource);
+    if (!index.exists(resource.getURI()))
+      index.add(resource);
+    else
+      index.update(resource);
 
     return resource;
   }
