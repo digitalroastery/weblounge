@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl.index;
 
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -49,7 +50,7 @@ import java.io.RandomAccessFile;
  * entries currently in the index and then the slots containing the indicated
  * number of 64-bit addresses (8 bytes).
  */
-public class PathIndex {
+public class PathIndex implements VersionedContentRepositoryIndex {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PathIndex.class);
@@ -57,8 +58,20 @@ public class PathIndex {
   /** Name for the path index file */
   public static final String PATH_IDX_NAME = "path.idx";
 
+  /** Location of the versions header */
+  protected static final long IDX_VERSION_HEADER_LOCATION = 0;
+
+  /** Location of the slots header */
+  protected static final long IDX_SLOTS_HEADER_LOCATION = 4;
+
+  /** Location of the entries-per-slot header */
+  protected static final long IDX_ENTRIES_PER_SLOT_HEADER_LOCATION = 8;
+
+  /** Location of the entries header */
+  protected static final long IDX_ENTRIES_HEADER_LOCATION = 12;
+
   /** Number of bytes that are used for the index header */
-  protected static final int IDX_HEADER_SIZE = 16;
+  protected static final int IDX_HEADER_SIZE = 20;
 
   /** Default number of entries in index */
   private static final int IDX_ENTRIES = 128;
@@ -69,23 +82,14 @@ public class PathIndex {
   /** Size of an entry (long) in bytes */
   protected static final int IDX_ENTRY_SIZE = 8;
 
-  /** Location of the slots header */
-  protected static final long IDX_SLOTS_HEADER_LOCATION = 0;
-
-  /** Location of the entries-per-slot header */
-  protected static final long IDX_ENTRIES_PER_SLOT_HEADER_LOCATION = 4;
-
-  /** Location of the entries header */
-  protected static final long IDX_ENTRIES_HEADER_LOCATION = 8;
-
-  /** Location of the first entry */
-  protected static final long IDX_ENTRIES_LOCATION = 16;
-
   /** The index file */
   protected RandomAccessFile idx = null;
 
   /** The index file */
   protected File idxFile = null;
+
+  /** The version number */
+  protected int indexVersion = -1;
 
   /** True if this is a readonly index */
   protected boolean isReadOnly = false;
@@ -155,6 +159,9 @@ public class PathIndex {
 
     // Read index header information
     try {
+      this.indexVersion = idx.readInt();
+      if (indexVersion != IDX_VERSION)
+        logger.warn("Path index version mismatch (found {}, expected {}), consider reindex", indexVersion, IDX_VERSION);
       this.slots = idx.readInt();
       this.entriesPerSlot = idx.readInt();
       this.entries = idx.readLong();
@@ -180,6 +187,15 @@ public class PathIndex {
    */
   public void close() throws IOException {
     idx.close();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex#getIndexVersion()
+   */
+  public int getIndexVersion() {
+    return indexVersion;
   }
 
   /**
@@ -393,6 +409,7 @@ public class PathIndex {
    *           writing to the index fails
    */
   private void init(int slots, int entriesPerSlot) throws IOException {
+    this.indexVersion = IDX_VERSION;
     this.slots = slots;
     this.entriesPerSlot = entriesPerSlot;
     this.slotSizeInBytes = 4 + (entriesPerSlot * IDX_ENTRY_SIZE);
@@ -405,9 +422,9 @@ public class PathIndex {
         slots,
         entriesPerSlot });
 
-    idx.seek(0);
-
     // Write header
+    idx.seek(0);
+    idx.writeInt(indexVersion);
     idx.writeInt(slots);
     idx.writeInt(entriesPerSlot);
     idx.writeLong(entries);
@@ -468,10 +485,11 @@ public class PathIndex {
 
     // Copy the current index to the new one
 
-    idx.seek(IDX_ENTRIES_LOCATION);
-    idxNew.seek(0);
+    idx.seek(IDX_HEADER_SIZE);
 
     // Write header
+    idxNew.seek(0);
+    idxNew.writeInt(indexVersion);
     idxNew.writeInt(slots);
     idxNew.writeInt(entriesPerSlot);
     idxNew.writeLong(entries);

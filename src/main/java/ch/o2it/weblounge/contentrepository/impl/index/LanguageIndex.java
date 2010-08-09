@@ -20,8 +20,9 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
-import ch.o2it.weblounge.common.impl.content.ResourceUtils;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 
 import org.apache.commons.io.FilenameUtils;
@@ -33,25 +34,27 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * This index is part of the content repository index and maps page identifiers
- * to versions. In order to quickly get to an entry, use the <code>id</code> or
+ * to languages. In order to quickly get to an entry, use the <code>id</code> or
  * <code>path</code> index.
  * 
  * <pre>
- * | slot | id      | versions
+ * | slot | id      | languages
  * |------------------------------------------
- * | 1    | a-b-c-d | 1 876876876
+ * | 1    | a-b-c-d | de en
  * </pre>
  */
-public class VersionIndex implements VersionedContentRepositoryIndex {
+public class LanguageIndex implements VersionedContentRepositoryIndex {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(VersionIndex.class);
+  private static final Logger logger = LoggerFactory.getLogger(LanguageIndex.class);
 
-  /** Name for the version index file */
-  public static final String VERSION_IDX_NAME = "version.idx";
+  /** Name for the language index file */
+  public static final String LANGUAGE_IDX_NAME = "language.idx";
 
   /** Location of the version header */
   protected static final long IDX_VERSION_HEADER_LOCATION = 0;
@@ -59,8 +62,8 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
   /** Location of the bytes-per-id header */
   protected static final long IDX_BYTES_PER_ID_HEADER_LOCATION = 4;
 
-  /** Location of the versions-per-entry header */
-  protected static final long IDX_VERSIONS_PER_ENTRY_HEADER_LOCATION = 8;
+  /** Location of the languages-per-entry header */
+  protected static final long IDX_LANGUAGES_PER_ENTRY_HEADER_LOCATION = 8;
 
   /** Location of the entries header */
   protected static final long IDX_SLOTS_HEADER_LOCATION = 12;
@@ -74,8 +77,8 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
   /** Default number of bytes used per id */
   private static final int IDX_BYTES_PER_ID = 36;
 
-  /** Default number of versions per index entry */
-  private static final int IDX_VERSIONS_PER_ENTRY = 10;
+  /** Default number of languages per index entry */
+  private static final int IDX_LANGUAGES_PER_ENTRY = 5;
 
   /** The index file */
   protected RandomAccessFile idx = null;
@@ -86,17 +89,20 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
   /** True if this is a readonly index */
   protected boolean isReadOnly = false;
 
-  /** The version number */
+  /** The index version number */
   protected int indexVersion = -1;
 
   /** Number of bytes per id */
   protected int bytesPerId = IDX_BYTES_PER_ID;
 
-  /** Number of versions per entry */
-  protected int versionsPerEntry = IDX_VERSIONS_PER_ENTRY;
+  /** Number of languages per entry */
+  protected int languagesPerEntry = IDX_LANGUAGES_PER_ENTRY;
+
+  /** Number of bytes per language */
+  protected int bytesPerLanguage = 2;
 
   /** Number of bytes per entry */
-  protected int bytesPerEntry = bytesPerId + IDX_VERSIONS_PER_ENTRY * 8;
+  protected int bytesPerEntry = bytesPerId + IDX_LANGUAGES_PER_ENTRY * bytesPerLanguage;
 
   /** Number of entries */
   protected long entries = 0;
@@ -108,10 +114,10 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * Creates an index inside the given directory. If the index does not exist,
    * it is created and initialized with the default index settings, which means
    * that uri identifiers are expected to be made out of 36 bytes (uuid) while
-   * there is room for 10 versions with 8 bytes each.
+   * there is room for 10 languages with 8 bytes each.
    * <p>
-   * Note that the number of versions will automatically be increased as soon as
-   * an additional version is added, while the size of identifiers is fixed.
+   * Note that the number of languages will automatically be increased as soon
+   * as an additional language is added, while the size of identifiers is fixed.
    * 
    * @param indexRootDir
    *          location of the index root directory
@@ -120,8 +126,8 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public VersionIndex(File indexRootDir, boolean readOnly) throws IOException {
-    this(indexRootDir, readOnly, IDX_BYTES_PER_ID, IDX_VERSIONS_PER_ENTRY);
+  public LanguageIndex(File indexRootDir, boolean readOnly) throws IOException {
+    this(indexRootDir, readOnly, IDX_BYTES_PER_ID, IDX_LANGUAGES_PER_ENTRY);
   }
 
   /**
@@ -129,21 +135,21 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * exist, it is created and initialized with the default index settings, which
    * means that uri identifiers are expected to be made out of 36 bytes (uuid).
    * <p>
-   * Note that the number of versions will automatically be increased as soon as
-   * an additional version is added, while the size of identifiers is fixed.
+   * Note that the number of languages will automatically be increased as soon
+   * as an additional language is added, while the size of identifiers is fixed.
    * 
    * @param indexRootDirectory
    *          location of the index root directory
-   * @param versions
-   *          the number of versions per entry
+   * @param languages
+   *          the number of languages per entry
    * @param readOnly
    *          <code>true</code> to indicate a read only index
    * @throws IOException
    *           if reading from the index fails
    */
-  public VersionIndex(File indexRootDirectory, boolean readOnly, int versions)
+  public LanguageIndex(File indexRootDirectory, boolean readOnly, int languages)
       throws IOException {
-    this(indexRootDirectory, readOnly, IDX_BYTES_PER_ID, versions);
+    this(indexRootDirectory, readOnly, IDX_BYTES_PER_ID, languages);
   }
 
   /**
@@ -156,15 +162,15 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    *          <code>true</code> to indicate a read only index
    * @param idLengthInBytes
    *          the number of bytes per id
-   * @param versions
-   *          the number of versions per entry
+   * @param languages
+   *          the number of languages per entry
    * @throws IOException
    *           if reading from the index fails
    */
-  public VersionIndex(File indexRootDir, boolean readOnly, int idLengthInBytes,
-      int versions) throws IOException {
+  public LanguageIndex(File indexRootDir, boolean readOnly,
+      int idLengthInBytes, int languages) throws IOException {
 
-    this.idxFile = new File(indexRootDir, VERSION_IDX_NAME);
+    this.idxFile = new File(indexRootDir, LANGUAGE_IDX_NAME);
     this.isReadOnly = readOnly;
 
     String mode = readOnly ? "r" : "rwd";
@@ -181,19 +187,19 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     try {
       this.indexVersion = idx.readInt();
       if (indexVersion != IDX_VERSION)
-        logger.warn("Version index version mismatch (found {}, expected {}), consider reindex", indexVersion, IDX_VERSION);
+        logger.warn("Language index version mismatch (found {}, expected {}), consider reindex", indexVersion, IDX_VERSION);
       this.bytesPerId = idx.readInt();
-      this.versionsPerEntry = idx.readInt();
+      this.languagesPerEntry = idx.readInt();
       this.slots = idx.readLong();
       this.entries = idx.readLong();
-      this.bytesPerEntry = bytesPerId + 4 + versionsPerEntry * 8;
-      if (this.bytesPerId != idLengthInBytes || this.versionsPerEntry != versions)
-        resize(idLengthInBytes, versions);
+      this.bytesPerEntry = bytesPerId + 4 + languagesPerEntry * 8;
+      if (this.bytesPerId != idLengthInBytes || this.languagesPerEntry != languages)
+        resize(idLengthInBytes, languages);
     } catch (EOFException e) {
       if (readOnly) {
         throw new IllegalStateException("Readonly index cannot be empty");
       }
-      init(idLengthInBytes, versions);
+      init(idLengthInBytes, languages);
     } catch (IOException e) {
       logger.error("Error reading from path index: " + e.getMessage());
       throw e;
@@ -212,13 +218,13 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex#getIndexVersion()
    */
   public int getIndexVersion() {
     return indexVersion;
   }
-  
+
   /**
    * Returns the index size in bytes. The size is calculated from the size of
    * the header plus the number of slots multiplied by the size of one slot.
@@ -230,16 +236,16 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Returns the maximum number of versions per entry.
+   * Returns the maximum number of languages per entry.
    * <p>
    * This number may change if a resize operation happens, e. g. as soon as an
-   * additional version is added to a uri that already has the current maximum
-   * number of versions associated with it.
+   * additional language is added to a uri that already has the current maximum
+   * number of languages associated with it.
    * 
-   * @return the number of versions per entry
+   * @return the number of languages per entry
    */
-  public int getVersionsPerEntry() {
-    return versionsPerEntry;
+  public int getLanguagesPerEntry() {
+    return languagesPerEntry;
   }
 
   /**
@@ -252,56 +258,104 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
   }
 
   /**
-   * Adds id and version to the index and returns the index address.
+   * Adds id and language to the index and returns the index address.
    * 
    * @param id
    *          the identifier
-   * @param version
-   *          the page version
+   * @param language
+   *          the resource language
    * @return the entry's address in this index
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized long add(String id, long version) throws IOException {
-    return add(slots, id, version);
+  public synchronized long add(String id, Language language) throws IOException {
+    return add(slots, id, language);
   }
 
   /**
-   * Adds the version to the entry that is located in slot <code>address</code>
-   * and returns the index address.
+   * Adds id and a set of languages to the index and returns the index address.
    * 
-   * @param entry
-   *          the entry where the version needs to be added
-   * @param version
-   *          the page version
-   * @return the entry's address in this index
-   * @throws IOException
-   *           if writing to the index fails
-   */
-  public synchronized long add(long entry, long version) throws IOException {
-    return add(entry, null, version);
-  }
-
-  /**
-   * Adds the version to the entry that is located in slot <code>address</code>
-   * and returns the index address.
-   * 
-   * @param entry
-   *          the entry where the version needs to be added
    * @param id
    *          the identifier
-   * @param version
-   *          the page version
+   * @param languages
+   *          the resource languages
    * @return the entry's address in this index
    * @throws IOException
    *           if writing to the index fails
    */
-  private long add(long entry, String id, long version) throws IOException {
+  public synchronized long setLanguages(String id, Set<Language> languages)
+      throws IOException {
+    if (languages.size() == 0)
+      return add(slots, id, null);
+
+    Iterator<Language> li = languages.iterator();
+    long address = add(slots, id, li.next());
+    while (li.hasNext()) {
+      add(address, li.next());
+    }
+    return address;
+  }
+
+  /**
+   * Adds the language to the entry that is located in slot <code>entry</code>
+   * and returns the index address.
+   * 
+   * @param entry
+   *          the entry where the language needs to be added
+   * @param language
+   *          the resource language
+   * @return the entry's address in this index
+   * @throws IOException
+   *           if writing to the index fails
+   */
+  public synchronized long add(long entry, Language language)
+      throws IOException {
+    return add(entry, null, language);
+  }
+
+  /**
+   * Adds the languages to the entry that is located in slot <code>entry</code>
+   * and returns the index address.
+   * 
+   * @param entry
+   *          the entry where the language needs to be added
+   * @param languages
+   *          the resource languages
+   * @return the entry's address in this index
+   * @throws IOException
+   *           if writing to the index fails
+   */
+  public void setLanguages(long entry, Set<Language> languages) throws IOException {
+    delete(entry, true);
+    if (languages == null || languages.size() == 0)
+      return;
+    Iterator<Language> li = languages.iterator();
+    long address = add(entry, li.next());
+    while (li.hasNext()) {
+      add(address, li.next());
+    }
+  }
+
+  /**
+   * Adds the language to the entry that is located in slot <code>address</code>
+   * and returns the index address.
+   * 
+   * @param entry
+   *          the entry where the language needs to be added
+   * @param id
+   *          the identifier
+   * @param language
+   *          the resource language
+   * @return the entry's address in this index
+   * @throws IOException
+   *           if writing to the index fails
+   */
+  private long add(long entry, String id, Language language) throws IOException {
     if (id != null && id.getBytes().length != bytesPerId)
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
-    int existingVersions = 0;
+    int existingLanguageCount = 0;
 
     // See if there is an empty slot (only if we are adding a whole new entry)
     if (entry >= slots) {
@@ -327,10 +381,10 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
       byte[] bytes = new byte[bytesPerId];
       idx.read(bytes);
       id = new String(bytes);
-      existingVersions = idx.readInt();
-      if (existingVersions >= versionsPerEntry) {
-        logger.info("Adding additional version, triggering index resize");
-        resize(bytesPerId, versionsPerEntry * 2);
+      existingLanguageCount = idx.readInt();
+      if (existingLanguageCount >= languagesPerEntry) {
+        logger.info("Adding additional language, triggering index resize");
+        resize(bytesPerId, languagesPerEntry * 2);
         startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
       }
     }
@@ -341,11 +395,15 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
       idx.write(id.getBytes());
     else
       idx.skipBytes(bytesPerId);
-    idx.writeInt(existingVersions + 1);
-    idx.skipBytes(existingVersions * 8);
-    idx.writeLong(version);
 
-    entries ++;
+    if (language != null) {
+      idx.writeInt(existingLanguageCount + 1);
+      idx.skipBytes(existingLanguageCount * bytesPerLanguage);
+      idx.write(language.getIdentifier().getBytes());
+      entries++;
+    } else {
+      idx.writeInt(0);
+    }
 
     // Update the file header
     if (entry >= slots) {
@@ -353,86 +411,117 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
       idx.seek(IDX_SLOTS_HEADER_LOCATION);
       idx.writeLong(slots);
       idx.writeLong(entries);
-      logger.debug("Added uri with id '{}' and initial version '{}' as entry no {}", new Object[] {
-          id,
-          ResourceUtils.getVersionString(version),
-          entries }
-      );
-    } else {
+      if (language != null)
+        logger.debug("Added uri with id '{}' and initial language '{}' as entry no {}", new Object[] {
+            id,
+            language,
+            entries });
+      else
+        logger.debug("Added uri with id '{}' and no initial language as entry no {}", new Object[] {
+            id,
+            entries });
+    } else if (language != null) {
       idx.seek(IDX_ENTRIES_HEADER_LOCATION);
       idx.writeLong(entries);
-      logger.debug("Added version '{}' to uri with id '{}'", ResourceUtils.getVersionString(version), id);
+      logger.debug("Added language '{}' to uri with id '{}'", language, id);
     }
 
     return entry;
   }
 
   /**
-   * Removes all versions for the page uri that is located at slot
+   * Removes all languages for the page uri that is located at slot
    * <code>entry</code> from the index.
    * 
    * @param entry
    *          start address of uri entry
+   * @param keepSlot
+   *          <code>true</code> to keep the slot assigned to the current id
    * @throws IOException
    *           if removing the entry from the index fails
    */
   public synchronized void delete(long entry) throws IOException {
+    delete(entry, false);
+  }
+
+  /**
+   * Removes all languages for the page uri that is located at slot
+   * <code>entry</code> from the index. If <code>keepSlot</code> is set to
+   * <code>true</code>, the languages will be removed but the slot is kept and
+   * remains assigned to the current id.
+   * 
+   * @param entry
+   *          start address of uri entry
+   * @param keepSlot
+   *          <code>true</code> to keep the slot assigned to the current id
+   * @throws IOException
+   *           if removing the entry from the index fails
+   */
+  protected synchronized void delete(long entry, boolean keepSlot)
+      throws IOException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
 
     // Remove the entry
     idx.seek(startOfEntry);
-    idx.write('\n');
-    idx.write(new byte[bytesPerEntry - 1]);
-
-    // Update the file header
-    entries--;
-    idx.seek(IDX_ENTRIES_HEADER_LOCATION);
-    idx.writeLong(entries);
-
-    logger.debug("Removed all versions at address '{}' from index", entry);
+    if (keepSlot) {
+      idx.skipBytes(IDX_BYTES_PER_ID);
+      idx.writeInt(0);
+      idx.write(new byte[languagesPerEntry * bytesPerEntry]);
+      logger.debug("Removed all languages at address '{}' from index", entry);
+    } else {
+      idx.write('\n');
+      idx.write(new byte[bytesPerEntry - 1]);
+      entries--;
+      idx.seek(IDX_ENTRIES_HEADER_LOCATION);
+      idx.writeLong(entries);
+      logger.debug("Removed entry at address '{}' from index", entry);
+    }
   }
 
   /**
-   * Removes the given version from the page uri that is located at slot
+   * Removes the given language from the page uri that is located at slot
    * <code>entry</code>.
    * 
    * @param entry
    *          start address of uri entry
-   * @param version
-   *          the version to delete
+   * @param language
+   *          the language to delete
    * @throws IOException
    *           if removing the entry from the index fails
    */
-  public synchronized void delete(long entry, long version) throws IOException {
+  public synchronized void delete(long entry, Language language)
+      throws IOException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
 
-    // Remove the version from the indicated entry
+    // Remove the language from the indicated entry
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
     int deleteEntry = -1;
     int v = idx.readInt();
-    long[] versions = new long[v];
+    String[] languages = new String[v];
     for (int i = 0; i < v; i++) {
-      versions[i] = idx.readLong();
-      if (versions[i] == version) {
+      byte[] l = new byte[bytesPerLanguage];
+      idx.read(l);
+      languages[i] = new String(l);
+      if (languages[i].equals(language.getIdentifier())) {
         deleteEntry = i;
       }
     }
 
     // Everything ok?
     if (deleteEntry == -1)
-      throw new IllegalStateException("Version '" + version + "' is not part of the index");
+      throw new IllegalStateException("Language '" + language + "' is not part of the index");
 
-    // Drop the version
+    // Drop the language
     idx.seek(startOfEntry + bytesPerId);
     idx.writeInt(v - 1);
     idx.skipBytes(deleteEntry * 8);
     for (int i = deleteEntry + 1; i < v; i++) {
-      idx.writeLong(versions[i]);
+      idx.write(languages[i].getBytes());
     }
-    idx.write(new byte[(versionsPerEntry - v - 1) * 8]);
+    idx.write(new byte[(languagesPerEntry - v - 1) * 8]);
 
-    logger.debug("Removed version '{}' from uri '{}' from index", version, entry);
+    logger.debug("Removed language '{}' from uri '{}' from index", language, entry);
   }
 
   /**
@@ -442,55 +531,59 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    *           if writing to the index fails
    */
   public synchronized void clear() throws IOException {
-    init(bytesPerId, versionsPerEntry);
+    init(bytesPerId, languagesPerEntry);
   }
 
   /**
-   * Returns the uri's versions.
+   * Returns the uri's languages.
    * 
    * @param entry
    *          the entry at which the id is expected
-   * @return the versions
+   * @return the languages
    * @throws EOFException
    *           if the user tries to access a non-existing address
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized long[] getVersions(long entry) throws IOException,
+  public synchronized Language[] getLanguages(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
     int v = idx.readInt();
-    long[] versions = new long[v];
+    Language[] languages = new Language[v];
     for (int i = 0; i < v; i++) {
-      versions[i] = idx.readLong();
+      byte[] language = new byte[bytesPerLanguage];
+      idx.read(language);
+      languages[i] = LanguageSupport.getLanguage(new String(language));
     }
-    return versions;
+    return languages;
   }
 
   /**
    * Returns <code>true</code> if the uri at address <code>entry</code> has the
-   * indicated version.
+   * indicated language.
    * 
    * @param entry
    *          the entry at which the id is expected
-   * @param version
-   *          the version to look up
-   * @return <code>true</code> if version <code>version</code> exist
+   * @param language
+   *          the language to look up
+   * @return <code>true</code> if language <code>language</code> exist
    * @throws EOFException
    *           if the user tries to access a non-existing address
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized boolean hasVersion(long entry, long version)
+  public synchronized boolean hasLanguage(long entry, Language language)
       throws IOException, EOFException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
     int v = idx.readInt();
     for (int i = 0; i < v; i++) {
-      if (version == idx.readLong())
+      byte[] l = new byte[bytesPerLanguage];
+      idx.read(l);
+      if (language.getIdentifier().equals(new String(l)))
         return true;
     }
     return false;
@@ -498,17 +591,17 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
   /**
    * Returns <code>true</code> if the uri at address <code>entry</code> has a
-   * version associated.
+   * language associated.
    * 
    * @param entry
    *          the entry at which the id is expected
-   * @return <code>true</code> if some <code>version</code> exists
+   * @return <code>true</code> if some language exists
    * @throws EOFException
    *           if the user tries to access a non-existing address
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized boolean hasVersions(long entry) throws IOException,
+  public synchronized boolean hasLanguage(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
@@ -525,19 +618,19 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           writing to the index fails
    */
-  private void init(int bytesPerId, int versionsPerEntry) throws IOException {
+  private void init(int bytesPerId, int languagesPerEntry) throws IOException {
     this.indexVersion = IDX_VERSION;
     this.bytesPerId = bytesPerId;
-    this.versionsPerEntry = versionsPerEntry;
-    this.bytesPerEntry = bytesPerId + 4 + versionsPerEntry * 8;
+    this.languagesPerEntry = languagesPerEntry;
+    this.bytesPerEntry = bytesPerId + 4 + languagesPerEntry * 8;
 
-    logger.info("Creating version index with {} bytes per entry", bytesPerEntry);
+    logger.info("Creating language index with {} bytes per entry", bytesPerEntry);
 
     // Write header
     idx.seek(0);
     idx.writeInt(indexVersion);
     idx.writeInt(bytesPerId);
-    idx.writeInt(versionsPerEntry);
+    idx.writeInt(languagesPerEntry);
     idx.writeLong(0);
     idx.writeLong(0);
 
@@ -555,7 +648,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     this.slots = 0;
     this.entries = 0;
 
-    logger.debug("Version index created");
+    logger.debug("Language index created");
   }
 
   /**
@@ -563,26 +656,26 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @param newBytesPerId
    *          the number of bytes per id
-   * @param newVersionsPerEntry
-   *          the number of versions per entry
+   * @param newLanguagesPerEntry
+   *          the number of languages per entry
    * @throws IOException
    *           writing to the index fails
    * @throws IllegalStateException
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public synchronized void resize(int newBytesPerId, int newVersionsPerEntry)
+  public synchronized void resize(int newBytesPerId, int newLanguagesPerEntry)
       throws IOException {
     if (this.bytesPerId > newBytesPerId && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of bytes per id when there are entries in the index");
-    if (this.versionsPerEntry > newVersionsPerEntry && this.entries > 0)
-      throw new IllegalStateException("Cannot reduce the number of versions per entry when there are entries in the index");
+    if (this.languagesPerEntry > newLanguagesPerEntry && this.entries > 0)
+      throw new IllegalStateException("Cannot reduce the number of languages per entry when there are entries in the index");
     if (this.isReadOnly)
       throw new IllegalStateException("This index is readonly");
 
-    int newBytesPerEntry = newBytesPerId + 4 + newVersionsPerEntry * 8;
+    int newBytesPerEntry = newBytesPerId + 4 + newLanguagesPerEntry * 8;
 
-    logger.info("Resizing version index with {} entries to {} bytes per entry", entries, newBytesPerEntry);
+    logger.info("Resizing language index with {} entries to {} bytes per entry", entries, newBytesPerEntry);
 
     String idxFilename = idxFile.getName();
     String fileName = FilenameUtils.getBaseName(idxFilename);
@@ -604,7 +697,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     idxNew.seek(0);
     idxNew.writeInt(indexVersion);
     idxNew.writeInt(newBytesPerId);
-    idxNew.writeInt(newVersionsPerEntry);
+    idxNew.writeInt(newLanguagesPerEntry);
     idxNew.writeLong(slots);
     idxNew.writeLong(entries);
 
@@ -633,11 +726,11 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
     this.bytesPerEntry = newBytesPerEntry;
     this.bytesPerId = newBytesPerId;
-    this.versionsPerEntry = newVersionsPerEntry;
+    this.languagesPerEntry = newLanguagesPerEntry;
     this.idxFile = newIdxFile;
 
     time = System.currentTimeMillis() - time;
-    logger.info("Version index resized in {}", ConfigurationUtils.toHumanReadableDuration(time));
+    logger.info("Language index resized in {}", ConfigurationUtils.toHumanReadableDuration(time));
   }
 
 }

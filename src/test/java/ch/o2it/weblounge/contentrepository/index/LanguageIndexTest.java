@@ -20,16 +20,15 @@
 
 package ch.o2it.weblounge.contentrepository.index;
 
-import static org.junit.Assert.assertFalse;
-
-import static org.junit.Assert.assertTrue;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
-import ch.o2it.weblounge.contentrepository.impl.index.VersionIndex;
+import ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -41,12 +40,12 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * Test case for {@link VersionIndex}.
+ * Test case for {@link LanguageIndex}.
  */
-public class VersionIndexTest {
+public class LanguageIndexTest {
   
-  /** Version index */
-  protected VersionIndex idx = null;
+  /** Language index */
+  protected LanguageIndex idx = null;
 
   /** The index file */
   protected File indexFile = null;
@@ -56,6 +55,15 @@ public class VersionIndexTest {
 
   /** The expected number of bytes used for this index */
   protected long expectedSize = -1;
+  
+  /** English */
+  protected Language english = LanguageSupport.getLanguage("en"); 
+
+  /** German */
+  protected Language german = LanguageSupport.getLanguage("de"); 
+
+  /** Italian */
+  protected Language french = LanguageSupport.getLanguage("fr"); 
 
   /**
    * @throws java.lang.Exception
@@ -63,10 +71,10 @@ public class VersionIndexTest {
   @Before
   public void setUp() throws Exception {
     File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-    indexFile = new File(tmpDir, VersionIndex.VERSION_IDX_NAME);
+    indexFile = new File(tmpDir, LanguageIndex.LANGUAGE_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new VersionIndex(tmpDir, false, versionsPerEntry);
+    idx = new LanguageIndex(tmpDir, false, versionsPerEntry);
     expectedSize = 28;
   }
 
@@ -81,7 +89,7 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#close()}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#close()}
    * .
    */
   @Test
@@ -96,7 +104,7 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#size()}.
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#size()}.
    */
   @Test
   public void testSize() {
@@ -105,7 +113,7 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#getVersionsPerEntry()}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#getVersionsPerEntry()}
    * .
    */
   @Test
@@ -114,14 +122,14 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#getEntries()}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#getEntries()}
    * .
    */
   @Test
   public void testGetEntries() {
     try {
       assertEquals(0, idx.getEntries());
-      idx.add(UUID.randomUUID().toString(), Resource.LIVE);
+      idx.add(UUID.randomUUID().toString(), english);
       assertEquals(1, idx.getEntries());
     } catch (IOException e) {
       e.printStackTrace();
@@ -131,7 +139,7 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#add(java.lang.String, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#add(java.lang.String, Language)}
    * .
    */
   @Test
@@ -140,8 +148,8 @@ public class VersionIndexTest {
     String uuid2 = UUID.randomUUID().toString();
     String uuid3 = UUID.randomUUID().toString();
     try {
-      idx.add(uuid1, Resource.LIVE);
-      idx.add(uuid2, Resource.LIVE);
+      idx.add(uuid1, english);
+      idx.add(uuid2, english);
       assertEquals(2, idx.getEntries());
       int size = 28 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry  * 8);
       assertEquals(size, idx.size());
@@ -149,7 +157,7 @@ public class VersionIndexTest {
       // test reusing slots
       idx.delete(0);
       assertEquals(size, idx.size());
-      long address = idx.add(uuid3, Resource.LIVE);
+      long address = idx.add(uuid3, english);
       assertEquals(0, address);
       assertEquals(size, idx.size());
     } catch (IOException e) {
@@ -160,20 +168,20 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#add(long, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#add(long, Language)}
    * .
    */
   @Test
   public void testAddLongLong() {
     String uuid1 = UUID.randomUUID().toString();
     try {
-      long address = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address = idx.add(idx.add(uuid1, english), german);
       assertEquals(2, idx.getEntries());
       int size = 28 + uuid1.getBytes().length + 4 + versionsPerEntry  * 8;
       assertEquals(size, idx.size());
-      assertEquals(2, idx.getVersions(address).length);
-      assertEquals(0, idx.getVersions(address)[0]);
-      assertEquals(1, idx.getVersions(address)[1]);
+      assertEquals(2, idx.getLanguages(address).length);
+      assertEquals(english, idx.getLanguages(address)[0]);
+      assertEquals(german, idx.getLanguages(address)[1]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -182,7 +190,7 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#delete(long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#delete(long)}
    * .
    */
   @Test
@@ -190,8 +198,8 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
-      idx.add(uuid2, Resource.LIVE);
+      idx.add(idx.add(uuid1, english), german);
+      idx.add(uuid2, english);
       int size = 28 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry  * 8);
       idx.delete(0);
       assertEquals(size, idx.size());
@@ -204,17 +212,17 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#delete(long, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#delete(long, Language)}
    * .
    */
   @Test
-  public void testDeleteLongLong() {
+  public void testDeleteLongLanguage() {
     String uuid1 = UUID.randomUUID().toString();
     try {
-      long address = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
-      idx.delete(address, Resource.LIVE);
-      assertEquals(1, idx.getVersions(address).length);
-      assertEquals(Resource.WORK, idx.getVersions(address)[0]);
+      long address = idx.add(idx.add(uuid1, english), german);
+      idx.delete(address, english);
+      assertEquals(1, idx.getLanguages(address).length);
+      assertEquals(german, idx.getLanguages(address)[0]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -223,18 +231,17 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#clear()}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#clear()}
    * .
    */
   @Test
   public void testClear() {
     String uuid = UUID.randomUUID().toString();
-    long address = 2384762;
     try {
-      idx.add(uuid, address);
+      idx.add(uuid, german);
       idx.clear();
       assertEquals(0, idx.getEntries());
-      assertEquals(versionsPerEntry, idx.getVersionsPerEntry());
+      assertEquals(versionsPerEntry, idx.getLanguagesPerEntry());
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -243,21 +250,21 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#getVersions(long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#getLanguages(long)}
    * .
    */
   @Test
-  public void testGetVersions() {
+  public void testGetLanguages() {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
-      long address2 = idx.add(uuid2, Resource.LIVE);
-      assertEquals(2, idx.getVersions(address1).length);
-      assertEquals(Resource.LIVE, idx.getVersions(address1)[0]);
-      assertEquals(Resource.WORK, idx.getVersions(address1)[1]);
-      assertEquals(1, idx.getVersions(address2).length);
-      assertEquals(Resource.LIVE, idx.getVersions(address2)[0]);
+      long address1 = idx.add(idx.add(uuid1, english), german);
+      long address2 = idx.add(uuid2, english);
+      assertEquals(2, idx.getLanguages(address1).length);
+      assertEquals(english, idx.getLanguages(address1)[0]);
+      assertEquals(german, idx.getLanguages(address1)[1]);
+      assertEquals(1, idx.getLanguages(address2).length);
+      assertEquals(english, idx.getLanguages(address2)[0]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -266,21 +273,24 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#hasVersion(long, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#hasLanguage(long, Language)}
    * .
    */
   @Test
-  public void testHasVersion() {
+  public void testHasLanguages() {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
-      long address2 = idx.add(uuid2, Resource.WORK);
-      assertTrue(idx.hasVersion(address1, Resource.LIVE));
-      assertTrue(idx.hasVersion(address1, Resource.WORK));
-      assertFalse(idx.hasVersion(address1, 27));
-      assertTrue(idx.hasVersion(address2, Resource.WORK));
-      assertFalse(idx.hasVersion(address2, Resource.LIVE));
+      long address1 = idx.add(idx.add(uuid1, english), german);
+      long address2 = idx.add(uuid2, german);
+      assertTrue(idx.hasLanguage(address1, english));
+      assertTrue(idx.hasLanguage(address1, german));
+      assertFalse(idx.hasLanguage(address1, french));
+      assertTrue(idx.hasLanguage(address2, german));
+      assertFalse(idx.hasLanguage(address2, english));
+      idx.delete(address2, german);
+      assertTrue(idx.hasLanguage(address1));
+      assertFalse(idx.hasLanguage(address2));
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -289,48 +299,26 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#hasVersions(long)}
-   * .
-   */
-  @Test
-  public void testHasVersions() {
-    String uuid1 = UUID.randomUUID().toString();
-    String uuid2 = UUID.randomUUID().toString();
-    try {
-      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
-      long address2 = idx.add(uuid2, Resource.WORK);
-      idx.delete(address2, Resource.WORK);
-      assertTrue(idx.hasVersions(address1));
-      assertFalse(idx.hasVersions(address2));
-    } catch (IOException e) {
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#resize(int, int)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#resize(int, int)}
    * .
    */
   @Test
   public void testResize() {
     String uuid = UUID.randomUUID().toString();
-    long version = 2384762;
     long slotsInIndex = 0;
     int bytesPerId = uuid.getBytes().length;
     
     // Resize to the same size
     try {
-      idx.add(uuid, version);
+      idx.add(uuid, german);
       slotsInIndex = idx.getEntries();
       idx.resize(bytesPerId, versionsPerEntry * 3);
-      assertEquals(versionsPerEntry * 3, idx.getVersionsPerEntry());
+      assertEquals(versionsPerEntry * 3, idx.getLanguagesPerEntry());
       assertEquals(1, idx.getEntries());
       assertEquals(28 + (slotsInIndex * (bytesPerId + 4 + versionsPerEntry * 3 * 8)), idx.size());
-      long[] versions = idx.getVersions(0);
-      assertEquals(1, versions.length);
-      assertEquals(version, versions[0]);
+      Language[] languages = idx.getLanguages(0);
+      assertEquals(1, languages.length);
+      assertEquals(german, languages[0]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -350,7 +338,7 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#getIndexVersion()}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#getIndexVersion()}
    * .
    */
   @Test

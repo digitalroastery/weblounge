@@ -174,7 +174,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void updated(Dictionary properties) {
     if (properties == null)
       return;

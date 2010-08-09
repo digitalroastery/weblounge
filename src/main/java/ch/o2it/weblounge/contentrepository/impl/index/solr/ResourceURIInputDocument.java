@@ -22,26 +22,27 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
- * updating page paths.
+ * updating resource paths.
  */
-public class PageURIInputDocument extends AbstractInputDocument {
+public class ResourceURIInputDocument extends AbstractInputDocument {
 
   /** Serial version uid */
   private static final long serialVersionUID = 1812364663819822016L;
 
   /**
    * Creates an input document for the given uri. On update, only the uri will
-   * change (namely the path), and the rest of the page will remain unchanged.
+   * change (namely the path), and the rest of the resource will remain unchanged.
    * 
    * @param uri
-   *          the page uri
+   *          the resource uri
    */
-  public PageURIInputDocument(ResourceURI uri) {
+  public ResourceURIInputDocument(ResourceURI uri) {
     init(uri);
   }
 
@@ -49,11 +50,12 @@ public class PageURIInputDocument extends AbstractInputDocument {
    * Populates this input document with the uri data.
    * 
    * @param uri
-   *          the page uri
+   *          the resource uri
    */
   private void init(ResourceURI uri) {
     setField(ID, uri.getId());
     setField(PATH, uri.getPath());
+    setField(TYPE, uri.getType());
   }
 
 }

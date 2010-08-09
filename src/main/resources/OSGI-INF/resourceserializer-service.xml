@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  start="activate" 
+  stop="deactivate"
+  name="Weblounge Resource Serializer Service">	
+  
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.ResourceSerializerServiceImpl" />
+  <property name="service.description" value="Weblounge Resource Serializer Service" />
+  <service>
+    <provide interface="ch.o2it.weblounge.contentrepository.ResourceSerializerService" />
+  </service>
+
+</scr:component>

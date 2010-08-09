@@ -250,8 +250,12 @@
             <Service-Component>
               OSGI-INF/contentrepository-service.xml,
               OSGI-INF/file-rest-service.xml,
+              OSGI-INF/file-serializer.xml,
               OSGI-INF/image-rest-service.xml,
+              OSGI-INF/image-serializer.xml,
               OSGI-INF/page-rest-service.xml,
+              OSGI-INF/page-serializer.xml,
+              OSGI-INF/resourceserializer-service.xml,
               OSGI-INF/search-rest-service.xml
             </Service-Component>
           </instructions>

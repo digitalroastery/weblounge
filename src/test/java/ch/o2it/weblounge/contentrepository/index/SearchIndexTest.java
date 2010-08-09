@@ -28,14 +28,19 @@ import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.o2it.weblounge.contentrepository.impl.FileResourceSerializer;
+import ch.o2it.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.o2it.weblounge.contentrepository.impl.PageSerializer;
+import ch.o2it.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.SearchIndex;
 
 import org.apache.commons.io.FileUtils;
@@ -99,22 +104,31 @@ public class SearchIndexTest {
     idxRoot = new File(rootPath);
     idx = new SearchIndex(idxRoot, isReadOnly);
 
+    // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
     EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
     EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
     EasyMock.replay(template);
     
+    // Site
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getTemplate((String)EasyMock.anyObject())).andReturn(template).anyTimes();
     EasyMock.replay(site);
+    
+    // Resource serializers
+    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
+    ResourceSerializerFactory.setResourceSerializerService(serializerService);
+    serializerService.registerSerializer(new PageSerializer());
+    serializerService.registerSerializer(new FileResourceSerializer());
+    serializerService.registerSerializer(new ImageResourceSerializer());
 
     // Prepare the page
     PageReader pageReader = new PageReader();
     pages = new Page[2];
     for (int i = 0; i < pages.length; i++) {
-      ResourceURI uri = new ResourceURIImpl(site, "/");
+      ResourceURI uri = new PageURIImpl(site, "/");
       InputStream is = this.getClass().getResourceAsStream("/page" + (i+1) + ".xml");
-      pages[i] = pageReader.read(is, uri);
+      pages[i] = pageReader.read(uri, is);
     }
   }
 

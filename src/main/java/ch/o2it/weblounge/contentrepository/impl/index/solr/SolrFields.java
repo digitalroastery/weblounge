@@ -30,6 +30,9 @@ public interface SolrFields {
   /** Path field name */
   public static final String PATH = "path";
 
+  /** Type field name */
+  public static final String TYPE = "type";
+
   /** Subjects field name */
   public static final String SUBJECTS = "subjects";
 

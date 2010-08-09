@@ -20,16 +20,21 @@
 
 package ch.o2it.weblounge.contentrepository.impl.bundle;
 
-import ch.o2it.weblounge.common.content.MalformedPageURIException;
+import ch.o2it.weblounge.common.content.MalformedResourceURIException;
+import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageReader;
-import ch.o2it.weblounge.common.impl.content.page.PageUtils;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.ResourceSerializer;
+import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository;
 import ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
@@ -40,18 +45,18 @@ import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.Map;
 
 /**
  * Content repository that reads pages and resources from the site's
@@ -157,7 +162,7 @@ public class BundleContentRepository extends AbstractContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException {
     if (uri == null)
@@ -178,15 +183,15 @@ public class BundleContentRepository extends AbstractContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int, long)
    */
   @SuppressWarnings("unchecked")
-  public Iterator<ResourceURI> listPages(ResourceURI uri, int level, long version)
+  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
       throws ContentRepositoryException {
     String entryPath = UrlSupport.concat(pagesPathPrefix, uri.getPath());
     int startLevel = StringUtils.countMatches(uri.getPath(), "/");
-    List<ResourceURI> pages = new ArrayList<ResourceURI>();
+    List<ResourceURI> resources = new ArrayList<ResourceURI>();
     Enumeration<URL> entries = bundle.findEntries(entryPath, "*.xml", level > 0);
     if (entries != null) {
       while (entries.hasMoreElements()) {
@@ -196,21 +201,21 @@ public class BundleContentRepository extends AbstractContentRepository {
         int currentLevel = StringUtils.countMatches(uri.getPath(), "/");
         if (level > -1 && level < Integer.MAX_VALUE && currentLevel > (startLevel + level))
           continue;
-        long v = PageUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
+        long v = ResourceUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
         if (version != -1 && v != version)
           continue;
         try {
-          ResourceURI pageURI = loadPageURI(site, entry);
-          if (pageURI == null)
-            throw new IllegalStateException("Page " + entry + " has no uri");
-          pages.add(pageURI);
-          logger.trace("Found revision '{}' of page {}", v, entry);
+          ResourceURI resourceURI = loadResourceURI(site, entry);
+          if (resourceURI == null)
+            throw new IllegalStateException("Resource " + entry + " has no uri");
+          resources.add(resourceURI);
+          logger.trace("Found revision '{}' of resource {}", v, entry);
         } catch (IOException e) {
-          throw new ContentRepositoryException("Unable to read id from page at " + entry, e);
+          throw new ContentRepositoryException("Unable to read id from resource at " + entry, e);
         }
       }
     }
-    return pages.iterator();
+    return resources.iterator();
   }
 
   /**
@@ -280,10 +285,15 @@ public class BundleContentRepository extends AbstractContentRepository {
     BundleContentRepositoryIndex index = null;
     index = new BundleContentRepositoryIndex(idxRootDir);
     boolean success = false;
-    
+
+    // Make sure the version matches the implementation
+    if (index.getIndexVersion() != VersionedContentRepositoryIndex.IDX_VERSION) {
+      logger.warn("Index version does not match implementation, triggering reindex");
+    } 
+
     // Is there an existing index?
-    if (index.getPages() > 0) {
-      long pageCount = index.getPages();
+    else if (index.getResourceCount() > 0) {
+      long pageCount = index.getResourceCount();
       long pageVersionCount = index.getVersions();
       logger.info("Loaded exising site index from {}", idxRootDir);
       logger.info("Index contains {} pages and {} revisions", pageCount, pageVersionCount - pageCount);
@@ -295,25 +305,46 @@ public class BundleContentRepository extends AbstractContentRepository {
       long time = System.currentTimeMillis();
       long pageCount = 0;
       long pageVersionCount = 0;
+      Map<String, ResourceSerializer<?>> serializers = new HashMap<String, ResourceSerializer<?>>();
       ResourceURI previousURI = null;
-      ResourceURI homeURI = new ResourceURIImpl(getSite(), "/");
-      Iterator<ResourceURI> pi = listPages(homeURI, Integer.MAX_VALUE, -1);
+      
+      ResourceURI homeURI = new PageURIImpl(getSite(), "/");
+      Iterator<ResourceURI> pi = list(homeURI, Integer.MAX_VALUE, -1);
+      // TODO: Add file uris
+
       while (pi.hasNext()) {
         ResourceURI uri = pi.next();
-        
-        // Load the page
-        Page page = null;
-        try {
-          page = loadPage(uri);
-          if (page == null)
+
+        // Look for a suitable resource reader
+        String resourceType = uri.getType();
+        ResourceSerializer<?> serializer = serializers.get(resourceType);
+        if (serializer == null) {
+          serializer = ResourceSerializerFactory.getSerializer(resourceType);
+          if (serializer == null) {
+            logger.warn("Skipping resource {}: No resource serializer found for type '{}'", uri, resourceType);
             continue;
+          } else {
+            serializers.put(resourceType, serializer);
+          }
+        }
+        
+        // Load the resource
+        Resource resource = null;
+        try {
+          ResourceReader<?> reader = serializer.getReader();        
+          InputStream is = loadResource(uri);
+          resource = reader.read(uri, is);
+          if (resource == null) {
+            logger.warn("Unkown error loading resource {}", uri);
+            continue;
+          }
         } catch (Exception e) {
-          logger.error("Error loading page '{}' from bundle: {}", uri, e.getMessage());
+          logger.error("Error loading resource '{}' from bundle: {}", uri, e.getMessage());
           continue;
         }
 
         // Add it to the index
-        index.add(page);
+        index.add(resource);
         pageVersionCount++;
         if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
           logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());
@@ -327,10 +358,10 @@ public class BundleContentRepository extends AbstractContentRepository {
       if (pageCount > 0) {
         time = System.currentTimeMillis() - time;
         logger.info("Site index populated in {} ms", ConfigurationUtils.toHumanReadableDuration(time));
-        logger.info("{} pages and {} revisions added to index", pageCount, pageVersionCount - pageCount);
+        logger.info("{} resources and {} revisions added to index", pageCount, pageVersionCount - pageCount);
       }
-    } catch (MalformedPageURIException e) {
-      throw new ContentRepositoryException("Error while reading page uri for index", e);
+    } catch (MalformedResourceURIException e) {
+      throw new ContentRepositoryException("Error while reading resource uri for index", e);
     } finally {
       if (!success) {
         try {
@@ -340,7 +371,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         }
       }
     }
-
+    
     return index;
   }
 
@@ -350,13 +381,13 @@ public class BundleContentRepository extends AbstractContentRepository {
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
    */
   @Override
-  protected Page loadPage(ResourceURI uri) throws IOException {
+  protected InputStream loadResource(ResourceURI uri) throws IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path
     // or get one, if that's not the case.
     if (uriPath == null) {
-      uriPath = index.toPath(uri);
+      uriPath = index.getPath(uri);
       if (uriPath == null)
         return null;
     }
@@ -364,22 +395,29 @@ public class BundleContentRepository extends AbstractContentRepository {
     String entryPath = UrlSupport.concat(new String[] {
         pagesPathPrefix,
         uriPath,
-        PageUtils.getDocument(uri.getVersion()) });
+        ResourceUtils.getDocument(uri.getVersion()) });
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
     try {
-      PageReader pageReader = new PageReader();
-      return pageReader.read(url.openStream(), uri);
-    } catch (SAXException e) {
-      throw new RuntimeException("SAX error while reading page '" + uri + "'", e);
+      return url.openStream();
     } catch (IOException e) {
       throw new IOException("I/O error while reading page '" + uri + "'", e);
-    } catch (ParserConfigurationException e) {
-      throw new IllegalStateException("Parser configuration error while reading page '" + uri + "'", e);
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.language.Language)
+   */
+  @Override
+  protected InputStream loadResourceContent(ResourceURI uri, Language language)
+      throws IOException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   /**

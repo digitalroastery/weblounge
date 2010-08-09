@@ -20,16 +20,16 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.PageInputDocument;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.PageURIInputDocument;
+import ch.o2it.weblounge.contentrepository.ResourceSerializer;
+import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.ResourceURIInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrConnection;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUpdateableInputDocument;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -38,6 +38,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.request.UpdateRequest.ACTION;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.SolrCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,10 +149,10 @@ public class SearchIndex {
 
   /**
    * Removes the entry with the given <code>id</code> from the database. The
-   * entry can either be a page or a resource.
+   * entry can either be a resource or a resource.
    * 
    * @param id
-   *          identifier of the page or resource
+   *          identifier of the resource or resource
    * @throws IOException
    *           if an errors occurs while talking to solr
    */
@@ -170,42 +171,62 @@ public class SearchIndex {
   }
 
   /**
-   * Posts the page to the search index.
+   * Posts the resource to the search index.
    * 
-   * @param page
-   *          the page to add to the index
+   * @param resource
+   *          the resource to add to the index
    * @throws IOException
    *           if an errors occurs while talking to solr
    */
-  public boolean add(Page page) throws IOException {
-    logger.debug("Adding page {} to search index", page);
+  public boolean add(Resource resource) throws IOException {
+    logger.debug("Adding resource {} to search index", resource);
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.setAction(ACTION.COMMIT, true, true);
-    solrRequest.add(new PageInputDocument(page));
+
+    // Have the serializer create an input document
+    String resourceType = resource.getURI().getType();
+    ResourceSerializer<?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+    if (serializer == null) {
+      logger.error("Unable to create an input document for {}: no serializer found", resource.getURI());
+      return false;
+    }
 
     // Post everything to the search index
     try {
+      SolrInputDocument inputDoc = serializer.getInputDocument(resource);
+      solrRequest.add(inputDoc);
       solrConnection.update(solrRequest);
       return true;
     } catch (Exception e) {
-      logger.error("Cannot add page " + page + " to index", e);
+      logger.error("Cannot add resource " + resource + " to index", e);
       return false;
     }
   }
 
   /**
-   * Posts the updated page to the search index.
+   * Posts the updated resource to the search index.
    * 
-   * @param page
-   *          the page to update
+   * @param resource
+   *          the resource to update
    */
-  public boolean update(Page page) {
-    logger.debug("Updating page {} in search index", page);
+  public boolean update(Resource resource) {
+    logger.debug("Updating resource {} in search index", resource);
+
+    // Have the serializer create an input document
+    String resourceType = resource.getURI().getType();
+    ResourceSerializer<?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+    if (serializer == null) {
+      logger.error("Unable to create an input document for {}: no serializer found", resource.getURI());
+      return false;
+    }
+
+    // Post the updated data to the search index
     try {
-      update(new PageInputDocument(page));
+      SolrInputDocument inputDoc = serializer.getInputDocument(resource);
+      update(inputDoc);
       return true;
     } catch (Exception e) {
-      logger.error("Cannot update page " + page + " in index", e);
+      logger.error("Cannot update resource " + resource + " in index", e);
       return false;
     }
   }
@@ -219,8 +240,7 @@ public class SearchIndex {
    * @throws Exception
    *           posting to solr fails
    */
-  protected QueryResponse update(SolrUpdateableInputDocument document)
-      throws Exception {
+  protected QueryResponse update(SolrInputDocument document) throws Exception {
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.setAction(ACTION.COMMIT, true, true);
     solrRequest.add(document);
@@ -228,10 +248,10 @@ public class SearchIndex {
   }
 
   /**
-   * Move the page identified by <code>uri</code> to the new location.
+   * Move the resource identified by <code>uri</code> to the new location.
    * 
    * @param uri
-   *          the page uri
+   *          the resource uri
    * @param path
    *          the new path
    * @return
@@ -239,11 +259,11 @@ public class SearchIndex {
   public boolean move(ResourceURI uri, String path) {
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
     try {
-      ResourceURIImpl newURI = new ResourceURIImpl(uri.getSite(), path, uri.getId());
-      update(new PageURIInputDocument(newURI));
+      ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getId());
+      update(new ResourceURIInputDocument(newURI));
       return true;
     } catch (Exception e) {
-      logger.error("Cannot update page uri " + uri + " in index", e);
+      logger.error("Cannot update resource uri " + uri + " in index", e);
       return false;
     }
   }

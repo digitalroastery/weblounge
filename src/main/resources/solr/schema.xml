@@ -230,9 +230,10 @@
 
   <fields>
 
-    <!-- The page/resource id. This is the unique identifier. -->
-    <field name="id" type="string" indexed="true" stored="true" required="true" /> 
+    <!-- The resource id. This is the unique identifier. -->
+    <field name="id" type="string" indexed="true" stored="true" required="true" />
     <field name="path" type="string" indexed="true" stored="true" required="true" />
+    <field name="type" type="string" indexed="true" stored="true" required="true" />
 
     <!-- Page-level metadata -->
     <field name="subjects" type="string" multiValued="true" indexed="true" stored="true" required="false" /> 

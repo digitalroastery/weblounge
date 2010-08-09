@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl.index;
 
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ import java.io.RandomAccessFile;
  * | 1    | a-b-c-d | /etc/weblounge
  * </pre>
  */
-public class URIIndex {
+public class URIIndex implements VersionedContentRepositoryIndex {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(URIIndex.class);
@@ -54,26 +55,32 @@ public class URIIndex {
   /** Default number of bytes used per id */
   private static final int IDX_BYTES_PER_ID = 36;
 
+  /** Default number of bytes per type */
+  private static final int IDX_BYTES_PER_TYPE = 8;
+
   /** Default number of bytes per path */
   private static final int IDX_BYTES_PER_PATH = 128;
 
   /** Location of the bytes-per-id header */
-  protected static final long IDX_BYTES_PER_ID_HEADER_LOCATION = 0;
+  protected static final long IDX_VERSION_HEADER_LOCATION = 0;
+
+  /** Location of the bytes-per-id header */
+  protected static final long IDX_BYTES_PER_ID_HEADER_LOCATION = 4;
+
+  /** Location of the bytes-per-id header */
+  protected static final long IDX_BYTES_PER_TYPE_HEADER_LOCATION = 8;
 
   /** Location of the bytes-per-path header */
-  protected static final long IDX_BYTES_PER_PATH_HEADER_LOCATION = 4;
+  protected static final long IDX_BYTES_PER_PATH_HEADER_LOCATION = 12;
 
   /** Location of the entries header */
-  protected static final long IDX_SLOTS_HEADER_LOCATION = 8;
+  protected static final long IDX_SLOTS_HEADER_LOCATION = 16;
 
   /** Location of the entries header */
-  protected static final long IDX_ENTRIES_HEADER_LOCATION = 16;
+  protected static final long IDX_ENTRIES_HEADER_LOCATION = 24;
 
   /** Number of bytes that are used for the index header */
-  protected static final int IDX_HEADER_SIZE = 24;
-
-  /** Location of the first entry */
-  protected static final long IDX_ENTRIES_LOCATION = IDX_HEADER_SIZE;
+  protected static final int IDX_HEADER_SIZE = 32;
 
   /** The index file */
   protected RandomAccessFile idx = null;
@@ -84,14 +91,20 @@ public class URIIndex {
   /** True if this is a readonly index */
   protected boolean isReadOnly = false;
 
+  /** The version number */
+  protected int indexVersion = -1;
+
   /** Number of bytes per id */
   protected int bytesPerId = IDX_BYTES_PER_ID;
+
+  /** Number of bytes per type */
+  protected int bytesPerType = IDX_BYTES_PER_TYPE;
 
   /** Number of bytes per path */
   protected int bytesPerPath = IDX_BYTES_PER_PATH;
 
   /** Number of bytes per entry */
-  protected int bytesPerEntry = bytesPerId + bytesPerPath;
+  protected int bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
 
   /** Number of entries */
   protected long entries = 0;
@@ -116,7 +129,7 @@ public class URIIndex {
    *           if reading from the index fails
    */
   public URIIndex(File indexRootDir, boolean readOnly) throws IOException {
-    this(indexRootDir, readOnly, IDX_BYTES_PER_ID, IDX_BYTES_PER_PATH);
+    this(indexRootDir, readOnly, IDX_BYTES_PER_ID, IDX_BYTES_PER_TYPE, IDX_BYTES_PER_PATH);
   }
 
   /**
@@ -138,7 +151,7 @@ public class URIIndex {
    */
   public URIIndex(File indexRootDir, boolean readOnly, int pathLengthInBytes)
       throws IOException {
-    this(indexRootDir, readOnly, IDX_BYTES_PER_ID, pathLengthInBytes);
+    this(indexRootDir, readOnly, IDX_BYTES_PER_ID, IDX_BYTES_PER_TYPE, pathLengthInBytes);
   }
 
   /**
@@ -153,13 +166,15 @@ public class URIIndex {
    *          <code>true</code> to indicate a read only index
    * @param idLengthInBytes
    *          the number of bytes per id
+   * @param typeLengthInBytes
+   *          the number of bytes per type
    * @param pathLengthInBytes
    *          the number of bytes per path
    * @throws IOException
    *           if reading from the index fails
    */
   public URIIndex(File indexRootDir, boolean readOnly, int idLengthInBytes,
-      int pathLengthInBytes) throws IOException {
+      int typeLengthInBytes, int pathLengthInBytes) throws IOException {
 
     this.idxFile = new File(indexRootDir, URI_IDX_NAME);
     this.isReadOnly = readOnly;
@@ -176,17 +191,21 @@ public class URIIndex {
 
     // Read index header information
     try {
+      this.indexVersion = idx.readInt();
+      if (indexVersion != IDX_VERSION)
+        logger.warn("URI index version mismatch (found {}, expected {}), consider reindex", indexVersion, IDX_VERSION);
       this.bytesPerId = idx.readInt();
+      this.bytesPerType = idx.readInt();
       this.bytesPerPath = idx.readInt();
       this.entries = idx.readLong();
-      this.bytesPerEntry = bytesPerId + bytesPerPath;
-      if (this.bytesPerId != idLengthInBytes || this.bytesPerPath != pathLengthInBytes)
-        resize(idLengthInBytes, pathLengthInBytes);
+      this.bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
+      if (this.bytesPerId != idLengthInBytes || this.bytesPerType != typeLengthInBytes || this.bytesPerPath != pathLengthInBytes)
+        bytesPerEntry = resize(idLengthInBytes, typeLengthInBytes, pathLengthInBytes);
     } catch (EOFException e) {
       if (readOnly) {
         throw new IllegalStateException("Readonly index cannot be empty");
       }
-      init(idLengthInBytes, pathLengthInBytes);
+      init(idLengthInBytes, typeLengthInBytes, pathLengthInBytes);
     } catch (IOException e) {
       logger.error("Error reading from path index: " + e.getMessage());
       throw e;
@@ -201,6 +220,15 @@ public class URIIndex {
    */
   public void close() throws IOException {
     idx.close();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex#getIndexVersion()
+   */
+  public int getIndexVersion() {
+    return indexVersion;
   }
 
   /**
@@ -219,7 +247,7 @@ public class URIIndex {
    * @return the number of bytes per entry
    */
   public int getEntrySize() {
-    return bytesPerPath;
+    return bytesPerEntry;
   }
 
   /**
@@ -236,28 +264,51 @@ public class URIIndex {
    * 
    * @param id
    *          the identifier
+   * @param type
+   *          the resource type
    * @param path
    *          the page path
    * @return the entry's address in this index
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized long add(String id, String path) throws IOException {
+  public synchronized long add(String id, String type, String path)
+      throws IOException {
+    if (type == null)
+      throw new IllegalArgumentException("Type cannot be null");
+    if (path == null)
+      throw new IllegalArgumentException("Path cannot be null");
+
     if (id.getBytes().length != bytesPerId)
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
     long entry = entries;
 
+    // Get the required entry size
+    int typeLengthInBytes = type.getBytes().length;
     int pathLengthInBytes = path.getBytes().length;
 
     // Make sure there is still room left for an additional entry. One entry
     // consists of the uuid, the path and a closing '\n'
-    if (pathLengthInBytes >= bytesPerPath) {
-      logger.info("Path doesn't fit, triggering index resize");
-      int newBytesPerPath = bytesPerPath * 2;
-      while (newBytesPerPath < pathLengthInBytes)
-        newBytesPerPath *= 2;
-      resize(bytesPerId, newBytesPerPath);
+    if (typeLengthInBytes >= bytesPerType || pathLengthInBytes >= bytesPerPath) {
+
+      // Make sure the type field is long enough
+      int newBytesPerType = bytesPerType;
+      if (typeLengthInBytes >= bytesPerType) {
+        logger.info("Type doesn't fit, triggering index resize");
+        while (newBytesPerType < typeLengthInBytes)
+          newBytesPerType *= 2;
+      }
+
+      // Make sure the path field is long enough
+      int newBytesPerPath = bytesPerPath;
+      if (pathLengthInBytes >= bytesPerPath) {
+        logger.info("Path doesn't fit, triggering index resize");
+        while (newBytesPerPath < pathLengthInBytes)
+          newBytesPerPath *= 2;
+      }
+
+      bytesPerEntry = resize(bytesPerId, newBytesPerType, newBytesPerPath);
     }
 
     // See if there is an empty slot
@@ -282,6 +333,9 @@ public class URIIndex {
     // Add the new address at the end
     idx.seek(startOfEntry);
     idx.write(id.getBytes());
+    idx.write(type.getBytes());
+    for (int i = 0; i < bytesPerType - type.length(); i++)
+      idx.writeByte(0);
     idx.write(path.getBytes());
     idx.write('\n');
     long remainingBytes = bytesPerEntry - IDX_BYTES_PER_ID - pathLengthInBytes - 1;
@@ -298,8 +352,9 @@ public class URIIndex {
     idx.writeLong(slots);
     idx.writeLong(entries);
 
-    logger.debug("Added uri with id '{}' and path '{}' as entry no {}", new Object[] {
+    logger.debug("Added uri with id '{}', type '{}' and path '{}' as entry no {}", new Object[] {
         id,
+        type,
         path,
         entries });
     return entry;
@@ -334,28 +389,55 @@ public class URIIndex {
    * 
    * @param entry
    *          start address of uri
+   * @param type
+   *          the new type
    * @param path
    *          the new path
    * @throws IOException
    *           if updating the path in the index fails
    */
-  public synchronized void update(long entry, String path) throws IOException {
-    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
-
+  public synchronized void update(long entry, String type, String path)
+      throws IOException {
+    if (type == null)
+      throw new IllegalArgumentException("Type cannot be null");
+    if (path == null)
+      throw new IllegalArgumentException("Path cannot be null");
+    
     // Check if the new path fits the current index
+    int typeLengthInBytes = type.getBytes().length;
     int pathLengthInBytes = path.getBytes().length;
-    if (pathLengthInBytes >= bytesPerPath) {
-      logger.info("Path doesn't fit, triggering index resize");
-      int newBytesPerPath = bytesPerPath * 2;
-      while (newBytesPerPath < pathLengthInBytes)
-        newBytesPerPath *= 2;
-      resize(bytesPerId, newBytesPerPath);
-      startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    
+    // Make sure there is still room left for an additional entry. One entry
+    // consists of the uuid, the path and a closing '\n'
+    if (typeLengthInBytes >= bytesPerType || pathLengthInBytes >= bytesPerPath) {
+
+      // Make sure the type field is long enough
+      int newBytesPerType = bytesPerType;
+      if (typeLengthInBytes >= bytesPerType) {
+        logger.info("Type doesn't fit, triggering index resize");
+        while (newBytesPerType < typeLengthInBytes)
+          newBytesPerType *= 2;
+      }
+
+      // Make sure the path field is long enough
+      int newBytesPerPath = bytesPerPath;
+      if (pathLengthInBytes >= bytesPerPath) {
+        logger.info("Path doesn't fit, triggering index resize");
+        while (newBytesPerPath < pathLengthInBytes)
+          newBytesPerPath *= 2;
+      }
+
+      bytesPerEntry = resize(bytesPerId, newBytesPerType, newBytesPerPath);
     }
+
+    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
 
     // Write the path to the index
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
+    for (int i = 0; i < bytesPerType - type.length(); i++)
+      idx.writeByte(0);
+    idx.write(type.getBytes());
     idx.write(path.getBytes());
     idx.write('\n');
     for (int i = 1; i < bytesPerEntry; i++) {
@@ -372,7 +454,7 @@ public class URIIndex {
    *           if writing to the index fails
    */
   public synchronized void clear() throws IOException {
-    init(bytesPerId, bytesPerPath);
+    init(bytesPerId, bytesPerType, bytesPerPath);
   }
 
   /**
@@ -399,6 +481,33 @@ public class URIIndex {
   }
 
   /**
+   * Returns the uri's type.
+   * 
+   * @param entry
+   *          the entry at which the id is expected
+   * @return the type
+   * @throws EOFException
+   *           if the user tries to access a non-existing address
+   * @throws IOException
+   *           if reading from the index fails
+   */
+  public synchronized String getType(long entry) throws IOException,
+      EOFException {
+    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    idx.seek(startOfEntry);
+    idx.skipBytes(bytesPerId);
+
+    byte[] bytes = new byte[bytesPerType];
+    idx.read(bytes);
+    for (int i = 0; i < bytes.length; i++) {
+      if (bytes[i] == 0)
+        return new String(bytes, 0, i);
+    }
+
+    throw new IllegalStateException("Found type without delimiter");
+  }
+
+  /**
    * Returns the uri's path.
    * 
    * @param entry
@@ -413,7 +522,7 @@ public class URIIndex {
       EOFException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
-    idx.skipBytes(bytesPerId);
+    idx.skipBytes(bytesPerId + bytesPerType);
 
     byte[] bytes = new byte[bytesPerPath];
     idx.read(bytes);
@@ -429,21 +538,29 @@ public class URIIndex {
    * Initializes the index file to the given size using <code>0</code> byte
    * values and writes the header information to it.
    * 
-   * @param bytesPerEntry
-   *          the number of bytes per entry
+   * @param bytesPerId
+   *          the number of bytes per identifier
+   * @param bytesPerType
+   *          the number of bytes per type
+   * @param bytesPerPath
+   *          the number of bytes per path
    * @throws IOException
    *           writing to the index fails
    */
-  private void init(int bytesPerId, int bytesPerPath) throws IOException {
+  private void init(int bytesPerId, int bytesPerType, int bytesPerPath) throws IOException {
+    this.indexVersion = IDX_VERSION;
     this.bytesPerId = bytesPerId;
+    this.bytesPerType = bytesPerType;
     this.bytesPerPath = bytesPerPath;
-    this.bytesPerEntry = bytesPerId + bytesPerPath;
+    this.bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
 
     logger.info("Creating uri index with {} bytes per entry", bytesPerEntry);
 
     // Write header
     idx.seek(0);
+    idx.writeInt(indexVersion);
     idx.writeInt(bytesPerId);
+    idx.writeInt(bytesPerType);
     idx.writeInt(bytesPerPath);
     idx.writeLong(0);
     idx.writeLong(0);
@@ -469,6 +586,8 @@ public class URIIndex {
    * 
    * @param newBytesPerId
    *          the number of bytes per id
+   * @param newBytesPerType
+   *          the number of bytes per type
    * @param newBytesPerPath
    *          the number of bytes per entry
    * @throws IOException
@@ -477,16 +596,18 @@ public class URIIndex {
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public synchronized void resize(int newBytesPerId, int newBytesPerPath)
+  public synchronized int resize(int newBytesPerId, int newBytesPerType, int newBytesPerPath)
       throws IOException {
     if (this.bytesPerId > newBytesPerId && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of bytes per id when there are entries in the index");
+    if (this.bytesPerType > newBytesPerType && this.entries > 0)
+      throw new IllegalStateException("Cannot reduce the number of bytes per type when there are entries in the index");
     if (this.bytesPerPath > newBytesPerPath && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of bytes per path when there are entries in the index");
     if (this.isReadOnly)
       throw new IllegalStateException("This index is readonly");
 
-    int newBytesPerEntry = newBytesPerId + newBytesPerPath;
+    int newBytesPerEntry = newBytesPerId + newBytesPerType + newBytesPerPath;
 
     logger.info("Resizing uri index with {} entries to {} bytes per entry", entries, newBytesPerEntry);
 
@@ -508,13 +629,15 @@ public class URIIndex {
 
     // Write header
     idxNew.seek(0);
+    idxNew.writeInt(indexVersion);
     idxNew.writeInt(newBytesPerId);
+    idxNew.writeInt(newBytesPerType);
     idxNew.writeInt(newBytesPerPath);
     idxNew.writeLong(slots);
     idxNew.writeLong(entries);
 
     // Copy the current index to the new one
-    idx.seek(IDX_ENTRIES_LOCATION);
+    idx.seek(IDX_HEADER_SIZE);
     for (int i = 0; i < this.entries; i++) {
       byte[] bytes = new byte[this.bytesPerEntry];
       idx.read(bytes);
@@ -538,11 +661,13 @@ public class URIIndex {
 
     this.bytesPerEntry = newBytesPerEntry;
     this.bytesPerId = newBytesPerId;
+    this.bytesPerType = newBytesPerType;
     this.bytesPerPath = newBytesPerPath;
     this.idxFile = newIdxFile;
 
     time = System.currentTimeMillis() - time;
     logger.info("Uri index resized in {}", ConfigurationUtils.toHumanReadableDuration(time));
+    return newBytesPerEntry;
   }
 
 }

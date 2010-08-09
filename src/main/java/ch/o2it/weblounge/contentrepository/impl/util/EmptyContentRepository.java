@@ -20,15 +20,18 @@
 
 package ch.o2it.weblounge.contentrepository.impl.util;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Dictionary;
 import java.util.Iterator;
 
@@ -97,9 +100,9 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#findPages(ch.o2it.weblounge.common.content.SearchQuery)
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
    */
-  public SearchResult findPages(SearchQuery query)
+  public SearchResult find(SearchQuery query)
       throws ContentRepositoryException {
     return null;
   }
@@ -107,28 +110,49 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#getPage(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public Page getPage(ResourceURI uri) throws ContentRepositoryException {
+  public Resource get(ResourceURI uri) throws ContentRepositoryException {
     return null;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#getPage(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.user.User,
    *      ch.o2it.weblounge.common.security.Permission)
    */
-  public Page getPage(ResourceURI uri, User user, Permission p)
+  public Resource get(ResourceURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException {
     return null;
   }
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.language.Language)
+   */
+  public InputStream getContent(ResourceURI uri, Language language)
+      throws ContentRepositoryException, IOException {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.language.Language, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)
+   */
+  public InputStream getContent(ResourceURI uri, Language language, User user,
+      Permission p) throws ContentRepositoryException, SecurityException,
+      IOException {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException {
     return null;
@@ -137,9 +161,9 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public Iterator<ResourceURI> listPages(ResourceURI uri)
+  public Iterator<ResourceURI> list(ResourceURI uri)
       throws ContentRepositoryException {
     return null;
   }
@@ -147,10 +171,10 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      long)
    */
-  public Iterator<ResourceURI> listPages(ResourceURI uri, long version)
+  public Iterator<ResourceURI> list(ResourceURI uri, long version)
       throws ContentRepositoryException {
     return null;
   }
@@ -158,10 +182,10 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int)
    */
-  public Iterator<ResourceURI> listPages(ResourceURI uri, int level)
+  public Iterator<ResourceURI> list(ResourceURI uri, int level)
       throws ContentRepositoryException {
     return null;
   }
@@ -169,10 +193,10 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int, long)
    */
-  public Iterator<ResourceURI> listPages(ResourceURI uri, int level, long version)
+  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
       throws ContentRepositoryException {
     return null;
   }
@@ -197,18 +221,18 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPages()
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getResourceCount()
    */
-  public long getPages() {
+  public long getResourceCount() {
     return 0;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions()
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersionCount()
    */
-  public long getVersions() {
+  public long getVersionCount() {
     return 0;
   }
 

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.URIIndex;
 
 import org.junit.After;
@@ -45,7 +46,16 @@ public class URIIndexTest {
   /** The index file */
   protected File indexFile = null;
 
-  /** Number of bytes per entry */
+  /** Number of bytes for the header */
+  protected int headerLength = 32;
+
+  /** Number of bytes per id */
+  protected int idLength = 36;
+
+  /** Number of bytes per type */
+  protected int typeLength = 8;
+
+  /** Number of bytes per path */
   protected int pathLength = 128;
 
   /**
@@ -88,15 +98,15 @@ public class URIIndexTest {
    */
   @Test
   public void testSize() {
-    assertEquals(24, idx.size());
+    assertEquals(headerLength, idx.size());
     String uuid = UUID.randomUUID().toString();
     try {
-      idx.add(uuid, "/");
+      idx.add(uuid, "page", "/");
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error adding entry to the index");
     }
-    assertEquals(24 + uuid.getBytes().length + pathLength, idx.size());
+    assertEquals(headerLength + uuid.getBytes().length + typeLength + pathLength, idx.size());
   }
 
   /**
@@ -106,7 +116,7 @@ public class URIIndexTest {
    */
   @Test
   public void testGetEntrySize() {
-    assertEquals(pathLength, idx.getEntrySize());
+    assertEquals(idLength + typeLength + pathLength, idx.getEntrySize());
   }
 
   /**
@@ -118,7 +128,7 @@ public class URIIndexTest {
   public void testGetEntries() {
     assertEquals(0, idx.getEntries());
     try {
-      idx.add(UUID.randomUUID().toString(), "/");
+      idx.add(UUID.randomUUID().toString(), "page", "/");
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error adding entry to the index");
@@ -136,10 +146,10 @@ public class URIIndexTest {
     try {
       String uuid = UUID.randomUUID().toString();
       String path = "/weblounge";
-      long address = idx.add(uuid, path);
+      long address = idx.add(uuid, "page", path);
       assertEquals(0, address);
       assertEquals(1, idx.getEntries());
-      assertEquals(pathLength, idx.getEntrySize());
+      assertEquals(idLength + typeLength + pathLength, idx.getEntrySize());
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error adding entry to the index");
@@ -157,7 +167,7 @@ public class URIIndexTest {
     String uuid = UUID.randomUUID().toString();
     String path = "/weblounge";
     try {
-      address = idx.add(uuid, path);
+      address = idx.add(uuid, "page", path);
       idx.delete(address);
       assertEquals(0, idx.getEntries());
     } catch (IOException e) {
@@ -187,7 +197,7 @@ public class URIIndexTest {
     
     // Add another entry and make sure it fills the empty slot
     try {
-      long newAddress = idx.add(UUID.randomUUID().toString(), "/");
+      long newAddress = idx.add(UUID.randomUUID().toString(), "page", "/");
       assertEquals(address, newAddress);
     } catch (IOException e) {
       e.printStackTrace();
@@ -212,28 +222,28 @@ public class URIIndexTest {
       String newLongPath = newLongPathBuffer.toString();
 
       // Add the entry
-      long address = idx.add(uuid, path);
+      long address = idx.add(uuid, "page", path);
 
       // Update it
-      idx.update(address, newPath);
+      idx.update(address, "page", newPath);
       assertEquals(1, idx.getEntries());
       assertEquals(uuid, idx.getId(address));
       assertEquals(newPath, idx.getPath(address));
-      assertEquals(pathLength, idx.getEntrySize());
+      assertEquals(idLength + typeLength + pathLength, idx.getEntrySize());
 
       // ... again ...
-      idx.update(address, path);
+      idx.update(address, "page", path);
       assertEquals(1, idx.getEntries());
       assertEquals(uuid, idx.getId(address));
       assertEquals(path, idx.getPath(address));
-      assertEquals(pathLength, idx.getEntrySize());
+      assertEquals(idLength + typeLength + pathLength, idx.getEntrySize());
 
       // ... with a very long path
-      idx.update(address, newLongPath.toString());
+      idx.update(address, "page", newLongPath.toString());
       assertEquals(1, idx.getEntries());
       assertEquals(uuid, idx.getId(address));
       assertEquals(newLongPath, idx.getPath(address));
-      assertEquals(2 * pathLength, idx.getEntrySize());
+      assertEquals(idLength + typeLength + 2 * pathLength, idx.getEntrySize());
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -251,12 +261,12 @@ public class URIIndexTest {
     try {
       idx.clear();
       assertEquals(0, idx.getEntries());
-      assertEquals(24, idx.size());
+      assertEquals(headerLength, idx.size());
 
-      idx.add(uuid, "/");
+      idx.add(uuid, "page", "/");
       idx.clear();
       assertEquals(0, idx.getEntries());
-      assertEquals(24 + uuid.getBytes().length + pathLength, idx.size());
+      assertEquals(headerLength + uuid.getBytes().length + typeLength + pathLength, idx.size());
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error clearing the index");
@@ -278,9 +288,9 @@ public class URIIndexTest {
     for (int i = 0; i < pathLength + 1; i++)
       path.append("x");
     try {
-      address = idx.add(uuid1, shortPath);
+      address = idx.add(uuid1, "page", shortPath);
       assertEquals(uuid1, idx.getId(address));
-      address = idx.add(uuid2, path.toString());
+      address = idx.add(uuid2, "page", path.toString());
       assertEquals(uuid2, idx.getId(address));
     } catch (IOException e) {
       e.printStackTrace();
@@ -303,9 +313,9 @@ public class URIIndexTest {
     for (int i = 0; i < pathLength + 1; i++)
       path.append("x");
     try {
-      address = idx.add(uuid1, shortPath);
+      address = idx.add(uuid1, "page", shortPath);
       assertEquals(shortPath, idx.getPath(address));
-      address = idx.add(uuid2, path.toString());
+      address = idx.add(uuid2, "page", path.toString());
       assertEquals(path.toString(), idx.getPath(address));
     } catch (IOException e) {
       e.printStackTrace();
@@ -319,21 +329,86 @@ public class URIIndexTest {
    * .
    */
   @Test
-  public void testResize() {
+  public void testResizeType() {
     long address = -1;
     String uuid = UUID.randomUUID().toString();
+    
+    // Test oversized type
+    StringBuffer type = new StringBuffer();
+    for (int i = 0; i < typeLength + 1; i++)
+      type.append("x");
+    try {
+      address = idx.add(uuid, type.toString(), "/");
+      assertEquals(1, idx.getEntries());
+      assertEquals(idLength + 2 * typeLength + pathLength, idx.getEntrySize());
+      assertEquals("/", idx.getPath(address));
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error adding entry to the index");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.URIIndex#resize(int)}
+   * .
+   */
+  @Test
+  public void testResizePath() {
+    long address = -1;
+    String uuid = UUID.randomUUID().toString();
+    
+    // Test oversized path
     StringBuffer path = new StringBuffer("/");
     for (int i = 0; i < pathLength + 1; i++)
       path.append("x");
     try {
-      address = idx.add(uuid, path.toString());
+      address = idx.add(uuid, "page", path.toString());
       assertEquals(1, idx.getEntries());
-      assertEquals(pathLength * 2, idx.getEntrySize());
+      assertEquals(idLength + typeLength + 2 * pathLength, idx.getEntrySize());
       assertEquals(path.toString(), idx.getPath(address));
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error adding entry to the index");
     }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.URIIndex#resize(int)}
+   * .
+   */
+  @Test
+  public void testResizeTypeAndPath() {
+    long address = -1;
+    String uuid = UUID.randomUUID().toString();
+    
+    // Test oversized type and path
+    StringBuffer type = new StringBuffer();
+    for (int i = 0; i < typeLength + 1; i++)
+      type.append("x");
+    StringBuffer path = new StringBuffer("/");
+    for (int i = 0; i < pathLength + 1; i++)
+      path.append("x");
+    try {
+      address = idx.add(uuid, type.toString(), path.toString());
+      assertEquals(1, idx.getEntries());
+      assertEquals(idLength + 2 * typeLength + 2 * pathLength, idx.getEntrySize());
+      assertEquals(path.toString(), idx.getPath(address));
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error adding entry to the index");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.URIIndex#getIndexVersion()}
+   * .
+   */
+  @Test
+  public void testGetIndexVersion() {
+    assertEquals(VersionedContentRepositoryIndex.IDX_VERSION, idx.getIndexVersion());
   }
 
 }

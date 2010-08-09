@@ -23,6 +23,7 @@ package ch.o2it.weblounge.contentrepository.index;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.IdIndex;
 
 import org.junit.After;
@@ -63,7 +64,7 @@ public class IdIndexTest {
     if (indexFile.exists())
       indexFile.delete();
     idx = new IdIndex(tmpDir, false, slotsInIndex, entriesPerSlot);
-    expectedSize = 16 + (slotsInIndex * (4 + entriesPerSlot * 8));
+    expectedSize = 20 + (slotsInIndex * (4 + entriesPerSlot * 8));
   }
 
   /**
@@ -225,7 +226,7 @@ public class IdIndexTest {
       assertEquals(slotsInIndex, idx.getSlots());
       assertEquals(entriesPerSlot * 3, idx.getSlotSize());
       assertEquals(1, idx.getEntries());
-      assertEquals(16 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
+      assertEquals(20 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
       long[] candidates = idx.locate(uuid);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);
@@ -244,6 +245,16 @@ public class IdIndexTest {
     } catch (IllegalStateException e) {
       // Expected
     }
+  }
+  
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#getIndexVersion()}
+   * .
+   */
+  @Test
+  public void testGetIndexVersion() throws Exception {
+    assertEquals(VersionedContentRepositoryIndex.IDX_VERSION, idx.getIndexVersion());
   }
 
 }

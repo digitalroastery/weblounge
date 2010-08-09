@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  name="Weblounge Page Serializer">	
+  
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.PageSerializer" />
+  <property name="service.description" value="Weblounge Page Serializer" />
+  <service>
+    <provide interface="ch.o2it.weblounge.contentrepository.ResourceSerializer" />
+  </service>
+
+</scr:component>

@@ -22,11 +22,11 @@ package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.content.resource.File;
+import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.file.FileImpl;
-import ch.o2it.weblounge.common.impl.content.file.FileReader;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
@@ -136,7 +136,7 @@ public class FileEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Get the resource
-    final File resource = loadResource(request, resourceId, languageId);
+    final FileResource resource = loadResource(request, resourceId, languageId);
     if (resource == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -198,7 +198,7 @@ public class FileEndpoint {
     Site site = getSite(request);
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI resourceURI = new ResourceURIImpl(site, null, resourceId);
+    ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
 
     // Does the resource exist?
     try {
@@ -213,7 +213,7 @@ public class FileEndpoint {
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
       try {
-        Page currentPage = contentRepository.getPage(resourceURI);
+        FileResource currentPage = (FileResource)contentRepository.get(resourceURI);
         String etag = Long.toString(currentPage.getModificationDate().getTime());
         if (!etag.equals(ifMatchHeader)) {
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
@@ -225,10 +225,10 @@ public class FileEndpoint {
     }
 
     // Parse the resource and update it in the repository
-    File resource = null;
+    FileResource resource = null;
     try {
-      FileReader resourceReader = new FileReader();
-      resource = resourceReader.read(IOUtils.toInputStream(resourceXml), resourceURI);
+      FileResourceReader resourceReader = new FileResourceReader();
+      resource = resourceReader.read(resourceURI, IOUtils.toInputStream(resourceXml));
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
       User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
@@ -284,10 +284,10 @@ public class FileEndpoint {
         if (!path.startsWith("/"))
           path = "/" + path;
         WebUrl url = new WebUrlImpl(site, path);
-        resourceURI = new ResourceURIImpl(site, url.getPath(), uuid);
+        resourceURI = new FileResourceURIImpl(site, url.getPath(), uuid);
 
         // Make sure the resource doesn't exist
-        if (contentRepository.exists(new ResourceURIImpl(site, url.getPath()))) {
+        if (contentRepository.exists(new FileResourceURIImpl(site, url.getPath()))) {
           logger.warn("Tried to create already existing resource {} in site '{}'", resourceURI, site);
           throw new WebApplicationException(Status.CONFLICT);
         }
@@ -299,7 +299,7 @@ public class FileEndpoint {
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
     } else {
-      resourceURI = new ResourceURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
+      resourceURI = new FileResourceURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
     }
 
     // Parse the resource and store it
@@ -309,7 +309,7 @@ public class FileEndpoint {
       logger.debug("Adding resource to {}", resourceURI);
       try {
         PageReader resourceReader = new PageReader();
-        resource = resourceReader.read(IOUtils.toInputStream(resourceXml), resourceURI);
+        resource = resourceReader.read(resourceURI, IOUtils.toInputStream(resourceXml));
       } catch (IOException e) {
         logger.warn("Error reading resource {} from request", resourceURI);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -331,7 +331,7 @@ public class FileEndpoint {
 
     // Store the new resource
     try {
-      contentRepository.put(resourceURI, resource, user);
+      contentRepository.put(resource, user);
       uri = new URI(UrlSupport.concat(request.getRequestURL().toString(), resourceURI.getId()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for resource {}: {}", resourceURI, e.getMessage());
@@ -370,7 +370,7 @@ public class FileEndpoint {
 
     Site site = getSite(request);
     User user = null; // TODO: Extract user
-    ResourceURI resourceURI = new ResourceURIImpl(site, null, resourceId);
+    ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Make sure the resource doesn't exist
@@ -527,7 +527,7 @@ public class FileEndpoint {
    *          the language
    * @return the resource
    */
-  protected File loadResource(HttpServletRequest request, String resourceId,
+  protected FileResource loadResource(HttpServletRequest request, String resourceId,
       String languageId) {
     if (sites == null) {
       logger.debug("Unable to load page '{}': no sites registered", resourceId);
@@ -553,10 +553,10 @@ public class FileEndpoint {
 
     // Load the resource and return it
     // try {
-    ResourceURI resourceURI = new ResourceURIImpl(site, null, resourceId);
+    ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
     // Resource resource = contentRepository.getPage(resourceURI);
     URL fileUrl = getClass().getResource("/image/placeholder.jpg");
-    File resource = new FileImpl(resourceURI, fileUrl);
+    FileResource resource = new FileResourceImpl(resourceURI, fileUrl);
     return resource;
     // } catch (ContentRepositoryException e) {
     // throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

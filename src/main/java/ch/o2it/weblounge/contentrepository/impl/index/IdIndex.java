@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl.index;
 
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -49,7 +50,7 @@ import java.io.RandomAccessFile;
  * entries currently in the index and then the slots containing the indicated
  * number of 64-bit addresses (8 bytes).
  */
-public class IdIndex {
+public class IdIndex implements VersionedContentRepositoryIndex {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(IdIndex.class);
@@ -57,8 +58,20 @@ public class IdIndex {
   /** Name for the id index file */
   public static final String ID_IDX_NAME = "id.idx";
 
+  /** Location of the version header */
+  protected static final long IDX_VERSION_HEADER_LOCATION = 0;
+
+  /** Location of the slots header */
+  protected static final long IDX_SLOTS_HEADER_LOCATION = 4;
+
+  /** Location of the entries-per-slot header */
+  protected static final long IDX_ENTRIES_PER_SLOT_HEADER_LOCATION = 8;
+
+  /** Location of the entries header */
+  protected static final long IDX_ENTRIES_HEADER_LOCATION = 12;
+
   /** Number of bytes that are used for the index header */
-  protected static final int IDX_HEADER_SIZE = 16;
+  protected static final int IDX_HEADER_SIZE = 20;
 
   /** Default number of entries in index */
   private static final int IDX_ENTRIES = 128;
@@ -69,18 +82,6 @@ public class IdIndex {
   /** Size of an entry (long) in bytes */
   protected static final int IDX_ENTRY_SIZE = 8;
 
-  /** Location of the slots header */
-  protected static final long IDX_SLOTS_HEADER_LOCATION = 0;
-
-  /** Location of the entries-per-slot header */
-  protected static final long IDX_ENTRIES_PER_SLOT_HEADER_LOCATION = 4;
-
-  /** Location of the entries header */
-  protected static final long IDX_ENTRIES_HEADER_LOCATION = 8;
-
-  /** Location of the first entry */
-  protected static final long IDX_ENTRIES_LOCATION = 16;
-
   /** The index file */
   protected RandomAccessFile idx = null;
 
@@ -89,6 +90,9 @@ public class IdIndex {
 
   /** True if this is a readonly index */
   protected boolean isReadOnly = false;
+
+  /** The version number */
+  protected int indexVersion = -1;
 
   /** Number of slots in the ids index */
   protected int slots = IDX_ENTRIES;
@@ -155,6 +159,9 @@ public class IdIndex {
 
     // Read index header information
     try {
+      this.indexVersion = idx.readInt();
+      if (indexVersion != IDX_VERSION)
+        logger.warn("Id index version mismatch (found {}, expected {}), consider reindex", indexVersion, IDX_VERSION);
       this.slots = idx.readInt();
       this.entriesPerSlot = idx.readInt();
       this.entries = idx.readLong();
@@ -180,6 +187,15 @@ public class IdIndex {
    */
   public void close() throws IOException {
     idx.close();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex#getIndexVersion()
+   */
+  public int getIndexVersion() {
+    return indexVersion;
   }
 
   /**
@@ -391,6 +407,7 @@ public class IdIndex {
    *           writing to the index fails
    */
   private void init(int slots, int entriesPerSlot) throws IOException {
+    this.indexVersion = IDX_VERSION;
     this.slots = slots;
     this.entriesPerSlot = entriesPerSlot;
     this.slotSizeInBytes = 4 + (entriesPerSlot * IDX_ENTRY_SIZE);
@@ -403,9 +420,9 @@ public class IdIndex {
         slots,
         entriesPerSlot });
 
-    idx.seek(0);
-
     // Write header
+    idx.seek(0);
+    idx.writeInt(indexVersion);
     idx.writeInt(slots);
     idx.writeInt(entriesPerSlot);
     idx.writeLong(entries);
@@ -466,10 +483,11 @@ public class IdIndex {
 
     // Copy the current index to the new one
 
-    idx.seek(IDX_ENTRIES_LOCATION);
-    idxNew.seek(0);
+    idx.seek(IDX_HEADER_SIZE);
 
     // Write header
+    idxNew.seek(0);
+    idxNew.writeInt(indexVersion);
     idxNew.writeInt(slots);
     idxNew.writeInt(entriesPerSlot);
     idxNew.writeLong(entries);

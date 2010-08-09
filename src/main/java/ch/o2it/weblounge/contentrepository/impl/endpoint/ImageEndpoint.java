@@ -22,10 +22,10 @@ package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.image.Image;
+import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.image.ImageImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageResourceImpl;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -53,9 +53,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 
 /**
  * This class implements the <code>REST</code> endpoint for images.
@@ -93,7 +93,7 @@ public class ImageEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Get the image resource
-    final Image resource = loadImage(request, resourceId);
+    final ImageResource resource = loadImage(request, resourceId);
     if (resource == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -151,7 +151,7 @@ public class ImageEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Get the image resource
-    Image image = loadImage(request, resourceId);
+    ImageResource image = loadImage(request, resourceId);
     if (image == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -176,7 +176,7 @@ public class ImageEndpoint {
     }
 
     // TODO: Scale
-    final Image scaledImage = image;
+    final ImageResource scaledImage = image;
 
     // Create the response
     ResponseBuilder response = Response.ok(new StreamingOutput() {
@@ -301,7 +301,7 @@ public class ImageEndpoint {
    *          the image identifier
    * @return the image
    */
-  protected Image loadImage(HttpServletRequest request, String resourceId) {
+  protected ImageResource loadImage(HttpServletRequest request, String resourceId) {
     if (sites == null) {
       logger.debug("Unable to load page '{}': no sites registered", resourceId);
       return null;
@@ -319,13 +319,13 @@ public class ImageEndpoint {
 
     // Load the image and return it
     // try {
-    ResourceURI resourceURI = new ResourceURIImpl(site, null, resourceId);
+    ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
     // Resource resource = contentRepository.getPage(resourceURI);
     URL imageUrl = getClass().getResource("/image/placeholder.jpg");
-    Image resource = new ImageImpl(resourceURI, imageUrl);
-    if (!(resource instanceof Image))
+    ImageResource resource = new ImageResourceImpl(resourceURI, imageUrl);
+    if (!(resource instanceof ImageResource))
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    return (Image) resource;
+    return (ImageResource) resource;
     // } catch (ContentRepositoryException e) {
     // throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     // }

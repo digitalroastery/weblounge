@@ -77,7 +77,7 @@ public class StandaloneBundle implements Bundle {
    * @see org.osgi.framework.Bundle#findEntries(java.lang.String,
    *      java.lang.String, boolean)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration findEntries(String path, String filePattern, boolean recurse) {
     List<URL> result = new ArrayList<URL>();
     for (URL url : entries) {
@@ -116,7 +116,7 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getEntryPaths(java.lang.String)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getEntryPaths(String path) {
     List<URL> result = new ArrayList<URL>();
     for (URL url : entries) {
@@ -132,7 +132,7 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getHeaders()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Dictionary getHeaders() {
     return new Hashtable();
   }
@@ -142,7 +142,7 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getHeaders(java.lang.String)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Dictionary getHeaders(String locale) {
     return new Hashtable();
   }
@@ -188,7 +188,7 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#getResources(java.lang.String)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getResources(String name) throws IOException {
     return classLoader.getResources(name);
   }
@@ -234,8 +234,7 @@ public class StandaloneBundle implements Bundle {
    * 
    * @see org.osgi.framework.Bundle#loadClass(java.lang.String)
    */
-  @SuppressWarnings("unchecked")
-  public Class loadClass(String name) throws ClassNotFoundException {
+  public Class<?> loadClass(String name) throws ClassNotFoundException {
     return classLoader.loadClass(name);
   }
 

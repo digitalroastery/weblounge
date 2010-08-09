@@ -20,13 +20,15 @@
 
 package ch.o2it.weblounge.contentrepository.impl.jcr;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * JRC implementation of the <code>WritableContentRepository</code> interface.
@@ -35,40 +37,43 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deletePage(ch.o2it.weblounge.common.content.ResourceURI, long[])
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deleteResource(ch.o2it.weblounge.common.content.ResourceURI,
+   *      long[])
    */
   @Override
-  protected void deletePage(ResourceURI uri, long[] revisions) throws IOException {
+  protected void deleteResource(ResourceURI uri, long[] revisions)
+      throws IOException {
     // TODO Auto-generated method stub
-    
+
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storePage(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.page.Page)
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected void storePage(ResourceURI uri, Page page) throws IOException {
+  protected void storeResource(Resource resource) throws IOException {
     // TODO Auto-generated method stub
-    
+
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#updatePage(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.page.Page)
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.o2it.weblounge.common.content.Resource,
+   *      java.io.InputStream)
    */
   @Override
-  protected void updatePage(ResourceURI uri, Page page) throws IOException {
+  protected void storeResourceContent(Resource resource, InputStream is)
+      throws IOException {
     // TODO Auto-generated method stub
-    
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadIndex()
    */
   @Override
@@ -79,22 +84,35 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage(ch.o2it.weblounge.common.content.ResourceURI)
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResource(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  protected Page loadPage(ResourceURI uri) throws IOException {
+  protected InputStream loadResource(ResourceURI uri) throws IOException {
     // TODO Auto-generated method stub
     return null;
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#index()
    */
   public void index() throws ContentRepositoryException {
     // TODO Auto-generated method stub
-    
+
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  @Override
+  protected InputStream loadResourceContent(ResourceURI uri, Language language)
+      throws IOException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

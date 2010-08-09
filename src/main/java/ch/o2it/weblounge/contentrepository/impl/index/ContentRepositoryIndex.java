@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 
 import org.slf4j.Logger;
@@ -36,7 +35,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 /**
- * This index into the repository is used to map page and resource urls into
+ * This index into the repository is used to map resource and resource urls into
  * repository indices and vice versa. In addition, it will facilitate listing
  * url hierarchies.
  */
@@ -57,9 +56,12 @@ public class ContentRepositoryIndex {
   /** The version index */
   protected VersionIndex versionIdx = null;
 
+  /** The language index */
+  protected LanguageIndex languageIdx = null;
+
   /** The search index */
   protected SearchIndex searchIdx = null;
-  
+
   /** The index root directory */
   protected File idxRootDir = null;
 
@@ -80,6 +82,7 @@ public class ContentRepositoryIndex {
     this.idIdx = new IdIndex(new File(rootDir, "structure"), readOnly);
     this.pathIdx = new PathIndex(new File(rootDir, "structure"), readOnly);
     this.versionIdx = new VersionIndex(new File(rootDir, "structure"), readOnly);
+    this.languageIdx = new LanguageIndex(new File(rootDir, "structure"), readOnly);
     this.searchIdx = new SearchIndex(new File(rootDir, "fulltext"), readOnly);
   }
 
@@ -94,13 +97,35 @@ public class ContentRepositoryIndex {
    *          the path index
    * @param versionIndex
    *          the version index
+   * @param languageIndex
+   *          the language index
    */
   public ContentRepositoryIndex(URIIndex uriIndex, IdIndex idIndex,
-      PathIndex pathIndex, VersionIndex versionIndex) {
+      PathIndex pathIndex, VersionIndex versionIndex,
+      LanguageIndex languageIndex) {
     this.uriIdx = uriIndex;
     this.idIdx = idIndex;
     this.pathIdx = pathIndex;
     this.versionIdx = versionIndex;
+    this.languageIdx = languageIndex;
+  }
+
+  /**
+   * Returns the index version or <code>-1</code> if the versions differ.
+   * 
+   * @return the index version
+   */
+  public int getIndexVersion() {
+    int version = uriIdx.getIndexVersion();
+    int idIdxVersion = idIdx.getIndexVersion();
+    int pathIdxVersion = pathIdx.getIndexVersion();
+    int versionIdxVersion = versionIdx.getIndexVersion();
+    int languageIdxVersion = languageIdx.getIndexVersion();
+    if (idIdxVersion != version || pathIdxVersion != version || versionIdxVersion != version || languageIdxVersion != version) {
+      logger.warn("Version mismatch detected in structural index");
+      return -1;
+    }
+    return version;
   }
 
   /**
@@ -144,6 +169,16 @@ public class ContentRepositoryIndex {
   }
 
   /**
+   * Sets the language index.
+   * 
+   * @param languageIndex
+   *          the language index
+   */
+  protected void setVersionIndex(LanguageIndex languageIndex) {
+    this.languageIdx = languageIndex;
+  }
+
+  /**
    * Sets the search index.
    * 
    * @param searchIndex
@@ -168,16 +203,18 @@ public class ContentRepositoryIndex {
       pathIdx.close();
     if (versionIdx != null)
       versionIdx.close();
+    if (languageIdx != null)
+      languageIdx.close();
     if (searchIdx != null)
       searchIdx.close();
   }
 
   /**
-   * Returns the number of pages in this index.
+   * Returns the number of resources in this index.
    * 
-   * @return the number of pages
+   * @return the number of resources
    */
-  public long getPages() {
+  public long getResourceCount() {
     return uriIdx.getEntries();
   }
 
@@ -191,37 +228,44 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Adds all relevant entries for the given page uri to the index and returns
-   * it, probably providing a newly created uri identifier.
+   * Adds all relevant entries for the given resource uri to the index and
+   * returns it, probably providing a newly created uri identifier.
    * 
    * @param url
-   *          the page uri
+   *          the resource uri
    * @return the uri
    * @throws IOException
    *           if accessing the index fails
    */
-  public synchronized ResourceURI add(Page page) throws IOException {
-    ResourceURI uri = page.getURI();
+  public synchronized ResourceURI add(Resource resource) throws IOException {
+    ResourceURI uri = resource.getURI();
     if (uri.getPath() == null)
       throw new IllegalArgumentException("Uri must contain a path");
 
     long address = toURIEntry(uri);
 
-    // If there is no address, we are about to add a new page
+    // If there is no address, we are about to add a new resource
     if (address < 0) {
       String id = uri.getId();
       if (id == null) {
         id = UUID.randomUUID().toString();
-        uri = new ResourceURIImpl(uri.getSite(), uri.getPath(), uri.getVersion(), id);
-        ((ResourceURIImpl)page.getURI()).setIdentifier(id);
+        uri = new ResourceURIImpl(uri.getType(), uri.getSite(), uri.getPath(), uri.getVersion(), id);
+        ((ResourceURIImpl) resource.getURI()).setIdentifier(id);
       }
+      String type = uri.getType();
       String path = uri.getPath();
-      address = uriIdx.add(id, path);
+      address = uriIdx.add(id, type, path);
       idIdx.add(id, address);
       pathIdx.add(path, address);
       versionIdx.add(id, uri.getVersion());
+      languageIdx.setLanguages(id, resource.languages());
       if (uri.getVersion() == Resource.LIVE) {
-        searchIdx.add(page);
+        if (resource.isIndexed())
+          searchIdx.add(resource);
+        else
+          searchIdx.delete(uri);
+      } else {
+        languageIdx.add(id, null);
       }
     }
 
@@ -229,24 +273,29 @@ public class ContentRepositoryIndex {
     else if (!versionIdx.hasVersion(address, uri.getVersion())) {
       versionIdx.add(address, uri.getVersion());
       if (uri.getVersion() == Resource.LIVE) {
-        searchIdx.add(page);
+        languageIdx.setLanguages(address, resource.languages());
+        if (resource.isIndexed())
+          searchIdx.add(resource);
+        else
+          searchIdx.delete(uri);
       }
     }
 
-    // Seems to be an existing page, so it's an update rather than an addition
+    // Seems to be an existing resource, so it's an update rather than an
+    // addition
     else {
-      logger.warn("Existing page '{}' was passed to add(), redirecting to update()", uri.getId());
-      update(page);
+      logger.warn("Existing resource '{}' was passed to add(), redirecting to update()", uri.getId());
+      update(resource);
     }
 
     return uri;
   }
 
   /**
-   * Removes all entries for the given page uri from the index.
+   * Removes all entries for the given resource uri from the index.
    * 
    * @param uri
-   *          the page uri
+   *          the resource uri
    * @throws IOException
    *           if accessing the index fails
    */
@@ -276,11 +325,11 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Returns all revisions for the specified page or <code>null</code> if the
-   * page doesn't exist.
+   * Returns all revisions for the specified resource or <code>null</code> if
+   * the resource doesn't exist.
    * 
    * @param uri
-   *          the page uri
+   *          the resource uri
    * @return the revisions
    */
   public long[] getRevisions(ResourceURI uri) throws IOException {
@@ -295,7 +344,7 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Returns the identifier of the page with uri <code>uri</code> or
+   * Returns the identifier of the resource with uri <code>uri</code> or
    * <code>null</code> if the uri is not part of the index.
    * 
    * @param uri
@@ -306,10 +355,10 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public String toId(ResourceURI uri) throws IOException {
+  public String getIdentifier(ResourceURI uri) throws IOException {
     String path = uri.getPath();
     if (path == null)
-      throw new IllegalArgumentException("PageURI must contain a path");
+      throw new IllegalArgumentException("ResourceURI must contain a path");
 
     long[] addresses = pathIdx.locate(path);
 
@@ -331,7 +380,7 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Returns the path of the page with uri <code>uri</code> by looking it up
+   * Returns the path of the resource with uri <code>uri</code> by looking it up
    * using the uri's identifier or <code>null</code> if the uri is not part of
    * the index.
    * 
@@ -343,10 +392,10 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public String toPath(ResourceURI uri) throws IOException {
+  public String getPath(ResourceURI uri) throws IOException {
     String id = uri.getId();
     if (id == null)
-      throw new IllegalArgumentException("PageURI must contain an identifier");
+      throw new IllegalArgumentException("ResourceURI must contain an identifier");
 
     long[] addresses = idIdx.locate(id);
 
@@ -368,31 +417,55 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Updates the contents of the given page.
+   * Returns the resource type or <code>null</code> the resource could not be
+   * found.
    * 
-   * @param page
-   *          the page to update
+   * @param uri
+   *          the resource uri
+   * @return the resource type
+   * @throws IOException
+   *           if accessing the index fails
+   */
+  public String getType(ResourceURI uri) throws IOException {
+    long address = toURIEntry(uri);
+    if (address == -1)
+      return null;
+    return uriIdx.getType(address);
+  }
+
+  /**
+   * Updates the contents of the given resource.
+   * 
+   * @param resource
+   *          the resource to update
    * @throws IOException
    *           if updating the index fails
    */
-  public synchronized void update(Page page) throws IOException {
-    ResourceURI uri = page.getURI();
+  public synchronized void update(Resource resource) throws IOException {
+    ResourceURI uri = resource.getURI();
     if (uri.getVersion() == Resource.LIVE) {
-      searchIdx.update(page);
+      if (resource.isIndexed())
+        searchIdx.update(resource);
+      else
+        searchIdx.delete(resource.getURI());
+
+      long address = toURIEntry(resource.getURI());
+      languageIdx.setLanguages(address, null);
     }
   }
 
   /**
-   * Updates the path of the given page.
+   * Updates the path of the given resource.
    * 
    * @param uir
-   *          the page uri
+   *          the resource uri
    * @param path
    *          the new path
    * @throws IOException
    *           if updating the index fails
    */
-  public synchronized void move(ResourceURI uri, String path) throws IOException {
+  public synchronized void move(ResourceURI uri, String path)
+      throws IOException {
     String oldPath = uri.getPath();
 
     // Locate the entry in question
@@ -403,11 +476,11 @@ public class ContentRepositoryIndex {
       throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
 
     // Do it this way to make sure we have identical path trimming
-    uri = new ResourceURIImpl(uri.getSite(), path, uri.getVersion(), uri.getId());
+    uri = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getVersion(), uri.getId());
 
     pathIdx.delete(oldPath, address);
     pathIdx.add(uri.getPath(), address);
-    uriIdx.update(address, uri.getPath());
+    uriIdx.update(address, uri.getType(), uri.getPath());
     if (uri.getVersion() == Resource.LIVE) {
       searchIdx.move(uri, path);
     }
@@ -482,7 +555,7 @@ public class ContentRepositoryIndex {
    *          the search query
    * @return the search result
    */
-  public SearchResult findPages(SearchQuery query) throws IOException {
+  public SearchResult find(SearchQuery query) throws IOException {
     return searchIdx.getByQuery(query);
   }
 

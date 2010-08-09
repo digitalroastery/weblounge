@@ -20,11 +20,12 @@
 
 package ch.o2it.weblounge.contentrepository.impl.bundle;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
-import ch.o2it.weblounge.common.impl.content.page.PageUtils;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -96,7 +97,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     // See if there are any pages. If that's the case, then we don't need to
     // do anything. If not, we need to copy everything that's currently in the
     // bundle.
-    String pagesPath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), PAGES_PATH);
+    String pagesPath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), REPOSITORY_PATH);
     File pagesDirectory = new File(pagesPath);
     if (pagesDirectory.isDirectory() && pagesDirectory.list().length > 0) {
       logger.debug("Found existing content for site '{}' at {}", site, pagesPath);
@@ -111,8 +112,8 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     for (Iterator<ResourceURI> pi = getURIsFromBundle(); pi.hasNext();) {
       ResourceURI uri = pi.next();
       try {
-        Page page = loadPageFromBundle(uri);
-        put(uri, page, user);
+        Resource page = loadPageFromBundle(uri);
+        put(page, user);
       } catch (SecurityException e) {
         logger.error("Security error reading page " + uri + ": " + e.getMessage(), e);
         throw new ContentRepositoryException(e);
@@ -121,7 +122,6 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
         throw new ContentRepositoryException(e);
       }
     }
-
   }
 
   /**
@@ -134,7 +134,8 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
   @SuppressWarnings("unchecked")
   protected Iterator<ResourceURI> getURIsFromBundle()
       throws ContentRepositoryException {
-    ResourceURI homeURI = new ResourceURIImpl(getSite(), "/");
+    // TODO: Handle resource URIs
+    ResourceURI homeURI = new PageURIImpl(getSite(), "/");
     String entryPath = UrlSupport.concat(pagesPathPrefix, homeURI.getPath());
     List<ResourceURI> pageURIs = new ArrayList<ResourceURI>();
     Enumeration<URL> entries = bundle.findEntries(entryPath, "*.xml", true);
@@ -143,8 +144,8 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
         URL entry = entries.nextElement();
         String path = FilenameUtils.getPath(entry.getPath());
         path = path.substring(pagesPathPrefix.length() - 1);
-        long v = PageUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
-        ResourceURI pageURI = new ResourceURIImpl(site, path, v);
+        long v = ResourceUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
+        ResourceURI pageURI = new PageURIImpl(site, path, v);
         pageURIs.add(pageURI);
         logger.trace("Found revision '{}' of page {}", v, entry);
       }
@@ -171,13 +172,13 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     String entryPath = UrlSupport.concat(new String[] {
         pagesPathPrefix,
         uriPath,
-        PageUtils.getDocument(uri.getVersion()) });
+        ResourceUtils.getDocument(uri.getVersion()) });
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
     try {
       PageReader pageReader = new PageReader();
-      return pageReader.read(url.openStream(), uri);
+      return pageReader.read(uri, url.openStream());
     } catch (SAXException e) {
       throw new RuntimeException("SAX error while reading page '" + uri + "'", e);
     } catch (IOException e) {

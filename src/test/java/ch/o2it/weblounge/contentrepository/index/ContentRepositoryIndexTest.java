@@ -29,9 +29,11 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.IdIndex;
@@ -48,6 +50,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * Test case for the {@link ContentRepositoryIndex}.
@@ -88,12 +91,13 @@ public class ContentRepositoryIndexTest {
 
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getTemplate("home")).andReturn(t);
+    EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
     EasyMock.replay(site);
 
-    page = new PageImpl(new ResourceURIImpl(site, "/weblounge"));
+    page = new PageImpl(new PageURIImpl(site, "/weblounge"));
     page.setTemplate("home");
 
-    otherPage = new PageImpl(new ResourceURIImpl(site, "/weblounge/other"));
+    otherPage = new PageImpl(new PageURIImpl(site, "/weblounge/other"));
     otherPage.setTemplate("home");
   }
 
@@ -151,9 +155,9 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testGetRevisions() {
-    ResourceURI uri1 = new ResourceURIImpl(site, "/weblounge");
-    ResourceURI uri2Live = new ResourceURIImpl(site, "/etc/weblounge");
-    ResourceURI uri2Work = new ResourceURIImpl(site, "/etc/weblounge", Resource.WORK);
+    ResourceURI uri1 = new PageURIImpl(site, "/weblounge");
+    ResourceURI uri2Live = new PageURIImpl(site, "/etc/weblounge");
+    ResourceURI uri2Work = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
     try {
       idx.add(new PageImpl(uri1));
       idx.add(new PageImpl(uri2Live));
@@ -181,7 +185,7 @@ public class ContentRepositoryIndexTest {
       String id = idx.add(page).getId();
       idx.move(page.getURI(), newPath);
       assertEquals(1, idx.size());
-      assertEquals(id, idx.toId(new ResourceURIImpl(site, newPath)));
+      assertEquals(id, idx.getIdentifier(new PageURIImpl(site, newPath)));
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -212,11 +216,11 @@ public class ContentRepositoryIndexTest {
       assertFalse(idx.exists(page.getURI()));
       String id = idx.add(page).getId();
       assertTrue(idx.exists(page.getURI()));
-      assertTrue(idx.exists(new ResourceURIImpl(site, "/weblounge")));
-      assertFalse(idx.exists(new ResourceURIImpl(site, "/xxx")));
+      assertTrue(idx.exists(new PageURIImpl(site, "/weblounge")));
+      assertFalse(idx.exists(new PageURIImpl(site, "/xxx")));
       
       // This seems strange, but if there is an identifier, we take it
-      assertTrue(idx.exists(new ResourceURIImpl(site, "/xxx", id)));
+      assertTrue(idx.exists(new PageURIImpl(site, "/xxx", id)));
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -274,6 +278,31 @@ public class ContentRepositoryIndexTest {
       e.printStackTrace();
       fail(e.getMessage());
     }
+  }
+  
+  /**
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getIndexVersion()}.
+   */
+  @Test
+  public void testIndexVersion() {
+    assertEquals(VersionedContentRepositoryIndex.IDX_VERSION, idx.getIndexVersion());
+    
+    // Overwrite the version number with 0, which is an invalid value
+    try {
+      idx.close();
+
+      File idIdxFile = new File(PathSupport.concat(indexRootDirectory.getAbsolutePath(), "structure"), IdIndex.ID_IDX_NAME);
+      RandomAccessFile index = new RandomAccessFile(idIdxFile, "rwd");
+      index.seek(0);
+      index.writeInt(0);
+      index.close();
+
+      idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
+      assertEquals(-1, idx.getIndexVersion());
+    } catch (IOException e) {
+      fail("Error writing version to index");
+    }
+
   }
   
 }

@@ -20,25 +20,30 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
+import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageReader;
-import ch.o2it.weblounge.common.impl.content.page.PageUtils;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.ResourceSerializer;
+import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
-import org.xml.sax.SAXException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.CharBuffer;
@@ -48,7 +53,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactory;
 
 /**
@@ -56,6 +60,9 @@ import javax.xml.transform.TransformerFactory;
  */
 public abstract class AbstractContentRepository implements ContentRepository {
 
+  /** Logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(AbstractContentRepository.class);
+  
   /** Index into this repository */
   protected ContentRepositoryIndex index = null;
 
@@ -74,9 +81,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /** The xml transformer factory */
   protected final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
-  /** Regular expression to match the page id, path and version */
-  protected final static Pattern pageHeaderRegex = Pattern.compile(".*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*version=\"([^\"]*)\".*");
-  
+  /** Regular expression to match the resource id, path and version */
+  protected final static Pattern resourceHeaderRegex = Pattern.compile(".*<\\s*([\\w]*) .*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*version=\"([^\"]*)\".*");
+
   /**
    * {@inheritDoc}
    * 
@@ -171,15 +178,14 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#findPages(ch.o2it.weblounge.common.content.SearchQuery)
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
    */
-  public SearchResult findPages(SearchQuery query)
-      throws ContentRepositoryException {
+  public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
     try {
-      return index.findPages(query);
+      return index.find(query);
     } catch (IOException e) {
       throw new ContentRepositoryException(e);
     }
@@ -188,14 +194,31 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPage(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public Page getPage(ResourceURI uri) throws ContentRepositoryException {
+  public Resource get(ResourceURI uri) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
+    
+    // Check the resource type
     try {
-      return loadPage(uri);
+      if (uri.getType() != null && !uri.getType().equals(index.getType(new ResourceURIImpl(null, uri.getSite(), uri.getPath(), uri.getId())))) {
+        logger.warn("Type mismatch between requested and actual resource type");
+        return null;
+      }
     } catch (IOException e) {
+      logger.error("Error looking up uri type of {}: {}", uri, e.getMessage());
+      throw new ContentRepositoryException(e);
+    }
+    
+    // Load the resource
+    try {
+      InputStream is = loadResource(uri);
+      ResourceSerializer<?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceReader<?> reader = serializer.getReader();
+      return reader.read(uri, is);
+    } catch (Exception e) {
+      logger.error("Error loading {}: {}", uri, e.getMessage());
       throw new ContentRepositoryException(e);
     }
   }
@@ -203,20 +226,52 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPage(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.user.User,
    *      ch.o2it.weblounge.common.security.Permission)
    */
-  public Page getPage(ResourceURI uri, User user, Permission p)
+  public Resource get(ResourceURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
-    Page page = getPage(uri);
+    Resource resource = get(uri);
 
     // TODO: Check permissions
 
-    return page;
+    return resource;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.language.Language)
+   */
+  public InputStream getContent(ResourceURI uri, Language language)
+      throws ContentRepositoryException, IOException {
+    return loadResourceContent(uri, language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.language.Language,
+   *      ch.o2it.weblounge.common.user.User,
+   *      ch.o2it.weblounge.common.security.Permission)
+   */
+  public InputStream getContent(ResourceURI uri, Language language, User user,
+      Permission p) throws ContentRepositoryException, SecurityException,
+      IOException {
+
+    // TODO: check permissions
+    // Resource resource = get(uri);
+    // if (resource.check(SystemPermission.READ, user)) {
+    //   throw new SecurityException("User " + user + " is not allowed to access " + uri);
+    // }
+
+    return loadResourceContent(uri, language);
   }
 
   /**
@@ -224,7 +279,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException {
+  public ResourceURI[] getVersions(ResourceURI uri)
+      throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
@@ -244,35 +300,35 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public Iterator<ResourceURI> listPages(ResourceURI uri)
+  public Iterator<ResourceURI> list(ResourceURI uri)
       throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
-    return listPages(uri, Integer.MAX_VALUE, -1);
+    return list(uri, Integer.MAX_VALUE, -1);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      long[])
    */
-  public Iterator<ResourceURI> listPages(ResourceURI uri, long version)
+  public Iterator<ResourceURI> list(ResourceURI uri, long version)
       throws ContentRepositoryException {
-    return listPages(uri, Integer.MAX_VALUE, version);
+    return list(uri, Integer.MAX_VALUE, version);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int)
    */
-  public Iterator<ResourceURI> listPages(ResourceURI uri, int level)
+  public Iterator<ResourceURI> list(ResourceURI uri, int level)
       throws ContentRepositoryException {
-    return listPages(uri, level, -1);
+    return list(uri, level, -1);
   }
 
   /**
@@ -280,10 +336,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * This implementation uses the index to get the list.
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#listPages(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int, long)
    */
-  public Iterator<ResourceURI> listPages(ResourceURI uri, int level, long version)
+  public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
       throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -318,18 +374,18 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getPages()
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getResourceCount()
    */
-  public long getPages() {
-    return index != null ? index.getPages() : -1;
+  public long getResourceCount() {
+    return index != null ? index.getResourceCount() : -1;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions()
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersionCount()
    */
-  public long getVersions() {
+  public long getVersionCount() {
     return index != null ? index.getVersions() : -1;
   }
 
@@ -400,15 +456,32 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
-   * Loads and returns the page from the repository.
+   * Loads and returns the resource from the repository.
    * 
    * @param uri
-   *          the page uri
-   * @return the page
+   *          the resource uri
+   * @return the resource
    * @throws IOException
-   *           if the page could not be loaded
+   *           if the resource could not be loaded
    */
-  protected abstract Page loadPage(ResourceURI uri) throws IOException;
+  protected abstract InputStream loadResource(ResourceURI uri)
+      throws IOException;
+
+  /**
+   * Returns the input stream to the resource content identified by
+   * <code>uri</code> and <code>language</code> or <code>null</code> if no such
+   * resource exists.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param language
+   *          the language
+   * @return the resource contents
+   * @throws IOException
+   *           if opening the stream to the resource failed
+   */
+  protected abstract InputStream loadResourceContent(ResourceURI uri,
+      Language language) throws IOException;
 
   /**
    * Loads the repository index. Depending on the concrete implementation, the
@@ -457,44 +530,49 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
-   * Returns the page that is located at the indicated url.
+   * Returns the resource that is located at the indicated url.
    * 
-   * @param url
-   *          location of the page file
-   * @return the page
+   * @param uri
+   *          the resource uri
+   * @param contentUrl
+   *          location of the resource file
+   * @return the resource
    */
-  protected Page loadPage(Site site, URL url) throws IOException {
-    BufferedInputStream is = new BufferedInputStream(url.openStream());
+  protected Resource loadResource(ResourceURI uri, URL contentUrl)
+      throws IOException {
+    BufferedInputStream is = new BufferedInputStream(contentUrl.openStream());
     try {
-      PageReader reader = new PageReader();
-      return reader.read(is, new ResourceURIImpl(site));
-    } catch (SAXException e) {
-      throw new IOException("Error reading page from " + url);
-    } catch (ParserConfigurationException e) {
-      throw new IOException("Error parsing page at " + url);
+      ResourceSerializer<?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceReader<?> reader = serializer.getReader();
+      return reader.read(uri, is);
+    } catch (Exception e) {
+      throw new IOException("Error reading resource from " + contentUrl);
     }
   }
 
   /**
-   * Returns the page uri or <code>null</code> if no page id and/or path could
-   * be found on the specified document. This method is intended to serve as a
-   * utility method when importing pages.
+   * Returns the resource uri or <code>null</code> if no resource id and/or path
+   * could be found on the specified document. This method is intended to serve
+   * as a utility method when importing resources.
    * 
-   * @param url
-   *          location of the page file
-   * @return the page uri
+   * @param site
+   *          the resource uri
+   * @param contentUrl
+   *          location of the resource file
+   * @return the resource uri
    */
-  protected ResourceURI loadPageURI(Site site, URL url) throws IOException {
-    BufferedInputStream is = new BufferedInputStream(url.openStream());
+  protected ResourceURI loadResourceURI(Site site, URL contentUrl)
+      throws IOException {
+    BufferedInputStream is = new BufferedInputStream(contentUrl.openStream());
     InputStreamReader reader = new InputStreamReader(is);
     CharBuffer buf = CharBuffer.allocate(1024);
     reader.read(buf);
     String s = new String(buf.array());
     s = s.replace('\n', ' ');
-    Matcher m = pageHeaderRegex.matcher(s);
+    Matcher m = resourceHeaderRegex.matcher(s);
     if (m.matches()) {
-      long version = PageUtils.getVersion(m.group(3));
-      return new ResourceURIImpl(site, m.group(2), version, m.group(1));
+      long version = ResourceUtils.getVersion(m.group(4));
+      return new ResourceURIImpl(m.group(1), site, m.group(3), version, m.group(2));
     }
     return null;
   }

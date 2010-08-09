@@ -121,7 +121,7 @@ public class SearchEndpoint {
 
     // Return the result
     try {
-      SearchResult result = repository.findPages(query);
+      SearchResult result = repository.find(query);
       return Response.ok(result.toXml()).build();
     } catch (ContentRepositoryException e) {
       logger.error("Error trying to access the content repository", e);

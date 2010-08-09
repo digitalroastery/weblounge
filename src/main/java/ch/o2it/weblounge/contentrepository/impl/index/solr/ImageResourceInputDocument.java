@@ -1,0 +1,59 @@
+/*
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2010 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+package ch.o2it.weblounge.contentrepository.impl.index.solr;
+
+import ch.o2it.weblounge.common.content.file.FileResource;
+import ch.o2it.weblounge.common.content.image.ImageResource;
+
+/**
+ * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
+ * posting weblounge images to solr.
+ */
+public class ImageResourceInputDocument extends FileResourceInputDocument {
+
+  /** Serial version uid */
+  private static final long serialVersionUID = 1812364663819822015L;
+
+  /**
+   * Creates an input document for the given resource.
+   * 
+   * @param resource
+   *          the resource
+   */
+  public ImageResourceInputDocument(ImageResource resource) {
+    super(resource);
+  }
+
+  /**
+   * Populates this input document with the resource data.
+   * 
+   * @param resource
+   *          the resource
+   */
+  protected void init(FileResource resource) {
+    super.init(resource);
+    
+    // Preview information
+    // TODO: Create preview
+
+  }
+
+}

@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
@@ -153,7 +154,7 @@ public class PageEndpoint {
     Site site = getSite(request);
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI pageURI = new ResourceURIImpl(site, null, pageId);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
 
     // Does the page exist?
     try {
@@ -168,7 +169,7 @@ public class PageEndpoint {
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
       try {
-        Page currentPage = contentRepository.getPage(pageURI);
+        Page currentPage = (Page)contentRepository.get(pageURI);
         String etag = Long.toString(currentPage.getModificationDate().getTime());
         if (!etag.equals(ifMatchHeader)) {
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
@@ -183,12 +184,12 @@ public class PageEndpoint {
     Page page = null;
     try {
       PageReader pageReader = new PageReader();
-      page = pageReader.read(IOUtils.toInputStream(pageXml), pageURI);
+      page = pageReader.read(pageURI, IOUtils.toInputStream(pageXml));
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
       User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       page.setModified(modifier, new Date());
-      contentRepository.update(pageURI, page, user);
+      contentRepository.put(page, user);
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -238,10 +239,10 @@ public class PageEndpoint {
         if (!path.startsWith("/"))
           path = "/" + path;
         WebUrl url = new WebUrlImpl(site, path);
-        pageURI = new ResourceURIImpl(site, url.getPath(), uuid);
+        pageURI = new PageURIImpl(site, url.getPath(), uuid);
 
         // Make sure the page doesn't exist
-        if (contentRepository.exists(new ResourceURIImpl(site, url.getPath()))) {
+        if (contentRepository.exists(new PageURIImpl(site, url.getPath()))) {
           logger.warn("Tried to create already existing page {} in site '{}'", pageURI, site);
           throw new WebApplicationException(Status.CONFLICT);
         }
@@ -253,7 +254,7 @@ public class PageEndpoint {
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
     } else {
-      pageURI = new ResourceURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
+      pageURI = new PageURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
     }
 
     // Parse the page and store it
@@ -263,7 +264,7 @@ public class PageEndpoint {
       logger.debug("Adding page to {}", pageURI);
       try {
         PageReader pageReader = new PageReader();
-        page = pageReader.read(IOUtils.toInputStream(pageXml), pageURI);
+        page = pageReader.read(pageURI, IOUtils.toInputStream(pageXml));
       } catch (IOException e) {
         logger.warn("Error reading page {} from request", pageURI);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -285,7 +286,7 @@ public class PageEndpoint {
 
     // Store the new page
     try {
-      contentRepository.put(pageURI, page, user);
+      contentRepository.put(page, user);
       uri = new URI(UrlSupport.concat(request.getRequestURL().toString(), pageURI.getId()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for page {}: {}", pageURI, e.getMessage());
@@ -324,7 +325,7 @@ public class PageEndpoint {
 
     Site site = getSite(request);
     User user = null; // TODO: Extract user
-    ResourceURI pageURI = new ResourceURIImpl(site, null, pageId);
+    ResourceURI pageURI = new PageURIImpl(site, null, pageId);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Make sure the page doesn't exist
@@ -579,8 +580,8 @@ public class PageEndpoint {
 
     // Load the page and return it
     try {
-      ResourceURI pageURI = new ResourceURIImpl(site, null, pageId);
-      Page page = contentRepository.getPage(pageURI);
+      ResourceURI pageURI = new PageURIImpl(site, null, pageId);
+      Page page = (Page)contentRepository.get(pageURI);
       return page;
     } catch (ContentRepositoryException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

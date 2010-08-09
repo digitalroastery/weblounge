@@ -18,20 +18,41 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.contentrepository.impl.index;
+package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
+import ch.o2it.weblounge.common.content.file.FileResource;
 
 /**
- * This index is part of the content repository page index and maps
- * <code>int</code> representations of page identifiers to slot numbers in the
- * uri index.
- * 
- * <pre>
- * | slot | address in map.idx
- * |------------------------------------------
- * | 1    | addressOf(a-b-c-d), addressOf(e-f-g-h)
- * </pre>
+ * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
+ * posting weblounge resources to solr.
  */
-public class TreeIndex {
+public class FileResourceInputDocument extends ResourceInputDocument {
+
+  /** Serial version uid */
+  private static final long serialVersionUID = 1812364663819822015L;
+
+  /**
+   * Creates an input document for the given resource.
+   * 
+   * @param resource
+   *          the resource
+   */
+  public FileResourceInputDocument(FileResource resource) {
+    init(resource);
+  }
+
+  /**
+   * Populates this input document with the resource data.
+   * 
+   * @param resource
+   *          the resource
+   */
+  protected void init(FileResource resource) {
+    super.init(resource);
+    
+    // Preview information
+    // TODO: Create preview
+
+  }
 
 }
