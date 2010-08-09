@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.impl.content.page.PageUtils;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import javax.servlet.jsp.JspException;
@@ -61,7 +61,7 @@ public class VersionCheckTag extends WebloungeTag {
   public int doStartTag() throws JspException {
     super.doStartTag();
     long version = request.getVersion();
-    if (this.version == PageUtils.getVersionString(version)) {
+    if (this.version == ResourceUtils.getVersionString(version)) {
       return EVAL_BODY_INCLUDE;
     } else {
       return SKIP_BODY;

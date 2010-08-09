@@ -20,15 +20,15 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -176,10 +176,10 @@ public class PagePreviewTag extends WebloungeTag {
     } else {
       ContentRepository contentRepository = null;
       contentRepository = ContentRepositoryFactory.getRepository(site);
-      ResourceURI pageURI = ResourceURIImpl.fromId(site, pageId);
+      ResourceURI pageURI = new PageURIImpl(site, null, pageId);
 
       try {
-        page = contentRepository.getPage(pageURI, user, SystemPermission.READ);
+        page = (Page)contentRepository.get(pageURI, user, SystemPermission.READ);
         if (page == null) {
           logger.error("No data available for page '" + pageURI + "'");
           return EVAL_PAGE;

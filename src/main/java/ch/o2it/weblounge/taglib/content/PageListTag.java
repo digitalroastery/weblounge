@@ -235,7 +235,7 @@ public class PageListTag extends WebloungeTag {
       SearchQuery query = new SearchQueryImpl(site);
       for (String subject : subjects)
         query.withSubject(subject);
-      pages = repository.findPages(query);
+      pages = repository.find(query);
     }
 
     boolean found = false;

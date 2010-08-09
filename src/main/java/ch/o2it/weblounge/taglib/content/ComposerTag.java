@@ -27,8 +27,8 @@ import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -281,9 +281,13 @@ public class ComposerTag extends WebloungeTag {
           pageUrl = pageUrl.substring(0, urlSeparator);
           if ("".equals(pageUrl))
             pageUrl = "/";
-          ResourceURI pageURI = new ResourceURIImpl(site, pageUrl);
+          ResourceURI pageURI = new PageURIImpl(site, pageUrl);
           try {
-            p = contentRepository.getPage(pageURI, user, SystemPermission.READ);
+            if (!Page.TYPE.equals(p.getType())) {
+              logger.debug("Home page is not of type '{}'", Page.TYPE);
+              return new Pagelet[] {};
+            }
+            p = (Page)contentRepository.get(pageURI, user, SystemPermission.READ);
             if (p != null)
               content = p.getPagelets(composerName);
             originalContent = false;
@@ -367,9 +371,9 @@ public class ComposerTag extends WebloungeTag {
 
     // If no page was specified, take homepage instead.
     if (targetPage == null) {
-      ResourceURI homeURI = new ResourceURIImpl(site, "/");
+      ResourceURI homeURI = new PageURIImpl(site, "/");
       try {
-        targetPage = contentRepository.getPage(homeURI, user, SystemPermission.READ);
+        targetPage = (Page)contentRepository.get(homeURI, user, SystemPermission.READ);
         if (targetPage == null) {
           logger.warn("No page was found while processing composer on " + url);
           return EVAL_PAGE;

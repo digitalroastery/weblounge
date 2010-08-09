@@ -23,7 +23,7 @@ package ch.o2it.weblounge.taglib.content;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -73,10 +73,10 @@ public class PageHeaderTag extends WebloungeTag {
     }
 
     // Try to load the page
-    ResourceURI uri = ResourceURIImpl.fromId(site, pageId);
+    ResourceURI uri = new PageURIImpl(site, null, pageId);
     Page page = null;
     try {
-      page = repository.getPage(uri);
+      page = (Page)repository.get(uri);
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load page preview " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;
