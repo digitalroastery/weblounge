@@ -42,8 +42,10 @@ public interface Resource extends Localizable, Creatable, Modifiable, Publishabl
       SystemPermission.TRANSLATE,
       SystemPermission.PUBLISH,
       SystemPermission.MANAGE };
+  
   /** Live version of a page */
   long LIVE = 0;
+
   /** Work version of a page */
   long WORK = 1;
 

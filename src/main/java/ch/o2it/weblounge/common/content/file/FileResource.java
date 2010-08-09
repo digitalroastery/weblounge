@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content.resource;
+package ch.o2it.weblounge.common.content.file;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.language.Language;
@@ -29,7 +29,10 @@ import java.io.InputStream;
 /**
  * This interface models a file resource.
  */
-public interface File extends Resource {
+public interface FileResource extends Resource {
+
+  /** The resource type */
+  public final static String TYPE = "resource";
 
   /**
    * Opens a stream to the file's content.

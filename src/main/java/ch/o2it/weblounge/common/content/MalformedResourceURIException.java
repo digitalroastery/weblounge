@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
+ *  Copyright (c) 2009 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -18,43 +18,24 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content.image;
-
-import ch.o2it.weblounge.common.content.resource.File;
+package ch.o2it.weblounge.common.content;
 
 /**
- * Object representation of an image resource.
+ * This exception is thrown if an invalid <code>ResourceURI</code> is about to
+ * be created.
  */
-public interface Image extends File {
+public class MalformedResourceURIException extends RuntimeException {
+
+  /** The serial version UID */
+  private static final long serialVersionUID = -4385183355893667958L;
 
   /**
-   * Sets the image's width in pixels.
+   * Creates an exception stating that <code>path</code> is malformed.
    * 
-   * @param width
-   *          the image width
+   * @param path the path to the resource
    */
-  void setWidth(int width);
-
-  /**
-   * Returns the image width in pixels.
-   * 
-   * @return the image width
-   */
-  int getWidth();
-
-  /**
-   * Sets the image's height in pixels.
-   * 
-   * @param height
-   *          the image height
-   */
-  void setHeight(int height);
-
-  /**
-   * Returns the image height in pixels.
-   * 
-   * @return the image height
-   */
-  int getHeight();
+  public MalformedResourceURIException(String path) {
+    super("The resource uri path '" + path + "' is invalid!");
+  }
 
 }

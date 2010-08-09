@@ -29,8 +29,8 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * This interface defines a fluent api for a query object used to lookup pages
- * in the {@link PageRepository}.
+ * This interface defines a fluent api for a query object used to lookup
+ * resources in the <code>ContentRepository</code>.
  */
 public interface SearchQuery {
 
@@ -80,7 +80,7 @@ public interface SearchQuery {
   int getOffset();
 
   /**
-   * Return the page with the given identifier.
+   * Return the resources with the given identifier.
    * 
    * @param id
    *          the identifier to look up
@@ -96,7 +96,7 @@ public interface SearchQuery {
   String getId();
 
   /**
-   * Return the page with the given path.
+   * Return the resources with the given path.
    * 
    * @param path
    *          the path to look up
@@ -112,7 +112,7 @@ public interface SearchQuery {
   String getPath();
 
   /**
-   * Return the pages with the given template.
+   * Return the resources with the given template.
    * 
    * @param template
    *          the template to look up
@@ -128,8 +128,24 @@ public interface SearchQuery {
   String getTemplate();
 
   /**
-   * Return pages that contain the given text either in the page header or in
-   * one of the pagelets.
+   * Return the resources with the given type.
+   * 
+   * @param type
+   *          the resource type to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withType(String type);
+
+  /**
+   * Returns the resource type or <code>null</code> if no type was specified.
+   * 
+   * @return the type
+   */
+  String getType();
+
+  /**
+   * Return resources that contain the given text either in the page header or
+   * in one of the pagelets.
    * 
    * @param text
    *          the text to look up
@@ -182,7 +198,7 @@ public interface SearchQuery {
   Map<String, String> getProperties();
 
   /**
-   * Return only pages with hits in the specified language.
+   * Return only resources with hits in the specified language.
    * 
    * @param language
    *          the language
@@ -198,7 +214,7 @@ public interface SearchQuery {
   Language getLanguage();
 
   /**
-   * Only returns pages that contain the specified subject. Note that this
+   * Only returns resources that contain the specified subject. Note that this
    * method may be called multiple times in order to specify more than one
    * subject.
    * 
@@ -216,7 +232,7 @@ public interface SearchQuery {
   String[] getSubjects();
 
   /**
-   * Return only pages that have been created or modified by the specified
+   * Return only resources that have been created or modified by the specified
    * author.
    * 
    * @param author
@@ -233,7 +249,7 @@ public interface SearchQuery {
   User getAuthor();
 
   /**
-   * Return only pages that have been created by the specified user.
+   * Return only resources that have been created by the specified user.
    * 
    * @param creator
    *          the creator
@@ -249,7 +265,7 @@ public interface SearchQuery {
   User getCreator();
 
   /**
-   * Return only pages that have been modified by the specified user.
+   * Return only resources that have been modified by the specified user.
    * 
    * @param modifier
    *          the modifier
@@ -266,7 +282,7 @@ public interface SearchQuery {
   User getModifier();
 
   /**
-   * Return only pages that have been published by the specified publisher.
+   * Return only resources that have been published by the specified publisher.
    * 
    * @param publisher
    *          the publisher
@@ -283,7 +299,7 @@ public interface SearchQuery {
   User getPublisher();
 
   /**
-   * Return pages that have been published on the given date.
+   * Return resources that have been published on the given date.
    * <p>
    * Note that this method throws an <code>IllegalStateException</code> if used
    * in conjunction with {@link #withPublishingDateBetween(Date)} or
@@ -296,7 +312,7 @@ public interface SearchQuery {
   SearchQuery withPublishingDate(Date date);
 
   /**
-   * Return pages with a publishing date of <code>date</code> or later.
+   * Return resources with a publishing date of <code>date</code> or later.
    * <p>
    * Note that this method cannot be used without a subsequent call to
    * {@link #and(Date)} in order to specify the end date.
@@ -324,7 +340,7 @@ public interface SearchQuery {
   Date getPublishingDateEnd();
 
   /**
-   * Return pages that have been modified on the given date.
+   * Return resources that have been modified on the given date.
    * <p>
    * Note that this method throws an <code>IllegalStateException</code> if used
    * in conjunction with {@link #withModificationDateBetween(Date)} or
@@ -337,7 +353,7 @@ public interface SearchQuery {
   SearchQuery withModificationDate(Date date);
 
   /**
-   * Return pages with a modification date of <code>date</code> or later.
+   * Return resources with a modification date of <code>date</code> or later.
    * <p>
    * Note that this method cannot be used without a subsequent call to
    * {@link #and(Date)} in order to specify the end date.
@@ -365,7 +381,7 @@ public interface SearchQuery {
   Date getModificationDateEnd();
 
   /**
-   * Return pages that have been created on the given date.
+   * Return resources that have been created on the given date.
    * <p>
    * Note that this method throws an <code>IllegalStateException</code> if used
    * in conjunction with {@link #withCreationDateBetween(Date)} or
@@ -378,7 +394,7 @@ public interface SearchQuery {
   SearchQuery withCreationDate(Date date);
 
   /**
-   * Return pages with a Creation date of <code>date</code> or later.
+   * Return resources with a Creation date of <code>date</code> or later.
    * <p>
    * Note that this method cannot be used without a subsequent call to
    * {@link #and(Date)} in order to specify the end date.
@@ -418,8 +434,8 @@ public interface SearchQuery {
   SearchQuery and(Date date);
 
   /**
-   * Only return pages that are located on or below the given path in the page
-   * tree.
+   * Only return resources that are located on or below the given path in the
+   * page tree.
    * 
    * @param path
    *          the path in the site tree
@@ -435,7 +451,7 @@ public interface SearchQuery {
   String getPathPrefix();
 
   /**
-   * Return pages that contain the specified pagelet.
+   * Return resources that contain the specified pagelet.
    * <p>
    * Note that you can specify the location where the pagelet needs to be as
    * additional elements or properties by a subsequent call to
@@ -484,7 +500,7 @@ public interface SearchQuery {
   SearchQuery atPosition(int position) throws IllegalStateException;
 
   /**
-   * Only return pages that contain a certain pagelet (see
+   * Only return resources that contain a certain pagelet (see
    * {@link #withPagelet(Pagelet)} that features the given property with the
    * indicated value.
    * <p>
@@ -509,7 +525,7 @@ public interface SearchQuery {
       throws IllegalStateException;
 
   /**
-   * Only return pages that contain a certain pagelet (see
+   * Only return resources that contain a certain pagelet (see
    * {@link #withPagelet(Pagelet)} that features the given text with the
    * indicated value in any language.
    * <p>

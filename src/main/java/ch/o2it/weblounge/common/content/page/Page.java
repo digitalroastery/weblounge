@@ -38,6 +38,9 @@ import ch.o2it.weblounge.common.content.Resource;
  */
 public interface Page extends Resource {
 
+  /** The resource type */
+  public final static String TYPE = "page";
+
   /**
    * Sets the layout that should be applied to this page. The layout controls
    * which pagelets to place into a composer by default, which ones to protect

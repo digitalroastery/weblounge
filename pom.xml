@@ -38,14 +38,16 @@
               org.apache.commons.lang;version="2.4",
               javax.security.auth.login,
               javax.security.auth.spi,
-              javax.servlet.http;version="2.5"
+              javax.servlet.http;version="2.5",
+              javax.xml.parsers,
+              org.xml.sax
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.common;version=${project.version},
               ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.common.content.file;version=${project.version},
               ch.o2it.weblounge.common.content.image;version=${project.version},
               ch.o2it.weblounge.common.content.page;version=${project.version},
-              ch.o2it.weblounge.common.content.resource;version=${project.version},
               ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.request;version=${project.version},
               ch.o2it.weblounge.common.scheduler;version=${project.version},

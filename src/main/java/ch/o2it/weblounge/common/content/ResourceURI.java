@@ -44,6 +44,14 @@ public interface ResourceURI extends Url {
   String getPath();
 
   /**
+   * Returns the resource type, which usually equals the class name of the
+   * represented resource.
+   * 
+   * @return the resource type
+   */
+  String getType();
+
+  /**
    * Returns the page version. The version represents the various editing stages
    * of a page. Note that there are two special version values:
    * <ul>

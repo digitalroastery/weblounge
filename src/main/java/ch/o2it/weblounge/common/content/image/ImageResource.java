@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2010 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -18,24 +18,46 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content;
+package ch.o2it.weblounge.common.content.image;
+
+import ch.o2it.weblounge.common.content.file.FileResource;
 
 /**
- * This exception is thrown if an invalid <code>PageURI</code> is about to
- * be created.
+ * Object representation of an image resource.
  */
-public class MalformedPageURIException extends RuntimeException {
+public interface ImageResource extends FileResource {
 
-  /** The serial version UID */
-  private static final long serialVersionUID = -4385183355893667958L;
+  /** The resource type */
+  public final static String TYPE = "resource";
 
   /**
-   * Creates an exception stating that <code>path</code> is malformed.
+   * Sets the image's width in pixels.
    * 
-   * @param path the path to the page
+   * @param width
+   *          the image width
    */
-  public MalformedPageURIException(String path) {
-    super("The page uri path '" + path + "' is invalid!");
-  }
+  void setWidth(int width);
+
+  /**
+   * Returns the image width in pixels.
+   * 
+   * @return the image width
+   */
+  int getWidth();
+
+  /**
+   * Sets the image's height in pixels.
+   * 
+   * @param height
+   *          the image height
+   */
+  void setHeight(int height);
+
+  /**
+   * Returns the image height in pixels.
+   * 
+   * @return the image height
+   */
+  int getHeight();
 
 }

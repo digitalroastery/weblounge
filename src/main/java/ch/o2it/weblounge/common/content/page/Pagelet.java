@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.content.Creatable;
 import ch.o2it.weblounge.common.content.LocalizedModifiable;
 import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
@@ -40,7 +39,7 @@ import java.util.Date;
  * During lifetime, the pagelet keeps track of creation, modification and
  * publishing processes.
  */
-public interface Pagelet extends Localizable, Creatable, Publishable, LocalizedModifiable, Securable {
+public interface Pagelet extends Creatable, Publishable, LocalizedModifiable, Securable {
 
   /** The pagelet's permissions */
   static final Permission[] permissions = new Permission[] {
