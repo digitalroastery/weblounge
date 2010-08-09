@@ -20,11 +20,12 @@
 
 package ch.o2it.weblounge.contentrepository;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.user.User;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This type of repository implements methods to write contents to it.
@@ -32,52 +33,55 @@ import java.io.IOException;
 public interface WritableContentRepository extends ContentRepository {
 
   /**
-   * Puts the page to the specified location. Depending on whether the page
+   * Puts the resource to the specified location. Depending on whether the resource
    * identified by <code>uri</code> already exists, the method either creates a
-   * new page or updates the existing one.
+   * new resource or updates the existing one.
    * <p>
-   * The returned page contains the same data than the one passed in as the
-   * <code>page</code> argument but with an updated uri.
+   * The returned resource contains the same data than the one passed in as the
+   * <code>resource</code> argument but with an updated uri.
    * 
    * @param uri
-   *          the page uri
-   * @param page
-   *          the page
+   *          the resource uri
+   * @param resource
+   *          the resource
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
    *           if adding fails due to a database error
-   * @return the page with the given uri
+   * @return the updated resource
    */
-  Page put(ResourceURI uri, Page page, User user) throws SecurityException, IOException;
+  Resource put(Resource resource, User user) throws SecurityException, IOException;
 
   /**
-   * Updates the given page. This method writes the page header to the database
-   * under the specified version tag.
+   * Puts the resource to the specified location. Depending on whether the resource
+   * identified by <code>uri</code> already exists, the method either creates a
+   * new resource or updates the existing one.
+   * <p>
+   * The returned resource contains the same data than the one passed in as the
+   * <code>resource</code> argument but with an updated uri.
    * 
-   * @param user
-   *          the user updating the page
    * @param uri
-   *          uri of the page to update
-   * @param page
-   *          the page
+   *          the resource uri
+   * @param resource
+   *          the resource
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
-   *           if updating fails due to a database error
+   *           if adding fails due to a database error
+   * @return the resource with the given uri
    */
-  boolean update(ResourceURI uri, Page page, User user) throws SecurityException, IOException;
+  void putContent(Resource resource, InputStream is, User user) throws SecurityException, IOException;
 
   /**
-   * This method moves the given page to the new uri.
+   * This method moves the given resource to the new uri.
    * 
    * @param uri
-   *          uri of the page to move
+   *          uri of the resource to move
    * @param target
    *          the target uri
    * @param user
    *          the user
-   * @return <code>true</code> if the page could be moved
+   * @return <code>true</code> if the resource could be moved
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
@@ -87,14 +91,14 @@ public interface WritableContentRepository extends ContentRepository {
       throws SecurityException, IOException;
 
   /**
-   * This method removes the given page in all available versions from the
+   * This method removes the given resource in all available versions from the
    * database.
    * 
    * @param uri
-   *          uri of the page to remove
+   *          uri of the resource to remove
    * @param user
    *          the user
-   * @return <code>true</code> if the page could be removed
+   * @return <code>true</code> if the resource could be removed
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
@@ -103,18 +107,18 @@ public interface WritableContentRepository extends ContentRepository {
   boolean delete(ResourceURI uri, User user) throws SecurityException, IOException;
 
   /**
-   * This method removes the given page in the specified version from the
+   * This method removes the given resource in the specified version from the
    * database.
    * 
    * @param uri
-   *          uri of the page to remove
+   *          uri of the resource to remove
    * @param version
    *          the version to remove
    * @param user
    *          the user
    * @param allRevisions
    *          <code>true</code> to remove all revisions
-   * @return <code>true</code> if the page could be removed
+   * @return <code>true</code> if the resource could be removed
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
