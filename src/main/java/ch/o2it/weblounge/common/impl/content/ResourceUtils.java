@@ -18,15 +18,15 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.content.page;
+package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.Resource;
 
 /**
- * This class contains utility methods intended to facilitate dealing with page
+ * This class contains utility methods intended to facilitate dealing with resource
  * versions and names.
  */
-public class PageUtils {
+public class ResourceUtils {
 
   /**
    * Returns the version for the given version identifier. Available versions

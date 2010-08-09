@@ -25,8 +25,8 @@ import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.file.FileImpl;
-import ch.o2it.weblounge.common.impl.content.file.FileReader;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
- * Test case to test {@link FileImpl}.
+ * Test case to test {@link FileResourceImpl}.
  */
 public class FileImplXmlTest extends FileImplTest {
   
@@ -49,12 +49,12 @@ public class FileImplXmlTest extends FileImplTest {
   public void setUp() throws Exception {
     setupPrerequisites();
     URL testContext = this.getClass().getResource(testFile);
-    FileReader reader = new FileReader();
-    file = reader.read(testContext.openStream(), fileURI);
+    FileResourceReader reader = new FileResourceReader();
+    file = reader.read(fileURI, testContext.openStream());
   }
   
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#toXml()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#toXml()}.
    */
   @Test
   public void testToXml() {

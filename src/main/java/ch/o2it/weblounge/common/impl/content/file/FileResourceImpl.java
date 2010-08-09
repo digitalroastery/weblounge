@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.impl.content.file;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.resource.File;
+import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceImpl;
 import ch.o2it.weblounge.common.language.Language;
 
@@ -32,7 +32,7 @@ import java.net.URL;
 /**
  * Default implementation of a file resource.
  */
-public class FileImpl extends ResourceImpl implements File {
+public class FileResourceImpl extends ResourceImpl implements FileResource {
 
   /** URL to the file's */
   protected URL contentUrl = null;
@@ -50,7 +50,7 @@ public class FileImpl extends ResourceImpl implements File {
    * @param uri
    *          the file uri
    */
-  public FileImpl(ResourceURI uri) {
+  public FileResourceImpl(ResourceURI uri) {
     this(uri, null);
   }
 
@@ -63,7 +63,7 @@ public class FileImpl extends ResourceImpl implements File {
    * @param contentUrl
    *          <code>URL</code> to the file's content
    */
-  public FileImpl(ResourceURI uri, URL contentUrl) {
+  public FileResourceImpl(ResourceURI uri, URL contentUrl) {
     super(uri);
     this.contentUrl = contentUrl;
   }
@@ -71,7 +71,7 @@ public class FileImpl extends ResourceImpl implements File {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.resource.File#setSize(long)
+   * @see ch.o2it.weblounge.common.content.file.FileResource#setSize(long)
    */
   public void setSize(long size) {
     this.size = size;
@@ -80,7 +80,7 @@ public class FileImpl extends ResourceImpl implements File {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.resource.File#getSize(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.content.file.FileResource#getSize(ch.o2it.weblounge.common.language.Language)
    */
   public long getSize(Language language) {
     return size;
@@ -89,7 +89,7 @@ public class FileImpl extends ResourceImpl implements File {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.resource.File#setMimeType(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.file.FileResource#setMimeType(java.lang.String)
    */
   public void setMimeType(String mimeType) {
     this.mimeType = mimeType;
@@ -98,7 +98,7 @@ public class FileImpl extends ResourceImpl implements File {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.resource.File#getMimeType()
+   * @see ch.o2it.weblounge.common.content.file.FileResource#getMimeType()
    */
   public String getMimeType() {
     return mimeType;
@@ -131,7 +131,7 @@ public class FileImpl extends ResourceImpl implements File {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.resource.File#openStream()
+   * @see ch.o2it.weblounge.common.content.file.FileResource#openStream()
    */
   public InputStream openStream() throws IOException {
     return contentUrl.openStream();

@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.impl.content;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.page.PageSecurityContext;
-import ch.o2it.weblounge.common.impl.content.page.PageUtils;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.security.SecurityContextImpl;
@@ -724,7 +723,7 @@ public abstract class ResourceImpl extends LocalizableObject implements Resource
     b.append("\" path=\"");
     b.append(uri.getPath());
     b.append("\" version=\"");
-    b.append(PageUtils.getVersionString(uri.getVersion()));
+    b.append(ResourceUtils.getVersionString(uri.getVersion()));
     b.append("\">");
 
     // Add header

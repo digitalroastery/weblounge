@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.Renderer;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.DeclarativeHTMLHeadElement;
 import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
@@ -31,7 +31,7 @@ import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.content.page.Script;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
@@ -129,7 +129,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       return;
 
     if (targetPath != null)
-      this.pageURI = new ResourceURIImpl(site, targetPath);
+      this.pageURI = new PageURIImpl(site, targetPath);
     if (templateId != null)
       this.template = site.getTemplate(templateId);
   }
@@ -567,7 +567,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
     // pageuri
     if (pageURI != null)
-      b.append("<page>").append(pageURI).append("</page>");
+      b.append("<page>").append(pageURI.getPath()).append("</page>");
     else if (targetPath != null)
       b.append("<page>").append(targetPath).append("</page>");
 

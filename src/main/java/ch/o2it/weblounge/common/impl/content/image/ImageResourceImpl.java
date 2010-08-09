@@ -21,15 +21,15 @@
 package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.image.Image;
-import ch.o2it.weblounge.common.impl.content.file.FileImpl;
+import ch.o2it.weblounge.common.content.image.ImageResource;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 
 import java.net.URL;
 
 /**
  * Default implementation of an image resource.
  */
-public class ImageImpl extends FileImpl implements Image {
+public class ImageResourceImpl extends FileResourceImpl implements ImageResource {
 
   /** The width in pixels */
   protected int width = 0;
@@ -42,17 +42,27 @@ public class ImageImpl extends FileImpl implements Image {
    * 
    * @param uri
    *          the image uri
+   */
+  public ImageResourceImpl(ResourceURI uri) {
+    super(uri, null);
+  }
+
+  /**
+   * Creates a new image with the given uri.
+   * 
+   * @param uri
+   *          the image uri
    * @param contentUrl
    *          <code>URL</code> to the file's content
    */
-  public ImageImpl(ResourceURI uri, URL contentUrl) {
+  public ImageResourceImpl(ResourceURI uri, URL contentUrl) {
     super(uri, contentUrl);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.image.Image#setWidth(int)
+   * @see ch.o2it.weblounge.common.content.image.ImageResource#setWidth(int)
    */
   public void setWidth(int width) {
     this.width = width;
@@ -61,7 +71,7 @@ public class ImageImpl extends FileImpl implements Image {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.image.Image#getWidth()
+   * @see ch.o2it.weblounge.common.content.image.ImageResource#getWidth()
    */
   public int getWidth() {
     return width;
@@ -70,7 +80,7 @@ public class ImageImpl extends FileImpl implements Image {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.image.Image#setHeight(int)
+   * @see ch.o2it.weblounge.common.content.image.ImageResource#setHeight(int)
    */
   public void setHeight(int height) {
     this.height = height;
@@ -79,7 +89,7 @@ public class ImageImpl extends FileImpl implements Image {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.image.Image#getHeight()
+   * @see ch.o2it.weblounge.common.content.image.ImageResource#getHeight()
    */
   public int getHeight() {
     return height;

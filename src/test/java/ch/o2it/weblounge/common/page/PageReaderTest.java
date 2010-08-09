@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;
@@ -62,7 +63,7 @@ public class PageReaderTest {
   public void setUp() throws Exception {
     Site site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
-    pageURI = new ResourceURIImpl(site, "/test", Resource.LIVE);
+    pageURI = new PageURIImpl(site, "/test", Resource.LIVE);
     reader = new PageReader();
   }
   
@@ -78,15 +79,15 @@ public class PageReaderTest {
     String otherTestXml = TestUtils.loadXmlFromResource(otherTestFile);
 
     // Read test page
-    page = reader.read(testContext.openStream(), pageURI);
+    page = reader.read(pageURI, testContext.openStream());
     assertEquals(testXml, new String(page.toXml().getBytes("UTF-8")));
 
     // Read other test page
-    page = reader.read(otherTestContext.openStream(), pageURI);
+    page = reader.read(pageURI, otherTestContext.openStream());
     assertEquals(otherTestXml, new String(page.toXml().getBytes("UTF-8")));
 
     // Read test page again
-    page = reader.read(testContext.openStream(), pageURI);
+    page = reader.read(pageURI, testContext.openStream());
     assertEquals(testXml, new String(page.toXml().getBytes("UTF-8")));
 }
 

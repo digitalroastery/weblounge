@@ -21,9 +21,7 @@
 package ch.o2it.weblounge.common.page;
 
 import static org.junit.Assert.assertEquals;
-
 import static org.junit.Assert.assertNotNull;
-
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Resource;
@@ -32,6 +30,7 @@ import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PagePreviewReader;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
@@ -101,7 +100,7 @@ public class PagePreviewReaderTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);
     EasyMock.replay(site);
-    pageURI = new ResourceURIImpl(site, "/test", Resource.LIVE);
+    pageURI = new PageURIImpl(site, "/test", Resource.LIVE);
   }
 
   /**

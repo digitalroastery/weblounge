@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.PageletURI;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 
@@ -62,7 +62,7 @@ public class PageletURIImplTest {
   @Before
   public void setUp() throws Exception {
     site = EasyMock.createNiceMock(Site.class);
-    uri = new ResourceURIImpl(site, path);
+    uri = new PageURIImpl(site, path);
     location = new PageletURIImpl(uri, composer, position);
   }
 
@@ -103,11 +103,11 @@ public class PageletURIImplTest {
    */
   @Test
   public void testEqualsObject() {
-    uri = new ResourceURIImpl(site, path);
+    uri = new PageURIImpl(site, path);
     location = new PageletURIImpl(uri, composer, position);
     PageletURI sameLocation = new PageletURIImpl(uri, composer, position);
     assertEquals(location, sameLocation);
-    assertFalse(location.equals(new PageletURIImpl(new ResourceURIImpl(site, "/test2"), composer, position)));
+    assertFalse(location.equals(new PageletURIImpl(new PageURIImpl(site, "/test2"), composer, position)));
     assertFalse(location.equals(new PageletURIImpl(uri, "main2", position)));
     assertFalse(location.equals(new PageletURIImpl(uri, composer, position + 1)));
   }

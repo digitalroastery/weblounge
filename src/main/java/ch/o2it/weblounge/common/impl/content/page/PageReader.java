@@ -20,7 +20,9 @@
 
 package ch.o2it.weblounge.common.impl.content.page;
 
+import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
@@ -48,7 +50,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse page data.
  */
-public final class PageReader extends WebloungeContentReader {
+public final class PageReader extends WebloungeContentReader implements ResourceReader<Page> {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(PageReader.class);
@@ -100,15 +102,15 @@ public final class PageReader extends WebloungeContentReader {
 
   /**
    * This method is called when a <code>Page</code> object is instantiated.
-   * 
-   * @param is
-   *          the xml input stream
    * @param uri
    *          the page uri
+   * @param is
+   *          the xml input stream
+   * 
    * @throws IOException
    *           if reading the input stream fails
    */
-  public PageImpl read(InputStream is, ResourceURI uri) throws SAXException,
+  public PageImpl read(ResourceURI uri, InputStream is) throws SAXException,
       IOException, ParserConfigurationException {
     reset();
     page = new PageImpl(uri);

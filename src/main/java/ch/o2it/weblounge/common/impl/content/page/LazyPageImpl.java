@@ -110,7 +110,7 @@ public class LazyPageImpl implements Page {
       }
 
       // Load the page
-      page = reader.read(IOUtils.toInputStream(pageXml), uri);
+      page = reader.read(uri, IOUtils.toInputStream(pageXml));
       isHeaderLoaded = true;
       isBodyLoaded = true;
       cleanupAfterLoading();

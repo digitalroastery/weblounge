@@ -149,7 +149,7 @@ public class SearchQueryImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withPath(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withTemplate(java.lang.String)}
    * .
    */
   @Test
@@ -157,6 +157,18 @@ public class SearchQueryImplTest {
     String template = "news";
     query.withTemplate(template);
     assertEquals(template, query.getTemplate());
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withType(java.lang.String)}
+   * .
+   */
+  @Test
+  public void testWithType() {
+    String type = "page";
+    query.withType(type);
+    assertEquals(type, query.getType());
   }
 
   /**

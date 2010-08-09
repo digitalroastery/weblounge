@@ -50,7 +50,7 @@ public class PageImplXmlTest extends PageImplTest {
     setupPrerequisites();
     URL testContext = this.getClass().getResource(testFile);
     PageReader reader = new PageReader();
-    page = reader.read(testContext.openStream(), pageURI);
+    page = reader.read(pageURI, testContext.openStream());
   }
   
   /**

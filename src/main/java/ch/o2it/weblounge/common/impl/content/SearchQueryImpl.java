@@ -55,12 +55,15 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The object that needs to show up next */
   protected Class<?> expectation = null;
-  
+
   /** The uuid */
   protected String id = null;
-  
+
   /** The path */
   protected String path = null;
+
+  /** The type */
+  protected String type = null;
 
   /** The template */
   protected String template = null;
@@ -70,13 +73,13 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The list of required subjects */
   protected List<String> subjects = new ArrayList<String>();
-  
+
   /** The properties */
   protected Map<String, String> properties = new HashMap<String, String>();
 
   /** The elements */
   protected Map<String, String> elements = new HashMap<String, String>();
-  
+
   /** The last method called */
   protected String lastMethod = null;
 
@@ -97,7 +100,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The end of the range for the publishing date */
   protected Date publishingDateTo = null;
-  
+
   /** The author */
   protected User author = null;
 
@@ -112,7 +115,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The path prefix */
   protected String pathPrefix = null;
-  
+
   /** Query terms */
   protected String text = null;
 
@@ -194,7 +197,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withId(java.lang.String)
    */
   public SearchQuery withId(String id) {
@@ -203,10 +206,10 @@ public class SearchQueryImpl implements SearchQuery {
     this.id = id;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getId()
    */
   public String getId() {
@@ -215,7 +218,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withPath(java.lang.String)
    */
   public SearchQuery withPath(String path) {
@@ -224,35 +227,54 @@ public class SearchQueryImpl implements SearchQuery {
     this.path = PathSupport.trim(path);
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getPath()
    */
   public String getPath() {
     return path;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withTemplate(java.lang.String)
    */
   public SearchQuery withTemplate(String template) {
     this.template = template;
     return this;
   }
-
+  
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getTemplate()
    */
   public String getTemplate() {
     return template;
   }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withType(java.lang.String)
+   */
+  public SearchQuery withType(String type) {
+    this.type = type;
+    return this;
+  }
   
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getType()
+   */
+  public String getType() {
+    return type;
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -260,7 +282,7 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public SearchQuery and(Date date) {
     ensureExpectation(Date.class);
-    Date startDate = (Date)stack.peek();
+    Date startDate = (Date) stack.peek();
     if (startDate.equals(date) || startDate.after(date))
       throw new IllegalStateException("End date must be after start date");
     if ("withCreationDateBetween".equals(lastMethod))
@@ -353,10 +375,10 @@ public class SearchQueryImpl implements SearchQuery {
     this.author = author;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getAuthor()
    */
   public User getAuthor() {
@@ -392,10 +414,10 @@ public class SearchQueryImpl implements SearchQuery {
     subjects.add(subject);
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getSubjects()
    */
   public String[] getSubjects() {
@@ -425,25 +447,25 @@ public class SearchQueryImpl implements SearchQuery {
     expect(Date.class);
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getCreationDate()
    */
   public Date getCreationDate() {
     return creationDateFrom;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getCreationDateEnd()
    */
   public Date getCreationDateEnd() {
     return creationDateTo;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -470,7 +492,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getModificationDate()
    */
   public Date getModificationDate() {
@@ -479,13 +501,13 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getModificationDateEnd()
    */
   public Date getModificationDateEnd() {
     return modificationDateTo;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -538,7 +560,7 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withCreator(ch.o2it.weblounge.common.user.User)
    */
   public SearchQuery withCreator(User creator) {
@@ -546,19 +568,19 @@ public class SearchQueryImpl implements SearchQuery {
     this.creator = creator;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getCreator()
    */
   public User getCreator() {
     return creator;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withModifier(ch.o2it.weblounge.common.user.User)
    */
   public SearchQuery withModifier(User modifier) {
@@ -566,16 +588,16 @@ public class SearchQueryImpl implements SearchQuery {
     this.modifier = modifier;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getModifier()
    */
   public User getModifier() {
     return modifier;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -586,10 +608,10 @@ public class SearchQueryImpl implements SearchQuery {
     this.publisher = publisher;
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getPublisher()
    */
   public User getPublisher() {
@@ -622,22 +644,22 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getPublishingDate()
    */
   public Date getPublishingDate() {
     return publishingDateFrom;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getPublishingDateEnd()
    */
   public Date getPublishingDateEnd() {
     return publishingDateTo;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -660,23 +682,24 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withElement(java.lang.String, java.lang.String)
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withElement(java.lang.String,
+   *      java.lang.String)
    */
   public SearchQuery withElement(String element, String value) {
     elements.put(element, value);
     return this;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#getElements()
    */
   public Map<String, String> getElements() {
     return elements;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -696,7 +719,7 @@ public class SearchQueryImpl implements SearchQuery {
   public Map<String, String> getProperties() {
     return properties;
   }
-  
+
   /**
    * Pushes the configuration object onto the stack.
    * 
@@ -769,12 +792,12 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return "*:" + (text != null ? text : "*");
   }
-  
+
 }

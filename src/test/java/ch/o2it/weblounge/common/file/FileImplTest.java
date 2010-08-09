@@ -27,9 +27,10 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.resource.File;
+import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.file.FileImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
@@ -46,12 +47,12 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Test case to test {@link FileImpl}.
+ * Test case to test {@link FileResourceImpl}.
  */
 public class FileImplTest {
 
   /** The file that was read in */
-  protected File file = null;
+  protected FileResource file = null;
   
   /** The file uri */
   protected ResourceURIImpl fileURI = null;
@@ -134,12 +135,12 @@ public class FileImplTest {
   @Before
   public void setUp() throws Exception {
     setupPrerequisites();
-    file = new FileImpl(fileURI);
+    file = new FileResourceImpl(fileURI);
     file.setIndexed(isIndexed);
     file.setPromoted(isPromoted);
     file.setCoverage(germanCoverage, german);
     file.setCoverage(frenchCoverage, french);
-    ((FileImpl)file).setCreated(hans, creationDate);
+    ((FileResourceImpl)file).setCreated(hans, creationDate);
     file.setDescription(germanDescription, german);
     file.setDescription(frenchDescription, french);
     file.setLocked(amelie);
@@ -163,11 +164,11 @@ public class FileImplTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));    
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
     EasyMock.replay(site);
-    fileURI = new ResourceURIImpl(site, "/test", Resource.LIVE);
+    fileURI = new FileResourceURIImpl(site, "/test", Resource.LIVE);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#hashCode()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#hashCode()}.
    */
   @Test
   public void testHashCode() {
@@ -175,7 +176,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getSite()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getSite()}.
    */
   @Test
   public void testGetSite() {
@@ -183,7 +184,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getVersion()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getVersion()}.
    */
   @Test
   public void testGetVersion() {
@@ -191,7 +192,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getType()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getType()}.
    */
   @Test
   public void testGetType() {
@@ -199,7 +200,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#removeSubject(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#removeSubject(java.lang.String)}.
    */
   @Test
   public void testRemoveSubject() {
@@ -208,7 +209,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getURI()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getURI()}.
    */
   @Test
   public void testGetURI() {
@@ -216,7 +217,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getPublisher()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getPublisher()}.
    */
   @Test
   public void testGetPublisher() {
@@ -224,7 +225,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getPublishFrom()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getPublishFrom()}.
    */
   @Test
   public void testGetPublishFrom() {
@@ -232,7 +233,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getPublishTo()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getPublishTo()}.
    */
   @Test
   public void testGetPublishTo() {
@@ -240,7 +241,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#isPromoted()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#isPromoted()}.
    */
   @Test
   public void testIsPromoted() {
@@ -248,7 +249,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#isIndexed()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#isIndexed()}.
    */
   @Test
   public void testIsIndexed() {
@@ -256,7 +257,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getCoverage()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getCoverage()}.
    */
   @Test
   public void testGetCoverage() {
@@ -264,7 +265,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getCoverage(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getCoverage(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetCoverageLanguage() {
@@ -274,7 +275,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getCoverage(ch.o2it.weblounge.common.language.Language, boolean)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getCoverage(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
   public void testGetCoverageLanguageBoolean() {
@@ -287,7 +288,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getDescription()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getDescription()}.
    */
   @Test
   public void testGetDescription() {
@@ -295,7 +296,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getDescription(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getDescription(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetDescriptionLanguage() {
@@ -305,7 +306,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getDescription(ch.o2it.weblounge.common.language.Language, boolean)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getDescription(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
   public void testGetDescriptionLanguageBoolean() {
@@ -318,7 +319,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getRights()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getRights()}.
    */
   @Test
   public void testGetRights() {
@@ -326,7 +327,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getRights(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getRights(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetRightsLanguage() {
@@ -336,7 +337,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getRights(ch.o2it.weblounge.common.language.Language, boolean)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getRights(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
   public void testGetRightsLanguageBoolean() {
@@ -349,7 +350,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getTitle()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getTitle()}.
    */
   @Test
   public void testGetTitle() {
@@ -357,7 +358,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getTitle(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getTitle(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testGetTitleLanguage() {
@@ -367,7 +368,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getTitle(ch.o2it.weblounge.common.language.Language, boolean)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getTitle(ch.o2it.weblounge.common.language.Language, boolean)}.
    */
   @Test
   public void testGetTitleLanguageBoolean() {
@@ -380,7 +381,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#hasSubject(String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#hasSubject(String)}.
    */
   @Test
   public void testHasSubject() {
@@ -389,7 +390,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getSubjects()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getSubjects()}.
    */
   @Test
   public void testGetSubjects() {
@@ -398,7 +399,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#allow(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#allow(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -407,7 +408,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#deny(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#deny(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -416,7 +417,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#check(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -425,7 +426,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#check(ch.o2it.weblounge.common.security.PermissionSet, ch.o2it.weblounge.common.security.Authority)}.
    */
   @Test
   @Ignore
@@ -434,7 +435,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#checkOne(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
    */
   @Test
   @Ignore
@@ -443,7 +444,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#checkAll(ch.o2it.weblounge.common.security.Permission, ch.o2it.weblounge.common.security.Authority[])}.
    */
   @Test
   @Ignore
@@ -452,7 +453,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#permissions()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#permissions()}.
    */
   @Test
   @Ignore
@@ -461,7 +462,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getOwner()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getOwner()}.
    */
   @Test
   public void testGetOwner() {
@@ -469,17 +470,17 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#equals(java.lang.Object)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {
     assertTrue(file.equals(file));
-    assertTrue(file.equals(new FileImpl(fileURI)));
-    assertFalse(file.equals(new FileImpl(new ResourceURIImpl(site, "/test/2", Resource.LIVE))));
+    assertTrue(file.equals(new FileResourceImpl(fileURI)));
+    assertFalse(file.equals(new FileResourceImpl(new FileResourceURIImpl(site, "/test/2", Resource.LIVE))));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#isPublished()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#isPublished()}.
    */
   @Test
   public void testIsPublished() {
@@ -490,7 +491,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#isPublished(java.util.Date)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#isPublished(java.util.Date)}.
    */
   @Test
   public void testIsPublishedDate() {
@@ -500,7 +501,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getCreationDate()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getCreationDate()}.
    */
   @Test
   public void testGetCreationDate() {
@@ -508,7 +509,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getCreator()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getCreator()}.
    */
   @Test
   public void testGetCreator() {
@@ -516,7 +517,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#isCreatedAfter(java.util.Date)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#isCreatedAfter(java.util.Date)}.
    */
   @Test
   public void testIsCreatedAfter() {
@@ -524,7 +525,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getModificationDate()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getModificationDate()}.
    */
   @Test
   public void testGetModificationDate() {
@@ -532,7 +533,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getModifier()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getModifier()}.
    */
   @Test
   public void testGetModifier() {
@@ -540,7 +541,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#getLockOwner()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getLockOwner()}.
    */
   @Test
   public void testGetLockOwner() {
@@ -548,7 +549,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#setUnlocked()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#setUnlocked()}.
    */
   @Test
   public void testSetUnlocked() {
@@ -557,7 +558,7 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#isLocked()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#isLocked()}.
    */
   @Test
   public void testIsLocked() {
@@ -565,11 +566,11 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileImpl#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#compareTo(ch.o2it.weblounge.common.language.Localizable, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testCompareTo() {
-    File p2 = new FileImpl(new ResourceURIImpl(site, "/test/2", Resource.LIVE));
+    FileResource p2 = new FileResourceImpl(new FileResourceURIImpl(site, "/test/2", Resource.LIVE));
     p2.setTitle(germanTitle, german);
     assertEquals(0, file.compareTo(p2, german));
   }

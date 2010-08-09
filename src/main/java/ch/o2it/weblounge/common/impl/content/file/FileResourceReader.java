@@ -20,7 +20,9 @@
 
 package ch.o2it.weblounge.common.impl.content.file;
 
+import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
@@ -47,10 +49,10 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse file data.
  */
-public final class FileReader extends WebloungeContentReader {
+public final class FileResourceReader extends WebloungeContentReader implements ResourceReader<FileResource> {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(FileReader.class);
+  private final static Logger logger = LoggerFactory.getLogger(FileResourceReader.class);
 
   /** Parser factory */
   private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -59,7 +61,7 @@ public final class FileReader extends WebloungeContentReader {
   private WeakReference<SAXParser> parserRef = null;
 
   /** The file object */
-  private FileImpl file = null;
+  private FileResourceImpl file = null;
 
   /** Current parser context */
   private enum ParserContext {
@@ -78,24 +80,24 @@ public final class FileReader extends WebloungeContentReader {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public FileReader() throws ParserConfigurationException, SAXException {
+  public FileResourceReader() throws ParserConfigurationException, SAXException {
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
   /**
    * This method is called when a <code>File</code> object is instantiated.
-   * 
-   * @param is
-   *          the xml input stream
    * @param uri
    *          the file uri
+   * @param is
+   *          the xml input stream
+   * 
    * @throws IOException
    *           if reading the input stream fails
    */
-  public FileImpl read(InputStream is, ResourceURI uri) throws SAXException,
+  public FileResource read(ResourceURI uri, InputStream is) throws SAXException,
       IOException, ParserConfigurationException {
     reset();
-    file = new FileImpl(uri);
+    file = new FileResourceImpl(uri);
     SAXParser parser = parserRef.get();
     if (parser == null) {
       parser = parserFactory.newSAXParser();
@@ -112,7 +114,7 @@ public final class FileReader extends WebloungeContentReader {
    * @param file
    *          the file
    */
-  public void init(FileImpl file) {
+  public void init(FileResourceImpl file) {
     this.file = file;
   }
 

@@ -20,13 +20,11 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.MalformedPageURIException;
+import ch.o2it.weblounge.common.content.MalformedResourceURIException;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.url.UrlImpl;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.WebUrl;
 
 /**
  * Implementation of the {@link ResourceURI} interface.
@@ -36,51 +34,24 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
   /** Serial version UID */
   private static final long serialVersionUID = -686750395794924219L;
 
-  /** The page identifier */
-  String id = null;
+  /** The resource identifier */
+  protected String id = null;
 
   /** The associated site */
-  Site site = null;
+  protected Site site = null;
 
-  /** The page */
+  /** The resource type */
+  protected String type = null;
+
+  /** The resource */
   long version = Resource.LIVE;
+  
+  /** The to string representation */
+  private String external = null;
 
   /**
-   * Constructor for a URI pointing to the live version of the root document.
-   * 
-   * @param site
-   *          the associated site
-   */
-  public ResourceURIImpl(Site site) {
-    this(site, "/", Resource.LIVE, null);
-  }
-
-  /**
-   * Creates a new {@link ResourceURI} from the given request, which is used to
-   * determine <code>site</code>, <code>path</code> and <code>version</code>.
-   * 
-   * @param request
-   *          the request
-   */
-  public ResourceURIImpl(WebloungeRequest request) {
-    this(request.getSite(), request.getUrl().getPath(), request.getVersion(), null);
-  }
-
-  /**
-   * Creates a new {@link ResourceURI} from the given url, which is used to
-   * determine <code>site</code> and <code>path</code>. The uri will default to
-   * the live version.
-   * 
-   * @param url
-   *          the url
-   */
-  public ResourceURIImpl(WebUrl url) {
-    this(url.getSite(), url.getPath(), Resource.LIVE, null);
-  }
-
-  /**
-   * Creates a new {@link ResourceURI} that is equal to <code>uri</code> except for
-   * the version which is switched to <code>version</code>.
+   * Creates a new {@link ResourceURI} that is equal to <code>uri</code> except
+   * for the version which is switched to <code>version</code>.
    * 
    * @param uri
    *          the uri
@@ -88,61 +59,79 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    *          the version
    */
   public ResourceURIImpl(ResourceURI uri, long version) {
-    this(uri.getSite(), uri.getPath(), version, uri.getId());
+    this(uri.getType(), uri.getSite(), uri.getPath(), version, uri.getId());
   }
 
   /**
-   * Creates a new {@link ResourceURI} pointing to the live version of the page
+   * Creates a new {@link ResourceURI} pointing to the live version of the resource
    * identified by <code>site</code> and <code>path</code>.
    * 
+   * @param type
+   *          the resource type
    * @param site
    *          the site
    * @param path
    *          the path
+   * @throws MalformedResourceURIException
+   *           if the uri cannot be created. Usually, this is due to a malformed
+   *           <code>path</code> parameter
    */
-  public ResourceURIImpl(Site site, String path) throws MalformedPageURIException {
-    this(site, path, Resource.LIVE, null);
+  public ResourceURIImpl(String type, Site site, String path)
+      throws MalformedResourceURIException {
+    this(type, site, path, Resource.LIVE, null);
   }
 
   /**
-   * Creates a new {@link ResourceURI} pointing to a specific version of the page
-   * identified by <code>site</code>, <code>path</code> and <code>version</code>
-   * .
+   * Creates a new {@link ResourceURI} pointing to a specific version of the
+   * resource identified by <code>site</code>, <code>path</code> and
+   * <code>version</code>.
    * 
+   * @param type
+   *          the resource type
    * @param site
    *          the site
    * @param path
    *          the path
    * @param version
    *          the version
+   * @throws MalformedResourceURIException
+   *           if the uri cannot be created. Usually, this is due to a malformed
+   *           <code>path</code> parameter
    */
-  public ResourceURIImpl(Site site, String path, long version)
-      throws MalformedPageURIException {
-    this(site, path, version, null);
+  public ResourceURIImpl(String type, Site site, String path, long version)
+      throws MalformedResourceURIException {
+    this(type, site, path, version, null);
   }
 
   /**
-   * Creates a new {@link ResourceURI} pointing to a specific version of the page
-   * identified by <code>id<code>, <code>site</code>, <code>path</code> and
+   * Creates a new {@link ResourceURI} pointing to a specific version of the
+   * resource identified by <code>id<code>, <code>site</code>, <code>path</code> and
    * <code>version</code>.
    * 
+   * @param type
+   *          the resource type
    * @param site
    *          the site
    * @param path
    *          the path
    * @param id
-   *          the page identifier
+   *          the resource identifier
+   * @throws MalformedResourceURIException
+   *           if the uri cannot be created. Usually, this is due to a malformed
+   *           <code>path</code> parameter
    */
-  public ResourceURIImpl(Site site, String path, String id)
-      throws MalformedPageURIException {
-    this(site, path, Resource.LIVE, id);
+  public ResourceURIImpl(String type, Site site, String path, String id)
+      throws MalformedResourceURIException {
+    this(type, site, path, Resource.LIVE, id);
   }
 
   /**
-   * Creates a new {@link ResourceURI} pointing to a specific version of the page
-   * identified by <code>id<code>, <code>site</code>, <code>path</code> and
+   * Creates a new {@link ResourceURI} pointing to a specific version of the
+   * resource identified by <code>id<code>, <code>site</code>, <code>path</code> and
    * <code>version</code>.
    * 
+   * @param type
+   *          the resource type
    * @param site
    *          the site
    * @param path
@@ -150,54 +139,33 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    * @param version
    *          the version
    * @param id
-   *          the page identifier
+   *          the resource identifier
+   * @throws MalformedResourceURIException
+   *           if the uri cannot be created. Usually, this is due to a malformed
+   *           <code>path</code> parameter
    */
-  public ResourceURIImpl(Site site, String path, long version, String id)
-      throws MalformedPageURIException {
+  public ResourceURIImpl(String type, Site site, String path, long version,
+      String id) throws MalformedResourceURIException {
     super(path, '/');
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     if (path != null && !path.startsWith("/"))
-      throw new MalformedPageURIException(path);
+      throw new MalformedResourceURIException(path);
+    this.type = type;
     this.site = site;
     this.id = id;
     this.version = version;
   }
 
   /**
-   * Returns a page uri that references the page with the given identifier.
-   * 
-   * @param site
-   *          the site
-   * @param id
-   *          the page identifier
-   * @return the uri
-   */
-  public static ResourceURIImpl fromId(Site site, String id) {
-    return new ResourceURIImpl(site, null, id);
-  }
-
-  /**
-   * Returns a page uri that references the page with the given path.
-   * 
-   * @param site
-   *          the site
-   * @param path
-   *          the page path
-   * @return the uri
-   */
-  public static ResourceURIImpl fromPath(Site site, String path) {
-    return new ResourceURIImpl(site, path);
-  }
-
-  /**
-   * Sets the page identifier.
+   * Sets the resource identifier.
    * 
    * @param id
    *          the identifier
    */
   public void setIdentifier(String id) {
     this.id = id;
+    external = null;
   }
 
   /**
@@ -205,7 +173,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    * 
    * @see ch.o2it.weblounge.common.content.ResourceURI#getId()
    */
-  public String getId() throws MalformedPageURIException {
+  public String getId() throws MalformedResourceURIException {
     return id;
   }
 
@@ -214,11 +182,11 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    * 
    * @see ch.o2it.weblounge.common.content.ResourceURI#getParentURI()
    */
-  public ResourceURI getParentURI() throws MalformedPageURIException {
+  public ResourceURI getParentURI() throws MalformedResourceURIException {
     String parentPath = getParentPath();
     if (parentPath == null)
       return null;
-    return new ResourceURIImpl(site, parentPath, version, id);
+    return new ResourceURIImpl(type, site, parentPath, version, id);
   }
 
   /**
@@ -226,7 +194,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    * 
    * @see ch.o2it.weblounge.common.content.ResourceURI#getPath()
    */
-  public String getPath() throws MalformedPageURIException {
+  public String getPath() throws MalformedResourceURIException {
     return path;
   }
 
@@ -235,7 +203,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    * 
    * @see ch.o2it.weblounge.common.content.ResourceURI#getSite()
    */
-  public Site getSite() throws MalformedPageURIException {
+  public Site getSite() throws MalformedResourceURIException {
     return site;
   }
 
@@ -244,7 +212,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    * 
    * @see ch.o2it.weblounge.common.content.ResourceURI#getVersion()
    */
-  public long getVersion() throws MalformedPageURIException {
+  public long getVersion() throws MalformedResourceURIException {
     return version;
   }
 
@@ -253,8 +221,18 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    * 
    * @see ch.o2it.weblounge.common.content.ResourceURI#getVersion(long)
    */
-  public ResourceURI getVersion(long version) throws MalformedPageURIException {
-    return new ResourceURIImpl(site, path, version);
+  public ResourceURI getVersion(long version)
+      throws MalformedResourceURIException {
+    return new ResourceURIImpl(type, site, path, version);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.ResourceURI#getType()
+   */
+  public String getType() {
+    return type;
   }
 
   /**
@@ -286,15 +264,21 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
     }
     return super.equals(obj);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.url.UrlImpl#toString()
    */
   @Override
   public String toString() {
-    return (path != null) ? path : id;
+    if (external == null) {
+      StringBuffer buf = new StringBuffer(site.getIdentifier());
+      buf.append(":");
+      buf.append((path != null) ? path : id);
+      external = buf.toString();
+    }
+    return external;
   }
 
 }
