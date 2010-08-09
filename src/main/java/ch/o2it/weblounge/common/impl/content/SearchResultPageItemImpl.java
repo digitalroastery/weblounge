@@ -61,7 +61,7 @@ public class SearchResultPageItemImpl extends SearchResultItemImpl {
    */
   public SearchResultPageItemImpl(Site site, String id, WebUrl url,
       double relevance, Object source) {
-    super(site, id, url, relevance, source);
+    super(site, id, url, Page.TYPE, relevance, source);
   }
 
   /**

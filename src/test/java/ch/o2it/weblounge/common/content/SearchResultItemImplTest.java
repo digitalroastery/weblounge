@@ -23,6 +23,7 @@ package ch.o2it.weblounge.common.content;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
@@ -77,7 +78,7 @@ public class SearchResultItemImplTest {
   @Before
   public void setUp() throws Exception {
     setUpPrerequisites();
-    item = new SearchResultItemImpl(site, id, url, relevance, source);
+    item = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance, source);
     item.setTitle(title);
     item.setPreview(previewData);
     item.setPreviewRenderer(renderer);
@@ -149,7 +150,7 @@ public class SearchResultItemImplTest {
    */
   @Test
   public void testCompareToSearchResultItem() {
-    SearchResultItem nextItem = new SearchResultItemImpl(site, id, url, relevance + 1.0, source);
+    SearchResultItem nextItem = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance + 1.0, source);
     assertTrue(item.compareTo(nextItem) > 0);
   }
 

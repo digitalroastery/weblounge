@@ -23,6 +23,7 @@ package ch.o2it.weblounge.common.content;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
@@ -81,7 +82,7 @@ public class SearchResultImplTest {
     WebUrl url = new WebUrlImpl(site, "/");
     for (int i=0; i < limit; i++) {
       double relevance = Math.random();
-      SearchResultItemImpl item = new SearchResultItemImpl(site, id, url, relevance, source);
+      SearchResultItemImpl item = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance, source);
       result.addResultItem(item);
     }
   }

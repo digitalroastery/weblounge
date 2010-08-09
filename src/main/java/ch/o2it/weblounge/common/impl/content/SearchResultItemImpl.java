@@ -41,12 +41,15 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchResultImpl.class);
-  
+
   /** THe associated site */
   protected Site site = null;
 
   /** The page id */
   protected String id = null;
+
+  /** The resource type */
+  protected String type = null;
 
   /** The title */
   protected String title = null;
@@ -81,16 +84,19 @@ public class SearchResultItemImpl implements SearchResultItem {
    *          the document id
    * @param url
    *          the url to show the hit
+   * @param type
+   *          the resource type
    * @param relevance
    *          the score inside the search result
    * @param source
    *          the object that produced the result item
    */
-  public SearchResultItemImpl(Site site, String id, WebUrl url,
+  public SearchResultItemImpl(Site site, String id, WebUrl url, String type,
       double relevance, Object source) {
     this.site = site;
     this.id = id;
     this.url = url;
+    this.type = type;
     this.source = source;
     this.score = relevance;
   }
@@ -141,6 +147,25 @@ public class SearchResultItemImpl implements SearchResultItem {
    */
   public WebUrl getUrl() {
     return url;
+  }
+
+  /**
+   * Sets the resource type.
+   * 
+   * @param type
+   *          the type
+   */
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.SearchResultItem#getType()
+   */
+  public String getType() {
+    return type;
   }
 
   /**
@@ -252,7 +277,7 @@ public class SearchResultItemImpl implements SearchResultItem {
       Object preview = getPreview();
       List<Object> previewParts = new ArrayList<Object>();
       if (preview.getClass().isArray()) {
-        for (Object previewPart : (Object[])preview) {
+        for (Object previewPart : (Object[]) preview) {
           previewParts.add(previewPart);
         }
       } else {
@@ -283,7 +308,7 @@ public class SearchResultItemImpl implements SearchResultItem {
       }
       buf.append("</preview>");
     }
-    
+
     buf.append("</result>");
     return buf.toString();
   }

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultPageItemImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
@@ -74,7 +75,7 @@ public class SearchResultItemPageImplTest extends SearchResultItemImplTest {
    */
   @Test
   public void testCompareToSearchResultItem() {
-    SearchResultItem nextItem = new SearchResultItemImpl(site, id, url, relevance + 1.0, source);
+    SearchResultItem nextItem = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance + 1.0, source);
     assertTrue(item.compareTo(nextItem) > 0);
   }
 
