@@ -29,7 +29,7 @@ public class DefaultResourceLoader implements ResourceLoader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.mock.ResourceLoader#getResource(java.lang.String)
+   * @see ch.o2it.weblounge.mock.ResourceLoader#get(java.lang.String)
    */
   public Resource getResource(String path) {
     // TODO Implement getResource(string)

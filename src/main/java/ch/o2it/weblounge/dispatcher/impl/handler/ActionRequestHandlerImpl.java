@@ -20,14 +20,14 @@
 
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
+import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
 import ch.o2it.weblounge.common.impl.request.Http11Utils;
@@ -545,10 +545,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         if (encoding == null)
           encoding = "utf-8";
         decocedTargetUrl = URLDecoder.decode(targetUrl, encoding);
-        target = new ResourceURIImpl(site, decocedTargetUrl);
+        target = new PageURIImpl(site, decocedTargetUrl);
       } catch (UnsupportedEncodingException e) {
         logger.warn("Error while decoding target url {}: {}", targetUrl, e.getMessage());
-        target = new ResourceURIImpl(site, "/");
+        target = new PageURIImpl(site, "/");
       }
     }
 
@@ -563,7 +563,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
     // Nothing found, let's choose the site's homepage
     if (target == null) {
-      target = new ResourceURIImpl(site, "/");
+      target = new PageURIImpl(site, "/");
     }
 
     // We are about to render the action output in the composers of the target
@@ -576,7 +576,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     }
     
     // Does the page exist?
-    page = contentRepository.getPage(target);
+    page = (Page)contentRepository.get(target);
     if (page == null) {
       if (targetForced) {
         logger.warn("Output of action '{}' is configured to render on non existing page {}", action, target);
@@ -584,8 +584,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       }
 
       // Fall back to site homepage
-      target = new ResourceURIImpl(site, "/");
-      page = contentRepository.getPage(target);
+      target = new PageURIImpl(site, "/");
+      page = (Page)contentRepository.get(target);
       if (page == null) {
         logger.debug("Site {} has no homepage as fallback to render actions", site);
         return null;
