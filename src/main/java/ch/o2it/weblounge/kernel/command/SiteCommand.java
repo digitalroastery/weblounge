@@ -25,8 +25,8 @@ import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -216,9 +216,9 @@ public class SiteCommand {
 
     // Pages and revisions
     ContentRepository repository = ContentRepositoryFactory.getRepository(site);
-    long pages = repository != null ? repository.getPages() : -1;
+    long pages = repository != null ? repository.getResourceCount() : -1;
     pad("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
-    long revisions = repository != null ? repository.getVersions() : -1;
+    long revisions = repository != null ? repository.getVersionCount() : -1;
     pad("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
   }
 
@@ -244,10 +244,11 @@ public class SiteCommand {
     // Is it a page?
     try {
       String objectId = args[0];
+      // TODO: What if we hit a file or an image?
       if (objectId.startsWith("/"))
-        page = repository.getPage(new ResourceURIImpl(site, args[0]));
+        page = (Page)repository.get(new PageURIImpl(site, args[0]));
       else
-        page = repository.getPage(ResourceURIImpl.fromId(site, args[0]));
+        page = (Page)repository.get(new PageURIImpl(site, null, args[0]));
       if (page != null) {
         title("page");
         pad("id", page.getURI().getId().toString());
@@ -349,7 +350,7 @@ public class SiteCommand {
 
     // Is it a page?
     try {
-      SearchResult result = repository.findPages(query);
+      SearchResult result = repository.find(query);
 
       // Format the output
       Formatter formatter = new Formatter(System.out);

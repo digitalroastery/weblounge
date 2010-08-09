@@ -202,6 +202,7 @@ public class SiteManager {
     if (site.isStartedAutomatically()) {
       try {
         logger.debug("Starting site '{}'", site);
+        // TODO: Make sure there is a *running* content repository for this site
         site.start();
       } catch (IllegalStateException e) {
         logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
