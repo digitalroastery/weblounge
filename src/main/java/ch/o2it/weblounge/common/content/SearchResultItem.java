@@ -47,6 +47,13 @@ public interface SearchResultItem extends Comparable<SearchResultItem> {
   WebUrl getUrl();
 
   /**
+   * Returns the type of the result item.
+   * 
+   * @return the type
+   */
+  String getType();
+
+  /**
    * Returns the title of this search result.
    * 
    * @return the title
