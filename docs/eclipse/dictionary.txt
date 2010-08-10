@@ -68,3 +68,4 @@ dactivation
 metadata
 endpoints
 fulltext
+download
