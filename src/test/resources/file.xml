@@ -37,4 +37,16 @@
       <user id="amelie" realm="testland">Amélie Poulard</user>
     </locked>
   </head>
+  <body>
+    <content language="en">
+      <filename>image.jpg</filename>
+      <mimetype>image/jpeg</mimetype>
+      <size>745569</size>
+    </content>
+    <content language="de">
+      <filename>image.png</filename>
+      <mimetype>image/png</mimetype>
+      <size>520894</size>
+    </content>
+  </body>
 </resource>
