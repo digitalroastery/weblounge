@@ -22,10 +22,13 @@ package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceImpl;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -40,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,12 +83,15 @@ public class ImageEndpoint {
    *          the request
    * @param resourceId
    *          the image identifier
+   * @param languageId
+   *          the language identifier
    * @return the image
    */
   @GET
-  @Path("/{resourceid}")
+  @Path("/{resourceid}/{languageid}")
   public Response getImage(@Context HttpServletRequest request,
-      @PathParam("resourceid") String resourceId) {
+      @PathParam("resourceid") String resourceId,
+      @PathParam("languageid") String languageId) {
 
     // Check the parameters
     if (resourceId == null)
@@ -97,29 +102,46 @@ public class ImageEndpoint {
     if (resource == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-
+    
     // Is there an up-to-date, cached version on the client side?
-    if (!isModidifed(resource, request)) {
+    if (!isModified(resource, request)) {
       return Response.notModified().build();
+    }
+    
+    // Extract the language
+    Language language = LanguageSupport.getLanguage(languageId);
+    if (language == null) {
+      language = getSite(request).getDefaultLanguage();
+      if (language == null) {
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
+    }
+    
+    // Load the content
+    ImageContent imageContent = resource.getContent(language);
+    if (imageContent == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
     }
 
     // Create the response
     ResponseBuilder response = Response.ok(new StreamingOutput() {
-      public void write(OutputStream os) throws IOException, WebApplicationException {
+      public void write(OutputStream os) throws IOException,
+          WebApplicationException {
         InputStream is = null;
         try {
-          is = resource.openStream();
+//          is = resource.openStream();
           IOUtils.copy(is, os);
         } finally {
           IOUtils.closeQuietly(is);
         }
       }
     });
-    if (resource.getMimeType() != null)
-      response.type(resource.getMimeType());
+    if (imageContent.getMimetype() != null)
+      response.type(imageContent.getMimetype());
     else
       response.type(MediaType.APPLICATION_OCTET_STREAM);
-    // TODO: Add content length
+    if (imageContent.getSize() > 0)
+      response.header("Content-Length", imageContent.getSize());
     response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
     response.lastModified(resource.getModificationDate());
     return response.build();
@@ -138,10 +160,11 @@ public class ImageEndpoint {
    * @return the scaled image
    */
   @GET
-  @Path("/{resourceid}/formats/{formatid}")
+  @Path("/{resourceid}/{languageid}/formats/{formatid}")
   @Produces("image/*")
   public Response scaleImage(@Context HttpServletRequest request,
       @PathParam("resourceid") String resourceId,
+      @PathParam("languageid") String languageId,
       @PathParam("formatid") String formatId) {
 
     // Check the parameters
@@ -157,8 +180,23 @@ public class ImageEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModidifed(image, request)) {
+    if (!isModified(image, request)) {
       return Response.notModified().build();
+    }
+
+    // Extract the language
+    Language language = LanguageSupport.getLanguage(languageId);
+    if (language == null) {
+      language = getSite(request).getDefaultLanguage();
+      if (language == null) {
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
+    }
+    
+    // Load the content
+    ImageContent imageContent = image.getContent(language);
+    if (imageContent == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
     }
 
     // Load the image format
@@ -182,7 +220,7 @@ public class ImageEndpoint {
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
           WebApplicationException {
-        IOUtils.copy(scaledImage.openStream(), os);
+//        IOUtils.copy(scaledImage.openStream(), os);
       }
     });
     response.tag(new EntityTag(Long.toString(image.getModificationDate().getTime())));
@@ -222,7 +260,7 @@ public class ImageEndpoint {
    *           if the <code>If-Modified-Since</code> cannot be converted to a
    *           date.
    */
-  protected boolean isModidifed(Resource resource, HttpServletRequest request) {
+  protected boolean isModified(Resource resource, HttpServletRequest request) {
     try {
       long cachedModificationDate = request.getDateHeader("If-Modified-Since");
       Date pageModificationDate = resource.getModificationDate();
@@ -301,7 +339,8 @@ public class ImageEndpoint {
    *          the image identifier
    * @return the image
    */
-  protected ImageResource loadImage(HttpServletRequest request, String resourceId) {
+  protected ImageResource loadImage(HttpServletRequest request,
+      String resourceId) {
     if (sites == null) {
       logger.debug("Unable to load page '{}': no sites registered", resourceId);
       return null;
@@ -320,9 +359,7 @@ public class ImageEndpoint {
     // Load the image and return it
     // try {
     ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
-    // Resource resource = contentRepository.getPage(resourceURI);
-    URL imageUrl = getClass().getResource("/image/placeholder.jpg");
-    ImageResource resource = new ImageResourceImpl(resourceURI, imageUrl);
+    ImageResource resource = new ImageResourceImpl(resourceURI);
     if (!(resource instanceof ImageResource))
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     return (ImageResource) resource;

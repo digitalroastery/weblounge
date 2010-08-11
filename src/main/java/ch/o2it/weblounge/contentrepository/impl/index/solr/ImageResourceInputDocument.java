@@ -27,19 +27,19 @@ import ch.o2it.weblounge.common.content.image.ImageResource;
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
  * posting weblounge images to solr.
  */
-public class ImageResourceInputDocument extends FileResourceInputDocument {
+public class ImageResourceInputDocument extends ResourceInputDocument {
 
   /** Serial version uid */
   private static final long serialVersionUID = 1812364663819822015L;
 
   /**
-   * Creates an input document for the given resource.
+   * Creates an input document for the given image.
    * 
-   * @param resource
-   *          the resource
+   * @param image
+   *          the image
    */
-  public ImageResourceInputDocument(ImageResource resource) {
-    super(resource);
+  public ImageResourceInputDocument(ImageResource image) {
+    init(image);
   }
 
   /**

@@ -178,7 +178,7 @@ public class SearchIndex {
    * @throws IOException
    *           if an errors occurs while talking to solr
    */
-  public boolean add(Resource resource) throws IOException {
+  public boolean add(Resource<?> resource) throws IOException {
     logger.debug("Adding resource {} to search index", resource);
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.setAction(ACTION.COMMIT, true, true);

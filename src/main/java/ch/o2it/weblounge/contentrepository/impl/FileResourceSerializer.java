@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
@@ -58,8 +59,8 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
    *
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
    */
-  public SolrInputDocument getInputDocument(FileResource resource) {
-    return new FileResourceInputDocument(resource);
+  public SolrInputDocument getInputDocument(Resource<?> resource) {
+    return new FileResourceInputDocument((FileResource)resource);
   }
 
 }

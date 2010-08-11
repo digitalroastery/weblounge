@@ -22,6 +22,7 @@ package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
@@ -29,6 +30,7 @@ import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
@@ -53,7 +55,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Date;
 import java.util.UUID;
 
@@ -142,8 +143,23 @@ public class FileEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModidifed(resource, request)) {
+    if (!isModified(resource, request)) {
       return Response.notModified().build();
+    }
+
+    // Extract the language
+    Language language = LanguageSupport.getLanguage(languageId);
+    if (language == null) {
+      language = getSite(request).getDefaultLanguage();
+      if (language == null) {
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
+    }
+    
+    // Load the content
+    FileContent fileContent = resource.getContent(language);
+    if (fileContent == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
     }
 
     // Create the response
@@ -152,17 +168,19 @@ public class FileEndpoint {
           WebApplicationException {
         InputStream is = null;
         try {
-          is = resource.openStream();
+//          is = resource.openStream();
           IOUtils.copy(is, os);
         } finally {
           IOUtils.closeQuietly(is);
         }
       }
     });
-    if (resource.getMimeType() != null)
-      response.type(resource.getMimeType());
+    if (fileContent.getMimetype() != null)
+      response.type(fileContent.getMimetype());
     else
       response.type(MediaType.APPLICATION_OCTET_STREAM);
+    if (fileContent.getSize() > 0)
+      response.header("Content-Length", fileContent.getSize());
     response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
     response.lastModified(resource.getModificationDate());
     return response.build();
@@ -433,7 +451,7 @@ public class FileEndpoint {
    *           if the <code>If-Modified-Since</code> cannot be converted to a
    *           date.
    */
-  protected boolean isModidifed(Resource resource, HttpServletRequest request) {
+  protected boolean isModified(Resource<?> resource, HttpServletRequest request) {
     try {
       long cachedModificationDate = request.getDateHeader("If-Modified-Since");
       Date pageModificationDate = resource.getModificationDate();
@@ -554,9 +572,7 @@ public class FileEndpoint {
     // Load the resource and return it
     // try {
     ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
-    // Resource resource = contentRepository.getPage(resourceURI);
-    URL fileUrl = getClass().getResource("/image/placeholder.jpg");
-    FileResource resource = new FileResourceImpl(resourceURI, fileUrl);
+    FileResource resource = new FileResourceImpl(resourceURI);
     return resource;
     // } catch (ContentRepositoryException e) {
     // throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

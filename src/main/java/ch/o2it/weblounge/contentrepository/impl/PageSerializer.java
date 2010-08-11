@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
@@ -58,8 +59,8 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
    *
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
    */
-  public SolrInputDocument getInputDocument(Page page) {
-    return new PageInputDocument(page);
+  public SolrInputDocument getInputDocument(Resource<?> page) {
+    return new PageInputDocument((Page)page);
   }
 
 }
