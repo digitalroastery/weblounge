@@ -24,6 +24,8 @@ import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.language.Language;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -160,4 +162,32 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
     return xml;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof FileContent) {
+      FileContent content = (FileContent)obj;
+      if (!StringUtils.trimToEmpty(filename).equals(content.getFilename()))
+          return false;
+      if (size != content.getSize())
+          return false;
+      return super.equals(content);
+    }
+    return false;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#toString()
+   */
+  @Override
+  public String toString() {
+    return filename != null ? filename : super.toString();
+  }
+  
 }

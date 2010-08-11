@@ -88,5 +88,30 @@ public class ResourceContentImpl implements ResourceContent {
     buf.append("</content>");
     return buf.toString();
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof ResourceContent) {
+      return language.equals(((ResourceContent)obj).getLanguage());
+    }
+    return false;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer(language.toString().toLowerCase());
+    buf.append(" content");
+    return buf.toString();
+  }
 
 }

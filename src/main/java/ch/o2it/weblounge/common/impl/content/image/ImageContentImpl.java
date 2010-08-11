@@ -116,4 +116,32 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
     return xml;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof ImageContent) {
+      ImageContent content = (ImageContent)obj;
+      if (width != content.getWidth())
+        return false;
+      if (height != content.getHeight())
+        return false;
+      return super.equals(content);
+    }
+    return false;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#toString()
+   */
+  @Override
+  public String toString() {
+    return filename != null ? filename : super.toString();
+  }
+
 }
