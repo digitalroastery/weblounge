@@ -154,7 +154,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       if (resourceCount > 0) {
         time = System.currentTimeMillis() - time;
         logger.info("Site index populated in {} ms", ConfigurationUtils.toHumanReadableDuration(time));
-        logger.info("{} resources added to index", resourceCount - resourceCount);
+        logger.info("{} resources added to index", resourceCount);
       }
     } catch (IOException e) {
       throw new ContentRepositoryException("Error while writing to index", e);
@@ -188,7 +188,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
-    File restructuredSite = new File(repositoryRoot, "." + resourceDirectory);
+    File restructuredResources = new File(repositoryRoot, "." + resourceDirectory);
 
     logger.info("Populating site index '{}' with {}s...", site, resourceType);
     long resourceCount = 0;
@@ -198,13 +198,13 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     Stack<File> uris = new Stack<File>();
     String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), resourceDirectory);
-    File siteRootDirectory = new File(homePath);
-    FileUtils.forceMkdir(siteRootDirectory);
+    File resourcesRootDirectory = new File(homePath);
+    FileUtils.forceMkdir(resourcesRootDirectory);
 
     Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
 
-    uris.push(siteRootDirectory);
-    
+    uris.push(resourcesRootDirectory);
+
     try {
       while (!uris.empty()) {
         File dir = uris.pop();
@@ -228,24 +228,39 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                 logger.warn("Skipping resource {}: unable to extract uri", f);
                 continue;
               }
-  
+
               // Look for a suitable resource reader
               ResourceSerializer<?, ?> serializer = serializers.get(resourceType);
               if (serializer == null) {
                 serializer = ResourceSerializerFactory.getSerializer(resourceType);
                 if (serializer == null) {
-                  logger.warn("Skipping resource {}: no resource serializer found for type '{}'", uri, resourceType);
-                  continue;
+                  
+                  // Serializers are loaded as components, which might not be
+                  // immediately available at startup time. We are in no hurry,
+                  // and take our time.
+                  // TODO: Come up with a better way!
+                  int retryCount = 3;
+                  while (serializer == null && retryCount > 0) {
+                    logger.warn("No serializers found. Waiting for a couple of seconds for them to register");
+                    Thread.sleep(10000);
+                    serializer = ResourceSerializerFactory.getSerializer(resourceType);
+                    retryCount --;
+                  }
+                  if (retryCount == 0) {
+                    logger.warn("Skipping resource {}: no resource serializer found for type '{}'", uri, resourceType);
+                    continue;
+                  }
                 } else {
                   serializers.put(resourceType, serializer);
                 }
               }
-  
+
               // Load the resource
               Resource<?> resource = null;
               ResourceReader<?, ?> reader = serializer.getReader();
+              InputStream is = null;
               try {
-                InputStream is = loadResource(uri);
+                is = new FileInputStream(f);
                 resource = reader.read(uri, is);
                 if (resource == null) {
                   logger.warn("Unkown error loading {}", uriToFile(uri));
@@ -254,20 +269,22 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               } catch (Exception e) {
                 logger.error("Error loading {}: {}", uriToFile(uri), e.getMessage());
                 continue;
+              } finally {
+                IOUtils.closeQuietly(is);
               }
-  
+
               index.add(resource);
               resourceVersionCount++;
               if (!foundResource) {
-                logger.info("Adding {} to site index", uri);
+                logger.info("Adding {} {} to site index", resourceType, uri);
                 resourceCount++;
                 foundResource = true;
               }
-  
+
               // Make sure the resource is in the correct place
               File expectedFile = uriToFile(uri);
               String tempPath = expectedFile.getAbsolutePath().substring(homePath.length());
-              FileUtils.copyFile(f, new File(restructuredSite, tempPath));
+              FileUtils.copyFile(f, new File(restructuredResources, tempPath));
               if (!f.equals(expectedFile)) {
                 restructured = true;
               }
@@ -280,34 +297,35 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
           }
         }
       }
-  
-      // Move new site in place
+
+      // Move restructured resources in place
       if (restructured) {
-        File movedOldSite = new File(repositoryRoot, "resources-old");
-        if (movedOldSite.exists()) {
+        String oldResourcesDirectory = resourceDirectory + "-old";
+        File movedOldResources = new File(repositoryRoot, oldResourcesDirectory);
+        if (movedOldResources.exists()) {
           for (int i = 1; i < Integer.MAX_VALUE; i++) {
-            movedOldSite = new File(repositoryRoot, "resources-old " + i);
-            if (!movedOldSite.exists())
+            movedOldResources = new File(repositoryRoot, oldResourcesDirectory + " " + i);
+            if (!movedOldResources.exists())
               break;
           }
         }
-        FileUtils.moveDirectory(siteRootDirectory, movedOldSite);
-        FileUtils.moveDirectory(restructuredSite, siteRootDirectory);
+        FileUtils.moveDirectory(resourcesRootDirectory, movedOldResources);
+        FileUtils.moveDirectory(restructuredResources, resourcesRootDirectory);
       }
 
       if (resourceCount > 0) {
-        logger.info("{} {} and {} revisions added to index", new Object[] {
-            resourceType,
+        logger.info("{} {}s and {} revisions added to index", new Object[] {
             resourceCount,
+            resourceType,
             resourceVersionCount - resourceCount });
       }
-      
+
     } finally {
-      if (restructuredSite.exists()) {
-        FileUtils.deleteQuietly(restructuredSite);
+      if (restructuredResources.exists()) {
+        FileUtils.deleteQuietly(restructuredResources);
       }
     }
-    
+
     return resourceCount;
   }
 
@@ -350,22 +368,22 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     if (uri.getVersion() < 0) {
       logger.warn("Resource {} has no version");
     }
+
+    // Build the path
     path = appendIdToPath(id, path);
     path.append(File.separatorChar);
-    
-    String documentName = ResourceUtils.getDocument(Math.max(uri.getVersion(), Resource.LIVE));
-
-    // Is the version in the filename?
-    String unversionedPath = path.append(documentName).toString();
-    File unversionedFile = new File(unversionedPath);
-    if (unversionedFile.isFile()) {
-      return unversionedFile;
-    }
-
-    // Trying a versioned file path
     path.append(uri.getVersion());
     path.append(File.separatorChar);
-    path.append(documentName);
+
+    // Handle the version. There is "live" and "work", everything else is
+    // encoded in the path
+    long documentVersion = uri.getVersion();
+    if (documentVersion > Resource.WORK) {
+      documentVersion = Resource.LIVE;
+    }
+
+    // Add the document name
+    path.append(ResourceUtils.getDocument(documentVersion));
     return new File(path.toString());
   }
 
