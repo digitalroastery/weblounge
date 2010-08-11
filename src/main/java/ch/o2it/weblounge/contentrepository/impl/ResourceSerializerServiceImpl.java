@@ -32,7 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Service that will watch out for resource serializers and then register it
@@ -132,6 +134,19 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.ResourceSerializerService#getSerializers()
+   */
+  public Set<ResourceSerializer<?, ?>> getSerializers() {
+    Set<ResourceSerializer<?, ?>> set = new HashSet<ResourceSerializer<?, ?>>();
+    synchronized (serializers) {
+      set.addAll(serializers.values());
+    }
+    return set;
+  }
+  
   /**
    * Service tracker for {@link ResourceSerializer} instances.
    */

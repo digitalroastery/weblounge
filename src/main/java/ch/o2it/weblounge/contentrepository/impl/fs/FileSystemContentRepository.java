@@ -25,9 +25,6 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.file.FileResource;
-import ch.o2it.weblounge.common.content.image.ImageResource;
-import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
@@ -57,6 +54,7 @@ import java.io.OutputStream;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,9 +76,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
   /** Name of the index path element right below the repository root */
   public static final String INDEX_PATH = "index";
-
-  /** Name of the repository path element right below the repository root */
-  // public static final String REPOSITORY_PATH = "repository";
 
   /** The repository root directory */
   protected File repositoryRoot = null;
@@ -147,9 +142,15 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       long time = System.currentTimeMillis();
       long resourceCount = 0;
 
-      resourceCount += index(Page.TYPE);
-      resourceCount += index(FileResource.TYPE);
-      resourceCount += index(ImageResource.TYPE);
+      // Index each and every known resource type
+      Set<ResourceSerializer<?,?>> serializers = ResourceSerializerFactory.getSerializers();
+      if (serializers == null) {
+        logger.warn("Unable to index {} while no resource serializers are registered", this);
+        return;
+      }
+      for (ResourceSerializer<?,?> serializer : serializers) {
+        resourceCount += index(serializer.getType());
+      }
 
       if (resourceCount > 0) {
         time = System.currentTimeMillis() - time;
@@ -234,22 +235,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               if (serializer == null) {
                 serializer = ResourceSerializerFactory.getSerializer(resourceType);
                 if (serializer == null) {
-                  
-                  // Serializers are loaded as components, which might not be
-                  // immediately available at startup time. We are in no hurry,
-                  // and take our time.
-                  // TODO: Come up with a better way!
-                  int retryCount = 3;
-                  while (serializer == null && retryCount > 0) {
-                    logger.warn("No serializers found. Waiting for a couple of seconds for them to register");
-                    Thread.sleep(10000);
-                    serializer = ResourceSerializerFactory.getSerializer(resourceType);
-                    retryCount --;
-                  }
-                  if (retryCount == 0) {
-                    logger.warn("Skipping resource {}: no resource serializer found for type '{}'", uri, resourceType);
-                    continue;
-                  }
+                  logger.warn("Skipping resource {}: no resource serializer found for type '{}'", uri, resourceType);
+                  continue;
                 } else {
                   serializers.put(resourceType, serializer);
                 }
@@ -276,7 +263,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               index.add(resource);
               resourceVersionCount++;
               if (!foundResource) {
-                logger.info("Adding {} {} to site index", resourceType, uri);
+                String resourceName = uri.toString();
+                if (resource.contents().size() > 0)
+                  resourceName += resource.contents().iterator().next();
+                logger.info("Adding {} {} to site index", resourceType, resourceName);
                 resourceCount++;
                 foundResource = true;
               }
@@ -313,6 +303,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         FileUtils.moveDirectory(restructuredResources, resourcesRootDirectory);
       }
 
+      // Log the work
       if (resourceCount > 0) {
         logger.info("{} {}s and {} revisions added to index", new Object[] {
             resourceCount,
