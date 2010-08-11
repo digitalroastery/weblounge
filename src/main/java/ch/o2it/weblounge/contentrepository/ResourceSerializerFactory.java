@@ -20,9 +20,10 @@
 
 package ch.o2it.weblounge.contentrepository;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 /**
  * Default implementation of the <code>ResourceSerializerFactory</code>. The
@@ -58,10 +59,23 @@ public class ResourceSerializerFactory {
    */
   public static ResourceSerializer<?, ?> getSerializer(String resourceType) {
     if (serializerService == null) {
-      logger.warn("Tried to access resource serializer without a backing service being configured");
+      logger.warn("Tried to access resource serializer while backing service is not yet configured");
       return null;
     }
     return serializerService.getSerializer(resourceType);
+  }
+  
+  /**
+   * Returns all registered <code>ResourceSerializer</code>s in a set.
+   * 
+   * @return the set of serializers
+   */
+  public static Set<ResourceSerializer<?, ?>> getSerializers() {
+    if (serializerService == null) {
+      logger.warn("Tried to access resource serializers while backing service is not yet configured");
+      return null;
+    }
+    return serializerService.getSerializers(); 
   }
 
 }

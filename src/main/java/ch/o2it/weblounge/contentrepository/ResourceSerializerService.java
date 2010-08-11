@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository;
 
+import java.util.Set;
 
 /**
  * The <code>ResourceSerializerService</code> provides access to registered
@@ -36,5 +37,12 @@ public interface ResourceSerializerService {
    * @return the serializer
    */
   ResourceSerializer<?, ?> getSerializer(String resourceType);
+
+  /**
+   * Returns all registered <code>ResourceSerializer</code>s in a set.
+   * 
+   * @return the set of serializers
+   */
+  Set<ResourceSerializer<?, ?>> getSerializers();
 
 }
