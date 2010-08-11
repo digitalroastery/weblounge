@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.user.User;
 
@@ -50,7 +51,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           if adding fails due to a database error
    * @return the updated resource
    */
-  Resource put(Resource resource, User user) throws SecurityException, IOException;
+  Resource<? extends ResourceContent> put(Resource<? extends ResourceContent> resource, User user) throws SecurityException, IOException;
 
   /**
    * Puts the resource to the specified location. Depending on whether the resource
@@ -70,7 +71,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           if adding fails due to a database error
    * @return the resource with the given uri
    */
-  void putContent(Resource resource, InputStream is, User user) throws SecurityException, IOException;
+  void putContent(Resource<? extends ResourceContent> resource, InputStream is, User user) throws SecurityException, IOException;
 
   /**
    * This method moves the given resource to the new uri.

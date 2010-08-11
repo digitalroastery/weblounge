@@ -56,7 +56,7 @@ public class ResourceSerializerFactory {
    *          the resource type
    * @return the serializer
    */
-  public static ResourceSerializer<?> getSerializer(String resourceType) {
+  public static ResourceSerializer<?, ?> getSerializer(String resourceType) {
     if (serializerService == null) {
       logger.warn("Tried to access resource serializer without a backing service being configured");
       return null;

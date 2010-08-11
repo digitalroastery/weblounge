@@ -35,6 +35,6 @@ public interface ResourceSerializerService {
    *          the resource type
    * @return the serializer
    */
-  ResourceSerializer<?> getSerializer(String resourceType);
+  ResourceSerializer<?, ?> getSerializer(String resourceType);
 
 }
