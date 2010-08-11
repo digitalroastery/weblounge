@@ -41,4 +41,14 @@ public class FileResourceImpl extends ResourceImpl<FileContent> implements FileR
     super(uri);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#toXmlRootTag()
+   */
+  @Override
+  protected String toXmlRootTag() {
+    return TYPE;
+  }
+  
 }

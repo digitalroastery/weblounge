@@ -155,7 +155,8 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
       xml.append("<filename><![CDATA[").append(filename).append("]]></filename>");
     if (mimetype != null)
       xml.append("<mimetype>").append(mimetype).append("</mimetype>");
-    xml.append("<size>").append(size).append("</size>");
+    if (size >= 0)
+      xml.append("<size>").append(size).append("</size>");
     return xml;
   }
 

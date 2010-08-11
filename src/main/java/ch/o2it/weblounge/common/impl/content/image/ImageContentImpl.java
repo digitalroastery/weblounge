@@ -106,6 +106,7 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
    */
   @Override
   protected StringBuffer addXml(StringBuffer xml) {
+    xml = super.addXml(xml);
     if (width <= 0)
       throw new IllegalArgumentException("Image must be wider than 0 pixels");
     if (height <= 0)

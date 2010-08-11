@@ -40,4 +40,14 @@ public class ImageResourceImpl extends ResourceImpl<ImageContent> implements Ima
     super(uri);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#toXmlRootTag()
+   */
+  @Override
+  protected String toXmlRootTag() {
+    return TYPE;
+  }
+
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<resource id="abc19980-8f98-4873-a813-71b6dfab22ag" path="/a/b/c/" version="live">
+<file id="abc19980-8f98-4873-a813-71b6dfab22ag" path="/a/b/c/" version="live">
   <head>
     <promote>true</promote>
     <index>true</index>
@@ -37,4 +37,11 @@
       <user id="amelie" realm="testland">Amélie Poulard</user>
     </locked>
   </head>
-</resource>
+  <body>
+    <content language="en">
+      <filename><![CDATA[image.jpg]]></filename>
+      <mimetype>image/jpeg</mimetype>
+      <size>745569</size>
+    </content>
+  </body>
+</file>

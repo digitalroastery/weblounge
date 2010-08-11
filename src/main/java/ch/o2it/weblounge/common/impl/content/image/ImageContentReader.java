@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.image.ImageContent;
-import ch.o2it.weblounge.common.impl.content.ResourceContentReader;
+import ch.o2it.weblounge.common.impl.content.file.FileContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ import javax.xml.parsers.SAXParser;
 /**
  * Utility class used to parse <code>Content</code> data for simple files.
  */
-public class ImageContentReader extends ResourceContentReader {
+public class ImageContentReader extends FileContentReader {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(ImageContentReader.class);

@@ -20,60 +20,28 @@
 
 package ch.o2it.weblounge.common.impl.content.image;
 
-import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
+import ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.security.Authority;
-import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.user.User;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Utility class used to parse image data.
  */
-public final class ImageResourceReader extends WebloungeContentReader implements ResourceReader<ImageContent, ImageResource> {
+public final class ImageResourceReader extends AbstractResourceReaderImpl<ImageContent, ImageResource> {
 
-  /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ImageResourceReader.class);
-
-  /** Parser factory */
-  private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-
-  /** The SAX parser */
-  private WeakReference<SAXParser> parserRef = null;
-
-  /** The image object */
-  private ImageResourceImpl image = null;
-
-  /** Current parser context */
-  private enum ParserContext {
-    Document, File, Head
-  };
-
-  /** The parser context */
-  private ParserContext parserContext = ParserContext.Document;
+  /** The image content reader */
+  private ImageContentReader contentReader = new ImageContentReader();
 
   /**
-   * Creates a new image data reader that will parse the XML data and store it in
+   * Creates a new file data reader that will parse the XML data and store it in
    * the <code>File</code> object that is returned by the {@link #read} method.
    * 
    * @throws ParserConfigurationException
@@ -82,106 +50,27 @@ public final class ImageResourceReader extends WebloungeContentReader implements
    *           if an error occurs while parsing
    */
   public ImageResourceReader() throws ParserConfigurationException, SAXException {
-    parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
-  }
-
-  /**
-   * This method is called when a <code>File</code> object is instantiated.
-   * @param uri
-   *          the image uri
-   * @param is
-   *          the xml input stream
-   * 
-   * @throws IOException
-   *           if reading the input stream fails
-   */
-  public ImageResource read(ResourceURI uri, InputStream is) throws SAXException,
-      IOException, ParserConfigurationException {
-    reset();
-    image = new ImageResourceImpl(uri);
-    SAXParser parser = parserRef.get();
-    if (parser == null) {
-      parser = parserFactory.newSAXParser();
-      parserRef = new WeakReference<SAXParser>(parser);
-    }
-    parser.parse(is, this);
-    return image;
-  }
-
-  /**
-   * Sets the image that needs to be further enriched with content from an xml
-   * document.
-   * 
-   * @param image
-   *          the image
-   */
-  public void init(ImageResourceImpl image) {
-    this.image = image;
-  }
-
-  /**
-   * Resets this parser instance.
-   */
-  void reset() {
-    this.image = null;
-    this.parserContext = ParserContext.Document;
-    SAXParser parser = parserRef.get();
-    if (parser != null)
-      parser.reset();
+    super();
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.user.User)
+   *
+   * @see ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl#reset()
    */
-  @Override
-  protected void setOwner(User owner) {
-    image.setOwner(owner);
+  public void reset() {
+    super.reset();
+    contentReader.reset();
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#allow(ch.o2it.weblounge.common.security.Permission,
-   *      ch.o2it.weblounge.common.security.Authority)
+   *
+   * @see ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl#createResource(ch.o2it.weblounge.common.content.ResourceURI)
    */
   @Override
-  protected void allow(Permission permission, Authority authority) {
-    image.allow(permission, authority);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setCreated(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date)
-   */
-  @Override
-  protected void setCreated(User user, Date date) {
-    image.setCreated(user, date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setModified(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date)
-   */
-  @Override
-  protected void setModified(User modifier, Date date) {
-    image.setModified(modifier, date);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setPublished(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date, java.util.Date)
-   */
-  @Override
-  protected void setPublished(User publisher, Date startDate, Date endDate) {
-    image.setPublished(publisher, startDate, endDate);
+  protected ImageResource createResource(ResourceURI uri) {
+    return new ImageResourceImpl(uri);
   }
 
   /**
@@ -200,12 +89,12 @@ public final class ImageResourceReader extends WebloungeContentReader implements
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
 
-    // read the image url
-    if ("resource".equals(raw)) {
-      parserContext = ParserContext.File;
-      ((ResourceURIImpl) image.getURI()).setIdentifier(attrs.getValue("id"));
+    // read the file url
+    if (FileResource.TYPE.equals(raw)) {
+      parserContext = ParserContext.Resource;
+      ((ResourceURIImpl) resource.getURI()).setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
-        ((ResourceURIImpl) image.getURI()).setPath(attrs.getValue("path"));
+        ((ResourceURIImpl) resource.getURI()).setPath(attrs.getValue("path"));
     }
 
     // in the header
@@ -213,18 +102,25 @@ public final class ImageResourceReader extends WebloungeContentReader implements
       parserContext = ParserContext.Head;
     }
 
-    // title, subject and the like
-    else if ("title".equals(raw) || "subject".equals(raw) || "description".equals(raw) || "coverage".equals(raw) || "rights".equals(raw)) {
-      String language = attrs.getValue("language");
-      if (language != null) {
-        Language l = LanguageSupport.getLanguage(language);
-        clipboard.put("language", l);
-      } else {
-        clipboard.remove("language");
-      }
+    // file content
+    else if ("content".equals(raw) || parserContext.equals(ParserContext.Content)) {
+      parserContext = ParserContext.Content;
+      contentReader.startElement(uri, local, raw, attrs);
     }
 
     super.startElement(uri, local, raw, attrs);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler#characters(char[], int, int)
+   */
+  @Override
+  public void characters(char[] chars, int start, int end) throws SAXException {
+    if (parserContext.equals(ParserContext.Content))
+      contentReader.characters(chars, start, end);
+    super.characters(chars, start, end);
   }
 
   /**
@@ -234,100 +130,16 @@ public final class ImageResourceReader extends WebloungeContentReader implements
   public void endElement(String uri, String local, String raw)
       throws SAXException {
 
-    if (parserContext.equals(ParserContext.Head)) {
-
-      // Indexed
-      if ("index".equals(raw)) {
-        image.setIndexed("true".equals(characters.toString()));
-      }
-
-      // Promote
-      else if ("promote".equals(raw)) {
-        image.setPromoted("true".equals(characters.toString()));
-      }
-
-      // Type
-      else if ("type".equals(raw)) {
-        image.setType(characters.toString());
-      }
-
-      // Title
-      else if ("title".equals(raw)) {
-        Language l = (Language) clipboard.get("language");
-        image.setTitle(characters.toString(), l);
-      }
-
-      // Description
-      else if ("description".equals(raw)) {
-        Language l = (Language) clipboard.get("language");
-        image.setDescription(characters.toString(), l);
-      }
-
-      // Coverage
-      else if ("coverage".equals(raw)) {
-        Language l = (Language) clipboard.get("language");
-        image.setCoverage(characters.toString(), l);
-      }
-
-      // Rights
-      else if ("rights".equals(raw)) {
-        Language l = (Language) clipboard.get("language");
-        image.setRights(characters.toString(), l);
-      }
-
-      // Subject
-      else if ("subject".equals(raw)) {
-        image.addSubject(characters.toString());
-      }
-
-      // Filelock
-      else if ("locked".equals(raw)) {
-        User user = (User) clipboard.get("user");
-        if (user != null)
-          image.setLocked(user);
-      }
-
-    }
-
-    // Head
-    if ("head".equals(raw)) {
-      parserContext = ParserContext.File;
+    // File content
+    if ("content".equals(raw)) {
+      contentReader.endElement(uri, local, raw);
+      parserContext = ParserContext.Resource;
+      resource.addContent(contentReader.getImageContent());
+    } else if (parserContext.equals(ParserContext.Content)) {
+      contentReader.endElement(uri, local, raw);
     }
 
     super.endElement(uri, local, raw);
-  }
-
-  /**
-   * The parser encountered problems while parsing. The warning is printed out
-   * but the parsing process continues.
-   * 
-   * @param e
-   *          information about the warning
-   */
-  public void warning(SAXParseException e) {
-    logger.warn("Warning while reading {}: {}", image, e.getMessage());
-  }
-
-  /**
-   * The parser encountered problems while parsing. The error is printed out and
-   * the parsing process is stopped.
-   * 
-   * @param e
-   *          information about the error
-   */
-  public void error(SAXParseException e) {
-    logger.warn("Error while reading {}: {}", image, e.getMessage());
-  }
-
-  /**
-   * The parser encountered problems while parsing. The fatal error is printed
-   * out and the parsing process is stopped.
-   * 
-   * @param e
-   *          information about the error
-   */
-  public void fatalError(SAXParseException e) {
-    logger.warn("Fatal error while reading {}: {}", image, e.getMessage());
   }
 
 }

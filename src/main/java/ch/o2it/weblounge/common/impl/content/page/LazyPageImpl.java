@@ -686,6 +686,17 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#setCreated(ch.o2it.weblounge.common.user.User, java.util.Date)
+   */
+  public void setCreated(User user, Date date) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.setCreated(user, date);
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.page.Page#setModified(ch.o2it.weblounge.common.user.User,
    *      java.util.Date)
