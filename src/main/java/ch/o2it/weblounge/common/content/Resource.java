@@ -388,6 +388,16 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   void setRights(String rights, Language language);
 
   /**
+   * Indicates the creation date as well as the person who created it.
+   * 
+   * @param user
+   *          the user that created the object
+   * @param date
+   *          the date of creation
+   */
+  void setCreated(User user, Date date);
+
+  /**
    * Indicates the date of the last modification as well as the person who
    * modified it.
    * 
