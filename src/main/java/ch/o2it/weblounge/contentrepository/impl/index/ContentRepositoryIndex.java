@@ -79,7 +79,7 @@ public class ContentRepositoryIndex {
   public ContentRepositoryIndex(File rootDir, boolean readOnly)
       throws IOException {
     this.idxRootDir = rootDir;
-    this.uriIdx = new URIIndex(new File(rootDir, "structure"), false);
+    this.uriIdx = new URIIndex(new File(rootDir, "structure"), readOnly);
     this.idIdx = new IdIndex(new File(rootDir, "structure"), readOnly);
     this.pathIdx = new PathIndex(new File(rootDir, "structure"), readOnly);
     this.versionIdx = new VersionIndex(new File(rootDir, "structure"), readOnly);
@@ -517,6 +517,7 @@ public class ContentRepositoryIndex {
     idIdx.clear();
     pathIdx.clear();
     versionIdx.clear();
+    languageIdx.clear();
     searchIdx.clear();
   }
 

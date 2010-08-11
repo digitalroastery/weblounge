@@ -338,10 +338,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
       idx.writeByte(0);
     idx.write(path.getBytes());
     idx.write('\n');
-    long remainingBytes = bytesPerEntry - IDX_BYTES_PER_ID - pathLengthInBytes - 1;
-    for (int i = 0; i < remainingBytes; i++) {
-      idx.writeByte(0);
-    }
+    idx.write(new byte[bytesPerPath - pathLengthInBytes - 1]);
 
     if (!reusingSlot)
       slots++;
@@ -435,14 +432,11 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     // Write the path to the index
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
-    for (int i = 0; i < bytesPerType - type.length(); i++)
-      idx.writeByte(0);
+    idx.write(new byte[bytesPerType - type.length()]);
     idx.write(type.getBytes());
     idx.write(path.getBytes());
     idx.write('\n');
-    for (int i = 1; i < bytesPerEntry; i++) {
-      idx.writeLong(0);
-    }
+    idx.write(new byte[bytesPerPath - pathLengthInBytes - 1]);
 
     logger.debug("Updated uri at address '{}' to {}", entry, path);
   }

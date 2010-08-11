@@ -132,7 +132,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throw new IllegalStateException("Repository is not connected");
 
     // Temporary path for rebuilt site
-    boolean success = false;
+    boolean success = true;
 
     try {
       // Clear the current index
@@ -158,8 +158,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         logger.info("{} resources added to index", resourceCount);
       }
     } catch (IOException e) {
+      success = false;
       throw new ContentRepositoryException("Error while writing to index", e);
     } catch (MalformedResourceURIException e) {
+      success = false;
       throw new ContentRepositoryException("Error while reading resource uri for index", e);
     } finally {
       if (!success) {
