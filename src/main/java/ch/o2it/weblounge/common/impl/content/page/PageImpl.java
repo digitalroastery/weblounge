@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content.page;
 
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
@@ -46,7 +47,7 @@ import java.util.Set;
 /**
  * A <code>Page</code> encapsulates all data that is attached with a site URL.
  */
-public class PageImpl extends ResourceImpl implements Page {
+public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PageImpl.class);
@@ -396,7 +397,7 @@ public class PageImpl extends ResourceImpl implements Page {
    * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#toXmlBody(java.lang.StringBuffer)
    */
   @Override
-  protected void toXmlBody(StringBuffer buffer) {
+  protected StringBuffer toXmlBody(StringBuffer buffer) {
     for (Map.Entry<String, List<Pagelet>> entry : composers.entrySet()) {
       buffer.append("<composer id=\"");
       buffer.append(entry.getKey());
@@ -406,6 +407,7 @@ public class PageImpl extends ResourceImpl implements Page {
       }
       buffer.append("</composer>");
     }
+    return super.toXmlBody(buffer);
   }
 
 }

@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.page.PageSecurityContext;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
@@ -38,13 +39,17 @@ import ch.o2it.weblounge.common.user.User;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A <code>Resource</code> encapsulates all data that is attached with a
  * resource URL.
  */
-public abstract class ResourceImpl extends LocalizableObject implements Resource {
+public abstract class ResourceImpl<T extends ResourceContent> extends LocalizableObject implements Resource<T> {
 
   /** The uri */
   protected ResourceURI uri = null;
@@ -88,6 +93,9 @@ public abstract class ResourceImpl extends LocalizableObject implements Resource
   /** The rights declaration */
   protected LocalizableContent<String> rights = null;
 
+  /** The resource content */
+  protected Map<Language, T> content = null;
+
   /**
    * Creates a new page for the given page uri.
    * 
@@ -97,6 +105,7 @@ public abstract class ResourceImpl extends LocalizableObject implements Resource
   public ResourceImpl(ResourceURI uri) {
     super(uri.getSite().getDefaultLanguage());
     this.uri = uri;
+    this.content = new HashMap<Language, T>();
     this.creationCtx = new CreationContext();
     this.modificationCtx = new ModificationContext();
     this.publishingCtx = new PublishingContext();
@@ -699,13 +708,72 @@ public abstract class ResourceImpl extends LocalizableObject implements Resource
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.Resource#addContent(ch.o2it.weblounge.common.content.ResourceContent)
+   */
+  public void addContent(T content) {
+    if (content == null)
+      throw new IllegalArgumentException("Resource content cannot be null");
+    this.content.put(content.getLanguage(), content);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Resource#getContent(ch.o2it.weblounge.common.language.Language)
+   */
+  public T getContent(Language language) {
+    return content.get(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Resource#removeContent(ch.o2it.weblounge.common.language.Language)
+   */
+  public T removeContent(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Content language must not be null");
+    return content.remove(language);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Resource#contents()
+   */
+  public Set<T> contents() {
+    Set<T> contents = new HashSet<T>();
+    contents.addAll(content.values());
+    return contents;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public int compareTo(Localizable o, Language l) {
     if (o instanceof Resource)
-      return title.get(l).compareTo(((Resource) o).getTitle(l));
+      return title.get(l).compareTo(((Resource<?>) o).getTitle(l));
     return title.compareTo(o, l);
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  public int hashCode() {
+    return uri.hashCode();
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof Resource) {
+      return uri.equals(((Resource<?>) obj).getURI());
+    }
+    return false;
   }
 
   /**
@@ -816,10 +884,10 @@ public abstract class ResourceImpl extends LocalizableObject implements Resource
     }
 
     b.append("</head>");
-    
+
     // Add custom body
     StringBuffer body = new StringBuffer();
-    toXmlBody(body);
+    body = toXmlBody(body);
     if (body.length() > 0) {
       b.append("<body>");
       b.append(body);
@@ -859,30 +927,18 @@ public abstract class ResourceImpl extends LocalizableObject implements Resource
    * the resource's xml serialization.
    * <p>
    * Subclasses that need to store additional content in that section should
-   * overwrite this method and add that information to the buffer.
+   * overwrite this method and add that information to the buffer. However, make
+   * sure to call <code>super.toXmlBody()</code> since this implementation adds
+   * the resource contents to the body.
    * 
    * @param buffer
    *          the string buffer
    */
-  protected void toXmlBody(StringBuffer buffer) {
-    return;
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  public int hashCode() {
-    return uri.hashCode();
-  }
-
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Resource) {
-      return uri.equals(((Resource) obj).getURI());
+  protected StringBuffer toXmlBody(StringBuffer buffer) {
+    for (ResourceContent content : this.content.values()) {
+      buffer.append(content.toXml());
     }
-    return false;
+    return buffer;
   }
 
 }

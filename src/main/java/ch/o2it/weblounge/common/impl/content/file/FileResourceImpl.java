@@ -21,28 +21,15 @@
 package ch.o2it.weblounge.common.impl.content.file;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceImpl;
-import ch.o2it.weblounge.common.language.Language;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 /**
  * Default implementation of a file resource.
  */
-public class FileResourceImpl extends ResourceImpl implements FileResource {
-
-  /** URL to the file's */
-  protected URL contentUrl = null;
+public class FileResourceImpl extends ResourceImpl<FileContent> implements FileResource {
   
-  /** The file size */
-  protected long size = -1;
-  
-  /** The mime type */
-  protected String mimeType = null;
-
   /**
    * Creates a new file with the given uri and the data at
    * <code>contentUrl</code>.
@@ -51,90 +38,7 @@ public class FileResourceImpl extends ResourceImpl implements FileResource {
    *          the file uri
    */
   public FileResourceImpl(ResourceURI uri) {
-    this(uri, null);
-  }
-
-  /**
-   * Creates a new file with the given uri and the data at
-   * <code>contentUrl</code>.
-   * 
-   * @param uri
-   *          the file uri
-   * @param contentUrl
-   *          <code>URL</code> to the file's content
-   */
-  public FileResourceImpl(ResourceURI uri, URL contentUrl) {
     super(uri);
-    this.contentUrl = contentUrl;
-  }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.file.FileResource#setSize(long)
-   */
-  public void setSize(long size) {
-    this.size = size;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.file.FileResource#getSize(ch.o2it.weblounge.common.language.Language)
-   */
-  public long getSize(Language language) {
-    return size;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.file.FileResource#setMimeType(java.lang.String)
-   */
-  public void setMimeType(String mimeType) {
-    this.mimeType = mimeType;
-  }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.file.FileResource#getMimeType()
-   */
-  public String getMimeType() {
-    return mimeType;
-  }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#toXmlHead(java.lang.StringBuffer)
-   */
-  @Override
-  protected void toXmlHead(StringBuffer buffer) {
-    super.toXmlHead(buffer);
-    
-    // Mime type
-    if (mimeType != null) {
-      buffer.append("<mimetype>");
-      buffer.append(mimeType);
-      buffer.append("</mimetype>");
-    }
-
-    // File size
-    if (size > 0) {
-      buffer.append("<size>");
-      buffer.append(size);
-      buffer.append("</size>");
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileResource#openStream()
-   */
-  public InputStream openStream() throws IOException {
-    return contentUrl.openStream();
   }
 
 }

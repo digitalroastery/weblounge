@@ -18,12 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.content.image;
+package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
-import ch.o2it.weblounge.common.content.image.ImageContent;
-import ch.o2it.weblounge.common.impl.content.ResourceContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,17 +35,24 @@ import java.lang.ref.WeakReference;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Utility class used to parse <code>Content</code> data for simple files.
  */
-public class ImageContentReader extends ResourceContentReader {
+public class ResourceContentReader extends WebloungeSAXHandler {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ImageContentReader.class);
+  private final static Logger logger = LoggerFactory.getLogger(ResourceContentReader.class);
 
-  /** The image content data */
-  protected ImageContentImpl imageContent = null;
+  /** Parser factory */
+  protected static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+
+  /** The SAX parser */
+  protected WeakReference<SAXParser> parserRef = null;
+
+  /** The file content data */
+  protected ResourceContentImpl content = null;
 
   /**
    * Creates a new file content reader that will parse serialized XML version of
@@ -60,7 +66,7 @@ public class ImageContentReader extends ResourceContentReader {
    * 
    * @see #read(InputStream)
    */
-  public ImageContentReader() throws ParserConfigurationException, SAXException {
+  public ResourceContentReader() throws ParserConfigurationException, SAXException {
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
@@ -76,7 +82,7 @@ public class ImageContentReader extends ResourceContentReader {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public ImageContent read(InputStream is) throws SAXException, IOException,
+  public ResourceContent read(InputStream is) throws SAXException, IOException,
       ParserConfigurationException {
 
     SAXParser parser = parserRef.get();
@@ -85,15 +91,17 @@ public class ImageContentReader extends ResourceContentReader {
       parserRef = new WeakReference<SAXParser>(parser);
     }
     parser.parse(is, this);
-    return imageContent;
+    return content;
   }
 
   /**
    * Resets the pagelet parser.
    */
   public void reset() {
-    super.reset();
-    imageContent = null;
+    content = null;
+    SAXParser parser = parserRef.get();
+    if (parser != null)
+      parser.reset();
   }
 
   /**
@@ -101,8 +109,8 @@ public class ImageContentReader extends ResourceContentReader {
    * 
    * @return the content
    */
-  ImageContent getImageContent() {
-    return imageContent;
+  ResourceContent getFileContent() {
+    return content;
   }
 
   /**
@@ -114,14 +122,13 @@ public class ImageContentReader extends ResourceContentReader {
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
 
+    super.startElement(uri, local, raw, attrs);
+
     // start of a new content element
     if ("content".equals(raw)) {
       String languageId = attrs.getValue("language");
-      imageContent = new ImageContentImpl(LanguageSupport.getLanguage(languageId));
-      content = imageContent;
-      logger.debug("Started reading image content {}", content);
-    } else {
-      super.startElement(uri, local, raw, attrs);
+      content = new ResourceContentImpl(LanguageSupport.getLanguage(languageId));
+      logger.debug("Started reading file content {}", content);
     }
 
   }
@@ -135,21 +142,12 @@ public class ImageContentReader extends ResourceContentReader {
   public void endElement(String uri, String local, String raw)
       throws SAXException {
 
-    // width
-    if ("width".equals(raw)) {
-      imageContent.setWidth(Integer.parseInt(getCharacters()));
-      logger.trace("Image's width is '{}'", imageContent.getWidth());
+    // content
+    if ("content".equals(raw)) {
+      logger.debug("Finished reading content {}", content);
     }
 
-    // height
-    else if ("height".equals(raw)) {
-      imageContent.setHeight(Integer.parseInt(getCharacters()));
-      logger.trace("Image's height is '{}'", imageContent.getHeight());
-    }
-    
-    else {
-      super.endElement(uri, local, raw);
-    }
+    super.endElement(uri, local, raw);
   }
 
 }

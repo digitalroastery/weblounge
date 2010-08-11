@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content.page;
 
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
@@ -50,7 +51,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse page data.
  */
-public final class PageReader extends WebloungeContentReader implements ResourceReader<Page> {
+public final class PageReader extends WebloungeContentReader implements ResourceReader<ResourceContent, Page> {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(PageReader.class);

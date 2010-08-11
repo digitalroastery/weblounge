@@ -98,7 +98,7 @@ public class LocalizableObject implements Localizable {
    * <code>language</code> is not set to <code>null</code>, in which case the
    * behavior will be set to {@link LanguageResolution#Original}.
    * 
-   * @param language
+   * @param identifier
    *          the default language
    */
   public LocalizableObject(Language defaultLanguage) {

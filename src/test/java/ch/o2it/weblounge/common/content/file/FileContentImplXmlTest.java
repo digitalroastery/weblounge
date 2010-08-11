@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.file.FileContentImpl;
+import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileContentReader;
 
 import org.junit.Before;
@@ -34,7 +34,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
- * Test case for class {@link FileContentImpl}.
+ * Test case for class {@link ResourceContentImpl}.
  */
 public class FileContentImplXmlTest extends FileContentImplTest {
     
@@ -52,7 +52,7 @@ public class FileContentImplXmlTest extends FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileContentImpl#toXml()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl#toXml()}.
    */
   @Test
   public void testToXml() {

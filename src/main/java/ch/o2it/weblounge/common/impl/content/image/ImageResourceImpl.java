@@ -21,21 +21,14 @@
 package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
-
-import java.net.URL;
+import ch.o2it.weblounge.common.impl.content.ResourceImpl;
 
 /**
  * Default implementation of an image resource.
  */
-public class ImageResourceImpl extends FileResourceImpl implements ImageResource {
-
-  /** The width in pixels */
-  protected int width = 0;
-
-  /** The width in pixels */
-  protected int height = 0;
+public class ImageResourceImpl extends ResourceImpl<ImageContent> implements ImageResource {
 
   /**
    * Creates a new image with the given uri.
@@ -44,71 +37,7 @@ public class ImageResourceImpl extends FileResourceImpl implements ImageResource
    *          the image uri
    */
   public ImageResourceImpl(ResourceURI uri) {
-    super(uri, null);
-  }
-
-  /**
-   * Creates a new image with the given uri.
-   * 
-   * @param uri
-   *          the image uri
-   * @param contentUrl
-   *          <code>URL</code> to the file's content
-   */
-  public ImageResourceImpl(ResourceURI uri, URL contentUrl) {
-    super(uri, contentUrl);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.image.ImageResource#setWidth(int)
-   */
-  public void setWidth(int width) {
-    this.width = width;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.image.ImageResource#getWidth()
-   */
-  public int getWidth() {
-    return width;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.image.ImageResource#setHeight(int)
-   */
-  public void setHeight(int height) {
-    this.height = height;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.image.ImageResource#getHeight()
-   */
-  public int getHeight() {
-    return height;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#toXmlHead(java.lang.StringBuffer)
-   */
-  @Override
-  protected void toXmlHead(StringBuffer buffer) {
-    super.toXmlHead(buffer);
-
-    // Image resolution
-    if (width > 0 && height > 0) {
-      buffer.append("<width>").append(width).append("</width>");
-      buffer.append("<height>").append(height).append("</height>");
-    }
+    super(uri);
   }
 
 }

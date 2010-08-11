@@ -21,17 +21,18 @@
 package ch.o2it.weblounge.common.impl.content.file;
 
 import ch.o2it.weblounge.common.content.file.FileContent;
+import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.language.Language;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Default implementation of a file content.
  */
-public class FileContentImpl implements FileContent {
+public class FileContentImpl extends ResourceContentImpl implements FileContent {
 
-  /** The content's language */
-  protected Language language = null;
-
-  /** The file's mimetype */
+  /** The file's mime type */
   protected String mimetype = null;
 
   /** The file's original name */
@@ -47,9 +48,7 @@ public class FileContentImpl implements FileContent {
    *          the language
    */
   protected FileContentImpl(Language language) {
-    if (language == null)
-      throw new IllegalArgumentException("Language cannot be null");
-    this.language = language;
+    super(language);
   }
   
   /**
@@ -63,35 +62,13 @@ public class FileContentImpl implements FileContent {
    *          the file size in bytes
    */
   public FileContentImpl(String filename, Language language, long filesize) {
+    super(language);
     if (filename == null)
       throw new IllegalArgumentException("Filename cannot be null");
-    if (language == null)
-      throw new IllegalArgumentException("Language cannot be null");
     if (filesize <= 0)
       throw new IllegalArgumentException("File size needs to be larger than 0 bytes");
     this.filename = filename;
-    this.language = language;
     this.size = filesize;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#setLanguage(ch.o2it.weblounge.common.language.Language)
-   */
-  public void setLanguage(Language language) {
-    if (language == null)
-      throw new IllegalArgumentException("Language must not be null");
-    this.language = language;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#getLanguage()
-   */
-  public Language getLanguage() {
-    return language;
   }
 
   /**
@@ -155,6 +132,16 @@ public class FileContentImpl implements FileContent {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.file.FileContent#openStream()
+   */
+  public InputStream openStream() throws IOException {
+    // TODO: Implement openStream()
+    throw new IllegalStateException("Not yet implemented");
+  }
+
+  /**
    * Callback for subclasses that need to add additional information to the file
    * content representation. Implementations should append their data to the
    * <code>StringBuffer</code> and return it once they're done.
@@ -164,25 +151,12 @@ public class FileContentImpl implements FileContent {
    * @return the modified string buffer
    */
   protected StringBuffer addXml(StringBuffer xml) {
-    return xml;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#toXml()
-   */
-  public String toXml() {
-    StringBuffer buf = new StringBuffer();
-    buf.append("<content language=\"").append(language.getIdentifier()).append("\">");
     if (filename != null)
-      buf.append("<filename><![CDATA[").append(filename).append("]]></filename>");
+      xml.append("<filename><![CDATA[").append(filename).append("]]></filename>");
     if (mimetype != null)
-      buf.append("<mimetype>").append(mimetype).append("</mimetype>");
-    buf.append("<size>").append(size).append("</size>");
-    addXml(buf);
-    buf.append("</content>");
-    return buf.toString();
+      xml.append("<mimetype>").append(mimetype).append("</mimetype>");
+    xml.append("<size>").append(size).append("</size>");
+    return xml;
   }
 
 }

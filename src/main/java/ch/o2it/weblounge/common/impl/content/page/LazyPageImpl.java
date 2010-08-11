@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content.page;
 
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
@@ -1094,6 +1095,33 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    *
+   * @see ch.o2it.weblounge.common.content.Resource#getContent(ch.o2it.weblounge.common.language.Language)
+   */
+  public ResourceContent getContent(Language language) {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#removeContent(ch.o2it.weblounge.common.language.Language)
+   */
+  public ResourceContent removeContent(Language language) {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#contents()
+   */
+  public Set<ResourceContent> contents() {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -1112,6 +1140,15 @@ public class LazyPageImpl implements Page {
   @Override
   public int hashCode() {
     return uri.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#addContent(ch.o2it.weblounge.common.content.ResourceContent)
+   */
+  public void addContent(ResourceContent content) {
+    return;
   }
   
 }

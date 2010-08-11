@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.content.file;
 
 import static org.junit.Assert.assertEquals;
 
+import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileContentImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
@@ -30,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test case for class {@link FileContentImpl}.
+ * Test case for class {@link ResourceContentImpl}.
  */
 public class FileContentImplTest {
   
@@ -59,7 +60,7 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileContentImpl#getLanguage()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl#getLanguage()}.
    */
   @Test
   public void testGetLanguage() {
@@ -67,7 +68,7 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileContentImpl#getMimetype()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl#getMimetype()}.
    */
   @Test
   public void testGetMimetype() {
@@ -75,7 +76,7 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileContentImpl#getFilename()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl#getFilename()}.
    */
   @Test
   public void testGetFilename() {
@@ -83,7 +84,7 @@ public class FileContentImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileContentImpl#getSize()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl#getSize()}.
    */
   @Test
   public void testGetSize() {

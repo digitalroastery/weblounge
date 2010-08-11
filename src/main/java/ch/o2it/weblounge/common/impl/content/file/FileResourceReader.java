@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.content.file;
 
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
@@ -49,7 +50,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse file data.
  */
-public final class FileResourceReader extends WebloungeContentReader implements ResourceReader<FileResource> {
+public final class FileResourceReader extends WebloungeContentReader implements ResourceReader<FileContent, FileResource> {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(FileResourceReader.class);
@@ -65,7 +66,7 @@ public final class FileResourceReader extends WebloungeContentReader implements 
 
   /** Current parser context */
   private enum ParserContext {
-    Document, File, Head
+    Document, File, Head, Content
   };
 
   /** The parser context */

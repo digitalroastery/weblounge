@@ -102,7 +102,7 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.impl.content.file.FileContentImpl#addXml(java.lang.StringBuffer)
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#addXml(java.lang.StringBuffer)
    */
   @Override
   protected StringBuffer addXml(StringBuffer xml) {

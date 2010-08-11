@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
@@ -49,7 +50,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse image data.
  */
-public final class ImageResourceReader extends WebloungeContentReader implements ResourceReader<ImageResource> {
+public final class ImageResourceReader extends WebloungeContentReader implements ResourceReader<ImageContent, ImageResource> {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(ImageResourceReader.class);

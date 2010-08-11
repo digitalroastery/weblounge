@@ -57,7 +57,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    * implementation, this method always returns <tt>default</tt>.
    * 
    * @return the layout identifier
-   * @see ch.o2it.weblounge.common.content.page.PageLayout.content.Layout#getIdentifier()
+   * @see ch.o2it.weblounge.common.content.page.PageLayout.content.Layout#getLanguage()
    */
   public String getIdentifier() {
     return identifier;
