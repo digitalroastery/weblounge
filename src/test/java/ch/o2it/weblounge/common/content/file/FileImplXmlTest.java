@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
+ *  Copyright (c) 2009 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -18,59 +18,49 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
+package ch.o2it.weblounge.common.content.file;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import static org.junit.Assert.assertEquals;
+
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
-
 /**
- * Test case for the xml serialization capabilities of {@link LinkImpl}.
+ * Test case to test {@link FileResourceImpl}.
  */
-public class LinkImplXmlTest extends LinkImplTest {
-
+public class FileImplXmlTest extends FileImplTest {
+  
   /** Name of the test file */
-  protected String testFile = "/link.xml";
-
+  protected String testFile = "/file.xml";
+  
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
-    setUpPreliminaries();
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+    setupPrerequisites();
     URL testContext = this.getClass().getResource(testFile);
-    Document doc = docBuilder.parse(testContext.openStream());
-    XPath xpath = XPathFactory.newInstance().newXPath();
-    xpath.setNamespaceContext(new XPathNamespaceContext(true));
-    link = LinkImpl.fromXml(doc.getFirstChild(), xpath);
+    FileResourceReader reader = new FileResourceReader();
+    file = reader.read(fileURI, testContext.openStream());
   }
-
+  
   /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.page.LinkImpl#toXml()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#toXml()}.
    */
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(link.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(file.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

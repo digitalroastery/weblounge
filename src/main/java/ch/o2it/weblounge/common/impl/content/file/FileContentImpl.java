@@ -43,6 +43,18 @@ public class FileContentImpl implements FileContent {
   /**
    * Creates a new file content representation.
    * 
+   * @param language
+   *          the language
+   */
+  protected FileContentImpl(Language language) {
+    if (language == null)
+      throw new IllegalArgumentException("Language cannot be null");
+    this.language = language;
+  }
+  
+  /**
+   * Creates a new file content representation.
+   * 
    * @param filename
    *          the original filename
    * @param language
@@ -163,11 +175,12 @@ public class FileContentImpl implements FileContent {
   public String toXml() {
     StringBuffer buf = new StringBuffer();
     buf.append("<content language=\"").append(language.getIdentifier()).append("\">");
+    if (filename != null)
+      buf.append("<filename><![CDATA[").append(filename).append("]]></filename>");
     if (mimetype != null)
       buf.append("<mimetype>").append(mimetype).append("</mimetype>");
-    if (filename != null)
-      buf.append("<filename>").append(filename).append("</filename>");
     buf.append("<size>").append(size).append("</size>");
+    addXml(buf);
     buf.append("</content>");
     return buf.toString();
   }

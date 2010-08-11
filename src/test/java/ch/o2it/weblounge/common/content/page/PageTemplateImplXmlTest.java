@@ -18,50 +18,61 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
+package ch.o2it.weblounge.common.content.page;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageletReader;
+import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
+import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+
 /**
- * Test case for the implementation at {@link PageletImpl}.
+ * Tests loading and serializing of {@link PageTemplateImpl} objects from and to
+ * <code>XML</code>.
  */
-public class PageletImplXmlTest extends PageletImplTest {
+public class PageTemplateImplXmlTest extends PageTemplateImplTest {
 
   /** File path and name */
-  protected String testFile = "/pagelet.xml";
+  protected String testFile = "/template.xml";
 
   /**
    * @throws java.lang.Exception
    */
   @Before
+  @Override
   public void setUp() throws Exception {
-    setupPreliminaries();
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
-    PageletReader reader = new PageletReader();
-    reader.setPageletLocation(location);
-    pagelet = reader.read(testContext.openStream());
+    Document doc = docBuilder.parse(testContext.openStream());
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    xpath.setNamespaceContext(new XPathNamespaceContext(true));
+    template = PageTemplateImpl.fromXml(doc.getFirstChild(), xpath);
+    composeable = (PageTemplateImpl)template;
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#toXml()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl#toXml()}.
    */
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(pagelet.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(template.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

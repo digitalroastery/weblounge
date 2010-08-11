@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2010 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -18,61 +18,47 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
+package ch.o2it.weblounge.common.content.image;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
-import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
+import ch.o2it.weblounge.common.impl.content.image.ImageContentImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageContentReader;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
-
 /**
- * Tests loading and serializing of {@link PageTemplateImpl} objects from and to
- * <code>XML</code>.
+ * Test case for class {@link ImageContentImpl}.
  */
-public class PageTemplateImplXmlTest extends PageTemplateImplTest {
-
-  /** File path and name */
-  protected String testFile = "/template.xml";
+public class ImageContentImplXmlTest extends ImageContentImplTest {
+    
+  /** Name of the test file */
+  protected String testFile = "/imagecontent.xml";
 
   /**
    * @throws java.lang.Exception
    */
   @Before
-  @Override
   public void setUp() throws Exception {
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
-    Document doc = docBuilder.parse(testContext.openStream());
-    XPath xpath = XPathFactory.newInstance().newXPath();
-    xpath.setNamespaceContext(new XPathNamespaceContext(true));
-    template = PageTemplateImpl.fromXml(doc.getFirstChild(), xpath);
-    composeable = (PageTemplateImpl)template;
+    ImageContentReader reader = new ImageContentReader();
+    image = reader.read(testContext.openStream());
   }
 
   /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl#toXml()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.ImageContentImpl#toXml()}.
    */
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(template.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(image.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

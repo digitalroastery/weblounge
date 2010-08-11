@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
+package ch.o2it.weblounge.common.content.page;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -57,7 +57,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testAddPageletPageletString()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testAddPageletPageletString()
    */
   @Override
   public void testAddPageletPageletString() {
@@ -69,7 +69,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testAddPageletPageletStringInt()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testAddPageletPageletStringInt()
    */
   @Override
   public void testAddPageletPageletStringInt() {
@@ -81,7 +81,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testAllow()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testAllow()
    */
   @Override
   public void testAllow() {
@@ -93,7 +93,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testCheckAll()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testCheckAll()
    */
   @Override
   public void testCheckAll() {
@@ -105,7 +105,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testCheckOne()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testCheckOne()
    */
   @Override
   public void testCheckOne() {
@@ -117,7 +117,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testCheckPermissionAuthority()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testCheckPermissionAuthority()
    */
   @Override
   public void testCheckPermissionAuthority() {
@@ -129,7 +129,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testCheckPermissionSetAuthority()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testCheckPermissionSetAuthority()
    */
   @Override
   public void testCheckPermissionSetAuthority() {
@@ -141,7 +141,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testCompareTo()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testCompareTo()
    */
   @Override
   public void testCompareTo() {
@@ -153,7 +153,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testDeny()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testDeny()
    */
   @Override
   public void testDeny() {
@@ -165,7 +165,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testEqualsObject()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testEqualsObject()
    */
   @Override
   public void testEqualsObject() {
@@ -177,7 +177,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetCoverage()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetCoverage()
    */
   @Override
   public void testGetCoverage() {
@@ -189,7 +189,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetCoverageLanguage()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetCoverageLanguage()
    */
   @Override
   public void testGetCoverageLanguage() {
@@ -201,7 +201,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetCoverageLanguageBoolean()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetCoverageLanguageBoolean()
    */
   @Override
   public void testGetCoverageLanguageBoolean() {
@@ -213,7 +213,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetCreationDate()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetCreationDate()
    */
   @Override
   public void testGetCreationDate() {
@@ -225,7 +225,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetCreator()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetCreator()
    */
   @Override
   public void testGetCreator() {
@@ -237,7 +237,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetDescription()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetDescription()
    */
   @Override
   public void testGetDescription() {
@@ -249,7 +249,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetDescriptionLanguage()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetDescriptionLanguage()
    */
   @Override
   public void testGetDescriptionLanguage() {
@@ -261,7 +261,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetDescriptionLanguageBoolean()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetDescriptionLanguageBoolean()
    */
   @Override
   public void testGetDescriptionLanguageBoolean() {
@@ -273,7 +273,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetLayout()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetLayout()
    */
   @Override
   public void testGetLayout() {
@@ -285,7 +285,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetLockOwner()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetLockOwner()
    */
   @Override
   public void testGetLockOwner() {
@@ -297,7 +297,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetModificationDate()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetModificationDate()
    */
   @Override
   public void testGetModificationDate() {
@@ -309,7 +309,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetModifier()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetModifier()
    */
   @Override
   public void testGetModifier() {
@@ -321,7 +321,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetOwner()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetOwner()
    */
   @Override
   public void testGetOwner() {
@@ -333,7 +333,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetPageletsString()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetPageletsString()
    */
   @Override
   public void testGetPageletsString() {
@@ -345,7 +345,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetPageletsStringStringString()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetPageletsStringStringString()
    */
   @Override
   public void testGetPageletsStringStringString() {
@@ -357,7 +357,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetPublisher()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetPublisher()
    */
   @Override
   public void testGetPublisher() {
@@ -369,7 +369,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetPublishFrom()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetPublishFrom()
    */
   @Override
   public void testGetPublishFrom() {
@@ -381,7 +381,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetPublishTo()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetPublishTo()
    */
   @Override
   public void testGetPublishTo() {
@@ -393,7 +393,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetRights()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetRights()
    */
   @Override
   public void testGetRights() {
@@ -405,7 +405,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetRightsLanguage()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetRightsLanguage()
    */
   @Override
   public void testGetRightsLanguage() {
@@ -417,7 +417,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetRightsLanguageBoolean()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetRightsLanguageBoolean()
    */
   @Override
   public void testGetRightsLanguageBoolean() {
@@ -429,7 +429,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetSite()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetSite()
    */
   @Override
   public void testGetSite() {
@@ -441,7 +441,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetSubjects()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetSubjects()
    */
   @Override
   public void testGetSubjects() {
@@ -453,7 +453,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetTemplate()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetTemplate()
    */
   @Override
   public void testGetTemplate() {
@@ -465,7 +465,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetTitle()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetTitle()
    */
   @Override
   public void testGetTitle() {
@@ -477,7 +477,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetTitleLanguage()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetTitleLanguage()
    */
   @Override
   public void testGetTitleLanguage() {
@@ -489,7 +489,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetTitleLanguageBoolean()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetTitleLanguageBoolean()
    */
   @Override
   public void testGetTitleLanguageBoolean() {
@@ -501,7 +501,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetType()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetType()
    */
   @Override
   public void testGetType() {
@@ -513,7 +513,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetURI()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetURI()
    */
   @Override
   public void testGetURI() {
@@ -525,7 +525,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testGetVersion()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetVersion()
    */
   @Override
   public void testGetVersion() {
@@ -537,7 +537,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testHashCode()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testHashCode()
    */
   @Override
   public void testHashCode() {
@@ -549,7 +549,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testHasSubject()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testHasSubject()
    */
   @Override
   public void testHasSubject() {
@@ -561,7 +561,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testIsCreatedAfter()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testIsCreatedAfter()
    */
   @Override
   public void testIsCreatedAfter() {
@@ -573,7 +573,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testIsIndexed()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testIsIndexed()
    */
   @Override
   public void testIsIndexed() {
@@ -585,7 +585,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testIsLocked()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testIsLocked()
    */
   @Override
   public void testIsLocked() {
@@ -597,7 +597,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testIsPromoted()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testIsPromoted()
    */
   @Override
   public void testIsPromoted() {
@@ -609,7 +609,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testIsPublished()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testIsPublished()
    */
   @Override
   public void testIsPublished() {
@@ -621,7 +621,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testIsPublishedDate()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testIsPublishedDate()
    */
   @Override
   public void testIsPublishedDate() {
@@ -633,7 +633,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testPermissions()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testPermissions()
    */
   @Override
   public void testPermissions() {
@@ -645,7 +645,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testRemovePagelet()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testRemovePagelet()
    */
   @Override
   public void testRemovePagelet() {
@@ -657,7 +657,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testRemoveSubject()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testRemoveSubject()
    */
   @Override
   public void testRemoveSubject() {
@@ -669,7 +669,7 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.page.PageImplTest#testSetUnlocked()
+   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testSetUnlocked()
    */
   @Override
   public void testSetUnlocked() {

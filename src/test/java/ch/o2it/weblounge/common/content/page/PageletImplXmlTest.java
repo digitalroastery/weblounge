@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
+ *  Copyright (c) 2009 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -18,60 +18,50 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.page;
+package ch.o2it.weblounge.common.content.page;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.page.ScriptImpl;
-import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
+import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletReader;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
-
 /**
- * Test case for the xml serialization capabilities of {@link ScriptImpl}
- * .
+ * Test case for the implementation at {@link PageletImpl}.
  */
-public class ScriptImplXmlTest extends ScriptImplTest {
+public class PageletImplXmlTest extends PageletImplTest {
 
-  /** Name of the test file */
-  protected String testFile = "/script.xml";
+  /** File path and name */
+  protected String testFile = "/pagelet.xml";
 
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
-    setUpPreliminaries();
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+    setupPreliminaries();
     URL testContext = this.getClass().getResource(testFile);
-    Document doc = docBuilder.parse(testContext.openStream());
-    XPath xpath = XPathFactory.newInstance().newXPath();
-    xpath.setNamespaceContext(new XPathNamespaceContext(true));
-    script = ScriptImpl.fromXml(doc.getFirstChild(), xpath);
+    PageletReader reader = new PageletReader();
+    reader.setPageletLocation(location);
+    pagelet = reader.read(testContext.openStream());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.page.ScriptImpl#toXml()}.
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl#toXml()}.
    */
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(script.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(pagelet.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

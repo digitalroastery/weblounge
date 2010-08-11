@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2010 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -18,49 +18,59 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.file;
-
-import static org.junit.Assert.fail;
+package ch.o2it.weblounge.common.content.page;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
+import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
+import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+
 /**
- * Test case to test {@link FileResourceImpl}.
+ * Test case for the xml capabilities of {@link PageletRendererImpl}.
  */
-public class FileImplXmlTest extends FileImplTest {
-  
+public class PageletRendererImplXmlTest extends PageletRendererImplTest {
+
   /** Name of the test file */
-  protected String testFile = "/file.xml";
-  
+  protected String testFile = "/pageletrenderer.xml";
+
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
-    setupPrerequisites();
+    setUpPreliminaries();
+    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     URL testContext = this.getClass().getResource(testFile);
-    FileResourceReader reader = new FileResourceReader();
-    file = reader.read(fileURI, testContext.openStream());
+    Document doc = docBuilder.parse(testContext.openStream());
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    xpath.setNamespaceContext(new XPathNamespaceContext(true));
+    renderer = PageletRendererImpl.fromXml(doc.getFirstChild(), xpath);
   }
-  
+
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#toXml()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl#toXml()}.
    */
   @Test
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(file.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(renderer.toXml().getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

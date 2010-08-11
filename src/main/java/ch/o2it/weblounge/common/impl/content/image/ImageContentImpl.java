@@ -38,6 +38,16 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
   /**
    * Creates a new image content representation.
    * 
+   * @param language
+   *          the language
+   */
+  public ImageContentImpl(Language language) {
+    super(language);
+  }
+
+  /**
+   * Creates a new image content representation.
+   * 
    * @param filename
    *          the original filename
    * @param language
