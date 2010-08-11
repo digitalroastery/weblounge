@@ -37,6 +37,7 @@ import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,14 +213,17 @@ public abstract class AbstractContentRepository implements ContentRepository {
     }
     
     // Load the resource
+    InputStream is = null;
     try {
-      InputStream is = loadResource(uri);
+      is = loadResource(uri);
       ResourceSerializer<?,?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
       ResourceReader<?,?> reader = serializer.getReader();
       return reader.read(uri, is);
     } catch (Exception e) {
       logger.error("Error loading {}: {}", uri, e.getMessage());
       throw new ContentRepositoryException(e);
+    } finally {
+      IOUtils.closeQuietly(is);
     }
   }
 
@@ -540,13 +544,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   protected Resource<?> loadResource(ResourceURI uri, URL contentUrl)
       throws IOException {
-    BufferedInputStream is = new BufferedInputStream(contentUrl.openStream());
+    InputStream is = new BufferedInputStream(contentUrl.openStream());
     try {
       ResourceSerializer<?,?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
       ResourceReader<?,?> reader = serializer.getReader();
       return reader.read(uri, is);
     } catch (Exception e) {
       throw new IOException("Error reading resource from " + contentUrl);
+    } finally {
+      IOUtils.closeQuietly(is);
     }
   }
 
@@ -563,18 +569,27 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   protected ResourceURI loadResourceURI(Site site, URL contentUrl)
       throws IOException {
-    BufferedInputStream is = new BufferedInputStream(contentUrl.openStream());
-    InputStreamReader reader = new InputStreamReader(is);
-    CharBuffer buf = CharBuffer.allocate(1024);
-    reader.read(buf);
-    String s = new String(buf.array());
-    s = s.replace('\n', ' ');
-    Matcher m = resourceHeaderRegex.matcher(s);
-    if (m.matches()) {
-      long version = ResourceUtils.getVersion(m.group(4));
-      return new ResourceURIImpl(m.group(1), site, m.group(3), version, m.group(2));
+
+    InputStream is = null;
+    InputStreamReader reader = null;
+    try {
+      is = new BufferedInputStream(contentUrl.openStream());
+      reader = new InputStreamReader(is);
+      CharBuffer buf = CharBuffer.allocate(1024);
+      reader.read(buf);
+      String s = new String(buf.array());
+      s = s.replace('\n', ' ');
+      Matcher m = resourceHeaderRegex.matcher(s);
+      if (m.matches()) {
+        long version = ResourceUtils.getVersion(m.group(4));
+        return new ResourceURIImpl(m.group(1), site, m.group(3), version, m.group(2));
+      }
+      return null;
+    } finally {
+      if (reader != null)
+        reader.close();
+      IOUtils.closeQuietly(is);
     }
-    return null;
   }
 
 }

@@ -40,6 +40,7 @@ import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
@@ -273,9 +274,10 @@ public class BundleContentRepository extends AbstractContentRepository {
   
           // Load the resource
           Resource<?> resource = null;
+          InputStream is = null;
           try {
             ResourceReader<?, ?> reader = serializer.getReader();
-            InputStream is = loadResource(uri);
+            is = loadResource(uri);
             resource = reader.read(uri, is);
             if (resource == null) {
               logger.warn("Unkown error loading resource {}", uri);
@@ -284,6 +286,8 @@ public class BundleContentRepository extends AbstractContentRepository {
           } catch (Exception e) {
             logger.error("Error loading resource '{}' from bundle: {}", uri, e.getMessage());
             continue;
+          } finally {
+            IOUtils.closeQuietly(is);
           }
   
           // Add it to the index

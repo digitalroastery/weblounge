@@ -531,10 +531,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       os = new FileOutputStream(resourceUrl);
       IOUtils.copy(is, os);
     } finally {
-      if (is != null)
-        IOUtils.closeQuietly(is);
-      if (os != null)
-        IOUtils.closeQuietly(os);
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(os);
     }
   }
 

@@ -341,13 +341,17 @@ public class SearchIndex {
    *          the config directory
    */
   private void copyClasspathResourceToFile(String classpath, File dir) {
-    InputStream in = SearchIndex.class.getResourceAsStream(classpath);
+    InputStream is = SearchIndex.class.getResourceAsStream(classpath);
+    FileOutputStream fos = null;
     try {
       File file = new File(dir, FilenameUtils.getName(classpath));
-      logger.debug("copying inputstream " + in + " to file to " + file);
-      IOUtils.copy(in, new FileOutputStream(file));
+      fos = new FileOutputStream(file);
+      IOUtils.copy(is, fos);
     } catch (IOException e) {
       throw new RuntimeException("Error copying solr classpath resource to the filesystem", e);
+    } finally {
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(fos);
     }
   }
 
