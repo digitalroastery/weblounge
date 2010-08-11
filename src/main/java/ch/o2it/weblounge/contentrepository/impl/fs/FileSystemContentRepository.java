@@ -25,6 +25,9 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileResource;
+import ch.o2it.weblounge.common.content.image.ImageResource;
+import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
@@ -77,7 +80,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   public static final String INDEX_PATH = "index";
 
   /** Name of the repository path element right below the repository root */
-  public static final String REPOSITORY_PATH = "repository";
+  // public static final String REPOSITORY_PATH = "repository";
 
   /** The repository root directory */
   protected File repositoryRoot = null;
@@ -134,7 +137,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throw new IllegalStateException("Repository is not connected");
 
     // Temporary path for rebuilt site
-    File restructuredSite = new File(repositoryRoot, ".resources");
     boolean success = false;
 
     try {
@@ -144,18 +146,66 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       logger.info("Populating site index '{}'...", site);
       long time = System.currentTimeMillis();
       long resourceCount = 0;
-      long resourceVersionCount = 0;
 
-      boolean restructured = false;
+      resourceCount += index(Page.TYPE);
+      resourceCount += index(FileResource.TYPE);
+      resourceCount += index(ImageResource.TYPE);
 
-      Stack<File> uris = new Stack<File>();
-      String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), REPOSITORY_PATH);
-      File siteRootDirectory = new File(homePath);
-      FileUtils.forceMkdir(siteRootDirectory);
+      if (resourceCount > 0) {
+        time = System.currentTimeMillis() - time;
+        logger.info("Site index populated in {} ms", ConfigurationUtils.toHumanReadableDuration(time));
+        logger.info("{} resources added to index", resourceCount - resourceCount);
+      }
+    } catch (IOException e) {
+      throw new ContentRepositoryException("Error while writing to index", e);
+    } catch (MalformedResourceURIException e) {
+      throw new ContentRepositoryException("Error while reading resource uri for index", e);
+    } finally {
+      if (!success) {
+        try {
+          index.clear();
+        } catch (IOException e) {
+          logger.error("Error while trying to cleanup after failed indexing operation", e);
+        }
+      }
+    }
+  }
 
-      Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
+  /**
+   * This method indexes a certain type of resources and expects the resources
+   * to be located in a subdirectory of the site directory named
+   * <tt>&lt;resourceType&gt;s<tt>.
+   * 
+   * @param resourceType
+   *          the resource type
+   * @return the number of resources that were indexed
+   * @throws IOException
+   *           if accessing a file fails
+   */
+  protected long index(String resourceType) throws IOException {
+    if (!connected)
+      throw new IllegalStateException("Repository is not connected");
 
-      uris.push(siteRootDirectory);
+    // Temporary path for rebuilt site
+    String resourceDirectory = resourceType + "s";
+    File restructuredSite = new File(repositoryRoot, "." + resourceDirectory);
+
+    logger.info("Populating site index '{}' with {}s...", site, resourceType);
+    long resourceCount = 0;
+    long resourceVersionCount = 0;
+
+    boolean restructured = false;
+
+    Stack<File> uris = new Stack<File>();
+    String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), resourceDirectory);
+    File siteRootDirectory = new File(homePath);
+    FileUtils.forceMkdir(siteRootDirectory);
+
+    Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
+
+    uris.push(siteRootDirectory);
+    
+    try {
       while (!uris.empty()) {
         File dir = uris.pop();
         File[] files = dir.listFiles(new FileFilter() {
@@ -178,9 +228,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                 logger.warn("Skipping resource {}: unable to extract uri", f);
                 continue;
               }
-
+  
               // Look for a suitable resource reader
-              String resourceType = uri.getType();
               ResourceSerializer<?, ?> serializer = serializers.get(resourceType);
               if (serializer == null) {
                 serializer = ResourceSerializerFactory.getSerializer(resourceType);
@@ -191,7 +240,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                   serializers.put(resourceType, serializer);
                 }
               }
-
+  
               // Load the resource
               Resource<?> resource = null;
               ResourceReader<?, ?> reader = serializer.getReader();
@@ -206,7 +255,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                 logger.error("Error loading {}: {}", uriToFile(uri), e.getMessage());
                 continue;
               }
-
+  
               index.add(resource);
               resourceVersionCount++;
               if (!foundResource) {
@@ -214,7 +263,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                 resourceCount++;
                 foundResource = true;
               }
-
+  
               // Make sure the resource is in the correct place
               File expectedFile = uriToFile(uri);
               String tempPath = expectedFile.getAbsolutePath().substring(homePath.length());
@@ -223,12 +272,15 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                 restructured = true;
               }
             } catch (Throwable t) {
-              logger.error("Error indexing resource {}: {}", f, t.getMessage());
+              logger.error("Error indexing {} {}: {}", new Object[] {
+                  resourceType,
+                  f,
+                  t.getMessage() });
             }
           }
         }
       }
-
+  
       // Move new site in place
       if (restructured) {
         File movedOldSite = new File(repositoryRoot, "resources-old");
@@ -243,27 +295,20 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         FileUtils.moveDirectory(restructuredSite, siteRootDirectory);
       }
 
-      success = true;
-
       if (resourceCount > 0) {
-        time = System.currentTimeMillis() - time;
-        logger.info("Site index populated in {} ms", ConfigurationUtils.toHumanReadableDuration(time));
-        logger.info("{} resources and {} revisions added to index", resourceCount, resourceVersionCount - resourceCount);
+        logger.info("{} {} and {} revisions added to index", new Object[] {
+            resourceType,
+            resourceCount,
+            resourceVersionCount - resourceCount });
       }
-    } catch (IOException e) {
-      throw new ContentRepositoryException("Error while writing to index", e);
-    } catch (MalformedResourceURIException e) {
-      throw new ContentRepositoryException("Error while reading resource uri for index", e);
+      
     } finally {
-      if (!success)
-        try {
-          index.clear();
-        } catch (IOException e) {
-          logger.error("Error while trying to cleanup after failed indexing operation", e);
-        }
-      if (restructuredSite.exists())
+      if (restructuredSite.exists()) {
         FileUtils.deleteQuietly(restructuredSite);
+      }
     }
+    
+    return resourceCount;
   }
 
   /**
@@ -289,7 +334,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   protected File uriToFile(ResourceURI uri) throws IOException {
     StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
-    path.append("/").append(REPOSITORY_PATH);
+    if (uri.getType() == null)
+      throw new IllegalArgumentException("Resource uri has no type");
+    path.append("/").append(uri.getType()).append("s");
     String id = null;
     if (uri.getId() != null) {
       id = uri.getId();
@@ -305,7 +352,20 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     }
     path = appendIdToPath(id, path);
     path.append(File.separatorChar);
-    path.append(ResourceUtils.getDocument(Math.max(uri.getVersion(), Resource.LIVE)));
+    
+    String documentName = ResourceUtils.getDocument(Math.max(uri.getVersion(), Resource.LIVE));
+
+    // Is the version in the filename?
+    String unversionedPath = path.append(documentName).toString();
+    File unversionedFile = new File(unversionedPath);
+    if (unversionedFile.isFile()) {
+      return unversionedFile;
+    }
+
+    // Trying a versioned file path
+    path.append(uri.getVersion());
+    path.append(File.separatorChar);
+    path.append(documentName);
     return new File(path.toString());
   }
 
@@ -319,7 +379,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   protected File uriToDirectory(ResourceURI uri) throws IOException {
     StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
-    path.append("/").append(REPOSITORY_PATH);
+    if (uri.getType() == null)
+      throw new IllegalArgumentException("Resource uri has no type");
+    path.append("/").append(uri.getType()).append("s");
     String id = null;
     if (uri.getId() != null) {
       id = uri.getId();
@@ -429,7 +491,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Remove the enclosing directories
     try {
-      while (!REPOSITORY_PATH.equals(f.getName()) && f.listFiles().length == 0) {
+      while (!uri.getType().equals(f.getName()) && f.listFiles().length == 0) {
         FileUtils.deleteDirectory(f);
         f = f.getParentFile();
       }
@@ -444,7 +506,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected void storeResource(Resource<? extends ResourceContent> resource) throws IOException {
+  protected void storeResource(Resource<? extends ResourceContent> resource)
+      throws IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
     OutputStream os = null;
@@ -470,7 +533,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      java.io.InputStream)
    */
   @Override
-  protected void storeResourceContent(Resource<? extends ResourceContent> resource, InputStream is)
+  protected void storeResourceContent(
+      Resource<? extends ResourceContent> resource, InputStream is)
       throws IOException {
     // TODO Auto-generated method stub
 
@@ -499,7 +563,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     else if (index.getIndexVersion() != VersionedContentRepositoryIndex.IDX_VERSION) {
       logger.warn("Index version does not match implementation, triggering reindex");
       index();
-    } 
+    }
 
     // Is there an existing index?
     long resourceCount = index.getResourceCount();

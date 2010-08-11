@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.language.Language;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +175,7 @@ public class ContentRepositoryIndex {
    * @param languageIndex
    *          the language index
    */
-  protected void setVersionIndex(LanguageIndex languageIndex) {
+  protected void setLanguageIndex(LanguageIndex languageIndex) {
     this.languageIdx = languageIndex;
   }
 
@@ -237,7 +238,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if accessing the index fails
    */
-  public synchronized ResourceURI add(Resource resource) throws IOException {
+  public synchronized ResourceURI add(Resource<?> resource) throws IOException {
     ResourceURI uri = resource.getURI();
     if (uri.getPath() == null)
       throw new IllegalArgumentException("Uri must contain a path");
@@ -344,6 +345,25 @@ public class ContentRepositoryIndex {
   }
 
   /**
+   * Returns all languages for the specified resource or <code>null</code> if
+   * the resource doesn't exist.
+   * 
+   * @param uri
+   *          the resource uri
+   * @return the languages
+   */
+  public Language[] getLanguages(ResourceURI uri) throws IOException {
+    // Locate the entry in question
+    long address = toURIEntry(uri);
+
+    // Everything ok?
+    if (address == -1)
+      throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
+
+    return languageIdx.getLanguages(address);
+  }
+
+  /**
    * Returns the identifier of the resource with uri <code>uri</code> or
    * <code>null</code> if the uri is not part of the index.
    * 
@@ -441,7 +461,7 @@ public class ContentRepositoryIndex {
    * @throws IOException
    *           if updating the index fails
    */
-  public synchronized void update(Resource resource) throws IOException {
+  public synchronized void update(Resource<?> resource) throws IOException {
     ResourceURI uri = resource.getURI();
     if (uri.getVersion() == Resource.LIVE) {
       if (resource.isIndexed())

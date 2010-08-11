@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.contentrepository.impl.bundle;
 
-import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
@@ -97,7 +96,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     // See if there are any pages. If that's the case, then we don't need to
     // do anything. If not, we need to copy everything that's currently in the
     // bundle.
-    String pagesPath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), REPOSITORY_PATH);
+    String pagesPath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), Page.TYPE + "s");
     File pagesDirectory = new File(pagesPath);
     if (pagesDirectory.isDirectory() && pagesDirectory.list().length > 0) {
       logger.debug("Found existing content for site '{}' at {}", site, pagesPath);
@@ -112,7 +111,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     for (Iterator<ResourceURI> pi = getURIsFromBundle(); pi.hasNext();) {
       ResourceURI uri = pi.next();
       try {
-        Resource page = loadPageFromBundle(uri);
+        Page page = loadPageFromBundle(uri);
         put(page, user);
       } catch (SecurityException e) {
         logger.error("Security error reading page " + uri + ": " + e.getMessage(), e);
