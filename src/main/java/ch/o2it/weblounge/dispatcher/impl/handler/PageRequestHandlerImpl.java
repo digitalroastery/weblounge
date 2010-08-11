@@ -384,7 +384,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getIdentifier()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getLanguage()
    */
   public String getIdentifier() {
     return "page";

@@ -642,7 +642,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getIdentifier()
+   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getLanguage()
    */
   public String getIdentifier() {
     return "actionhandler";
