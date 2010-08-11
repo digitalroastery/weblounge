@@ -20,8 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl;
 
-import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.ResourceReader;
+import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.FileResourceInputDocument;
@@ -34,7 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Implementation of a serializer for file resources.
  */
-public class FileResourceSerializer extends AbstractResourceSerializer<FileResource> {
+public class FileResourceSerializer extends AbstractResourceSerializer<FileContent, FileResource> {
 
   /**
    * Creates a new file resource serializer.
@@ -49,7 +48,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileResou
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractResourceSerializer#createNewReader()
    */
   @Override
-  protected ResourceReader<FileResource> createNewReader()
+  protected FileResourceReader createNewReader()
       throws ParserConfigurationException, SAXException {
     return new FileResourceReader();
   }
@@ -59,8 +58,8 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileResou
    *
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
    */
-  public SolrInputDocument getInputDocument(Resource resource) {
-    return new FileResourceInputDocument((FileResource)resource);
+  public SolrInputDocument getInputDocument(FileResource resource) {
+    return new FileResourceInputDocument(resource);
   }
 
 }

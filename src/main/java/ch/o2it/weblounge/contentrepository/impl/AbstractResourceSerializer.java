@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 
@@ -31,7 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Base implementation for resource serializers.
  */
-public abstract class AbstractResourceSerializer<T extends Resource> implements ResourceSerializer<T> {
+public abstract class AbstractResourceSerializer<S extends ResourceContent, T extends Resource<S>> implements ResourceSerializer<S, T> {
 
   /** The type */
   protected String type = null;
@@ -63,7 +64,7 @@ public abstract class AbstractResourceSerializer<T extends Resource> implements 
    * 
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getReader()
    */
-  public ResourceReader<T> getReader() throws ParserConfigurationException, SAXException {
+  public ResourceReader<S, T> getReader() throws ParserConfigurationException, SAXException {
     return createNewReader();
   }
 
@@ -76,7 +77,7 @@ public abstract class AbstractResourceSerializer<T extends Resource> implements 
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  protected abstract ResourceReader<T> createNewReader()
+  protected abstract ResourceReader<S, T> createNewReader()
       throws ParserConfigurationException, SAXException;
 
 }

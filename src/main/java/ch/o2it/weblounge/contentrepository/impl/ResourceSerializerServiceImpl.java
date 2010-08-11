@@ -45,7 +45,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   private static final Logger logger = LoggerFactory.getLogger(ResourceSerializerServiceImpl.class);
 
   /** The registered content repositories */
-  private Map<String, ResourceSerializer<?>> serializers = new HashMap<String, ResourceSerializer<?>>();
+  private Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
 
   /** The resource serializer tracker */
   private ResourceSerializerTracker siteTracker = null;
@@ -93,11 +93,11 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
    * @param serializer
    *          the serializer
    */
-  public void registerSerializer(ResourceSerializer<?> serializer) {
+  public void registerSerializer(ResourceSerializer<?, ?> serializer) {
     synchronized (serializers) {
       String type = serializer.getType();
       if (serializers.containsKey(type)) {
-        ResourceSerializer<?> current = serializers.get(type);
+        ResourceSerializer<?, ?> current = serializers.get(type);
         logger.warn("Replacing extisting resource serializer implementation {} for type '{}'", current, type);
       }
       serializers.put(type, serializer);
@@ -114,7 +114,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
    * @param serializer
    *          the serializer
    */
-  public void unregisterSerializer(ResourceSerializer<?> serializer) {
+  public void unregisterSerializer(ResourceSerializer<?, ?> serializer) {
     synchronized (serializers) {
       String type = serializer.getType();
       serializers.remove(type);
@@ -126,7 +126,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
    * 
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializerService#getSerializer(java.lang.String)
    */
-  public ResourceSerializer<?> getSerializer(String resourceType) {
+  public ResourceSerializer<?, ?> getSerializer(String resourceType) {
     synchronized (serializers) {
       return serializers.get(resourceType);
     }
@@ -162,7 +162,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
      */
     @Override
     public Object addingService(ServiceReference reference) {
-      ResourceSerializer<?> serializer = (ResourceSerializer<?>)super.addingService(reference);
+      ResourceSerializer<?, ?> serializer = (ResourceSerializer<?, ?>)super.addingService(reference);
       serializerService.registerSerializer(serializer);
       return serializer;
     }
@@ -175,7 +175,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
      */
     @Override
     public void removedService(ServiceReference reference, Object service) {
-      serializerService.unregisterSerializer((ResourceSerializer<?>) service);
+      serializerService.unregisterSerializer((ResourceSerializer<?, ?>) service);
       super.removedService(reference, service);
     }
 

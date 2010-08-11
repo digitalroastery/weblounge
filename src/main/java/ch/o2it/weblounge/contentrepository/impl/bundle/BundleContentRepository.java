@@ -262,7 +262,7 @@ public class BundleContentRepository extends AbstractContentRepository {
       long time = System.currentTimeMillis();
       long pageCount = 0;
       long pageVersionCount = 0;
-      Map<String, ResourceSerializer<?>> serializers = new HashMap<String, ResourceSerializer<?>>();
+      Map<String, ResourceSerializer<?,?>> serializers = new HashMap<String, ResourceSerializer<?,?>>();
       ResourceURI previousURI = null;
 
       ResourceURI homeURI = new PageURIImpl(getSite(), "/");
@@ -274,7 +274,7 @@ public class BundleContentRepository extends AbstractContentRepository {
 
         // Look for a suitable resource reader
         String resourceType = uri.getType();
-        ResourceSerializer<?> serializer = serializers.get(resourceType);
+        ResourceSerializer<?, ?> serializer = serializers.get(resourceType);
         if (serializer == null) {
           serializer = ResourceSerializerFactory.getSerializer(resourceType);
           if (serializer == null) {
@@ -286,9 +286,9 @@ public class BundleContentRepository extends AbstractContentRepository {
         }
 
         // Load the resource
-        Resource resource = null;
+        Resource<?> resource = null;
         try {
-          ResourceReader<?> reader = serializer.getReader();
+          ResourceReader<?, ?> reader = serializer.getReader();
           InputStream is = loadResource(uri);
           resource = reader.read(uri, is);
           if (resource == null) {

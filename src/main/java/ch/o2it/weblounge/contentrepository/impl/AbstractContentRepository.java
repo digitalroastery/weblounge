@@ -196,7 +196,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public Resource get(ResourceURI uri) throws ContentRepositoryException {
+  public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
     
@@ -214,8 +214,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
     // Load the resource
     try {
       InputStream is = loadResource(uri);
-      ResourceSerializer<?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
-      ResourceReader<?> reader = serializer.getReader();
+      ResourceSerializer<?,?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceReader<?,?> reader = serializer.getReader();
       return reader.read(uri, is);
     } catch (Exception e) {
       logger.error("Error loading {}: {}", uri, e.getMessage());
@@ -230,12 +230,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
    *      ch.o2it.weblounge.common.user.User,
    *      ch.o2it.weblounge.common.security.Permission)
    */
-  public Resource get(ResourceURI uri, User user, Permission p)
+  public Resource<?> get(ResourceURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
-    Resource resource = get(uri);
+    Resource<?> resource = get(uri);
 
     // TODO: Check permissions
 
@@ -538,12 +538,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
    *          location of the resource file
    * @return the resource
    */
-  protected Resource loadResource(ResourceURI uri, URL contentUrl)
+  protected Resource<?> loadResource(ResourceURI uri, URL contentUrl)
       throws IOException {
     BufferedInputStream is = new BufferedInputStream(contentUrl.openStream());
     try {
-      ResourceSerializer<?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
-      ResourceReader<?> reader = serializer.getReader();
+      ResourceSerializer<?,?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceReader<?,?> reader = serializer.getReader();
       return reader.read(uri, is);
     } catch (Exception e) {
       throw new IOException("Error reading resource from " + contentUrl);

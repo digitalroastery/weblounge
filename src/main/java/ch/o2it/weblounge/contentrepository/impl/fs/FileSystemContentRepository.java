@@ -22,6 +22,7 @@ package ch.o2it.weblounge.contentrepository.impl.fs;
 
 import ch.o2it.weblounge.common.content.MalformedResourceURIException;
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
@@ -152,7 +153,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       File siteRootDirectory = new File(homePath);
       FileUtils.forceMkdir(siteRootDirectory);
 
-      Map<String, ResourceSerializer<?>> serializers = new HashMap<String, ResourceSerializer<?>>();
+      Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
 
       uris.push(siteRootDirectory);
       while (!uris.empty()) {
@@ -180,7 +181,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
               // Look for a suitable resource reader
               String resourceType = uri.getType();
-              ResourceSerializer<?> serializer = serializers.get(resourceType);
+              ResourceSerializer<?, ?> serializer = serializers.get(resourceType);
               if (serializer == null) {
                 serializer = ResourceSerializerFactory.getSerializer(resourceType);
                 if (serializer == null) {
@@ -192,8 +193,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               }
 
               // Load the resource
-              Resource resource = null;
-              ResourceReader<?> reader = serializer.getReader();
+              Resource<?> resource = null;
+              ResourceReader<?, ?> reader = serializer.getReader();
               try {
                 InputStream is = loadResource(uri);
                 resource = reader.read(uri, is);
@@ -443,7 +444,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected void storeResource(Resource resource) throws IOException {
+  protected void storeResource(Resource<? extends ResourceContent> resource) throws IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
     OutputStream os = null;
@@ -469,7 +470,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      java.io.InputStream)
    */
   @Override
-  protected void storeResourceContent(Resource resource, InputStream is)
+  protected void storeResourceContent(Resource<? extends ResourceContent> resource, InputStream is)
       throws IOException {
     // TODO Auto-generated method stub
 

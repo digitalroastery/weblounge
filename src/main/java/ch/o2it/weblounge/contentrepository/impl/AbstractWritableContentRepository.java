@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.user.User;
@@ -108,7 +109,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.content.resource.Resource)
    */
-  public Resource put(Resource resource, User user) throws SecurityException,
+  public Resource<? extends ResourceContent> put(Resource<? extends ResourceContent> resource, User user) throws SecurityException,
       IOException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
@@ -132,7 +133,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#putContent(ch.o2it.weblounge.common.content.Resource,
    *      java.io.InputStream, ch.o2it.weblounge.common.user.User)
    */
-  public void putContent(Resource resource, InputStream is, User user)
+  public void putContent(Resource<? extends ResourceContent> resource, InputStream is, User user)
       throws SecurityException, IOException {
 
     if (!connected)
@@ -154,7 +155,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  abstract protected void storeResource(Resource resource) throws IOException;
+  abstract protected void storeResource(Resource<? extends ResourceContent> resource) throws IOException;
 
   /**
    * Writes a new resource to the repository storage.
@@ -166,7 +167,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  abstract protected void storeResourceContent(Resource resource, InputStream is)
+  abstract protected void storeResourceContent(Resource<? extends ResourceContent> resource, InputStream is)
       throws IOException;
 
   /**
