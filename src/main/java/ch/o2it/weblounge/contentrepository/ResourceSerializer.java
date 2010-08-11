@@ -64,6 +64,6 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    *          the resource
    * @return the input document
    */
-  SolrInputDocument getInputDocument(T resource);
+  SolrInputDocument getInputDocument(Resource<?> resource);
 
 }
