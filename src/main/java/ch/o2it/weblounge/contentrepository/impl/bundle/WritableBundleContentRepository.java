@@ -20,14 +20,16 @@
 
 package ch.o2it.weblounge.contentrepository.impl.bundle;
 
+import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
-import ch.o2it.weblounge.common.impl.content.page.PageReader;
-import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.ResourceSerializer;
+import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
 import org.apache.commons.io.FilenameUtils;
@@ -44,6 +46,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -60,9 +63,6 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
 
   /** Prefix into the bundle */
   protected String bundlePathPrefix = "/repository";
-
-  /** Prefix into the bundle */
-  protected String pagesPathPrefix = bundlePathPrefix + "/pages";
 
   /** The bundle */
   protected Bundle bundle = null;
@@ -83,107 +83,134 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     if (bundle == null)
       throw new ContentRepositoryException("Bundle was not found in connect properties");
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#start()
    */
   @Override
   public void start() throws ContentRepositoryException {
     super.start();
 
-    // See if there are any pages. If that's the case, then we don't need to
+    // Are the serializers already up and running?
+    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
+    if (serializers == null) {
+      logger.warn("Unable to index {} while no resource serializers are registered", this);
+      return;
+    }
+
+    // See if there are any resources. If that's the case, then we don't need to
     // do anything. If not, we need to copy everything that's currently in the
     // bundle.
-    String pagesPath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), Page.TYPE + "s");
-    File pagesDirectory = new File(pagesPath);
-    if (pagesDirectory.isDirectory() && pagesDirectory.list().length > 0) {
-      logger.debug("Found existing content for site '{}' at {}", site, pagesPath);
-      return;
+    for (ResourceSerializer<?, ?> serializer : serializers) {
+      String resourceDirectoryPath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), serializer.getType() + "s");
+      File resourceDirectory = new File(resourceDirectoryPath);
+      if (resourceDirectory.isDirectory() && resourceDirectory.list().length > 0) {
+        logger.debug("Found existing {}s for site '{}' at {}", new Object[] {
+            serializer.getType(),
+            site,
+            resourceDirectoryPath });
+        return;
+      }
     }
 
     // If there is no content repository at the target location, copy the
     // initial bundle contents to the filesystem. Otherwise, keep working with
     // what's there already.
-    logger.info("Loading pages for '{}' from bundle {}", site, bundle);
+    logger.info("Loading resources for '{}' from bundle {}", site, bundle);
     WebloungeUser user = site.getAdministrator();
-    for (Iterator<ResourceURI> pi = getURIsFromBundle(); pi.hasNext();) {
+    for (Iterator<ResourceURI> pi = getResourceURIsFromBundle(); pi.hasNext();) {
       ResourceURI uri = pi.next();
       try {
-        Page page = loadPageFromBundle(uri);
-        put(page, user);
+        Resource<?> resource = loadResourceFromBundle(uri);
+        if (resource == null) {
+          throw new ContentRepositoryException("Unable to load " + uri.getType() + " " + uri + " from bundle");
+        }
+        logger.info("Loading {} {}:{}", new Object[] { uri.getType(), site, uri });
+        put(resource, user);
       } catch (SecurityException e) {
-        logger.error("Security error reading page " + uri + ": " + e.getMessage(), e);
+        logger.error("Security error reading " + uri.getType() + " " + uri + ": " + e.getMessage(), e);
         throw new ContentRepositoryException(e);
       } catch (IOException e) {
-        logger.error("Error reading page " + uri + ": " + e.getMessage(), e);
+        logger.error("Error reading " + uri.getType() + " " + uri + ": " + e.getMessage(), e);
         throw new ContentRepositoryException(e);
       }
     }
   }
 
   /**
-   * Loads all pages from the bundle and returns their uris as an iterator.
+   * Loads all resources from the bundle and returns their uris as an iterator.
    * 
-   * @return the page uris
+   * @return the resource uris
    * @throws ContentRepositoryException
    *           if reading from the repository fails
    */
   @SuppressWarnings("unchecked")
-  protected Iterator<ResourceURI> getURIsFromBundle()
+  protected Iterator<ResourceURI> getResourceURIsFromBundle()
       throws ContentRepositoryException {
-    // TODO: Handle resource URIs
-    ResourceURI homeURI = new PageURIImpl(getSite(), "/");
-    String entryPath = UrlSupport.concat(pagesPathPrefix, homeURI.getPath());
-    List<ResourceURI> pageURIs = new ArrayList<ResourceURI>();
-    Enumeration<URL> entries = bundle.findEntries(entryPath, "*.xml", true);
-    if (entries != null) {
-      while (entries.hasMoreElements()) {
-        URL entry = entries.nextElement();
-        String path = FilenameUtils.getPath(entry.getPath());
-        path = path.substring(pagesPathPrefix.length() - 1);
-        long v = ResourceUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
-        ResourceURI pageURI = new PageURIImpl(site, path, v);
-        pageURIs.add(pageURI);
-        logger.trace("Found revision '{}' of page {}", v, entry);
+
+    List<ResourceURI> resourceURIs = new ArrayList<ResourceURI>();
+
+    // For every serializer, try to load the resources
+    Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
+    for (ResourceSerializer<?, ?> serializer : serializers) {
+      String resourceDirectory = serializer.getType() + "s";
+      String resourcePathPrefix = UrlSupport.concat(bundlePathPrefix, resourceDirectory);
+      Enumeration<URL> entries = bundle.findEntries(resourcePathPrefix, "*.xml", true);
+      if (entries != null) {
+        while (entries.hasMoreElements()) {
+          URL entry = entries.nextElement();
+          String path = FilenameUtils.getPath(entry.getPath());
+          path = path.substring(resourcePathPrefix.length() - 1);
+          long v = ResourceUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
+          ResourceURI resourceURI = new ResourceURIImpl(serializer.getType(), site, path, v);
+          resourceURIs.add(resourceURI);
+          logger.trace("Found revision '{}' of {} {}", new Object[] {v, resourceURI.getType(), entry});
+        }
       }
     }
-    return pageURIs.iterator();
+
+    return resourceURIs.iterator();
   }
 
   /**
-   * Loads the specified page from the bundle rather than from the content
+   * Loads the specified resource from the bundle rather than from the content
    * repository.
    * 
    * @param uri
    *          the uri
-   * @return the page
+   * @return the resource
    * @throws IOException
-   *           if reading the page fails
+   *           if reading the resource fails
    */
-  protected Page loadPageFromBundle(ResourceURI uri) throws IOException {
+  protected Resource<?> loadResourceFromBundle(ResourceURI uri)
+      throws IOException {
     String uriPath = uri.getPath();
-
     if (uriPath == null)
-      throw new IllegalArgumentException("Page uri needs a path");
-
+      throw new IllegalArgumentException("Resource uri needs a path");
     String entryPath = UrlSupport.concat(new String[] {
-        pagesPathPrefix,
+        bundlePathPrefix,
+        uri.getType() + "s",
         uriPath,
         ResourceUtils.getDocument(uri.getVersion()) });
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
     try {
-      PageReader pageReader = new PageReader();
-      return pageReader.read(uri, url.openStream());
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      if (serializer == null) {
+        logger.warn("Unable to read {} {}: no serializer found", uri.getType(), uri);
+        return null;
+      }
+      ResourceReader<?, ?> resourceReader = serializer.getReader();
+      return resourceReader.read(uri, url.openStream());
     } catch (SAXException e) {
-      throw new RuntimeException("SAX error while reading page '" + uri + "'", e);
+      throw new RuntimeException("SAX error while reading " + uri.getType() + " '" + uri + "'", e);
     } catch (IOException e) {
-      throw new IOException("I/O error while reading page '" + uri + "'", e);
+      throw new IOException("I/O error while reading " + uri.getType() + " '" + uri + "'", e);
     } catch (ParserConfigurationException e) {
-      throw new IllegalStateException("Parser configuration error while reading page '" + uri + "'", e);
+      throw new IllegalStateException("Parser configuration error while reading " + uri.getType() + " '" + uri + "'", e);
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

@@ -26,7 +26,6 @@ import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
-import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -53,10 +52,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Content repository that reads pages and resources from the site's
@@ -250,72 +248,61 @@ public class BundleContentRepository extends AbstractContentRepository {
 
     // Is there an existing index?
     else if (index.getResourceCount() > 0) {
-      long pageCount = index.getResourceCount();
-      long pageVersionCount = index.getVersions();
+      long resourceCount = index.getResourceCount();
+      long revisionCount = index.getVersions();
       logger.info("Loaded exising site index from {}", idxRootDir);
-      logger.info("Index contains {} pages and {} revisions", pageCount, pageVersionCount - pageCount);
+      logger.info("Index contains {} resources and {} revisions", resourceCount, revisionCount - resourceCount);
       return index;
     }
 
     try {
       logger.info("Populating temporary site index '{}'...", site);
       long time = System.currentTimeMillis();
-      long pageCount = 0;
-      long pageVersionCount = 0;
-      Map<String, ResourceSerializer<?,?>> serializers = new HashMap<String, ResourceSerializer<?,?>>();
+      long resourceCount = 0;
+      long revisionCount = 0;
       ResourceURI previousURI = null;
 
-      ResourceURI homeURI = new PageURIImpl(getSite(), "/");
-      Iterator<ResourceURI> pi = list(homeURI, Integer.MAX_VALUE, -1);
-      // TODO: Add file uris
-
-      while (pi.hasNext()) {
-        ResourceURI uri = pi.next();
-
-        // Look for a suitable resource reader
-        String resourceType = uri.getType();
-        ResourceSerializer<?, ?> serializer = serializers.get(resourceType);
-        if (serializer == null) {
-          serializer = ResourceSerializerFactory.getSerializer(resourceType);
-          if (serializer == null) {
-            logger.warn("Skipping resource {}: No resource serializer found for type '{}'", uri, resourceType);
-            continue;
-          } else {
-            serializers.put(resourceType, serializer);
-          }
-        }
-
-        // Load the resource
-        Resource<?> resource = null;
-        try {
-          ResourceReader<?, ?> reader = serializer.getReader();
-          InputStream is = loadResource(uri);
-          resource = reader.read(uri, is);
-          if (resource == null) {
-            logger.warn("Unkown error loading resource {}", uri);
+      // Add all known resource types to the index
+      Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
+      for (ResourceSerializer<?, ?> serializer : serializers) {
+        String resourcePath = "/" + serializer.getType() + "s";
+        ResourceURI resourceRootURI = new ResourceURIImpl(serializer.getType(), getSite(), resourcePath);
+        Iterator<ResourceURI> pi = list(resourceRootURI, Integer.MAX_VALUE, -1);
+        while (pi.hasNext()) {
+          ResourceURI uri = pi.next();
+  
+          // Load the resource
+          Resource<?> resource = null;
+          try {
+            ResourceReader<?, ?> reader = serializer.getReader();
+            InputStream is = loadResource(uri);
+            resource = reader.read(uri, is);
+            if (resource == null) {
+              logger.warn("Unkown error loading resource {}", uri);
+              continue;
+            }
+          } catch (Exception e) {
+            logger.error("Error loading resource '{}' from bundle: {}", uri, e.getMessage());
             continue;
           }
-        } catch (Exception e) {
-          logger.error("Error loading resource '{}' from bundle: {}", uri, e.getMessage());
-          continue;
+  
+          // Add it to the index
+          index.add(resource);
+          revisionCount++;
+          if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
+            logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());
+            resourceCount++;
+          }
+          previousURI = uri;
         }
-
-        // Add it to the index
-        index.add(resource);
-        pageVersionCount++;
-        if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
-          logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());
-          pageCount++;
-        }
-        previousURI = uri;
       }
 
       success = true;
 
-      if (pageCount > 0) {
+      if (resourceCount > 0) {
         time = System.currentTimeMillis() - time;
         logger.info("Site index populated in {} ms", ConfigurationUtils.toHumanReadableDuration(time));
-        logger.info("{} resources and {} revisions added to index", pageCount, pageVersionCount - pageCount);
+        logger.info("{} resources and {} revisions added to index", resourceCount, revisionCount - resourceCount);
       }
     } catch (MalformedResourceURIException e) {
       throw new ContentRepositoryException("Error while reading resource uri for index", e);

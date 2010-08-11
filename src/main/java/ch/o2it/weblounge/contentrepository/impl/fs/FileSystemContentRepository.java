@@ -138,7 +138,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       // Clear the current index
       index.clear();
 
-      logger.info("Populating site index '{}'...", site);
+      logger.info("Creating site index '{}'...", site);
       long time = System.currentTimeMillis();
       long resourceCount = 0;
 
@@ -189,24 +189,25 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
-    File restructuredResources = new File(repositoryRoot, "." + resourceDirectory);
-
-    logger.info("Populating site index '{}' with {}s...", site, resourceType);
-    long resourceCount = 0;
-    long resourceVersionCount = 0;
-
-    boolean restructured = false;
-
-    Stack<File> uris = new Stack<File>();
     String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), resourceDirectory);
     File resourcesRootDirectory = new File(homePath);
     FileUtils.forceMkdir(resourcesRootDirectory);
+    if (resourcesRootDirectory.list().length == 0) {
+      logger.debug("No {}s found to index", resourceType);
+      return 0;
+    }
+
+    logger.info("Populating site index '{}' with {}s...", site, resourceType);
 
     Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
-
-    uris.push(resourcesRootDirectory);
+    File restructuredResources = new File(repositoryRoot, "." + resourceDirectory);
+    long resourceCount = 0;
+    long resourceVersionCount = 0;
+    boolean restructured = false;
 
     try {
+      Stack<File> uris = new Stack<File>();
+      uris.push(resourcesRootDirectory);
       while (!uris.empty()) {
         File dir = uris.pop();
         File[] files = dir.listFiles(new FileFilter() {
@@ -559,8 +560,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       ContentRepositoryException {
 
     logger.debug("Trying to load site index from {}", idxRootDir);
+    
+    // Is this a new index?
+    boolean created = !idxRootDir.exists() || idxRootDir.list().length == 0;
     FileUtils.forceMkdir(idxRootDir);
 
+    // Add content if there is any
     index = new FileSystemContentRepositoryIndex(idxRootDir);
 
     // Create the index if there is nothing in place so far
@@ -575,10 +580,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     }
 
     // Is there an existing index?
-    long resourceCount = index.getResourceCount();
-    long resourceVersionCount = index.getVersions();
-    logger.info("Loaded existing site index from {}", idxRootDir);
-    logger.info("Index contains {} resources and {} revisions", resourceCount, resourceVersionCount - resourceCount);
+    if (created) {
+      logger.info("Created site index at {}", idxRootDir);
+    } else {
+      long resourceCount = index.getResourceCount();
+      long resourceVersionCount = index.getVersions();
+      logger.info("Loaded site index from {}", idxRootDir);
+      logger.info("Index contains {} resources and {} revisions", resourceCount, resourceVersionCount - resourceCount);
+    }
 
     return index;
   }
