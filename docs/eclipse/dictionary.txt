@@ -69,3 +69,5 @@ metadata
 endpoints
 fulltext
 download
+serializer
+deserializing
