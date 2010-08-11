@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<file id="5bc19990-8f99-4873-a813-71b6dfac22ad" path="/files/porsche/" version="live">
+<file id="5bc19990-8f99-4873-a813-71b6dfac22ad" path="/porsche/" version="live">
   <head>
     <promote>true</promote>
     <index>true</index>
@@ -39,10 +39,12 @@
   </head>
   <body>
     <content language="en">
+      <filename><![CDATA[car.jpg]]></filename>
       <mimetype>image/jpeg</mimetype>
       <size>73642</size>
     </content>
     <content language="de">
+      <filename><![CDATA[auto.png]]></filename>
       <mimetype>image/png</mimetype>
       <size>262889</size>
     </content>
