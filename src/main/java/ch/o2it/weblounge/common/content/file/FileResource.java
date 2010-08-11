@@ -21,57 +21,13 @@
 package ch.o2it.weblounge.common.content.file;
 
 import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.language.Language;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * This interface models a file resource.
  */
-public interface FileResource extends Resource {
+public interface FileResource extends Resource<FileContent> {
 
   /** The resource type */
-  public final static String TYPE = "resource";
-
-  /**
-   * Opens a stream to the file's content.
-   * 
-   * @return the content
-   * @throws IOException
-   *           if reading the resource content fails
-   */
-  InputStream openStream() throws IOException;
-
-  /**
-   * Sets the file size in bytes.
-   * 
-   * @param size the file size
-   */
-  void setSize(long size);
-  
-  /**
-   * Returns the file size in bytes for the given language version.
-   * 
-   * @param language
-   *          the language
-   */
-  long getSize(Language language);
-
-  /**
-   * Sets the mime type.
-   * 
-   * @param mimeType
-   *          the mime type
-   */
-  void setMimeType(String mimeType);
-
-  /**
-   * Returns the resource's mime type or <code>null</code> if the mimetype is
-   * unknown.
-   * 
-   * @return the mime type
-   */
-  String getMimeType();
+  public final static String TYPE = "file";
 
 }

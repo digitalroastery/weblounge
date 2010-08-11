@@ -20,14 +20,18 @@
 
 package ch.o2it.weblounge.common.content.file;
 
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.language.Language;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * File content represents an actual download for a {@link FileResource}. It
  * contains information about the file's mime type, size and extension. In
  * addition, it is designed to be extended by subclasses like images.
  */
-public interface FileContent {
+public interface FileContent extends ResourceContent {
 
   /**
    * Sets the content language.
@@ -90,10 +94,12 @@ public interface FileContent {
   long getSize();
 
   /**
-   * Returns an xml representation of this file content.
+   * Opens a stream to the file's content.
    * 
-   * @return the xml representation
+   * @return the content
+   * @throws IOException
+   *           if reading the resource content fails
    */
-  String toXml();
+  InputStream openStream() throws IOException;
 
 }

@@ -58,5 +58,5 @@ public interface ImageContent extends FileContent {
    * @return the height
    */
   int getHeight();
-
+  
 }

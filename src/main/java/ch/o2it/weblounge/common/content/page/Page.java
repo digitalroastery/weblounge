@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.content.page;
 
 import ch.o2it.weblounge.common.content.Resource;
-
+import ch.o2it.weblounge.common.content.ResourceContent;
 
 /**
  * A <code>Page</code> encapsulates all data that is attached to a site url and
@@ -36,7 +36,7 @@ import ch.o2it.weblounge.common.content.Resource;
  * <li>{@link WORK}: the work version of the page</li>
  * </ul>
  */
-public interface Page extends Resource {
+public interface Page extends Resource<ResourceContent> {
 
   /** The resource type */
   public final static String TYPE = "page";

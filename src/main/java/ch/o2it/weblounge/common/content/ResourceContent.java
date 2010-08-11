@@ -18,16 +18,35 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.content.image;
+package ch.o2it.weblounge.common.content;
 
-import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.language.Language;
 
 /**
- * Object representation of an image resource.
+ * Resource content represents the actual content of a resource.
  */
-public interface ImageResource extends Resource<ImageContent> {
+public interface ResourceContent {
 
-  /** The resource type */
-  public final static String TYPE = "image";
+  /**
+   * Sets the content language.
+   * 
+   * @param language
+   *          the language
+   */
+  void setLanguage(Language language);
+
+  /**
+   * Returns the content language.
+   * 
+   * @return the language
+   */
+  Language getLanguage();
+
+  /**
+   * Returns an xml representation of this file content.
+   * 
+   * @return the xml representation
+   */
+  String toXml();
 
 }

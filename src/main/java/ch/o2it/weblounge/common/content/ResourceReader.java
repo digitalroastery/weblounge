@@ -31,7 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * A <code>ResourceReader</code> is able to parse xml for a given type of
  * resources and return it's object representation.
  */
-public interface ResourceReader<T extends Resource> {
+public interface ResourceReader<S extends ResourceContent, T extends Resource<S>> {
 
   /**
    * Reads the serialized resource from the input stream and returns the

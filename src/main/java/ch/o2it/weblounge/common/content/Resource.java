@@ -28,12 +28,13 @@ import ch.o2it.weblounge.common.security.SystemPermission;
 import ch.o2it.weblounge.common.user.User;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * A resource is the basic storage unit, also referred to as <tt>content</tt>.
  * Typical incarnations of resources are pages and files.
  */
-public interface Resource extends Localizable, Creatable, Modifiable, Publishable, Securable {
+public interface Resource<T extends ResourceContent> extends Localizable, Creatable, Modifiable, Publishable, Securable {
 
   /** The resource's permissions */
   static final Permission[] permissions = new Permission[] {
@@ -42,7 +43,7 @@ public interface Resource extends Localizable, Creatable, Modifiable, Publishabl
       SystemPermission.TRANSLATE,
       SystemPermission.PUBLISH,
       SystemPermission.MANAGE };
-  
+
   /** Live version of a page */
   long LIVE = 0;
 
@@ -408,6 +409,40 @@ public interface Resource extends Localizable, Creatable, Modifiable, Publishabl
    *          publishing end date
    */
   void setPublished(User publisher, Date from, Date to);
+
+  /**
+   * Adds the file content.
+   * 
+   * @param content
+   *          the file content
+   */
+  void addContent(T content);
+
+  /**
+   * Returns the file content in the given language or <code>null</code> if
+   * there is no such content.
+   * 
+   * @param language
+   *          the content language
+   * @return the resource content
+   */
+  T getContent(Language language);
+
+  /**
+   * Removes the file content for the given language.
+   * 
+   * @param language
+   *          the resource identifier
+   * @return the removed resource content
+   */
+  T removeContent(Language language);
+
+  /**
+   * Returns the resource contents.
+   * 
+   * @return the resource contents
+   */
+  Set<T> contents();
 
   /**
    * Returns an XML representation of this resource header.
