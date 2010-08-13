@@ -471,8 +471,27 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   @Override
   protected InputStream loadResourceContent(ResourceURI uri, Language language)
       throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+    File resourceFile = uriToFile(uri);
+    if (resourceFile == null)
+      return null;
+
+    // Look for the localized file
+    File resourceDirectory = resourceFile.getParentFile();
+    final String filenamePrefix = language.getIdentifier() + "."; 
+    File[] localizedFiles = resourceDirectory.listFiles(new FileFilter() {
+      public boolean accept(File f) {
+        return f.isFile() && f.getName().startsWith(filenamePrefix);
+      }
+    });
+    
+    // Make sure everything looks consistent
+    if (localizedFiles.length == 0)
+      return null;
+    else if (localizedFiles.length > 1)
+      logger.warn("Inconsistencies found in resource {} content {}", language, uri);
+    
+    // Finally return the content
+    return new FileInputStream(localizedFiles[0]);
   }
 
   /**

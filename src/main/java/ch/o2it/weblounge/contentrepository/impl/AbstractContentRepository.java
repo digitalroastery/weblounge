@@ -63,7 +63,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractContentRepository.class);
-  
+
   /** Index into this repository */
   protected ContentRepositoryIndex index = null;
 
@@ -200,24 +200,23 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
-    
-    // Check the resource type
+
+    // Check if the resource is available
     try {
-      if (uri.getType() != null && !uri.getType().equals(index.getType(new ResourceURIImpl(null, uri.getSite(), uri.getPath(), uri.getId())))) {
-        logger.warn("Type mismatch between requested and actual resource type");
+      if (!index.exists(uri)) {
         return null;
       }
     } catch (IOException e) {
-      logger.error("Error looking up uri type of {}: {}", uri, e.getMessage());
+      logger.error("Error looking up uri {}: {}", uri, e.getMessage());
       throw new ContentRepositoryException(e);
     }
-    
+
     // Load the resource
     InputStream is = null;
     try {
       is = loadResource(uri);
-      ResourceSerializer<?,?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
-      ResourceReader<?,?> reader = serializer.getReader();
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(uri, is);
     } catch (Exception e) {
       logger.error("Error loading {}: {}", uri, e.getMessage());
@@ -272,7 +271,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
     // TODO: check permissions
     // Resource resource = get(uri);
     // if (resource.check(SystemPermission.READ, user)) {
-    //   throw new SecurityException("User " + user + " is not allowed to access " + uri);
+    // throw new SecurityException("User " + user + " is not allowed to access "
+    // + uri);
     // }
 
     return loadResourceContent(uri, language);
@@ -479,7 +479,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @param uri
    *          the resource uri
    * @param language
-   *          the language
+   *          the content language
    * @return the resource contents
    * @throws IOException
    *           if opening the stream to the resource failed
@@ -546,8 +546,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throws IOException {
     InputStream is = new BufferedInputStream(contentUrl.openStream());
     try {
-      ResourceSerializer<?,?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
-      ResourceReader<?,?> reader = serializer.getReader();
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(uri, is);
     } catch (Exception e) {
       throw new IOException("Error reading resource from " + contentUrl);

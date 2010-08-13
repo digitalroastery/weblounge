@@ -52,6 +52,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -133,6 +134,44 @@ public class FileEndpoint extends AbstractContentRepositoryEndpoint {
    *          the request
    * @param resourceId
    *          the resource identifier
+   * @return the resource
+   */
+  @GET
+  @Path("/{resourceid}/content")
+  public Response getFileContent(@Context HttpServletRequest request,
+      @PathParam("resourceid") String resourceId) {
+
+    // Check the parameters
+    if (resourceId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Get the resource
+    final FileResource resource = (FileResource) loadResource(request, resourceId, FileResource.TYPE);
+    if (resource == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+    
+    // Determine the language
+    Site site = getSite(request);
+    Set<Language> resourceLanguages = resource.languages();
+    Language defaultLanguage = site.getDefaultLanguage();
+    Language preferred = LanguageSupport.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    if (preferred == null) {
+      // TODO: get original language
+      return null;
+    }
+    return getFileContent(request, resourceId, preferred.getIdentifier());
+  }
+
+  /**
+   * Returns the resource content with the given identifier or a
+   * <code>404</code> if the resource or the resource content could not be
+   * found.
+   * 
+   * @param request
+   *          the request
+   * @param resourceId
+   *          the resource identifier
    * @param languageId
    *          the language identifier
    * @return the resource
@@ -186,6 +225,8 @@ public class FileEndpoint extends AbstractContentRepositoryEndpoint {
         try {
           try {
             is = contentRepository.getContent(resource.getURI(), selectedLanguage);
+            if (is == null)
+              throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
           } catch (ContentRepositoryException e) {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
           }
