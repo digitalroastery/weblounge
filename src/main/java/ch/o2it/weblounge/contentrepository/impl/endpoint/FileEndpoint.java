@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
+import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
@@ -146,21 +148,21 @@ public class FileEndpoint extends AbstractContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Get the resource
-    final FileResource resource = (FileResource) loadResource(request, resourceId, FileResource.TYPE);
-    if (resource == null) {
+    final Resource<?> resource = loadResource(request, resourceId, null);
+    if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
-    
+
     // Determine the language
     Site site = getSite(request);
     Set<Language> resourceLanguages = resource.languages();
     Language defaultLanguage = site.getDefaultLanguage();
     Language preferred = LanguageSupport.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
     if (preferred == null) {
-      // TODO: get original language
-      return null;
+      preferred = resource.getOriginalContent().getLanguage();
     }
-    return getFileContent(request, resourceId, preferred.getIdentifier());
+ 
+    return getFileContent(request, resource, preferred);
   }
 
   /**
@@ -186,33 +188,49 @@ public class FileEndpoint extends AbstractContentRepositoryEndpoint {
     if (resourceId == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
+    // Extract the language
+    Language language = LanguageSupport.getLanguage(languageId);
+    if (language == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+    
     // Get the resource
-    final FileResource resource = (FileResource) loadResource(request, resourceId, FileResource.TYPE);
-    if (resource == null) {
+    final Resource<?> resource = loadResource(request, resourceId, FileResource.TYPE);
+    if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
+
+    return getFileContent(request, resource, language);
+  }
+
+  /**
+   * Loads the given resource content.
+   * 
+   * @param request
+   *          the servlet request
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return the resource content
+   */
+  protected Response getFileContent(HttpServletRequest request,
+      final Resource<?> resource, final Language language) {
+
+    // Check the parameters
+    if (resource == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
     if (!isModified(resource, request)) {
       return Response.notModified().build();
     }
 
-    // Extract the language
-    // TODO: Implement weblounge fallback mechanism
-    Language language = LanguageSupport.getLanguage(languageId);
-    if (language == null) {
-      language = getSite(request).getDefaultLanguage();
-      if (language == null) {
-        throw new WebApplicationException(Status.BAD_REQUEST);
-      }
-    }
-
     // Load the content
-    FileContent fileContent = resource.getContent(language);
-    if (fileContent == null) {
+    ResourceContent resourceContent = resource.getContent(language);
+    if (resourceContent == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
-    
+
     Site site = getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
     final Language selectedLanguage = language;
@@ -236,12 +254,19 @@ public class FileEndpoint extends AbstractContentRepositoryEndpoint {
         }
       }
     });
-    if (fileContent.getMimetype() != null)
-      response.type(fileContent.getMimetype());
-    else
-      response.type(MediaType.APPLICATION_OCTET_STREAM);
-    if (fileContent.getSize() > 0)
-      response.header("Content-Length", fileContent.getSize());
+
+    // Set file-related response information
+    if (resourceContent instanceof FileContent) {
+      FileContent fileContent = (FileContent) resourceContent;
+      if (fileContent.getMimetype() != null)
+        response.type(fileContent.getMimetype());
+      else
+        response.type(MediaType.APPLICATION_OCTET_STREAM);
+      if (fileContent.getSize() > 0)
+        response.header("Content-Length", fileContent.getSize());
+    }
+
+    // Add an e-tag and send the response
     response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
     response.lastModified(resource.getModificationDate());
     return response.build();

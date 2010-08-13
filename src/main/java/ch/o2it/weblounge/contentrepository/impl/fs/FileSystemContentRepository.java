@@ -456,6 +456,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   protected InputStream loadResource(ResourceURI uri) throws IOException {
+    if (uri.getType() == null) {
+      uri.setType(index.getType(uri));
+    }
     File resourceFile = uriToFile(uri);
     if (resourceFile == null || !resourceFile.isFile())
       return null;

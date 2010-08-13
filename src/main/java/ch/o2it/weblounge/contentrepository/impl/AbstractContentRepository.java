@@ -211,6 +211,16 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throw new ContentRepositoryException(e);
     }
 
+    // Make sure we have the correct resource type
+    try {
+      if (uri.getType() == null) {
+        uri.setType(index.getType(uri));
+      }
+    } catch (IOException e) {
+      logger.error("Error looking up type for {}: {}", uri, e.getMessage());
+      throw new ContentRepositoryException(e);
+    }
+
     // Load the resource
     InputStream is = null;
     try {

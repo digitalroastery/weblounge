@@ -22,7 +22,6 @@ package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -81,6 +80,9 @@ public class AbstractContentRepositoryEndpoint {
    * Returns the resource identified by the given request and resource
    * identifier or <code>null</code> if either one of the site, the site's
    * content repository or the resource itself is not available.
+   * <p>
+   * If <code>resourceType</code> is not <code>null</code>, the loaded resource
+   * is only returned if the resource type matches.
    * 
    * @param request
    *          the servlet request
@@ -110,7 +112,10 @@ public class AbstractContentRepositoryEndpoint {
     // Load the resource and return it
     try {
       ResourceURI resourceURI = new ResourceURIImpl(resourceType, site, null, resourceId);
-      FileResource resource = (FileResource) contentRepository.get(resourceURI);
+      Resource<?> resource = contentRepository.get(resourceURI);
+      if (resourceType != null && !resourceType.equals(resource.getType())) {
+        return null;
+      }
       return resource;
     } catch (ContentRepositoryException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
