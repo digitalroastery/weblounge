@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.language.Language;
 /**
  * Resource content represents the actual content of a resource.
  */
-public interface ResourceContent {
+public interface ResourceContent extends Creatable {
 
   /**
    * Sets the content language.
@@ -41,7 +41,7 @@ public interface ResourceContent {
    * @return the language
    */
   Language getLanguage();
-
+  
   /**
    * Returns an xml representation of this file content.
    * 

@@ -42,6 +42,13 @@ public interface ResourceURI extends Url {
    * @return the path
    */
   String getPath();
+  
+  /**
+   * Sets the resource type.
+   * 
+   * @param type the type
+   */
+  void setType(String type);
 
   /**
    * Returns the resource type, which usually equals the class name of the

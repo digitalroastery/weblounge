@@ -429,7 +429,7 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   void addContent(T content);
 
   /**
-   * Returns the file content in the given language or <code>null</code> if
+   * Returns the resource content in the given language or <code>null</code> if
    * there is no such content.
    * 
    * @param language
@@ -437,6 +437,16 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
    * @return the resource content
    */
   T getContent(Language language);
+
+  /**
+   * Returns the resource content with the earliest creation date or
+   * <code>null</code> if there is no such content.
+   * 
+   * @param language
+   *          the content language
+   * @return the resource content
+   */
+  T getOriginalContent();
 
   /**
    * Removes the file content for the given language.
