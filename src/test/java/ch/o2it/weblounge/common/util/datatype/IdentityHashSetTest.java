@@ -199,7 +199,7 @@ public class IdentityHashSetTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#remove(java.lang.Object)}
+   * {@link ch.o2it.weblounge.core.util.datatype.IdentityHashSet#disableLanguage(java.lang.Object)}
    * .
    */
   @Test

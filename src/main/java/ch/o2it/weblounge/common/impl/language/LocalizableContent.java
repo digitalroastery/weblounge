@@ -139,13 +139,13 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
   /**
    * Removes the content as well as support for this language from this object.
    * 
-   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#remove(ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#disableLanguage(ch.o2it.weblounge.common.language.Language)
    */
   @Override
-  public void remove(Language language) {
+  public void disableLanguage(Language language) {
     if (language == null)
       throw new IllegalArgumentException("Language must not be null");
-    super.remove(language);
+    super.disableLanguage(language);
     content.remove(language);
   }
 

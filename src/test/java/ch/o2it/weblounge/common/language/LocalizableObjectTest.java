@@ -91,11 +91,11 @@ public class LocalizableObjectTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#remove(ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.language.LocalizableObject#disableLanguage(ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testRemove() {
-    content.remove(french);
+    content.disableLanguage(french);
     assertFalse(content.supportsLanguage(french));
     assertEquals(1, content.size());
   }

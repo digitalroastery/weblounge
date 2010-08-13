@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceImpl;
+import ch.o2it.weblounge.common.language.Language;
 
 /**
  * Default implementation of a file resource.
@@ -41,6 +42,32 @@ public class FileResourceImpl extends ResourceImpl<FileContent> implements FileR
     super(uri);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#addContent(ch.o2it.weblounge.common.content.ResourceContent)
+   */
+  @Override
+  public void addContent(FileContent content) {
+    if (content == null)
+      throw new IllegalArgumentException("Content must not be null");
+    super.addContent(content);
+    enableLanguage(content.getLanguage());
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#removeContent(ch.o2it.weblounge.common.language.Language)
+   */
+  @Override
+  public FileContent removeContent(Language language) {
+    if (content == null)
+      throw new IllegalArgumentException("Content must not be null");
+    disableLanguage(language);
+    return super.removeContent(language);
+  }
+  
   /**
    * {@inheritDoc}
    *

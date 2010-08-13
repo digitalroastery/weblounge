@@ -34,7 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Utility class used to parse file data.
  */
-public final class FileResourceReader extends AbstractResourceReaderImpl<FileContent, FileResource> {
+public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, FileResource> {
 
   /** The file content reader */
   private FileContentReader contentReader = new FileContentReader();

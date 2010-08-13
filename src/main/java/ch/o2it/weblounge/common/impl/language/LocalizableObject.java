@@ -170,7 +170,7 @@ public class LocalizableObject implements Localizable {
    * @param language
    *          the language to be removed
    */
-  public void remove(Language language) {
+  public void disableLanguage(Language language) {
     if (language == null)
       throw new IllegalArgumentException("Language must not be null");
 

@@ -29,10 +29,13 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -348,6 +351,52 @@ public final class LanguageSupport {
     String languageId = s.substring(languagePosition + 1, languagePosition + 3);
     l = getLanguage(languageId);
     return l;
+  }
+
+  /**
+   * Returns the language out of <code>choices</code> that matches the client's
+   * requirements as indicated through the <code>Accept-Language</code> header.
+   * If no match is possible, <code>null</code> is returned.
+   * 
+   * @param choices
+   *          the available locales
+   * @param request
+   *          the http request
+   */
+  public static Language getPreferredLanguage(Set<Language> choices,
+      HttpServletRequest request) {
+    if (request.getHeader("Accept-Language") != null) {
+      Enumeration<?> locales = request.getLocales();
+      while (locales.hasMoreElements()) {
+        Language l = getLanguage((Locale) locales.nextElement());
+        if (choices.contains(l))
+          return l;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the language out of <code>choices</code> that matches the client's
+   * requirements as indicated through the <code>Accept-Language</code> header.
+   * If no match is possible, it is determined if <code>choices</code> contains
+   * <code>defaultLanguage</code> in which case that language is returned. If
+   * neither of this is the case, <code>null</code> is returned.
+   * 
+   * @param choices
+   *          the available locales
+   * @param defaultLanguage
+   *          the default language fallback
+   * @param request
+   *          the http request
+   */
+  public static Language getPreferredLanguage(Set<Language> choices,
+      HttpServletRequest request, Language defaultLanguage) {
+    Language preferred = getPreferredLanguage(choices, request);
+    if (preferred == null && choices.contains(defaultLanguage)) {
+      return defaultLanguage;
+    }
+    return preferred;
   }
 
 }
