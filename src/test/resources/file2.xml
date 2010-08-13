@@ -39,6 +39,10 @@
   </head>
   <body>
     <content language="en">
+      <created>
+        <user id="amelie" realm="testland">Amélie Poulard</user>
+        <date>2009-02-18T22:06:40Z</date>
+      </created>
       <filename><![CDATA[image.jpg]]></filename>
       <mimetype>image/jpeg</mimetype>
       <size>745569</size>

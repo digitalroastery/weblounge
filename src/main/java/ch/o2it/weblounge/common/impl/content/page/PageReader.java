@@ -202,7 +202,8 @@ public final class PageReader extends WebloungeContentReader implements Resource
   /**
    * Resets this parser instance.
    */
-  void reset() {
+  public void reset() {
+    super.reset();
     this.page = null;
     this.composer = null;
     this.parserContext = ParserContext.Document;

@@ -21,8 +21,8 @@
 package ch.o2it.weblounge.common.impl.content.file;
 
 import ch.o2it.weblounge.common.content.file.FileContent;
+import ch.o2it.weblounge.common.impl.content.ResourceContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
-import ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse <code>Content</code> data for simple files.
  */
-public class FileContentReader extends WebloungeSAXHandler {
+public class FileContentReader extends ResourceContentReader {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(FileContentReader.class);
@@ -52,7 +52,7 @@ public class FileContentReader extends WebloungeSAXHandler {
   protected WeakReference<SAXParser> parserRef = null;
 
   /** The file content data */
-  protected FileContentImpl content = null;
+  protected FileContentImpl fileContent = null;
 
   /**
    * Creates a new file content reader that will parse serialized XML version of
@@ -91,14 +91,14 @@ public class FileContentReader extends WebloungeSAXHandler {
       parserRef = new WeakReference<SAXParser>(parser);
     }
     parser.parse(is, this);
-    return content;
+    return fileContent;
   }
 
   /**
    * Resets the pagelet parser.
    */
   public void reset() {
-    content = null;
+    fileContent = null;
     SAXParser parser = parserRef.get();
     if (parser != null)
       parser.reset();
@@ -110,7 +110,7 @@ public class FileContentReader extends WebloungeSAXHandler {
    * @return the content
    */
   FileContent getFileContent() {
-    return content;
+    return fileContent;
   }
 
   /**
@@ -127,8 +127,9 @@ public class FileContentReader extends WebloungeSAXHandler {
     // start of a new content element
     if ("content".equals(raw)) {
       String languageId = attrs.getValue("language");
-      content = new FileContentImpl(LanguageSupport.getLanguage(languageId));
-      logger.debug("Started reading file content {}", content);
+      fileContent = new FileContentImpl(LanguageSupport.getLanguage(languageId));
+      content = fileContent;
+      logger.debug("Started reading file content {}", fileContent);
     }
 
   }
@@ -144,25 +145,25 @@ public class FileContentReader extends WebloungeSAXHandler {
 
     // content
     if ("content".equals(raw)) {
-      logger.debug("Finished reading content {}", content);
+      logger.debug("Finished reading content {}", fileContent);
     }
 
     // filename
     else if ("filename".equals(raw)) {
-      content.setFilename(getCharacters());
-      logger.trace("File content's filename is '{}'", content.getFilename());
+      fileContent.setFilename(getCharacters());
+      logger.trace("File content's filename is '{}'", fileContent.getFilename());
     }
 
     // mimetype
     else if ("mimetype".equals(raw)) {
-      content.setMimetype(getCharacters());
-      logger.trace("File content's mimetype is '{}'", content.getMimetype());
+      fileContent.setMimetype(getCharacters());
+      logger.trace("File content's mimetype is '{}'", fileContent.getMimetype());
     }
 
     // size
     else if ("size".equals(raw)) {
-      content.setSize(Long.parseLong(getCharacters()));
-      logger.trace("File content's filesize is '{}'", content.getSize());
+      fileContent.setSize(Long.parseLong(getCharacters()));
+      logger.trace("File content's filesize is '{}'", fileContent.getSize());
     }
 
     super.endElement(uri, local, raw);

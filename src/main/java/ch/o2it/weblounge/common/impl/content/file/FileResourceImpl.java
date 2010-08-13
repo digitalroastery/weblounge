@@ -40,6 +40,7 @@ public class FileResourceImpl extends ResourceImpl<FileContent> implements FileR
    */
   public FileResourceImpl(ResourceURI uri) {
     super(uri);
+    setLanguageResolution(LanguageResolution.Original);
   }
 
   /**
@@ -64,8 +65,12 @@ public class FileResourceImpl extends ResourceImpl<FileContent> implements FileR
   public FileContent removeContent(Language language) {
     if (content == null)
       throw new IllegalArgumentException("Content must not be null");
+    if (content.size() == 1)
+      throw new IllegalStateException("Cannot remove last remaining resource content");
+    FileContent content = super.removeContent(language);
+    setOriginalLanguage(getOriginalContent().getLanguage());
     disableLanguage(language);
-    return super.removeContent(language);
+    return content;
   }
   
   /**

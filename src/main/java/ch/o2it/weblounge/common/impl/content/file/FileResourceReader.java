@@ -107,7 +107,9 @@ public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, 
       contentReader.startElement(uri, local, raw, attrs);
     }
 
-    super.startElement(uri, local, raw, attrs);
+    else {
+      super.startElement(uri, local, raw, attrs);
+    }
   }
   
   /**
@@ -134,11 +136,16 @@ public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, 
       contentReader.endElement(uri, local, raw);
       parserContext = ParserContext.Resource;
       resource.addContent(contentReader.getFileContent());
-    } else if (parserContext.equals(ParserContext.Content)) {
+    }
+    
+    // file content
+    else if (parserContext.equals(ParserContext.Content)) {
       contentReader.endElement(uri, local, raw);
     }
 
-    super.endElement(uri, local, raw);
+    else {
+      super.endElement(uri, local, raw);
+    }
   }
 
 }

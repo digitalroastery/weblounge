@@ -20,15 +20,21 @@
 
 package ch.o2it.weblounge.common.content.file;
 
+import static org.junit.Assert.assertFalse;
+
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileContentImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.user.User;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Date;
 
 /**
  * Test case for class {@link ResourceContentImpl}.
@@ -50,6 +56,15 @@ public class FileContentImplTest {
   /** The mime type */
   protected String mimetype = "application/pdf";
   
+  /** The creation date */
+  protected Date creationDate = new Date(1231358741000L);
+
+  /** Some date after the latest modification date */
+  protected Date futureDate = new Date(2000000000000L);
+
+  /** The creation date */
+  protected User amelie = new UserImpl("amelie", "testland", "Amélie Poulard");
+
   /**
    * @throws java.lang.Exception
    */
@@ -57,6 +72,7 @@ public class FileContentImplTest {
   public void setUp() throws Exception {
     content = new FileContentImpl(filename, german, size);
     content.setMimetype(mimetype);
+    ((FileContentImpl)content).setCreated(creationDate, amelie);
   }
 
   /**
@@ -89,6 +105,30 @@ public class FileContentImplTest {
   @Test
   public void testGetSize() {
     assertEquals(size, content.getSize());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl#getCreationDate()}.
+   */
+  @Test
+  public void testGetCreationDate() {
+    assertEquals(creationDate, content.getCreationDate());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl#getCreator()}.
+   */
+  @Test
+  public void testGetCreator() {
+    assertEquals(amelie, content.getCreator());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl#isCreatedAfter(java.util.Date)}.
+   */
+  @Test
+  public void testIsCreatedAfter() {
+    assertFalse(content.isCreatedAfter(futureDate));
   }
 
 }

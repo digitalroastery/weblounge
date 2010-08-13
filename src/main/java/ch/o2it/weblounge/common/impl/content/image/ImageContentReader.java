@@ -118,6 +118,7 @@ public class ImageContentReader extends FileContentReader {
     if ("content".equals(raw)) {
       String languageId = attrs.getValue("language");
       imageContent = new ImageContentImpl(LanguageSupport.getLanguage(languageId));
+      fileContent = imageContent;
       content = imageContent;
       logger.debug("Started reading image content {}", content);
     } else {

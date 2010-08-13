@@ -66,6 +66,15 @@ public abstract class WebloungeSAXHandler extends DefaultHandler {
   }
 
   /**
+   * Resets the parser.
+   */
+  public void reset() {
+    characters = new StringBuffer();
+    clipboard.clear();
+    contentReaderContext = Context.Unknown;
+  }
+
+  /**
    * Returns the trimmed contents of the characters buffer.
    * 
    * @return the trimmed characters

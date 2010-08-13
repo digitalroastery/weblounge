@@ -108,7 +108,7 @@ public class ResourceContentImpl implements ResourceContent {
    *          the creator
    */
   public void setCreated(Date date, User user) {
-
+    creationCtx.setCreated(user, date);
   }
 
   /**

@@ -22,7 +22,9 @@ package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler;
+import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -53,7 +56,7 @@ public class ResourceContentReader extends WebloungeSAXHandler {
 
   /** The file content data */
   protected ResourceContentImpl content = null;
-
+  
   /**
    * Creates a new file content reader that will parse serialized XML version of
    * the file content and store it in the {@link ResourceContent} that is returned
@@ -95,9 +98,10 @@ public class ResourceContentReader extends WebloungeSAXHandler {
   }
 
   /**
-   * Resets the pagelet parser.
+   * Resets the parser.
    */
   public void reset() {
+    super.reset();
     content = null;
     SAXParser parser = parserRef.get();
     if (parser != null)
@@ -109,7 +113,7 @@ public class ResourceContentReader extends WebloungeSAXHandler {
    * 
    * @return the content
    */
-  ResourceContent getFileContent() {
+  ResourceContent getResourceContent() {
     return content;
   }
 
@@ -129,6 +133,12 @@ public class ResourceContentReader extends WebloungeSAXHandler {
       String languageId = attrs.getValue("language");
       content = new ResourceContentImpl(LanguageSupport.getLanguage(languageId));
       logger.debug("Started reading file content {}", content);
+    } 
+
+    // creator
+    else if ("user".equals(raw)) {
+      clipboard.put("user", attrs.getValue("id"));
+      clipboard.put("realm", attrs.getValue("realm"));
     }
 
   }
@@ -145,6 +155,36 @@ public class ResourceContentReader extends WebloungeSAXHandler {
     // content
     if ("content".equals(raw)) {
       logger.debug("Finished reading content {}", content);
+    }
+    
+    // user
+    else if ("user".equals(raw)) {
+      String login = (String) clipboard.remove("user");
+      String realm = (String) clipboard.remove("realm");
+      String name = getCharacters();
+      User user = new UserImpl(login, realm, name);
+      clipboard.put("user", user);
+    }
+    
+    // date
+    else if ("date".equals(raw)) {
+      try {
+        Date d = dateFormat.parse(getCharacters());
+        clipboard.put("date", d);
+      } catch (Exception e) {
+        throw new IllegalStateException("Reading date failed: '" + getCharacters() + "'");
+      }
+    }
+    
+    // created
+    else if ("created".equals(raw)) {
+      User owner = (User) clipboard.remove("user");
+      if (owner == null)
+        throw new IllegalStateException("Creator not found");
+      Date date = (Date) clipboard.remove("date");
+      if (date == null)
+        throw new IllegalStateException("Creation date not found");
+      content.setCreated(date, owner);
     }
 
     super.endElement(uri, local, raw);

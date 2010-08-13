@@ -20,6 +20,10 @@
 
 package ch.o2it.weblounge.common.content.file;
 
+import static org.junit.Assert.assertNull;
+
+import static org.junit.Assert.assertNotNull;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +33,7 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
@@ -59,6 +64,9 @@ public class FileImplTest {
   
   /** The German language */
   protected Language german = new LanguageImpl(new Locale("de"));
+
+  /** The English language */
+  protected Language english = new LanguageImpl(new Locale("en"));
 
   /** The French language */
   protected Language french = new LanguageImpl(new Locale("fr"));
@@ -99,8 +107,8 @@ public class FileImplTest {
   /** Content creation date */
   protected Date creationDate = new Date(1231358741000L);
   
-  /** French modification date */
-  protected Date frenchModificationDate = new Date(1234994800000L);
+  /** Content Modification date */
+  protected Date modificationDate = new Date(1234994800000L);
 
   /** Publishing start date */
   protected Date publishingStartDate = new Date(1146851901000L);
@@ -129,6 +137,24 @@ public class FileImplTest {
   /** The subjects */
   protected String[] subjects = new String[] { "This subject", "Other subject"};
   
+  /** The English file name */
+  protected String englishFilename = "image.jpg";
+
+  /** The English file name */
+  protected String englishMimetype = "image/jpeg";
+  
+  /** The English file size */
+  protected long englishFilesize = 745569L;
+
+  /** The German file name */
+  protected String germanFilename = "image.png";
+
+  /** The German file name */
+  protected String germanMimetype = "image/png";
+
+  /** The German file size */
+  protected long germanFilesize = 520894L;
+
   /**
    * @throws java.lang.Exception
    */
@@ -144,7 +170,7 @@ public class FileImplTest {
     file.setDescription(germanDescription, german);
     file.setDescription(frenchDescription, french);
     file.setLocked(amelie);
-    file.setModified(amelie, frenchModificationDate);
+    file.setModified(amelie, modificationDate);
     file.setOwner(hans);
     file.setPublished(hans, publishingStartDate, publishingEndDate);
     file.setRights(germanRights, german);
@@ -153,6 +179,14 @@ public class FileImplTest {
     file.setType(fileType);
     for (String subject : subjects)
       file.addSubject(subject);
+    
+    FileContentImpl germanContent = new FileContentImpl(germanFilename, german, germanFilesize);
+    germanContent.setCreated(creationDate, amelie);
+    file.addContent(germanContent);
+
+    FileContentImpl englishContent = new FileContentImpl(englishFilename, english, englishFilesize);
+    englishContent.setCreated(modificationDate, amelie);
+    file.addContent(englishContent);
   }
   
   /**
@@ -493,7 +527,7 @@ public class FileImplTest {
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#isPublished(java.util.Date)}.
    */
-  @Test
+  @Test 
   public void testIsPublishedDate() {
     Date d = new Date(publishingStartDate.getTime() + Times.MS_PER_DAY);
     assertTrue(file.isPublished(d));
@@ -529,7 +563,7 @@ public class FileImplTest {
    */
   @Test
   public void testGetModificationDate() {
-    assertEquals(frenchModificationDate, file.getModificationDate());
+    assertEquals(modificationDate, file.getModificationDate());
   }
 
   /**
@@ -573,6 +607,45 @@ public class FileImplTest {
     FileResource p2 = new FileResourceImpl(new FileResourceURIImpl(site, "/test/2", Resource.LIVE));
     p2.setTitle(germanTitle, german);
     assertEquals(0, file.compareTo(p2, german));
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceImpl#getContent(ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testGetContent() {
+    assertNotNull(file.getContent(german));
+    assertEquals(german, file.getContent(german).getLanguage());
+    assertNotNull(file.getContent(english));
+    assertEquals(english, file.getContent(english).getLanguage());
+    assertNull(file.getContent(italian));
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceImpl#getOriginalContent()}.
+   */
+  @Test
+  public void testGetOriginalContent() {
+    assertNotNull(file.getOriginalContent());
+    assertEquals(german, file.getOriginalContent().getLanguage());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceImpl#removeContent(ch.o2it.weblounge.common.language.Language)}.
+   */
+  @Test
+  public void testRemoveContent() {
+    file.removeContent(italian);
+    file.removeContent(german);
+    assertEquals(1, file.contents().size());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceImpl#contents()}.
+   */
+  @Test
+  public void testContents() {
+    assertEquals(2, file.contents().size());
   }
 
 }

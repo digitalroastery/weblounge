@@ -186,8 +186,8 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
 
     // creator, modifier
     if ("user".equals(raw)) {
-      String login = (String) clipboard.get("user");
-      String realm = (String) clipboard.get("realm");
+      String login = (String) clipboard.remove("user");
+      String realm = (String) clipboard.remove("realm");
       String name = getCharacters();
       User user = new UserImpl(login, realm, name);
       clipboard.put("user", user);
@@ -226,10 +226,10 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
 
     // created
     else if (contentReaderContext == Context.Creation && "created".equals(raw)) {
-      User owner = (User) clipboard.get("user");
+      User owner = (User) clipboard.remove("user");
       if (owner == null)
         throw new IllegalStateException("Creator not found");
-      Date date = (Date) clipboard.get("date");
+      Date date = (Date) clipboard.remove("date");
       if (date == null)
         throw new IllegalStateException("Creation date not found");
       setCreated(owner, date);
@@ -238,10 +238,10 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
 
     // modified
     else if (contentReaderContext == Context.Modification && "modified".equals(raw)) {
-      User modifier = (User) clipboard.get("user");
+      User modifier = (User) clipboard.remove("user");
       if (modifier == null)
         throw new IllegalStateException("Modifier not found");
-      Date date = (Date) clipboard.get("date");
+      Date date = (Date) clipboard.remove("date");
       if (date == null)
         throw new IllegalStateException("Modification date not found");
       setModified(modifier, date);
@@ -250,20 +250,20 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
 
     // published
     else if (contentReaderContext == Context.Publish && "published".equals(raw)) {
-      User publisher = (User) clipboard.get("user");
+      User publisher = (User) clipboard.remove("user");
       if (publisher == null)
         throw new IllegalStateException("Publisher not found");
-      Date startDate = (Date) clipboard.get("publish.start");
+      Date startDate = (Date) clipboard.remove("publish.start");
       if (startDate == null)
         throw new IllegalStateException("Publication start date not found");
-      Date endDate = (Date) clipboard.get("publish.end");
+      Date endDate = (Date) clipboard.remove("publish.end");
       setPublished(publisher, startDate, endDate);
       contentReaderContext = Context.Unknown;
     }
 
     // owner
     else if (contentReaderContext == Context.Security && "owner".equals(raw)) {
-      User owner = (User) clipboard.get("user");
+      User owner = (User) clipboard.remove("user");
       if (owner == null)
         throw new IllegalStateException("Owner not found");
       setOwner(owner);
@@ -273,8 +273,8 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
     else if (contentReaderContext == Context.Security && "permission".equals(raw)) {
       // TODO: Finish this code
       /*
-       * String id = (String) clipboard.get("id"); Permission permission = new
-       * PermissionImpl(id); String type = (String) clipboard.get("type"); if
+       * String id = (String) clipboard.remove("id"); Permission permission = new
+       * PermissionImpl(id); String type = (String) clipboard.remove("type"); if
        * (type != null) { type =
        * AbstractSecurityContext.resolveAuthorityTypeShortcut(type);
        * StringTokenizer tok = new StringTokenizer(getCharacters(), " ,;");

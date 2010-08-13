@@ -117,7 +117,8 @@ public final class PagePreviewReader extends WebloungeContentReader {
   /**
    * Resets this parser instance.
    */
-  void reset() {
+  public void reset() {
+    super.reset();
     this.pageURI = null;
     this.composer = null;
     this.position = 0;

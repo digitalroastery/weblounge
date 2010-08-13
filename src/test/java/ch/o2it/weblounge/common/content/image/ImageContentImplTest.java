@@ -24,10 +24,14 @@ import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.content.image.ImageContentImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.user.User;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Date;
 
 /**
  * Test case for class {@link ImageContentImpl}.
@@ -49,6 +53,15 @@ public class ImageContentImplTest {
   /** The mime type */
   protected String mimetype = "image/jpeg";
   
+  /** The creation date */
+  protected Date creationDate = new Date(1231358741000L);
+
+  /** Some date after the latest modification date */
+  protected Date futureDate = new Date(2000000000000L);
+
+  /** The creation date */
+  protected User amelie = new UserImpl("amelie", "testland", "Amélie Poulard");
+
   /** The image width */
   protected int width = 2188;
 
@@ -64,6 +77,7 @@ public class ImageContentImplTest {
     image.setMimetype(mimetype);
     image.setWidth(width);
     image.setHeight(height);
+    ((ImageContentImpl)image).setCreated(creationDate, amelie);
   }
 
   /**

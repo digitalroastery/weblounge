@@ -342,25 +342,25 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
 
       // Title
       else if ("title".equals(raw)) {
-        Language l = (Language) clipboard.get("language");
+        Language l = (Language) clipboard.remove("language");
         resource.setTitle(characters.toString(), l);
       }
 
       // Description
       else if ("description".equals(raw)) {
-        Language l = (Language) clipboard.get("language");
+        Language l = (Language)clipboard.remove("language");
         resource.setDescription(characters.toString(), l);
       }
 
       // Coverage
       else if ("coverage".equals(raw)) {
-        Language l = (Language) clipboard.get("language");
+        Language l = (Language)clipboard.remove("language");
         resource.setCoverage(characters.toString(), l);
       }
 
       // Rights
       else if ("rights".equals(raw)) {
-        Language l = (Language) clipboard.get("language");
+        Language l = (Language)clipboard.remove("language");
         resource.setRights(characters.toString(), l);
       }
 
@@ -371,7 +371,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
 
       // Pagelock
       else if ("locked".equals(raw)) {
-        User user = (User) clipboard.get("user");
+        User user = (User)clipboard.remove("user");
         if (user != null)
           resource.setLocked(user);
       }
