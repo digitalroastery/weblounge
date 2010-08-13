@@ -110,7 +110,7 @@ public interface ContentRepository {
    *           if reading the resource from the repository fails
    * @return the resource
    */
-  Resource get(ResourceURI uri) throws ContentRepositoryException;
+  Resource<?> get(ResourceURI uri) throws ContentRepositoryException;
 
   /**
    * Returns the requested resource or <code>null</code> if the resource is not
@@ -129,7 +129,7 @@ public interface ContentRepository {
    * @throws SecurityException
    *           if access is denied for the given user and permission
    */
-  Resource get(ResourceURI uri, User user, Permission p)
+  Resource<?> get(ResourceURI uri, User user, Permission p)
       throws ContentRepositoryException, SecurityException;
 
   /**
@@ -139,7 +139,7 @@ public interface ContentRepository {
    * @param uri
    *          the resource uri
    * @param language
-   *          the language
+   *          the content language
    * @return the resource
    * @throws ContentRepositoryException
    *           if reading the content from the repository fails
