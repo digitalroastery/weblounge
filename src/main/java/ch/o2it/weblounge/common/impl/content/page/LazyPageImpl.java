@@ -1115,6 +1115,15 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    *
+   * @see ch.o2it.weblounge.common.content.Resource#getOriginalContent()
+   */
+  public ResourceContent getOriginalContent() {
+    return null;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.o2it.weblounge.common.content.Resource#removeContent(ch.o2it.weblounge.common.language.Language)
    */
   public ResourceContent removeContent(Language language) {

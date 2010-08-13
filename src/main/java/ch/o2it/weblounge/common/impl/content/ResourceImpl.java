@@ -727,6 +727,20 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#getOriginalContent()
+   */
+  public T getOriginalContent() {
+    T original = null;
+    for (T c : content.values()) {
+      if (original == null || original.isCreatedAfter(c.getCreationDate()))
+        original = c;
+    }
+    return original;
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Resource#removeContent(ch.o2it.weblounge.common.language.Language)
    */

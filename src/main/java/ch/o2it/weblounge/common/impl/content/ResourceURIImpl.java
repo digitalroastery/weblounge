@@ -225,6 +225,15 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
       throws MalformedResourceURIException {
     return new ResourceURIImpl(type, site, path, version);
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.ResourceURI#setType(java.lang.String)
+   */
+  public void setType(String type) {
+    this.type = type;
+  }
 
   /**
    * {@inheritDoc}
