@@ -1,0 +1,133 @@
+html {
+  font: 13px/1.231 arial,helvetica,clean,sans-serif;
+}
+fieldset {
+  margin-bottom: 2em;
+  margin-top: 0.5em;
+  padding-bottom: 1em;
+  width: 90%;
+}
+pre {
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+table.method {
+  width: 100%;
+}
+table.testing {
+  width: 96%;
+  border: 2px solid #CCC;
+}
+ul {
+  margin: 0.2em;
+  padding-left: 1em;
+}
+div.table_spacer {
+  height: 2em;
+}
+div.hidden_form {
+  padding-bottom: 0.5em;
+}
+div.footer {
+  padding-top: 1em;
+  font-weight: bold;
+}
+span.required {
+  color: red;
+}
+.method_set_header {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-size: 1.4em;
+  font-weight: bold;
+}
+.method_header th {
+  background: #069 none repeat scroll 0 0;
+  color: white;
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 0.6em 0.3em;
+  text-align: left;
+  vertical-align: top;
+}
+th.method_header_left {
+  text-align: right;
+  padding: 0.6em 1em;
+  width: 200px;
+}
+tr.method th {
+  font-family: sans-serif;
+  font-weight: normal;
+  padding: 0.5em 1.0em;
+  text-align: right;
+  vertical-align: top;
+}
+tr.method th.method_important {
+  font-weight: bold;
+}
+tr.method td {
+  border-bottom: 1px solid #CCC;
+  padding-bottom: 6px;
+  padding-left: 4px;
+  padding-top: 6px;
+  vertical-align: top;
+}
+tr.testform TD {
+}
+tr.testform A {
+}
+div.hidden {
+  display: none;
+}
+div.spaced {
+  margin: 4px 0px;
+}
+td.form_label {
+  width: 20%;
+  padding-right: 4px;
+  padding-top: 10px;
+  vertical-align: top;
+  text-align: right;
+  white-space: nowrap;
+}
+.form_field_description {
+  font-size: 0.9em !important;
+  padding-top: 11px;
+  padding-left: 4px;
+  vertical-align: top;
+  text-align: left;
+}
+td.form_submit {
+  border: none !important;
+}
+a.hidden {
+  display: none;
+}
+.test_form_response textarea {
+  font-size: small;
+  font-family: monospace;
+  width: 100%;
+}
+.response_status {
+  font-family: monospace;
+  font-size: small;
+  padding-top: 10px;
+  padding-bottom: 5px;
+}
+.response_headers {
+  font-family: monospace;
+  font-size: small;
+  padding-top: 5px;
+  padding-bottom: 10px;
+}
+.response_body {
+  width: 100%;
+  font-family: monospace;
+  border-left: 4px solid #999;
+  padding-left: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
