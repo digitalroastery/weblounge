@@ -52,19 +52,19 @@ public final class PageEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "pages");
     docs.setTitle("Weblounge Pages");
 
-    // GET /{pageid}
-    Endpoint pageEndpoint = new Endpoint("/{pageid}", Method.GET, "getpage");
+    // GET /{page}
+    Endpoint pageEndpoint = new Endpoint("/{page}", Method.GET, "getpage");
     pageEndpoint.setDescription("Returns the page with the given id");
     pageEndpoint.addFormat(Format.xml());
     pageEndpoint.addStatus(OK("the page was found and is returned as part of the response"));
     pageEndpoint.addStatus(NOT_FOUND("the page was not found or could not be loaded"));
     pageEndpoint.addStatus(BAD_REQUEST("an invalid page identifier was received"));
     pageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    pageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
+    pageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.STRING, "The page identifier"));
     pageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, pageEndpoint);
 
-    // POST /{pageid}
+    // POST /{page}
     Endpoint createPageEndpoint = new Endpoint("/", Method.POST, "createpage");
     createPageEndpoint.setDescription("Creates a new page, either at the given path or at a random location and returns the REST url of the created resource.");
     createPageEndpoint.addFormat(Format.xml());
@@ -79,8 +79,8 @@ public final class PageEndpointDocs {
     createPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, createPageEndpoint);
 
-    // PUT /{pageid}
-    Endpoint updatePageEndpoint = new Endpoint("/{pageid}", Method.PUT, "updatepage");
+    // PUT /{page}
+    Endpoint updatePageEndpoint = new Endpoint("/{page}", Method.PUT, "updatepage");
     updatePageEndpoint.setDescription("Updates the specified page. If the client supplies an If-Match header, the update is processed only if the header value matches the page's ETag");
     updatePageEndpoint.addFormat(Format.xml());
     updatePageEndpoint.addStatus(OK("the page was updated"));
@@ -90,13 +90,13 @@ public final class PageEndpointDocs {
     updatePageEndpoint.addStatus(PRECONDITION_FAILED("the page's etag does not match the value specified in the If-Match header"));
     updatePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     updatePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    updatePageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
+    updatePageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.STRING, "The page identifier"));
     updatePageEndpoint.addRequiredParameter(new Parameter("page", Parameter.Type.STRING, "The page content"));
     updatePageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, updatePageEndpoint);
 
-    // DELETE /{pageid}
-    Endpoint deletePageEndpoint = new Endpoint("/{pageid}", Method.DELETE, "deletepage");
+    // DELETE /{page}
+    Endpoint deletePageEndpoint = new Endpoint("/{page}", Method.DELETE, "deletepage");
     deletePageEndpoint.setDescription("Deletes the specified page.");
     deletePageEndpoint.addFormat(Format.xml());
     deletePageEndpoint.addStatus(OK("the page was deleted"));
@@ -104,33 +104,33 @@ public final class PageEndpointDocs {
     deletePageEndpoint.addStatus(NOT_FOUND("the page was not found"));
     deletePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     deletePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    deletePageEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
+    deletePageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.STRING, "The page identifier"));
     deletePageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
 
-    // GET /{pageid}/composers/{composerId}
-    Endpoint composerEndpoint = new Endpoint("/{pageid}/composers/{composerid}", Method.GET, "getcomposer");
+    // GET /{page}/composers/{composerId}
+    Endpoint composerEndpoint = new Endpoint("/{page}/composers/{composer}", Method.GET, "getcomposer");
     composerEndpoint.setDescription("Returns the composer with the given id from the indicated page");
     composerEndpoint.addFormat(Format.xml());
     composerEndpoint.addStatus(OK("the composer was found and is returned as part of the response"));
     composerEndpoint.addStatus(NOT_FOUND("the composer was not found or could not be loaded"));
     composerEndpoint.addStatus(BAD_REQUEST("an invalid page or composer identifier was received"));
     composerEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    composerEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
-    composerEndpoint.addPathParameter(new Parameter("composerid", Parameter.Type.STRING, "The composer identifier"));
+    composerEndpoint.addPathParameter(new Parameter("page", Parameter.Type.STRING, "The page identifier"));
+    composerEndpoint.addPathParameter(new Parameter("composer", Parameter.Type.STRING, "The composer identifier"));
     composerEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, composerEndpoint);
 
-    // GET /{pageid}/composers/{composerId}/pagelets/{pageletIndex}
-    Endpoint pageletEndpoint = new Endpoint("/{pageid}/composers/{composerid}/pagelets/{pageletindex}", Method.GET, "getpagelet");
+    // GET /{page}/composers/{composerId}/pagelets/{pageletIndex}
+    Endpoint pageletEndpoint = new Endpoint("/{page}/composers/{composer}/pagelets/{pageletindex}", Method.GET, "getpagelet");
     pageletEndpoint.setDescription("Returns the pagelet at the given index from the indicated composer on the page");
     pageletEndpoint.addFormat(Format.xml());
     pageletEndpoint.addStatus(OK("the pagelet was found and is returned as part of the response"));
     pageletEndpoint.addStatus(NOT_FOUND("the pagelet was not found or could not be loaded"));
     pageletEndpoint.addStatus(BAD_REQUEST("an invalid page, composer identifier or pagelet index was received"));
     pageletEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    pageletEndpoint.addPathParameter(new Parameter("pageid", Parameter.Type.STRING, "The page identifier"));
-    pageletEndpoint.addPathParameter(new Parameter("composerid", Parameter.Type.STRING, "The composer identifier"));
+    pageletEndpoint.addPathParameter(new Parameter("page", Parameter.Type.STRING, "The page identifier"));
+    pageletEndpoint.addPathParameter(new Parameter("composer", Parameter.Type.STRING, "The composer identifier"));
     pageletEndpoint.addPathParameter(new Parameter("pageletindex", Parameter.Type.STRING, "The zero-based pagelet index"));
     pageletEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, pageletEndpoint);

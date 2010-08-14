@@ -53,8 +53,8 @@ public final class FileEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "files");
     docs.setTitle("Weblounge Files");
 
-    // GET /{resourceid}
-    Endpoint fileEndpoint = new Endpoint("/{resourceid}", Method.GET, "getfile");
+    // GET /{resource}
+    Endpoint fileEndpoint = new Endpoint("/{resource}", Method.GET, "getfile");
     fileEndpoint.setDescription("Returns the file with the given id");
     fileEndpoint.addFormat(Format.xml());
     fileEndpoint.addStatus(OK("the file was found and is returned as part of the response"));
@@ -65,8 +65,8 @@ public final class FileEndpointDocs {
     fileEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, fileEndpoint);
 
-    // GET /{resourceid}/content/{language}
-    Endpoint fileContentEndpoint = new Endpoint("/{resourceid}/content/{languageid}", Method.GET, "getfilecontent");
+    // GET /{resource}/content/{language}
+    Endpoint fileContentEndpoint = new Endpoint("/{resource}/content/{language}", Method.GET, "getfilecontent");
     fileContentEndpoint.setDescription("Returns the localized file contents with the given id");
     fileContentEndpoint.addFormat(Format.xml());
     fileContentEndpoint.addStatus(OK("the file content was found and is returned as part of the response"));
@@ -79,7 +79,7 @@ public final class FileEndpointDocs {
     fileContentEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, fileContentEndpoint);
 
-    // POST /{resourceid}
+    // POST /{resource}
     Endpoint createPageEndpoint = new Endpoint("/", Method.POST, "createfile");
     createPageEndpoint.setDescription("Creates a new file, either at the given path or at a random location and returns the REST url of the created resource.");
     createPageEndpoint.addFormat(Format.xml());
@@ -92,10 +92,10 @@ public final class FileEndpointDocs {
     createPageEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.STRING, "The target path"));
     createPageEndpoint.addOptionalParameter(new Parameter("file", Parameter.Type.STRING, "The file data"));
     createPageEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.WRITE, createPageEndpoint);
+    //docs.addEndpoint(Endpoint.Type.WRITE, createPageEndpoint);
 
-    // PUT /{resourceid}
-    Endpoint updatePageEndpoint = new Endpoint("/{resourceid}", Method.PUT, "updatefile");
+    // PUT /{resource}
+    Endpoint updatePageEndpoint = new Endpoint("/{resource}", Method.PUT, "updatefile");
     updatePageEndpoint.setDescription("Updates the specified file. If the client supplies an If-Match header, the update is processed only if the header value matches the file's ETag");
     updatePageEndpoint.addFormat(Format.xml());
     updatePageEndpoint.addStatus(OK("the file was updated"));
@@ -107,10 +107,10 @@ public final class FileEndpointDocs {
     updatePageEndpoint.addPathParameter(new Parameter("resourceid", Parameter.Type.STRING, "The file identifier"));
     updatePageEndpoint.addRequiredParameter(new Parameter("file", Parameter.Type.STRING, "The file content"));
     updatePageEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.WRITE, updatePageEndpoint);
+    //docs.addEndpoint(Endpoint.Type.WRITE, updatePageEndpoint);
 
-    // DELETE /{resourceid}
-    Endpoint deletePageEndpoint = new Endpoint("/{resourceid}", Method.DELETE, "deletefile");
+    // DELETE /{resource}
+    Endpoint deletePageEndpoint = new Endpoint("/{resource}", Method.DELETE, "deletefile");
     deletePageEndpoint.setDescription("Deletes the specified file.");
     deletePageEndpoint.addFormat(Format.xml());
     deletePageEndpoint.addStatus(OK("the file was deleted"));
@@ -120,7 +120,7 @@ public final class FileEndpointDocs {
     deletePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
     deletePageEndpoint.addPathParameter(new Parameter("resourceid", Parameter.Type.STRING, "The file identifier"));
     deletePageEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
+    //docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
 
     return EndpointDocumentationGenerator.generate(docs);
   }

@@ -72,7 +72,7 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 @Path("/")
 @Produces(MediaType.TEXT_XML)
-public class PageEndpoint extends AbstractContentRepositoryEndpoint {
+public class PageEndpoint extends ContentRepositoryEndpoint {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PageEndpoint.class);
@@ -91,9 +91,9 @@ public class PageEndpoint extends AbstractContentRepositoryEndpoint {
    * @return the page
    */
   @GET
-  @Path("/{pageid}")
+  @Path("/{page}")
   public Response getPage(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId) {
+      @PathParam("page") String pageId) {
 
     // Check the parameters
     if (pageId == null)
@@ -133,9 +133,9 @@ public class PageEndpoint extends AbstractContentRepositoryEndpoint {
    *           if the update fails
    */
   @PUT
-  @Path("/{pageid}")
+  @Path("/{page}")
   public Response updatePage(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId, @FormParam("page") String pageXml,
+      @PathParam("page") String pageId, @FormParam("page") String pageXml,
       @HeaderParam("If-Match") String ifMatchHeader) {
 
     // Check the parameters
@@ -309,9 +309,9 @@ public class PageEndpoint extends AbstractContentRepositoryEndpoint {
    * @return response an empty response
    */
   @DELETE
-  @Path("/{pageid}")
+  @Path("/{page}")
   public Response deletePage(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId) {
+      @PathParam("page") String pageId) {
 
     // Check the parameters
     if (pageId == null)
@@ -364,10 +364,10 @@ public class PageEndpoint extends AbstractContentRepositoryEndpoint {
    * @return the composer
    */
   @GET
-  @Path("/{pageid}/composers/{composerid}")
+  @Path("/{page}/composers/{composer}")
   public Response getComposer(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId,
-      @PathParam("composerid") String composerId) {
+      @PathParam("page") String pageId,
+      @PathParam("composer") String composerId) {
 
     // Check the parameters
     if (pageId == null)
@@ -412,10 +412,10 @@ public class PageEndpoint extends AbstractContentRepositoryEndpoint {
    * @return the pagelet
    */
   @GET
-  @Path("/{pageid}/composers/{composerid}/pagelets/{pageletindex}")
+  @Path("/{page}/composers/{composer}/pagelets/{pageletindex}")
   public Response getPagelet(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId,
-      @PathParam("composerid") String composerId,
+      @PathParam("page") String pageId,
+      @PathParam("composer") String composerId,
       @PathParam("pageletindex") int pageletIndex) {
 
     if (pageId == null)

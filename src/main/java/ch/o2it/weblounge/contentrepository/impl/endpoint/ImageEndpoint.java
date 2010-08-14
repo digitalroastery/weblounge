@@ -21,30 +21,35 @@
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.ResourceContent;
+import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.image.ImageResourceImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Module;
+import ch.o2it.weblounge.common.site.ScalingMode;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
-import ch.o2it.weblounge.contentrepository.WritableContentRepository;
-import ch.o2it.weblounge.kernel.SiteManager;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.Set;
 
+import javax.imageio.ImageIO;
+import javax.media.jai.InterpolationBicubic;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.ScaleDescriptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -64,13 +69,7 @@ import javax.ws.rs.core.StreamingOutput;
  */
 @Path("/")
 @Produces(MediaType.TEXT_XML)
-public class ImageEndpoint {
-
-  /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ImageEndpoint.class);
-
-  /** The sites that are online */
-  private transient SiteManager sites = null;
+public class ImageEndpoint extends ContentRepositoryEndpoint {
 
   /** The endpoint documentation */
   private String docs = null;
@@ -81,151 +80,329 @@ public class ImageEndpoint {
    * 
    * @param request
    *          the request
-   * @param resourceId
-   *          the image identifier
-   * @param languageId
-   *          the language identifier
+   * @param imageId
+   *          the resource identifier
    * @return the image
    */
   @GET
-  @Path("/{resourceid}/{languageid}")
-  public Response getImage(@Context HttpServletRequest request,
-      @PathParam("resourceid") String resourceId,
-      @PathParam("languageid") String languageId) {
+  @Produces("text/xml")
+  @Path("/{image}")
+  public Response getImageResource(@Context HttpServletRequest request,
+      @PathParam("image") String imageId) {
 
     // Check the parameters
-    if (resourceId == null)
-      return Response.status(Status.BAD_REQUEST).build();
+    if (imageId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
 
-    // Get the image resource
-    final ImageResource resource = loadImage(request, resourceId);
+    // Get the resource
+    final ImageResource resource = (ImageResource) loadResource(request, imageId, ImageResource.TYPE);
     if (resource == null) {
-      return Response.status(Status.NOT_FOUND).build();
+      throw new WebApplicationException(Status.NOT_FOUND);
     }
-    
+
     // Is there an up-to-date, cached version on the client side?
     if (!isModified(resource, request)) {
       return Response.notModified().build();
     }
-    
-    // Extract the language
-    Language language = LanguageSupport.getLanguage(languageId);
-    if (language == null) {
-      language = getSite(request).getDefaultLanguage();
-      if (language == null) {
-        throw new WebApplicationException(Status.BAD_REQUEST);
-      }
-    }
-    
-    // Load the content
-    ImageContent imageContent = resource.getContent(language);
-    if (imageContent == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    }
 
     // Create the response
-    ResponseBuilder response = Response.ok(new StreamingOutput() {
-      public void write(OutputStream os) throws IOException,
-          WebApplicationException {
-        InputStream is = null;
-        try {
-//          is = resource.openStream();
-          IOUtils.copy(is, os);
-        } finally {
-          IOUtils.closeQuietly(is);
-        }
-      }
-    });
-    if (imageContent.getMimetype() != null)
-      response.type(imageContent.getMimetype());
-    else
-      response.type(MediaType.APPLICATION_OCTET_STREAM);
-    if (imageContent.getSize() > 0)
-      response.header("Content-Length", imageContent.getSize());
+    ResponseBuilder response = Response.ok(resource.toXml());
     response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
     response.lastModified(resource.getModificationDate());
     return response.build();
   }
 
   /**
-   * Returns the scaled image with the given identifier or a <code>404</code> if
-   * either the image or the image format could not be found.
+   * Returns the original image with the given identifier or a <code>404</code>
+   * if the image resource or the image could not be found.
    * 
    * @param request
    *          the request
-   * @param resourceId
-   *          the image identifier
-   * @param formatId
-   *          the format identifier
-   * @return the scaled image
+   * @param imageId
+   *          the resource identifier
+   * @return the resource
    */
   @GET
-  @Path("/{resourceid}/{languageid}/formats/{formatid}")
-  @Produces("image/*")
-  public Response scaleImage(@Context HttpServletRequest request,
-      @PathParam("resourceid") String resourceId,
-      @PathParam("languageid") String languageId,
-      @PathParam("formatid") String formatId) {
+  @Path("/{image}/original")
+  public Response getOriginalImage(@Context HttpServletRequest request,
+      @PathParam("image") String imageId) {
 
     // Check the parameters
-    if (resourceId == null)
-      return Response.status(Status.BAD_REQUEST).build();
-    if (formatId == null)
-      return Response.status(Status.BAD_REQUEST).build();
+    if (imageId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
 
-    // Get the image resource
-    ImageResource image = loadImage(request, resourceId);
-    if (image == null) {
-      return Response.status(Status.NOT_FOUND).build();
-    }
-
-    // Is there an up-to-date, cached version on the client side?
-    if (!isModified(image, request)) {
-      return Response.notModified().build();
-    }
-
-    // Extract the language
-    Language language = LanguageSupport.getLanguage(languageId);
-    if (language == null) {
-      language = getSite(request).getDefaultLanguage();
-      if (language == null) {
-        throw new WebApplicationException(Status.BAD_REQUEST);
-      }
-    }
-    
-    // Load the content
-    ImageContent imageContent = image.getContent(language);
-    if (imageContent == null) {
+    // Get the resource
+    final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
+    if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
-    // Load the image format
-    ImageStyle format = null;
+    // Determine the language
     Site site = getSite(request);
-    for (Module m : site.getModules()) {
-      format = m.getImageStyle(formatId);
-      if (format != null)
-        break;
-    }
-    if (format == null) {
-      logger.warn("Image format '{}' does not exist in site '{}'");
-      // TODO: Throw exception
-      // return Response.status(Status.BAD_REQUEST).build();
+    Set<Language> resourceLanguages = resource.languages();
+    Language defaultLanguage = site.getDefaultLanguage();
+    Language preferred = LanguageSupport.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    if (preferred == null) {
+      preferred = resource.getOriginalContent().getLanguage();
     }
 
-    // TODO: Scale
-    final ImageResource scaledImage = image;
+    return getResourceContent(request, resource, preferred);
+  }
+
+  /**
+   * Returns the original image with the given identifier or a <code>404</code>
+   * if the image resource or the image could not be found in the given
+   * language.
+   * 
+   * @param request
+   *          the request
+   * @param imageId
+   *          the resource identifier
+   * @param languageId
+   *          the language identifier
+   * @return the image
+   */
+  @GET
+  @Path("/{image}/{language}/original")
+  public Response getOriginalImage(@Context HttpServletRequest request,
+      @PathParam("image") String imageId,
+      @PathParam("language") String languageId) {
+
+    // Check the parameters
+    if (imageId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Extract the language
+    Language language = LanguageSupport.getLanguage(languageId);
+    if (language == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    // Get the image
+    final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
+    if (resource == null || resource.contents().isEmpty()) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    return getResourceContent(request, resource, language);
+  }
+
+  /**
+   * Returns the original image with the given identifier or a <code>404</code>
+   * if the image resource or the image could not be found.
+   * 
+   * @param request
+   *          the request
+   * @param imageId
+   *          the resource identifier
+   * @param styleId
+   *          the image style identifier
+   * @return the resource
+   */
+  @GET
+  @Path("/{image}/styles/{style}")
+  public Response getStyledImage(@Context HttpServletRequest request,
+      @PathParam("image") String imageId, @PathParam("style") String styleId) {
+
+    // Check the parameters
+    if (imageId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Get the resource
+    final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
+    if (resource == null || resource.contents().isEmpty()) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    // Determine the language
+    Site site = getSite(request);
+    Set<Language> resourceLanguages = resource.languages();
+    Language defaultLanguage = site.getDefaultLanguage();
+    Language preferred = LanguageSupport.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    if (preferred == null) {
+      preferred = resource.getOriginalContent().getLanguage();
+    }
+
+    // Find the image style
+    ImageStyle style = null;
+    for (Module m : site.getModules()) {
+      style = m.getImageStyle(styleId);
+      if (style != null) {
+        return getScaledImage(request, resource, preferred, style);
+      }
+    }
+
+    // TODO: Temporary, remove!
+    ImageStyle s = new ImageStyleImpl("test", 500, 500);
+    s.setScalingMode(ScalingMode.Box);
+    return getScaledImage(request, resource, preferred, style);
+    
+    
+    // The image style was not found
+    //throw new WebApplicationException(Status.PRECONDITION_FAILED);
+  }
+
+  /**
+   * Returns the original image with the given identifier or a <code>404</code>
+   * if the image resource or the image could not be found in the given
+   * language.
+   * 
+   * @param request
+   *          the request
+   * @param imageId
+   *          the resource identifier
+   * @param languageId
+   *          the language identifier
+   * @param styleId
+   *          the image style identifier
+   * @return the image
+   */
+  @GET
+  @Path("/{image}/{language}/styles/{style}")
+  public Response getStyledImageContent(@Context HttpServletRequest request,
+      @PathParam("image") String imageId,
+      @PathParam("language") String languageId,
+      @PathParam("style") String styleId) {
+
+    // Check the parameters
+    if (imageId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Extract the language
+    Language language = LanguageSupport.getLanguage(languageId);
+    if (language == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    // Get the image
+    final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
+    if (resource == null || resource.contents().isEmpty()) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    // Find the image style
+    Site site = getSite(request);
+    ImageStyle style = null;
+    for (Module m : site.getModules()) {
+      style = m.getImageStyle(styleId);
+      if (style != null) {
+        return getScaledImage(request, resource, language, style);
+      }
+    }
+
+    // The image style was not found
+    throw new WebApplicationException(Status.PRECONDITION_FAILED);
+  }
+
+  /**
+   * Loads the given resource content.
+   * 
+   * @param request
+   *          the servlet request
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @param style
+   *          the image style
+   * @return the resource content
+   */
+  protected Response getScaledImage(HttpServletRequest request,
+      final Resource<?> resource, final Language language,
+      final ImageStyle style) {
+
+    // Check the parameters
+    if (resource == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Is there an up-to-date, cached version on the client side?
+    if (!isModified(resource, request)) {
+      return Response.notModified().build();
+    }
+
+    // Load the content
+    ResourceContent resourceContent = resource.getContent(language);
+    if (resourceContent == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    } else if (!(resourceContent instanceof ImageContent)) {
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
+    final String mimetype = ((ImageContent)resourceContent).getMimetype();
+    final String format = mimetype.substring(mimetype.indexOf("/"));
+    
+    Site site = getSite(request);
+    final ContentRepository contentRepository = getContentRepository(site, false);
+    final Language selectedLanguage = language;
 
     // Create the response
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
           WebApplicationException {
-//        IOUtils.copy(scaledImage.openStream(), os);
+        InputStream is = null;
+        InputStream scaledIs = null;
+        try {
+          try {
+            is = contentRepository.getContent(resource.getURI(), selectedLanguage);
+            scaledIs = scale(is, format, style);
+            if (is == null)
+              throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+          } catch (ContentRepositoryException e) {
+            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+          }
+          IOUtils.copy(is, os);
+        } finally {
+          IOUtils.closeQuietly(is);
+          IOUtils.closeQuietly(scaledIs);
+        }
       }
     });
-    response.tag(new EntityTag(Long.toString(image.getModificationDate().getTime())));
-    response.lastModified(image.getModificationDate());
+
+    // Set file-related response information
+    if (resourceContent instanceof FileContent) {
+      FileContent fileContent = (FileContent) resourceContent;
+      if (fileContent.getMimetype() != null)
+        response.type(fileContent.getMimetype());
+      else
+        response.type(MediaType.APPLICATION_OCTET_STREAM);
+      if (fileContent.getSize() > 0)
+        response.header("Content-Length", fileContent.getSize());
+    }
+
+    // Add an e-tag and send the response
+    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.lastModified(resource.getModificationDate());
     return response.build();
+  }
+
+  /**
+   * Resizes the given image to what is defined by the image style.
+   * 
+   * @param is
+   *          the input stream
+   * @param format
+   *          the image format
+   * @param style
+   *          the style
+   * @return the resized image
+   */
+  protected InputStream scale(InputStream is, String format, ImageStyle style) {
+    BufferedImage image = null;
+    try {
+      image = ImageIO.read(is);
+      if (image == null)
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      float scale = 2.0f;
+      RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+      RenderedOp resizeOp = ScaleDescriptor.create(image, scale, scale, 0.0f, 0.0f, new InterpolationBicubic(8), hints);
+      BufferedImage resizedImage = resizeOp.getAsBufferedImage();
+      PipedOutputStream os = new PipedOutputStream();
+      PipedInputStream pis = new PipedInputStream(os);
+      ImageIO.write(resizedImage, format, os);
+      return pis;
+    } catch (IOException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
   }
 
   /**
@@ -243,149 +420,6 @@ public class ImageEndpoint {
       docs = ImageEndpointDocs.createDocumentation(endpointUrl);
     }
     return docs;
-  }
-
-  /**
-   * Returns <code>true</code> if the resource either is more recent than the
-   * cached version on the client side or the request does not contain caching
-   * information.
-   * 
-   * @param resource
-   *          the resource
-   * @param request
-   *          the client request
-   * @return <code>true</code> if the page is more recent than the version that
-   *         is cached at the client.
-   * @throws WebApplicationException
-   *           if the <code>If-Modified-Since</code> cannot be converted to a
-   *           date.
-   */
-  protected boolean isModified(Resource resource, HttpServletRequest request) {
-    try {
-      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-      Date pageModificationDate = resource.getModificationDate();
-      return cachedModificationDate < pageModificationDate.getTime();
-    } catch (IllegalArgumentException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
-    }
-  }
-
-  /**
-   * Extracts the site from the request and returns it. If the site is not found
-   * or it's not running, a corresponding <code>WebApplicationException</code>
-   * is thrown.
-   * 
-   * @param request
-   *          the http request
-   * @return the site
-   * @throws WebApplicationException
-   *           if the site is not found or is not running
-   */
-  protected Site getSite(HttpServletRequest request)
-      throws WebApplicationException {
-    Site site = sites.findSiteByName(request.getServerName());
-    if (site == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    } else if (!site.isRunning()) {
-      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
-    }
-    return site;
-  }
-
-  /**
-   * Tries to locate the content repository for the given site. If
-   * <code>writable</code> is <code>true</code>, the method tries to cast the
-   * repository to a <code>WritableContentRepository</code>.
-   * <p>
-   * This method throws a corresponding <code>WebApplicationException</code> in
-   * case of failure.
-   * 
-   * @param site
-   *          the site
-   * @param writable
-   *          <code>true</code> to request a writable repository
-   * @return the repository
-   * @throws WebApplicationException
-   *           if the repository can't be located or if it's not writable
-   */
-  protected ContentRepository getContentRepository(Site site, boolean writable) {
-    ContentRepository contentRepository = null;
-    try {
-      contentRepository = ContentRepositoryFactory.getRepository(site);
-      if (contentRepository == null) {
-        logger.warn("No content repository found for site '{}'", site);
-        throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
-      }
-      if (writable) {
-        WritableContentRepository wcr = (WritableContentRepository) contentRepository;
-        return wcr;
-      } else {
-        return contentRepository;
-      }
-    } catch (ClassCastException e) {
-      logger.warn("Content repository '{}' is not writable", site);
-      throw new WebApplicationException(Status.NOT_ACCEPTABLE);
-    }
-  }
-
-  /**
-   * Returns the image identified by the given request and resource identifier
-   * or <code>null</code> if either one of the site, the site's content
-   * repository or the image itself is not available.
-   * 
-   * @param request
-   *          the servlet request
-   * @param resourceId
-   *          the image identifier
-   * @return the image
-   */
-  protected ImageResource loadImage(HttpServletRequest request,
-      String resourceId) {
-    if (sites == null) {
-      logger.debug("Unable to load page '{}': no sites registered", resourceId);
-      return null;
-    }
-
-    // Extract the site
-    Site site = getSite(request);
-
-    // Look for the content repository
-    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
-    if (contentRepository == null) {
-      logger.warn("No content repository found for site '{}'", site);
-      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
-    }
-
-    // Load the image and return it
-    // try {
-    ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
-    ImageResource resource = new ImageResourceImpl(resourceURI);
-    if (!(resource instanceof ImageResource))
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    return (ImageResource) resource;
-    // } catch (ContentRepositoryException e) {
-    // throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    // }
-  }
-
-  /**
-   * Callback for OSGi to set the site manager.
-   * 
-   * @param siteManager
-   *          the site manager
-   */
-  void setSiteManager(SiteManager siteManager) {
-    this.sites = siteManager;
-  }
-
-  /**
-   * Callback for OSGi to remove the site manager.
-   * 
-   * @param siteManager
-   *          the site manager
-   */
-  void removeSiteManager(SiteManager siteManager) {
-    this.sites = null;
   }
 
   /**

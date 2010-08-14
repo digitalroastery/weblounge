@@ -21,8 +21,11 @@
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -30,26 +33,105 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 import ch.o2it.weblounge.kernel.SiteManager;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 /**
  * Utility implementation for content repository endpoints, providing easy
  * access to the content repository and its functionality.
  */
-public class AbstractContentRepositoryEndpoint {
+public class ContentRepositoryEndpoint {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractContentRepositoryEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryEndpoint.class);
 
   /** The sites that are online */
   protected transient SiteManager sites = null;
+
+  /**
+   * Loads the given resource content.
+   * 
+   * @param request
+   *          the servlet request
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @return the resource content
+   */
+  protected Response getResourceContent(HttpServletRequest request,
+      final Resource<?> resource, final Language language) {
+
+    // Check the parameters
+    if (resource == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Is there an up-to-date, cached version on the client side?
+    if (!isModified(resource, request)) {
+      return Response.notModified().build();
+    }
+
+    // Load the content
+    ResourceContent resourceContent = resource.getContent(language);
+    if (resourceContent == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    Site site = getSite(request);
+    final ContentRepository contentRepository = getContentRepository(site, false);
+    final Language selectedLanguage = language;
+
+    // Create the response
+    ResponseBuilder response = Response.ok(new StreamingOutput() {
+      public void write(OutputStream os) throws IOException,
+          WebApplicationException {
+        InputStream is = null;
+        try {
+          try {
+            is = contentRepository.getContent(resource.getURI(), selectedLanguage);
+            if (is == null)
+              throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+          } catch (ContentRepositoryException e) {
+            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+          }
+          IOUtils.copy(is, os);
+        } finally {
+          IOUtils.closeQuietly(is);
+        }
+      }
+    });
+
+    // Set file-related response information
+    if (resourceContent instanceof FileContent) {
+      FileContent fileContent = (FileContent) resourceContent;
+      if (fileContent.getMimetype() != null)
+        response.type(fileContent.getMimetype());
+      else
+        response.type(MediaType.APPLICATION_OCTET_STREAM);
+      if (fileContent.getSize() > 0)
+        response.header("Content-Length", fileContent.getSize());
+    }
+
+    // Add an e-tag and send the response
+    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.lastModified(resource.getModificationDate());
+    return response.build();
+  }
 
   /**
    * Returns <code>true</code> if the resource either is more recent than the
@@ -113,7 +195,7 @@ public class AbstractContentRepositoryEndpoint {
     try {
       ResourceURI resourceURI = new ResourceURIImpl(resourceType, site, null, resourceId);
       Resource<?> resource = contentRepository.get(resourceURI);
-      if (resourceType != null && !resourceType.equals(resource.getType())) {
+      if (resourceType != null && !resourceType.equals(resource.getURI().getType())) {
         return null;
       }
       return resource;

@@ -21,9 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
@@ -38,7 +36,6 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
@@ -49,8 +46,6 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -74,7 +69,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -82,7 +76,7 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 @Path("/")
 @Produces(MediaType.TEXT_XML)
-public class FileEndpoint extends AbstractContentRepositoryEndpoint {
+public class FileEndpoint extends ContentRepositoryEndpoint {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(FileEndpoint.class);
@@ -101,6 +95,7 @@ public class FileEndpoint extends AbstractContentRepositoryEndpoint {
    * @return the resource
    */
   @GET
+  @Produces("text/xml")
   @Path("/{resourceid}")
   public Response getFile(@Context HttpServletRequest request,
       @PathParam("resourceid") String resourceId) {
@@ -162,7 +157,7 @@ public class FileEndpoint extends AbstractContentRepositoryEndpoint {
       preferred = resource.getOriginalContent().getLanguage();
     }
  
-    return getFileContent(request, resource, preferred);
+    return getResourceContent(request, resource, preferred);
   }
 
   /**
@@ -199,77 +194,7 @@ public class FileEndpoint extends AbstractContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
-    return getFileContent(request, resource, language);
-  }
-
-  /**
-   * Loads the given resource content.
-   * 
-   * @param request
-   *          the servlet request
-   * @param resource
-   *          the resource
-   * @param language
-   *          the language
-   * @return the resource content
-   */
-  protected Response getFileContent(HttpServletRequest request,
-      final Resource<?> resource, final Language language) {
-
-    // Check the parameters
-    if (resource == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-
-    // Is there an up-to-date, cached version on the client side?
-    if (!isModified(resource, request)) {
-      return Response.notModified().build();
-    }
-
-    // Load the content
-    ResourceContent resourceContent = resource.getContent(language);
-    if (resourceContent == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    }
-
-    Site site = getSite(request);
-    final ContentRepository contentRepository = getContentRepository(site, false);
-    final Language selectedLanguage = language;
-
-    // Create the response
-    ResponseBuilder response = Response.ok(new StreamingOutput() {
-      public void write(OutputStream os) throws IOException,
-          WebApplicationException {
-        InputStream is = null;
-        try {
-          try {
-            is = contentRepository.getContent(resource.getURI(), selectedLanguage);
-            if (is == null)
-              throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-          } catch (ContentRepositoryException e) {
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-          }
-          IOUtils.copy(is, os);
-        } finally {
-          IOUtils.closeQuietly(is);
-        }
-      }
-    });
-
-    // Set file-related response information
-    if (resourceContent instanceof FileContent) {
-      FileContent fileContent = (FileContent) resourceContent;
-      if (fileContent.getMimetype() != null)
-        response.type(fileContent.getMimetype());
-      else
-        response.type(MediaType.APPLICATION_OCTET_STREAM);
-      if (fileContent.getSize() > 0)
-        response.header("Content-Length", fileContent.getSize());
-    }
-
-    // Add an e-tag and send the response
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
-    response.lastModified(resource.getModificationDate());
-    return response.build();
+    return getResourceContent(request, resource, language);
   }
 
   /**
