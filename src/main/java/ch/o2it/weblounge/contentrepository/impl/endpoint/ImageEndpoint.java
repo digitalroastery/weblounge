@@ -35,21 +35,21 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
+import com.sun.media.jai.codec.MemoryCacheSeekableStream;
+import com.sun.media.jai.codec.SeekableStream;
+
 import org.apache.commons.io.IOUtils;
 
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
-import javax.media.jai.InterpolationBicubic;
+import javax.media.jai.JAI;
+import javax.media.jai.OpImage;
 import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.ScaleDescriptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -235,10 +235,9 @@ public class ImageEndpoint extends ContentRepositoryEndpoint {
     ImageStyle s = new ImageStyleImpl("test", 500, 500);
     s.setScalingMode(ScalingMode.Box);
     return getScaledImage(request, resource, preferred, style);
-    
-    
+
     // The image style was not found
-    //throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    // throw new WebApplicationException(Status.PRECONDITION_FAILED);
   }
 
   /**
@@ -326,9 +325,9 @@ public class ImageEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
-    final String mimetype = ((ImageContent)resourceContent).getMimetype();
+    final String mimetype = ((ImageContent) resourceContent).getMimetype();
     final String format = mimetype.substring(mimetype.indexOf("/"));
-    
+
     Site site = getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
     final Language selectedLanguage = language;
@@ -338,20 +337,19 @@ public class ImageEndpoint extends ContentRepositoryEndpoint {
       public void write(OutputStream os) throws IOException,
           WebApplicationException {
         InputStream is = null;
-        InputStream scaledIs = null;
         try {
           try {
             is = contentRepository.getContent(resource.getURI(), selectedLanguage);
-            scaledIs = scale(is, format, style);
             if (is == null)
               throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+            scale(is, os, format, style);
+            os.flush();
           } catch (ContentRepositoryException e) {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
           }
-          IOUtils.copy(is, os);
         } finally {
           IOUtils.closeQuietly(is);
-          IOUtils.closeQuietly(scaledIs);
+          IOUtils.closeQuietly(os);
         }
       }
     });
@@ -378,27 +376,38 @@ public class ImageEndpoint extends ContentRepositoryEndpoint {
    * 
    * @param is
    *          the input stream
+   * @param os
+   *          the output stream
    * @param format
    *          the image format
    * @param style
    *          the style
-   * @return the resized image
    */
-  protected InputStream scale(InputStream is, String format, ImageStyle style) {
-    BufferedImage image = null;
+  protected void scale(InputStream is, OutputStream os, String format,
+      ImageStyle style) {
     try {
-      image = ImageIO.read(is);
+      
+      // Load the image from the given input stream
+      SeekableStream seekableInputStream = new MemoryCacheSeekableStream(is);
+      RenderedOp image = JAI.create("stream", seekableInputStream);
       if (image == null)
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
+
+      ((OpImage) image.getRendering()).setTileCache(null);
       float scale = 2.0f;
-      RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-      RenderedOp resizeOp = ScaleDescriptor.create(image, scale, scale, 0.0f, 0.0f, new InterpolationBicubic(8), hints);
-      BufferedImage resizedImage = resizeOp.getAsBufferedImage();
-      PipedOutputStream os = new PipedOutputStream();
-      PipedInputStream pis = new PipedInputStream(os);
-      ImageIO.write(resizedImage, format, os);
-      return pis;
-    } catch (IOException e) {
+
+      // Resize the image
+      ParameterBlock subsampleParams = new ParameterBlock();
+      subsampleParams.addSource(image).add(scale).add(scale).add(0.0f).add(0.0f);
+      RenderingHints qualityHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+      RenderedOp resizedImage = JAI.create("SubsampleAverage", subsampleParams, qualityHints);
+
+      // Write the resized image to the output stream, in the specified encoding
+      ParameterBlock encodeParams = new ParameterBlock();
+      encodeParams.addSource(resizedImage).add(os).add(format);
+      JAI.create("encode", encodeParams, null);
+
+    } catch (Throwable t) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     } finally {
       IOUtils.closeQuietly(is);

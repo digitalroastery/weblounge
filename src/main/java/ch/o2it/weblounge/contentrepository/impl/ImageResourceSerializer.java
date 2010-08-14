@@ -37,10 +37,18 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ImageResourceSerializer extends AbstractResourceSerializer<ImageContent, ImageResource> {
 
   /**
+   * this gets rid of exception for not using native acceleration
+   */
+  static {
+    System.setProperty("com.sun.media.jai.disableMediaLib", "true");
+  }
+
+  /**
    * Creates a new image resource serializer.
    */
   public ImageResourceSerializer() {
     super(ImageResource.TYPE);
+
   }
 
   /**
@@ -56,11 +64,11 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
    */
   public SolrInputDocument getInputDocument(Resource<?> resource) {
-    return new ImageResourceInputDocument((ImageResource)resource);
+    return new ImageResourceInputDocument((ImageResource) resource);
   }
 
 }
