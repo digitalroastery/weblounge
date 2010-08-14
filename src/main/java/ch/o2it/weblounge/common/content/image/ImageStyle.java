@@ -77,6 +77,18 @@ public interface ImageStyle extends Composeable {
   int getWidth();
 
   /**
+   * Returns the scale for the original <code>width</code> and
+   * <code>height</code>.
+   * 
+   * @param width
+   *          the original width
+   * @param height
+   *          the original height
+   * @return the scaling factor
+   */
+  float scale(int width, int height);
+
+  /**
    * Returns an xml representation of this image style.
    * 
    * @return the xml representation
