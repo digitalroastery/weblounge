@@ -62,6 +62,9 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
   /** The resource object */
   protected T resource = null;
 
+  /** The root tag */
+  protected String rootTag = null;
+
   /** Flag to indicate whether the page header should be read */
   protected boolean readHeader = true;
 
@@ -80,13 +83,18 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    * it in the <code>Resource</code> object that is returned by the
    * {@link #read} method.
    * 
+   * @param rootTag
+   *          name of the root tag
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public AbstractResourceReaderImpl() throws ParserConfigurationException,
-      SAXException {
+  public AbstractResourceReaderImpl(String rootTag)
+      throws ParserConfigurationException, SAXException {
+    if (rootTag == null)
+      throw new IllegalArgumentException("Root tag name must not be null");
+    this.rootTag = rootTag;
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
@@ -280,8 +288,9 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
       Attributes attrs) throws SAXException {
 
     // read the page url
-    if ("page".equals(raw)) {
+    if (rootTag.equals(raw)) {
       parserContext = ParserContext.Resource;
+      ((ResourceURIImpl) resource.getURI()).setType(rootTag);
       ((ResourceURIImpl) resource.getURI()).setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
         ((ResourceURIImpl) resource.getURI()).setPath(attrs.getValue("path"));
@@ -348,19 +357,19 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
 
       // Description
       else if ("description".equals(raw)) {
-        Language l = (Language)clipboard.remove("language");
+        Language l = (Language) clipboard.remove("language");
         resource.setDescription(characters.toString(), l);
       }
 
       // Coverage
       else if ("coverage".equals(raw)) {
-        Language l = (Language)clipboard.remove("language");
+        Language l = (Language) clipboard.remove("language");
         resource.setCoverage(characters.toString(), l);
       }
 
       // Rights
       else if ("rights".equals(raw)) {
-        Language l = (Language)clipboard.remove("language");
+        Language l = (Language) clipboard.remove("language");
         resource.setRights(characters.toString(), l);
       }
 
@@ -371,7 +380,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
 
       // Pagelock
       else if ("locked".equals(raw)) {
-        User user = (User)clipboard.remove("user");
+        User user = (User) clipboard.remove("user");
         if (user != null)
           resource.setLocked(user);
       }

@@ -102,6 +102,54 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   public ImageStyleImpl() {
     this(null, -1, -1, None, true);
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.image.ImageStyle#scale(int, int)
+   */
+  public float scale(int width, int height) {
+    float scaleX = 1.0f;
+    float scaleY = 1.0f;
+    float scale = 1.0f;
+    switch (scalingMode) {
+      case Box:
+        scaleX = this.width / width;
+        scaleY = this.height / height;
+        if (scaleX < 1.0f || scaleY < 1.0f) {
+          scale = Math.min(scaleX, scaleY);
+        } else {
+          scale = Math.max(scaleX, scaleY);
+        }
+        break;
+      case Cover:
+        scaleX = this.width / width;
+        scaleY = this.height / height;
+        if (scaleX > 1.0f || scaleY > 1.0f) {
+          scale = Math.max(scaleX, scaleY);
+        } else {
+          scale = Math.min(scaleX, scaleY);
+        }
+        break;
+      case Fill:
+        // TODO: Implement
+        break;
+      case Height:
+        if (height != this.height) {
+          scale = this.height / height;
+        }
+        break;
+      case Width:
+        if (width != this.width) {
+          scale = this.width / width;
+        }
+        break;
+      default:
+        scale = 1.0f;
+        break;
+    }
+    return scale;
+  }
 
   /**
    * {@inheritDoc}

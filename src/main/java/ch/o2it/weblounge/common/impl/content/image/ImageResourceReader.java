@@ -50,7 +50,7 @@ public final class ImageResourceReader extends AbstractResourceReaderImpl<ImageC
    *           if an error occurs while parsing
    */
   public ImageResourceReader() throws ParserConfigurationException, SAXException {
-    super();
+    super(ImageResource.TYPE);
   }
 
   /**

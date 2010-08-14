@@ -49,7 +49,7 @@ public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, 
    *           if an error occurs while parsing
    */
   public FileResourceReader() throws ParserConfigurationException, SAXException {
-    super();
+    super(FileResource.TYPE);
   }
 
   /**
@@ -94,11 +94,6 @@ public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, 
       ((ResourceURIImpl) resource.getURI()).setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
         ((ResourceURIImpl) resource.getURI()).setPath(attrs.getValue("path"));
-    }
-
-    // in the header
-    else if ("head".equals(raw)) {
-      parserContext = ParserContext.Head;
     }
 
     // file content

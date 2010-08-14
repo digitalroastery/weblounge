@@ -51,7 +51,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse page data.
  */
-public final class PageReader extends WebloungeContentReader implements ResourceReader<ResourceContent, Page> {
+public class PageReader extends WebloungeContentReader implements ResourceReader<ResourceContent, Page> {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(PageReader.class);
