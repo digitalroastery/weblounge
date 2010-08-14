@@ -98,10 +98,9 @@
       <module>modules/weblounge-dispatcher</module>
       <module>modules/weblounge-kernel</module>
       <module>modules/weblounge-site</module>
+      <module>modules/weblounge-system</module>
       <module>modules/weblounge-taglib</module>
       <module>modules/weblounge-test</module>
-      <module>modules/weblounge-user-api</module>
-      <module>modules/weblounge-user</module>
   
       <!-- Attic (ui) -->
       <!--
@@ -113,6 +112,8 @@
       <module>modules/weblounge-pagedirectory</module>
       <module>modules/weblounge-pageeditor-api</module>
       <module>modules/weblounge-pageeditor</module>
+      <module>modules/weblounge-user-api</module>
+      <module>modules/weblounge-user</module>
       <module>modules/weblounge-userdirectory-api</module>
       <module>modules/weblounge-userdirectory</module>
       <module>modules/weblounge-workspace</module>
@@ -283,6 +284,13 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.2-beta-5</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.3.1</version>
+          <configuration>
+            <forceCreation>true</forceCreation>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
