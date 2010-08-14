@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.o2it.weblounge</groupId>
+  <artifactId>weblounge-system</artifactId>
+  <packaging>jar</packaging>
+  <name>Weblounge System Extensions</name>
+  <version>3.0-SNAPSHOT</version>
+
+  <!-- 
+    The bundle plugin is called during the process-classes phase with
+    the "manifest" goal. This will generate a manifest with all the
+    default bundle manifest headers.
+    
+    However, it's not possible to add arbitrary Export-Package headers.
+    This is done in the jar plugin when the created manifest is simply
+    extended with those headers.
+    
+    The result is a bundle that was created using a regular jar task.  
+  -->
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <forceCreation>true</forceCreation>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+            <manifestEntries>
+              <Export-Package>
+                com.sun.image.codec.jpeg
+              </Export-Package>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.system</Bundle-SymbolicName>
+            <Bundle-Category>framework</Bundle-Category>
+            <Fragment-Host>system.bundle; extension:=framework</Fragment-Host>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
