@@ -100,6 +100,9 @@ td.form_label {
   vertical-align: top;
   text-align: left;
 }
+.form_field_text {
+  width: 95%	
+}
 td.form_submit {
   border: none !important;
 }
