@@ -1,34 +1,190 @@
-(function($) {
+/*
+ *  Weblounge: Web Content Management System
+ *  Copyright (c) 2010 The Weblounge Team
+ *  http://weblounge.o2it.ch
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the Free Software Foundation
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
 
-    /**
-     * Add a click handler to the link that shows the test form.
-     */
-    $("a.link_show_testform").click(
-        function() {
-           var link = $(this);
-           var form = link.parent().find("div.hidden_form");
-           var link_hide_testform = link.parent().find("a.link_hide_testform");
-           form.fadeIn(400);
-           link_hide_testform.show();
-           link.hide();
-           return false;
-        }
-    );
+var Docs = (function($) {
+	
+	var docs = {};
+	
+	/**
+	 * Initialize the docs page, mainly by registering event listeners on the
+	 * relevant elements.
+	 */
+	docs.init = function() {
 
-    /**
-     * Add a click handler to the link that hides the test form.
-     */
-    $("a.link_hide_testform").click(
-        function() {
-           var link = $(this);
-           var form = link.parent().find("div.hidden_form");
-           var link_show_testform = link.parent().find("a.link_show_testform");
-           form.fadeOut(200);
-           link_show_testform.show();
-           link.hide();
-           return false;
-        }
-     );
+	    /**
+	     * Add a click handler to the link that shows the test form.
+	     */
+	    $("a.link_show_testform").click(
+	        function() {
+	           var link = $(this);
+	           var form = link.parent().find("div.hidden_form");
+	           var link_hide_testform = link.parent().find("a.link_hide_testform");
+	           form.fadeIn(400);
+	           link_hide_testform.show();
+	           link.hide();
+	           return false;
+	        }
+	    );
+
+	    /**
+	     * Add a click handler to the link that hides the test form.
+	     */
+	    $("a.link_hide_testform").click(
+	        function() {
+	           var link = $(this);
+	           var form = link.parent().find("div.hidden_form");
+	           var link_show_testform = link.parent().find("a.link_show_testform");
+	           form.fadeOut(200);
+	           link_show_testform.show();
+	           link.hide();
+	           return false;
+	        }
+	     );
+
+	    /**
+	     * Loops through all the test forms and wires the input fields with the
+	     * checkXYZ() - methods.
+	     */
+	    $("form.form_test_form").each(function() {
+	        var form = $(this);
+	        if (form.find("input.form_action_holder").length >= 1) {
+
+	            // wire path parameters
+	            var formParams = form.find(".form_param_path");
+	            if (formParams.length > 0) {
+			        formParams.change(function() {
+			        	checkPath(form);
+			        });
+			        formParams.keyup(function() {
+			        	checkPath(form);
+			        });
+	            }
+	            checkPath(form);
+
+	            // wire required parameters
+	            var reqParameters = form.find(".form_param_required");
+	            if (reqParameters.length > 0) {
+	                reqParameters.change(function() {
+	                	checkRequired(form);
+	                });
+	                reqParameters.keyup(function() {
+	                	checkRequired(form);
+	                });
+	            }
+	            checkRequired(form);
+
+	            // handle the ajax submissions
+	            if (form.find("input.form_ajax_submit").length >= 1) {
+	              // add an event handler to the form submit
+	              form.bind('submit', function() {
+	                  if (checkRequired(form)) {
+	                      var submitParameters = {};
+	                      form.find(".form_param_submit").each(function() {
+	                          var param = $(this);
+	                          submitParameters[param.attr('name')] = param.val();
+	                      });
+
+	                      var method = form.find(".form_method").val();
+	                      var url = form.attr('action');
+	                      form.parent().find(".test_form_working").show();
+	                      form.parent().find(".test_form_response input").click(function() {
+	                          $(this).parent.hide();
+	                      });
+
+	                      // clear previous responses
+	                      var responseBody = form.parent().find(".test_form_response");
+	                      responseBody.hide();
+	                      responseBody.find("div.response_status").text("");
+	                      responseBody.find("div.response_headers").text("");
+	                      responseBody.find("pre.response_body").text("");
+
+	                      // make the request
+	                      $.ajax({
+	                          type: method,
+	                          url: url,
+	                          processData: true,
+	                          dataType: 'text',
+	                          data: submitParameters,
+	                          success: function(data, textStatus, request) {
+	                              form.parent().find(".test_form_working").hide();
+	                              // response status
+	                              var statusText = "<b>Status:</b> <tt>" + request.status + " (" + request.statusText + ")</tt>";
+	                              responseBody.find("div.response_status").html(statusText);
+	                              // response headers
+	                              var headers = request.getAllResponseHeaders();
+	                              var contentType = null;
+	                              if (headers !== undefined) {
+	                                var headersText = "";
+	                                var headerLines = headers.split("\n");
+	                                for (var i = 0; i < headerLines.length; i++) {
+	                                  if (headerLines[i] !== "") {
+	                                    var header = headerLines[i].replace("\r", "").split("\: ");
+	                                    headersText += "<b>" + header[0] + "</b>: " + header[1] + "<br/>";
+	                                    if (header[0] == "Content-Type") {
+	                                        contentType = header[1];
+	                                    }
+	                                  }
+	                                }
+	                                responseBody.find("div.response_headers").html(headersText);
+	                              }
+	                              // response body
+	                              if (data !== undefined && data != "") {
+	                                responseBody.find("pre.response_body").text(prettify(data, contentType));
+	                                responseBody.find("pre.response_body").show();
+	                              } else {
+	                                responseBody.find("pre.response_body").hide();
+	                              }
+	                              responseBody.show();
+	                          },
+	                          error: function(request, textStatus, errorThrown) {
+	                              form.parent().find(".test_form_working").hide();
+	                              // response status
+	                              var statusText = "<b>Status:</b> <tt>" + request.status + " (" + request.statusText + ")</tt>";
+	                              responseBody.find("div.response_status").html(statusText);
+	                              // response headers
+	                              var headers = request.getAllResponseHeaders();
+	                              if (headers !== undefined) {
+	                                var headersText = "";
+	                                var headerLines = headers.split("\n");
+	                                for (var i = 0; i < headerLines.length; i++) {
+	                                  if (headerLines[i] !== "") {
+	                                    var header = headerLines[i].split("\: ");
+	                                    headersText += "<b>" + header[0] + "</b>: " + header[1] + "<br/>";
+	                                  }
+	                                }
+	                                responseBody.find("div.response_headers").html(headersText);
+	                              }
+	                              responseBody.find("pre.response_body").hide();
+	                              responseBody.show();
+	                          }
+	                      });
+	                  } else {
+	                      alert("Fill out all required fields first");
+	                  }
+	                  return false;
+	              });
+	            }
+	        }
+	    });
+	        
+	};
 
     /**
      * Takes a path and integrates the pathParameters values into it.
@@ -36,7 +192,7 @@
      * @param path the path with keys (e.g. /my/{thing}/{stuff})
      * @param parameters the parameters to put into the path (e.g. {'thing':'apple'})
      */
-    function updatePath(path, parameters) {
+    var updatePath = function(path, parameters) {
         var newPath = path;
         for (var key in parameters) {
             if (parameters.hasOwnProperty(key)) {
@@ -47,12 +203,12 @@
             }
         }
         return newPath;
-    }
+    };
 
     /**
      * Checks the path parameters.
      */
-    function checkPath(form) {
+    var checkPath = function(form) {
         var parameters = [];
         form.find(".form_param_path").each(function() {
             var param = $(this);
@@ -67,13 +223,13 @@
             return false;
         }
         return true;
-    }
+    };
 
     /**
      * Checks the form for required parameters and disables the form's submit
      * button if a required parameter is missing.
      */
-    function checkRequired(form) {
+    var checkRequired = function(form) {
         var required = form.find(".form_param_required");
         var total = required.length;
         var counter = 0;
@@ -92,13 +248,13 @@
             // disable form submit until required options at set
             formInputs.attr('disabled', 'disabled');
 	            return false;
-	        }
-	    }
+        }
+    };
   
-        /**
+    /**
      * Returns a pretty-printed version of an xml response body.
      */
-    function prettify(content, contentType) {
+    var prettify = function(content, contentType) {
         if (contentType !== "text/xml")
             return content;
 
@@ -152,131 +308,8 @@
         }
         
         return formatted;
-    }
+    };
     
-    /**
-     * Loops through all the test forms and wires the input fields with the
-     * checkXYZ() - methods.
-     */
-    $("form.form_test_form").each(function() {
-        var form = $(this);
-        if (form.find("input.form_action_holder").length >= 1) {
-
-            // wire path parameters
-            var formParams = form.find(".form_param_path");
-            if (formParams.length > 0) {
-		        formParams.change(function() {
-		        	checkPath(form);
-		        });
-		        formParams.keyup(function() {
-		        	checkPath(form);
-		        });
-            }
-            checkPath(form);
-
-            // wire required parameters
-            var reqParameters = form.find(".form_param_required");
-            if (reqParameters.length > 0) {
-                reqParameters.change(function() {
-                	checkRequired(form);
-                });
-                reqParameters.keyup(function() {
-                	checkRequired(form);
-                });
-            }
-            checkRequired(form);
-
-            // handle the ajax submissions
-            if (form.find("input.form_ajax_submit").length >= 1) {
-              // add an event handler to the form submit
-              form.bind('submit', function() {
-                  if (checkRequired(form)) {
-                      var submitParameters = {};
-                      form.find(".form_param_submit").each(function() {
-                          var param = $(this);
-                          submitParameters[param.attr('name')] = param.val();
-                      });
-
-                      var method = form.find(".form_method").val();
-                      var url = form.attr('action');
-                      form.parent().find(".test_form_working").show();
-                      form.parent().find(".test_form_response input").click(function() {
-                          $(this).parent.hide();
-                      });
-
-                      // clear previous responses
-                      var responseBody = form.parent().find(".test_form_response");
-                      responseBody.hide();
-                      responseBody.find("div.response_status").text("");
-                      responseBody.find("div.response_headers").text("");
-                      responseBody.find("pre.response_body").text("");
-
-                      // make the request
-                      $.ajax({
-                          type: method,
-                          url: url,
-                          processData: true,
-                          dataType: 'text',
-                          data: submitParameters,
-                          success: function(data, textStatus, request) {
-                              form.parent().find(".test_form_working").hide();
-                              // response status
-                              var statusText = "<b>Status:</b> <tt>" + request.status + " (" + request.statusText + ")</tt>";
-                              responseBody.find("div.response_status").html(statusText);
-                              // response headers
-                              var headers = request.getAllResponseHeaders();
-                              var contentType = null;
-                              if (headers !== undefined) {
-                                var headersText = "";
-                                var headerLines = headers.split("\n");
-                                for (var i = 0; i < headerLines.length; i++) {
-                                  if (headerLines[i] !== "") {
-                                    var header = headerLines[i].replace("\r", "").split("\: ");
-                                    headersText += "<b>" + header[0] + "</b>: " + header[1] + "<br/>";
-                                    if (header[0] == "Content-Type") {
-                                        contentType = header[1];
-                                    }
-                                  }
-                                }
-                                responseBody.find("div.response_headers").html(headersText);
-                              }
-                              // response body
-                              if (data !== undefined && data != "") {
-                                responseBody.find("pre.response_body").text(prettify(data, contentType));
-                                responseBody.find("pre.response_body").show();
-                              } else {
-                                responseBody.find("pre.response_body").hide();
-                              }
-                              responseBody.show();
-                          },
-                          error: function(request, textStatus, errorThrown) {
-                              form.parent().find(".test_form_working").hide();
-                              // response status
-                              var statusText = "<b>Status:</b> <tt>" + request.status + " (" + request.statusText + ")</tt>";
-                              responseBody.find("div.response_status").html(statusText);
-                              // response headers
-                              var headers = request.getAllResponseHeaders();
-                              if (headers !== undefined) {
-                                var headersText = "";
-                                var headerLines = headers.split("\n");
-                                for (var i = 0; i < headerLines.length; i++) {
-                                  if (headerLines[i] !== "") {
-                                    var header = headerLines[i].split("\: ");
-                                    headersText += "<b>" + header[0] + "</b>: " + header[1] + "<br/>";
-                                  }
-                                }
-                                responseBody.find("div.response_headers").html(headersText);
-                              }
-                              responseBody.find("pre.response_body").hide();
-                              responseBody.show();
-                          }
-                      });
-                  } else {
-                      alert("Fill out all required fields first");
-                  }
-                  return false;
-              });
-            }
-        }
-    });
+    return docs;
+    
 }(jQuery));
