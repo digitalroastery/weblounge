@@ -102,6 +102,7 @@
               org.osgi.framework;version="1.4.0",
               org.osgi.service.component;version="1.1.0",
               org.osgi.service.http;version="1.1.0",
+              org.osgi.service.cm;version="1.1.0",
               org.osgi.util.tracker;version="1.4.0",
               org.slf4j;version="1.5.6"
             </Import-Package>
