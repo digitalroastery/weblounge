@@ -135,7 +135,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @PUT
   @Path("/{page}")
   public Response updatePage(@Context HttpServletRequest request,
-      @PathParam("page") String pageId, @FormParam("page") String pageXml,
+      @PathParam("page") String pageId, @FormParam("content") String pageXml,
       @HeaderParam("If-Match") String ifMatchHeader) {
 
     // Check the parameters

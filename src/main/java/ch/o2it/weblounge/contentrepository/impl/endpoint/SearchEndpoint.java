@@ -154,9 +154,9 @@ public class SearchEndpoint {
     searchEndpoint.addStatus(BAD_REQUEST("no search terms have been specified"));
     searchEndpoint.addStatus(ERROR("executing the query resulted in an error"));
     searchEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    searchEndpoint.addPathParameter(new Parameter("searchterms", Parameter.Type.STRING, "The search terms"));
-    searchEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.STRING, "Offset within the result set", "-1"));
-    searchEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.STRING, "Number of result items to include", "-1"));
+    searchEndpoint.addPathParameter(new Parameter("searchterms", Parameter.Type.String, "The search terms"));
+    searchEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Offset within the result set", "-1"));
+    searchEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Number of result items to include", "-1"));
     searchEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, searchEndpoint);
 

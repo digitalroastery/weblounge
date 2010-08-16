@@ -61,7 +61,7 @@ public final class FilesEndpointDocs {
     fileEndpoint.addStatus(NOT_FOUND("the file was not found or could not be loaded"));
     fileEndpoint.addStatus(BAD_REQUEST("an invalid file identifier was received"));
     fileEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    fileEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.STRING, "The file identifier"));
+    fileEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The file identifier"));
     fileEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, fileEndpoint);
 
@@ -74,8 +74,8 @@ public final class FilesEndpointDocs {
     fileContentEndpoint.addStatus(NOT_FOUND("the file content don't exist in the specified language"));
     fileContentEndpoint.addStatus(BAD_REQUEST("an invalid file identifier was received"));
     fileContentEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    fileContentEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.STRING, "The file identifier"));
-    fileContentEndpoint.addPathParameter(new Parameter("language", Parameter.Type.STRING, "The language identifier"));
+    fileContentEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The file identifier"));
+    fileContentEndpoint.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
     fileContentEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, fileContentEndpoint);
 
@@ -89,8 +89,8 @@ public final class FilesEndpointDocs {
     createPageEndpoint.addStatus(CONFLICT("a file already exists at the specified path"));
     createPageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     createPageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    createPageEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.STRING, "The target path"));
-    createPageEndpoint.addOptionalParameter(new Parameter("file", Parameter.Type.STRING, "The file data"));
+    createPageEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The target path"));
+    createPageEndpoint.addOptionalParameter(new Parameter("file", Parameter.Type.String, "The file data"));
     createPageEndpoint.setTestForm(new TestForm());
     //docs.addEndpoint(Endpoint.Type.WRITE, createPageEndpoint);
 
@@ -104,8 +104,8 @@ public final class FilesEndpointDocs {
     updatePageEndpoint.addStatus(PRECONDITION_FAILED("the file's etag does not match the value specified in the If-Match header"));
     updatePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     updatePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    updatePageEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.STRING, "The file identifier"));
-    updatePageEndpoint.addRequiredParameter(new Parameter("file", Parameter.Type.STRING, "The file content"));
+    updatePageEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The file identifier"));
+    updatePageEndpoint.addRequiredParameter(new Parameter("file", Parameter.Type.String, "The file content"));
     updatePageEndpoint.setTestForm(new TestForm());
     //docs.addEndpoint(Endpoint.Type.WRITE, updatePageEndpoint);
 
@@ -118,7 +118,7 @@ public final class FilesEndpointDocs {
     deletePageEndpoint.addStatus(NOT_FOUND("the file was not found"));
     deletePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     deletePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    deletePageEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.STRING, "The file identifier"));
+    deletePageEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The file identifier"));
     deletePageEndpoint.setTestForm(new TestForm());
     //docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
 

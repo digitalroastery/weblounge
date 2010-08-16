@@ -57,7 +57,7 @@ public final class ImagesEndpointDocs {
     getImageEndpoint.addStatus(NOT_FOUND("the image was not found or could not be loaded"));
     getImageEndpoint.addStatus(BAD_REQUEST("an invalid image identifier was received"));
     getImageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    getImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.STRING, "The resource identifier"));
+    getImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.String, "The resource identifier"));
     getImageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getImageEndpoint);
 
@@ -69,7 +69,7 @@ public final class ImagesEndpointDocs {
     originalImageEndpoint.addStatus(NOT_FOUND("the image was not found or could not be loaded"));
     originalImageEndpoint.addStatus(BAD_REQUEST("an invalid image identifier was received"));
     originalImageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    originalImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.STRING, "The image identifier"));
+    originalImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.String, "The image identifier"));
     originalImageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, originalImageEndpoint);
 
@@ -82,8 +82,8 @@ public final class ImagesEndpointDocs {
     originalLocalizedImageEndpoint.addStatus(NOT_FOUND("the image does not exist in the specified language"));
     originalLocalizedImageEndpoint.addStatus(BAD_REQUEST("an invalid image identifier was received"));
     originalLocalizedImageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    originalLocalizedImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.STRING, "The image identifier"));
-    originalLocalizedImageEndpoint.addPathParameter(new Parameter("language", Parameter.Type.STRING, "The language identifier"));
+    originalLocalizedImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.String, "The image identifier"));
+    originalLocalizedImageEndpoint.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
     originalLocalizedImageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, originalLocalizedImageEndpoint);
 
@@ -95,8 +95,8 @@ public final class ImagesEndpointDocs {
     scaleImageEndpoint.addStatus(NOT_FOUND("the image was not found or could not be loaded"));
     scaleImageEndpoint.addStatus(BAD_REQUEST("an invalid image or image style identifier was received"));
     scaleImageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    scaleImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.STRING, "The image identifier"));
-    scaleImageEndpoint.addPathParameter(new Parameter("style", Parameter.Type.STRING, "The image style identifier"));
+    scaleImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.String, "The image identifier"));
+    scaleImageEndpoint.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
     scaleImageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, scaleImageEndpoint);
 
@@ -109,9 +109,9 @@ public final class ImagesEndpointDocs {
     scaleLocalizedImageEndpoint.addStatus(NOT_FOUND("the image does not exist in the specified language"));
     scaleLocalizedImageEndpoint.addStatus(BAD_REQUEST("an invalid image or image style identifier was received"));
     scaleLocalizedImageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    scaleLocalizedImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.STRING, "The image identifier"));
-    scaleLocalizedImageEndpoint.addPathParameter(new Parameter("language", Parameter.Type.STRING, "The language identifier"));
-    scaleLocalizedImageEndpoint.addPathParameter(new Parameter("style", Parameter.Type.STRING, "The image style identifier"));
+    scaleLocalizedImageEndpoint.addPathParameter(new Parameter("image", Parameter.Type.String, "The image identifier"));
+    scaleLocalizedImageEndpoint.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
+    scaleLocalizedImageEndpoint.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
     scaleLocalizedImageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, scaleLocalizedImageEndpoint);
 
