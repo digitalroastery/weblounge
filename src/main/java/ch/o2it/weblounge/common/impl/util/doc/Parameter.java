@@ -34,7 +34,7 @@ public class Parameter {
 
   /** Parameter type */
   public static enum Type {
-    TEXT, STRING, BOOLEAN, FILE, ENUM
+    Text, String, Boolean, File, Enum
   };
 
   /** The parameter name */

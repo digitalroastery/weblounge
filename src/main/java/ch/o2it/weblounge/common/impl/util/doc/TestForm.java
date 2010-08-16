@@ -163,7 +163,7 @@ public class TestForm {
     if (endpoint.getRequiredParameters() != null) {
       for (Parameter param : endpoint.getRequiredParameters()) {
         param.setRequired(true);
-        if (Parameter.Type.FILE.equals(param.getType())) {
+        if (Parameter.Type.File.equals(param.getType())) {
           hasUpload = true;
         }
         this.parameters.add(param);
@@ -172,7 +172,7 @@ public class TestForm {
     if (endpoint.getOptionalParameters() != null) {
       for (Parameter param : endpoint.getOptionalParameters()) {
         param.setRequired(false);
-        if (Parameter.Type.FILE.equals(param.getType())) {
+        if (Parameter.Type.File.equals(param.getType())) {
           hasUpload = true;
         }
         this.parameters.add(param);
@@ -181,7 +181,7 @@ public class TestForm {
     if (endpoint.getBodyParameter() != null) {
       Parameter param = endpoint.getBodyParameter();
       param.setRequired(true);
-      if (Parameter.Type.FILE.equals(param.getType())) {
+      if (Parameter.Type.File.equals(param.getType())) {
         hasUpload = true;
       }
       this.parameters.add(param);

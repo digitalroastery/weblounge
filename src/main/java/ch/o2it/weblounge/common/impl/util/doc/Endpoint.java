@@ -140,7 +140,7 @@ public class Endpoint {
    */
   public Parameter addBodyParameter(boolean isBinary, String defaultValue,
       String description) {
-    Parameter.Type type = isBinary ? Parameter.Type.FILE : Parameter.Type.TEXT;
+    Parameter.Type type = isBinary ? Parameter.Type.File : Parameter.Type.Text;
     Parameter parameter = new Parameter("BODY", type, description, defaultValue);
     parameter.setRequired(true);
     parameter.setAttribute("rows", "8");
@@ -163,7 +163,7 @@ public class Endpoint {
     if (parameter == null)
       throw new IllegalArgumentException("Parameter must not be null");
 
-    if (Parameter.Type.FILE.name().equals(parameter.getType()) || Parameter.Type.TEXT.name().equals(parameter.getType()))
+    if (Parameter.Type.File.name().equals(parameter.getType()) || Parameter.Type.Text.name().equals(parameter.getType()))
       throw new IllegalStateException("Cannot add path parameter of type FILE or TEXT");
 
     parameter.setRequired(true);

@@ -130,7 +130,7 @@
 		        <a href="#" class="link_show_testform">${endpoint.form.title!"Test form"} (click to reveal)</a>
 		        <div class="hidden_form hidden">
 		          <form id="form_${endpoint.name}" class="form_test_form" action="${metadata.url}${endpoint.path}" 
-		                method="${endpoint.method?lower_case}"<#if endpoint.form.fileUpload> enctype="multipart/form-data"</#if>>
+		                method="${endpoint.method?lower_case}" enctype="<#if endpoint.form.fileUpload>multipart/form-data<#else>application/x-www-form-urlencoded</#if>">
 		            <input class="form_action_holder" type="hidden" value="${metadata.url}${endpoint.path}" />
 		            <input class="form_endpoint_name" type="hidden" value="${endpoint.name}" />
 		            <input class="form_method" type="hidden" value="${endpoint.method}" />
@@ -152,14 +152,14 @@
 		            <table class="testing" cellpadding="0" cellspacing="0">
 		              <#list endpoint.form.parameters as item>
 		              <tr class="form_field <#if item.required>form_required<#else>form_optional</#if>">
-		                <#if item.type == "text">
+		                <#if item.type == "Text">
 		                <td class="form_textarea" colspan="3">
 		                  <label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:<br/>
 		                  <textarea id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_text form_param_submit<#if item.required> form_param_required</#if>" 
 		                    rows="${(item.attributes.rows)!'3'}" cols="${(item.attributes.cols)!'80'}">${item.defaultValue!}</textarea>
 		                  <div class="form_field_description">${item.description!}</div>
 		                </td>
-		                <#elseif item.type == "boolean">
+		                <#elseif item.type == "Boolean">
 		                <td class="form_label">
 		                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:
 		                </td>
@@ -168,7 +168,7 @@
 		                    type="checkbox" value="${item.defaultValue!}" />
 		                </td>
 		                <td class="form_field_description">${item.description!}</td>
-		                <#elseif item.type == "file">
+		                <#elseif item.type == "File">
 		                <td class="form_label">
 		                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:
 		                </td>
@@ -176,7 +176,7 @@
 		                  <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_file" class="form_field form_param_upload<#if item.required> form_param_required</#if>" type="file" />
 		                </td>
 		                <td class="form_field_description">${item.description!}</td>
-		                <#elseif item.type == "enum">
+		                <#elseif item.type == "Enum">
 		                <td class="form_label">
 		                  <#if item.required><span class="required">*</span>&nbsp;</#if><label for="${endpoint.name}_${item.name}"><tt>${item.name}</tt></label>:
 		                </td>
