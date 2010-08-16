@@ -72,10 +72,10 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 @Path("/")
 @Produces(MediaType.TEXT_XML)
-public class PageEndpoint extends ContentRepositoryEndpoint {
+public class PagesEndpoint extends ContentRepositoryEndpoint {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(PageEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(PagesEndpoint.class);
 
   /** The endpoint documentation */
   private String docs = null;
@@ -456,7 +456,7 @@ public class PageEndpoint extends ContentRepositoryEndpoint {
     if (docs == null) {
       String endpointUrl = "/system/pages";
       // TODO: determine endpoint url
-      docs = PageEndpointDocs.createDocumentation(endpointUrl);
+      docs = PagesEndpointDocs.createDocumentation(endpointUrl);
     }
     return docs;
   }

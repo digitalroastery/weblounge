@@ -69,7 +69,7 @@ import javax.ws.rs.core.StreamingOutput;
  */
 @Path("/")
 @Produces(MediaType.TEXT_XML)
-public class ImageEndpoint extends ContentRepositoryEndpoint {
+public class ImagesEndpoint extends ContentRepositoryEndpoint {
 
   /** The endpoint documentation */
   private String docs = null;
@@ -426,7 +426,7 @@ public class ImageEndpoint extends ContentRepositoryEndpoint {
     if (docs == null) {
       String endpointUrl = "/system/images";
       // TODO: determine endpoint url
-      docs = ImageEndpointDocs.createDocumentation(endpointUrl);
+      docs = ImagesEndpointDocs.createDocumentation(endpointUrl);
     }
     return docs;
   }

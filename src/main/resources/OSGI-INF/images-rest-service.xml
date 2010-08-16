@@ -3,11 +3,11 @@
   immediate="true" 
   name="Weblounge Image Endpoint">	
   
-  <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.ImageEndpoint" />
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.ImagesEndpoint" />
   <property name="service.description" value="Weblounge Image Endpoint" />
   <property name="rest.path" value="images" />
   <service>
-    <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.ImageEndpoint" />
+    <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.ImagesEndpoint" />
   </service>
 
   <reference name="sites" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />

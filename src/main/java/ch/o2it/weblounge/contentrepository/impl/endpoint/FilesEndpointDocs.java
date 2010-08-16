@@ -40,7 +40,7 @@ import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 /**
  * File endpoint documentation generator.
  */
-public final class FileEndpointDocs {
+public final class FilesEndpointDocs {
 
   /**
    * Creates the documentation.
@@ -61,7 +61,7 @@ public final class FileEndpointDocs {
     fileEndpoint.addStatus(NOT_FOUND("the file was not found or could not be loaded"));
     fileEndpoint.addStatus(BAD_REQUEST("an invalid file identifier was received"));
     fileEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    fileEndpoint.addPathParameter(new Parameter("resourceid", Parameter.Type.STRING, "The file identifier"));
+    fileEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.STRING, "The file identifier"));
     fileEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, fileEndpoint);
 
@@ -74,8 +74,8 @@ public final class FileEndpointDocs {
     fileContentEndpoint.addStatus(NOT_FOUND("the file content don't exist in the specified language"));
     fileContentEndpoint.addStatus(BAD_REQUEST("an invalid file identifier was received"));
     fileContentEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    fileContentEndpoint.addPathParameter(new Parameter("resourceid", Parameter.Type.STRING, "The file identifier"));
-    fileContentEndpoint.addPathParameter(new Parameter("languageid", Parameter.Type.STRING, "The language identifier"));
+    fileContentEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.STRING, "The file identifier"));
+    fileContentEndpoint.addPathParameter(new Parameter("language", Parameter.Type.STRING, "The language identifier"));
     fileContentEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, fileContentEndpoint);
 
@@ -104,7 +104,7 @@ public final class FileEndpointDocs {
     updatePageEndpoint.addStatus(PRECONDITION_FAILED("the file's etag does not match the value specified in the If-Match header"));
     updatePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     updatePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    updatePageEndpoint.addPathParameter(new Parameter("resourceid", Parameter.Type.STRING, "The file identifier"));
+    updatePageEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.STRING, "The file identifier"));
     updatePageEndpoint.addRequiredParameter(new Parameter("file", Parameter.Type.STRING, "The file content"));
     updatePageEndpoint.setTestForm(new TestForm());
     //docs.addEndpoint(Endpoint.Type.WRITE, updatePageEndpoint);
@@ -118,7 +118,7 @@ public final class FileEndpointDocs {
     deletePageEndpoint.addStatus(NOT_FOUND("the file was not found"));
     deletePageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     deletePageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
-    deletePageEndpoint.addPathParameter(new Parameter("resourceid", Parameter.Type.STRING, "The file identifier"));
+    deletePageEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.STRING, "The file identifier"));
     deletePageEndpoint.setTestForm(new TestForm());
     //docs.addEndpoint(Endpoint.Type.WRITE, deletePageEndpoint);
 

@@ -76,10 +76,10 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 @Path("/")
 @Produces(MediaType.TEXT_XML)
-public class FileEndpoint extends ContentRepositoryEndpoint {
+public class FilesEndpoint extends ContentRepositoryEndpoint {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(FileEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(FilesEndpoint.class);
 
   /** The endpoint documentation */
   private String docs = null;
@@ -443,7 +443,7 @@ public class FileEndpoint extends ContentRepositoryEndpoint {
     if (docs == null) {
       String endpointUrl = "/system/files";
       // TODO: determine endpoint url
-      docs = FileEndpointDocs.createDocumentation(endpointUrl);
+      docs = FilesEndpointDocs.createDocumentation(endpointUrl);
     }
     return docs;
   }

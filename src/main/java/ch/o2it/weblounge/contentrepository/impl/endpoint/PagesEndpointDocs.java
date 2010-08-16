@@ -39,7 +39,7 @@ import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 /**
  * Page endpoint documentation generator.
  */
-public final class PageEndpointDocs {
+public final class PagesEndpointDocs {
 
   /**
    * Creates the documentation.

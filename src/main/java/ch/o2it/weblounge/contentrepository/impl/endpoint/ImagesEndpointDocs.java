@@ -36,7 +36,7 @@ import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 /**
  * Image endpoint documentation generator.
  */
-public final class ImageEndpointDocs {
+public final class ImagesEndpointDocs {
 
   /**
    * Creates the documentation.

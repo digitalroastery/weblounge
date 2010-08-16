@@ -3,11 +3,11 @@
   immediate="true" 
   name="Weblounge File Endpoint">	
   
-  <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.FileEndpoint" />
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.FilesEndpoint" />
   <property name="service.description" value="Weblounge File Endpoint" />
   <property name="rest.path" value="files" />
   <service>
-    <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.FileEndpoint" />
+    <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.FilesEndpoint" />
   </service>
 
   <reference name="sites" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
