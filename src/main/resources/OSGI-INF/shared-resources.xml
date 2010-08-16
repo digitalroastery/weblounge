@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  start="activate"
+  stop="deactivate"
+  name="Weblounge Shared Resources">
+
+  <implementation class="ch.o2it.weblounge.kernel.WebloungeSharedResources" />
+  <property name="service.description" value="Weblounge Shared Resources" />
+  <reference name="httpservice" interface="org.osgi.service.http.HttpService" cardinality="1..1" policy="static" bind="setHttpService" />
+
+</scr:component>
