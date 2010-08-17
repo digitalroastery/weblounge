@@ -274,7 +274,7 @@ public class PageListTag extends WebloungeTag {
     }
 
     // Set the headline in the request
-    if (found) {
+    if (found && page != null) {
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
       this.page = page;

@@ -31,11 +31,9 @@ import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.security.SystemPermission;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
@@ -162,7 +160,6 @@ public class PagePreviewTag extends WebloungeTag {
   @Override
   public int doStartTag() throws JspException {
     Site site = request.getSite();
-    User user = request.getUser();
 
     if (pageId == null) {
       PageListTag pageListTag = (PageListTag) findAncestorWithClass(this, PageListTag.class);
@@ -179,7 +176,7 @@ public class PagePreviewTag extends WebloungeTag {
       ResourceURI pageURI = new PageURIImpl(site, null, pageId);
 
       try {
-        page = (Page)contentRepository.get(pageURI, user, SystemPermission.READ);
+        page = (Page)contentRepository.get(pageURI);
         if (page == null) {
           logger.error("No data available for page '" + pageURI + "'");
           return EVAL_PAGE;

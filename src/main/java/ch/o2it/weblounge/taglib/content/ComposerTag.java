@@ -31,7 +31,6 @@ import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.security.SystemPermission;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.HTMLAction;
 import ch.o2it.weblounge.common.site.Module;
@@ -283,13 +282,14 @@ public class ComposerTag extends WebloungeTag {
             pageUrl = "/";
           ResourceURI pageURI = new PageURIImpl(site, pageUrl);
           try {
-            if (!Page.TYPE.equals(p.getType())) {
-              logger.debug("Home page is not of type '{}'", Page.TYPE);
-              return new Pagelet[] {};
-            }
-            p = (Page)contentRepository.get(pageURI, user, SystemPermission.READ);
-            if (p != null)
+            p = (Page)contentRepository.get(pageURI);
+            if (p != null) {
+              if (!Page.TYPE.equals(p.getType())) {
+                logger.debug("Home page is not of type '{}'", Page.TYPE);
+                return new Pagelet[] {};
+              }
               content = p.getPagelets(composerName);
+            }
             originalContent = false;
           } catch (SecurityException e) {
             logger.debug("Tried to load protected content from inherited page {} for composer {}", pageURI, composerName);
@@ -373,7 +373,7 @@ public class ComposerTag extends WebloungeTag {
     if (targetPage == null) {
       ResourceURI homeURI = new PageURIImpl(site, "/");
       try {
-        targetPage = (Page)contentRepository.get(homeURI, user, SystemPermission.READ);
+        targetPage = (Page)contentRepository.get(homeURI);
         if (targetPage == null) {
           logger.warn("No page was found while processing composer on " + url);
           return EVAL_PAGE;
