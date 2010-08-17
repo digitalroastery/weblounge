@@ -21,8 +21,10 @@
 package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContentReader;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
+import ch.o2it.weblounge.common.impl.content.image.ImageContentReader;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.ImageResourceInputDocument;
 
@@ -69,6 +71,16 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    */
   public SolrInputDocument getInputDocument(Resource<?> resource) {
     return new ImageResourceInputDocument((ImageResource) resource);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getContentReader()
+   */
+  public ResourceContentReader<ImageContent> getContentReader()
+      throws ParserConfigurationException, SAXException {
+    return new ImageContentReader();
   }
 
 }

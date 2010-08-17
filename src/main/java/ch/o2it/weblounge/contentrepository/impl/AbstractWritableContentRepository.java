@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
 import org.slf4j.Logger;
@@ -49,9 +50,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   public boolean delete(ResourceURI uri, User user) throws SecurityException,
       IOException {
-    if (!connected)
-      throw new IllegalStateException("Content repository is not connected");
-
     return delete(uri, user, true);
   }
 
@@ -67,10 +65,15 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // See if the resource exists
-    long[] revisions = index.getRevisions(uri);
-    if (revisions == null) {
+    if (!index.exists(uri)) {
       logger.warn("Resource '{}' not found in repository index", uri);
       return false;
+    }
+
+    // Get the revisions to delete
+    long[] revisions = new long[] { uri.getVersion() };
+    if (allRevisions) {
+      revisions = index.getRevisions(uri);
     }
 
     // TODO: Check permissions
@@ -106,23 +109,38 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.content.resource.Resource)
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.Resource,
+   *      ch.o2it.weblounge.common.user.User)
    */
-  public Resource<? extends ResourceContent> put(Resource<? extends ResourceContent> resource, User user) throws SecurityException,
-      IOException {
+  public Resource<? extends ResourceContent> put(
+      Resource<? extends ResourceContent> resource, User user)
+      throws ContentRepositoryException, SecurityException, IOException,
+      IllegalStateException {
+
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
     // TODO: Check permission
 
-    storeResource(resource);
-
     // Add entry to index
-    if (!index.exists(resource.getURI()))
+    if (!index.exists(resource.getURI())) {
+      if (resource.contents().size() > 0)
+        throw new IllegalStateException("Cannot to add content metadata without content");
       index.add(resource);
-    else
+    } else {
+      logger.debug("Checking content section of existing {} {}", resource.getType(), resource);
+      Resource<?> r = get(resource.getURI());
+      if (resource.contents().size() != r.contents().size())
+        throw new IllegalStateException("Cannot modify content metadata without content");
+      for (ResourceContent c : resource.contents()) {
+        if (!c.equals(r.getContent(c.getLanguage())))
+          throw new IllegalStateException("Cannot modify content metadata without content");
+      }
       index.update(resource);
+    }
+
+    // Write the updated resource to disk
+    storeResource(resource);
 
     return resource;
   }
@@ -133,18 +151,75 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#putContent(ch.o2it.weblounge.common.content.Resource,
    *      java.io.InputStream, ch.o2it.weblounge.common.user.User)
    */
-  public void putContent(Resource<? extends ResourceContent> resource, InputStream is, User user)
-      throws SecurityException, IOException {
+  @SuppressWarnings("unchecked")
+  public <T extends ResourceContent> Resource<T> putContent(ResourceURI uri,
+      T content, InputStream is, User user) throws ContentRepositoryException,
+      SecurityException, IOException, IllegalStateException {
 
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
     // TODO: Check permission
 
-    storeResourceContent(resource, is);
+    // Make sure the resource exists
+    if (!index.exists(uri))
+      throw new IllegalStateException("Cannot add content to missing resource " + uri);
+    Resource<T> resource = null;
+    try {
+      resource = (Resource<T>) get(uri);
+      if (resource == null) {
+        throw new IllegalStateException("Resource " + uri + " not found");
+      }
+    } catch (ClassCastException e) {
+      logger.error("Trying to add content of type {} to incompatible resource", content.getClass());
+      throw new IllegalStateException(e);
+    }
 
-    // Add entry to index
-    index.add(resource);
+    // Store the content and add entry to index
+    resource.addContent(content);
+    storeResourceContent(uri, content, is);
+    storeResource(resource);
+    index.update(resource);
+
+    return resource;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#deleteContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.ResourceContent, ch.o2it.weblounge.common.user.User)
+   */
+  @SuppressWarnings("unchecked")
+  public <T extends ResourceContent> Resource<T> deleteContent(ResourceURI uri,
+      T content, User user) throws ContentRepositoryException,
+      SecurityException, IOException, IllegalStateException {
+
+    if (!connected)
+      throw new IllegalStateException("Content repository is not connected");
+
+    // TODO: Check permission
+
+    // Make sure the resource exists
+    if (!index.exists(uri))
+      throw new IllegalStateException("Cannot remove content from missing resource " + uri);
+    Resource<T> resource = null;
+    try {
+      resource = (Resource<T>) get(uri);
+      if (resource == null) {
+        throw new IllegalStateException("Resource " + uri + " not found");
+      }
+    } catch (ClassCastException e) {
+      logger.error("Trying to remove content of type {} from incompatible resource", content.getClass());
+      throw new IllegalStateException(e);
+    }
+
+    // Store the content and add entry to index
+    resource.removeContent(content.getLanguage());
+    deleteResourceContent(uri, content);
+    storeResource(resource);
+    index.update(resource);
+
+    return resource;
   }
 
   /**
@@ -155,20 +230,23 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  abstract protected void storeResource(Resource<? extends ResourceContent> resource) throws IOException;
+  abstract protected void storeResource(
+      Resource<? extends ResourceContent> resource) throws IOException;
 
   /**
-   * Writes a new resource to the repository storage.
+   * Writes the resource content to the repository storage.
    * 
-   * @param resource
+   * @param uri
+   *          the resource uri
+   * @param content
    *          the resource content
    * @param is
    *          the input stream
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  abstract protected void storeResourceContent(Resource<? extends ResourceContent> resource, InputStream is)
-      throws IOException;
+  protected abstract <T extends ResourceContent> void storeResourceContent(ResourceURI uri,
+      T content, InputStream is) throws IOException;
 
   /**
    * Deletes the indicated revisions of resource <code>uri</code> from the
@@ -182,5 +260,18 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    */
   protected abstract void deleteResource(ResourceURI uri, long[] revisions)
       throws IOException;
+
+  /**
+   * Deletes the resource content from the repository storage.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param content
+   *          the resource content
+   * @throws IOException
+   *           if the resource can't be written to the storage
+   */
+  protected abstract <T extends ResourceContent> void deleteResourceContent(ResourceURI uri,
+      T content) throws IOException;
 
 }

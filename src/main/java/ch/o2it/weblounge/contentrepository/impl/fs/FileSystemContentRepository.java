@@ -25,7 +25,6 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -39,6 +38,7 @@ import ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,12 +143,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       long resourceCount = 0;
 
       // Index each and every known resource type
-      Set<ResourceSerializer<?,?>> serializers = ResourceSerializerFactory.getSerializers();
+      Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
       if (serializers == null) {
         logger.warn("Unable to index {} while no resource serializers are registered", this);
         return;
       }
-      for (ResourceSerializer<?,?> serializer : serializers) {
+      for (ResourceSerializer<?, ?> serializer : serializers) {
         resourceCount += index(serializer.getType());
       }
 
@@ -382,6 +382,34 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   }
 
   /**
+   * Returns the <code>File</code> object that is represented by
+   * <code>uri</code> and <code>content</code> or <code>null</code> if the
+   * resource or the resource content does not exist on the filesystem.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param content
+   *          the resource content
+   * @return the content file
+   * @throws IOException
+   *           if the file cannot be accessed not exist
+   */
+  protected File uriToContentFile(ResourceURI uri, ResourceContent content)
+      throws IOException {
+    File resourceDirectory = uriToDirectory(uri);
+    File resourceRevisionDirectory = new File(resourceDirectory, Long.toString(uri.getVersion()));
+
+    // Construct the filename
+    String fileName = content.getLanguage().getIdentifier();
+    String fileExtension = FilenameUtils.getExtension(content.getFilename());
+    if (!"".equals(fileExtension)) {
+      fileName += "." + fileExtension;
+    }
+    File contentFile = new File(resourceRevisionDirectory, fileName);
+    return contentFile;
+  }
+
+  /**
    * Returns the resource uri's parent directory or <code>null</code> if the
    * directory does not exist on the filesystem.
    * 
@@ -480,19 +508,19 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Look for the localized file
     File resourceDirectory = resourceFile.getParentFile();
-    final String filenamePrefix = language.getIdentifier() + "."; 
+    final String filenamePrefix = language.getIdentifier() + ".";
     File[] localizedFiles = resourceDirectory.listFiles(new FileFilter() {
       public boolean accept(File f) {
         return f.isFile() && f.getName().startsWith(filenamePrefix);
       }
     });
-    
+
     // Make sure everything looks consistent
     if (localizedFiles.length == 0)
       return null;
     else if (localizedFiles.length > 1)
       logger.warn("Inconsistencies found in resource {} content {}", language, uri);
-    
+
     // Finally return the content
     return new FileInputStream(localizedFiles[0]);
   }
@@ -508,23 +536,21 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throws IOException {
 
     // Remove the resources
+    File resourceDir = uriToDirectory(uri);
     for (long r : revisions) {
-      ResourceURI resourceURI = new ResourceURIImpl(uri, r);
-      File f = uriToFile(uri);
-      if (f.exists() && !f.delete()) {
-        logger.warn("Tried to remove non-existing resource '{}' from repository", uri);
-        throw new IOException("Unable to delete resource " + resourceURI + " located at " + f + " from repository");
+      File f = new File(resourceDir, Long.toString(r));
+      if (f.exists()) {
+        try {
+          FileUtils.deleteDirectory(f);
+        } catch (IOException e) {
+          throw new IOException("Unable to delete revision " + r + " of resource " + uri + " located at " + f + " from repository");
+        }
       }
     }
 
-    // Get the resource's directory
-    File f = uriToDirectory(uri);
-    if (!f.exists()) {
-      throw new IOException("Unable to get directory for resource " + uri + ", supposedly located at " + f);
-    }
-
-    // Remove the enclosing directories
+    // Remove the resource directory itself if there are no more resources
     try {
+      File f = resourceDir;
       while (!uri.getType().equals(f.getName()) && f.listFiles().length == 0) {
         FileUtils.deleteDirectory(f);
         f = f.getParentFile();
@@ -540,8 +566,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected void storeResource(Resource<? extends ResourceContent> resource)
-      throws IOException {
+  protected void storeResource(Resource<?> resource) throws IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
     OutputStream os = null;
@@ -561,15 +586,38 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.o2it.weblounge.common.content.Resource,
-   *      java.io.InputStream)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.content.ResourceContent, java.io.InputStream)
    */
   @Override
-  protected void storeResourceContent(
-      Resource<? extends ResourceContent> resource, InputStream is)
-      throws IOException {
-    // TODO Auto-generated method stub
+  protected <T extends ResourceContent> void storeResourceContent(
+      ResourceURI uri, T content, InputStream is) throws IOException {
 
+    File contentFile = uriToContentFile(uri, content);
+    OutputStream os = null;
+    try {
+      FileUtils.forceMkdir(contentFile.getParentFile());
+      if (!contentFile.exists())
+        contentFile.createNewFile();
+      IOUtils.copyLarge(is, os);
+    } finally {
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(os);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deleteResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.content.ResourceContent)
+   */
+  protected <T extends ResourceContent> void deleteResourceContent(
+      ResourceURI uri, T content) throws IOException {
+    File contentFile = uriToContentFile(uri, content);
+    if (contentFile == null)
+      throw new IOException("Resource content " + contentFile + " does not exist");
+    FileUtils.deleteQuietly(contentFile);
   }
 
   /**
@@ -582,7 +630,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       ContentRepositoryException {
 
     logger.debug("Trying to load site index from {}", idxRootDir);
-    
+
     // Is this a new index?
     boolean created = !idxRootDir.exists() || idxRootDir.list().length == 0;
     FileUtils.forceMkdir(idxRootDir);

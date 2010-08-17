@@ -424,7 +424,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
   @Produces(MediaType.TEXT_HTML)
   public String getDocumentation() {
     if (docs == null) {
-      String endpointUrl = "/system/images";
+      String endpointUrl = "/system/weblounge/images";
       // TODO: determine endpoint url
       docs = ImagesEndpointDocs.createDocumentation(endpointUrl);
     }

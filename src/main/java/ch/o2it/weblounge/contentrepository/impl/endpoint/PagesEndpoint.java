@@ -196,6 +196,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     } catch (SAXException e) {
       logger.warn("Error parsing udpated page {}: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.BAD_REQUEST);
+    } catch (IllegalStateException e) {
+      logger.warn("Error updating page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error updating page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Create the response
@@ -219,7 +225,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @POST
   @Path("/")
   public Response addPage(@Context HttpServletRequest request,
-      @FormParam("page") String pageXml, @FormParam("path") String path) {
+      @FormParam("content") String pageXml, @FormParam("path") String path) {
 
     Site site = getSite(request);
     User user = null; // TODO: Extract user
@@ -291,6 +297,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     } catch (IOException e) {
       logger.warn("Error writing new page {}: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Error adding new page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error adding new page {}: {}", pageURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Create the response
@@ -340,6 +352,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Tried to delete page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
+      logger.warn("Error deleting page {} from site '{}': {}", new Object[] {
+          pageURI,
+          site,
+          e.getMessage() });
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ContentRepositoryException e) {
       logger.warn("Error deleting page {} from site '{}': {}", new Object[] {
           pageURI,
           site,
@@ -454,7 +472,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @Produces(MediaType.TEXT_HTML)
   public String getDocumentation() {
     if (docs == null) {
-      String endpointUrl = "/system/pages";
+      String endpointUrl = "/system/weblounge/pages";
       // TODO: determine endpoint url
       docs = PagesEndpointDocs.createDocumentation(endpointUrl);
     }

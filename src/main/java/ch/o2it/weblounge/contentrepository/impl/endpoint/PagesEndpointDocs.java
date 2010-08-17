@@ -75,7 +75,7 @@ public final class PagesEndpointDocs {
     createPageEndpoint.addStatus(METHOD_NOT_ALLOWED("the site or its content repository is read-only"));
     createPageEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
     createPageEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The target path"));
-    createPageEndpoint.addOptionalParameter(new Parameter("page", Parameter.Type.String, "The page data"));
+    createPageEndpoint.addOptionalParameter(new Parameter("content", Parameter.Type.Text, "The page data"));
     createPageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, createPageEndpoint);
 

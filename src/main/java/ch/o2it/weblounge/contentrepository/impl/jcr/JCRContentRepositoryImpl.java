@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl.jcr;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -54,22 +55,11 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected void storeResource(Resource resource) throws IOException {
+  protected void storeResource(Resource<?> resource) throws IOException {
     // TODO Auto-generated method stub
 
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.o2it.weblounge.common.content.Resource,
-   *      java.io.InputStream)
-   */
-  @Override
-  protected void storeResourceContent(Resource resource, InputStream is)
-      throws IOException {
-    // TODO Auto-generated method stub
-  }
 
   /**
    * {@inheritDoc}
@@ -113,6 +103,30 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
       throws IOException {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.ResourceContent, java.io.InputStream)
+   */
+  @Override
+  protected <T extends ResourceContent> void storeResourceContent(
+      ResourceURI uri, T content, InputStream is) throws IOException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deleteResourceContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.ResourceContent)
+   */
+  @Override
+  protected <T extends ResourceContent> void deleteResourceContent(
+      ResourceURI uri, T content) throws IOException {
+    // TODO Auto-generated method stub
+    
   }
 
 }

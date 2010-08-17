@@ -21,13 +21,11 @@
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
+import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
@@ -37,6 +35,8 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.contentrepository.ResourceSerializer;
+import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
 import org.apache.commons.io.IOUtils;
@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -96,16 +97,16 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    */
   @GET
   @Produces("text/xml")
-  @Path("/{resourceid}")
+  @Path("/{resource}")
   public Response getFile(@Context HttpServletRequest request,
-      @PathParam("resourceid") String resourceId) {
+      @PathParam("resource") String resourceId) {
 
     // Check the parameters
     if (resourceId == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Get the resource
-    final FileResource resource = (FileResource) loadResource(request, resourceId, FileResource.TYPE);
+    Resource<?> resource = loadResource(request, resourceId, null);
     if (resource == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
@@ -134,9 +135,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * @return the resource
    */
   @GET
-  @Path("/{resourceid}/content")
+  @Path("/{resource}/content")
   public Response getFileContent(@Context HttpServletRequest request,
-      @PathParam("resourceid") String resourceId) {
+      @PathParam("resource") String resourceId) {
 
     // Check the parameters
     if (resourceId == null)
@@ -156,7 +157,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     if (preferred == null) {
       preferred = resource.getOriginalContent().getLanguage();
     }
- 
+
     return getResourceContent(request, resource, preferred);
   }
 
@@ -174,9 +175,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * @return the resource
    */
   @GET
-  @Path("/{resourceid}/content/{languageid}")
+  @Path("/{resource}/content/{languageid}")
   public Response getFileContent(@Context HttpServletRequest request,
-      @PathParam("resourceid") String resourceId,
+      @PathParam("resource") String resourceId,
       @PathParam("languageid") String languageId) {
 
     // Check the parameters
@@ -187,14 +188,172 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     Language language = LanguageSupport.getLanguage(languageId);
     if (language == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-    
+
     // Get the resource
-    final Resource<?> resource = loadResource(request, resourceId, FileResource.TYPE);
+    Resource<?> resource = loadResource(request, resourceId, null);
     if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
     return getResourceContent(request, resource, language);
+  }
+
+  /**
+   * Adds the resource content with language <code>language</code> to the
+   * specified resource.
+   * 
+   * @param request
+   *          the request
+   * @param resourceId
+   *          the resource identifier
+   * @param languageId
+   *          the language identifier
+   * @param is
+   *          the input stream
+   * @return the resource
+   */
+  @PUT
+  @Path("/{resource}/content/{languageid}")
+  public Response addFileContent(@Context HttpServletRequest request,
+      @PathParam("resource") String resourceId,
+      @PathParam("languageid") String languageId, InputStream is) {
+
+    // Check the parameters
+    if (resourceId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    if (is == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Extract the language
+    Language language = LanguageSupport.getLanguage(languageId);
+    if (language == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    // Get the resource
+    Resource<?> resource = loadResource(request, resourceId, null);
+    if (resource == null || resource.contents().isEmpty()) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    // Try to create the resource
+    ResourceURI uri = resource.getURI();
+    ResourceContent content = null;
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resource.getURI().getType());
+    ResourceReader<?, ?> reader;
+    try {
+      reader = (ResourceReader<?, ?>) serializer.getContentReader();
+      // TODO: Get input stream for resource
+      content = (ResourceContent) reader.read(resource.getURI(), null);
+    } catch (IOException e) {
+      logger.warn("Error reading resource content {} from request", uri);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error configuring parser to read resource content {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (SAXException e) {
+      logger.warn("Error parsing udpated resource {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+
+    Site site = getSite(request);
+    User admin = site.getAdministrator();
+    User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+    content.setCreator(user);
+
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    try {
+      resource = contentRepository.putContent(resource.getURI(), content, is, user);
+    } catch (SecurityException e) {
+      logger.warn("Tried to update content of resource {} without permission", uri);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IOException e) {
+      logger.warn("Error writing content to resource {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Illegal state while adding content to resource {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error adding content to resource {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.ok();
+    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.lastModified(resource.getModificationDate());
+    return response.build();
+  }
+
+  /**
+   * Returns the resource content with the given identifier or a
+   * <code>404</code> if the resource or the resource content could not be
+   * found.
+   * 
+   * @param request
+   *          the request
+   * @param resourceId
+   *          the resource identifier
+   * @param languageId
+   *          the language identifier
+   * @return the resource
+   */
+  @DELETE
+  @Path("/{resource}/content/{languageid}")
+  public Response deleteFileContent(@Context HttpServletRequest request,
+      @PathParam("resource") String resourceId,
+      @PathParam("languageid") String languageId) {
+
+    // Check the parameters
+    if (resourceId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Extract the language
+    Language language = LanguageSupport.getLanguage(languageId);
+    if (language == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    // Get the resource
+    Resource<?> resource = loadResource(request, resourceId, null);
+    if (resource == null || resource.contents().isEmpty()) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    // Get the resource content
+    ResourceContent content = resource.getContent(language);
+    if (content == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    ResourceURI uri = resource.getURI();
+    Site site = getSite(request);
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    // TODO: Replace with real user
+    User user = site.getAdministrator();
+
+    // Delete the resource
+    try {
+      resource = contentRepository.deleteContent(uri, content, user);
+    } catch (SecurityException e) {
+      logger.warn("Security restricion while user " + user + " tried to remove content from " + uri);
+      throw new WebApplicationException(Status.FORBIDDEN);
+    } catch (IllegalStateException e) {
+      logger.warn("Tried to remove content from missing resource " + uri);
+      throw new WebApplicationException(Status.NOT_FOUND);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error while accessing resource " + uri);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IOException e) {
+      logger.warn("Error while deleting content from resource " + uri);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.ok(resource.toXml());
+    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.lastModified(resource.getModificationDate());
+    return response.build();
   }
 
   /**
@@ -213,21 +372,23 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    *           if the update fails
    */
   @PUT
-  @Path("/{resourceid}")
+  @Path("/{resource}")
   public Response updateFile(@Context HttpServletRequest request,
-      @PathParam("resourceid") String resourceId,
-      @FormParam("page") String resourceXml,
+      @PathParam("resource") String resourceId,
+      @FormParam("content") String resourceXml,
       @HeaderParam("If-Match") String ifMatchHeader) {
 
     // Check the parameters
     if (resourceId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+    if (resourceXml == null)
       return Response.status(Status.BAD_REQUEST).build();
 
     // Extract the site
     Site site = getSite(request);
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-    ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
+    ResourceURI resourceURI = new ResourceURIImpl(null, site, null, resourceId);
 
     // Does the resource exist?
     try {
@@ -242,8 +403,8 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
       try {
-        FileResource currentPage = (FileResource) contentRepository.get(resourceURI);
-        String etag = Long.toString(currentPage.getModificationDate().getTime());
+        Resource<?> currentResource = contentRepository.get(resourceURI);
+        String etag = Long.toString(currentResource.getModificationDate().getTime());
         if (!etag.equals(ifMatchHeader)) {
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
         }
@@ -254,9 +415,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Parse the resource and update it in the repository
-    FileResource resource = null;
+    Resource<?> resource = null;
+    // TOOD: Extract resource type
+    String resourceType = null;
     try {
-      FileResourceReader resourceReader = new FileResourceReader();
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+      ResourceReader<?, ?> resourceReader = (ResourceReader<?, ?>) serializer.getContentReader();
       resource = resourceReader.read(resourceURI, IOUtils.toInputStream(resourceXml));
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
@@ -275,6 +439,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     } catch (SAXException e) {
       logger.warn("Error parsing udpated resource {}: {}", resourceURI, e.getMessage());
       throw new WebApplicationException(Status.BAD_REQUEST);
+    } catch (IllegalStateException e) {
+      logger.warn("Illegal state while udpating resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error udpating resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Create the response
@@ -312,10 +482,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         if (!path.startsWith("/"))
           path = "/" + path;
         WebUrl url = new WebUrlImpl(site, path);
-        resourceURI = new FileResourceURIImpl(site, url.getPath(), uuid);
+        resourceURI = new ResourceURIImpl(null, site, url.getPath(), uuid);
 
         // Make sure the resource doesn't exist
-        if (contentRepository.exists(new FileResourceURIImpl(site, url.getPath()))) {
+        if (contentRepository.exists(new ResourceURIImpl(null, site, url.getPath()))) {
           logger.warn("Tried to create already existing resource {} in site '{}'", resourceURI, site);
           throw new WebApplicationException(Status.CONFLICT);
         }
@@ -327,16 +497,19 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
     } else {
-      resourceURI = new FileResourceURIImpl(site, "/" + uuid.replaceAll("-", ""), uuid);
+      resourceURI = new ResourceURIImpl(null, site, "/" + uuid.replaceAll("-", ""), uuid);
     }
 
     // Parse the resource and store it
-    PageImpl resource = null;
+    Resource<?> resource = null;
+    // TODO: Extract resource type
+    String resourceType = null;
     URI uri = null;
     if (!StringUtils.isBlank(resourceXml)) {
       logger.debug("Adding resource to {}", resourceURI);
       try {
-        PageReader resourceReader = new PageReader();
+        ResourceSerializer<?,?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+        ResourceReader<?,?> resourceReader = serializer.getReader();
         resource = resourceReader.read(resourceURI, IOUtils.toInputStream(resourceXml));
       } catch (IOException e) {
         logger.warn("Error reading resource {} from request", resourceURI);
@@ -350,8 +523,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       }
     } else {
       logger.debug("Creating new resource at {}", resourceURI);
-      resource = new PageImpl(resourceURI);
-      resource.setTemplate(site.getDefaultTemplate().getIdentifier());
+      resource = new FileResourceImpl(resourceURI);
       User admin = site.getAdministrator();
       User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       resource.setCreated(creator, new Date());
@@ -369,6 +541,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
       logger.warn("Error writing new resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Illegal state while adding new resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error adding new resource {}: {}", resourceURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
@@ -388,9 +566,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    * @return response an empty response
    */
   @DELETE
-  @Path("/{resourceid}")
+  @Path("/{resource}")
   public Response deleteFile(@Context HttpServletRequest request,
-      @PathParam("resourceid") String resourceId) {
+      @PathParam("resource") String resourceId) {
 
     // Check the parameters
     if (resourceId == null)
@@ -398,17 +576,17 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     Site site = getSite(request);
     User user = null; // TODO: Extract user
-    ResourceURI resourceURI = new FileResourceURIImpl(site, null, resourceId);
+    ResourceURI resourceURI = new ResourceURIImpl(null, site, null, resourceId);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
-    // Make sure the resource doesn't exist
+    // Make sure the resource exists
     try {
       if (!contentRepository.exists(resourceURI)) {
         logger.warn("Tried to delete non existing resource {} in site '{}'", resourceURI, site);
         throw new WebApplicationException(Status.NOT_FOUND);
       }
     } catch (ContentRepositoryException e) {
-      logger.warn("Page lookup {} failed for site '{}'", resourceURI, site);
+      logger.warn("File lookup {} failed for site '{}'", resourceURI, site);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
@@ -424,9 +602,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
           site,
           e.getMessage() });
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error removing resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-
-    // Don't forget the resource contents
 
     return Response.ok().build();
   }
@@ -441,7 +620,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   @Produces(MediaType.TEXT_HTML)
   public String getDocumentation() {
     if (docs == null) {
-      String endpointUrl = "/system/files";
+      String endpointUrl = "/system/weblounge/files";
       // TODO: determine endpoint url
       docs = FilesEndpointDocs.createDocumentation(endpointUrl);
     }

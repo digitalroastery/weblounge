@@ -177,7 +177,7 @@ public class ContentRepositoryEndpoint {
   protected Resource<?> loadResource(HttpServletRequest request,
       String resourceId, String resourceType) {
     if (sites == null) {
-      logger.debug("Unable to load {} '{}': no sites registered", resourceType, resourceId);
+      logger.debug("Unable to load resource '{}': no sites registered", resourceId);
       return null;
     }
 
