@@ -65,11 +65,11 @@ public class FileResourceImpl extends ResourceImpl<FileContent> implements FileR
   public FileContent removeContent(Language language) {
     if (content == null)
       throw new IllegalArgumentException("Content must not be null");
-    if (content.size() == 1)
-      throw new IllegalStateException("Cannot remove last remaining resource content");
     FileContent content = super.removeContent(language);
-    setOriginalLanguage(getOriginalContent().getLanguage());
-    disableLanguage(language);
+    FileContent originalContent = getOriginalContent();
+    if (originalContent != null) {
+      setOriginalLanguage(getOriginalContent().getLanguage());
+    }
     return content;
   }
   
