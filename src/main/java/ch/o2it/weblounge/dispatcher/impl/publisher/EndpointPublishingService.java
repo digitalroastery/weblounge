@@ -53,10 +53,10 @@ import javax.ws.rs.Path;
  * Listens for JAX-RS annotated services and publishes them to the global URL
  * space using a single shared HttpContext.
  */
-public class RESTPublisher implements ManagedService {
+public class EndpointPublishingService implements ManagedService {
 
   /** Logging facility */
-  static final Logger logger = LoggerFactory.getLogger(RESTPublisher.class);
+  static final Logger logger = LoggerFactory.getLogger(EndpointPublishingService.class);
 
   /** Service pid, used to look up the service configuration */
   public static final String SERVICE_PID = "ch.o2it.weblounge.restpublisher";
@@ -68,7 +68,7 @@ public class RESTPublisher implements ManagedService {
   public static final String OPT_PATH = OPT_PREFIX + ".path";
 
   /** Configuration key used to configure the endpoint's alias */
-  public static final String DEFAULT_PATH = "/system";
+  public static final String DEFAULT_PATH = "/system/weblounge";
 
   /** The context path option used to override the default context path */
   public static final String OPT_CONTEXTPATH = "rest.path";
@@ -94,7 +94,7 @@ public class RESTPublisher implements ManagedService {
   /**
    * Creates a new publishing service for JSR 311 annotated classes.
    */
-  public RESTPublisher() {
+  public EndpointPublishingService() {
     servletMap = new ConcurrentHashMap<String, GenericServlet>();
     jsr311ServiceListener = new JSR311AnnotatedServiceListener();
   }

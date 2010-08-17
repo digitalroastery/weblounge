@@ -56,6 +56,13 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   private CacheServiceTracker cacheTracker = null;
 
   /**
+   * Creates a new instance of the dispatcher service.
+   */
+  public DispatcherServiceImpl() {
+    dispatcher = new WebloungeDispatcherServlet();
+  }
+  
+  /**
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @SuppressWarnings("rawtypes")
@@ -78,7 +85,6 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     logger.debug("Activating weblounge dispatcher");
 
     // Create an http tracker and make sure it forwards to our servlet
-    dispatcher = new WebloungeDispatcherServlet();
     logger.trace("Start looking for http service implementations");
     httpTracker = new HttpServiceTracker(bundleContext, dispatcher);
     httpTracker.open();

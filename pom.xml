@@ -201,11 +201,11 @@
           	  ch.o2it.weblounge.dispatcher.impl;version=${project.version}
             </Export-Package>
             <Service-Component>
+              OSGI-INF/action-requesthandler.xml,
               OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/dispatcher-service.xml,
-              OSGI-INF/action-requesthandler.xml,
+              OSGI-INF/endpoint-publishing-service.xml,
               OSGI-INF/page-requesthandler.xml,
-              OSGI-INF/rest-publisher-service.xml,
               OSGI-INF/site-dispatcher-service.xml
             </Service-Component>
           </instructions>
