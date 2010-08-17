@@ -253,7 +253,7 @@ public class IdIndexTest {
    * .
    */
   @Test
-  public void testGetIndexVersion() throws Exception {
+  public void testGetIndexVersion() {
     assertEquals(VersionedContentRepositoryIndex.IDX_VERSION, idx.getIndexVersion());
   }
 

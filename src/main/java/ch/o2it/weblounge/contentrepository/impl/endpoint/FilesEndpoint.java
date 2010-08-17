@@ -257,16 +257,14 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     Site site = getSite(request);
+    // TODO: Replace with current user
     User admin = site.getAdministrator();
     User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
     content.setCreator(user);
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     try {
-      resource = contentRepository.putContent(resource.getURI(), content, is, user);
-    } catch (SecurityException e) {
-      logger.warn("Tried to update content of resource {} without permission", uri);
-      throw new WebApplicationException(Status.FORBIDDEN);
+      resource = contentRepository.putContent(resource.getURI(), content, is);
     } catch (IOException e) {
       logger.warn("Error writing content to resource {}: {}", uri, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -330,14 +328,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     // TODO: Replace with real user
-    User user = site.getAdministrator();
 
     // Delete the resource
     try {
-      resource = contentRepository.deleteContent(uri, content, user);
-    } catch (SecurityException e) {
-      logger.warn("Security restricion while user " + user + " tried to remove content from " + uri);
-      throw new WebApplicationException(Status.FORBIDDEN);
+      resource = contentRepository.deleteContent(uri, content);
     } catch (IllegalStateException e) {
       logger.warn("Tried to remove content from missing resource " + uri);
       throw new WebApplicationException(Status.NOT_FOUND);
@@ -426,10 +420,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       User admin = site.getAdministrator();
       user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       resource.setModified(user, new Date());
-      contentRepository.put(resource, user);
-    } catch (SecurityException e) {
-      logger.warn("Tried to update resource {} of site '{}' without permission", resourceURI, site);
-      throw new WebApplicationException(Status.FORBIDDEN);
+      contentRepository.put(resource);
     } catch (IOException e) {
       logger.warn("Error reading udpated resource {} from request", resourceURI);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -467,11 +458,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    */
   @POST
   @Path("/")
-  public Response addFile(@Context HttpServletRequest request,
+  public Response createFile(@Context HttpServletRequest request,
       @FormParam("resource") String resourceXml, @FormParam("path") String path) {
 
     Site site = getSite(request);
-    User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Create the resource uri
@@ -493,7 +483,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         logger.warn("Tried to create a resource with an invalid path '{}': {}", path, e.getMessage());
         throw new WebApplicationException(Status.BAD_REQUEST);
       } catch (ContentRepositoryException e) {
-        logger.warn("Page lookup {} failed for site '{}'", resourceURI, site);
+        logger.warn("Resource lookup {} failed for site '{}'", resourceURI, site);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
     } else {
@@ -502,8 +492,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Parse the resource and store it
     Resource<?> resource = null;
-    // TODO: Extract resource type
-    String resourceType = null;
+    String resourceType = getResourceType(resourceXml);
+    if (resourceType == null) {
+      logger.warn("Tried to create a resource without a type");
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+    
     URI uri = null;
     if (!StringUtils.isBlank(resourceXml)) {
       logger.debug("Adding resource to {}", resourceURI);
@@ -531,14 +525,11 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Store the new resource
     try {
-      contentRepository.put(resource, user);
+      contentRepository.put(resource);
       uri = new URI(UrlSupport.concat(request.getRequestURL().toString(), resourceURI.getId()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for resource {}: {}", resourceURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    } catch (SecurityException e) {
-      logger.warn("Tried to update resource {} of site '{}' without permission", resourceURI, site);
-      throw new WebApplicationException(Status.FORBIDDEN);
     } catch (IOException e) {
       logger.warn("Error writing new resource {}: {}", resourceURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -575,7 +566,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     Site site = getSite(request);
-    User user = null; // TODO: Extract user
     ResourceURI resourceURI = new ResourceURIImpl(null, site, null, resourceId);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
@@ -592,10 +582,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Delete the resource
     try {
-      contentRepository.delete(resourceURI, user);
-    } catch (SecurityException e) {
-      logger.warn("Tried to delete resource {} of site '{}' without permission", resourceURI, site);
-      throw new WebApplicationException(Status.FORBIDDEN);
+      contentRepository.delete(resourceURI);
     } catch (IOException e) {
       logger.warn("Error deleting resource {} from site '{}': {}", new Object[] {
           resourceURI,

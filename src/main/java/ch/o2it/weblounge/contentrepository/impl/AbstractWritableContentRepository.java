@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
@@ -45,22 +44,20 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public boolean delete(ResourceURI uri, User user) throws SecurityException,
-      IOException {
-    return delete(uri, user, true);
+  public boolean delete(ResourceURI uri) throws SecurityException, IOException {
+    return delete(uri, true);
   }
 
   /**
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.user.User, boolean)
+   *      boolean)
    */
-  public boolean delete(ResourceURI uri, User user, boolean allRevisions)
-      throws SecurityException, IOException {
+  public boolean delete(ResourceURI uri, boolean allRevisions)
+      throws IOException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
@@ -76,7 +73,6 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       revisions = index.getRevisions(uri);
     }
 
-    // TODO: Check permissions
     deleteResource(uri, revisions);
 
     // Remove all resource revisions from the index
@@ -92,11 +88,9 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#move(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.user.User)
+   *      ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public boolean move(ResourceURI uri, ResourceURI target, User user)
-      throws SecurityException, IOException {
+  public boolean move(ResourceURI uri, ResourceURI target) throws IOException {
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
@@ -109,23 +103,19 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.Resource,
-   *      ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.Resource)
    */
   public Resource<? extends ResourceContent> put(
-      Resource<? extends ResourceContent> resource, User user)
-      throws ContentRepositoryException, SecurityException, IOException,
-      IllegalStateException {
+      Resource<? extends ResourceContent> resource)
+      throws ContentRepositoryException, IOException, IllegalStateException {
 
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
 
-    // TODO: Check permission
-
     // Add entry to index
     if (!index.exists(resource.getURI())) {
       if (resource.contents().size() > 0)
-        throw new IllegalStateException("Cannot to add content metadata without content");
+        throw new IllegalStateException("Cannot add content metadata without content");
       index.add(resource);
     } else {
       logger.debug("Checking content section of existing {} {}", resource.getType(), resource);
@@ -148,18 +138,16 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#putContent(ch.o2it.weblounge.common.content.Resource,
-   *      java.io.InputStream, ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#putContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.content.ResourceContent, java.io.InputStream)
    */
   @SuppressWarnings("unchecked")
   public <T extends ResourceContent> Resource<T> putContent(ResourceURI uri,
-      T content, InputStream is, User user) throws ContentRepositoryException,
-      SecurityException, IOException, IllegalStateException {
+      T content, InputStream is) throws ContentRepositoryException,
+      IOException, IllegalStateException {
 
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
-
-    // TODO: Check permission
 
     // Make sure the resource exists
     if (!index.exists(uri))
@@ -186,18 +174,17 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#deleteContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.ResourceContent, ch.o2it.weblounge.common.user.User)
+   * 
+   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#deleteContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.content.ResourceContent)
    */
   @SuppressWarnings("unchecked")
   public <T extends ResourceContent> Resource<T> deleteContent(ResourceURI uri,
-      T content, User user) throws ContentRepositoryException,
-      SecurityException, IOException, IllegalStateException {
+      T content) throws ContentRepositoryException, IOException,
+      IllegalStateException {
 
     if (!connected)
       throw new IllegalStateException("Content repository is not connected");
-
-    // TODO: Check permission
 
     // Make sure the resource exists
     if (!index.exists(uri))
@@ -245,8 +232,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <T extends ResourceContent> void storeResourceContent(ResourceURI uri,
-      T content, InputStream is) throws IOException;
+  protected abstract <T extends ResourceContent> void storeResourceContent(
+      ResourceURI uri, T content, InputStream is) throws IOException;
 
   /**
    * Deletes the indicated revisions of resource <code>uri</code> from the
@@ -271,7 +258,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <T extends ResourceContent> void deleteResourceContent(ResourceURI uri,
-      T content) throws IOException;
+  protected abstract <T extends ResourceContent> void deleteResourceContent(
+      ResourceURI uri, T content) throws IOException;
 
 }

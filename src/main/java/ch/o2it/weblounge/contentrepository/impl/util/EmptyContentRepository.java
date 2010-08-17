@@ -25,8 +25,6 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
@@ -88,18 +86,6 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.user.User,
-   *      ch.o2it.weblounge.common.security.Permission)
-   */
-  public boolean exists(ResourceURI uri, User user, Permission p)
-      throws ContentRepositoryException, SecurityException {
-    return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
    */
   public SearchResult find(SearchQuery query)
@@ -112,19 +98,7 @@ public class EmptyContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public Resource get(ResourceURI uri) throws ContentRepositoryException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.user.User,
-   *      ch.o2it.weblounge.common.security.Permission)
-   */
-  public Resource get(ResourceURI uri, User user, Permission p)
-      throws ContentRepositoryException, SecurityException {
+  public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
     return null;
   }
 
@@ -135,17 +109,6 @@ public class EmptyContentRepository implements ContentRepository {
    */
   public InputStream getContent(ResourceURI uri, Language language)
       throws ContentRepositoryException, IOException {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.language.Language, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)
-   */
-  public InputStream getContent(ResourceURI uri, Language language, User user,
-      Permission p) throws ContentRepositoryException, SecurityException,
-      IOException {
     return null;
   }
 

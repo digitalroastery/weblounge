@@ -146,7 +146,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Extract the site
     Site site = getSite(request);
-    User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     ResourceURI pageURI = new PageURIImpl(site, null, pageId);
 
@@ -183,7 +182,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       User admin = site.getAdministrator();
       User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       page.setModified(modifier, new Date());
-      contentRepository.put(page, user);
+      contentRepository.put(page);
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
@@ -224,11 +223,10 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    */
   @POST
   @Path("/")
-  public Response addPage(@Context HttpServletRequest request,
+  public Response createPage(@Context HttpServletRequest request,
       @FormParam("content") String pageXml, @FormParam("path") String path) {
 
     Site site = getSite(request);
-    User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Create the page uri
@@ -286,7 +284,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Store the new page
     try {
-      contentRepository.put(page, user);
+      contentRepository.put(page);
       uri = new URI(UrlSupport.concat(request.getRequestURL().toString(), pageURI.getId()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for page {}: {}", pageURI, e.getMessage());
@@ -330,7 +328,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     Site site = getSite(request);
-    User user = null; // TODO: Extract user
     ResourceURI pageURI = new PageURIImpl(site, null, pageId);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
@@ -347,7 +344,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Delete the page
     try {
-      contentRepository.delete(pageURI, user);
+      contentRepository.delete(pageURI);
     } catch (SecurityException e) {
       logger.warn("Tried to delete page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);

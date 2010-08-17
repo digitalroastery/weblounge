@@ -21,12 +21,12 @@
 package ch.o2it.weblounge.contentrepository.impl.bundle;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
-import ch.o2it.weblounge.common.user.WebloungeUser;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
@@ -40,6 +40,7 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -119,7 +120,6 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     // initial bundle contents to the filesystem. Otherwise, keep working with
     // what's there already.
     logger.info("Loading resources for '{}' from bundle {}", site, bundle);
-    WebloungeUser user = site.getAdministrator();
     for (Iterator<ResourceURI> pi = getResourceURIsFromBundle(); pi.hasNext();) {
       ResourceURI uri = pi.next();
       try {
@@ -128,10 +128,20 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
           throw new ContentRepositoryException("Unable to load " + uri.getType() + " " + uri + " from bundle");
         }
         logger.info("Loading {} {}:{}", new Object[] { uri.getType(), site, uri });
-        put(resource, user);
-      } catch (SecurityException e) {
-        logger.error("Security error reading " + uri.getType() + " " + uri + ": " + e.getMessage(), e);
-        throw new ContentRepositoryException(e);
+        Set<? extends ResourceContent> content = resource.contents();
+        if (content.size() == 0) {
+          put(resource);
+        } else {
+          for (ResourceContent c : content)
+            resource.removeContent(c.getLanguage());
+          put(resource);
+          for (ResourceContent c : content) {
+            InputStream is = loadResourceContentFromBundle(uri, c);
+            if (is == null)
+              throw new ContentRepositoryException("Resource content " + c + " missing from repository");
+            putContent(uri, c, is);
+          }
+        }
       } catch (IOException e) {
         logger.error("Error reading " + uri.getType() + " " + uri + ": " + e.getMessage(), e);
         throw new ContentRepositoryException(e);
@@ -214,6 +224,36 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  /**
+   * Loads the specified resource from the bundle rather than from the content
+   * repository.
+   * 
+   * @param uri
+   *          the uri
+   * @return the resource
+   * @throws IOException
+   *           if reading the resource fails
+   */
+  protected InputStream loadResourceContentFromBundle(ResourceURI uri, ResourceContent content)
+      throws IOException {
+    String uriPath = uri.getPath();
+    if (uriPath == null)
+      throw new IllegalArgumentException("Resource uri needs a path");
+    String documentName = content.getLanguage().getIdentifier();
+    if (!"".equals(FilenameUtils.getExtension(content.getFilename())))
+      documentName += "." + FilenameUtils.getExtension(content.getFilename());
+    String entryPath = UrlSupport.concat(new String[] {
+        bundlePathPrefix,
+        uri.getType() + "s",
+        uriPath,
+        documentName
+    });
+    URL url = bundle.getEntry(entryPath);
+    if (url == null)
+      return null;
+    return url.openStream();
   }
 
 }

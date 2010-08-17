@@ -599,6 +599,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       FileUtils.forceMkdir(contentFile.getParentFile());
       if (!contentFile.exists())
         contentFile.createNewFile();
+      os = new FileOutputStream(contentFile);
       IOUtils.copyLarge(is, os);
     } finally {
       IOUtils.closeQuietly(is);

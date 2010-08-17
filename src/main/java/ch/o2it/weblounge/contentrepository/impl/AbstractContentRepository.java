@@ -28,9 +28,7 @@ import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
@@ -159,26 +157,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.user.User,
-   *      ch.o2it.weblounge.common.security.Permission)
-   */
-  public boolean exists(ResourceURI uri, User user, Permission p)
-      throws ContentRepositoryException, SecurityException {
-    if (!connected)
-      throw new IllegalStateException("Content repository is not connected");
-
-    // TODO: Implement security
-    try {
-      return index.exists(uri);
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
    */
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
@@ -239,52 +217,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.user.User,
-   *      ch.o2it.weblounge.common.security.Permission)
-   */
-  public Resource<?> get(ResourceURI uri, User user, Permission p)
-      throws ContentRepositoryException, SecurityException {
-    if (!connected)
-      throw new IllegalStateException("Content repository is not connected");
-
-    Resource<?> resource = get(uri);
-
-    // TODO: Check permissions
-
-    return resource;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public InputStream getContent(ResourceURI uri, Language language)
       throws ContentRepositoryException, IOException {
-    return loadResourceContent(uri, language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
-   *      ch.o2it.weblounge.common.language.Language,
-   *      ch.o2it.weblounge.common.user.User,
-   *      ch.o2it.weblounge.common.security.Permission)
-   */
-  public InputStream getContent(ResourceURI uri, Language language, User user,
-      Permission p) throws ContentRepositoryException, SecurityException,
-      IOException {
-
-    // TODO: check permissions
-    // Resource resource = get(uri);
-    // if (resource.check(SystemPermission.READ, user)) {
-    // throw new SecurityException("User " + user + " is not allowed to access "
-    // + uri);
-    // }
-
     return loadResourceContent(uri, language);
   }
 

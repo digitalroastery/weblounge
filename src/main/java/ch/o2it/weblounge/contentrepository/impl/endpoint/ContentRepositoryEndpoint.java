@@ -41,15 +41,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 
 /**
  * Utility implementation for content repository endpoints, providing easy
@@ -59,6 +61,9 @@ public class ContentRepositoryEndpoint {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryEndpoint.class);
+
+  /** Regular expression to match the resource type */
+  protected final static Pattern resourceTypeRegex = Pattern.compile(".*<\\s*([\\w]*) .*");
 
   /** The sites that are online */
   protected transient SiteManager sites = null;
@@ -260,6 +265,22 @@ public class ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
     return site;
+  }
+
+  /**
+   * Returns the resource type or <code>null</code> if the type could not be
+   * extracted from the specified document.
+   * 
+   * @param input
+   *          the input text
+   * @return the resource type
+   */
+  protected String getResourceType(String input) {
+    Matcher m = resourceTypeRegex.matcher(input);
+    if (m.matches()) {
+      return m.group(1);
+    }
+    return null;
   }
 
   /**

@@ -58,7 +58,7 @@ public class ResourceInputDocument extends AbstractInputDocument {
    * @param resource
    *          the resource
    */
-  protected void init(Resource resource) {
+  protected void init(Resource<?> resource) {
     setField(ID, resource.getURI().getId(), true);
     setField(PATH, resource.getURI().getPath(), true);
     setField(TYPE, resource.getURI().getType(), true);
