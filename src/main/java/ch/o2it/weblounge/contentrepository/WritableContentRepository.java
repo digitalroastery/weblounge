@@ -23,7 +23,6 @@ package ch.o2it.weblounge.contentrepository;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.user.User;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +41,7 @@ public interface WritableContentRepository extends ContentRepository {
    * <code>resource</code> argument but with an updated uri.
    * <p>
    * <b>Note:</b> do not modify the resource content using this method. Use
-   * {@link #putContent(Resource, InputStream, User)} instead.
+   * {@link #putContent(Resource, InputStream)} instead.
    * 
    * @param uri
    *          the resource uri
@@ -50,8 +49,6 @@ public interface WritableContentRepository extends ContentRepository {
    *          the resource
    * @throws ContentRepositoryException
    *           if updating the content repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
    * @throws IOException
    *           if adding fails due to a database error
    * @throws IllegalStateException
@@ -63,9 +60,8 @@ public interface WritableContentRepository extends ContentRepository {
    * @return the updated resource
    */
   Resource<? extends ResourceContent> put(
-      Resource<? extends ResourceContent> resource, User user)
-      throws ContentRepositoryException, SecurityException, IOException,
-      IllegalStateException;
+      Resource<? extends ResourceContent> resource)
+      throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
    * Adds the content to the specified resource.
@@ -79,8 +75,6 @@ public interface WritableContentRepository extends ContentRepository {
    *          the resource content
    * @throws ContentRepositoryException
    *           if updating the content repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
    * @throws IOException
    *           if adding fails due to a database error
    * @throws IllegalStateException
@@ -88,9 +82,9 @@ public interface WritableContentRepository extends ContentRepository {
    *           type
    * @return the updated resource
    */
-  <T extends ResourceContent> Resource<T> putContent(ResourceURI uri, T content,
-      InputStream is, User user) throws ContentRepositoryException,
-      SecurityException, IOException, IllegalStateException;
+  <T extends ResourceContent> Resource<T> putContent(ResourceURI uri,
+      T content, InputStream is) throws ContentRepositoryException,
+      IOException, IllegalStateException;
 
   /**
    * Deletes the resource content.
@@ -101,17 +95,15 @@ public interface WritableContentRepository extends ContentRepository {
    *          the resource content
    * @throws ContentRepositoryException
    *           if removing the content repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
    * @throws IOException
    *           if removal fails due to a database error
    * @throws IllegalStateException
    *           if the parent resource does not exist
    * @return the updated resource
    */
-  <T extends ResourceContent> Resource<T> deleteContent(ResourceURI uri, T content,
-      User user) throws ContentRepositoryException,
-      SecurityException, IOException, IllegalStateException;
+  <T extends ResourceContent> Resource<T> deleteContent(ResourceURI uri,
+      T content) throws ContentRepositoryException, IOException,
+      IllegalStateException;
 
   /**
    * This method moves the given resource to the new uri.
@@ -120,18 +112,14 @@ public interface WritableContentRepository extends ContentRepository {
    *          uri of the resource to move
    * @param target
    *          the target uri
-   * @param user
-   *          the user
    * @return <code>true</code> if the resource could be moved
    * @throws ContentRepositoryException
    *           if updating the content repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
    * @throws IOException
    *           if moving fails due to a database error
    */
-  boolean move(ResourceURI uri, ResourceURI target, User user)
-      throws ContentRepositoryException, SecurityException, IOException;
+  boolean move(ResourceURI uri, ResourceURI target)
+      throws ContentRepositoryException, IOException;
 
   /**
    * This method removes the given resource in all available versions from the
@@ -139,18 +127,14 @@ public interface WritableContentRepository extends ContentRepository {
    * 
    * @param uri
    *          uri of the resource to remove
-   * @param user
-   *          the user
    * @return <code>true</code> if the resource could be removed
    * @throws ContentRepositoryException
    *           if updating the content repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
    * @throws IOException
    *           if removal fails due to a database error
    */
-  boolean delete(ResourceURI uri, User user) throws ContentRepositoryException,
-      SecurityException, IOException;
+  boolean delete(ResourceURI uri) throws ContentRepositoryException,
+      IOException;
 
   /**
    * This method removes the given resource in the specified version from the
@@ -160,20 +144,16 @@ public interface WritableContentRepository extends ContentRepository {
    *          uri of the resource to remove
    * @param version
    *          the version to remove
-   * @param user
-   *          the user
    * @param allRevisions
    *          <code>true</code> to remove all revisions
    * @return <code>true</code> if the resource could be removed
    * @throws ContentRepositoryException
    *           if updating the content repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
    * @throws IOException
    *           if removal fails due to a database error
    */
-  boolean delete(ResourceURI uri, User user, boolean allRevisions)
-      throws ContentRepositoryException, SecurityException, IOException;
+  boolean delete(ResourceURI uri, boolean allRevisions)
+      throws ContentRepositoryException, IOException;
 
   /**
    * Triggers a re-index of the repository's search index.

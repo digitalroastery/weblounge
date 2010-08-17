@@ -25,8 +25,6 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.user.User;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,26 +111,6 @@ public interface ContentRepository {
   Resource<?> get(ResourceURI uri) throws ContentRepositoryException;
 
   /**
-   * Returns the requested resource or <code>null</code> if the resource is not
-   * available.
-   * 
-   * @param uri
-   *          the resource uri
-   * @param user
-   *          the requesting user
-   * @param p
-   *          the requested permission
-   * 
-   * @return the resource or <code>null</code>
-   * @throws ContentRepositoryException
-   *           if reading the resource from the repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
-   */
-  Resource<?> get(ResourceURI uri, User user, Permission p)
-      throws ContentRepositoryException, SecurityException;
-
-  /**
    * Returns the resource content identified by <code>uri</code> and
    * <code>language</code> or <code>null</code> if no content was found.
    * 
@@ -150,31 +128,6 @@ public interface ContentRepository {
       throws ContentRepositoryException, IOException;
 
   /**
-   * Returns the requested resource or <code>null</code> if the resource is not
-   * available.
-   * 
-   * @param uri
-   *          the resource uri
-   * @param language
-   *          the language
-   * @param user
-   *          the requesting user
-   * @param p
-   *          the requested permission
-   * 
-   * @return the resource or <code>null</code>
-   * @throws ContentRepositoryException
-   *           if reading the resource from the repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
-   * @throws IOException
-   *           if reading the resource contents fails
-   */
-  InputStream getContent(ResourceURI uri, Language language, User user,
-      Permission p) throws ContentRepositoryException, SecurityException,
-      IOException;
-
-  /**
    * Returns <code>true</code> if the requested resource exists.
    * 
    * @param uri
@@ -184,26 +137,6 @@ public interface ContentRepository {
    *           if looking up the resource from the repository fails
    */
   boolean exists(ResourceURI uri) throws ContentRepositoryException;
-
-  /**
-   * Returns <code>true</code> if the requested resource exists for the given
-   * user and is accessible with respect to permissions and version.
-   * 
-   * @param uri
-   *          the resource uri
-   * @param user
-   *          the requesting user
-   * @param p
-   *          the requested permission
-   * @return <code>true</code> if the resource exists and is accessible for the
-   *         given user using permission <code>p</code>.
-   * @throws ContentRepositoryException
-   *           if looking up the resource from the repository fails
-   * @throws SecurityException
-   *           if access is denied for the given user and permission
-   */
-  boolean exists(ResourceURI uri, User user, Permission p)
-      throws ContentRepositoryException, SecurityException;
 
   /**
    * Returns a resource uri for every available revision of the resource.
