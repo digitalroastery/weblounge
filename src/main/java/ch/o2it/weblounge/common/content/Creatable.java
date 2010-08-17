@@ -33,6 +33,22 @@ import java.util.Date;
 public interface Creatable {
 
   /**
+   * Sets the creation date.
+   * 
+   * @param date
+   *          the creation date
+   */
+  void setCreationDate(Date date);
+
+  /**
+   * Sets the user that created the object.
+   * 
+   * @param user
+   *          the creator
+   */
+  void setCreator(User user);
+  
+  /**
    * Returns the object's creation date.
    * 
    * @return the creation date

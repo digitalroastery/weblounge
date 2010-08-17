@@ -20,49 +20,37 @@
 
 package ch.o2it.weblounge.common.content;
 
-import ch.o2it.weblounge.common.language.Language;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * Resource content represents the actual content of a resource.
+ * A reader for resource content.
  */
-public interface ResourceContent extends Creatable {
+public interface ResourceContentReader<T extends ResourceContent> {
 
   /**
-   * Sets the resource name.
+   * This method is called to parse the serialized XML of a
+   * {@link ResourceContent}.
    * 
-   * @param name
-   *          the name
+   * @param is
+   *          the content data
+   * @throws ParserConfigurationException
+   *           if the SAX parser setup failed
+   * @throws IOException
+   *           if reading the input stream fails
+   * @throws SAXException
+   *           if an error occurs while parsing
    */
-  void setFilename(String name);
+  T read(InputStream is) throws SAXException, IOException,
+      ParserConfigurationException;
 
   /**
-   * Returns the resource name. Depending on the type of resource, this is
-   * likely a filename.
-   * 
-   * @return the name
+   * Resets the parser.
    */
-  String getFilename();
-
-  /**
-   * Sets the content language.
-   * 
-   * @param language
-   *          the language
-   */
-  void setLanguage(Language language);
-
-  /**
-   * Returns the content language.
-   * 
-   * @return the language
-   */
-  Language getLanguage();
-  
-  /**
-   * Returns an xml representation of this file content.
-   * 
-   * @return the xml representation
-   */
-  String toXml();
+  void reset();
 
 }

@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.common.content.file;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
-import ch.o2it.weblounge.common.language.Language;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,21 +31,6 @@ import java.io.InputStream;
  * addition, it is designed to be extended by subclasses like images.
  */
 public interface FileContent extends ResourceContent {
-
-  /**
-   * Sets the content language.
-   * 
-   * @param language
-   *          the language
-   */
-  void setLanguage(Language language);
-
-  /**
-   * Returns the file language.
-   * 
-   * @return the language
-   */
-  Language getLanguage();
 
   /**
    * Sets the content mime type.
@@ -62,21 +46,6 @@ public interface FileContent extends ResourceContent {
    * @return the mime type
    */
   String getMimetype();
-
-  /**
-   * Sets the filename.
-   * 
-   * @param filename
-   *          the filename
-   */
-  void setFilename(String filename);
-
-  /**
-   * Returns the original filename.
-   * 
-   * @return the filename
-   */
-  String getFilename();
 
   /**
    * Sets the file size in bytes.
