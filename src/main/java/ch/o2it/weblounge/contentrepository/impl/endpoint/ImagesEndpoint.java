@@ -26,11 +26,9 @@ import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
-import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.ScalingMode;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -47,6 +45,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
 
+import javax.media.jai.BorderExtender;
+import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.OpImage;
 import javax.media.jai.RenderedOp;
@@ -231,13 +231,8 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       }
     }
 
-    // TODO: Temporary, remove!
-    ImageStyle s = new ImageStyleImpl("test", 500, 500);
-    s.setScalingMode(ScalingMode.Box);
-    return getScaledImage(request, resource, preferred, style);
-
     // The image style was not found
-    // throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    throw new WebApplicationException(Status.PRECONDITION_FAILED);
   }
 
   /**
@@ -326,7 +321,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     final String mimetype = ((ImageContent) resourceContent).getMimetype();
-    final String format = mimetype.substring(mimetype.indexOf("/"));
+    final String format = mimetype.substring(mimetype.indexOf("/") + 1);
 
     Site site = getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
@@ -349,7 +344,6 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
           }
         } finally {
           IOUtils.closeQuietly(is);
-          IOUtils.closeQuietly(os);
         }
       }
     });
@@ -361,8 +355,6 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
         response.type(fileContent.getMimetype());
       else
         response.type(MediaType.APPLICATION_OCTET_STREAM);
-      if (fileContent.getSize() > 0)
-        response.header("Content-Length", fileContent.getSize());
     }
 
     // Add an e-tag and send the response
@@ -394,13 +386,19 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
         throw new WebApplicationException(Status.PRECONDITION_FAILED);
 
       ((OpImage) image.getRendering()).setTileCache(null);
-      float scale = 2.0f;
+      float scaleX = 2.0f;
+      float scaleY = 2.0f;
+      float offsetX = 2.0f;
+      float offsetY = 2.0f;
 
       // Resize the image
-      ParameterBlock subsampleParams = new ParameterBlock();
-      subsampleParams.addSource(image).add(scale).add(scale).add(0.0f).add(0.0f);
-      RenderingHints qualityHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-      RenderedOp resizedImage = JAI.create("SubsampleAverage", subsampleParams, qualityHints);
+      ParameterBlock scaleParams = new ParameterBlock();
+      scaleParams.addSource(image);
+      scaleParams.add(scaleX).add(scaleY).add(offsetX).add(offsetY);
+      scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC));
+      RenderingHints renderingHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+      renderingHints.add(new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY)));
+      RenderedOp resizedImage = JAI.create("scale", scaleParams, renderingHints);
 
       // Write the resized image to the output stream, in the specified encoding
       ParameterBlock encodeParams = new ParameterBlock();
@@ -409,8 +407,6 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
 
     } catch (Throwable t) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    } finally {
-      IOUtils.closeQuietly(is);
     }
   }
 

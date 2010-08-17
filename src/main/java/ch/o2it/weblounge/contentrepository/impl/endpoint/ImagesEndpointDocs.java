@@ -101,7 +101,7 @@ public final class ImagesEndpointDocs {
     docs.addEndpoint(Endpoint.Type.READ, scaleImageEndpoint);
 
     // GET /{resourceid}/styles/{styleid}
-    Endpoint scaleLocalizedImageEndpoint = new Endpoint("/{resource}/{languageid}/styles/{style}", Method.GET, "localizedstyledimage");
+    Endpoint scaleLocalizedImageEndpoint = new Endpoint("/{image}/{language}/styles/{style}", Method.GET, "localizedstyledimage");
     scaleLocalizedImageEndpoint.setDescription("Returns a scaled version of the image with the given identifier and language");
     scaleLocalizedImageEndpoint.addFormat(new Format("image", null, null));
     scaleLocalizedImageEndpoint.addStatus(OK("the image was scaled using the specified image style and is returned as part of the response"));
