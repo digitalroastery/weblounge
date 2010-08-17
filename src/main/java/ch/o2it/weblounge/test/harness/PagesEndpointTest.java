@@ -72,12 +72,12 @@ public class PagesEndpointTest extends IntegrationTestBase {
    * @see ch.o2it.weblounge.test.harness.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
-    logger.info("Preparing test of content repository rest api");
+    logger.info("Preparing test of pages endpoint");
 
     // Include the mountpoint
     // TODO: Make this dynamic
     // serverUrl = UrlSupport.concat(serverUrl, "weblounge");
-    String requestUrl = UrlSupport.concat(serverUrl, "system/pages");
+    String requestUrl = UrlSupport.concat(serverUrl, "system/weblounge/pages");
     String testPath = "/testpath/";
 
     // Prepare the request

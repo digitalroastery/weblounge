@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<file id="5bc19990-8f99-4873-a813-71b6dfac22ad" path="/porsche/" version="live">
+<image id="5bc19990-8f99-4873-a813-71b6dfac22ad" path="/porsche/" version="live">
   <head>
     <promote>true</promote>
     <index>true</index>
@@ -39,14 +39,26 @@
   </head>
   <body>
     <content language="en">
+      <created>
+        <user id="hans" realm="testland">Hans Muster</user>
+        <date>2009-01-07T19:05:41Z</date>
+      </created>
       <filename><![CDATA[car.jpg]]></filename>
       <mimetype>image/jpeg</mimetype>
       <size>73642</size>
+      <width>1000</width>
+      <height>666</height>
     </content>
     <content language="de">
+      <created>
+        <user id="amelie" realm="testland">Amélie Poulard</user>
+        <date>2009-02-18T21:06:40Z</date>
+      </created>
       <filename><![CDATA[auto.png]]></filename>
       <mimetype>image/png</mimetype>
       <size>262889</size>
+      <width>1000</width>
+      <height>666</height>
     </content>
   </body>
-</file>
+</image>

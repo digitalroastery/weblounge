@@ -64,7 +64,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
     // Include the mountpoint
     // TODO: Make this dynamic
     //serverUrl = UrlSupport.concat(serverUrl, "weblounge");
-    String requestUrl = UrlSupport.concat(serverUrl, "system/search");
+    String requestUrl = UrlSupport.concat(serverUrl, "system/weblounge/search");
     
     // Prepare the request
     logger.info("Searching for a page");
