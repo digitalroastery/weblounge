@@ -34,44 +34,84 @@ import java.io.InputStream;
 public interface WritableContentRepository extends ContentRepository {
 
   /**
-   * Puts the resource to the specified location. Depending on whether the resource
-   * identified by <code>uri</code> already exists, the method either creates a
-   * new resource or updates the existing one.
+   * Puts the resource to the specified location. Depending on whether the
+   * resource identified by <code>uri</code> already exists, the method either
+   * creates a new resource or updates the existing one.
    * <p>
    * The returned resource contains the same data than the one passed in as the
    * <code>resource</code> argument but with an updated uri.
+   * <p>
+   * <b>Note:</b> do not modify the resource content using this method. Use
+   * {@link #putContent(Resource, InputStream, User)} instead.
    * 
    * @param uri
    *          the resource uri
    * @param resource
    *          the resource
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
    *           if adding fails due to a database error
+   * @throws IllegalStateException
+   *           if the resource does not exist and contains a non-empty content
+   *           section.
+   * @throws IllegalStateException
+   *           if the resource exists but contains different resource content
+   *           than what is specified in the updated document
    * @return the updated resource
    */
-  Resource<? extends ResourceContent> put(Resource<? extends ResourceContent> resource, User user) throws SecurityException, IOException;
+  Resource<? extends ResourceContent> put(
+      Resource<? extends ResourceContent> resource, User user)
+      throws ContentRepositoryException, SecurityException, IOException,
+      IllegalStateException;
 
   /**
-   * Puts the resource to the specified location. Depending on whether the resource
-   * identified by <code>uri</code> already exists, the method either creates a
-   * new resource or updates the existing one.
+   * Adds the content to the specified resource.
    * <p>
    * The returned resource contains the same data than the one passed in as the
    * <code>resource</code> argument but with an updated uri.
    * 
    * @param uri
    *          the resource uri
-   * @param resource
-   *          the resource
+   * @param content
+   *          the resource content
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
    *           if adding fails due to a database error
-   * @return the resource with the given uri
+   * @throws IllegalStateException
+   *           if the parent resource does not exist or is of an incompatible
+   *           type
+   * @return the updated resource
    */
-  void putContent(Resource<? extends ResourceContent> resource, InputStream is, User user) throws SecurityException, IOException;
+  <T extends ResourceContent> Resource<T> putContent(ResourceURI uri, T content,
+      InputStream is, User user) throws ContentRepositoryException,
+      SecurityException, IOException, IllegalStateException;
+
+  /**
+   * Deletes the resource content.
+   * 
+   * @param uri
+   *          the resource uri
+   * @param content
+   *          the resource content
+   * @throws ContentRepositoryException
+   *           if removing the content repository fails
+   * @throws SecurityException
+   *           if access is denied for the given user and permission
+   * @throws IOException
+   *           if removal fails due to a database error
+   * @throws IllegalStateException
+   *           if the parent resource does not exist
+   * @return the updated resource
+   */
+  <T extends ResourceContent> Resource<T> deleteContent(ResourceURI uri, T content,
+      User user) throws ContentRepositoryException,
+      SecurityException, IOException, IllegalStateException;
 
   /**
    * This method moves the given resource to the new uri.
@@ -83,13 +123,15 @@ public interface WritableContentRepository extends ContentRepository {
    * @param user
    *          the user
    * @return <code>true</code> if the resource could be moved
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
    *           if moving fails due to a database error
    */
   boolean move(ResourceURI uri, ResourceURI target, User user)
-      throws SecurityException, IOException;
+      throws ContentRepositoryException, SecurityException, IOException;
 
   /**
    * This method removes the given resource in all available versions from the
@@ -100,12 +142,15 @@ public interface WritableContentRepository extends ContentRepository {
    * @param user
    *          the user
    * @return <code>true</code> if the resource could be removed
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
    *           if removal fails due to a database error
    */
-  boolean delete(ResourceURI uri, User user) throws SecurityException, IOException;
+  boolean delete(ResourceURI uri, User user) throws ContentRepositoryException,
+      SecurityException, IOException;
 
   /**
    * This method removes the given resource in the specified version from the
@@ -120,13 +165,15 @@ public interface WritableContentRepository extends ContentRepository {
    * @param allRevisions
    *          <code>true</code> to remove all revisions
    * @return <code>true</code> if the resource could be removed
+   * @throws ContentRepositoryException
+   *           if updating the content repository fails
    * @throws SecurityException
    *           if access is denied for the given user and permission
    * @throws IOException
    *           if removal fails due to a database error
    */
   boolean delete(ResourceURI uri, User user, boolean allRevisions)
-      throws SecurityException, IOException;
+      throws ContentRepositoryException, SecurityException, IOException;
 
   /**
    * Triggers a re-index of the repository's search index.

@@ -22,6 +22,7 @@ package ch.o2it.weblounge.contentrepository;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
+import ch.o2it.weblounge.common.content.ResourceContentReader;
 import ch.o2it.weblounge.common.content.ResourceReader;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -65,5 +66,18 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @return the input document
    */
   SolrInputDocument getInputDocument(Resource<?> resource);
+
+  /**
+   * Returns a <code>ResourceContentReader</code> for the type of resources that
+   * is supported by this serializer.
+   * 
+   * @return the resource reader
+   * @throws ParserConfigurationException
+   *           if the SAX parser setup failed
+   * @throws SAXException
+   *           if an error occurs during parser instantiation
+   */
+  ResourceContentReader<S> getContentReader() throws ParserConfigurationException,
+      SAXException;
 
 }
