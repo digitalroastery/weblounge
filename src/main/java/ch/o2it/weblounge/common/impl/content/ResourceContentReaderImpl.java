@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
+import ch.o2it.weblounge.common.content.ResourceContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler;
@@ -43,10 +44,10 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse <code>Content</code> data for simple files.
  */
-public class ResourceContentReader extends WebloungeSAXHandler {
+public abstract class ResourceContentReaderImpl<T extends ResourceContent> extends WebloungeSAXHandler implements ResourceContentReader<T> {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ResourceContentReader.class);
+  private final static Logger logger = LoggerFactory.getLogger(ResourceContentReaderImpl.class);
 
   /** Parser factory */
   protected static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -55,12 +56,12 @@ public class ResourceContentReader extends WebloungeSAXHandler {
   protected WeakReference<SAXParser> parserRef = null;
 
   /** The file content data */
-  protected ResourceContentImpl content = null;
-  
+  protected T content = null;
+
   /**
    * Creates a new file content reader that will parse serialized XML version of
-   * the file content and store it in the {@link ResourceContent} that is returned
-   * by the {@link #read} method.
+   * the file content and store it in the {@link ResourceContent} that is
+   * returned by the {@link #read} method.
    * 
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
@@ -69,23 +70,17 @@ public class ResourceContentReader extends WebloungeSAXHandler {
    * 
    * @see #read(InputStream)
    */
-  public ResourceContentReader() throws ParserConfigurationException, SAXException {
+  public ResourceContentReaderImpl() throws ParserConfigurationException,
+      SAXException {
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
   /**
-   * This method is called to parse the serialized XML of a {@link ResourceContent}.
+   * {@inheritDoc}
    * 
-   * @param is
-   *          the content data
-   * @throws ParserConfigurationException
-   *           if the SAX parser setup failed
-   * @throws IOException
-   *           if reading the input stream fails
-   * @throws SAXException
-   *           if an error occurs while parsing
+   * @see ch.o2it.weblounge.common.content.ResourceContentReader#read(java.io.InputStream)
    */
-  public ResourceContent read(InputStream is) throws SAXException, IOException,
+  public T read(InputStream is) throws SAXException, IOException,
       ParserConfigurationException {
 
     SAXParser parser = parserRef.get();
@@ -98,7 +93,9 @@ public class ResourceContentReader extends WebloungeSAXHandler {
   }
 
   /**
-   * Resets the parser.
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.ResourceContentReader#reset()
    */
   public void reset() {
     super.reset();
@@ -113,9 +110,17 @@ public class ResourceContentReader extends WebloungeSAXHandler {
    * 
    * @return the content
    */
-  ResourceContent getResourceContent() {
+  public T getContent() {
     return content;
   }
+
+  /**
+   * Creates an empty resource content object that will be populated by the
+   * parser.
+   * 
+   * @return the new content object
+   */
+  protected abstract T createContent();
 
   /**
    * {@inheritDoc}
@@ -131,9 +136,10 @@ public class ResourceContentReader extends WebloungeSAXHandler {
     // start of a new content element
     if ("content".equals(raw)) {
       String languageId = attrs.getValue("language");
-      content = new ResourceContentImpl(LanguageSupport.getLanguage(languageId));
+      content = createContent();
+      content.setLanguage(LanguageSupport.getLanguage(languageId));
       logger.debug("Started reading file content {}", content);
-    } 
+    }
 
     // creator
     else if ("user".equals(raw)) {
@@ -156,7 +162,13 @@ public class ResourceContentReader extends WebloungeSAXHandler {
     if ("content".equals(raw)) {
       logger.debug("Finished reading content {}", content);
     }
-    
+
+    // filename
+    else if ("filename".equals(raw)) {
+      content.setFilename(getCharacters());
+      logger.trace("Content's filename is '{}'", content.getFilename());
+    }
+
     // user
     else if ("user".equals(raw)) {
       String login = (String) clipboard.remove("user");
@@ -165,7 +177,7 @@ public class ResourceContentReader extends WebloungeSAXHandler {
       User user = new UserImpl(login, realm, name);
       clipboard.put("user", user);
     }
-    
+
     // date
     else if ("date".equals(raw)) {
       try {
@@ -175,7 +187,7 @@ public class ResourceContentReader extends WebloungeSAXHandler {
         throw new IllegalStateException("Reading date failed: '" + getCharacters() + "'");
       }
     }
-    
+
     // created
     else if ("created".equals(raw)) {
       User owner = (User) clipboard.remove("user");
@@ -184,7 +196,8 @@ public class ResourceContentReader extends WebloungeSAXHandler {
       Date date = (Date) clipboard.remove("date");
       if (date == null)
         throw new IllegalStateException("Creation date not found");
-      content.setCreated(date, owner);
+      content.setCreator(owner);
+      content.setCreationDate(date);
     }
 
     super.endElement(uri, local, raw);

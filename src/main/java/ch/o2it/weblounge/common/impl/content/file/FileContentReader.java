@@ -21,8 +21,7 @@
 package ch.o2it.weblounge.common.impl.content.file;
 
 import ch.o2it.weblounge.common.content.file.FileContent;
-import ch.o2it.weblounge.common.impl.content.ResourceContentReader;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.content.ResourceContentReaderImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +39,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Utility class used to parse <code>Content</code> data for simple files.
  */
-public class FileContentReader extends ResourceContentReader {
+public class FileContentReader extends ResourceContentReaderImpl<FileContent> {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(FileContentReader.class);
@@ -50,9 +49,6 @@ public class FileContentReader extends ResourceContentReader {
 
   /** The SAX parser */
   protected WeakReference<SAXParser> parserRef = null;
-
-  /** The file content data */
-  protected FileContentImpl fileContent = null;
 
   /**
    * Creates a new file content reader that will parse serialized XML version of
@@ -70,6 +66,16 @@ public class FileContentReader extends ResourceContentReader {
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentReaderImpl#createContent()
+   */
+  @Override
+  protected FileContent createContent() {
+    return new FileContentImpl();
+  }
+  
   /**
    * This method is called to parse the serialized XML of a {@link FileContent}.
    * 
@@ -91,26 +97,17 @@ public class FileContentReader extends ResourceContentReader {
       parserRef = new WeakReference<SAXParser>(parser);
     }
     parser.parse(is, this);
-    return fileContent;
+    return content;
   }
 
   /**
    * Resets the pagelet parser.
    */
   public void reset() {
-    fileContent = null;
+    content = null;
     SAXParser parser = parserRef.get();
     if (parser != null)
       parser.reset();
-  }
-
-  /**
-   * Returns the content that has been read in.
-   * 
-   * @return the content
-   */
-  FileContent getFileContent() {
-    return fileContent;
   }
 
   /**
@@ -122,16 +119,12 @@ public class FileContentReader extends ResourceContentReader {
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
 
-    super.startElement(uri, local, raw, attrs);
-
     // start of a new content element
     if ("content".equals(raw)) {
-      String languageId = attrs.getValue("language");
-      fileContent = new FileContentImpl(LanguageSupport.getLanguage(languageId));
-      content = fileContent;
-      logger.debug("Started reading file content {}", fileContent);
+      logger.debug("Started reading file content {}", content);
     }
 
+    super.startElement(uri, local, raw, attrs);
   }
 
   /**
@@ -145,25 +138,19 @@ public class FileContentReader extends ResourceContentReader {
 
     // content
     if ("content".equals(raw)) {
-      logger.debug("Finished reading content {}", fileContent);
-    }
-
-    // filename
-    else if ("filename".equals(raw)) {
-      fileContent.setFilename(getCharacters());
-      logger.trace("File content's filename is '{}'", fileContent.getFilename());
+      logger.debug("Finished reading content {}", content);
     }
 
     // mimetype
     else if ("mimetype".equals(raw)) {
-      fileContent.setMimetype(getCharacters());
-      logger.trace("File content's mimetype is '{}'", fileContent.getMimetype());
+      content.setMimetype(getCharacters());
+      logger.trace("File content's mimetype is '{}'", content.getMimetype());
     }
 
     // size
     else if ("size".equals(raw)) {
-      fileContent.setSize(Long.parseLong(getCharacters()));
-      logger.trace("File content's filesize is '{}'", fileContent.getSize());
+      content.setSize(Long.parseLong(getCharacters()));
+      logger.trace("File content's filesize is '{}'", content.getSize());
     }
 
     super.endElement(uri, local, raw);

@@ -612,10 +612,28 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
+   */
+  public void setCreationDate(Date date) {
+    creationCtx.setCreationDate(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Modifiable#getCreationDate()
    */
   public Date getCreationDate() {
     return creationCtx.getCreationDate();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   */
+  public void setCreator(User user) {
+    creationCtx.setCreator(user);
   }
 
   /**
@@ -727,7 +745,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#getOriginalContent()
    */
   public T getOriginalContent() {
@@ -738,7 +756,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     }
     return original;
   }
-  
+
   /**
    * {@inheritDoc}
    * 

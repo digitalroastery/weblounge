@@ -134,7 +134,7 @@ public final class ImageResourceReader extends AbstractResourceReaderImpl<ImageC
     if ("content".equals(raw)) {
       contentReader.endElement(uri, local, raw);
       parserContext = ParserContext.Resource;
-      resource.addContent(contentReader.getImageContent());
+      resource.addContent(contentReader.getContent());
     } else if (parserContext.equals(ParserContext.Content)) {
       contentReader.endElement(uri, local, raw);
     }

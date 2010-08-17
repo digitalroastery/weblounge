@@ -363,6 +363,15 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
+   */
+  public void setCreationDate(Date date) {
+    creationCtx.setCreationDate(date);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#getCreationDate()
    */
   public Date getCreationDate() {
@@ -371,13 +380,22 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
    */
   public boolean isCreatedAfter(Date date) {
     return creationCtx.isCreatedAfter(date);
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   */
+  public void setCreator(User user) {
+    creationCtx.setCreator(user);
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -432,10 +450,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   public boolean isPublished() {
     return publishingCtx.isPublished();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
    */
   public boolean isPublished(Date date) {
@@ -702,7 +720,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
     b.append(pageletId);
     b.append("\"");
     b.append(">");
-    
+
     // export security context
     b.append(securityCtx.toXml());
 

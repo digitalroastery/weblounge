@@ -22,8 +22,7 @@ package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.image.ImageContent;
-import ch.o2it.weblounge.common.impl.content.file.FileContentReader;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.content.ResourceContentReaderImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +39,10 @@ import javax.xml.parsers.SAXParser;
 /**
  * Utility class used to parse <code>Content</code> data for simple files.
  */
-public class ImageContentReader extends FileContentReader {
+public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> {
 
   /** Logging facility */
   private final static Logger logger = LoggerFactory.getLogger(ImageContentReader.class);
-
-  /** The image content data */
-  protected ImageContentImpl imageContent = null;
 
   /**
    * Creates a new file content reader that will parse serialized XML version of
@@ -85,24 +81,25 @@ public class ImageContentReader extends FileContentReader {
       parserRef = new WeakReference<SAXParser>(parser);
     }
     parser.parse(is, this);
-    return imageContent;
+    return content;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentReaderImpl#createContent()
+   */
+  @Override
+  protected ImageContent createContent() {
+    return new ImageContentImpl();
+  }
+  
   /**
    * Resets the pagelet parser.
    */
   public void reset() {
     super.reset();
-    imageContent = null;
-  }
-
-  /**
-   * Returns the content that has been read in.
-   * 
-   * @return the content
-   */
-  ImageContent getImageContent() {
-    return imageContent;
+    content = null;
   }
 
   /**
@@ -116,15 +113,10 @@ public class ImageContentReader extends FileContentReader {
 
     // start of a new content element
     if ("content".equals(raw)) {
-      String languageId = attrs.getValue("language");
-      imageContent = new ImageContentImpl(LanguageSupport.getLanguage(languageId));
-      fileContent = imageContent;
-      content = imageContent;
       logger.debug("Started reading image content {}", content);
-    } else {
-      super.startElement(uri, local, raw, attrs);
     }
 
+    super.startElement(uri, local, raw, attrs);
   }
 
   /**
@@ -136,16 +128,28 @@ public class ImageContentReader extends FileContentReader {
   public void endElement(String uri, String local, String raw)
       throws SAXException {
 
+    // mimetype
+    if ("mimetype".equals(raw)) {
+      content.setMimetype(getCharacters());
+      logger.trace("File content's mimetype is '{}'", content.getMimetype());
+    }
+
+    // size
+    else if ("size".equals(raw)) {
+      content.setSize(Long.parseLong(getCharacters()));
+      logger.trace("File content's filesize is '{}'", content.getSize());
+    }
+
     // width
     if ("width".equals(raw)) {
-      imageContent.setWidth(Integer.parseInt(getCharacters()));
-      logger.trace("Image's width is '{}'", imageContent.getWidth());
+      content.setWidth(Integer.parseInt(getCharacters()));
+      logger.trace("Image's width is '{}'", content.getWidth());
     }
 
     // height
     else if ("height".equals(raw)) {
-      imageContent.setHeight(Integer.parseInt(getCharacters()));
-      logger.trace("Image's height is '{}'", imageContent.getHeight());
+      content.setHeight(Integer.parseInt(getCharacters()));
+      logger.trace("Image's height is '{}'", content.getHeight());
     }
     
     else {

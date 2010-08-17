@@ -868,6 +868,17 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
+   */
+  public void setCreationDate(Date date) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.setCreationDate(date);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Creatable#getCreationDate()
    */
@@ -888,6 +899,17 @@ public class LazyPageImpl implements Page {
     return page.isCreatedAfter(date);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   */
+  public void setCreator(User user) {
+    if (!isHeaderLoaded)
+      loadPageHeader();
+    page.setCreator(user);
+  }
+  
   /**
    * {@inheritDoc}
    * 

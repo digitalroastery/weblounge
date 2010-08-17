@@ -130,7 +130,7 @@ public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, 
     if ("content".equals(raw)) {
       contentReader.endElement(uri, local, raw);
       parserContext = ParserContext.Resource;
-      resource.addContent(contentReader.getFileContent());
+      resource.addContent(contentReader.getContent());
     }
     
     // file content

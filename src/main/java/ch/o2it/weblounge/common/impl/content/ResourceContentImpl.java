@@ -24,6 +24,8 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.user.User;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Date;
 
 /**
@@ -31,25 +33,55 @@ import java.util.Date;
  */
 public class ResourceContentImpl implements ResourceContent {
 
+  /** The content's name */
+  protected String filename = null;
+
   /** The content's language */
   protected Language language = null;
 
   /** Creation information */
   protected CreationContext creationCtx = new CreationContext();
-  
+
   /** True if this is the original content */
   protected boolean isOriginal = false;
+
+  /**
+   * Creates a new resource content representation.
+   */
+  protected ResourceContentImpl() {
+  }
 
   /**
    * Creates a new resource content representation.
    * 
    * @param language
    *          the content language
+   * @param name
+   *          the content name
    */
-  protected ResourceContentImpl(Language language) {
+  protected ResourceContentImpl(Language language, String name) {
     if (language == null)
       throw new IllegalArgumentException("Language cannot be null");
     this.language = language;
+    this.filename = name;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.ResourceContent#setFilename(java.lang.String)
+   */
+  public void setFilename(String name) {
+    this.filename = name;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.ResourceContent#getFilename()
+   */
+  public String getFilename() {
+    return filename;
   }
 
   /**
@@ -74,6 +106,15 @@ public class ResourceContentImpl implements ResourceContent {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
+   */
+  public void setCreationDate(Date date) {
+    creationCtx.setCreationDate(date);
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Creatable#getCreationDate()
    */
@@ -88,6 +129,15 @@ public class ResourceContentImpl implements ResourceContent {
    */
   public boolean isCreatedAfter(Date date) {
     return creationCtx.isCreatedAfter(date);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   */
+  public void setCreator(User user) {
+    creationCtx.setCreator(user);
   }
 
   /**
@@ -129,7 +179,10 @@ public class ResourceContentImpl implements ResourceContent {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ResourceContent) {
-      return language.equals(((ResourceContent) obj).getLanguage());
+      ResourceContent c = (ResourceContent)obj;
+      if (!StringUtils.trimToEmpty(filename).equals(c.getFilename()))
+        return false;
+      return language.equals(c.getLanguage());
     }
     return false;
   }
@@ -156,6 +209,8 @@ public class ResourceContentImpl implements ResourceContent {
     StringBuffer buf = new StringBuffer();
     buf.append("<content language=\"").append(getLanguage().getIdentifier()).append("\">");
     buf.append(creationCtx.toXml());
+    if (filename != null)
+      buf.append("<filename><![CDATA[").append(filename).append("]]></filename>");
     addXml(buf);
     buf.append("</content>");
     return buf.toString();
@@ -168,9 +223,13 @@ public class ResourceContentImpl implements ResourceContent {
    */
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer(language.toString().toLowerCase());
-    buf.append(" content");
-    return buf.toString();
+    if (filename != null) {
+      return filename;
+    } else {
+      StringBuffer buf = new StringBuffer(language.toString().toLowerCase());
+      buf.append(" content");
+      return buf.toString();
+    }
   }
 
 }

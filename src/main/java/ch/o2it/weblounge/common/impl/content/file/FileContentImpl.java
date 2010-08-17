@@ -24,8 +24,6 @@ import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.language.Language;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -37,22 +35,16 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
   /** The file's mime type */
   protected String mimetype = null;
 
-  /** The file's original name */
-  protected String filename = null;
-
   /** The file size in bytes */
   protected long size = -1L;
 
   /**
    * Creates a new file content representation.
-   * 
-   * @param language
-   *          the language
    */
-  protected FileContentImpl(Language language) {
-    super(language);
+  protected FileContentImpl() {
+    super();
   }
-  
+
   /**
    * Creates a new file content representation.
    * 
@@ -64,12 +56,11 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
    *          the file size in bytes
    */
   public FileContentImpl(String filename, Language language, long filesize) {
-    super(language);
+    super(language, filename);
     if (filename == null)
       throw new IllegalArgumentException("Filename cannot be null");
     if (filesize <= 0)
       throw new IllegalArgumentException("File size needs to be larger than 0 bytes");
-    this.filename = filename;
     this.size = filesize;
   }
 
@@ -91,26 +82,6 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
    */
   public String getMimetype() {
     return mimetype;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#setFilename(java.lang.String)
-   */
-  public void setFilename(String filename) {
-    if (filename == null)
-      throw new IllegalArgumentException("Filename must not be null");
-    this.filename = filename;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#getFilename()
-   */
-  public String getFilename() {
-    return filename;
   }
 
   /**
@@ -153,8 +124,6 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
    * @return the modified string buffer
    */
   protected StringBuffer addXml(StringBuffer xml) {
-    if (filename != null)
-      xml.append("<filename><![CDATA[").append(filename).append("]]></filename>");
     if (mimetype != null)
       xml.append("<mimetype>").append(mimetype).append("</mimetype>");
     if (size >= 0)
@@ -171,23 +140,11 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
   public boolean equals(Object obj) {
     if (obj instanceof FileContent) {
       FileContent content = (FileContent)obj;
-      if (!StringUtils.trimToEmpty(filename).equals(content.getFilename()))
-          return false;
       if (size != content.getSize())
           return false;
       return super.equals(content);
     }
     return false;
-  }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#toString()
-   */
-  @Override
-  public String toString() {
-    return filename != null ? filename : super.toString();
   }
   
 }
