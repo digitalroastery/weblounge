@@ -79,6 +79,27 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     this.width = width;
     this.height = height;
     this.scalingMode = scaling;
+    switch (scaling) {
+      case Box:
+      case Cover:
+      case Fill:
+        if (width <= 0)
+          throw new IllegalArgumentException("Image width cannot be null with " + scaling.toString().toLowerCase() + " scaling");
+        if (height <= 0)
+          throw new IllegalArgumentException("Image height cannot be null with " + scaling.toString().toLowerCase() + " scaling");
+        break;
+      case Width:
+        if (width <= 0)
+          throw new IllegalArgumentException("Image width cannot be null with " + scaling.toString().toLowerCase() + " scaling");
+        break;
+      case Height:
+        if (height <= 0)
+          throw new IllegalArgumentException("Image height cannot be null with " + scaling.toString().toLowerCase() + " scaling");
+        break;
+      case None:
+        break;
+      
+    }
   }
 
   /**
