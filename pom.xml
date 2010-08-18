@@ -29,9 +29,7 @@
           <archive>
             <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
             <manifestEntries>
-              <Export-Package>
-                com.sun.image.codec.jpeg
-              </Export-Package>
+              <Export-Package>com.sun.image.codec.jpeg; version="0.0.0"</Export-Package>
             </manifestEntries>
           </archive>
         </configuration>
@@ -52,7 +50,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.system</Bundle-SymbolicName>
-            <Bundle-Category>framework</Bundle-Category>
             <Fragment-Host>system.bundle; extension:=framework</Fragment-Host>
           </instructions>
         </configuration>
