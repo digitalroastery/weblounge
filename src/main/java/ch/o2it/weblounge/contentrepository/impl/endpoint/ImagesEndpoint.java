@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Module;
@@ -33,23 +34,13 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-import com.sun.media.jai.codec.SeekableStream;
-
 import org.apache.commons.io.IOUtils;
 
-import java.awt.RenderingHints;
-import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.OpImage;
-import javax.media.jai.RenderedOp;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -268,9 +259,8 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
 
     // Get the image
     final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
-    if (resource == null || resource.contents().isEmpty()) {
+    if (resource == null || resource.contents().isEmpty())
       throw new WebApplicationException(Status.NOT_FOUND);
-    }
 
     // Find the image style
     Site site = getSite(request);
@@ -284,6 +274,61 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
 
     // The image style was not found
     throw new WebApplicationException(Status.PRECONDITION_FAILED);
+  }
+  
+  /**
+   * Returns the list of image styles that are registered for a site.
+   * 
+   * @param request
+   *          the request
+   * @return the list of image styles
+   */
+  @GET
+  @Path("/styles")
+  public Response getImagestyles(@Context HttpServletRequest request) {
+    Site site = getSite(request);
+    if (site == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+    
+    StringBuffer buf = new StringBuffer("<styles>");
+    for (Module m : site.getModules()) {
+      ImageStyle[] styles = m.getImageStyles();
+      for (ImageStyle style : styles) {
+        buf.append(style.toXml());
+      }
+    }
+    buf.append("</styles>");
+    
+    ResponseBuilder response = Response.ok(buf.toString());
+    return response.build();
+  }
+
+  /**
+   * Returns the image styles or a <code>404</code>.
+   * 
+   * @param request
+   *          the request
+   * @param styleId
+   *          the image style identifier
+   * @return the image
+   */
+  @GET
+  @Path("/styles/{style}")
+  public Response getImagestyle(@Context HttpServletRequest request,
+      @PathParam("style") String styleId) {
+    
+    Site site = getSite(request);
+    ImageStyle style = null;
+    for (Module m : site.getModules()) {
+      style = m.getImageStyle(styleId);
+      if (style != null) {
+        ResponseBuilder response = Response.ok(style.toXml());
+        return response.build();
+      }
+    }
+    
+    // The image style was not found
+    throw new WebApplicationException(Status.NOT_FOUND);
   }
 
   /**
@@ -337,7 +382,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
             is = contentRepository.getContent(resource.getURI(), selectedLanguage);
             if (is == null)
               throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-            scale(is, os, format, style);
+            ImageStyleUtils.style(is, os, format, style);
             os.flush();
           } catch (ContentRepositoryException e) {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -361,53 +406,6 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
     response.lastModified(resource.getModificationDate());
     return response.build();
-  }
-
-  /**
-   * Resizes the given image to what is defined by the image style.
-   * 
-   * @param is
-   *          the input stream
-   * @param os
-   *          the output stream
-   * @param format
-   *          the image format
-   * @param style
-   *          the style
-   */
-  protected void scale(InputStream is, OutputStream os, String format,
-      ImageStyle style) {
-    try {
-      
-      // Load the image from the given input stream
-      SeekableStream seekableInputStream = new MemoryCacheSeekableStream(is);
-      RenderedOp image = JAI.create("stream", seekableInputStream);
-      if (image == null)
-        throw new WebApplicationException(Status.PRECONDITION_FAILED);
-
-      ((OpImage) image.getRendering()).setTileCache(null);
-      float scaleX = 2.0f;
-      float scaleY = 2.0f;
-      float offsetX = 2.0f;
-      float offsetY = 2.0f;
-
-      // Resize the image
-      ParameterBlock scaleParams = new ParameterBlock();
-      scaleParams.addSource(image);
-      scaleParams.add(scaleX).add(scaleY).add(offsetX).add(offsetY);
-      scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC));
-      RenderingHints renderingHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-      renderingHints.add(new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY)));
-      RenderedOp resizedImage = JAI.create("scale", scaleParams, renderingHints);
-
-      // Write the resized image to the output stream, in the specified encoding
-      ParameterBlock encodeParams = new ParameterBlock();
-      encodeParams.addSource(resizedImage).add(os).add(format);
-      JAI.create("encode", encodeParams, null);
-
-    } catch (Throwable t) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    }
   }
 
   /**

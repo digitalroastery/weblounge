@@ -115,6 +115,27 @@ public final class ImagesEndpointDocs {
     scaleLocalizedImageEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, scaleLocalizedImageEndpoint);
 
+    // GET /styles
+    Endpoint getStylesEndpoint = new Endpoint("/styles", Method.GET, "getstyles");
+    getStylesEndpoint.setDescription("Returns the image style");
+    getStylesEndpoint.addFormat(Format.xml());
+    getStylesEndpoint.addStatus(OK("the image styles are returned as part of the response"));
+    getStylesEndpoint.addStatus(SERVICE_UNAVAILABLE("the site is temporarily offline"));
+    getStylesEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getStylesEndpoint);
+
+    // GET /styles/{styleid}
+    Endpoint getStyleEndpoint = new Endpoint("/styles/{style}", Method.GET, "getstyle");
+    getStyleEndpoint.setDescription("Returns the image style");
+    getStyleEndpoint.addFormat(Format.xml());
+    getStyleEndpoint.addStatus(OK("the image style was found and is returned as part of the response"));
+    getStyleEndpoint.addStatus(NOT_FOUND("the image style was not found"));
+    getStyleEndpoint.addStatus(BAD_REQUEST("an invalid image style identifier was received"));
+    getStyleEndpoint.addStatus(SERVICE_UNAVAILABLE("the site is temporarily offline"));
+    getStyleEndpoint.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
+    getStyleEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getStyleEndpoint);
+
     return EndpointDocumentationGenerator.generate(docs);
   }
 

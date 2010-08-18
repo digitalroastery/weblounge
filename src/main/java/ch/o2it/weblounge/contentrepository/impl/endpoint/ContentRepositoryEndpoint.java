@@ -200,6 +200,8 @@ public class ContentRepositoryEndpoint {
     try {
       ResourceURI resourceURI = new ResourceURIImpl(resourceType, site, null, resourceId);
       Resource<?> resource = contentRepository.get(resourceURI);
+      if (resource == null)
+        return null;
       if (resourceType != null && !resourceType.equals(resource.getURI().getType())) {
         return null;
       }
