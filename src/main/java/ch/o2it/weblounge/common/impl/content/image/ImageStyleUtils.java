@@ -54,31 +54,31 @@ public class ImageStyleUtils {
    *          the image style
    * @return the scaling factor
    */
-  public static float getScale(int imageWidth, int imageHeight, ImageStyle style) {
+  public static float getScale(float imageWidth, float imageHeight, ImageStyle style) {
     boolean taller = imageWidth < imageHeight;
     float scale = 1.0f;
 
     switch (style.getScalingMode()) {
       case Box:
         if (taller)
-          scale = (float)style.getHeight() / imageHeight;
+          scale = (float)style.getHeight() / (float)imageHeight;
         else
-          scale = (float)style.getWidth() / imageWidth;
+          scale = (float)style.getWidth() / (float)imageWidth;
         break;
       case Cover:
       case Fill:
         if (taller)
-          scale = (float)style.getWidth() / imageWidth;
+          scale = (float)style.getWidth() / (float)imageWidth;
         else
-          scale = (float)style.getHeight() / imageHeight;
+          scale = (float)style.getHeight() / (float)imageHeight;
         break;
       case Height:
-        scale = (float)style.getHeight() / imageHeight;
+        scale = (float)style.getHeight() / (float)imageHeight;
         break;
       case None:
         break;
       case Width:
-        scale = (float)style.getWidth() / imageWidth;
+        scale = (float)style.getWidth() / (float)imageWidth;
         break;
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
@@ -99,11 +99,12 @@ public class ImageStyleUtils {
    *          the image style
    * @return the horizontal cropping amount
    */
-  public static float getCropX(int imageWidth, int imageHeight, ImageStyle style) {
-    int cropX = 0;
-    
+  public static float getCropX(float imageWidth, float imageHeight, ImageStyle style) {
+    float cropX = 0;
+    float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
+        cropX = ((float)imageWidth * scale) - (float)style.getWidth();
         break;
       case Box:
       case Cover:
@@ -130,11 +131,12 @@ public class ImageStyleUtils {
    *          the image style
    * @return the vertical cropping amount
    */
-  public static float getCropY(int imageWidth, int imageHeight, ImageStyle style) {
-    int cropY = 0;
-    
+  public static float getCropY(float imageWidth, float imageHeight, ImageStyle style) {
+    float cropY = 0;
+    float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
+        cropY = ((float)imageHeight * scale) - (float)style.getHeight();
         break;
       case Box:
       case Cover:
@@ -179,45 +181,48 @@ public class ImageStyleUtils {
       int imageWidth = image.getWidth();
       int imageHeight = image.getHeight();
       
-      // Calculate scaling and cropping parameters
-      float scale = getScale(imageWidth, imageHeight, style);
-      float cropX = getCropX(imageWidth, imageHeight, style);
-      float cropY = getCropY(imageWidth, imageHeight, style);
-      
-      RenderedOp processedImage = image;
-      
+      // Quality hints when processing the image
+      RenderingHints qualityHints = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+      qualityHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      qualityHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+      qualityHints.put(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+      qualityHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+      qualityHints.put(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+
       // Resizing
+
+      float scale = getScale(imageWidth, imageHeight, style);
+
       if (scale != 1.0) {
         ParameterBlock scaleParams = new ParameterBlock();
         scaleParams.addSource(image);
         scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
         scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
-        
-        RenderingHints qualityHints = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-        qualityHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        qualityHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-        qualityHints.put(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-        qualityHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        qualityHints.put(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        
-        processedImage = JAI.create("scale", scaleParams, qualityHints);
+        image = JAI.create("scale", scaleParams, qualityHints);
       }
-      
+
+      float scaledWidth = (float)image.getWidth();
+      float scaledHeight = (float)image.getHeight();
+
       // Cropping
+
+      float cropX = (float)Math.ceil(getCropX(scaledWidth, scaledHeight, style));
+      float cropY = (float)Math.ceil(getCropY(scaledWidth, scaledHeight , style));
+      
       if (cropX > 0 || cropY > 0) {
         ParameterBlock cropParams = new ParameterBlock();
-        cropParams.addSource(processedImage);
-        cropParams.add(cropX > 0 ? cropX/2 : 0); // top left x
-        cropParams.add(cropY > 0 ? cropY/2 : 0); // top left y
-        cropParams.add(cropX > 0 ? imageWidth - cropX : imageWidth); // width
-        cropParams.add(cropY > 0 ? imageHeight - cropY : imageHeight); // height
-        processedImage = JAI.create("crop", cropParams);
+        cropParams.addSource(image);
+        cropParams.add(cropX > 0 ? cropX/2.0f : 0.0f); // top left x
+        cropParams.add(cropY > 0 ? cropY/2.0f : 0.0f); // top left y
+        cropParams.add(scaledWidth - cropX);
+        cropParams.add(scaledHeight - cropY);
+        image = JAI.create("crop", cropParams, qualityHints);
       }
 
       // Create the cropped and resized image
       ParameterBlock encodeParams = new ParameterBlock();
-      encodeParams.addSource(processedImage).add(os).add(format);
-      JAI.create("encode", encodeParams, null);
+      encodeParams.addSource(image).add(os).add(format);
+      JAI.create("encode", encodeParams, qualityHints);
 
     } catch (Throwable t) {
       throw new IOException(t);
