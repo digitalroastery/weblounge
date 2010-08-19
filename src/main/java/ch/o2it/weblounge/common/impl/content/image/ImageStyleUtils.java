@@ -37,7 +37,6 @@ import java.io.OutputStream;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
-import javax.media.jai.OpImage;
 import javax.media.jai.RenderedOp;
 
 /**
@@ -64,25 +63,25 @@ public class ImageStyleUtils {
     switch (style.getScalingMode()) {
       case Box:
         if (taller)
-          scale = (float)style.getHeight() / (float)imageHeight;
+          scale = style.getHeight() / imageHeight;
         else
-          scale = (float)style.getWidth() / (float)imageWidth;
+          scale = style.getWidth() / imageWidth;
         break;
       case Cover:
       case Fill:
         if (taller)
-          scale = (float)style.getWidth() / (float)imageWidth;
+          scale = style.getWidth() / imageWidth;
         else
-          scale = (float)style.getHeight() / (float)imageHeight;
+          scale = style.getHeight() / imageHeight;
         break;
       case Height:
-        scale = (float)style.getHeight() / (float)imageHeight;
+        scale = style.getHeight() / imageHeight;
         break;
       case None:
         scale = 1.0f;
         break;
       case Width:
-        scale = (float)style.getWidth() / (float)imageWidth;
+        scale = style.getWidth() / imageWidth;
         break;
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
@@ -108,7 +107,7 @@ public class ImageStyleUtils {
     float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
-        cropX = ((float)imageWidth * scale) - (float)style.getWidth();
+        cropX = (imageWidth * scale) - style.getWidth();
         break;
       case Box:
       case Cover:
@@ -141,7 +140,7 @@ public class ImageStyleUtils {
     float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
-        cropY = ((float)imageHeight * scale) - (float)style.getHeight();
+        cropY = (imageHeight * scale) - style.getHeight();
         break;
       case Box:
       case Cover:
@@ -172,6 +171,8 @@ public class ImageStyleUtils {
       ImageStyle style) throws IOException {
     if (style == null)
       throw new IllegalArgumentException("Image style cannot be null");
+    
+    RenderedOp image = null;
     try {
 
       // Do we need to do any work at all?
@@ -182,23 +183,13 @@ public class ImageStyleUtils {
       
       // Load the image from the given input stream
       SeekableStream seekableInputStream = new MemoryCacheSeekableStream(is);
-      RenderedOp image = JAI.create("stream", seekableInputStream);
+      image = JAI.create("stream", seekableInputStream);
       if (image == null)
         throw new IOException("Error reading image from input stream");
-
-      ((OpImage) image.getRendering()).setTileCache(null);
-
+      
       // Get the original image size
       int imageWidth = image.getWidth();
       int imageHeight = image.getHeight();
-      
-      // Quality hints when processing the image
-      RenderingHints qualityHints = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-      qualityHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      qualityHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-      qualityHints.put(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-      qualityHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-      qualityHints.put(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
       // Resizing
 
@@ -209,11 +200,20 @@ public class ImageStyleUtils {
         scaleParams.addSource(image);
         scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
         scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
-        image = JAI.create("scale", scaleParams, qualityHints);
+
+        // Quality related hints when scaling the image
+        RenderingHints scalingHints = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        scalingHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        scalingHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        scalingHints.put(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+        //qualityHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        scalingHints.put(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+
+        image = JAI.create("scale", scaleParams, scalingHints);
       }
 
-      float scaledWidth = (float)image.getWidth();
-      float scaledHeight = (float)image.getHeight();
+      float scaledWidth = image.getWidth();
+      float scaledHeight = image.getHeight();
 
       // Cropping
 
@@ -227,16 +227,22 @@ public class ImageStyleUtils {
         cropParams.add(cropY > 0 ? cropY/2.0f : 0.0f); // top left y
         cropParams.add(scaledWidth - cropX);
         cropParams.add(scaledHeight - cropY);
-        image = JAI.create("crop", cropParams, qualityHints);
+
+        RenderingHints croppingHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+
+        image = JAI.create("crop", cropParams, croppingHints);
       }
 
       // Create the cropped and resized image
       ParameterBlock encodeParams = new ParameterBlock();
       encodeParams.addSource(image).add(os).add(format);
-      JAI.create("encode", encodeParams, qualityHints);
+      image = JAI.create("encode", encodeParams, null);
 
     } catch (Throwable t) {
       throw new IOException(t);
+    } finally {
+      if (image != null)
+        image.dispose();
     }
   }
 
