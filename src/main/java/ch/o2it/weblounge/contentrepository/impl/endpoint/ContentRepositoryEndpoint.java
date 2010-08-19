@@ -133,6 +133,7 @@ public class ContentRepositoryEndpoint {
     }
 
     // Add an e-tag and send the response
+    response.header("Content-Disposition", "attachment; filename=" + resource.getContent(selectedLanguage).getFilename());
     response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
     response.lastModified(resource.getModificationDate());
     return response.build();

@@ -30,6 +30,7 @@ import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Module;
+import ch.o2it.weblounge.common.site.ScalingMode;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -76,7 +77,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the image
    */
   @GET
-  @Produces("text/xml")
+  @Produces(MediaType.TEXT_XML)
   @Path("/{image}")
   public Response getImageResource(@Context HttpServletRequest request,
       @PathParam("image") String imageId) {
@@ -114,7 +115,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the resource
    */
   @GET
-  @Path("/{image}/original")
+  @Path("/{image}/styles/original")
   public Response getOriginalImage(@Context HttpServletRequest request,
       @PathParam("image") String imageId) {
 
@@ -154,7 +155,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the image
    */
   @GET
-  @Path("/{image}/{language}/original")
+  @Path("/{image}/{language}/styles/original")
   public Response getOriginalImage(@Context HttpServletRequest request,
       @PathParam("image") String imageId,
       @PathParam("language") String languageId) {
@@ -284,6 +285,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the list of image styles
    */
   @GET
+  @Produces(MediaType.TEXT_XML)
   @Path("/styles")
   public Response getImagestyles(@Context HttpServletRequest request) {
     Site site = getSite(request);
@@ -313,6 +315,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the image
    */
   @GET
+  @Produces(MediaType.TEXT_XML)
   @Path("/styles/{style}")
   public Response getImagestyle(@Context HttpServletRequest request,
       @PathParam("style") String styleId) {
@@ -371,6 +374,11 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
     final Language selectedLanguage = language;
+    
+    // When there is no scaling required, just return the original
+    if (ScalingMode.None.equals(style.getScalingMode())) {
+      return getResourceContent(request, resource, selectedLanguage);
+    }
 
     // Create the response
     ResponseBuilder response = Response.ok(new StreamingOutput() {
@@ -383,7 +391,6 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
             if (is == null)
               throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
             ImageStyleUtils.style(is, os, format, style);
-            os.flush();
           } catch (ContentRepositoryException e) {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
           }
@@ -403,6 +410,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Add an e-tag and send the response
+    response.header("Content-Disposition", "attachment; filename=" + resource.getContent(selectedLanguage).getFilename());
     response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
     response.lastModified(resource.getModificationDate());
     return response.build();
