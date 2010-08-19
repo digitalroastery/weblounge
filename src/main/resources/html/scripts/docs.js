@@ -124,12 +124,14 @@ var Docs = (function($) {
 	                          data: submitParameters,
 	                          success: function(data, textStatus, request) {
 	                              form.parent().find(".test_form_working").hide();
+	                              
 	                              // response status
 	                              var statusText = "<b>Status:</b> <tt>" + request.status + " (" + request.statusText + ")</tt>";
 	                              responseBody.find("div.response_status").html(statusText);
+
 	                              // response headers
 	                              var headers = request.getAllResponseHeaders();
-	                              var contentType = null;
+	                              var contentType = "";
 	                              if (headers !== undefined) {
 	                                var headersText = "";
 	                                var headerLines = headers.split("\n");
@@ -144,8 +146,9 @@ var Docs = (function($) {
 	                                }
 	                                responseBody.find("div.response_headers").html(headersText);
 	                              }
+	                              
 	                              // response body
-	                              if (data !== undefined && data != "") {
+	                              if (data !== undefined && data != "" && contentType.indexOf("text") == 0) {
 	                                responseBody.find("pre.response_body").text(prettify(data, contentType));
 	                                responseBody.find("pre.response_body").show();
 	                              } else {
@@ -155,9 +158,11 @@ var Docs = (function($) {
 	                          },
 	                          error: function(request, textStatus, errorThrown) {
 	                              form.parent().find(".test_form_working").hide();
+	                              
 	                              // response status
 	                              var statusText = "<b>Status:</b> <tt>" + request.status + " (" + request.statusText + ")</tt>";
 	                              responseBody.find("div.response_status").html(statusText);
+
 	                              // response headers
 	                              var headers = request.getAllResponseHeaders();
 	                              if (headers !== undefined) {
@@ -171,6 +176,8 @@ var Docs = (function($) {
 	                                }
 	                                responseBody.find("div.response_headers").html(headersText);
 	                              }
+	                              
+	                              // response body
 	                              responseBody.find("pre.response_body").hide();
 	                              responseBody.show();
 	                          }
