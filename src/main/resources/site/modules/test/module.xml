@@ -61,4 +61,42 @@
       <schedule>* * * * *</schedule>
   	</job>
   </jobs>
+  <imagestyles>
+    <imagestyle id="original">
+      <name language="en">Original size</name>
+      <scalingmode>none</scalingmode>
+    </imagestyle>
+    <imagestyle id="box">
+      <name language="en">Scale to bounding box</name>
+      <scalingmode>box</scalingmode>
+      <width>250</width>
+      <height>250</height>
+    </imagestyle>
+    <imagestyle id="cover">
+      <name language="en">Scale to cover area</name>
+      <scalingmode>cover</scalingmode>
+      <width>250</width>
+      <height>250</height>
+    </imagestyle>
+    <imagestyle id="fill">
+      <name language="en">Scale to fill area and crop</name>
+      <scalingmode>fill</scalingmode>
+      <width>250</width>
+      <height>250</height>
+    </imagestyle>
+    <imagestyle id="width">
+      <name language="en">Scale to fit width</name>
+      <scalingmode>width</scalingmode>
+      <width>250</width>
+    </imagestyle>
+    <imagestyle id="height">
+      <name language="en">Scale to fit height</name>
+      <scalingmode>height</scalingmode>
+      <height>250</height>
+    </imagestyle>
+    <imagestyle id="none">
+      <name language="en">Original size</name>
+      <scalingmode>none</scalingmode>
+    </imagestyle>
+  </imagestyles>
 </module>

@@ -22,12 +22,13 @@ package ch.o2it.weblounge.test.command;
 
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.o2it.weblounge.test.harness.PagesEndpointTest;
 import ch.o2it.weblounge.test.harness.HTMLActionTest;
 import ch.o2it.weblounge.test.harness.I18nTest;
+import ch.o2it.weblounge.test.harness.ImagesEndpointTest;
 import ch.o2it.weblounge.test.harness.IntegrationTest;
 import ch.o2it.weblounge.test.harness.JSONActionTest;
 import ch.o2it.weblounge.test.harness.JavaServerPagesTest;
+import ch.o2it.weblounge.test.harness.PagesEndpointTest;
 import ch.o2it.weblounge.test.harness.ProtectedStaticResourcesTest;
 import ch.o2it.weblounge.test.harness.SearchEndpointTest;
 import ch.o2it.weblounge.test.harness.StaticResourcesTest;
@@ -69,6 +70,7 @@ public final class TestCommand {
     tests.add(new I18nTest());
     tests.add(new PagesEndpointTest());
     tests.add(new SearchEndpointTest());
+    tests.add(new ImagesEndpointTest());
   }
   
   /**
