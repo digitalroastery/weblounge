@@ -237,6 +237,10 @@
                 <name>file.encoding</name>
                 <value>UTF-8</value>
               </property>
+              <property>
+                <name>java.awt.headless</name>
+                <value>true</value>
+              </property>
             </systemProperties>
         </configuration>
       </plugin>
