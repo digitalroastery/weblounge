@@ -21,9 +21,12 @@
 package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.site.ScalingMode;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
+
+import org.apache.commons.io.IOUtils;
 
 import java.awt.RenderingHints;
 import java.awt.image.renderable.ParameterBlock;
@@ -76,6 +79,7 @@ public class ImageStyleUtils {
         scale = (float)style.getHeight() / (float)imageHeight;
         break;
       case None:
+        scale = 1.0f;
         break;
       case Width:
         scale = (float)style.getWidth() / (float)imageWidth;
@@ -108,9 +112,10 @@ public class ImageStyleUtils {
         break;
       case Box:
       case Cover:
+      case Width:
       case Height:
       case None:
-      case Width:
+        cropX = 0;
         break;
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
@@ -141,8 +146,8 @@ public class ImageStyleUtils {
       case Box:
       case Cover:
       case Height:
-      case None:
       case Width:
+      case None:
         break;
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
@@ -168,6 +173,12 @@ public class ImageStyleUtils {
     if (style == null)
       throw new IllegalArgumentException("Image style cannot be null");
     try {
+
+      // Do we need to do any work at all?
+      if (ScalingMode.None.equals(style.getScalingMode())) {
+        IOUtils.copy(is, os);
+        return;
+      }
       
       // Load the image from the given input stream
       SeekableStream seekableInputStream = new MemoryCacheSeekableStream(is);
@@ -206,8 +217,8 @@ public class ImageStyleUtils {
 
       // Cropping
 
-      float cropX = (float)Math.ceil(getCropX(scaledWidth, scaledHeight, style));
-      float cropY = (float)Math.ceil(getCropY(scaledWidth, scaledHeight , style));
+      float cropX = (float)Math.floor(getCropX(scaledWidth, scaledHeight, style));
+      float cropY = (float)Math.floor(getCropY(scaledWidth, scaledHeight , style));
       
       if (cropX > 0 || cropY > 0) {
         ParameterBlock cropParams = new ParameterBlock();

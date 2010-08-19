@@ -95,10 +95,9 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
       case Height:
         if (height <= 0)
           throw new IllegalArgumentException("Image height cannot be null with " + scaling.toString().toLowerCase() + " scaling");
-        break;
+        break;      
       case None:
         break;
-      
     }
   }
 
