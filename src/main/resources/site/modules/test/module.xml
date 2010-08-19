@@ -62,7 +62,7 @@
   	</job>
   </jobs>
   <imagestyles>
-    <imagestyle id="original">
+    <imagestyle id="none">
       <name language="en">Original size</name>
       <scalingmode>none</scalingmode>
     </imagestyle>
@@ -93,10 +93,6 @@
       <name language="en">Scale to fit height</name>
       <scalingmode>height</scalingmode>
       <height>250</height>
-    </imagestyle>
-    <imagestyle id="none">
-      <name language="en">Original size</name>
-      <scalingmode>none</scalingmode>
     </imagestyle>
   </imagestyles>
 </module>

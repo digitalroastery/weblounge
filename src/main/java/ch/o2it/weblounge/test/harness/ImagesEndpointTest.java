@@ -76,7 +76,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   private static final String mimetypeEnglish = "image/jpeg";
 
   /** File name of the English version */
-  private static final String filenameEnglish = "image.jpg";
+  private static final String filenameEnglish = "porsche.jpg";
 
   /** File size of the German version */
   private static final long sizeGerman = 262889L;
@@ -85,7 +85,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   private static final String mimetypeGerman = "image/png";
 
   /** File name of the German version */
-  private static final String filenameGerman = "image.png";
+  private static final String filenameGerman = "porsche.png";
 
   /** The style's width */
   private static final float width = 250;
@@ -152,7 +152,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue(response.getEntity().getContentLength() > 0);
       Document stylesXml = TestSiteUtils.parseXMLResponse(response);
-      assertEquals(7, Integer.parseInt(XPathHelper.valueOf(stylesXml, "count(//imagestyle)")));
+      assertEquals(6, Integer.parseInt(XPathHelper.valueOf(stylesXml, "count(//imagestyle)")));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -214,9 +214,11 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertTrue(response.getEntity().getContentLength() > 0);
 
       // Test headers
-      assertEquals(mimetypeEnglish, response.getHeaders("Content-Type"));
-      assertEquals(sizeEnglish, response.getEntity().getContentType());
-      assertEquals("inline; filename=\"" + filenameEnglish + "\"", response.getHeaders("Content-Disposition"));
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeEnglish, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test content
       SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
@@ -256,9 +258,11 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertTrue(response.getEntity().getContentLength() > 0);
 
       // Test headers
-      assertEquals(mimetypeEnglish, response.getHeaders("Content-Type"));
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(sizeEnglish, response.getEntity().getContentLength());
-      assertEquals("inline; filename=\"" + filenameEnglish + "\"", response.getHeaders("Content-Disposition"));
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test content
       SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
@@ -285,9 +289,11 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertTrue(response.getEntity().getContentLength() > 0);
 
       // Test headers
-      assertEquals(mimetypeGerman, response.getHeaders("Content-Type"));
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(sizeGerman, response.getEntity().getContentLength());
-      assertEquals("inline; filename=\"" + filenameGerman + "\"", response.getHeaders("Content-Disposition"));
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("attachment; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test content
       SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
@@ -319,19 +325,21 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
       try {
-        logger.info("Requesting scaled default image '{}' from ", styleId, url);
+        logger.info("Requesting scaled default image '{}' from {}", styleId, url);
         HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertTrue(response.getEntity().getContentLength() > 0);
         
         // Test headers
-        assertEquals(mimetypeEnglish, response.getHeaders("Content-Type"));
-        assertEquals("inline; filename=\"" + filenameEnglish + "\"", response.getHeaders("Content-Disposition"));
+        assertEquals(1, response.getHeaders("Content-Type").length);
+        assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
+        assertEquals(1, response.getHeaders("Content-Disposition").length);
+        assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
         // Test content
         SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
         RenderedOp image = JAI.create("stream", seekableInputStream);
-        assertTrue(checkSize(image, mode));
+        assertTrue("Image size mismatch", checkSize(image, mode));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
@@ -363,19 +371,21 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
       httpClient = new DefaultHttpClient();
       try {
-        logger.info("Requesting scaled english image '{}' from ", styleId, englishUrl);
+        logger.info("Requesting scaled english image '{}' from {}", styleId, englishUrl);
         HttpResponse response = TestSiteUtils.request(httpClient, getEnglishOriginalRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertTrue(response.getEntity().getContentLength() > 0);
 
         // Test headers
-        assertEquals(mimetypeEnglish, response.getHeaders("Content-Type"));
-        assertEquals("inline; filename=\"" + filenameEnglish + "\"", response.getHeaders("Content-Disposition"));
+        assertEquals(1, response.getHeaders("Content-Type").length);
+        assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
+        assertEquals(1, response.getHeaders("Content-Disposition").length);
+        assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
         // Test content
         SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
         RenderedOp image = JAI.create("stream", seekableInputStream);
-        assertTrue(checkSize(image, mode));
+        assertTrue("Image size mismatch", checkSize(image, mode));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
@@ -390,19 +400,21 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
       httpClient = new DefaultHttpClient();
       try {
-        logger.info("Requesting scaled english image '{}' from ", styleId, englishUrl);
+        logger.info("Requesting scaled german image '{}' from {}", styleId, germanUrl);
         HttpResponse response = TestSiteUtils.request(httpClient, getGermanOriginalRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertTrue(response.getEntity().getContentLength() > 0);
 
         // Test headers
-        assertEquals(mimetypeGerman, response.getHeaders("Content-Type"));
-        assertEquals("inline; filename=\"" + filenameGerman + "\"", response.getHeaders("Content-Disposition"));
+        assertEquals(1, response.getHeaders("Content-Type").length);
+        assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
+        assertEquals(1, response.getHeaders("Content-Disposition").length);
+        assertEquals("attachment; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
 
         // Test content
         SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
         RenderedOp image = JAI.create("stream", seekableInputStream);
-        assertTrue(checkSize(image, mode));
+        assertTrue("Image size mismatch", checkSize(image, mode));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
@@ -422,28 +434,28 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   private boolean checkSize(RenderedOp image, ScalingMode mode) {
     switch (mode) {
       case Box:
-        assertEquals(originalWidth, image.getWidth());
-        assertEquals(originalHeight * (originalWidth / width), image.getHeight());
+        assertEquals(width, image.getWidth());
+        assertEquals(originalHeight * (width / originalWidth), image.getHeight());
         break;
       case Cover:
+        assertEquals(originalWidth * (height / originalHeight), image.getWidth());
         assertEquals(height, image.getHeight());
-        assertEquals(originalWidth * (originalHeight / height), image.getWidth());
         break;
       case Fill:
-        assertEquals(originalWidth, image.getWidth());
+        assertEquals(width + 1, image.getWidth());
         assertEquals(height, image.getHeight());
         break;
+      case Width:
+        assertEquals(width, image.getWidth());
+        assertEquals(originalHeight * (width / originalWidth), image.getHeight());
+        break;
       case Height:
+        assertEquals(originalWidth * (height / originalHeight), image.getWidth());
         assertEquals(height, image.getHeight());
-        assertEquals(originalWidth * (originalHeight / height), image.getWidth());
         break;
       case None:
         assertEquals(originalWidth, image.getWidth());
         assertEquals(originalHeight, image.getHeight());
-        break;
-      case Width:
-        assertEquals(width, image.getWidth());
-        assertEquals(originalHeight * (originalWidth / width), image.getHeight());
         break;
     }
     return true;
