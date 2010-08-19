@@ -54,9 +54,9 @@
         <user id="amelie" realm="testland">Amélie Poulard</user>
         <date>2009-02-18T21:06:40Z</date>
       </created>
-      <filename><![CDATA[porsche.png]]></filename>
-      <mimetype>image/png</mimetype>
-      <size>262889</size>
+      <filename><![CDATA[porsche.jpg]]></filename>
+      <mimetype>image/jpeg</mimetype>
+      <size>88723</size>
       <width>1000</width>
       <height>666</height>
     </content>

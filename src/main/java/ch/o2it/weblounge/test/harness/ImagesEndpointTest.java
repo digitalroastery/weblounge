@@ -33,6 +33,7 @@ import ch.o2it.weblounge.test.util.TestSiteUtils;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -41,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,13 +81,13 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   private static final String filenameEnglish = "porsche.jpg";
 
   /** File size of the German version */
-  private static final long sizeGerman = 262889L;
+  private static final long sizeGerman = 88723L;
 
   /** Mime type of the German version */
-  private static final String mimetypeGerman = "image/png";
+  private static final String mimetypeGerman = "image/jpeg";
 
   /** File name of the German version */
-  private static final String filenameGerman = "porsche.png";
+  private static final String filenameGerman = "porsche.jpg";
 
   /** The style's width */
   private static final float width = 250;
@@ -147,10 +149,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     HttpGet getStylesRequest = new HttpGet(url);
     HttpClient httpClient = new DefaultHttpClient();
     try {
-      logger.debug("Requesting list of image styles from {}", url);
+      logger.debug("Requesting list of image styles");
       HttpResponse response = TestSiteUtils.request(httpClient, getStylesRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      assertTrue(response.getEntity().getContentLength() > 0);
+      assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
       Document stylesXml = TestSiteUtils.parseXMLResponse(response);
       assertEquals(6, Integer.parseInt(XPathHelper.valueOf(stylesXml, "count(//imagestyle)")));
     } finally {
@@ -177,10 +179,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
       try {
-        logger.info("Requesting image style '{}' from {}", styleId, url);
+        logger.info("Requesting image style '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        assertTrue(response.getEntity().getContentLength() > 0);
+        assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
         Document styleXml = TestSiteUtils.parseXMLResponse(response);
         assertEquals(1, Integer.parseInt(XPathHelper.valueOf(styleXml, "count(//imagestyle)")));
         assertNotNull(styleId, XPathHelper.valueOf(styleXml, "//imagestyle/@id"));
@@ -208,10 +210,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     HttpGet getStyleRequest = new HttpGet(url);
     httpClient = new DefaultHttpClient();
     try {
-      logger.info("Requesting original image version from {}", url);
+      logger.info("Requesting original image version");
       HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      assertTrue(response.getEntity().getContentLength() > 0);
+      assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
       // Test headers
       assertEquals(1, response.getHeaders("Content-Type").length);
@@ -221,10 +223,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test content
-      SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
-      RenderedOp image = JAI.create("stream", seekableInputStream);
-      assertEquals(originalWidth, image.getWidth());
-      assertEquals(originalHeight, image.getHeight());
+      assertTrue("Image size mismatch", checkSize(response, null));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -252,10 +251,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
     httpClient = new DefaultHttpClient();
     try {
-      logger.info("Requesting original english image from {}", englishUrl);
+      logger.info("Requesting original english image");
       HttpResponse response = TestSiteUtils.request(httpClient, getEnglishOriginalRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      assertTrue(response.getEntity().getContentLength() > 0);
+      assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
       // Test headers
       assertEquals(1, response.getHeaders("Content-Type").length);
@@ -265,10 +264,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test content
-      SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
-      RenderedOp image = JAI.create("stream", seekableInputStream);
-      assertEquals(originalWidth, image.getWidth());
-      assertEquals(originalHeight, image.getHeight());
+      assertTrue("Image size mismatch", checkSize(response, null));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -283,10 +279,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
     httpClient = new DefaultHttpClient();
     try {
-      logger.info("Requesting original german image from {}", englishUrl);
+      logger.info("Requesting original german image");
       HttpResponse response = TestSiteUtils.request(httpClient, getGermanOriginalRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      assertTrue(response.getEntity().getContentLength() > 0);
+      assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
       // Test headers
       assertEquals(1, response.getHeaders("Content-Type").length);
@@ -296,10 +292,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertEquals("attachment; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test content
-      SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
-      RenderedOp image = JAI.create("stream", seekableInputStream);
-      assertEquals(originalWidth, image.getWidth());
-      assertEquals(originalHeight, image.getHeight());
+      assertTrue("Image size mismatch", checkSize(response, null));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -325,10 +318,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
       try {
-        logger.info("Requesting scaled default image '{}' from {}", styleId, url);
+        logger.info("Requesting scaled default image '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        assertTrue(response.getEntity().getContentLength() > 0);
+        assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
         
         // Test headers
         assertEquals(1, response.getHeaders("Content-Type").length);
@@ -337,9 +330,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
         // Test content
-        SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
-        RenderedOp image = JAI.create("stream", seekableInputStream);
-        assertTrue("Image size mismatch", checkSize(image, mode));
+        assertTrue("Image size mismatch", checkSize(response, mode));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
@@ -371,10 +362,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
       httpClient = new DefaultHttpClient();
       try {
-        logger.info("Requesting scaled english image '{}' from {}", styleId, englishUrl);
+        logger.info("Requesting scaled english image '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getEnglishOriginalRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        assertTrue(response.getEntity().getContentLength() > 0);
+        assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
         // Test headers
         assertEquals(1, response.getHeaders("Content-Type").length);
@@ -383,9 +374,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
         // Test content
-        SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
-        RenderedOp image = JAI.create("stream", seekableInputStream);
-        assertTrue("Image size mismatch", checkSize(image, mode));
+        assertTrue("Image size mismatch", checkSize(response, mode));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
@@ -400,10 +389,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
       httpClient = new DefaultHttpClient();
       try {
-        logger.info("Requesting scaled german image '{}' from {}", styleId, germanUrl);
+        logger.info("Requesting scaled german image '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getGermanOriginalRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        assertTrue(response.getEntity().getContentLength() > 0);
+        assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
         // Test headers
         assertEquals(1, response.getHeaders("Content-Type").length);
@@ -412,9 +401,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         assertEquals("attachment; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
 
         // Test content
-        SeekableStream seekableInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
-        RenderedOp image = JAI.create("stream", seekableInputStream);
-        assertTrue("Image size mismatch", checkSize(image, mode));
+        assertTrue("Image size mismatch", checkSize(response, mode));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
@@ -431,33 +418,48 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    * @return <code>true</code> if the image size is in line with the scaling
    *         mode
    */
-  private boolean checkSize(RenderedOp image, ScalingMode mode) {
-    switch (mode) {
-      case Box:
-        assertEquals(width, image.getWidth());
-        assertEquals(originalHeight * (width / originalWidth), image.getHeight());
-        break;
-      case Cover:
-        assertEquals(originalWidth * (height / originalHeight), image.getWidth());
-        assertEquals(height, image.getHeight());
-        break;
-      case Fill:
-        assertEquals(width + 1, image.getWidth());
-        assertEquals(height, image.getHeight());
-        break;
-      case Width:
-        assertEquals(width, image.getWidth());
-        assertEquals(originalHeight * (width / originalWidth), image.getHeight());
-        break;
-      case Height:
-        assertEquals(originalWidth * (height / originalHeight), image.getWidth());
-        assertEquals(height, image.getHeight());
-        break;
-      case None:
+  private boolean checkSize(HttpResponse response, ScalingMode mode) {
+    SeekableStream imageInputStream = null;
+    try {
+      imageInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());
+      RenderedOp image = JAI.create("stream", imageInputStream);
+      if (mode == null) {
         assertEquals(originalWidth, image.getWidth());
         assertEquals(originalHeight, image.getHeight());
-        break;
+      } else {
+        switch (mode) {
+          case Box:
+            assertEquals(width, image.getWidth());
+            assertEquals(originalHeight * (width / originalWidth), image.getHeight());
+            break;
+          case Cover:
+            assertEquals(originalWidth * (height / originalHeight), image.getWidth());
+            assertEquals(height, image.getHeight());
+            break;
+          case Fill:
+            assertEquals(width + 1, image.getWidth());
+            assertEquals(height, image.getHeight());
+            break;
+          case Width:
+            assertEquals(width, image.getWidth());
+            assertEquals(originalHeight * (width / originalWidth), image.getHeight());
+            break;
+          case Height:
+            assertEquals(originalWidth * (height / originalHeight), image.getWidth());
+            assertEquals(height, image.getHeight());
+            break;
+          case None:
+            assertEquals(originalWidth, image.getWidth());
+            assertEquals(originalHeight, image.getHeight());
+            break;
+        }
+      }
+    } catch (IOException e) {
+      fail("Unable to read " + mode + " image from response");
+    } finally {
+      IOUtils.closeQuietly(imageInputStream);
     }
+
     return true;
   }
 
