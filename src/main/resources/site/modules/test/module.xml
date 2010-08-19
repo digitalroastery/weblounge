@@ -1,4 +1,6 @@
-<module id="test" xmlns="http://www.o2it.ch/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd">
+<module id="test" xmlns="http://www.o2it.ch/weblounge/3.0/module"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd">
   <enable>true</enable>
   <name language="de">Testmodul</name>
   <pagelets>
@@ -9,8 +11,10 @@
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
       <includes>
-        <link href="file://${module.root}/css/greeting.css" rel="stylesheet" type="text/css" />
-        <script src="file://${module.root}/scripts/greeting.js" type="javascript"/>
+        <link href="file://${module.root}/css/greeting.css" rel="stylesheet"
+          type="text/css" />
+        <script src="file://${module.root}/scripts/greeting.js"
+          type="javascript" />
       </includes>
     </pagelet>
     <pagelet id="include" composeable="true">
@@ -20,7 +24,8 @@
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
       <includes>
-        <link href="file://${module.root}/css/greeting.css" rel="stylesheet" type="text/css" />
+        <link href="file://${module.root}/css/greeting.css" rel="stylesheet"
+          type="text/css" />
       </includes>
     </pagelet>
     <pagelet id="i18n" composeable="false">
@@ -35,7 +40,8 @@
       <class>ch.o2it.weblounge.test.site.GreeterHTMLAction</class>
       <mountpoint>/greeting/</mountpoint>
       <includes>
-        <script src="file://${module.root}/scripts/greeting.js" type="javascript"/>
+        <script src="file://${module.root}/scripts/greeting.js"
+          type="javascript" />
       </includes>
     </action>
     <action id="greeter.xml">
@@ -58,8 +64,8 @@
     <job id="greeter">
       <name language="en">Job title</name>
       <class>ch.o2it.weblounge.test.site.GreeterJob</class>
-      <schedule>* * * * *</schedule>
-  	</job>
+      <schedule>*/10 * * * *</schedule>
+    </job>
   </jobs>
   <imagestyles>
     <imagestyle id="none">

@@ -126,6 +126,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     try {
       testGetImageStyles(requestUrl);
       testGetImageStyle(requestUrl);
+      testGetImageMetadata(requestUrl);
       testGetOriginalImage(requestUrl);
       testGetOriginalImageLanguage(requestUrl);
       testGetStyledImage(requestUrl);
@@ -193,7 +194,36 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests the <code>/{id}/styles/original</code> method of the endpoint.
+   * Tests the <code>/{id}/metadata</code> method of the endpoint.
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetImageMetadata(String serverUrl) throws Exception {
+    HttpClient httpClient = null;
+    String url = UrlSupport.concat(new String[] {
+        serverUrl,
+        imageId,
+        "metadata" });
+    HttpGet getStyleRequest = new HttpGet(url);
+    httpClient = new DefaultHttpClient();
+    try {
+      logger.info("Requesting image metadata");
+      HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
+      Document styleXml = TestSiteUtils.parseXMLResponse(response);
+      assertEquals(1, Integer.parseInt(XPathHelper.valueOf(styleXml, "count(//image)")));
+      assertEquals(imageId, XPathHelper.valueOf(styleXml, "//image/@id"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+
+  /**
+   * Tests the <code>/{id}</code> method of the endpoint.
    * 
    * @param serverUrl
    *          the base url
@@ -205,8 +235,8 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     String url = UrlSupport.concat(new String[] {
         serverUrl,
         imageId,
-        "styles",
-        "original" });
+        "original"
+    });
     HttpGet getStyleRequest = new HttpGet(url);
     httpClient = new DefaultHttpClient();
     try {
@@ -245,9 +275,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     String englishUrl = UrlSupport.concat(new String[] {
         serverUrl,
         imageId,
+        "locales",
         "en",
-        "styles",
-        "original" });
+        "original"
+    });
     HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
     httpClient = new DefaultHttpClient();
     try {
@@ -273,9 +304,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     String germanUrl = UrlSupport.concat(new String[] {
         serverUrl,
         imageId,
+        "locales",
         "de",
-        "styles",
-        "original" });
+        "original"
+    });
     HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
     httpClient = new DefaultHttpClient();
     try {
@@ -314,7 +346,8 @@ public class ImagesEndpointTest extends IntegrationTestBase {
           serverUrl,
           imageId,
           "styles",
-          styleId });
+          styleId
+      });
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
       try {
@@ -356,9 +389,11 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       String englishUrl = UrlSupport.concat(new String[] {
           serverUrl,
           imageId,
+          "locales",
           "en",
           "styles",
-          styleId });
+          styleId
+      });
       HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
       httpClient = new DefaultHttpClient();
       try {
@@ -383,9 +418,11 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       String germanUrl = UrlSupport.concat(new String[] {
           serverUrl,
           imageId,
+          "locales",
           "de",
           "styles",
-          styleId });
+          styleId
+      });
       HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
       httpClient = new DefaultHttpClient();
       try {
