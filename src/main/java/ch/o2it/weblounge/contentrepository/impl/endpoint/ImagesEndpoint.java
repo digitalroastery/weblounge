@@ -29,6 +29,7 @@ import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ScalingMode;
 import ch.o2it.weblounge.common.site.Site;
@@ -60,7 +61,6 @@ import javax.ws.rs.core.StreamingOutput;
  * This class implements the <code>REST</code> endpoint for images.
  */
 @Path("/")
-@Produces(MediaType.TEXT_XML)
 public class ImagesEndpoint extends ContentRepositoryEndpoint {
 
   /** The endpoint documentation */
@@ -78,7 +78,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    */
   @GET
   @Produces(MediaType.TEXT_XML)
-  @Path("/{image}")
+  @Path("/{image}/metadata")
   public Response getImageResource(@Context HttpServletRequest request,
       @PathParam("image") String imageId) {
 
@@ -115,7 +115,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the resource
    */
   @GET
-  @Path("/{image}/styles/original")
+  @Path("/{image}/original")
   public Response getOriginalImage(@Context HttpServletRequest request,
       @PathParam("image") String imageId) {
 
@@ -155,7 +155,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the image
    */
   @GET
-  @Path("/{image}/{language}/styles/original")
+  @Path("/{image}/locales/{language}/original")
   public Response getOriginalImage(@Context HttpServletRequest request,
       @PathParam("image") String imageId,
       @PathParam("language") String languageId) {
@@ -165,9 +165,12 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
-    Language language = LanguageSupport.getLanguage(languageId);
-    if (language == null)
-      throw new WebApplicationException(Status.NOT_FOUND);
+    Language language = null;
+    try {
+      language = LanguageSupport.getLanguage(languageId);
+    } catch (UnknownLanguageException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
 
     // Get the image
     final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
@@ -224,7 +227,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // The image style was not found
-    throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    throw new WebApplicationException(Status.BAD_REQUEST);
   }
 
   /**
@@ -243,7 +246,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the image
    */
   @GET
-  @Path("/{image}/{language}/styles/{style}")
+  @Path("/{image}/locales/{language}/styles/{style}")
   public Response getStyledImageContent(@Context HttpServletRequest request,
       @PathParam("image") String imageId,
       @PathParam("language") String languageId,
@@ -254,9 +257,12 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
-    Language language = LanguageSupport.getLanguage(languageId);
-    if (language == null)
-      throw new WebApplicationException(Status.NOT_FOUND);
+    Language language = null;
+    try {
+      language = LanguageSupport.getLanguage(languageId);
+    } catch (UnknownLanguageException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
 
     // Get the image
     final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
@@ -274,7 +280,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // The image style was not found
-    throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    throw new WebApplicationException(Status.BAD_REQUEST);
   }
   
   /**
