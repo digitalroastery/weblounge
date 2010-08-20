@@ -56,4 +56,17 @@
       </plugin>
     </plugins>
   </build>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>o2it.snapshots</id>
+      <name>O2 IT Snapshot Repository</name>
+      <url>http://maven.o2it.ch/content/repositories/snapshots</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+    <repository>
+      <id>o2it.releases</id>
+      <name>O2 IT Releases Repository</name>
+      <url>http://maven.o2it.ch/content/repositories/releases</url>
+    </repository>
+  </distributionManagement>
 </project>
