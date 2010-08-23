@@ -105,13 +105,13 @@ public class FileImplTest {
   protected String frenchCoverage = "Zurich";
 
   /** Content creation date */
-  protected Date creationDate = new Date(1231358741000L);
+  protected Date creationDate = new Date(1234037141000L);
   
   /** Content Modification date */
-  protected Date modificationDate = new Date(1234994800000L);
+  protected Date modificationDate = new Date(1237414000000L);
 
   /** Publishing start date */
-  protected Date publishingStartDate = new Date(1146851901000L);
+  protected Date publishingStartDate = new Date(1144259901000L);
 
   /** Publishing end date */
   protected Date publishingEndDate = new Date(1262307600000L);
@@ -180,11 +180,11 @@ public class FileImplTest {
     for (String subject : subjects)
       file.addSubject(subject);
     
-    FileContentImpl germanContent = new FileContentImpl(germanFilename, german, germanFilesize);
+    FileContentImpl germanContent = new FileContentImpl(germanFilename, german, germanMimetype, germanFilesize);
     germanContent.setCreated(creationDate, amelie);
     file.addContent(germanContent);
 
-    FileContentImpl englishContent = new FileContentImpl(englishFilename, english, englishFilesize);
+    FileContentImpl englishContent = new FileContentImpl(englishFilename, english, englishMimetype, englishFilesize);
     englishContent.setCreated(modificationDate, amelie);
     file.addContent(englishContent);
   }

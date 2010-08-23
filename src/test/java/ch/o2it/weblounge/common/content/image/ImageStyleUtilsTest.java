@@ -83,6 +83,9 @@ public class ImageStyleUtilsTest {
     styles.add(new ImageStyleImpl("width", (int)width, (int)height, ScalingMode.Width, false));
     styles.add(new ImageStyleImpl("height", (int)width, (int)height, ScalingMode.Height, false));
     styles.add(new ImageStyleImpl("none", (int)width, (int)height, ScalingMode.None, false));
+    
+    // Make sure it's working on headless systems
+    System.setProperty("java.awt.headless", "true");
   }
 
   /**

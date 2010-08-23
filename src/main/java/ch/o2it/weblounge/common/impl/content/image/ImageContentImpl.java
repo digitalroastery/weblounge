@@ -49,11 +49,14 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
    *          the original filename
    * @param language
    *          the language
+   * @param mimetype
+   *          the image's mime type
    * @param filesize
    *          the file size in bytes
    */
-  public ImageContentImpl(String filename, Language language, long filesize) {
-    super(filename, language, filesize);
+  public ImageContentImpl(String filename, Language language, String mimetype,
+      long filesize) {
+    super(filename, language, mimetype, filesize);
   }
 
   /**
@@ -95,10 +98,10 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
   public int getHeight() {
     return height;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#addXml(java.lang.StringBuffer)
    */
   @Override
@@ -115,13 +118,13 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ImageContent) {
-      ImageContent content = (ImageContent)obj;
+      ImageContent content = (ImageContent) obj;
       if (width != content.getWidth())
         return false;
       if (height != content.getHeight())
@@ -130,10 +133,10 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
     }
     return false;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#toString()
    */
   @Override

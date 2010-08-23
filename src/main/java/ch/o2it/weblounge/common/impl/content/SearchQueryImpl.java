@@ -115,6 +115,12 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The path prefix */
   protected String pathPrefix = null;
+  
+  /** The filename */
+  protected String filename = null;
+
+  /** The mime type */
+  protected String mimetype = null;
 
   /** Query terms */
   protected String text = null;
@@ -720,6 +726,44 @@ public class SearchQueryImpl implements SearchQuery {
     return properties;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withFilename(java.lang.String)
+   */
+  public SearchQuery withFilename(String filename) {
+    this.filename = filename;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getFilename()
+   */
+  public String getFilename() {
+    return filename;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withMimetype(java.lang.String)
+   */
+  public SearchQuery withMimetype(String mimetype) {
+    this.mimetype = mimetype;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getMimetype()
+   */
+  public String getMimetype() {
+    return mimetype;
+  }
+  
   /**
    * Pushes the configuration object onto the stack.
    * 

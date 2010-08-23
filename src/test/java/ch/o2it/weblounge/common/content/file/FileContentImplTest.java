@@ -70,7 +70,7 @@ public class FileContentImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    content = new FileContentImpl(filename, german, size);
+    content = new FileContentImpl(filename, german, mimetype, size);
     content.setMimetype(mimetype);
     ((FileContentImpl)content).setCreated(creationDate, amelie);
   }

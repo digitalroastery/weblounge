@@ -73,8 +73,7 @@ public class ImageContentImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    image = new ImageContentImpl(filename, german, size);
-    image.setMimetype(mimetype);
+    image = new ImageContentImpl(filename, german, mimetype, size);
     image.setWidth(width);
     image.setHeight(height);
     ((ImageContentImpl)image).setCreated(creationDate, amelie);

@@ -36,6 +36,12 @@ public class ResourceContentImpl implements ResourceContent {
   /** The content's name */
   protected String filename = null;
 
+  /** The file's mime type */
+  protected String mimetype = null;
+
+  /** The file size in bytes */
+  protected long size = -1L;
+
   /** The content's language */
   protected Language language = null;
 
@@ -64,6 +70,28 @@ public class ResourceContentImpl implements ResourceContent {
       throw new IllegalArgumentException("Language cannot be null");
     this.language = language;
     this.filename = name;
+  }
+
+  /**
+   * Creates a new resource content representation.
+   * 
+   * @param language
+   *          the content language
+   * @param name
+   *          the content name
+   * @param mimetype
+   *          the content's mimetype
+   * @param size
+   *          the content size in bytes
+   */
+  protected ResourceContentImpl(Language language, String name,
+      String mimetype, long size) {
+    if (language == null)
+      throw new IllegalArgumentException("Language cannot be null");
+    this.language = language;
+    this.filename = name;
+    this.mimetype = mimetype;
+    this.size = size;
   }
 
   /**
@@ -106,13 +134,13 @@ public class ResourceContentImpl implements ResourceContent {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
    */
   public void setCreationDate(Date date) {
     creationCtx.setCreationDate(date);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -130,10 +158,10 @@ public class ResourceContentImpl implements ResourceContent {
   public boolean isCreatedAfter(Date date) {
     return creationCtx.isCreatedAfter(date);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
    */
   public void setCreator(User user) {
@@ -164,6 +192,46 @@ public class ResourceContentImpl implements ResourceContent {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.content.ResourceContent#setMimetype(java.lang.String)
+   */
+  public void setMimetype(String mimetype) {
+    if (mimetype == null)
+      throw new IllegalArgumentException("Mimetype must not be null");
+    this.mimetype = mimetype;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.ResourceContent#getMimetype()
+   */
+  public String getMimetype() {
+    return mimetype;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.ResourceContent#setSize(long)
+   */
+  public void setSize(long size) {
+    if (size <= 0)
+      throw new IllegalArgumentException("Content size must be greater than 0 bytes");
+    this.size = size;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.ResourceContent#getSize()
+   */
+  public long getSize() {
+    return size;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -179,7 +247,7 @@ public class ResourceContentImpl implements ResourceContent {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ResourceContent) {
-      ResourceContent c = (ResourceContent)obj;
+      ResourceContent c = (ResourceContent) obj;
       if (!StringUtils.trimToEmpty(filename).equals(c.getFilename()))
         return false;
       return language.equals(c.getLanguage());
@@ -211,6 +279,10 @@ public class ResourceContentImpl implements ResourceContent {
     buf.append(creationCtx.toXml());
     if (filename != null)
       buf.append("<filename><![CDATA[").append(filename).append("]]></filename>");
+    if (mimetype != null)
+      buf.append("<mimetype>").append(mimetype).append("</mimetype>");
+    if (size >= 0)
+      buf.append("<size>").append(size).append("</size>");
     addXml(buf);
     buf.append("</content>");
     return buf.toString();

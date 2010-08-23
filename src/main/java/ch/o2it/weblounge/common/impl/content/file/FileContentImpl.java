@@ -24,19 +24,10 @@ import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.language.Language;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * Default implementation of a file content.
  */
 public class FileContentImpl extends ResourceContentImpl implements FileContent {
-
-  /** The file's mime type */
-  protected String mimetype = null;
-
-  /** The file size in bytes */
-  protected long size = -1L;
 
   /**
    * Creates a new file content representation.
@@ -52,99 +43,34 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
    *          the original filename
    * @param language
    *          the language
+   * @param mimetype
+   *          the file's mimetype
    * @param filesize
    *          the file size in bytes
    */
-  public FileContentImpl(String filename, Language language, long filesize) {
-    super(language, filename);
+  public FileContentImpl(String filename, Language language, String mimetype,
+      long filesize) {
+    super(language, filename, mimetype, filesize);
     if (filename == null)
       throw new IllegalArgumentException("Filename cannot be null");
     if (filesize <= 0)
       throw new IllegalArgumentException("File size needs to be larger than 0 bytes");
-    this.size = filesize;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#setMimetype(java.lang.String)
-   */
-  public void setMimetype(String mimetype) {
-    if (mimetype == null)
-      throw new IllegalArgumentException("Mimetype must not be null");
-    this.mimetype = mimetype;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#getMimetype()
-   */
-  public String getMimetype() {
-    return mimetype;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#setSize(long)
-   */
-  public void setSize(long size) {
-    if (size <= 0)
-      throw new IllegalArgumentException("File size must be greater than 0 bytes");
-    this.size = size;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.file.FileContent#getSize()
-   */
-  public long getSize() {
-    return size;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.file.FileContent#openStream()
-   */
-  public InputStream openStream() throws IOException {
-    // TODO: Implement openStream()
-    throw new IllegalStateException("Not yet implemented");
-  }
-
-  /**
-   * Callback for subclasses that need to add additional information to the file
-   * content representation. Implementations should append their data to the
-   * <code>StringBuffer</code> and return it once they're done.
-   * 
-   * @param xml
-   *          the string buffer
-   * @return the modified string buffer
-   */
-  protected StringBuffer addXml(StringBuffer xml) {
-    if (mimetype != null)
-      xml.append("<mimetype>").append(mimetype).append("</mimetype>");
-    if (size >= 0)
-      xml.append("<size>").append(size).append("</size>");
-    return xml;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof FileContent) {
-      FileContent content = (FileContent)obj;
+      FileContent content = (FileContent) obj;
       if (size != content.getSize())
-          return false;
+        return false;
       return super.equals(content);
     }
     return false;
   }
-  
+
 }
