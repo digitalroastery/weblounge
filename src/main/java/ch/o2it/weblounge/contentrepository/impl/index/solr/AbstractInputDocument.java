@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.common.SolrInputDocument;
 
 import java.text.MessageFormat;
 
@@ -35,7 +36,7 @@ import java.text.MessageFormat;
  * that will ease handling of objects such as dates or users and help prevent
  * posting of <code>null</code> values.
  */
-public abstract class AbstractInputDocument extends SolrUpdateableInputDocument {
+public abstract class AbstractInputDocument extends SolrInputDocument {
 
   /** Serial version uid */
   private static final long serialVersionUID = 1812364663819822015L;
@@ -53,13 +54,13 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
    *          <code>true</code> to add the contents to the fulltext field as
    *          well
    */
-  public void setField(String fieldName, Object fieldValue,
+  public void addField(String fieldName, Object fieldValue,
       boolean addToFulltext) {
     if (fieldName == null)
       throw new IllegalArgumentException("Field name cannot be null");
     if (fieldValue == null)
       return;
-    super.setField(fieldName, fieldValue);
+    super.addField(fieldName, fieldValue);
 
     // Add to fulltext
     if (addToFulltext) {
@@ -85,12 +86,12 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
    *          <code>true</code> to add the contents to the fulltext field as
    *          well
    */
-  public void setField(String fieldName, Object fieldValue, Language language, boolean addToFulltext) {
+  public void addField(String fieldName, Object fieldValue, Language language, boolean addToFulltext) {
     if (fieldName == null)
       throw new IllegalArgumentException("Field name cannot be null");
     if (fieldValue == null)
       return;
-    super.setField(fieldName, fieldValue);
+    super.addField(fieldName, fieldValue);
 
     // Add to fulltext
     if (addToFulltext) {

@@ -34,7 +34,7 @@ public interface SolrFields {
   public static final String TYPE = "type";
 
   /** Subjects field name */
-  public static final String SUBJECTS = "subjects";
+  public static final String SUBJECT = "subjects";
 
   /** Template field name */
   public static final String TEMPLATE = "template";

@@ -96,7 +96,7 @@ public class SolrRequester {
 
     // Subjects
     if (query.getSubjects().length > 0) {
-      and(solrQuery, SolrFields.SUBJECTS, query.getSubjects(), true, true);
+      and(solrQuery, SolrFields.SUBJECT, query.getSubjects(), true, true);
     }
 
     // Template

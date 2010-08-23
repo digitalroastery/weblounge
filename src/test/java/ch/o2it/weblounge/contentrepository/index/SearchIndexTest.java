@@ -52,7 +52,6 @@ import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -384,7 +383,6 @@ public class SearchIndexTest {
    * .
    */
   @Test 
-  @Ignore
   public void testGetWithSubjects() {
     populateIndex();
     try {
@@ -405,7 +403,6 @@ public class SearchIndexTest {
    * .
    */
   @Test 
-  @Ignore
   public void testGetWithProperty() {
     populateIndex();
     try {
@@ -424,7 +421,6 @@ public class SearchIndexTest {
    * .
    */
   @Test 
-  @Ignore
   public void testGetWithFilename() {
     populateIndex();
     try {
@@ -443,7 +439,6 @@ public class SearchIndexTest {
    * .
    */
   @Test 
-  @Ignore
   public void testGetWithMimetype() {
     populateIndex();
     try {

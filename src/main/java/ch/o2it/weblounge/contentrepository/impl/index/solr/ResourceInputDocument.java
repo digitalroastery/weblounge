@@ -38,7 +38,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUB
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_TO;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECTS;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
@@ -65,50 +65,50 @@ public class ResourceInputDocument extends AbstractInputDocument {
    *          the resource
    */
   protected void init(Resource<?> resource) {
-    setField(ID, resource.getURI().getId(), true);
-    setField(PATH, resource.getURI().getPath(), true);
-    setField(TYPE, resource.getURI().getType(), true);
+    addField(ID, resource.getURI().getId(), true);
+    addField(PATH, resource.getURI().getPath(), true);
+    addField(TYPE, resource.getURI().getType(), true);
 
     // Resource-level
     for (String subject : resource.getSubjects())
-      setField(SUBJECTS, subject, true);
+      addField(SUBJECT, subject, true);
 
     // Creation, modification and publishing information
     //setField(CREATED, SolrUtils.serializeDate(resource.getCreationDate()), false);
-    setField(CREATED, resource.getCreationDate(), false);
-    setField(CREATED_BY, SolrUtils.serializeUser(resource.getCreator()), false);
-    setField(MODIFIED, SolrUtils.serializeDate(resource.getModificationDate()), false);
-    setField(MODIFIED_BY, SolrUtils.serializeUser(resource.getModifier()), false);
-    setField(PUBLISHED_FROM, SolrUtils.serializeDate(resource.getPublishFrom()), false);
-    setField(PUBLISHED_TO, SolrUtils.serializeDate(resource.getPublishTo()), false);
-    setField(PUBLISHED_BY, SolrUtils.serializeUser(resource.getPublisher()), false);
+    addField(CREATED, resource.getCreationDate(), false);
+    addField(CREATED_BY, SolrUtils.serializeUser(resource.getCreator()), false);
+    addField(MODIFIED, SolrUtils.serializeDate(resource.getModificationDate()), false);
+    addField(MODIFIED_BY, SolrUtils.serializeUser(resource.getModifier()), false);
+    addField(PUBLISHED_FROM, SolrUtils.serializeDate(resource.getPublishFrom()), false);
+    addField(PUBLISHED_TO, SolrUtils.serializeDate(resource.getPublishTo()), false);
+    addField(PUBLISHED_BY, SolrUtils.serializeUser(resource.getPublisher()), false);
 
     // Language dependent header fields
     for (Language l : resource.languages()) {
-      setField(getLocalizedFieldName(DESCRIPTION, l), resource.getDescription(l, true), l, true);
-      setField(getLocalizedFieldName(COVERAGE, l), resource.getCoverage(l, true), l, false);
-      setField(getLocalizedFieldName(RIGHTS, l), resource.getRights(l, true), l, false);
-      setField(getLocalizedFieldName(TITLE, l), resource.getTitle(l, true), l, true);
+      addField(getLocalizedFieldName(DESCRIPTION, l), resource.getDescription(l, true), l, true);
+      addField(getLocalizedFieldName(COVERAGE, l), resource.getCoverage(l, true), l, false);
+      addField(getLocalizedFieldName(RIGHTS, l), resource.getRights(l, true), l, false);
+      addField(getLocalizedFieldName(TITLE, l), resource.getTitle(l, true), l, true);
     }
 
     // The whole resource
     String resourceXml = resource.toXml();
-    setField(XML, resourceXml, false);
+    addField(XML, resourceXml, false);
 
     // Resource header
     String headerXml = resourceXml.replaceAll("<body[^>]*>[\\s\\S]+?<\\/body>", "");
     if (!StringUtils.isBlank(headerXml)) {
-      setField(HEADER_XML, headerXml, false);
+      addField(HEADER_XML, headerXml, false);
     }
     
     // Resource contents
     for (ResourceContent content : resource.contents()) {
       Language l = content.getLanguage();
-      setField(getLocalizedFieldName(CONTENT_XML, l), content.toXml(), false);
-      setField(getLocalizedFieldName(CONTENT_CREATED, l), SolrUtils.serializeDate(content.getCreationDate()), false);
-      setField(getLocalizedFieldName(CONTENT_CREATED_BY, l), SolrUtils.serializeUser(content.getCreator()), false);
-      setField(getLocalizedFieldName(CONTENT_FILENAME, l), content.getFilename(), true);
-      setField(getLocalizedFieldName(CONTENT_MIMETYPE, l), content.getMimetype(), false);
+      addField(getLocalizedFieldName(CONTENT_XML, l), content.toXml(), false);
+      addField(getLocalizedFieldName(CONTENT_CREATED, l), SolrUtils.serializeDate(content.getCreationDate()), false);
+      addField(getLocalizedFieldName(CONTENT_CREATED_BY, l), SolrUtils.serializeUser(content.getCreator()), false);
+      addField(getLocalizedFieldName(CONTENT_FILENAME, l), content.getFilename(), true);
+      addField(getLocalizedFieldName(CONTENT_MIMETYPE, l), content.getMimetype(), false);
     }
     
   }

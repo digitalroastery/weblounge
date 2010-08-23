@@ -64,7 +64,7 @@ public class PageInputDocument extends ResourceInputDocument {
     super.init(page);
 
     // Page-level
-    setField(TEMPLATE, page.getTemplate(), false);
+    addField(TEMPLATE, page.getTemplate(), false);
 
     // Pagelet elements and properties
     for (Composer composer : page.getComposers()) {
@@ -72,13 +72,13 @@ public class PageInputDocument extends ResourceInputDocument {
       for (Pagelet p : composer.getPagelets()) {
         String location = composer.getIdentifier() + "-" + i;
         for (Language l : p.languages()) {
-          setField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeContent(p, l, false), l, true);
-          setField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeProperties(p, false), l, true);
-          setField(MessageFormat.format(PAGELET_ELEMENTS, location, l.getIdentifier()), serializeContent(p, l, true), l, false);
+          addField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeContent(p, l, false), l, true);
+          addField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeProperties(p, false), l, true);
+          addField(MessageFormat.format(PAGELET_ELEMENTS, location, l.getIdentifier()), serializeContent(p, l, true), l, false);
         }
-        setField(MessageFormat.format(PAGELET_PROPERTIES, location), serializeProperties(p, true), false);
-        setField(MessageFormat.format(PAGELET_XML, location), p.toXml(), false);
-        setField(MessageFormat.format(PAGELET_TYPE, location), p.getModule() + "/" + p.getIdentifier(), false);
+        addField(MessageFormat.format(PAGELET_PROPERTIES, location), serializeProperties(p, true), false);
+        addField(MessageFormat.format(PAGELET_XML, location), p.toXml(), false);
+        addField(MessageFormat.format(PAGELET_TYPE, location), p.getModule() + "/" + p.getIdentifier(), false);
         i++;
       }
     }
@@ -90,7 +90,7 @@ public class PageInputDocument extends ResourceInputDocument {
       preview.append(p.toXml());
     }
     preview.append("</composer>");
-    setField(PREVIEW_XML, preview.toString(), false);
+    addField(PREVIEW_XML, preview.toString(), false);
 
   }
 
