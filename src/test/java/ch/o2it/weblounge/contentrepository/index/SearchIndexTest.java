@@ -26,14 +26,19 @@ import static org.junit.Assert.fail;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
@@ -55,6 +60,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -80,17 +87,29 @@ public class SearchIndexTest {
   /** The sample pages */
   protected Page[] pages = null;
 
+  /** The sample files */
+  protected FileResource[] files = null;
+
   /** UUID of page 1 */
   protected String uuid1 = "4bb19980-8f98-4873-a813-71b6dfab22af";
 
   /** UUID of page 2 */
   protected String uuid2 = "4bb19980-8f98-4873-a813-71b6dfab22ag";
+  
+  /** UUID of the image resource */
+  protected String imageid = "4bb19980-8f98-4873-a813-71b6dfab22as";
 
   /** Path of page 1 */
   protected String path1 = "/test/";
 
   /** Path of page 2 */
   protected String path2 = "/a/b/c";
+
+  /** Filename */
+  protected String filename = "image.jpg";
+
+  /** Mimetype */
+  protected String mimetype = "image/jpeg";
 
   /**
    * Creates the test setup.
@@ -110,9 +129,14 @@ public class SearchIndexTest {
     EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
     EasyMock.replay(template);
     
+    Set<Language> languages = new HashSet<Language>();
+    languages.add(LanguageSupport.getLanguage("en"));
+    languages.add(LanguageSupport.getLanguage("de"));
+    
     // Site
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getTemplate((String)EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
     EasyMock.replay(site);
     
     // Resource serializers
@@ -122,13 +146,22 @@ public class SearchIndexTest {
     serializerService.registerSerializer(new FileResourceSerializer());
     serializerService.registerSerializer(new ImageResourceSerializer());
 
-    // Prepare the page
+    // Prepare the pages
     PageReader pageReader = new PageReader();
     pages = new Page[2];
     for (int i = 0; i < pages.length; i++) {
       ResourceURI uri = new PageURIImpl(site, "/");
       InputStream is = this.getClass().getResourceAsStream("/page" + (i+1) + ".xml");
       pages[i] = pageReader.read(uri, is);
+    }
+
+    // Prepare the files
+    FileResourceReader fileReader = new FileResourceReader();
+    files = new FileResource[2];
+    for (int i = 0; i < files.length; i++) {
+      ResourceURI uri = new FileResourceURIImpl(site, "/");
+      InputStream is = this.getClass().getResourceAsStream("/file" + (i+1) + ".xml");
+      files[i] = fileReader.read(uri, is);
     }
   }
 
@@ -208,8 +241,8 @@ public class SearchIndexTest {
       User amelie = new UserImpl("amelie");
       SearchQuery q = new SearchQueryImpl(site).withAuthor(amelie);
       SearchResult result = idx.getByQuery(q);
-      assertEquals(2, result.getItems().length);
-      assertEquals(2, result.getHitCount());
+      assertEquals(4, result.getItems().length);
+      assertEquals(4, result.getHitCount());
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error querying by author");
@@ -228,8 +261,8 @@ public class SearchIndexTest {
       User hans = new UserImpl("hans");
       SearchQuery q = new SearchQueryImpl(site).withCreator(hans);
       SearchResult result = idx.getByQuery(q);
-      assertEquals(2, result.getItems().length);
-      assertEquals(2, result.getHitCount());
+      assertEquals(4, result.getItems().length);
+      assertEquals(4, result.getHitCount());
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error querying by creator");
@@ -241,7 +274,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test @Ignore
+  @Test 
   public void testGetWithCreationDate() {
     populateIndex();
     try {
@@ -271,8 +304,8 @@ public class SearchIndexTest {
       User amelie = new UserImpl("amelie");
       SearchQuery q = new SearchQueryImpl(site).withModifier(amelie);
       SearchResult result = idx.getByQuery(q);
-      assertEquals(2, result.getItems().length);
-      assertEquals(2, result.getHitCount());
+      assertEquals(4, result.getItems().length);
+      assertEquals(4, result.getHitCount());
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error querying by modifier");
@@ -284,7 +317,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test @Ignore
+  @Test 
   public void testGetWithModificationDate() {
     populateIndex();
     try {
@@ -307,7 +340,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test
+  @Test 
   public void testGetWithPublisher() {
     populateIndex();
     try {
@@ -327,7 +360,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test @Ignore
+  @Test 
   public void testGetWithPublishingDate() {
     populateIndex();
     try {
@@ -350,7 +383,8 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test
+  @Test 
+  @Ignore
   public void testGetWithSubjects() {
     populateIndex();
     try {
@@ -362,6 +396,63 @@ public class SearchIndexTest {
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error querying by subject");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test 
+  @Ignore
+  public void testGetWithProperty() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site);
+      q.withProperty("resourceid", imageid);
+      assertEquals(1, idx.getByQuery(q).getItems().length);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by property");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test 
+  @Ignore
+  public void testGetWithFilename() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site);
+      q.withFilename(filename);
+      assertEquals(1, idx.getByQuery(q).getItems().length);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by filename");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test 
+  @Ignore
+  public void testGetWithMimetype() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site);
+      q.withMimetype(mimetype);
+      assertEquals(1, idx.getByQuery(q).getItems().length);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by mimetype");
     }
   }
 
@@ -459,9 +550,9 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#move(ch.o2it.weblounge.common.content.ResourceURI, java.lang.String)}
    * .
    */
-  @Test
+  @Test 
   public void testMove() {
-    populateIndex();
+    int resources = populateIndex();
     String newPath = "/new/path/test";
     idx.move(pages[0].getURI(), newPath);
     try {
@@ -471,7 +562,7 @@ public class SearchIndexTest {
       
       // Make sure the number of pages remains the same
       q = new SearchQueryImpl(site);
-      assertEquals(pages.length, idx.getByQuery(q).getItems().length);
+      assertEquals(resources, idx.getByQuery(q).getItems().length);
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error querying cleared index");
@@ -494,6 +585,15 @@ public class SearchIndexTest {
     } catch (IOException e) {
       e.printStackTrace();
       fail("Adding sample page to the index failed");
+    }
+    try {
+      for (FileResource file : files) {
+        idx.add(file);
+        count ++;
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Adding sample file to the index failed");
     }
     return count;
   }

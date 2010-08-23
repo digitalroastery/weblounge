@@ -128,7 +128,7 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
   /**
    * Returns a string representation of the pagelet's element content in the
    * specified language. If <code>format</code> is <code>true</code> then the
-   * content is formatted as <code>field:=&lt;value&gt;;;</code>, otherwise just
+   * content is formatted as <code>field=&lt;value&gt;;;</code>, otherwise just
    * the values are added.
    * 
    * @param pagelet
@@ -146,7 +146,7 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
       String[] content = pagelet.getMultiValueContent(element, language, true);
       for (String c : content) {
         if (format)
-          buf.append(element).append(":=").append(c).append(";;");
+          buf.append(element).append("=").append(c).append(";;");
         else
           buf.append(" ").append(c);
       }
@@ -157,7 +157,7 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
   /**
    * Returns a string representation of the pagelet's element properties. If
    * <code>format</code> is <code>true</code> then the property is formatted as
-   * <code>field:=&lt;value&gt;;;</code>, otherwise just the values are added.
+   * <code>field=&lt;value&gt;;;</code>, otherwise just the values are added.
    * 
    * @param pagelet
    *          the pagelet
@@ -171,7 +171,7 @@ public abstract class AbstractInputDocument extends SolrUpdateableInputDocument 
       String[] values = pagelet.getMultiValueProperty(property);
       for (String v : values) {
         if (format)
-          buf.append(property).append(":").append(v).append(" ;; ");
+          buf.append(property).append("=").append(v).append(" ;; ");
         else
           buf.append(" ").append(v);
       }

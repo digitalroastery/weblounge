@@ -20,6 +20,11 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_CREATED;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_CREATED_BY;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
@@ -39,6 +44,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TYP
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.apache.commons.lang.StringUtils;
@@ -63,12 +69,13 @@ public class ResourceInputDocument extends AbstractInputDocument {
     setField(PATH, resource.getURI().getPath(), true);
     setField(TYPE, resource.getURI().getType(), true);
 
-    // FileResource-level
+    // Resource-level
     for (String subject : resource.getSubjects())
       setField(SUBJECTS, subject, true);
 
     // Creation, modification and publishing information
-    setField(CREATED, SolrUtils.serializeDate(resource.getCreationDate()), false);
+    //setField(CREATED, SolrUtils.serializeDate(resource.getCreationDate()), false);
+    setField(CREATED, resource.getCreationDate(), false);
     setField(CREATED_BY, SolrUtils.serializeUser(resource.getCreator()), false);
     setField(MODIFIED, SolrUtils.serializeDate(resource.getModificationDate()), false);
     setField(MODIFIED_BY, SolrUtils.serializeUser(resource.getModifier()), false);
@@ -76,7 +83,7 @@ public class ResourceInputDocument extends AbstractInputDocument {
     setField(PUBLISHED_TO, SolrUtils.serializeDate(resource.getPublishTo()), false);
     setField(PUBLISHED_BY, SolrUtils.serializeUser(resource.getPublisher()), false);
 
-    // Language dependent fields
+    // Language dependent header fields
     for (Language l : resource.languages()) {
       setField(getLocalizedFieldName(DESCRIPTION, l), resource.getDescription(l, true), l, true);
       setField(getLocalizedFieldName(COVERAGE, l), resource.getCoverage(l, true), l, false);
@@ -88,10 +95,20 @@ public class ResourceInputDocument extends AbstractInputDocument {
     String resourceXml = resource.toXml();
     setField(XML, resourceXml, false);
 
-    // FileResource header
+    // Resource header
     String headerXml = resourceXml.replaceAll("<body[^>]*>[\\s\\S]+?<\\/body>", "");
     if (!StringUtils.isBlank(headerXml)) {
       setField(HEADER_XML, headerXml, false);
+    }
+    
+    // Resource contents
+    for (ResourceContent content : resource.contents()) {
+      Language l = content.getLanguage();
+      setField(getLocalizedFieldName(CONTENT_XML, l), content.toXml(), false);
+      setField(getLocalizedFieldName(CONTENT_CREATED, l), SolrUtils.serializeDate(content.getCreationDate()), false);
+      setField(getLocalizedFieldName(CONTENT_CREATED_BY, l), SolrUtils.serializeUser(content.getCreator()), false);
+      setField(getLocalizedFieldName(CONTENT_FILENAME, l), content.getFilename(), true);
+      setField(getLocalizedFieldName(CONTENT_MIMETYPE, l), content.getMimetype(), false);
     }
     
   }

@@ -96,6 +96,21 @@ public interface SolrFields {
   /** Pagelet xml field name */
   public static final String PAGELET_TYPE = "pagelet-type-{0}";
 
+  /** Resource content filename field name */
+  public static final String CONTENT_FILENAME = "content-filename-{0}";
+
+  /** Resource content mime type field name */
+  public static final String CONTENT_MIMETYPE = "content-mimetype-{0}";
+
+  /** Resource content creation date field name */
+  public static final String CONTENT_CREATED = "content-created-{0}";
+
+  /** Resource content creator field name */
+  public static final String CONTENT_CREATED_BY = "content-created-by-{0}";
+
+  /** Resource content xml field name */
+  public static final String CONTENT_XML = "content-xml-{0}";
+
   /** Solr ranking score */
   public static final String SCORE = "score";
   

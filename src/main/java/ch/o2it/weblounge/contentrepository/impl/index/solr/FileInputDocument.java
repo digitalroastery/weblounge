@@ -21,25 +21,24 @@
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
 import ch.o2it.weblounge.common.content.file.FileResource;
-import ch.o2it.weblounge.common.content.image.ImageResource;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
- * posting weblounge images to solr.
+ * posting weblounge resources to solr.
  */
-public class ImageResourceInputDocument extends ResourceInputDocument {
+public class FileInputDocument extends ResourceInputDocument {
 
   /** Serial version uid */
   private static final long serialVersionUID = 1812364663819822015L;
 
   /**
-   * Creates an input document for the given image.
+   * Creates an input document for the given resource.
    * 
-   * @param image
-   *          the image
+   * @param resource
+   *          the resource
    */
-  public ImageResourceInputDocument(ImageResource image) {
-    init(image);
+  public FileInputDocument(FileResource resource) {
+    init(resource);
   }
 
   /**

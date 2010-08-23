@@ -81,6 +81,25 @@
           <property id="tags"><![CDATA[b]]></property>
         </properties>
       </pagelet>
+      <pagelet module="repository" id="image">
+        <security>
+          <owner>
+            <user id="hans" realm="testland">Hans Muster</user>
+          </owner>
+        </security>
+        <created>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <date>2009-01-07T20:05:41Z</date>
+        </created>
+        <published>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <from>2009-01-07T20:05:41Z</from>
+          <to>2009-02-18T22:06:40Z</to>
+        </published>
+        <properties>
+          <property id="resourceid"><![CDATA[4bb19980-8f98-4873-a813-71b6dfab22as]]></property>
+        </properties>
+      </pagelet>
     </composer>
   </body>
 </page>

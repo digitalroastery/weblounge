@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.impl.content.image.ImageContentReader;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.ImageResourceInputDocument;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.ImageInputDocument;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xml.sax.SAXException;
@@ -70,7 +70,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
    */
   public SolrInputDocument getInputDocument(Resource<?> resource) {
-    return new ImageResourceInputDocument((ImageResource) resource);
+    return new ImageInputDocument((ImageResource) resource);
   }
 
   /**

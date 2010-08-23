@@ -20,11 +20,14 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils.*;
+
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.SearchResultImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultPageItemImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -35,6 +38,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.Map;
 
 /**
  * Class implementing <code>LookupRequester</code> to provide connection to solr
@@ -80,57 +86,63 @@ public class SolrRequester {
 
     // Id
     if (query.getId() != null) {
-      and(solrQuery, SolrFields.ID, query.getId());
+      and(solrQuery, SolrFields.ID, query.getId(), true, true);
     }
 
     // Path
     if (query.getPath() != null) {
-      and(solrQuery, SolrFields.PATH, query.getPath());
+      and(solrQuery, SolrFields.PATH, query.getPath(), true, true);
     }
 
     // Subjects
     if (query.getSubjects().length > 0) {
-      and(solrQuery, SolrFields.SUBJECTS, query.getSubjects());
+      and(solrQuery, SolrFields.SUBJECTS, query.getSubjects(), true, true);
     }
 
     // Template
     if (query.getTemplate() != null) {
-      and(solrQuery, SolrFields.TEMPLATE, query.getTemplate());
+      and(solrQuery, SolrFields.TEMPLATE, query.getTemplate(), true, true);
     }
 
     // Creator
     if (query.getCreator() != null) {
-      and(solrQuery, SolrFields.CREATED_BY, SolrUtils.serializeUser(query.getCreator()));
+      and(solrQuery, SolrFields.CREATED_BY, SolrUtils.serializeUser(query.getCreator()), true, true);
     }
 
     // Creation date
     if (query.getCreationDate() != null) {
-      and(solrQuery, SolrFields.CREATED, SolrUtils.serializeDate(query.getCreationDate()));
+      and(solrQuery, SolrFields.CREATED, SolrUtils.selectDay(query.getCreationDate()), false, false);
     }
 
     // Modifier
     if (query.getModifier() != null) {
-      and(solrQuery, SolrFields.MODIFIED_BY, SolrUtils.serializeUser(query.getModifier()));
+      and(solrQuery, SolrFields.MODIFIED_BY, SolrUtils.serializeUser(query.getModifier()), true, true);
     }
 
     // Modification date
     if (query.getModificationDate() != null) {
-      and(solrQuery, SolrFields.MODIFIED, SolrUtils.serializeDate(query.getModificationDate()));
+      and(solrQuery, SolrFields.MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, false);
     }
 
     // Publisher
     if (query.getPublisher() != null) {
-      and(solrQuery, SolrFields.PUBLISHED_BY, SolrUtils.serializeUser(query.getPublisher()));
+      and(solrQuery, SolrFields.PUBLISHED_BY, SolrUtils.serializeUser(query.getPublisher()), true, true);
     }
 
     // Publication date
     if (query.getPublishingDate() != null) {
-      and(solrQuery, SolrFields.PUBLISHED_FROM, SolrUtils.serializeDate(query.getPublishingDate()));
+      and(solrQuery, SolrFields.PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
+    }
+
+    // Pagelet properties
+    for (Map.Entry<String, String> entry : query.getProperties().entrySet()) {
+      StringBuffer searchTerm = new StringBuffer(entry.getKey()).append("=").append(entry.getValue());
+      andAllLanguagesOf(solrQuery, SolrFields.PAGELET_PROPERTIES, searchTerm.toString(), query.getSite().getLanguages(), true, true);
     }
 
     // Fulltext
     if (query.getText() != null) {
-      and(solrQuery, SolrFields.FULLTEXT, query.getText());
+      and(solrQuery, SolrFields.FULLTEXT, query.getText(), true, true);
     }
 
     if (solrQuery.length() == 0)
@@ -170,9 +182,9 @@ public class SolrRequester {
       WebUrl url = new WebUrlImpl(site, path);
 
       SearchResultPageItemImpl item = new SearchResultPageItemImpl(site, id, url, score, site);
-      item.setPageXml((String)doc.getFieldValue(SolrFields.XML));
-      item.setPageHeaderXml((String)doc.getFieldValue(SolrFields.HEADER_XML));
-      item.setPagePreviewXml((String)doc.getFieldValue(SolrFields.PREVIEW_XML));
+      item.setPageXml((String) doc.getFieldValue(SolrFields.XML));
+      item.setPageHeaderXml((String) doc.getFieldValue(SolrFields.HEADER_XML));
+      item.setPagePreviewXml((String) doc.getFieldValue(SolrFields.PREVIEW_XML));
       item.setTitle((String) doc.getFieldValue(SolrFields.TITLE));
 
       // Add the item to the result set
@@ -192,14 +204,73 @@ public class SolrRequester {
    *          the field name
    * @param fieldValue
    *          the field value
+   * @param quote
+   *          <code>true</code> to put the field values in quotes
+   * @param clean
+   *          <code>true</code> to escape solr special characters in the field
+   *          value
    * @return the encoded query part
    */
-  private StringBuilder and(StringBuilder buf, String fieldName, String fieldValue) {
+  private StringBuilder and(StringBuilder buf, String fieldName,
+      String fieldValue, boolean quote, boolean clean) {
     if (buf.length() > 0)
       buf.append(" AND ");
     buf.append(StringUtils.trim(fieldName));
     buf.append(":");
-    buf.append(StringUtils.trim(fieldValue));
+    if (quote)
+      buf.append("\"");
+    if (clean)
+      buf.append(StringUtils.trim(clean(fieldValue)));
+    else
+      buf.append(StringUtils.trim(fieldValue));
+    if (quote)
+      buf.append("\"");
+    return buf;
+  }
+
+  /**
+   * Encodes field name and value as part of the AND clause of a solr query:
+   * <tt>AND fieldName : fieldValue</tt>.
+   * 
+   * @param buf
+   *          the <code>StringBuilder</code> to append to
+   * @param fieldName
+   *          the field name
+   * @param index
+   *          the indexed field value
+   * @param fieldValue
+   *          the field value
+   * @param quote
+   *          <code>true</code> to put the field values in quotes
+   * @param clean
+   *          <code>true</code> to escape solr special characters in the field
+   *          value
+   * @return the encoded query part
+   */
+  private StringBuilder andAllLanguagesOf(StringBuilder buf, String fieldName,
+      String fieldValue, Language[] languages, boolean quote, boolean clean) {
+    if (buf.length() > 0)
+      buf.append(" AND ");
+    if (languages.length > 1)
+      buf.append(" (");
+    int i = 0;
+    for (Language l : languages) {
+      if (i > 0)
+        buf.append(" OR ");
+      buf.append(StringUtils.trim(MessageFormat.format(fieldName, l.getIdentifier())));
+      buf.append(":");
+      if (quote)
+        buf.append("\"");
+      if (clean)
+        buf.append(StringUtils.trim(clean(fieldValue)));
+      else
+        buf.append(StringUtils.trim(fieldValue));
+      if (quote)
+        buf.append("\"");
+      i++;
+    }
+    if (languages.length > 1)
+      buf.append(") ");
     return buf;
   }
 
@@ -211,23 +282,33 @@ public class SolrRequester {
    *          the <code>StringBuilder</code> to append to
    * @param fieldName
    *          the field name
-   * @param fieldValue
+   * @param fieldValues
    *          the field value
+   * @param quote
+   *          <code>true</code> to put the field values in quotes
+   * @param clean
+   *          <code>true</code> to escape solr special characters in the field
+   *          value
    * @return the encoded query part
    */
   private StringBuilder and(StringBuilder buf, String fieldName,
-      String[] fieldValue) {
+      String[] fieldValues, boolean quote, boolean clean) {
     if (buf.length() > 0)
       buf.append(" AND ");
-    buf.append("(");
+    buf.append(fieldName);
+    buf.append(":(");
     boolean first = true;
-    for (String value : fieldValue) {
+    for (String value : fieldValues) {
       if (!first)
         buf.append(" OR ");
-      buf.append(fieldName);
-      buf.append(":");
-      buf.append(value);
-      buf.append(" ");
+      if (quote)
+        buf.append("\"");
+      if (clean)
+        buf.append(StringUtils.trim(clean(value)));
+      else
+        buf.append(StringUtils.trim(value));
+      if (quote)
+        buf.append("\"");
       first = false;
     }
     buf.append(")");

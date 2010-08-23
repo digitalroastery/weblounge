@@ -266,6 +266,13 @@
     <dynamicField name="pagelet-elements-*" type="text" indexed="true" stored="true"/>
     <dynamicField name="pagelet-xml-*" type="text" indexed="false" stored="true" multiValued="true"/>
 
+    <!-- Dynamic fields for resource content -->
+    <dynamicField name="content-mimetype-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="content-filename-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="content-created-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="content-created-by-*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="content-xml-*" type="text" indexed="false" stored="true"/>
+
     <!-- Language sensitive fulltext search -->
     <dynamicField name="fulltext-*" type="text" indexed="true" stored="false"/>
 

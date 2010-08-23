@@ -34,8 +34,11 @@ public class SolrUtils {
   /** The solr supported date format. **/
   protected static DateFormat dateFormat = new SimpleDateFormat(SolrFields.SOLR_DATE_FORMAT);
 
-  /** The regular filter expression */
-  private static final String queryCleanerRegex = "[^0-9a-zA-ZöäüßÖÄÜ/\" +-.,]";
+  /** The solr supported date format for days **/
+  protected static DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+  /** The regular filter expression for single characters */
+  private static final String charCleanerRegex = "([\\+\\-\\!\\(\\)\\{\\}\\[\\]\\\\^\"\\~\\*\\?\\:])";
 
   /**
    * Clean up the user query input string to avoid invalid input parameters.
@@ -44,8 +47,11 @@ public class SolrUtils {
    *          The input String.
    * @return The cleaned string.
    */
-  static String clean(String q) {
-    return q.replaceAll(queryCleanerRegex, " ").trim();
+  public static String clean(String q) {
+    q = q.replaceAll(charCleanerRegex, "\\\\$1");
+    q = q.replaceAll("\\&\\&", "\\\\&\\\\&");
+    q = q.replaceAll("\\|\\|", "\\\\|\\\\|");
+    return q;
   }
 
   /**
@@ -60,6 +66,47 @@ public class SolrUtils {
     if (date == null)
       return null;
     return dateFormat.format(date);
+  }
+
+  /**
+   * Returns an expression to search for any date that lies in between
+   * <code>startDate</date> and <code>endDate</date>.
+   * 
+   * @param startDate
+   *          the start date
+   * @param endDate
+   *          the end date
+   * @return the serialized search expression
+   */
+  public static String serializeDateRange(Date startDate, Date endDate) {
+    if (startDate == null)
+      throw new IllegalArgumentException("Start date cannot be null");
+    if (endDate == null)
+      throw new IllegalArgumentException("End date cannot be null");
+    StringBuffer buf = new StringBuffer("[");
+    buf.append(dateFormat.format(startDate));
+    buf.append(" TO ");
+    buf.append(dateFormat.format(endDate));
+    buf.append("]");
+    return buf.toString();
+  }
+
+  /**
+   * Returns an expression to search for the given day.
+   * 
+   * @param date
+   *          the date
+   * @return the serialized search expression
+   */
+  public static String selectDay(Date date) {
+    if (date == null)
+      return null;
+    StringBuffer buf = new StringBuffer("[");
+    buf.append(dayFormat.format(date)).append("T00:00:00Z");
+    buf.append(" TO ");
+    buf.append(dayFormat.format(date)).append("T23:59:59Z");
+    buf.append("]");
+    return buf.toString();
   }
 
   /**
