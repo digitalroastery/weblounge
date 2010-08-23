@@ -52,7 +52,6 @@ import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -410,13 +409,12 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  @Ignore
   public void testGetWithContent() {
     populateIndex();
     try {
       SearchQuery q = new SearchQueryImpl(site);
       q.withElement(elementId, elementValue);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
+      assertEquals(2, idx.getByQuery(q).getItems().length);
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error querying by element");

@@ -72,7 +72,7 @@ public class PageInputDocument extends ResourceInputDocument {
       for (Pagelet p : composer.getPagelets()) {
         String location = composer.getIdentifier() + "-" + i;
         for (Language l : p.languages()) {
-          addField(PAGELET_CONTENTS, serializeContent(p, l), l, true);
+          addField(PAGELET_CONTENTS, serializeContent(p, l), true);
           addField(getLocalizedFieldName(PAGELET_CONTENTS_LOCALIZED, l), serializeContent(p, l), l, true);
         }
         addField(PAGELET_PROPERTIES, serializeProperties(p), false);

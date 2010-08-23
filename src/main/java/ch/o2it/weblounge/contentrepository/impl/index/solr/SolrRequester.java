@@ -132,15 +132,20 @@ public class SolrRequester {
       and(solrQuery, SolrFields.PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
     }
 
-    // Content elements
+    // Pagelet elements
     for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
-      StringBuffer searchTerm = new StringBuffer(entry.getKey()).append("=").append(entry.getValue());
-      and(solrQuery, SolrFields.PAGELET_CONTENTS, searchTerm.toString(), true, true);
+      solrQuery.append(" ").append(SolrFields.PAGELET_CONTENTS).append(":");
+      solrQuery.append("\"").append(entry.getKey()).append(":=\"");
+      int i = 0;
+      for (String contentValue : StringUtils.split(entry.getValue())) {
+        solrQuery.append(" \"").append(SolrUtils.clean(contentValue)).append("\"");
+        i++;
+      }
     }
 
     // Pagelet properties
     for (Map.Entry<String, String> entry : query.getProperties().entrySet()) {
-      StringBuffer searchTerm = new StringBuffer(entry.getKey()).append("=").append(entry.getValue());
+      StringBuffer searchTerm = new StringBuffer(entry.getKey()).append(":= ").append(entry.getValue());
       and(solrQuery, SolrFields.PAGELET_PROPERTIES, searchTerm.toString(), true, true);
     }
 

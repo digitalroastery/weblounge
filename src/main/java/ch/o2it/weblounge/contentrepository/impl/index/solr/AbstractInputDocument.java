@@ -143,12 +143,12 @@ public abstract class AbstractInputDocument extends SolrInputDocument {
   protected String[] serializeContent(Pagelet pagelet, Language language) {
     List<String> result = new ArrayList<String>();
     for (String element : pagelet.getContentNames(language)) {
-      StringBuffer buf = new StringBuffer();
       String[] content = pagelet.getMultiValueContent(element, language, true);
       for (String c : content) {
-        buf.append(element).append("=").append(c);
+        StringBuffer buf = new StringBuffer();
+        buf.append(element).append(":= ").append(c);
+        result.add(buf.toString());
       }
-      result.add(buf.toString());
     }
     return result.toArray(new String[result.size()]);
   }
@@ -165,11 +165,11 @@ public abstract class AbstractInputDocument extends SolrInputDocument {
   protected String[] serializeProperties(Pagelet pagelet) {
     List<String> result = new ArrayList<String>();
     for (String property : pagelet.getPropertyNames()) {
-      StringBuffer buf = new StringBuffer();
       for (String v : pagelet.getMultiValueProperty(property)) {
-        buf.append(property).append("=").append(v);
+        StringBuffer buf = new StringBuffer();
+        buf.append(property).append(":= ").append(v);
+        result.add(buf.toString());
       }
-      result.add(buf.toString());
     }
     return result.toArray(new String[result.size()]);
   }
