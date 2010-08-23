@@ -20,14 +20,13 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils.*;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils.clean;
 
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.SearchResultImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultPageItemImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -39,7 +38,6 @@ import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -134,10 +132,26 @@ public class SolrRequester {
       and(solrQuery, SolrFields.PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
     }
 
+    // Content elements
+    for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
+      StringBuffer searchTerm = new StringBuffer(entry.getKey()).append("=").append(entry.getValue());
+      and(solrQuery, SolrFields.PAGELET_CONTENTS, searchTerm.toString(), true, true);
+    }
+
     // Pagelet properties
     for (Map.Entry<String, String> entry : query.getProperties().entrySet()) {
       StringBuffer searchTerm = new StringBuffer(entry.getKey()).append("=").append(entry.getValue());
-      andAllLanguagesOf(solrQuery, SolrFields.PAGELET_PROPERTIES, searchTerm.toString(), query.getSite().getLanguages(), true, true);
+      and(solrQuery, SolrFields.PAGELET_PROPERTIES, searchTerm.toString(), true, true);
+    }
+
+    // Content filenames
+    if (query.getFilename() != null) {
+      and(solrQuery, SolrFields.CONTENT_FILENAME, query.getFilename(), true, true);
+    }
+
+    // Content mimetypes
+    if (query.getMimetype() != null) {
+      and(solrQuery, SolrFields.CONTENT_MIMETYPE, query.getMimetype(), true, true);
     }
 
     // Fulltext
@@ -185,7 +199,7 @@ public class SolrRequester {
       item.setPageXml((String) doc.getFieldValue(SolrFields.XML));
       item.setPageHeaderXml((String) doc.getFieldValue(SolrFields.HEADER_XML));
       item.setPagePreviewXml((String) doc.getFieldValue(SolrFields.PREVIEW_XML));
-      item.setTitle((String) doc.getFieldValue(SolrFields.TITLE));
+      item.setTitle((String) doc.getFieldValue(SolrFields.TITLE_LOCALIZED));
 
       // Add the item to the result set
       result.addResultItem(item);
@@ -225,52 +239,6 @@ public class SolrRequester {
       buf.append(StringUtils.trim(fieldValue));
     if (quote)
       buf.append("\"");
-    return buf;
-  }
-
-  /**
-   * Encodes field name and value as part of the AND clause of a solr query:
-   * <tt>AND fieldName : fieldValue</tt>.
-   * 
-   * @param buf
-   *          the <code>StringBuilder</code> to append to
-   * @param fieldName
-   *          the field name
-   * @param index
-   *          the indexed field value
-   * @param fieldValue
-   *          the field value
-   * @param quote
-   *          <code>true</code> to put the field values in quotes
-   * @param clean
-   *          <code>true</code> to escape solr special characters in the field
-   *          value
-   * @return the encoded query part
-   */
-  private StringBuilder andAllLanguagesOf(StringBuilder buf, String fieldName,
-      String fieldValue, Language[] languages, boolean quote, boolean clean) {
-    if (buf.length() > 0)
-      buf.append(" AND ");
-    if (languages.length > 1)
-      buf.append(" (");
-    int i = 0;
-    for (Language l : languages) {
-      if (i > 0)
-        buf.append(" OR ");
-      buf.append(StringUtils.trim(MessageFormat.format(fieldName, l.getIdentifier())));
-      buf.append(":");
-      if (quote)
-        buf.append("\"");
-      if (clean)
-        buf.append(StringUtils.trim(clean(fieldValue)));
-      else
-        buf.append(StringUtils.trim(fieldValue));
-      if (quote)
-        buf.append("\"");
-      i++;
-    }
-    if (languages.length > 1)
-      buf.append(") ");
     return buf;
   }
 
@@ -329,7 +297,7 @@ public class SolrRequester {
 
     sb.append("(");
 
-    sb.append(SolrFields.TITLE);
+    sb.append(SolrFields.TITLE_LOCALIZED);
     sb.append(":(");
     sb.append(uq);
     sb.append(")^");

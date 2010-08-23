@@ -59,6 +59,7 @@ public class SolrUtilsTest {
     Calendar d = Calendar.getInstance();
     d.set(Calendar.DAY_OF_MONTH, 2);
     d.set(Calendar.HOUR, 5);
+    d.set(Calendar.HOUR_OF_DAY, 5);
     d.set(Calendar.MINUTE, 59);
     d.set(Calendar.SECOND, 13);
     d.set(Calendar.MILLISECOND, 0);
@@ -76,7 +77,7 @@ public class SolrUtilsTest {
     d.set(Calendar.MILLISECOND, 0);
     d.set(Calendar.SECOND, 0);
     d.set(Calendar.MINUTE, 0);
-    d.set(Calendar.HOUR, 0);
+    d.set(Calendar.HOUR_OF_DAY, 0);
     Date startDate = d.getTime();
     d.add(Calendar.DAY_OF_MONTH, 2);
     d.add(Calendar.HOUR, 5);

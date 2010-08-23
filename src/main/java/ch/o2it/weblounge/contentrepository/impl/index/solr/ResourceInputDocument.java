@@ -22,12 +22,16 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_CREATED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_CREATED_BY;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME_LOCALIZED;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.DESCRIPTION_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.DESCRIPTION;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
@@ -37,8 +41,10 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAT
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_TO;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
@@ -85,10 +91,14 @@ public class ResourceInputDocument extends AbstractInputDocument {
 
     // Language dependent header fields
     for (Language l : resource.languages()) {
-      addField(getLocalizedFieldName(DESCRIPTION, l), resource.getDescription(l, true), l, true);
-      addField(getLocalizedFieldName(COVERAGE, l), resource.getCoverage(l, true), l, false);
-      addField(getLocalizedFieldName(RIGHTS, l), resource.getRights(l, true), l, false);
-      addField(getLocalizedFieldName(TITLE, l), resource.getTitle(l, true), l, true);
+      addField(DESCRIPTION, resource.getDescription(l, true), l, true);
+      addField(getLocalizedFieldName(DESCRIPTION_LOCALIZED, l), resource.getDescription(l, true), l, false);
+      addField(COVERAGE, resource.getCoverage(l, true), l, true);
+      addField(getLocalizedFieldName(COVERAGE_LOCALIZED, l), resource.getCoverage(l, true), l, false);
+      addField(RIGHTS, resource.getRights(l, true), l, true);
+      addField(getLocalizedFieldName(RIGHTS_LOCALIZED, l), resource.getRights(l, true), l, false);
+      addField(TITLE, resource.getTitle(l, true), l, true);
+      addField(getLocalizedFieldName(TITLE_LOCALIZED, l), resource.getTitle(l, true), l, false);
     }
 
     // The whole resource
@@ -107,8 +117,10 @@ public class ResourceInputDocument extends AbstractInputDocument {
       addField(getLocalizedFieldName(CONTENT_XML, l), content.toXml(), false);
       addField(getLocalizedFieldName(CONTENT_CREATED, l), SolrUtils.serializeDate(content.getCreationDate()), false);
       addField(getLocalizedFieldName(CONTENT_CREATED_BY, l), SolrUtils.serializeUser(content.getCreator()), false);
-      addField(getLocalizedFieldName(CONTENT_FILENAME, l), content.getFilename(), true);
-      addField(getLocalizedFieldName(CONTENT_MIMETYPE, l), content.getMimetype(), false);
+      addField(CONTENT_FILENAME, content.getFilename(), true);
+      addField(getLocalizedFieldName(CONTENT_FILENAME_LOCALIZED, l), content.getFilename(), false);
+      addField(CONTENT_MIMETYPE, content.getMimetype(), true);
+      addField(getLocalizedFieldName(CONTENT_MIMETYPE_LOCALIZED, l), content.getMimetype(), false);
     }
     
   }

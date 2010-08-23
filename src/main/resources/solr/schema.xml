@@ -254,20 +254,27 @@
     <field name="published-by" type="string" indexed="true" stored="true" required="false" />
 
     <!-- Language sensitive page-level content -->
+    <field name="description" type="string" indexed="true" stored="false" required="false" />
     <dynamicField name="description-*" type="string" indexed="true" stored="true" required="false" />
+    <field name="coverage" type="string" indexed="true" stored="false" required="false" />
     <dynamicField name="coverage-*" type="string" indexed="true" stored="true" required="false" />
+    <field name="rights" type="string" indexed="true" stored="false" required="false" />
     <dynamicField name="rights-*" type="string" indexed="true" stored="true" required="false" />
+    <field name="title" type="string" indexed="true" stored="false" required="false" />
     <dynamicField name="title-*" type="string" indexed="true" stored="true" required="false" />
    
     <!-- Dynamic fields for pagelet texts and properties -->
+    <field name="pagelet-type" type="text" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="pagelet-type-*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <field name="pagelet-contents" type="text" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="pagelet-contents-*" type="text" indexed="true" stored="true" multiValued="true"/>
-    <dynamicField name="pagelet-properties-*" type="text" indexed="true" stored="true"/>
-    <dynamicField name="pagelet-elements-*" type="text" indexed="true" stored="true"/>
+    <field name="pagelet-properties" type="text" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="pagelet-xml-*" type="text" indexed="false" stored="true" multiValued="true"/>
 
     <!-- Dynamic fields for resource content -->
+    <field name="content-mimetype" type="text" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="content-mimetype-*" type="text" indexed="true" stored="true"/>
+    <field name="content-filename" type="text" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="content-filename-*" type="text" indexed="true" stored="true"/>
     <dynamicField name="content-created-*" type="text" indexed="true" stored="true"/>
     <dynamicField name="content-created-by-*" type="text" indexed="true" stored="true"/>

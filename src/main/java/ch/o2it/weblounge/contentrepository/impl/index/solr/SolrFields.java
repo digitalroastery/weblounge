@@ -49,16 +49,28 @@ public interface SolrFields {
   public static final String PREVIEW_XML = "preview-xml";
 
   /** Description field name */
-  public static final String DESCRIPTION = "description-{0}";
+  public static final String DESCRIPTION = "description";
+
+  /** Description field name (localized) */
+  public static final String DESCRIPTION_LOCALIZED = "description-{0}";
 
   /** Coverage field name */
-  public static final String COVERAGE = "coverage-{0}";
+  public static final String COVERAGE = "coverage";
+
+  /** Coverage field name (localized) */
+  public static final String COVERAGE_LOCALIZED = "coverage-{0}";
 
   /** Rights field name */
-  public static final String RIGHTS = "rights-{0}";
+  public static final String RIGHTS = "rights";
+
+  /** Rights field name (localized) */
+  public static final String RIGHTS_LOCALIZED = "rights-{0}";
 
   /** Title field name */
-  public static final String TITLE = "title-{0}";
+  public static final String TITLE = "title";
+
+  /** Title field name (localized) */
+  public static final String TITLE_LOCALIZED = "title-{0}";
 
   /** Created field name */
   public static final String CREATED = "created";
@@ -82,25 +94,34 @@ public interface SolrFields {
   public static final String PUBLISHED_BY = "published-by";
 
   /** Pagelet text and properties values */
-  public static final String PAGELET_CONTENTS = "pagelet-contents-{0}";
+  public static final String PAGELET_CONTENTS = "pagelet-contents";
 
-  /** Pagelet text field name */
-  public static final String PAGELET_ELEMENTS = "pagelet-elements-{0}-{1}";
+  /** Pagelet text and properties values (localized) */
+  public static final String PAGELET_CONTENTS_LOCALIZED = "pagelet-contents-{0}";
 
   /** Pagelet properties field name */
-  public static final String PAGELET_PROPERTIES = "pagelet-properties-{0}";
+  public static final String PAGELET_PROPERTIES = "pagelet-properties";
+
+  /** Pagelet xml field name (located) */
+  public static final String PAGELET_XML_LOCATED = "pagelet-xml-{0}";
 
   /** Pagelet xml field name */
-  public static final String PAGELET_XML = "pagelet-xml-{0}";
+  public static final String PAGELET_TYPE = "pagelet-type";
 
-  /** Pagelet xml field name */
-  public static final String PAGELET_TYPE = "pagelet-type-{0}";
+  /** Pagelet xml field name (located) */
+  public static final String PAGELET_TYPE_LOCATED = "pagelet-type-{0}";
 
   /** Resource content filename field name */
-  public static final String CONTENT_FILENAME = "content-filename-{0}";
+  public static final String CONTENT_FILENAME = "content-filename";
+
+  /** Resource content filename field name (localized) */
+  public static final String CONTENT_FILENAME_LOCALIZED = "content-filename-{0}";
 
   /** Resource content mime type field name */
-  public static final String CONTENT_MIMETYPE = "content-mimetype-{0}";
+  public static final String CONTENT_MIMETYPE = "content-mimetype";
+
+  /** Resource content mime type field name (localized) */
+  public static final String CONTENT_MIMETYPE_LOCALIZED = "content-mimetype-{0}";
 
   /** Resource content creation date field name */
   public static final String CONTENT_CREATED = "content-created-{0}";

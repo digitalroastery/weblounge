@@ -52,6 +52,7 @@ import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -109,6 +110,12 @@ public class SearchIndexTest {
 
   /** Mimetype */
   protected String mimetype = "image/jpeg";
+
+  /** Element key */
+  protected String elementId = "title";
+
+  /** Element value */
+  protected String elementValue = "joyeux";
 
   /**
    * Creates the test setup.
@@ -402,6 +409,25 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
+  @Test
+  @Ignore
+  public void testGetWithContent() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site);
+      q.withElement(elementId, elementValue);
+      assertEquals(1, idx.getByQuery(q).getItems().length);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("Error querying by element");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
   @Test 
   public void testGetWithProperty() {
     populateIndex();
@@ -426,7 +452,7 @@ public class SearchIndexTest {
     try {
       SearchQuery q = new SearchQueryImpl(site);
       q.withFilename(filename);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
+      assertEquals(2, idx.getByQuery(q).getItems().length);
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error querying by filename");
@@ -444,7 +470,7 @@ public class SearchIndexTest {
     try {
       SearchQuery q = new SearchQueryImpl(site);
       q.withMimetype(mimetype);
-      assertEquals(1, idx.getByQuery(q).getItems().length);
+      assertEquals(2, idx.getByQuery(q).getItems().length);
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error querying by mimetype");

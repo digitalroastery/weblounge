@@ -29,6 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
@@ -136,23 +138,19 @@ public abstract class AbstractInputDocument extends SolrInputDocument {
    *          the pagelet
    * @param language
    *          the language
-   * @param format
-   *          <code>true</code> to include formatting
    * @return the serialized element content
    */
-  protected String serializeContent(Pagelet pagelet, Language language,
-      boolean format) {
-    StringBuffer buf = new StringBuffer();
+  protected String[] serializeContent(Pagelet pagelet, Language language) {
+    List<String> result = new ArrayList<String>();
     for (String element : pagelet.getContentNames(language)) {
+      StringBuffer buf = new StringBuffer();
       String[] content = pagelet.getMultiValueContent(element, language, true);
       for (String c : content) {
-        if (format)
-          buf.append(element).append("=").append(c).append(";;");
-        else
-          buf.append(" ").append(c);
+        buf.append(element).append("=").append(c);
       }
+      result.add(buf.toString());
     }
-    return buf.toString();
+    return result.toArray(new String[result.size()]);
   }
 
   /**
@@ -162,22 +160,18 @@ public abstract class AbstractInputDocument extends SolrInputDocument {
    * 
    * @param pagelet
    *          the pagelet
-   * @param format
-   *          <code>true</code> to include formatting
    * @return the serialized element properties
    */
-  protected String serializeProperties(Pagelet pagelet, boolean format) {
-    StringBuffer buf = new StringBuffer();
+  protected String[] serializeProperties(Pagelet pagelet) {
+    List<String> result = new ArrayList<String>();
     for (String property : pagelet.getPropertyNames()) {
-      String[] values = pagelet.getMultiValueProperty(property);
-      for (String v : values) {
-        if (format)
-          buf.append(property).append("=").append(v).append(" ;; ");
-        else
-          buf.append(" ").append(v);
+      StringBuffer buf = new StringBuffer();
+      for (String v : pagelet.getMultiValueProperty(property)) {
+        buf.append(property).append("=").append(v);
       }
+      result.add(buf.toString());
     }
-    return buf.toString();
+    return result.toArray(new String[result.size()]);
   }
 
 }

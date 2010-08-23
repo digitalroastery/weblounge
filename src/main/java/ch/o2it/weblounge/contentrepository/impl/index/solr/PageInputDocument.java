@@ -21,10 +21,10 @@
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_ELEMENTS;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_LOCATED;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML_LOCATED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
 
@@ -72,13 +72,12 @@ public class PageInputDocument extends ResourceInputDocument {
       for (Pagelet p : composer.getPagelets()) {
         String location = composer.getIdentifier() + "-" + i;
         for (Language l : p.languages()) {
-          addField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeContent(p, l, false), l, true);
-          addField(getLocalizedFieldName(PAGELET_CONTENTS, l), serializeProperties(p, false), l, true);
-          addField(MessageFormat.format(PAGELET_ELEMENTS, location, l.getIdentifier()), serializeContent(p, l, true), l, false);
+          addField(PAGELET_CONTENTS, serializeContent(p, l), l, true);
+          addField(getLocalizedFieldName(PAGELET_CONTENTS_LOCALIZED, l), serializeContent(p, l), l, true);
         }
-        addField(MessageFormat.format(PAGELET_PROPERTIES, location), serializeProperties(p, true), false);
-        addField(MessageFormat.format(PAGELET_XML, location), p.toXml(), false);
-        addField(MessageFormat.format(PAGELET_TYPE, location), p.getModule() + "/" + p.getIdentifier(), false);
+        addField(PAGELET_PROPERTIES, serializeProperties(p), false);
+        addField(MessageFormat.format(PAGELET_XML_LOCATED, location), p.toXml(), false);
+        addField(MessageFormat.format(PAGELET_TYPE_LOCATED, location), p.getModule() + "/" + p.getIdentifier(), false);
         i++;
       }
     }
