@@ -44,6 +44,36 @@ public interface ResourceContent extends Creatable {
   String getFilename();
 
   /**
+   * Sets the content mime type.
+   * 
+   * @param mimetype
+   *          the mime type
+   */
+  void setMimetype(String mimetype);
+
+  /**
+   * Returns the content type.
+   * 
+   * @return the mime type
+   */
+  String getMimetype();
+
+  /**
+   * Sets the content size in bytes.
+   * 
+   * @param size
+   *          the size
+   */
+  void setSize(long size);
+
+  /**
+   * Returns the content size in bytes.
+   * 
+   * @return the content size
+   */
+  long getSize();
+
+  /**
    * Sets the content language.
    * 
    * @param language
@@ -59,7 +89,7 @@ public interface ResourceContent extends Creatable {
   Language getLanguage();
   
   /**
-   * Returns an xml representation of this file content.
+   * Returns an xml representation of this content.
    * 
    * @return the xml representation
    */

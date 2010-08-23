@@ -22,53 +22,11 @@ package ch.o2it.weblounge.common.content.file;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * File content represents an actual download for a {@link FileResource}. It
  * contains information about the file's mime type, size and extension. In
  * addition, it is designed to be extended by subclasses like images.
  */
 public interface FileContent extends ResourceContent {
-
-  /**
-   * Sets the content mime type.
-   * 
-   * @param mimetype
-   *          the mime type
-   */
-  void setMimetype(String mimetype);
-
-  /**
-   * Returns the content type.
-   * 
-   * @return the mime type
-   */
-  String getMimetype();
-
-  /**
-   * Sets the file size in bytes.
-   * 
-   * @param size
-   *          the size
-   */
-  void setSize(long size);
-
-  /**
-   * Returns the file size in bytes.
-   * 
-   * @return the file size
-   */
-  long getSize();
-
-  /**
-   * Opens a stream to the file's content.
-   * 
-   * @return the content
-   * @throws IOException
-   *           if reading the resource content fails
-   */
-  InputStream openStream() throws IOException;
 
 }

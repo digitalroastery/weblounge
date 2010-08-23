@@ -549,4 +549,36 @@ public interface SearchQuery {
   SearchQuery andElement(String textName, String text)
       throws IllegalStateException;
 
+  /**
+   * Return the resources with the given filename in their content section.
+   * 
+   * @param filename
+   *          the filename to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withFilename(String filename);
+
+  /**
+   * Returns the filename or <code>null</code> if no filename was specified.
+   * 
+   * @return the filename
+   */
+  String getFilename();
+
+  /**
+   * Return the resources with the given mime type in their content section.
+   * 
+   * @param mimetype
+   *          the mime type to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withMimetype(String mimetype);
+
+  /**
+   * Returns the mime type or <code>null</code> if no mime type was specified.
+   * 
+   * @return the mime type
+   */
+  String getMimetype();
+
 }
