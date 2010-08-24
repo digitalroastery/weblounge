@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content;
 
+import ch.o2it.weblounge.common.site.Site;
+
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -37,10 +39,10 @@ public interface ResourceReader<S extends ResourceContent, T extends Resource<S>
    * Reads the serialized resource from the input stream and returns the
    * deserialized object representation.
    * 
-   * @param uri
-   *          the resource uri
    * @param is
    *          the input stream
+   * @param site
+   *          the resource's site
    * @return the resource
    * @throws SAXException
    *           if parsing the resource fails
@@ -49,7 +51,7 @@ public interface ResourceReader<S extends ResourceContent, T extends Resource<S>
    * @throws IOException
    *           if reading the input stream fails
    */
-  T read(ResourceURI uri, InputStream is) throws SAXException, IOException,
+  T read(InputStream is, Site site) throws SAXException, IOException,
       ParserConfigurationException;
 
 }

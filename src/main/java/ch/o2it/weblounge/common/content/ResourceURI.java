@@ -42,11 +42,12 @@ public interface ResourceURI extends Url {
    * @return the path
    */
   String getPath();
-  
+
   /**
    * Sets the resource type.
    * 
-   * @param type the type
+   * @param type
+   *          the type
    */
   void setType(String type);
 
@@ -57,6 +58,14 @@ public interface ResourceURI extends Url {
    * @return the resource type
    */
   String getType();
+
+  /**
+   * Sets the version.
+   * 
+   * @param version
+   *          the document version
+   */
+  void setVersion(long version);
 
   /**
    * Returns the page version. The version represents the various editing stages
