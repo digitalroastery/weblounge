@@ -46,6 +46,8 @@
       <filename><![CDATA[image.jpg]]></filename>
       <mimetype>image/jpeg</mimetype>
       <size>745569</size>
+      <width>1000</width>
+      <height>666</height>
     </content>
     <content language="de">
       <created>
@@ -55,6 +57,8 @@
       <filename><![CDATA[image.png]]></filename>
       <mimetype>image/png</mimetype>
       <size>520894</size>
+      <width>1000</width>
+      <height>666</height>
     </content>
   </body>
 </image>

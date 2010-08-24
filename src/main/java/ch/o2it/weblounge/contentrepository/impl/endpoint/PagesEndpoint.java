@@ -177,7 +177,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     Page page = null;
     try {
       PageReader pageReader = new PageReader();
-      page = pageReader.read(pageURI, IOUtils.toInputStream(pageXml));
+      page = pageReader.read(IOUtils.toInputStream(pageXml), site);
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
       User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
@@ -262,7 +262,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       logger.debug("Adding page to {}", pageURI);
       try {
         PageReader pageReader = new PageReader();
-        page = pageReader.read(pageURI, IOUtils.toInputStream(pageXml));
+        page = pageReader.read(IOUtils.toInputStream(pageXml), site);
       } catch (IOException e) {
         logger.warn("Error reading page {} from request", pageURI);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

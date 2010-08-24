@@ -278,7 +278,7 @@ public class BundleContentRepository extends AbstractContentRepository {
           try {
             ResourceReader<?, ?> reader = serializer.getReader();
             is = loadResource(uri);
-            resource = reader.read(uri, is);
+            resource = reader.read(is, site);
             if (resource == null) {
               logger.warn("Unkown error loading resource {}", uri);
               continue;

@@ -232,7 +232,7 @@
 
     <!-- The resource id. This is the unique identifier. -->
     <field name="id" type="string" indexed="true" stored="true" required="true" />
-    <field name="path" type="string" indexed="true" stored="true" required="true" />
+    <field name="path" type="string" indexed="true" stored="true" required="false" />
     <field name="type" type="string" indexed="true" stored="true" required="true" />
 
     <!-- Page-level metadata -->

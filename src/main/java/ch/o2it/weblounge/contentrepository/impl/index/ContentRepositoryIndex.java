@@ -254,7 +254,7 @@ public class ContentRepositoryIndex {
       String id = uri.getId();
       if (id == null) {
         id = UUID.randomUUID().toString();
-        uri = new ResourceURIImpl(uri.getType(), uri.getSite(), uri.getPath(), uri.getVersion(), id);
+        uri = new ResourceURIImpl(uri.getType(), uri.getSite(), uri.getPath(), id, uri.getVersion());
         ((ResourceURIImpl) resource.getURI()).setIdentifier(id);
       }
       String type = uri.getType();
@@ -515,7 +515,7 @@ public class ContentRepositoryIndex {
       throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
 
     // Do it this way to make sure we have identical path trimming
-    uri = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getVersion(), uri.getId());
+    uri = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getId(), uri.getVersion());
 
     pathIdx.delete(oldPath, address);
     pathIdx.add(uri.getPath(), address);

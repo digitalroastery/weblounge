@@ -23,17 +23,16 @@ package ch.o2it.weblounge.contentrepository.index;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.file.FileResource;
+import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
-import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
@@ -50,6 +49,7 @@ import ch.o2it.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.SearchIndex;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -87,8 +87,11 @@ public class SearchIndexTest {
   /** The sample pages */
   protected Page[] pages = null;
 
-  /** The sample files */
-  protected FileResource[] files = null;
+  /** The sample file */
+  protected FileResource file = null;
+
+  /** The sample file */
+  protected ImageResource image = null;
 
   /** UUID of page 1 */
   protected String uuid1 = "4bb19980-8f98-4873-a813-71b6dfab22af";
@@ -157,19 +160,22 @@ public class SearchIndexTest {
     PageReader pageReader = new PageReader();
     pages = new Page[2];
     for (int i = 0; i < pages.length; i++) {
-      ResourceURI uri = new PageURIImpl(site, "/");
       InputStream is = this.getClass().getResourceAsStream("/page" + (i+1) + ".xml");
-      pages[i] = pageReader.read(uri, is);
+      pages[i] = pageReader.read(is, site);
+      IOUtils.closeQuietly(is);
     }
 
-    // Prepare the files
+    // Prepare the sample file
     FileResourceReader fileReader = new FileResourceReader();
-    files = new FileResource[2];
-    for (int i = 0; i < files.length; i++) {
-      ResourceURI uri = new FileResourceURIImpl(site, "/");
-      InputStream is = this.getClass().getResourceAsStream("/file" + (i+1) + ".xml");
-      files[i] = fileReader.read(uri, is);
-    }
+    InputStream fileIs = this.getClass().getResourceAsStream("/file.xml");
+    file = fileReader.read(fileIs, site);
+    IOUtils.closeQuietly(fileIs);
+    
+    // Prepare the sample image
+    ImageResourceReader imageReader = new ImageResourceReader();
+    InputStream imageIs = this.getClass().getResourceAsStream("/image.xml");
+    image = imageReader.read(imageIs, site);
+    IOUtils.closeQuietly(imageIs);
   }
 
   /**
@@ -615,6 +621,8 @@ public class SearchIndexTest {
    */
   protected int populateIndex() {
     int count = 0;
+    
+    // Add the pages
     try {
       for (Page page : pages) {
         idx.add(page);
@@ -624,14 +632,23 @@ public class SearchIndexTest {
       e.printStackTrace();
       fail("Adding sample page to the index failed");
     }
+    
+    // Add the file
     try {
-      for (FileResource file : files) {
-        idx.add(file);
-        count ++;
-      }
+      idx.add(file);
+      count ++;
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample file to the index failed");
+    }
+    
+    // Add the image
+    try {
+      idx.add(image);
+      count ++;
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Adding sample image to the index failed");
     }
     return count;
   }

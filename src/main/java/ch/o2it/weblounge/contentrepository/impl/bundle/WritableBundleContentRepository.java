@@ -214,7 +214,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
         return null;
       }
       ResourceReader<?, ?> resourceReader = serializer.getReader();
-      return resourceReader.read(uri, url.openStream());
+      return resourceReader.read(url.openStream(), site);
     } catch (SAXException e) {
       throw new RuntimeException("SAX error while reading " + uri.getType() + " '" + uri + "'", e);
     } catch (IOException e) {

@@ -121,6 +121,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
   public void start() throws ContentRepositoryException {
     if (!connected)
       throw new ContentRepositoryException("Cannot start a disconnected content repository");
+    if (started)
+      throw new ContentRepositoryException("Content repository has already been started");
     try {
       index = loadIndex();
       started = true;
@@ -143,6 +145,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (!started)
       throw new ContentRepositoryException("Content repository is already stopped");
     try {
+      started = false;
       index.close();
     } catch (IOException e) {
       throw new ContentRepositoryException("Error closing repository index", e);
@@ -210,7 +213,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       is = loadResource(uri);
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
-      return reader.read(uri, is);
+      return reader.read(is, site);
     } catch (Exception e) {
       logger.error("Error loading {}: {}", uri, e.getMessage());
       throw new ContentRepositoryException(e);
@@ -509,7 +512,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     try {
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
-      return reader.read(uri, is);
+      return reader.read(is, site);
     } catch (Exception e) {
       throw new IOException("Error reading resource from " + contentUrl);
     } finally {
@@ -543,7 +546,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       Matcher m = resourceHeaderRegex.matcher(s);
       if (m.matches()) {
         long version = ResourceUtils.getVersion(m.group(4));
-        return new ResourceURIImpl(m.group(1), site, m.group(3), version, m.group(2));
+        return new ResourceURIImpl(m.group(1), site, m.group(3), m.group(2), version);
       }
       return null;
     } finally {

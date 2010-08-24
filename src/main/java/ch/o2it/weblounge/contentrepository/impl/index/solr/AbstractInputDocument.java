@@ -167,7 +167,7 @@ public abstract class AbstractInputDocument extends SolrInputDocument {
     for (String property : pagelet.getPropertyNames()) {
       for (String v : pagelet.getMultiValueProperty(property)) {
         StringBuffer buf = new StringBuffer();
-        buf.append(property).append(":= ").append(v);
+        buf.append(property).append(":=").append(v);
         result.add(buf.toString());
       }
     }

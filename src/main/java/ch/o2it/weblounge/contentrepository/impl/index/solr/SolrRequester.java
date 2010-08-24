@@ -145,7 +145,9 @@ public class SolrRequester {
 
     // Pagelet properties
     for (Map.Entry<String, String> entry : query.getProperties().entrySet()) {
-      StringBuffer searchTerm = new StringBuffer(entry.getKey()).append(":= ").append(entry.getValue());
+      StringBuffer searchTerm = new StringBuffer();
+      searchTerm.append(entry.getKey());
+      searchTerm.append(":=").append(entry.getValue());
       and(solrQuery, SolrFields.PAGELET_PROPERTIES, searchTerm.toString(), true, true);
     }
 

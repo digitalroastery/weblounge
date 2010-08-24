@@ -20,20 +20,25 @@
 
 package ch.o2it.weblounge.contentrepository.fs;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileResource;
+import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
@@ -50,6 +55,7 @@ import ch.o2it.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -57,7 +63,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -88,7 +93,7 @@ public class FileSystemContentRepositoryTest {
   protected String page1uuid = "4bb19980-8f98-4873-a813-71b6dfab22af";
 
   /** Path of page 1 */
-  protected String page1path = "/test";
+  protected String page1path = "/test/";
 
   /** URI of page 1 */
   protected ResourceURI page1URI = null;
@@ -123,8 +128,11 @@ public class FileSystemContentRepositoryTest {
   /** The sample pages */
   protected Page[] pages = null;
 
-  /** The sample files */
-  protected FileResource[] files = null;
+  /** The sample file */
+  protected FileResource file = null;
+
+  /** The sample file */
+  protected ImageResource image = null;
 
   /**
    * @throws java.lang.Exception
@@ -176,19 +184,21 @@ public class FileSystemContentRepositoryTest {
     PageReader pageReader = new PageReader();
     pages = new Page[2];
     for (int i = 0; i < pages.length; i++) {
-      ResourceURI uri = new PageURIImpl(site, "/");
       InputStream is = this.getClass().getResourceAsStream("/page" + (i + 1) + ".xml");
-      pages[i] = pageReader.read(uri, is);
+      pages[i] = pageReader.read(is, site);
     }
 
-    // Prepare the files
+    // Prepare the sample file
     FileResourceReader fileReader = new FileResourceReader();
-    files = new FileResource[2];
-    for (int i = 0; i < files.length; i++) {
-      ResourceURI uri = new FileResourceURIImpl(site, "/");
-      InputStream is = this.getClass().getResourceAsStream("/file" + (i + 1) + ".xml");
-      files[i] = fileReader.read(uri, is);
-    }
+    InputStream fileIs = this.getClass().getResourceAsStream("/file.xml");
+    file = fileReader.read(fileIs, site);
+    IOUtils.closeQuietly(fileIs);
+    
+    // Prepare the sample image
+    ImageResourceReader imageReader = new ImageResourceReader();
+    InputStream imageIs = this.getClass().getResourceAsStream("/image.xml");
+    image = imageReader.read(imageIs, site);
+    IOUtils.closeQuietly(imageIs);
   }
 
   /**
@@ -262,7 +272,6 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testDeleteResourceURI() {
     int resources = populateRepository();
     try {
@@ -276,22 +285,15 @@ public class FileSystemContentRepositoryTest {
 
     // Delete image resource which is referenced by page
     try {
-      repository.delete(imageURI);
-      fail("Managed to remove referenced resource");
-    } catch (IOException e) {
+      if (repository.delete(imageURI)) {
+        fail("Managed to remove referenced resource");
+      }
+      assertNotNull(repository.get(imageURI));
+      assertEquals(resources - 1, repository.getResourceCount());
+    } catch (Exception e) {
       e.printStackTrace();
       fail("Error trying to delete a resource");
-    } catch (ContentRepositoryException e) {
-      // This is expected
-      try {
-        assertNotNull(repository.get(imageURI));
-        assertEquals(resources - 1, repository.getResourceCount());
-      } catch (ContentRepositoryException e1) {
-        e1.printStackTrace();
-        fail("Error trying to delete a resource");
-      }
     }
-
   }
 
   /**
@@ -302,6 +304,7 @@ public class FileSystemContentRepositoryTest {
   @Test
   @Ignore
   public void testDeleteResourceURIBoolean() {
+    // TODO: Add another revision of a page to index
     fail("Not yet implemented"); // TODO
   }
 
@@ -311,9 +314,20 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testMove() {
-    fail("Not yet implemented"); // TODO
+    int resources = populateRepository();
+    String oldPath = page1URI.getPath(); 
+    String newPath = "/new/path"; 
+    ResourceURI newURI = new PageURIImpl(site, newPath, page1URI.getId());
+    try {
+      repository.move(page1URI, newURI);
+      assertEquals(resources, repository.getResourceCount());
+      assertNull(repository.get(new PageURIImpl(site, oldPath)));
+      assertNotNull(repository.get(new PageURIImpl(site, newPath)));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error moving resource");
+    }
   }
 
   /**
@@ -322,9 +336,27 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testPut() {
-    fail("Not yet implemented"); // TODO
+    int resources = populateRepository();
+    
+    // Try to add a duplicate resource
+    try {
+      repository.put(file);
+      assertEquals(resources, repository.getResourceCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error moving resource");
+    }
+
+    // Try to add a new resource
+    try {
+      ((ResourceURIImpl)file.getURI()).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      repository.put(file);
+      assertEquals(resources + 1, repository.getResourceCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error moving resource");
+    }
   }
 
   /**
@@ -351,35 +383,17 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.Resource)}
-   * .
-   */
-  @Test
-  @Ignore
-  public void testStoreResourceResourceOfQextendsResourceContent() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#disconnect()}
-   * .
-   */
-  @Test
-  @Ignore
-  public void testDisconnect() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for
    * {@link ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#start()}
    * .
    */
   @Test
-  @Ignore
   public void testStart() {
-    fail("Not yet implemented"); // TODO
+    try {
+      repository.start();
+      fail("Managed to start the repository twice");
+    } catch (ContentRepositoryException e) {
+      // This is expected
+    }
   }
 
   /**
@@ -388,9 +402,14 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testStop() {
-    fail("Not yet implemented"); // TODO
+    try {
+      repository.stop();
+      repository.stop();
+      fail("Managed to stop the repository twice");
+    } catch (ContentRepositoryException e) {
+      // This is expected
+    }
   }
 
   /**
@@ -399,9 +418,28 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testExists() {
-    fail("Not yet implemented"); // TODO
+    populateRepository();
+
+    // Test for existing resources
+    try {
+      assertTrue(repository.exists(page1URI));
+      assertTrue(repository.exists(documentURI));
+      assertTrue(repository.exists(imageURI));
+      
+      ((ResourceURIImpl)documentURI).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      assertFalse(repository.exists(documentURI));
+    } catch (ContentRepositoryException e) {
+      fail("Error checking for resource existence");
+    }
+
+    // Test for non-existing resources
+    try {
+      ((ResourceURIImpl)documentURI).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      assertFalse(repository.exists(documentURI));
+    } catch (ContentRepositoryException e) {
+      fail("Error checking for resource existence");
+    }
   }
 
   /**
@@ -498,9 +536,9 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testGetResourceCount() {
-    fail("Not yet implemented"); // TODO
+    int count = populateRepository();
+    assertEquals(count, repository.getResourceCount());
   }
 
   /**
@@ -522,29 +560,46 @@ public class FileSystemContentRepositoryTest {
    */
   protected int populateRepository() {
     int count = 0;
+    
+    // Add the pages
     try {
       for (Page page : pages) {
         repository.put(page);
-        count++;
+        count ++;
       }
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample page to the repository failed");
     }
+    
+    // Add the file
     try {
-      for (FileResource file : files) {
-        List<ResourceContent> contents = new ArrayList<ResourceContent>();
-        for (ResourceContent content : file.contents()) {
-          contents.add(file.removeContent(content.getLanguage()));
-        }
-        repository.put(file);
-        // TODO: Add resource contents
-        count++;
+      List<ResourceContent> contents = new ArrayList<ResourceContent>();
+      for (ResourceContent content : file.contents()) {
+        contents.add(file.removeContent(content.getLanguage()));
       }
+      repository.put(file);
+      // TODO: Add resource contents
+      count ++;
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample file to the repository failed");
     }
+    
+    // Add the image
+    try {
+      List<ResourceContent> contents = new ArrayList<ResourceContent>();
+      for (ResourceContent content : image.contents()) {
+        contents.add(image.removeContent(content.getLanguage()));
+      }
+      repository.put(image);
+      // TODO: Add resource contents
+      count ++;
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Adding sample image to the repository failed");
+    }
+
     return count;
   }
 

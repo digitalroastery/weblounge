@@ -33,7 +33,12 @@ import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
+import ch.o2it.weblounge.contentrepository.impl.FileResourceSerializer;
+import ch.o2it.weblounge.contentrepository.impl.ImageResourceSerializer;
+import ch.o2it.weblounge.contentrepository.impl.PageSerializer;
+import ch.o2it.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.IdIndex;
@@ -93,6 +98,13 @@ public class ContentRepositoryIndexTest {
     EasyMock.expect(site.getTemplate("home")).andReturn(t);
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
     EasyMock.replay(site);
+
+    // Resource serializers
+    ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
+    ResourceSerializerFactory.setResourceSerializerService(serializerService);
+    serializerService.registerSerializer(new PageSerializer());
+    serializerService.registerSerializer(new FileResourceSerializer());
+    serializerService.registerSerializer(new ImageResourceSerializer());
 
     page = new PageImpl(new PageURIImpl(site, "/weblounge"));
     page.setTemplate("home");

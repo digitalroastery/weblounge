@@ -230,18 +230,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
             uris.push(f);
           } else {
             try {
-              ResourceURI uri = loadResourceURI(site, f.toURI().toURL());
-              if (uri == null) {
-                logger.warn("Skipping resource {}: unable to extract uri", f);
-                continue;
-              }
-
               // Look for a suitable resource reader
               ResourceSerializer<?, ?> serializer = serializers.get(resourceType);
               if (serializer == null) {
                 serializer = ResourceSerializerFactory.getSerializer(resourceType);
                 if (serializer == null) {
-                  logger.warn("Skipping resource {}: no resource serializer found for type '{}'", uri, resourceType);
+                  logger.warn("Skipping resource {}: no resource serializer found for type '{}'", f, resourceType);
                   continue;
                 } else {
                   serializers.put(resourceType, serializer);
@@ -250,17 +244,19 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
               // Load the resource
               Resource<?> resource = null;
+              ResourceURI uri = null;
               ResourceReader<?, ?> reader = serializer.getReader();
               InputStream is = null;
               try {
                 is = new FileInputStream(f);
-                resource = reader.read(uri, is);
+                resource = reader.read(is, site);
                 if (resource == null) {
-                  logger.warn("Unkown error loading {}", uriToFile(uri));
+                  logger.warn("Unkown error loading {}", f);
                   continue;
                 }
+                uri = resource.getURI();
               } catch (Exception e) {
-                logger.error("Error loading {}: {}", uriToFile(uri), e.getMessage());
+                logger.error("Error loading {}: {}", f, e.getMessage());
                 continue;
               } finally {
                 IOUtils.closeQuietly(is);
