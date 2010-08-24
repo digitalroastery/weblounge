@@ -18,33 +18,33 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.content.file;
+package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.MalformedResourceURIException;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.file.FileResource;
+import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 
 /**
- * This a <code>ResourceURI</code> intended to represent files of type
- * <code>ch.o2it.weblounge.common.content.file.FileResource</code>.
+ * This a <code>ResourceURI</code> intended to represent images of type
+ * <code>ch.o2it.weblounge.common.content.image.ImageResource</code>.
  */
-public class FileResourceURIImpl extends ResourceURIImpl {
+public class ImageResourceURIImpl extends ResourceURIImpl {
 
   /** The serial version uid */
   private static final long serialVersionUID = -4786684576702578116L;
 
   /**
-   * Creates a new {@link FileResourceURI} from the given request, which is used to
+   * Creates a new {@link PageURI} from the given request, which is used to
    * determine <code>site</code>, <code>path</code> and <code>version</code>.
    * 
    * @param request
    *          the request
    */
-  public FileResourceURIImpl(WebloungeRequest request) {
-    super(FileResource.TYPE, request.getSite(), request.getUrl().getPath(), request.getVersion(), null);
+  public ImageResourceURIImpl(WebloungeRequest request) {
+    super(ImageResource.TYPE, request.getSite(), request.getUrl().getPath(), request.getVersion(), null);
   }
 
   /**
@@ -56,12 +56,12 @@ public class FileResourceURIImpl extends ResourceURIImpl {
    * @param version
    *          the version
    */
-  public FileResourceURIImpl(ResourceURI uri, long version) {
+  public ImageResourceURIImpl(ResourceURI uri, long version) {
     super(uri, version);
   }
 
   /**
-   * Creates a new {@link ResourceURI} pointing to the live version of the file
+   * Creates a new {@link ResourceURI} pointing to the live version of the image
    * identified by <code>site</code> and <code>path</code>.
    * 
    * @param site
@@ -72,14 +72,14 @@ public class FileResourceURIImpl extends ResourceURIImpl {
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public FileResourceURIImpl(Site site, String path)
+  public ImageResourceURIImpl(Site site, String path)
       throws MalformedResourceURIException {
-    super(FileResource.TYPE, site, path);
+    super(ImageResource.TYPE, site, path);
   }
 
   /**
    * Creates a new {@link ResourceURI} pointing to a specific version of the
-   * file identified by <code>site</code>, <code>path</code> and
+   * image identified by <code>site</code>, <code>path</code> and
    * <code>version</code> .
    * 
    * @param site
@@ -92,14 +92,14 @@ public class FileResourceURIImpl extends ResourceURIImpl {
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public FileResourceURIImpl(Site site, String path, long version)
+  public ImageResourceURIImpl(Site site, String path, long version)
       throws MalformedResourceURIException {
-    super(FileResource.TYPE, site, path, version);
+    super(ImageResource.TYPE, site, path, version);
   }
 
   /**
    * Creates a new {@link ResourceURI} pointing to a specific version of the
-   * file identified by <code>id<code>, <code>site</code>, <code>path</code> and
+   * image identified by <code>id<code>, <code>site</code>, <code>path</code> and
    * <code>version</code>.
    * 
    * @param site
@@ -107,19 +107,19 @@ public class FileResourceURIImpl extends ResourceURIImpl {
    * @param path
    *          the path
    * @param id
-   *          the file identifier
+   *          the image identifier
    * @throws MalformedResourceURIException
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public FileResourceURIImpl(Site site, String path, String id)
+  public ImageResourceURIImpl(Site site, String path, String id)
       throws MalformedResourceURIException {
-    super(FileResource.TYPE, site, path, id);
+    super(ImageResource.TYPE, site, path, id);
   }
 
   /**
    * Creates a new {@link ResourceURI} pointing to a specific version of the
-   * file identified by <code>id<code>, <code>site</code>, <code>path</code> and
+   * image identified by <code>id<code>, <code>site</code>, <code>path</code> and
    * <code>version</code>.
    * 
    * @param site
@@ -129,14 +129,14 @@ public class FileResourceURIImpl extends ResourceURIImpl {
    * @param version
    *          the version
    * @param id
-   *          the file identifier
+   *          the image identifier
    * @throws MalformedResourceURIException
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public FileResourceURIImpl(Site site, String path, long version, String id)
+  public ImageResourceURIImpl(Site site, String path, long version, String id)
       throws MalformedResourceURIException {
-    super(FileResource.TYPE, site, path, version, id);
+    super(ImageResource.TYPE, site, path, version, id);
   }
 
 }
