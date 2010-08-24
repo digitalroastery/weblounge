@@ -104,7 +104,7 @@ public class UrlImpl implements Url {
    */
   public void setPath(String path) {
     this.path = trim(path);
-    if (!this.path.startsWith(Character.toString(pathElementSeparatorChar)))
+    if (this.path != null && !this.path.startsWith(Character.toString(pathElementSeparatorChar)))
       this.path = pathElementSeparatorChar + this.path;
   }
 
@@ -211,7 +211,7 @@ public class UrlImpl implements Url {
    */
   protected String trim(String url) {
     if (url == null)
-      throw new IllegalArgumentException("Url cannot be null");
+      return null;
     url = url.trim().toLowerCase();
     String separator = Character.toString(pathElementSeparatorChar);
     // TODO: this fails if the separator is the windows file separator
