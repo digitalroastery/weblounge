@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<file id="4bb19980-8f98-4873-a813-71b6dfab22as" path="/service/test/" version="live">
+<image id="4bb19980-8f98-4873-a813-71b6dfab22as" path="/images/a" version="live">
   <head>
     <promote>true</promote>
     <index>true</index>
@@ -57,4 +57,4 @@
       <size>520894</size>
     </content>
   </body>
-</file>
+</image>

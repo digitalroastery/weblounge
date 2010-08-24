@@ -23,9 +23,12 @@ package ch.o2it.weblounge.contentrepository.impl;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.WritableContentRepository;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +49,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public boolean delete(ResourceURI uri) throws SecurityException, IOException {
+  public boolean delete(ResourceURI uri) throws ContentRepositoryException, IOException {
     return delete(uri, true);
   }
 
@@ -57,13 +60,22 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    *      boolean)
    */
   public boolean delete(ResourceURI uri, boolean allRevisions)
-      throws IOException {
-    if (!connected)
+      throws ContentRepositoryException, IOException {
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // See if the resource exists
     if (!index.exists(uri)) {
       logger.warn("Resource '{}' not found in repository index", uri);
+      return false;
+    }
+
+    // Make sure the resource is not being referenced elsewhere
+    // TODO: Make this it's own index
+    SearchQuery searchByResource = new SearchQueryImpl(site);
+    searchByResource.withProperty(SolrFields.PAGELET_PROPERTIES, "resourceid");
+    if (index.find(searchByResource).getItems().length > 0) {
+      logger.warn("Resource '{}' is still being referenced", uri);
       return false;
     }
 
@@ -90,14 +102,11 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#move(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public boolean move(ResourceURI uri, ResourceURI target) throws IOException {
-    if (!connected)
+  public void move(ResourceURI uri, ResourceURI target) throws IOException, ContentRepositoryException {
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
-    // Update the index
     index.move(uri, target.getPath());
-
-    return true;
   }
 
   /**
@@ -109,7 +118,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       Resource<? extends ResourceContent> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
 
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Add entry to index
@@ -146,7 +155,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       T content, InputStream is) throws ContentRepositoryException,
       IOException, IllegalStateException {
 
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Make sure the resource exists
@@ -183,7 +192,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       T content) throws ContentRepositoryException, IOException,
       IllegalStateException {
 
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Make sure the resource exists

@@ -129,7 +129,7 @@ public class ContentRepositoryIndexTest {
     try {
       idx.add(page);
       assertEquals(1, idx.size());
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
@@ -144,7 +144,7 @@ public class ContentRepositoryIndexTest {
       idx.add(page);
       idx.delete(page.getURI());
       assertEquals(0, idx.size());
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
@@ -169,7 +169,7 @@ public class ContentRepositoryIndexTest {
       assertEquals(2, revisions.length);
       assertEquals(Resource.LIVE, revisions[0]);
       assertEquals(Resource.WORK, revisions[1]);
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
@@ -186,7 +186,7 @@ public class ContentRepositoryIndexTest {
       idx.move(page.getURI(), newPath);
       assertEquals(1, idx.size());
       assertEquals(id, idx.getIdentifier(new PageURIImpl(site, newPath)));
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
@@ -201,7 +201,7 @@ public class ContentRepositoryIndexTest {
       idx.add(page);
       idx.clear();
       assertEquals(0, idx.size());
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
@@ -221,7 +221,7 @@ public class ContentRepositoryIndexTest {
       
       // This seems strange, but if there is an identifier, we take it
       assertTrue(idx.exists(new PageURIImpl(site, "/xxx", id)));
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
@@ -254,7 +254,7 @@ public class ContentRepositoryIndexTest {
       assertEquals(0, idx.size());
       idx.add(page);
       assertEquals(1, idx.size());
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
@@ -274,7 +274,7 @@ public class ContentRepositoryIndexTest {
       idx.delete(otherPage.getURI());
       idx.update(page);
       assertTrue(idx.exists(page.getURI()));
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }

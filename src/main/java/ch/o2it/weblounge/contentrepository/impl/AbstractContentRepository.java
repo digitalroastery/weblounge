@@ -74,6 +74,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /** Flag indicating the connected state */
   protected boolean connected = false;
 
+  /** Flag indicating the started state */
+  protected boolean started = false;
+
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -93,7 +96,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
     site = (Site) properties.get(Site.class.getName());
     if (site == null)
-      throw new IllegalStateException("Cannot connect without site");
+      throw new ContentRepositoryException("Unable to connect content repository without site");
 
     connected = true;
   }
@@ -116,8 +119,11 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#start()
    */
   public void start() throws ContentRepositoryException {
+    if (!connected)
+      throw new ContentRepositoryException("Cannot start a disconnected content repository");
     try {
       index = loadIndex();
+      started = true;
     } catch (IOException e) {
       throw new ContentRepositoryException("Error loading repository index", e);
     }
@@ -132,6 +138,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#stop()
    */
   public void stop() throws ContentRepositoryException {
+    if (!connected)
+      throw new ContentRepositoryException("Cannot stop a disconnected content repository");
+    if (!started)
+      throw new ContentRepositoryException("Content repository is already stopped");
     try {
       index.close();
     } catch (IOException e) {
@@ -145,7 +155,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
     try {
       return index.exists(uri);
@@ -160,14 +170,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
    */
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
-
-    try {
-      return index.find(query);
-    } catch (IOException e) {
-      throw new ContentRepositoryException(e);
-    }
+    return index.find(query);
   }
 
   /**
@@ -176,7 +181,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     // Check if the resource is available
@@ -232,7 +237,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     try {
@@ -255,7 +260,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public Iterator<ResourceURI> list(ResourceURI uri)
       throws ContentRepositoryException {
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
     return list(uri, Integer.MAX_VALUE, -1);
   }
@@ -292,7 +297,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
       throws ContentRepositoryException {
-    if (!connected)
+    if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
     return index.list(uri, level, version);
@@ -404,6 +409,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   protected boolean isConnected() {
     return connected;
+  }
+
+  /**
+   * Returns <code>true</code> if the repository is connected and started.
+   * 
+   * @return <code>true</code> if the repository is started
+   */
+  protected boolean isStarted() {
+    return connected && started;
   }
 
   /**

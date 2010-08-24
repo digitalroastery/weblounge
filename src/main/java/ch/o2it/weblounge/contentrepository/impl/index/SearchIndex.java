@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.ResourceURIInputDocument;
@@ -34,7 +35,6 @@ import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.request.UpdateRequest.ACTION;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -91,10 +91,8 @@ public class SearchIndex {
     this.isReadOnly = readOnly;
     try {
       loadSolr(solrRoot);
-    } catch (IOException e) {
-      throw e;
     } catch (Exception e) {
-      throw new IOException(e);
+      throw new IOException("Error loading solr index", e);
     }
 
   }
@@ -109,7 +107,7 @@ public class SearchIndex {
     try {
       solrConnection.destroy();
     } catch (Throwable t) {
-      logger.error("Error closing the solr connection");
+      throw new IOException("Error closing the solr connection", t);
     }
   }
 
@@ -119,15 +117,16 @@ public class SearchIndex {
    * @param query
    *          the search query
    * @return the result set
-   * @throws IOException
+   * @throws ContentRepositoryException
    *           if executing the search operation fails
    */
-  public SearchResult getByQuery(SearchQuery query) throws IOException {
+  public SearchResult getByQuery(SearchQuery query)
+      throws ContentRepositoryException {
     logger.debug("Searching index using query '{}'", query);
     try {
       return solrRequester.getByQuery(query);
-    } catch (SolrServerException e) {
-      throw new IOException(e);
+    } catch (Exception e) {
+      throw new ContentRepositoryException("Error querying solr index", e);
     }
   }
 
@@ -135,7 +134,7 @@ public class SearchIndex {
    * Clears the search index. Make sure you know what you are doing.
    * 
    * @throws IOException
-   *           if an errors occurs while talking to solr
+   *           if clearing the solr index fails
    */
   public void clear() throws IOException {
     try {
@@ -143,7 +142,7 @@ public class SearchIndex {
       initSolr(solrRoot);
       loadSolr(solrRoot);
     } catch (Exception e) {
-      logger.error("Cannot clear solr index", e);
+      throw new IOException("Cannot clear solr index", e);
     }
   }
 
@@ -153,10 +152,10 @@ public class SearchIndex {
    * 
    * @param id
    *          identifier of the resource or resource
-   * @throws IOException
-   *           if an errors occurs while talking to solr
+   * @throws ContentRepositoryException
+   *           if removing the resource from solr fails
    */
-  public boolean delete(ResourceURI uri) throws IOException {
+  public boolean delete(ResourceURI uri) throws ContentRepositoryException {
     logger.debug("Removing element with id '{}' from searching index", uri.getId());
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.deleteById(uri.getId());
@@ -165,8 +164,7 @@ public class SearchIndex {
       solrConnection.update(solrRequest);
       return true;
     } catch (Exception e) {
-      logger.error("Unable to clear solr index", e);
-      return false;
+      throw new ContentRepositoryException("Unable to clear solr index", e);
     }
   }
 
@@ -175,10 +173,10 @@ public class SearchIndex {
    * 
    * @param resource
    *          the resource to add to the index
-   * @throws IOException
-   *           if an errors occurs while talking to solr
+   * @throws ContentRepositoryException
+   *           if posting the new resource to solr fails
    */
-  public boolean add(Resource<?> resource) throws IOException {
+  public boolean add(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Adding resource {} to search index", resource);
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.setAction(ACTION.COMMIT, true, true);
@@ -187,8 +185,7 @@ public class SearchIndex {
     String resourceType = resource.getURI().getType();
     ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
     if (serializer == null) {
-      logger.error("Unable to create an input document for {}: no serializer found", resource.getURI());
-      return false;
+      throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
     }
 
     // Post everything to the search index
@@ -198,8 +195,7 @@ public class SearchIndex {
       solrConnection.update(solrRequest);
       return true;
     } catch (Exception e) {
-      logger.error("Cannot add resource " + resource + " to index", e);
-      return false;
+      throw new ContentRepositoryException("Cannot add resource " + resource + " to index", e);
     }
   }
 
@@ -208,8 +204,10 @@ public class SearchIndex {
    * 
    * @param resource
    *          the resource to update
+   * @throws ContentRepositoryException
+   *           if posting the updated resource to solr fails
    */
-  public boolean update(Resource<?> resource) {
+  public boolean update(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Updating resource {} in search index", resource);
 
     // Have the serializer create an input document
@@ -226,8 +224,7 @@ public class SearchIndex {
       update(inputDoc);
       return true;
     } catch (Exception e) {
-      logger.error("Cannot update resource " + resource + " in index", e);
-      return false;
+      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", e);
     }
   }
 
@@ -237,14 +234,19 @@ public class SearchIndex {
    * @param document
    *          the input document
    * @return the query response
-   * @throws Exception
-   *           posting to solr fails
+   * @throws ContentRepositoryException
+   *           if posting to solr fails
    */
-  protected QueryResponse update(SolrInputDocument document) throws Exception {
+  protected QueryResponse update(SolrInputDocument document)
+      throws ContentRepositoryException {
     UpdateRequest solrRequest = new UpdateRequest();
     solrRequest.setAction(ACTION.COMMIT, true, true);
     solrRequest.add(document);
-    return solrConnection.update(solrRequest);
+    try {
+      return solrConnection.update(solrRequest);
+    } catch (Exception e) {
+      throw new ContentRepositoryException("Cannot update document " + document + " in index", e);
+    }
   }
 
   /**
@@ -256,15 +258,15 @@ public class SearchIndex {
    *          the new path
    * @return
    */
-  public boolean move(ResourceURI uri, String path) {
+  public boolean move(ResourceURI uri, String path)
+      throws ContentRepositoryException {
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
     try {
       ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getId());
       update(new ResourceURIInputDocument(newURI));
       return true;
     } catch (Exception e) {
-      logger.error("Cannot update resource uri " + uri + " in index", e);
-      return false;
+      throw new ContentRepositoryException("Cannot update resource uri " + uri + " in index", e);
     }
   }
 
@@ -320,12 +322,12 @@ public class SearchIndex {
       FileUtils.forceMkdir(solrDataDir);
 
       // Make sure there is a configuration in place
-      copyClasspathResourceToFile("/solr/protwords.txt", solrConfigDir);
-      copyClasspathResourceToFile("/solr/schema.xml", solrConfigDir);
-      copyClasspathResourceToFile("/solr/scripts.conf", solrConfigDir);
-      copyClasspathResourceToFile("/solr/solrconfig.xml", solrConfigDir);
-      copyClasspathResourceToFile("/solr/stopwords.txt", solrConfigDir);
-      copyClasspathResourceToFile("/solr/synonyms.txt", solrConfigDir);
+      copyBundleResourceToFile("/solr/protwords.txt", solrConfigDir);
+      copyBundleResourceToFile("/solr/schema.xml", solrConfigDir);
+      copyBundleResourceToFile("/solr/scripts.conf", solrConfigDir);
+      copyBundleResourceToFile("/solr/solrconfig.xml", solrConfigDir);
+      copyBundleResourceToFile("/solr/stopwords.txt", solrConfigDir);
+      copyBundleResourceToFile("/solr/synonyms.txt", solrConfigDir);
     } catch (IOException e) {
       throw new RuntimeException("Error setting up solr index at " + solrRoot, e);
     }
@@ -340,7 +342,7 @@ public class SearchIndex {
    * @param dir
    *          the config directory
    */
-  private void copyClasspathResourceToFile(String classpath, File dir) {
+  private void copyBundleResourceToFile(String classpath, File dir) {
     InputStream is = SearchIndex.class.getResourceAsStream(classpath);
     FileOutputStream fos = null;
     try {

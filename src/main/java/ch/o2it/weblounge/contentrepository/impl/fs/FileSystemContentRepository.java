@@ -135,7 +135,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     boolean success = true;
 
     try {
-      // Clear the current index
+      // Clear the current index, which might be null if the site has not been
+      // started yet.
+      if (index == null)
+        index = loadIndex();
       index.clear();
 
       logger.info("Creating site index '{}'...", site);

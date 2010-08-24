@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -236,9 +237,12 @@ public class ContentRepositoryIndex {
    *          the resource uri
    * @return the uri
    * @throws IOException
-   *           if accessing the index fails
+   *           if writing to the index fails
+   * @throws ContentRepositoryException
+   *           if adding to the index fails
    */
-  public synchronized ResourceURI add(Resource<?> resource) throws IOException {
+  public synchronized ResourceURI add(Resource<?> resource) throws IOException,
+      ContentRepositoryException {
     ResourceURI uri = resource.getURI();
     if (uri.getPath() == null)
       throw new IllegalArgumentException("Uri must contain a path");
@@ -255,18 +259,25 @@ public class ContentRepositoryIndex {
       }
       String type = uri.getType();
       String path = uri.getPath();
-      address = uriIdx.add(id, type, path);
-      idIdx.add(id, address);
-      pathIdx.add(path, address);
-      versionIdx.add(id, uri.getVersion());
-      languageIdx.setLanguages(id, resource.languages());
-      if (uri.getVersion() == Resource.LIVE) {
-        if (resource.isIndexed())
-          searchIdx.add(resource);
-        else
-          searchIdx.delete(uri);
-      } else {
-        languageIdx.add(id, null);
+
+      try {
+        if (uri.getVersion() == Resource.LIVE) {
+          if (resource.isIndexed())
+            searchIdx.add(resource);
+          else
+            searchIdx.delete(uri);
+        } else {
+          languageIdx.add(id, null);
+        }
+        address = uriIdx.add(id, type, path);
+        idIdx.add(id, address);
+        pathIdx.add(path, address);
+        versionIdx.add(id, uri.getVersion());
+        languageIdx.setLanguages(id, resource.languages());
+      } catch (ContentRepositoryException e) {
+        throw e;
+      } catch (Throwable t) {
+        throw new ContentRepositoryException("Error adding " + resource + " to index", t);
       }
     }
 
@@ -298,9 +309,12 @@ public class ContentRepositoryIndex {
    * @param uri
    *          the resource uri
    * @throws IOException
-   *           if accessing the index fails
+   *           if updating the index fails
+   * @throws ContentRepositoryException
+   *           if deleting the resource fails
    */
-  public synchronized void delete(ResourceURI uri) throws IOException {
+  public synchronized void delete(ResourceURI uri) throws IOException,
+      ContentRepositoryException {
     String id = uri.getId();
     String path = uri.getPath();
 
@@ -318,11 +332,11 @@ public class ContentRepositoryIndex {
       path = uriIdx.getPath(address);
 
     // Delete the entry
+    searchIdx.delete(uri);
     idIdx.delete(id, address);
     pathIdx.delete(path, address);
     uriIdx.delete(address);
     versionIdx.delete(address);
-    searchIdx.delete(uri);
   }
 
   /**
@@ -459,9 +473,12 @@ public class ContentRepositoryIndex {
    * @param resource
    *          the resource to update
    * @throws IOException
+   *           if writing to the index fails
+   * @throws ContentRepositoryException
    *           if updating the index fails
    */
-  public synchronized void update(Resource<?> resource) throws IOException {
+  public synchronized void update(Resource<?> resource) throws IOException,
+      ContentRepositoryException {
     ResourceURI uri = resource.getURI();
     if (uri.getVersion() == Resource.LIVE) {
       if (resource.isIndexed())
@@ -482,10 +499,12 @@ public class ContentRepositoryIndex {
    * @param path
    *          the new path
    * @throws IOException
-   *           if updating the index fails
+   *           if writing to the index fails
+   * @throws ContentRepositoryException
+   *           if moving the resource fails
    */
   public synchronized void move(ResourceURI uri, String path)
-      throws IOException {
+      throws IOException, ContentRepositoryException {
     String oldPath = uri.getPath();
 
     // Locate the entry in question
@@ -575,8 +594,15 @@ public class ContentRepositoryIndex {
    * @param query
    *          the search query
    * @return the search result
+   * @throws IllegalArgumentException
+   *           if the query is <code>null</code>
+   * @throws ContentRepositoryException
+   *           if processing the query fails
    */
-  public SearchResult find(SearchQuery query) throws IOException {
+  public SearchResult find(SearchQuery query)
+      throws ContentRepositoryException, IllegalArgumentException {
+    if (query == null)
+      throw new IllegalArgumentException("Query cannot be null");
     return searchIdx.getByQuery(query);
   }
 
