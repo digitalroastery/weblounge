@@ -90,10 +90,10 @@ public class PageURITest {
   public void setUp() throws Exception {
     simpleURI = new PageURIImpl(site, defaultPath);
     versionedURI = new PageURIImpl(site, defaultPath, defaultRandomVersion);
-    identifyableVersionedURI = new PageURIImpl(site, defaultPath, defaultRandomVersion, defaultId);
+    identifyableVersionedURI = new PageURIImpl(site, defaultPath, defaultId, defaultRandomVersion);
     simpleParentURI = new PageURIImpl(site, defaultParentPath);
     versionedParentURI = new PageURIImpl(site, defaultParentPath, defaultRandomVersion);
-    identifyableParentURI = new PageURIImpl(site, defaultParentPath, defaultRandomVersion, defaultId);
+    identifyableParentURI = new PageURIImpl(site, defaultParentPath, defaultId, defaultRandomVersion);
   }
 
   /**

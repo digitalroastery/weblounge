@@ -20,11 +20,10 @@
 
 package ch.o2it.weblounge.common.impl.content.file;
 
-import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -65,11 +64,10 @@ public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl#createResource(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl#createResource(ch.o2it.weblounge.common.site.Site)
    */
-  @Override
-  protected FileResource createResource(ResourceURI uri) {
-    return new FileResourceImpl(uri);
+  protected FileResource createResource(Site site) {
+    return new FileResourceImpl(new FileResourceURIImpl(site));
   }
 
   /**
@@ -88,20 +86,13 @@ public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, 
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
 
-    // read the file url
-    if (FileResource.TYPE.equals(raw)) {
-      parserContext = ParserContext.Resource;
-      ((ResourceURIImpl) resource.getURI()).setIdentifier(attrs.getValue("id"));
-      if (attrs.getValue("path") != null)
-        ((ResourceURIImpl) resource.getURI()).setPath(attrs.getValue("path"));
-    }
-
     // file content
-    else if ("content".equals(raw) || parserContext.equals(ParserContext.Content)) {
+    if ("content".equals(raw) || parserContext.equals(ParserContext.Content)) {
       parserContext = ParserContext.Content;
       contentReader.startElement(uri, local, raw, attrs);
-    }
+    } 
 
+    // other stuff, most likely head elements
     else {
       super.startElement(uri, local, raw, attrs);
     }
@@ -138,6 +129,7 @@ public class FileResourceReader extends AbstractResourceReaderImpl<FileContent, 
       contentReader.endElement(uri, local, raw);
     }
 
+    // the rest
     else {
       super.endElement(uri, local, raw);
     }

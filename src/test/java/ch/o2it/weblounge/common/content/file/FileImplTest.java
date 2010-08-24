@@ -198,7 +198,7 @@ public class FileImplTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));    
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
     EasyMock.replay(site);
-    fileURI = new FileResourceURIImpl(site, "/test", Resource.LIVE);
+    fileURI = new FileResourceURIImpl(site, "/service/test", "4bb19980-8f98-4873-a813-71b6dfab22as", Resource.LIVE);
   }
 
   /**

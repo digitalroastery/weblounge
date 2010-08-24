@@ -44,7 +44,7 @@ public class ImageResourceURIImpl extends ResourceURIImpl {
    *          the request
    */
   public ImageResourceURIImpl(WebloungeRequest request) {
-    super(ImageResource.TYPE, request.getSite(), request.getUrl().getPath(), request.getVersion(), null);
+    super(ImageResource.TYPE, request.getSite(), request.getUrl().getPath(), null, request.getVersion());
   }
 
   /**
@@ -58,6 +58,23 @@ public class ImageResourceURIImpl extends ResourceURIImpl {
    */
   public ImageResourceURIImpl(ResourceURI uri, long version) {
     super(uri, version);
+  }
+
+  /**
+   * Creates a new {@link ResourceURI} pointing to the live version of the image
+   * identified by <code>site</code>.
+   * <p>
+   * <b>Note:</b> Make sure to set <code>id</code> or <code>path</code> prior to
+   * the first use of this uri.
+   * 
+   * @param site
+   *          the site
+   * @throws MalformedResourceURIException
+   *           if the uri cannot be created. Usually, this is due to a malformed
+   *           <code>path</code> parameter
+   */
+  public ImageResourceURIImpl(Site site) throws MalformedResourceURIException {
+    super(ImageResource.TYPE, site, null);
   }
 
   /**
@@ -99,8 +116,8 @@ public class ImageResourceURIImpl extends ResourceURIImpl {
 
   /**
    * Creates a new {@link ResourceURI} pointing to a specific version of the
-   * image identified by <code>id<code>, <code>site</code>, <code>path</code> and
-   * <code>version</code>.
+   * image identified by <code>id<code>, <code>site</code>, <code>path</code>
+   * and <code>version</code>.
    * 
    * @param site
    *          the site
@@ -119,24 +136,24 @@ public class ImageResourceURIImpl extends ResourceURIImpl {
 
   /**
    * Creates a new {@link ResourceURI} pointing to a specific version of the
-   * image identified by <code>id<code>, <code>site</code>, <code>path</code> and
-   * <code>version</code>.
+   * image identified by <code>id<code>, <code>site</code>, <code>path</code>
+   * and <code>version</code>.
    * 
    * @param site
    *          the site
    * @param path
    *          the path
-   * @param version
-   *          the version
    * @param id
    *          the image identifier
+   * @param version
+   *          the version
    * @throws MalformedResourceURIException
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public ImageResourceURIImpl(Site site, String path, long version, String id)
+  public ImageResourceURIImpl(Site site, String path, String id, long version)
       throws MalformedResourceURIException {
-    super(ImageResource.TYPE, site, path, version, id);
+    super(ImageResource.TYPE, site, path, id, version);
   }
 
 }

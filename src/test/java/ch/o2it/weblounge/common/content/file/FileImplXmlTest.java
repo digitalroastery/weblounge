@@ -50,7 +50,7 @@ public class FileImplXmlTest extends FileImplTest {
     setupPrerequisites();
     URL testContext = this.getClass().getResource(testFile);
     FileResourceReader reader = new FileResourceReader();
-    file = reader.read(fileURI, testContext.openStream());
+    file = reader.read(testContext.openStream(), site);
   }
   
   /**

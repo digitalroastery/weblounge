@@ -105,7 +105,7 @@ public class PagePreviewReaderTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.page.PagePreviewReader#read(java.io.InputStream, ch.o2it.weblounge.common.content.PageURI)}
+   * {@link ch.o2it.weblounge.common.impl.content.page.PagePreviewReader#read(ch.o2it.weblounge.common.content.PageURI, java.io.InputStream)}
    * .
    */
   @Test

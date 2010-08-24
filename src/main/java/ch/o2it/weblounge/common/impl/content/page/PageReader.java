@@ -22,15 +22,16 @@ package ch.o2it.weblounge.common.impl.content.page;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
-import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
+import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
@@ -89,7 +90,7 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
 
   /**
    * Creates a new page data reader that will parse the XML data and store it in
-   * the <code>Page</code> object that is returned by the {@link #read} method.
+   * the <code>Page</code> object that is returned by the {@link #read()} method.
    * 
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
@@ -103,18 +104,19 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
 
   /**
    * This method is called when a <code>Page</code> object is instantiated.
-   * @param uri
-   *          the page uri
+   * 
    * @param is
    *          the xml input stream
+   * @param site
+   *          the page's site
    * 
    * @throws IOException
    *           if reading the input stream fails
    */
-  public PageImpl read(ResourceURI uri, InputStream is) throws SAXException,
+  public PageImpl read(InputStream is, Site site) throws SAXException,
       IOException, ParserConfigurationException {
     reset();
-    page = new PageImpl(uri);
+    page = new PageImpl(new PageURIImpl(site, "/"));
     readHeader = true;
     readBody = true;
     SAXParser parser = parserRef.get();
@@ -131,8 +133,8 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
    * 
    * @param is
    *          the xml input stream
-   * @param uri
-   *          the page uri
+   * @param site
+   *          the page's site
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
    * @throws IOException
@@ -140,11 +142,10 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public PageImpl readHeader(InputStream is, ResourceURI uri) throws SAXException,
-      IOException, ParserConfigurationException {
-    if (page == null || !page.getURI().equals(uri)) {
-      reset();
-      page = new PageImpl(uri);
+  public PageImpl readHeader(InputStream is, Site site)
+      throws SAXException, IOException, ParserConfigurationException {
+    if (page == null) {
+      page = new PageImpl(new PageURIImpl(site, "/"));
     }
     readHeader = true;
     readBody = false;
@@ -162,8 +163,8 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
    * 
    * @param is
    *          the xml input stream
-   * @param uri
-   *          the page uri
+   * @param site
+   *          the page's site
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
    * @throws IOException
@@ -171,11 +172,10 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public PageImpl readBody(InputStream is, ResourceURI uri) throws SAXException,
-      IOException, ParserConfigurationException {
-    if (page == null || !page.getURI().equals(uri)) {
-      reset();
-      page = new PageImpl(uri);
+  public PageImpl readBody(InputStream is, Site site)
+      throws SAXException, IOException, ParserConfigurationException {
+    if (page == null) {
+      page = new PageImpl(new PageURIImpl(site, "/"));
     }
     readHeader = false;
     readBody = true;
@@ -305,6 +305,10 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
       ((ResourceURIImpl) page.getURI()).setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
         ((ResourceURIImpl) page.getURI()).setPath(attrs.getValue("path"));
+      if (attrs.getValue("version") != null) {
+        long version = ResourceUtils.getVersion(attrs.getValue("version"));
+        page.getURI().setVersion(version);
+      }
     }
 
     // in the header

@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
@@ -44,6 +43,9 @@ public class FileReaderTest {
   /** The file that was read in */
   protected FileResource file = null;
 
+  /** The site */
+  protected Site site = null;
+
   /** The file uri */
   protected ResourceURIImpl fileURI = null;
 
@@ -61,7 +63,7 @@ public class FileReaderTest {
    */
   @Before
   public void setUp() throws Exception {
-    Site site = EasyMock.createNiceMock(Site.class);
+    site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
     fileURI = new FileResourceURIImpl(site, "/test", Resource.LIVE);
     reader = new FileResourceReader();
@@ -69,7 +71,7 @@ public class FileReaderTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.file.FileResourceReader#read(java.io.InputStream, ch.o2it.weblounge.common.content.ResourceURI)}
+   * {@link ch.o2it.weblounge.common.impl.content.file.FileResourceReader#read(ch.o2it.weblounge.common.content.ResourceURI, java.io.InputStream)}
    * .
    */
   @Test
@@ -81,15 +83,15 @@ public class FileReaderTest {
     String otherTestXml = TestUtils.loadXmlFromResource(otherTestFile);
 
     // Read test file
-    file = reader.read(fileURI, testContext.openStream());
+    file = reader.read(testContext.openStream(), site);
     assertEquals(testXml, new String(file.toXml().getBytes("UTF-8")));
 
     // Read other test file
-    file = reader.read(fileURI, otherTestContext.openStream());
+    file = reader.read(otherTestContext.openStream(), site);
     assertEquals(otherTestXml, new String(file.toXml().getBytes("UTF-8")));
 
     // Read test file again
-    file = reader.read(fileURI, testContext.openStream());
+    file = reader.read(testContext.openStream(), site);
     assertEquals(testXml, new String(file.toXml().getBytes("UTF-8")));
   }
 

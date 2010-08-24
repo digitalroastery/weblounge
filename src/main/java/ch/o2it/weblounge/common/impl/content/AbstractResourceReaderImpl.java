@@ -23,11 +23,11 @@ package ch.o2it.weblounge.common.impl.content;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
-import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
+import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
@@ -94,25 +94,25 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
       throws ParserConfigurationException, SAXException {
     if (rootTag == null)
       throw new IllegalArgumentException("Root tag name must not be null");
-    this.rootTag = rootTag;
+    this.rootTag = rootTag.toLowerCase();
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
   }
 
   /**
    * This method is called when a <code>Page</code> object is instantiated.
    * 
-   * @param uri
-   *          the page uri
    * @param is
    *          the xml input stream
+   * @param uri
+   *          the page uri
    * 
    * @throws IOException
    *           if reading the input stream fails
    */
-  public T read(ResourceURI uri, InputStream is) throws SAXException,
-      IOException, ParserConfigurationException {
+  public T read(InputStream is, Site site) throws SAXException, IOException,
+      ParserConfigurationException {
     reset();
-    resource = createResource(uri);
+    resource = createResource(site);
     readHeader = true;
     readBody = true;
     SAXParser parser = parserRef.get();
@@ -127,19 +127,19 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
   /**
    * Creates an empty instance of the resource to read.
    * 
-   * @param uri
-   *          the resource uri
+   * @param site
+   *          the site
    * @return the empty resource
    */
-  protected abstract T createResource(ResourceURI uri);
+  protected abstract T createResource(Site site);
 
   /**
-   * This method is called when a <code>Page</code> object is instantiated.
+   * This method is called to read the head section of a resource.
    * 
    * @param is
    *          the xml input stream
-   * @param uri
-   *          the page uri
+   * @param site
+   *          the site
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
    * @throws IOException
@@ -147,11 +147,10 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public T readHeader(InputStream is, ResourceURI uri) throws SAXException,
+  public T readHeader(InputStream is, Site site) throws SAXException,
       IOException, ParserConfigurationException {
-    if (resource == null || !resource.getURI().equals(uri)) {
-      reset();
-      resource = createResource(uri);
+    if (resource == null) {
+      resource = createResource(site);
     }
     readHeader = true;
     readBody = false;
@@ -165,12 +164,12 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
   }
 
   /**
-   * This method is called when a <code>Page</code> object is instantiated.
+   * This method is called to read the body of a resource.
    * 
    * @param is
    *          the xml input stream
-   * @param uri
-   *          the page uri
+   * @param site
+   *          the site
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
    * @throws IOException
@@ -178,11 +177,10 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public T readBody(InputStream is, ResourceURI uri) throws SAXException,
+  public T readBody(InputStream is, Site site) throws SAXException,
       IOException, ParserConfigurationException {
-    if (resource == null || !resource.getURI().equals(uri)) {
-      reset();
-      resource = createResource(uri);
+    if (resource == null) {
+      resource = createResource(site);
     }
     readHeader = false;
     readBody = true;
@@ -294,6 +292,10 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
       ((ResourceURIImpl) resource.getURI()).setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
         ((ResourceURIImpl) resource.getURI()).setPath(attrs.getValue("path"));
+      if (attrs.getValue("version") != null) {
+        long version = ResourceUtils.getVersion(attrs.getValue("version"));
+        ((ResourceURIImpl) resource.getURI()).setVersion(version);
+      }
     }
 
     // in the header

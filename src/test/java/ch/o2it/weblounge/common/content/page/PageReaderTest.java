@@ -43,7 +43,10 @@ public class PageReaderTest {
   
   /** The page that was read in */
   protected Page page = null;
-  
+
+  /** The page's site */
+  protected Site site = null;
+
   /** The page uri */
   protected ResourceURIImpl pageURI = null;
 
@@ -61,14 +64,14 @@ public class PageReaderTest {
    */
   @Before
   public void setUp() throws Exception {
-    Site site = EasyMock.createNiceMock(Site.class);
+    site = EasyMock.createNiceMock(Site.class);
     EasyMock.replay(site);
     pageURI = new PageURIImpl(site, "/test", Resource.LIVE);
     reader = new PageReader();
   }
   
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageReader#read(java.io.InputStream, ch.o2it.weblounge.common.content.PageURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageReader#read(ch.o2it.weblounge.common.content.PageURI, java.io.InputStream)}.
    */
   @Test
   public void testResetPageReader() throws Exception {
@@ -79,15 +82,15 @@ public class PageReaderTest {
     String otherTestXml = TestUtils.loadXmlFromResource(otherTestFile);
 
     // Read test page
-    page = reader.read(pageURI, testContext.openStream());
+    page = reader.read(testContext.openStream(), site);
     assertEquals(testXml, new String(page.toXml().getBytes("UTF-8")));
 
     // Read other test page
-    page = reader.read(pageURI, otherTestContext.openStream());
+    page = reader.read(otherTestContext.openStream(), site);
     assertEquals(otherTestXml, new String(page.toXml().getBytes("UTF-8")));
 
     // Read test page again
-    page = reader.read(pageURI, testContext.openStream());
+    page = reader.read(testContext.openStream(), site);
     assertEquals(testXml, new String(page.toXml().getBytes("UTF-8")));
 }
 

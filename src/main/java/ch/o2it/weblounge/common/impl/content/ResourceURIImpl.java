@@ -59,7 +59,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    *          the version
    */
   public ResourceURIImpl(ResourceURI uri, long version) {
-    this(uri.getType(), uri.getSite(), uri.getPath(), version, uri.getId());
+    this(uri.getType(), uri.getSite(), uri.getPath(), uri.getId(), version);
   }
 
   /**
@@ -78,7 +78,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    */
   public ResourceURIImpl(String type, Site site, String path)
       throws MalformedResourceURIException {
-    this(type, site, path, Resource.LIVE, null);
+    this(type, site, path, null, Resource.LIVE);
   }
 
   /**
@@ -100,7 +100,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    */
   public ResourceURIImpl(String type, Site site, String path, long version)
       throws MalformedResourceURIException {
-    this(type, site, path, version, null);
+    this(type, site, path, null, version);
   }
 
   /**
@@ -122,7 +122,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    */
   public ResourceURIImpl(String type, Site site, String path, String id)
       throws MalformedResourceURIException {
-    this(type, site, path, Resource.LIVE, id);
+    this(type, site, path, id, Resource.LIVE);
   }
 
   /**
@@ -136,16 +136,16 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    *          the site
    * @param path
    *          the path
-   * @param version
-   *          the version
    * @param id
    *          the resource identifier
+   * @param version
+   *          the version
    * @throws MalformedResourceURIException
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public ResourceURIImpl(String type, Site site, String path, long version,
-      String id) throws MalformedResourceURIException {
+  public ResourceURIImpl(String type, Site site, String path, String id,
+      long version) throws MalformedResourceURIException {
     super(path, '/');
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
@@ -186,7 +186,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
     String parentPath = getParentPath();
     if (parentPath == null)
       return null;
-    return new ResourceURIImpl(type, site, parentPath, version, id);
+    return new ResourceURIImpl(type, site, parentPath, id, version);
   }
 
   /**
@@ -207,6 +207,15 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
     return site;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.ResourceURI#setVersion(long)
+   */
+  public void setVersion(long version) {
+    this.version = version;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -251,7 +260,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    */
   @Override
   public int hashCode() {
-    return path.hashCode();
+    return (id != null) ? id.hashCode() : path.hashCode();
   }
 
   /**

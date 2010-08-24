@@ -184,7 +184,7 @@ public class PageImplTest {
     EasyMock.expect(site.getAdministrator()).andReturn(new SiteAdminImpl("admin"));    
     EasyMock.expect(site.getDefaultLanguage()).andReturn(german);    
     EasyMock.replay(site);
-    pageURI = new PageURIImpl(site, "/test", Resource.LIVE);
+    pageURI = new PageURIImpl(site, "/service/test", "4bb19980-8f98-4873-a813-71b6dfab22as", Resource.LIVE);
   }
 
   /**

@@ -111,7 +111,7 @@ public class LazyPageImpl implements Page {
       }
 
       // Load the page
-      page = reader.read(uri, IOUtils.toInputStream(pageXml));
+      page = reader.read(IOUtils.toInputStream(pageXml), uri.getSite());
       isHeaderLoaded = true;
       isBodyLoaded = true;
       cleanupAfterLoading();
@@ -142,7 +142,7 @@ public class LazyPageImpl implements Page {
       }
 
       // Load the page header
-      page = reader.readHeader(IOUtils.toInputStream(headerXml), uri);
+      page = reader.readHeader(IOUtils.toInputStream(headerXml), uri.getSite());
       isHeaderLoaded = true;
       if (isHeaderLoaded && isBodyLoaded)
         cleanupAfterLoading();
@@ -169,7 +169,7 @@ public class LazyPageImpl implements Page {
       }
 
       // Load the page body
-      page = reader.readBody(IOUtils.toInputStream(pageXml), uri);
+      page = reader.readBody(IOUtils.toInputStream(pageXml), uri.getSite());
       isBodyLoaded = true;
       if (isHeaderLoaded && isBodyLoaded)
         cleanupAfterLoading();

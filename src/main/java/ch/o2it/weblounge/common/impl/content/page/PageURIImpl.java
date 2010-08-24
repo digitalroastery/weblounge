@@ -46,7 +46,7 @@ public class PageURIImpl extends ResourceURIImpl {
    *          the request
    */
   public PageURIImpl(WebloungeRequest request) {
-    super(TYPE, request.getSite(), request.getUrl().getPath(), request.getVersion(), null);
+    super(TYPE, request.getSite(), request.getUrl().getPath(), null, request.getVersion());
   }
 
   /**
@@ -60,6 +60,23 @@ public class PageURIImpl extends ResourceURIImpl {
    */
   public PageURIImpl(ResourceURI uri, long version) {
     super(uri, version);
+  }
+
+  /**
+   * Creates a new {@link ResourceURI} pointing to the live version of the page
+   * identified by <code>site</code>.
+   * <p>
+   * <b>Note:</b> Make sure to set <code>id</code> or <code>path</code> prior to
+   * the first use of this uri.
+   * 
+   * @param site
+   *          the site
+   * @throws MalformedResourceURIException
+   *           if the uri cannot be created. Usually, this is due to a malformed
+   *           <code>path</code> parameter
+   */
+  public PageURIImpl(Site site) throws MalformedResourceURIException {
+    super(TYPE, site, null);
   }
 
   /**
@@ -128,17 +145,17 @@ public class PageURIImpl extends ResourceURIImpl {
    *          the site
    * @param path
    *          the path
-   * @param version
-   *          the version
    * @param id
    *          the page identifier
+   * @param version
+   *          the version
    * @throws MalformedResourceURIException
    *           if the uri cannot be created. Usually, this is due to a malformed
    *           <code>path</code> parameter
    */
-  public PageURIImpl(Site site, String path, long version, String id)
+  public PageURIImpl(Site site, String path, String id, long version)
       throws MalformedResourceURIException {
-    super(TYPE, site, path, version, id);
+    super(TYPE, site, path, id, version);
   }
 
 }

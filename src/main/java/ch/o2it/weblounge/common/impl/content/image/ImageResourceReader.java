@@ -20,12 +20,10 @@
 
 package ch.o2it.weblounge.common.impl.content.image;
 
-import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -35,7 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Utility class used to parse image data.
  */
-public final class ImageResourceReader extends AbstractResourceReaderImpl<ImageContent, ImageResource> {
+public class ImageResourceReader extends AbstractResourceReaderImpl<ImageContent, ImageResource> {
 
   /** The image content reader */
   private ImageContentReader contentReader = new ImageContentReader();
@@ -49,13 +47,14 @@ public final class ImageResourceReader extends AbstractResourceReaderImpl<ImageC
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public ImageResourceReader() throws ParserConfigurationException, SAXException {
+  public ImageResourceReader() throws ParserConfigurationException,
+      SAXException {
     super(ImageResource.TYPE);
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl#reset()
    */
   public void reset() {
@@ -65,12 +64,11 @@ public final class ImageResourceReader extends AbstractResourceReaderImpl<ImageC
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl#createResource(ch.o2it.weblounge.common.content.ResourceURI)
+   * 
+   * @see ch.o2it.weblounge.common.impl.content.AbstractResourceReaderImpl#createResource(ch.o2it.weblounge.common.site.Site)
    */
-  @Override
-  protected ImageResource createResource(ResourceURI uri) {
-    return new ImageResourceImpl(uri);
+  protected ImageResource createResource(Site site) {
+    return new ImageResourceImpl(new ImageResourceURIImpl(site));
   }
 
   /**
@@ -89,32 +87,23 @@ public final class ImageResourceReader extends AbstractResourceReaderImpl<ImageC
   public void startElement(String uri, String local, String raw,
       Attributes attrs) throws SAXException {
 
-    // read the file url
-    if (FileResource.TYPE.equals(raw)) {
-      parserContext = ParserContext.Resource;
-      ((ResourceURIImpl) resource.getURI()).setIdentifier(attrs.getValue("id"));
-      if (attrs.getValue("path") != null)
-        ((ResourceURIImpl) resource.getURI()).setPath(attrs.getValue("path"));
-    }
-
-    // in the header
-    else if ("head".equals(raw)) {
-      parserContext = ParserContext.Head;
-    }
-
     // file content
-    else if ("content".equals(raw) || parserContext.equals(ParserContext.Content)) {
+    if ("content".equals(raw) || parserContext.equals(ParserContext.Content)) {
       parserContext = ParserContext.Content;
       contentReader.startElement(uri, local, raw, attrs);
     }
 
-    super.startElement(uri, local, raw, attrs);
+    // other stuff, most likely head elements
+    else {
+      super.startElement(uri, local, raw, attrs);
+    }
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler#characters(char[], int, int)
+   * 
+   * @see ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler#characters(char[],
+   *      int, int)
    */
   @Override
   public void characters(char[] chars, int start, int end) throws SAXException {
@@ -137,9 +126,9 @@ public final class ImageResourceReader extends AbstractResourceReaderImpl<ImageC
       resource.addContent(contentReader.getContent());
     } else if (parserContext.equals(ParserContext.Content)) {
       contentReader.endElement(uri, local, raw);
+    } else {
+      super.endElement(uri, local, raw);
     }
-
-    super.endElement(uri, local, raw);
   }
 
 }
