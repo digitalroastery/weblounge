@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
@@ -243,25 +244,37 @@ public class ContentRepositoryIndex {
    */
   public synchronized ResourceURI add(Resource<?> resource) throws IOException,
       ContentRepositoryException {
-    ResourceURI uri = resource.getURI();
-    if (uri.getPath() == null)
-      throw new IllegalArgumentException("Uri must contain a path");
 
-    long address = toURIEntry(uri);
+    ResourceURI uri = resource.getURI();
+    String id = uri.getId();
+    String path = uri.getPath();
+    String type = uri.getType();
+    long version = uri.getVersion();
+
+    long address = -1;
+    if (id != null || path != null) {
+      address = toURIEntry(uri);
+    }
 
     // If there is no address, we are about to add a new resource
     if (address < 0) {
-      String id = uri.getId();
+
+      // Create an id if necessary. A missing id indicates that the resource
+      // has never been added to the index before
       if (id == null) {
         id = UUID.randomUUID().toString();
-        uri = new ResourceURIImpl(uri.getType(), uri.getSite(), uri.getPath(), id, uri.getVersion());
         ((ResourceURIImpl) resource.getURI()).setIdentifier(id);
       }
-      String type = uri.getType();
-      String path = uri.getPath();
+      
+      // Make sure we have a path
+      if (path == null) {
+        path = UrlSupport.concat("/" + type + "s", id);
+      }
+      
+      uri = new ResourceURIImpl(type, uri.getSite(), path, id, version);
 
       try {
-        if (uri.getVersion() == Resource.LIVE) {
+        if (version == Resource.LIVE) {
           if (resource.isIndexed())
             searchIdx.add(resource);
           else
@@ -272,7 +285,7 @@ public class ContentRepositoryIndex {
         address = uriIdx.add(id, type, path);
         idIdx.add(id, address);
         pathIdx.add(path, address);
-        versionIdx.add(id, uri.getVersion());
+        versionIdx.add(id, version);
         languageIdx.setLanguages(id, resource.languages());
       } catch (ContentRepositoryException e) {
         throw e;
@@ -282,9 +295,9 @@ public class ContentRepositoryIndex {
     }
 
     // Otherwise, it's just a new version
-    else if (!versionIdx.hasVersion(address, uri.getVersion())) {
-      versionIdx.add(address, uri.getVersion());
-      if (uri.getVersion() == Resource.LIVE) {
+    else if (!versionIdx.hasVersion(address, version)) {
+      versionIdx.add(address, version);
+      if (version == Resource.LIVE) {
         languageIdx.setLanguages(address, resource.languages());
         if (resource.isIndexed())
           searchIdx.add(resource);
@@ -506,6 +519,12 @@ public class ContentRepositoryIndex {
   public synchronized void move(ResourceURI uri, String path)
       throws IOException, ContentRepositoryException {
     String oldPath = uri.getPath();
+
+    // If this resource did not have a path in the very beginning we can just
+    // use the uri index to look up the path that was used.
+    if (oldPath == null) {
+      oldPath = getPath(uri);
+    }
 
     // Locate the entry in question
     long address = toURIEntry(uri);

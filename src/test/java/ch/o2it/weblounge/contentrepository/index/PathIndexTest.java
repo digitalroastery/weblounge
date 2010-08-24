@@ -136,11 +136,11 @@ public class PathIndexTest {
    */
   @Test
   public void testAdd() {
-    String uuid = UUID.randomUUID().toString();
+    String path = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(uuid, address);
-      long[] candidates = idx.locate(uuid);
+      idx.add(path, address);
+      long[] candidates = idx.locate(path);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);
     } catch (IOException e) {
@@ -156,12 +156,12 @@ public class PathIndexTest {
    */
   @Test
   public void testDelete() {
-    String uuid = UUID.randomUUID().toString();
+    String path = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(uuid, address);
-      idx.delete(uuid, address);
-      long[] candidates = idx.locate(uuid);
+      idx.add(path, address);
+      idx.delete(path, address);
+      long[] candidates = idx.locate(path);
       assertEquals(0, candidates.length);
     } catch (IOException e) {
       e.printStackTrace();
@@ -175,10 +175,10 @@ public class PathIndexTest {
    */
   @Test
   public void testClear() {
-    String uuid = UUID.randomUUID().toString();
+    String path = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(uuid, address);
+      idx.add(path, address);
       idx.clear();
       assertTrue(idx.getEntries() == 0);
       assertEquals(slotsInIndex, idx.getSlots());
@@ -197,15 +197,15 @@ public class PathIndexTest {
    */
   @Test
   public void testGetPossibleSlots() {
-    String uuid = UUID.randomUUID().toString();
+    String path = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(uuid, address);
-      long[] candidates = idx.locate(uuid);
+      idx.add(path, address);
+      long[] candidates = idx.locate(path);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);
-      idx.add(uuid, address + 1);
-      candidates = idx.locate(uuid);
+      idx.add(path, address + 1);
+      candidates = idx.locate(path);
       assertEquals(2, candidates.length);
     } catch (IOException e) {
       e.printStackTrace();
@@ -219,18 +219,18 @@ public class PathIndexTest {
    */
   @Test
   public void testResize() {
-    String uuid = UUID.randomUUID().toString();
+    String path = UUID.randomUUID().toString();
     long address = 2384762;
     
     // Resize to the same size
     try {
-      idx.add(uuid, address);
+      idx.add(path, address);
       idx.resize(slotsInIndex, entriesPerSlot * 3);
       assertEquals(slotsInIndex, idx.getSlots());
       assertEquals(entriesPerSlot * 3, idx.getSlotSize());
       assertEquals(1, idx.getEntries());
       assertEquals(20 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
-      long[] candidates = idx.locate(uuid);
+      long[] candidates = idx.locate(path);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);
     } catch (IOException e) {

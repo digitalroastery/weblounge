@@ -27,8 +27,12 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
@@ -77,10 +81,15 @@ public class ContentRepositoryIndexTest {
   /** The other sample page */
   protected Page otherPage = null;
 
+  /** File resource */
+  protected FileResource file = null;
+
   /** The site */
   protected Site site = null;
   
   /**
+   * Sets up data structures for each test case.
+   * 
    * @throws java.lang.Exception
    */
   @Before
@@ -111,6 +120,8 @@ public class ContentRepositoryIndexTest {
 
     otherPage = new PageImpl(new PageURIImpl(site, "/weblounge/other"));
     otherPage.setTemplate("home");
+
+    file = new FileResourceImpl(new FileResourceURIImpl(site));
   }
 
   /**
@@ -141,6 +152,8 @@ public class ContentRepositoryIndexTest {
     try {
       idx.add(page);
       assertEquals(1, idx.size());
+      idx.add(file);
+      assertEquals(2, idx.size());
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -154,7 +167,10 @@ public class ContentRepositoryIndexTest {
   public void testDelete() {
     try {
       idx.add(page);
+      idx.add(file);
       idx.delete(page.getURI());
+      assertEquals(1, idx.size());
+      idx.delete(file.getURI());
       assertEquals(0, idx.size());
     } catch (Exception e) {
       e.printStackTrace();

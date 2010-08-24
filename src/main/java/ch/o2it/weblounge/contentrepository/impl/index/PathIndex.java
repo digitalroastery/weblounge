@@ -257,6 +257,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized void add(String path, long addressOfPath)
       throws IOException {
+
     int slot = findSlot(path);
     long startOfSlot = IDX_HEADER_SIZE + (slot * slotSizeInBytes);
 
