@@ -41,21 +41,6 @@ import java.util.Iterator;
 public interface ContentRepository {
 
   /**
-   * Sets the repository uri.
-   * 
-   * @param repositoryURI
-   *          the repository URI
-   */
-  void setURI(String repositoryURI);
-
-  /**
-   * Returns the repository uri.
-   * 
-   * @return the uri
-   */
-  String getURI();
-
-  /**
    * Opens the repository. Depending on the type of the repository
    * implementation, this might involve mounting network volumes, opening
    * database connections etc.
@@ -148,6 +133,17 @@ public interface ContentRepository {
    *           if looking up the resource versions from the repository fails
    */
   ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException;
+
+  /**
+   * Returns the resource's languages.
+   * 
+   * @param uri
+   *          the resource uri
+   * @return the languages
+   * @throws ContentRepositoryException
+   *           if looking up the resource languages from the repository fails
+   */
+  Language[] getLanguages(ResourceURI uri) throws ContentRepositoryException;
 
   /**
    * Returns an iteration of all resources with their uri containing
