@@ -368,15 +368,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     path.append(uri.getVersion());
     path.append(File.separatorChar);
 
-    // Handle the version. There is "live" and "work", everything else is
-    // encoded in the path
-    long documentVersion = uri.getVersion();
-    if (documentVersion > Resource.WORK) {
-      documentVersion = Resource.LIVE;
-    }
-
     // Add the document name
-    path.append(ResourceUtils.getDocument(documentVersion));
+    path.append(ResourceUtils.getDocument(Resource.LIVE));
     return new File(path.toString());
   }
 
@@ -482,7 +475,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResource()
    */
   @Override
-  protected InputStream loadResource(ResourceURI uri) throws IOException {
+  protected InputStream openStreamToResource(ResourceURI uri) throws IOException {
     if (uri.getType() == null) {
       uri.setType(index.getType(uri));
     }
@@ -495,11 +488,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#openStreamToResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.language.Language)
    */
   @Override
-  protected InputStream loadResourceContent(ResourceURI uri, Language language)
+  protected InputStream openStreamToResourceContent(ResourceURI uri, Language language)
       throws IOException {
     File resourceFile = uriToFile(uri);
     if (resourceFile == null)
@@ -654,7 +647,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       logger.info("Created site index at {}", idxRootDir);
     } else {
       long resourceCount = index.getResourceCount();
-      long resourceVersionCount = index.getVersions();
+      long resourceVersionCount = index.getRevisionCount();
       logger.info("Loaded site index from {}", idxRootDir);
       logger.info("Index contains {} resources and {} revisions", resourceCount, resourceVersionCount - resourceCount);
     }

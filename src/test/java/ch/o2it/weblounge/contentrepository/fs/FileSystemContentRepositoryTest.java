@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileResource;
@@ -40,6 +41,7 @@ import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
@@ -65,6 +67,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -134,6 +137,15 @@ public class FileSystemContentRepositoryTest {
   /** The sample file */
   protected ImageResource image = null;
 
+  /** English */
+  protected Language english = LanguageSupport.getLanguage("en"); 
+
+  /** German */
+  protected Language german = LanguageSupport.getLanguage("de"); 
+
+  /** Italian */
+  protected Language french = LanguageSupport.getLanguage("fr"); 
+
   /**
    * @throws java.lang.Exception
    */
@@ -193,7 +205,7 @@ public class FileSystemContentRepositoryTest {
     InputStream fileIs = this.getClass().getResourceAsStream("/file.xml");
     file = fileReader.read(fileIs, site);
     IOUtils.closeQuietly(fileIs);
-    
+
     // Prepare the sample image
     ImageResourceReader imageReader = new ImageResourceReader();
     InputStream imageIs = this.getClass().getResourceAsStream("/image.xml");
@@ -316,8 +328,8 @@ public class FileSystemContentRepositoryTest {
   @Test
   public void testMove() {
     int resources = populateRepository();
-    String oldPath = page1URI.getPath(); 
-    String newPath = "/new/path"; 
+    String oldPath = page1URI.getPath();
+    String newPath = "/new/path";
     ResourceURI newURI = new PageURIImpl(site, newPath, page1URI.getId());
     try {
       repository.move(page1URI, newURI);
@@ -338,7 +350,7 @@ public class FileSystemContentRepositoryTest {
   @Test
   public void testPut() {
     int resources = populateRepository();
-    
+
     // Try to add a duplicate resource
     try {
       repository.put(file);
@@ -350,7 +362,7 @@ public class FileSystemContentRepositoryTest {
 
     // Try to add a new resource
     try {
-      ((ResourceURIImpl)file.getURI()).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      ((ResourceURIImpl) file.getURI()).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
       repository.put(file);
       assertEquals(resources + 1, repository.getResourceCount());
     } catch (Exception e) {
@@ -426,8 +438,8 @@ public class FileSystemContentRepositoryTest {
       assertTrue(repository.exists(page1URI));
       assertTrue(repository.exists(documentURI));
       assertTrue(repository.exists(imageURI));
-      
-      ((ResourceURIImpl)documentURI).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+
+      ((ResourceURIImpl) documentURI).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
       assertFalse(repository.exists(documentURI));
     } catch (ContentRepositoryException e) {
       fail("Error checking for resource existence");
@@ -435,7 +447,7 @@ public class FileSystemContentRepositoryTest {
 
     // Test for non-existing resources
     try {
-      ((ResourceURIImpl)documentURI).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      ((ResourceURIImpl) documentURI).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
       assertFalse(repository.exists(documentURI));
     } catch (ContentRepositoryException e) {
       fail("Error checking for resource existence");
@@ -484,6 +496,50 @@ public class FileSystemContentRepositoryTest {
   @Ignore
   public void testGetVersions() {
     fail("Not yet implemented"); // TODO
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)}
+   * .
+   */
+  @Test
+  public void testGetLanguages() {
+    ResourceURI live1URI = new PageURIImpl(site, "/weblounge");
+    ResourceURI live2URI = new PageURIImpl(site, "/etc/weblounge");
+    ResourceURI work2URI = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+
+    Page page1Live = new PageImpl(live1URI);
+    page1Live.setTitle("title", english);
+
+    Page page2Live = new PageImpl(live2URI);
+    page2Live.setTitle("title", english);
+    page2Live.setTitle("titel", german);
+
+    Page page2Work = new PageImpl(work2URI);
+    page2Work.setTitle("title", english);
+    page2Work.setTitle("titel", german);
+    page2Work.setTitle("titre", french);
+
+    try {
+      // Add the pages to the index
+      repository.put(page1Live);
+      repository.put(page2Live);
+      repository.put(page2Work);
+
+      // Try to get the languages back
+      assertEquals(page1Live.languages().size(), repository.getLanguages(live1URI).length);
+      assertEquals(english, repository.getLanguages(live1URI)[0]);
+
+      assertEquals(page2Live.languages().size(), repository.getLanguages(live2URI).length);
+      assertTrue(page2Live.languages().containsAll(Arrays.asList(repository.getLanguages(live2URI))));
+
+      assertEquals(page2Work.languages().size(), repository.getLanguages(work2URI).length);
+      assertTrue(page2Work.languages().containsAll(Arrays.asList(repository.getLanguages(work2URI))));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
   }
 
   /**
@@ -560,18 +616,18 @@ public class FileSystemContentRepositoryTest {
    */
   protected int populateRepository() {
     int count = 0;
-    
+
     // Add the pages
     try {
       for (Page page : pages) {
         repository.put(page);
-        count ++;
+        count++;
       }
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample page to the repository failed");
     }
-    
+
     // Add the file
     try {
       List<ResourceContent> contents = new ArrayList<ResourceContent>();
@@ -580,12 +636,12 @@ public class FileSystemContentRepositoryTest {
       }
       repository.put(file);
       // TODO: Add resource contents
-      count ++;
+      count++;
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample file to the repository failed");
     }
-    
+
     // Add the image
     try {
       List<ResourceContent> contents = new ArrayList<ResourceContent>();
@@ -594,7 +650,7 @@ public class FileSystemContentRepositoryTest {
       }
       repository.put(image);
       // TODO: Add resource contents
-      count ++;
+      count++;
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample image to the repository failed");

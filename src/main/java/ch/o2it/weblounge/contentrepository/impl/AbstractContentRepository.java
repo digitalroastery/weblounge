@@ -48,6 +48,7 @@ import java.net.URL;
 import java.nio.CharBuffer;
 import java.util.Dictionary;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,9 +68,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /** The site */
   protected Site site = null;
-
-  /** The root uri, which identifies a sub part of the overall repository */
-  protected String rootURI = null;
 
   /** Flag indicating the connected state */
   protected boolean connected = false;
@@ -210,7 +208,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
     // Load the resource
     InputStream is = null;
     try {
-      is = loadResource(uri);
+      is = openStreamToResource(uri);
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
@@ -230,7 +228,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public InputStream getContent(ResourceURI uri, Language language)
       throws ContentRepositoryException, IOException {
-    return loadResourceContent(uri, language);
+    return openStreamToResourceContent(uri, language);
   }
 
   /**
@@ -251,6 +249,31 @@ public abstract class AbstractContentRepository implements ContentRepository {
         uris[i++] = new ResourceURIImpl(uri, r);
       }
       return uris;
+    } catch (IOException e) {
+      throw new ContentRepositoryException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
+   */
+  public Language[] getLanguages(ResourceURI uri)
+      throws ContentRepositoryException {
+    if (!isStarted())
+      throw new IllegalStateException("Content repository is not connected");
+
+    try {
+      if (uri.getVersion() == Resource.LIVE) {
+        return index.getLanguages(uri);
+      } else {
+        Resource<?> r = loadResource(uri);
+        if (r == null)
+          throw new ContentRepositoryException("Resource " + uri + " cannot be loaded");
+        Set<Language> languages = r.languages();
+        return languages.toArray(new Language[languages.size()]);
+      }
     } catch (IOException e) {
       throw new ContentRepositoryException(e);
     }
@@ -309,30 +332,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#setURI(java.lang.String)
-   */
-  public void setURI(String repositoryURI) {
-    if (connected)
-      throw new IllegalStateException("Unable to change the repository uri while still connected");
-    if (repositoryURI == null)
-      throw new IllegalArgumentException("Repository uri cannot be null");
-    if (repositoryURI.startsWith("/"))
-      throw new IllegalArgumentException("Repository uri Must be absolute");
-    rootURI = repositoryURI;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getURI()
-   */
-  public String getURI() {
-    return rootURI;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#getResourceCount()
    */
   public long getResourceCount() {
@@ -345,7 +344,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersionCount()
    */
   public long getVersionCount() {
-    return index != null ? index.getVersions() : -1;
+    return index != null ? index.getRevisionCount() : -1;
   }
 
   /**
@@ -432,7 +431,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @throws IOException
    *           if the resource could not be loaded
    */
-  protected abstract InputStream loadResource(ResourceURI uri)
+  protected abstract InputStream openStreamToResource(ResourceURI uri)
       throws IOException;
 
   /**
@@ -448,7 +447,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @throws IOException
    *           if opening the stream to the resource failed
    */
-  protected abstract InputStream loadResourceContent(ResourceURI uri,
+  protected abstract InputStream openStreamToResourceContent(ResourceURI uri,
       Language language) throws IOException;
 
   /**
@@ -495,6 +494,26 @@ public abstract class AbstractContentRepository implements ContentRepository {
       }
     }
     return false;
+  }
+
+  /**
+   * Returns the resource that is identified by the given uri.
+   * 
+   * @param uri
+   *          the resource uri
+   * @return the resource
+   */
+  protected Resource<?> loadResource(ResourceURI uri) throws IOException {
+    InputStream is = new BufferedInputStream(openStreamToResource(uri));
+    try {
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceReader<?, ?> reader = serializer.getReader();
+      return reader.read(is, site);
+    } catch (Exception e) {
+      throw new IOException("Error reading resource from " + uri);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
   }
 
   /**

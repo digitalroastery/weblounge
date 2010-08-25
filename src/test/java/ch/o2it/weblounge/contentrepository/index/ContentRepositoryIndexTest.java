@@ -30,12 +30,13 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
@@ -60,6 +61,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 
 /**
  * Test case for the {@link ContentRepositoryIndex}.
@@ -86,6 +88,15 @@ public class ContentRepositoryIndexTest {
 
   /** The site */
   protected Site site = null;
+  
+  /** English */
+  protected Language english = LanguageSupport.getLanguage("en"); 
+
+  /** German */
+  protected Language german = LanguageSupport.getLanguage("de"); 
+
+  /** Italian */
+  protected Language french = LanguageSupport.getLanguage("fr"); 
   
   /**
    * Sets up data structures for each test case.
@@ -197,6 +208,37 @@ public class ContentRepositoryIndexTest {
       assertEquals(2, revisions.length);
       assertEquals(Resource.LIVE, revisions[0]);
       assertEquals(Resource.WORK, revisions[1]);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)}.
+   */
+  @Test
+  public void testGetLanguages() {
+    ResourceURI live1URI = new PageURIImpl(site, "/weblounge");
+    ResourceURI live2URI = new PageURIImpl(site, "/etc/weblounge");
+
+    Page page1Live = new PageImpl(live1URI);
+    page1Live.setTitle("title", english);
+    
+    Page page2Live = new PageImpl(live2URI);
+    page2Live.setTitle("title", english);
+    page2Live.setTitle("titel", german);
+    
+    try {
+      // Add the pages to the index
+      idx.add(page1Live);
+      idx.add(page2Live);
+      
+      // Try to get the languages back
+      assertEquals(page1Live.languages().size(), idx.getLanguages(live1URI).length);
+      assertEquals(english, idx.getLanguages(live1URI)[0]);
+      assertEquals(page2Live.languages().size(), idx.getLanguages(live2URI).length);
+      assertTrue(page2Live.languages().containsAll(Arrays.asList(idx.getLanguages(live2URI))));
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());

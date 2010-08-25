@@ -60,15 +60,15 @@ public class EmptyContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#start()
    */
   public void start() throws ContentRepositoryException {
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#stop()
    */
   public void stop() throws ContentRepositoryException {
@@ -88,8 +88,7 @@ public class EmptyContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
    */
-  public SearchResult find(SearchQuery query)
-      throws ContentRepositoryException {
+  public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     return null;
   }
 
@@ -104,8 +103,9 @@ public class EmptyContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.language.Language)
+   * 
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.language.Language)
    */
   public InputStream getContent(ResourceURI uri, Language language)
       throws ContentRepositoryException, IOException {
@@ -117,7 +117,18 @@ public class EmptyContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.common.repository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public ResourceURI[] getVersions(ResourceURI uri) throws ContentRepositoryException {
+  public ResourceURI[] getVersions(ResourceURI uri)
+      throws ContentRepositoryException {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
+   */
+  public Language[] getLanguages(ResourceURI uri)
+      throws ContentRepositoryException {
     return null;
   }
 
@@ -167,23 +178,6 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#setURI(java.lang.String)
-   */
-  public void setURI(String repositoryURI) {
-  }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getURI()
-   */
-  public String getURI() {
-    return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#getResourceCount()
    */
   public long getResourceCount() {
@@ -192,7 +186,7 @@ public class EmptyContentRepository implements ContentRepository {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersionCount()
    */
   public long getVersionCount() {

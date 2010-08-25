@@ -75,9 +75,9 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResource(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#openStreamToResource(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  protected InputStream loadResource(ResourceURI uri) throws IOException {
+  protected InputStream openStreamToResource(ResourceURI uri) throws IOException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -95,11 +95,11 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#openStreamToResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.language.Language)
    */
   @Override
-  protected InputStream loadResourceContent(ResourceURI uri, Language language)
+  protected InputStream openStreamToResourceContent(ResourceURI uri, Language language)
       throws IOException {
     // TODO Auto-generated method stub
     return null;

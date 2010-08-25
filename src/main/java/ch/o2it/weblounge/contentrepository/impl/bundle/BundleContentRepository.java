@@ -66,7 +66,7 @@ import java.util.Set;
  * <code>/repository</code>, which means that pages are expected to live under
  * <code>/repository/pages</code> while resources are expected under
  * <code>/repository/resources</code>. You may want to change these assumptions
- * using {@link #setURI(String)}, {@link #setPagesURI(String)} or
+ * using {@link #setBundlePathPrefix(String)}, {@link #setPagesURI(String)} or
  * {@link #setResourcesURI()}.
  */
 public class BundleContentRepository extends AbstractContentRepository {
@@ -213,17 +213,31 @@ public class BundleContentRepository extends AbstractContentRepository {
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the path that identifies the repository root in the bundle. If nothing
+   * is specified, the default value of <code>/repository</code> will be used.
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#setURI(java.lang.String)
+   * @param repositoryURI
+   *          the path to the repository
+   * @throws IllegalArgumentException
+   *           if the uri is <code>null</code>
+   * @throws IllegalArgumentException
+   *           if the uri is not absolute
    */
-  public void setURI(String repositoryURI) {
-    super.setURI(repositoryURI);
+  public void setBundlePathPrefix(String repositoryURI) {
     if (repositoryURI == null)
       throw new IllegalArgumentException("Repository uri cannot be null");
     if (repositoryURI.startsWith("/"))
       throw new IllegalArgumentException("Repository uri Must be absolute");
     this.bundlePathPrefix = repositoryURI;
+  }
+
+  /**
+   * Returns the path that identifies the repository root in the bundle.
+   * 
+   * @return the path to the repository
+   */
+  public String getBundlePathPrefix() {
+    return bundlePathPrefix;
   }
 
   /**
@@ -250,7 +264,7 @@ public class BundleContentRepository extends AbstractContentRepository {
     // Is there an existing index?
     else if (index.getResourceCount() > 0) {
       long resourceCount = index.getResourceCount();
-      long revisionCount = index.getVersions();
+      long revisionCount = index.getRevisionCount();
       logger.info("Loaded exising site index from {}", idxRootDir);
       logger.info("Index contains {} resources and {} revisions", resourceCount, revisionCount - resourceCount);
       return index;
@@ -271,13 +285,13 @@ public class BundleContentRepository extends AbstractContentRepository {
         Iterator<ResourceURI> pi = list(resourceRootURI, Integer.MAX_VALUE, -1);
         while (pi.hasNext()) {
           ResourceURI uri = pi.next();
-  
+
           // Load the resource
           Resource<?> resource = null;
           InputStream is = null;
           try {
             ResourceReader<?, ?> reader = serializer.getReader();
-            is = loadResource(uri);
+            is = openStreamToResource(uri);
             resource = reader.read(is, site);
             if (resource == null) {
               logger.warn("Unkown error loading resource {}", uri);
@@ -289,7 +303,7 @@ public class BundleContentRepository extends AbstractContentRepository {
           } finally {
             IOUtils.closeQuietly(is);
           }
-  
+
           // Add it to the index
           index.add(resource);
           revisionCount++;
@@ -329,7 +343,7 @@ public class BundleContentRepository extends AbstractContentRepository {
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
    */
   @Override
-  protected InputStream loadResource(ResourceURI uri) throws IOException {
+  protected InputStream openStreamToResource(ResourceURI uri) throws IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path
@@ -356,11 +370,11 @@ public class BundleContentRepository extends AbstractContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#openStreamToResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.language.Language)
    */
   @Override
-  protected InputStream loadResourceContent(ResourceURI uri, Language language)
+  protected InputStream openStreamToResourceContent(ResourceURI uri, Language language)
       throws IOException {
     String uriPath = uri.getPath();
 

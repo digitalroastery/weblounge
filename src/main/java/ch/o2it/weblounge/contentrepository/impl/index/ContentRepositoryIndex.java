@@ -222,11 +222,11 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Returns the number of versions in this index.
+   * Returns the number of revisions in this index.
    * 
-   * @return the number of versions
+   * @return the number of revisions
    */
-  public long getVersions() {
+  public long getRevisionCount() {
     return versionIdx.getEntries();
   }
 
@@ -265,12 +265,12 @@ public class ContentRepositoryIndex {
         id = UUID.randomUUID().toString();
         ((ResourceURIImpl) resource.getURI()).setIdentifier(id);
       }
-      
+
       // Make sure we have a path
       if (path == null) {
         path = UrlSupport.concat("/" + type + "s", id);
       }
-      
+
       uri = new ResourceURIImpl(type, uri.getSite(), path, id, version);
 
       try {
@@ -380,6 +380,9 @@ public class ContentRepositoryIndex {
    * @return the languages
    */
   public Language[] getLanguages(ResourceURI uri) throws IOException {
+    if (uri.getVersion() != Resource.LIVE)
+      throw new IllegalArgumentException("The language index only works for live resources");
+
     // Locate the entry in question
     long address = toURIEntry(uri);
 
@@ -440,6 +443,9 @@ public class ContentRepositoryIndex {
    *           if accessing the index fails
    */
   public String getPath(ResourceURI uri) throws IOException {
+    if (uri.getVersion() != Resource.LIVE)
+      throw new IllegalArgumentException("The path index only works for live resources");
+
     String id = uri.getId();
     if (id == null)
       throw new IllegalArgumentException("ResourceURI must contain an identifier");
@@ -474,6 +480,8 @@ public class ContentRepositoryIndex {
    *           if accessing the index fails
    */
   public String getType(ResourceURI uri) throws IOException {
+    if (uri.getVersion() != Resource.LIVE)
+      throw new IllegalArgumentException("The type index only works for live resources");
     long address = toURIEntry(uri);
     if (address == -1)
       return null;
@@ -493,15 +501,17 @@ public class ContentRepositoryIndex {
   public synchronized void update(Resource<?> resource) throws IOException,
       ContentRepositoryException {
     ResourceURI uri = resource.getURI();
-    if (uri.getVersion() == Resource.LIVE) {
-      if (resource.isIndexed())
-        searchIdx.update(resource);
-      else
-        searchIdx.delete(resource.getURI());
 
-      long address = toURIEntry(resource.getURI());
-      languageIdx.setLanguages(address, null);
-    }
+    if (uri.getVersion() != Resource.LIVE)
+      throw new IllegalArgumentException("The type index only works for live resources");
+
+    if (resource.isIndexed())
+      searchIdx.update(resource);
+    else
+      searchIdx.delete(uri);
+
+    long address = toURIEntry(uri);
+    languageIdx.setLanguages(address, null);
   }
 
   /**
@@ -518,6 +528,9 @@ public class ContentRepositoryIndex {
    */
   public synchronized void move(ResourceURI uri, String path)
       throws IOException, ContentRepositoryException {
+    if (uri.getVersion() != Resource.LIVE)
+      throw new IllegalArgumentException("The index can only move live resources");
+
     String oldPath = uri.getPath();
 
     // If this resource did not have a path in the very beginning we can just

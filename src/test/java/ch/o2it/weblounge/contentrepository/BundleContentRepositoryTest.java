@@ -221,7 +221,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#setURI(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#setBundlePathPrefix(java.lang.String)}.
    */
   @Test
   public void testSetURI() {
