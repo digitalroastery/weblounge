@@ -44,10 +44,10 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
       SystemPermission.PUBLISH,
       SystemPermission.MANAGE };
 
-  /** Live version of a page */
+  /** Live version of a resource */
   long LIVE = 0;
 
-  /** Work version of a page */
+  /** Work version of a resource */
   long WORK = 1;
 
   /**
