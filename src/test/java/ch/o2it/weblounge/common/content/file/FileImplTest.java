@@ -210,22 +210,6 @@ public class FileImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getSite()}.
-   */
-  @Test
-  public void testGetSite() {
-    assertEquals(site, file.getURI().getSite());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getVersion()}.
-   */
-  @Test
-  public void testGetVersion() {
-    assertEquals(fileURI.getVersion(), file.getURI().getVersion());
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl#getType()}.
    */
   @Test

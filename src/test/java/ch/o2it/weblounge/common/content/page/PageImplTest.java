@@ -196,22 +196,6 @@ public class PageImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageImpl#getSite()}.
-   */
-  @Test
-  public void testGetSite() {
-    assertEquals(site, page.getURI().getSite());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageImpl#getVersion()}.
-   */
-  @Test
-  public void testGetVersion() {
-    assertEquals(pageURI.getVersion(), page.getURI().getVersion());
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageImpl#getType()}.
    */
   @Test

@@ -227,8 +227,6 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
     // created
     else if (contentReaderContext == Context.Creation && "created".equals(raw)) {
       User owner = (User) clipboard.remove("user");
-      if (owner == null)
-        throw new IllegalStateException("Creator not found");
       Date date = (Date) clipboard.remove("date");
       if (date == null)
         throw new IllegalStateException("Creation date not found");
@@ -239,8 +237,6 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
     // modified
     else if (contentReaderContext == Context.Modification && "modified".equals(raw)) {
       User modifier = (User) clipboard.remove("user");
-      if (modifier == null)
-        throw new IllegalStateException("Modifier not found");
       Date date = (Date) clipboard.remove("date");
       if (date == null)
         throw new IllegalStateException("Modification date not found");
@@ -251,8 +247,6 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
     // published
     else if (contentReaderContext == Context.Publish && "published".equals(raw)) {
       User publisher = (User) clipboard.remove("user");
-      if (publisher == null)
-        throw new IllegalStateException("Publisher not found");
       Date startDate = (Date) clipboard.remove("publish.start");
       if (startDate == null)
         throw new IllegalStateException("Publication start date not found");

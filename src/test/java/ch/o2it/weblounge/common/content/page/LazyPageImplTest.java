@@ -429,18 +429,6 @@ public class LazyPageImplTest extends PageImplTest {
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetSite()
-   */
-  @Override
-  public void testGetSite() {
-    super.testGetSite();
-    assertFalse(((LazyPageImpl)page).isHeaderLoaded());
-    assertFalse(((LazyPageImpl)page).isBodyLoaded());
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetSubjects()
    */
   @Override
@@ -518,18 +506,6 @@ public class LazyPageImplTest extends PageImplTest {
   @Override
   public void testGetURI() {
     super.testGetURI();
-    assertFalse(((LazyPageImpl)page).isHeaderLoaded());
-    assertFalse(((LazyPageImpl)page).isBodyLoaded());
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.page.PageImplTest#testGetVersion()
-   */
-  @Override
-  public void testGetVersion() {
-    super.testGetVersion();
     assertFalse(((LazyPageImpl)page).isHeaderLoaded());
     assertFalse(((LazyPageImpl)page).isBodyLoaded());
   }

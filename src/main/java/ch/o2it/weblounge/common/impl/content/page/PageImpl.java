@@ -285,7 +285,7 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
    * @see ch.o2it.weblounge.common.content.page.Page#getPreview()
    */
   public Pagelet[] getPreview() {
-    Site site = getSite();
+    Site site = getURI().getSite();
     PageTemplate t = site.getTemplate(template);
     if (preview == null && t == null) {
       logger.warn("Can't calculate the page preview due to missing template");

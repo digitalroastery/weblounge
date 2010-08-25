@@ -33,7 +33,6 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.User;
 
 import java.util.ArrayList;
@@ -115,24 +114,6 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     this.description = new LocalizableContent<String>(this);
     this.coverage = new LocalizableContent<String>(this);
     this.rights = new LocalizableContent<String>(this);
-  }
-
-  /**
-   * Returns the associated site.
-   * 
-   * @return the site
-   */
-  public Site getSite() {
-    return uri.getSite();
-  }
-
-  /**
-   * Returns the page version.
-   * 
-   * @return the page version
-   */
-  public long getVersion() {
-    return uri.getVersion();
   }
 
   /**
@@ -272,6 +253,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    */
   public void setCoverage(String coverage, Language language) {
     this.coverage.put(coverage, language);
+    enableLanguage(language);
   }
 
   /**
@@ -310,6 +292,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    */
   public void setDescription(String description, Language language) {
     this.description.put(description, language);
+    enableLanguage(language);
   }
 
   /**
@@ -348,6 +331,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    */
   public void setRights(String rights, Language language) {
     this.rights.put(rights, language);
+    enableLanguage(language);
   }
 
   /**
@@ -388,6 +372,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    */
   public void setTitle(String title, Language language) {
     this.title.put(title, language);
+    enableLanguage(language);
   }
 
   /**
@@ -732,6 +717,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     if (content == null)
       throw new IllegalArgumentException("Resource content cannot be null");
     this.content.put(content.getLanguage(), content);
+    this.enableLanguage(content.getLanguage());
   }
 
   /**
