@@ -218,7 +218,7 @@ public class SiteCommand {
     ContentRepository repository = ContentRepositoryFactory.getRepository(site);
     long pages = repository != null ? repository.getResourceCount() : -1;
     pad("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
-    long revisions = repository != null ? repository.getVersionCount() : -1;
+    long revisions = repository != null ? repository.getRevisionCount() : -1;
     pad("revisions", (revisions >= 0 ? Long.toString(revisions) : "n/a"));
   }
 
