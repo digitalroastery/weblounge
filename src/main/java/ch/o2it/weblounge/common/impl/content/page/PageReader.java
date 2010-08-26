@@ -302,9 +302,9 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
     // read the page url
     if ("page".equals(raw)) {
       parserContext = ParserContext.Page;
-      ((ResourceURIImpl) page.getURI()).setIdentifier(attrs.getValue("id"));
+      page.getURI().setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
-        ((ResourceURIImpl) page.getURI()).setPath(attrs.getValue("path"));
+        page.getURI().setPath(attrs.getValue("path"));
       if (attrs.getValue("version") != null) {
         long version = ResourceUtils.getVersion(attrs.getValue("version"));
         page.getURI().setVersion(version);

@@ -288,13 +288,13 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
     // read the page url
     if (rootTag.equals(raw)) {
       parserContext = ParserContext.Resource;
-      ((ResourceURIImpl) resource.getURI()).setType(rootTag);
-      ((ResourceURIImpl) resource.getURI()).setIdentifier(attrs.getValue("id"));
+      resource.getURI().setType(rootTag);
+      resource.getURI().setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
-        ((ResourceURIImpl) resource.getURI()).setPath(attrs.getValue("path"));
+        resource.getURI().setPath(attrs.getValue("path"));
       if (attrs.getValue("version") != null) {
         long version = ResourceUtils.getVersion(attrs.getValue("version"));
-        ((ResourceURIImpl) resource.getURI()).setVersion(version);
+        resource.getURI().setVersion(version);
       }
     }
 

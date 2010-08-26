@@ -156,6 +156,60 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#getIdentifier()
+   */
+  public String getIdentifier() {
+    return uri.getId();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#setIdentifier(java.lang.String)
+   */
+  public void setIdentifier(String identifier) {
+    uri.setIdentifier(identifier);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#getPath()
+   */
+  public String getPath() {
+    return uri.getPath();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#setPath(java.lang.String)
+   */
+  public void setPath(String path) {
+    uri.setPath(path);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#getVersion()
+   */
+  public long getVersion() {
+    return uri.getVersion();
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#setVersion(long)
+   */
+  public void setVersion(long version) {
+    uri.setVersion(version);
+  }
+
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Resource#addSubject(java.lang.String)
    */

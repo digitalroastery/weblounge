@@ -371,6 +371,15 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#getIdentifier()
+   */
+  public String getIdentifier() {
+    return uri.getId();
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.page.Page#getLayout()
    */
@@ -423,6 +432,15 @@ public class LazyPageImpl implements Page {
     if (!isBodyLoaded)
       loadPageBody();
     return page.getPagelets(composer, module, id);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#getPath()
+   */
+  public String getPath() {
+    return uri.getPath();
   }
 
   /**
@@ -550,6 +568,15 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#getVersion()
+   */
+  public long getVersion() {
+    return uri.getVersion();
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.page.Page#hasSubject(java.lang.String)
    */
@@ -649,6 +676,15 @@ public class LazyPageImpl implements Page {
     if (!isHeaderLoaded)
       loadPageHeader();
     page.setDescription(description, language);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#setIdentifier(java.lang.String)
+   */
+  public void setIdentifier(String identifier) {
+    uri.setIdentifier(identifier);
   }
 
   /**
@@ -787,6 +823,15 @@ public class LazyPageImpl implements Page {
     return page.setUnlocked();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#setVersion(long)
+   */
+  public void setVersion(long version) {
+    uri.setVersion(version);
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -1123,6 +1168,15 @@ public class LazyPageImpl implements Page {
     if (!isHeaderLoaded)
       loadPageHeader();
     page.setOwner(owner);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#setPath(java.lang.String)
+   */
+  public void setPath(String path) {
+    uri.setPath(path);
   }
 
   /**
