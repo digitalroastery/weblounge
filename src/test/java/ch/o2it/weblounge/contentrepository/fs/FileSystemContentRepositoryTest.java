@@ -512,9 +512,29 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testGetVersions() {
-    fail("Not yet implemented"); // TODO
+    ResourceURI live1URI = new PageURIImpl(site, "/weblounge");
+    ResourceURI live2URI = new PageURIImpl(site, "/etc/weblounge");
+    ResourceURI work2URI = new PageURIImpl(site, "/etc/weblounge", Resource.WORK);
+
+    Page page1Live = new PageImpl(live1URI);
+    Page page2Live = new PageImpl(live2URI);
+    Page page2Work = new PageImpl(work2URI);
+
+    try {
+      // Add the pages to the index
+      repository.put(page1Live);
+      repository.put(page2Live);
+      repository.put(page2Work);
+
+      // Check the versions
+      assertEquals(1, repository.getVersions(live1URI).length);
+      assertEquals(2, repository.getVersions(live2URI).length);
+      assertEquals(2, repository.getVersions(work2URI).length);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
   }
 
   /**
