@@ -239,6 +239,6 @@ public interface ContentRepository {
    * 
    * @return the number of versions
    */
-  long getVersionCount();
+  long getRevisionCount();
 
 }
