@@ -74,6 +74,51 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   String getType();
 
   /**
+   * Sets the resource identifier.
+   * 
+   * @param identifier
+   *          the resource identifier
+   */
+  void setIdentifier(String identifier);
+
+  /**
+   * Returns the resource identifier.
+   * 
+   * @return the resource identifier
+   */
+  String getIdentifier();
+
+  /**
+   * Sets the resource path.
+   * 
+   * @param path
+   *          the resource path
+   */
+  void setPath(String path);
+
+  /**
+   * Returns the resource path.
+   * 
+   * @return the resource path
+   */
+  String getPath();
+
+  /**
+   * Sets the resource version.
+   * 
+   * @param version
+   *          the resource version
+   */
+  void setVersion(long version);
+
+  /**
+   * Returns the resource version.
+   * 
+   * @return the resource version
+   */
+  long getVersion();
+
+  /**
    * Makes this a promoted resource. Specifying a collection of promoted pages
    * throughout a site will allow for building a sitemap or a list of points of
    * entrance.

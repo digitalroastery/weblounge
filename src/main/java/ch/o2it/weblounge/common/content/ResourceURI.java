@@ -30,11 +30,25 @@ import ch.o2it.weblounge.common.url.Url;
 public interface ResourceURI extends Url {
 
   /**
+   * Sets the resource identifier.
+   * 
+   * @param identifier the identifier
+   */
+  void setIdentifier(String identifier);
+  
+  /**
    * Returns the page identifier.
    * 
    * @return the page identifier
    */
   String getId();
+
+  /**
+   * Sets the uri path.
+   * 
+   * @param path the path
+   */
+  void setPath(String path);
 
   /**
    * Returns the path of the page that this uri is pointing to.
