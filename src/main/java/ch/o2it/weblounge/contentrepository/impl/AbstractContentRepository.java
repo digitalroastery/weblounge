@@ -341,9 +341,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersionCount()
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getRevisionCount()
    */
-  public long getVersionCount() {
+  public long getRevisionCount() {
     return index != null ? index.getRevisionCount() : -1;
   }
 

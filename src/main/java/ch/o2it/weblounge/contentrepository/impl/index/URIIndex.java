@@ -237,7 +237,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public long size() {
+  public synchronized long size() {
     return IDX_HEADER_SIZE + (slots * bytesPerEntry);
   }
 
@@ -246,7 +246,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of bytes per entry
    */
-  public int getEntrySize() {
+  public synchronized int getEntrySize() {
     return bytesPerEntry;
   }
 
@@ -255,8 +255,18 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public long getEntries() {
+  public synchronized long getEntries() {
     return entries;
+  }
+
+  /**
+   * Returns the load factor for this index, which is determined by the number
+   * of entries divided by the number of possible entries.
+   * 
+   * @return the load factor
+   */
+  public synchronized float getLoadFactor() {
+    return (float)entries / (float)slots;
   }
 
   /**
@@ -561,7 +571,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
 
     // If this file used to contain entries, we just null out the rest
     try {
-      byte[] bytes = new byte[bytesPerEntry - 1];
+      byte[] bytes = new byte[bytesPerEntry - 2];
       while (idx.getFilePointer() < idx.length()) {
         idx.write('\n');
         idx.write(bytes);

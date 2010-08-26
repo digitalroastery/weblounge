@@ -64,7 +64,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // See if the resource exists
-    if (!index.exists(uri)) {
+    if (allRevisions && ! index.existsInAnyVersion(uri) || !index.exists(uri)) {
       logger.warn("Resource '{}' not found in repository index", uri);
       return false;
     }
@@ -81,15 +81,17 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     // Get the revisions to delete
     long[] revisions = new long[] { uri.getVersion() };
     if (allRevisions) {
+      if (uri.getVersion() != Resource.LIVE)
+        uri = new ResourceURIImpl(uri, Resource.LIVE);
       revisions = index.getRevisions(uri);
     }
 
+    // Delete resources
     deleteResource(uri, revisions);
 
-    // Remove all resource revisions from the index
+    // Delete the index entries
     for (long revision : revisions) {
-      ResourceURI u = new ResourceURIImpl(uri, revision);
-      index.delete(u);
+      index.delete(new ResourceURIImpl(uri, revision));
     }
 
     return true;
@@ -121,20 +123,34 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // Add entry to index
-    if (!index.exists(resource.getURI())) {
+    if (!index.existsInAnyVersion(resource.getURI())) {
       if (resource.contents().size() > 0)
         throw new IllegalStateException("Cannot add content metadata without content");
       index.add(resource);
-    } else {
+    } 
+    
+    // The resource exists in some version
+    else {
       logger.debug("Checking content section of existing {} {}", resource.getType(), resource);
       Resource<?> r = get(resource.getURI());
-      if (resource.contents().size() != r.contents().size())
-        throw new IllegalStateException("Cannot modify content metadata without content");
-      for (ResourceContent c : resource.contents()) {
-        if (!c.equals(r.getContent(c.getLanguage())))
+      
+      // Does the resource exist in this version?
+      if (r != null) {
+        if (resource.contents().size() != r.contents().size())
           throw new IllegalStateException("Cannot modify content metadata without content");
+        for (ResourceContent c : resource.contents()) {
+          if (!c.equals(r.getContent(c.getLanguage())))
+            throw new IllegalStateException("Cannot modify content metadata without content");
+        }
+        index.update(resource);
+      } 
+      
+      // We are about to add a new version of a resource
+      else {
+        if (resource.contents().size() > 0)
+          throw new IllegalStateException("Cannot modify content metadata without content");
+        index.add(resource);
       }
-      index.update(resource);
     }
 
     // Write the updated resource to disk

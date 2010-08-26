@@ -263,30 +263,32 @@ public class ContentRepositoryIndex {
       // has never been added to the index before
       if (id == null) {
         id = UUID.randomUUID().toString();
-        ((ResourceURIImpl) resource.getURI()).setIdentifier(id);
+        resource.setIdentifier(id);
       }
 
       // Make sure we have a path
-      if (path == null) {
+      if (path == null || version != Resource.LIVE) {
         path = UrlSupport.concat("/" + type + "s", id);
       }
 
-      uri = new ResourceURIImpl(type, uri.getSite(), path, id, version);
+      uri.setIdentifier(id);
+      uri.setPath(path);
 
       try {
+        address = uriIdx.add(id, type, path);
+        idIdx.set(address, id);
+        versionIdx.add(id, version);
         if (version == Resource.LIVE) {
+          pathIdx.set(address, path);
+          languageIdx.set(id, resource.languages());
           if (resource.isIndexed())
             searchIdx.add(resource);
           else
             searchIdx.delete(uri);
         } else {
-          languageIdx.add(id, null);
+          pathIdx.set(address, null);
+          languageIdx.set(id, null);
         }
-        address = uriIdx.add(id, type, path);
-        idIdx.add(id, address);
-        pathIdx.add(path, address);
-        versionIdx.add(id, version);
-        languageIdx.setLanguages(id, resource.languages());
       } catch (ContentRepositoryException e) {
         throw e;
       } catch (Throwable t) {
@@ -296,14 +298,22 @@ public class ContentRepositoryIndex {
 
     // Otherwise, it's just a new version
     else if (!versionIdx.hasVersion(address, version)) {
-      versionIdx.add(address, version);
+      versionIdx.addVersion(address, version);
+    
+      // Handle live indices
       if (version == Resource.LIVE) {
-        languageIdx.setLanguages(address, resource.languages());
+        languageIdx.set(address, resource.languages());
         if (resource.isIndexed())
           searchIdx.add(resource);
         else
           searchIdx.delete(uri);
       }
+
+      // Make sure we are returning the full uri in case anything was missing
+      if (resource.getIdentifier() == null)
+        resource.setIdentifier(uriIdx.getId(address));
+      if (resource.getPath() == null)
+        resource.setPath(uriIdx.getPath(address));
     }
 
     // Seems to be an existing resource, so it's an update rather than an
@@ -311,45 +321,72 @@ public class ContentRepositoryIndex {
     else {
       logger.warn("Existing resource '{}' was passed to add(), redirecting to update()", uri.getId());
       update(resource);
+
+      if (resource.getIdentifier() == null)
+        resource.setIdentifier(uriIdx.getId(address));
+      if (resource.getPath() == null)
+        resource.setPath(uriIdx.getPath(address));
     }
 
     return uri;
   }
 
   /**
-   * Removes all entries for the given resource uri from the index.
+   * Removes all entries for the given resource uri from the index and returns
+   * <code>true</code>. If the resource is not part of the index,
+   * <code>false</code> is returned.
    * 
    * @param uri
    *          the resource uri
+   * @return <code>true</code> if the resource was deleted
    * @throws IOException
    *           if updating the index fails
    * @throws ContentRepositoryException
    *           if deleting the resource fails
    */
-  public synchronized void delete(ResourceURI uri) throws IOException,
-      ContentRepositoryException {
+  public synchronized boolean delete(ResourceURI uri) throws IOException,
+      ContentRepositoryException, IllegalArgumentException {
     String id = uri.getId();
     String path = uri.getPath();
+    long version = uri.getVersion();
 
     // Locate the entry in question
     long address = toURIEntry(uri);
 
-    // Everything ok?
-    if (address == -1)
-      throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
+    // Does the resource exist?
+    if (address == -1) {
+      logger.warn("Tried to delete non-existing resource {} from index", uri);
+      return false;
+    }
 
     // Load the missing data
     if (id == null)
       id = uriIdx.getId(address);
-    if (path == null)
-      path = uriIdx.getPath(address);
+    path = uriIdx.getPath(address);
 
-    // Delete the entry
-    searchIdx.delete(uri);
-    idIdx.delete(id, address);
-    pathIdx.delete(path, address);
-    uriIdx.delete(address);
-    versionIdx.delete(address);
+    // Are we deleting the one and only version?
+    long[] existingVersions = versionIdx.getVersions(address);
+
+    // Adjust/delete the entry
+    if (existingVersions.length == 1) {
+      searchIdx.delete(uri);
+      uriIdx.delete(address);
+      idIdx.delete(address, id);
+      if (version == Resource.LIVE) {
+        pathIdx.delete(path, address);
+      }
+      languageIdx.delete(address);
+      versionIdx.delete(address);
+    } else if (version == Resource.LIVE) {
+      searchIdx.delete(uri);
+      pathIdx.delete(path, address);
+      languageIdx.set(address, null);
+      versionIdx.delete(address, version);
+    } else {
+      versionIdx.delete(address, version);
+    }
+    
+    return true;
   }
 
   /**
@@ -366,7 +403,7 @@ public class ContentRepositoryIndex {
 
     // Everything ok?
     if (address == -1)
-      throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
+      throw new IllegalArgumentException("Uri " + uri + " was not found");
 
     return versionIdx.getVersions(address);
   }
@@ -378,8 +415,13 @@ public class ContentRepositoryIndex {
    * @param uri
    *          the resource uri
    * @return the languages
+   * @throws IOException
+   *           if accessing the index fails
+   * @throws IllegalArgumentException
+   *           if the uri does not refer to the live version of the resource
    */
-  public Language[] getLanguages(ResourceURI uri) throws IOException {
+  public Language[] getLanguages(ResourceURI uri) throws IOException,
+      IllegalArgumentException {
     if (uri.getVersion() != Resource.LIVE)
       throw new IllegalArgumentException("The language index only works for live resources");
 
@@ -388,9 +430,9 @@ public class ContentRepositoryIndex {
 
     // Everything ok?
     if (address == -1)
-      throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
+      throw new IllegalArgumentException("Uri " + uri + " was not found");
 
-    return languageIdx.getLanguages(address);
+    return languageIdx.get(address);
   }
 
   /**
@@ -402,10 +444,17 @@ public class ContentRepositoryIndex {
    * @return the id
    * @throws IllegalArgumentException
    *           if the uri does not contain a path
+   * @throws IllegalArgumentException
+   *           if the uri does not refer to the live version of the resource
    * @throws IOException
    *           if accessing the index fails
    */
-  public String getIdentifier(ResourceURI uri) throws IOException {
+  public String getIdentifier(ResourceURI uri) throws IOException,
+      IllegalArgumentException {
+
+    if (uri.getVersion() != Resource.LIVE)
+      throw new IllegalArgumentException("The id index only works for live resources");
+
     String path = uri.getPath();
     if (path == null)
       throw new IllegalArgumentException("ResourceURI must contain a path");
@@ -439,10 +488,14 @@ public class ContentRepositoryIndex {
    * @return the path
    * @throws IllegalArgumentException
    *           if the uri does not contain an identifier
+   * @throws IllegalArgumentException
+   *           if the uri does not refer to the live version of the resource
    * @throws IOException
    *           if accessing the index fails
    */
-  public String getPath(ResourceURI uri) throws IOException {
+  public String getPath(ResourceURI uri) throws IOException,
+      IllegalArgumentException {
+
     if (uri.getVersion() != Resource.LIVE)
       throw new IllegalArgumentException("The path index only works for live resources");
 
@@ -480,8 +533,6 @@ public class ContentRepositoryIndex {
    *           if accessing the index fails
    */
   public String getType(ResourceURI uri) throws IOException {
-    if (uri.getVersion() != Resource.LIVE)
-      throw new IllegalArgumentException("The type index only works for live resources");
     long address = toURIEntry(uri);
     if (address == -1)
       return null;
@@ -502,8 +553,9 @@ public class ContentRepositoryIndex {
       ContentRepositoryException {
     ResourceURI uri = resource.getURI();
 
+    // We are only interested in live versions
     if (uri.getVersion() != Resource.LIVE)
-      throw new IllegalArgumentException("The type index only works for live resources");
+      return;
 
     if (resource.isIndexed())
       searchIdx.update(resource);
@@ -511,7 +563,7 @@ public class ContentRepositoryIndex {
       searchIdx.delete(uri);
 
     long address = toURIEntry(uri);
-    languageIdx.setLanguages(address, null);
+    languageIdx.set(address, null);
   }
 
   /**
@@ -525,11 +577,22 @@ public class ContentRepositoryIndex {
    *           if writing to the index fails
    * @throws ContentRepositoryException
    *           if moving the resource fails
+   * @throws IllegalStateException
+   *           if the resource to be moved could not be found in the index
    */
   public synchronized void move(ResourceURI uri, String path)
-      throws IOException, ContentRepositoryException {
+      throws IOException, ContentRepositoryException, IllegalStateException {
+
+    // We are only interested in live versions
     if (uri.getVersion() != Resource.LIVE)
-      throw new IllegalArgumentException("The index can only move live resources");
+      return;
+
+    // Locate the entry in question
+    long address = toURIEntry(uri);
+
+    // Everything ok?
+    if (address == -1)
+      throw new IllegalArgumentException("Uri " + uri + " was not found");
 
     String oldPath = uri.getPath();
 
@@ -539,22 +602,13 @@ public class ContentRepositoryIndex {
       oldPath = getPath(uri);
     }
 
-    // Locate the entry in question
-    long address = toURIEntry(uri);
-
-    // Everything ok?
-    if (address == -1)
-      throw new IllegalStateException("Inconsistencies found in index. Uri " + uri + " cannot be located");
-
     // Do it this way to make sure we have identical path trimming
     uri = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getId(), uri.getVersion());
 
-    pathIdx.delete(oldPath, address);
-    pathIdx.add(uri.getPath(), address);
     uriIdx.update(address, uri.getType(), uri.getPath());
-    if (uri.getVersion() == Resource.LIVE) {
-      searchIdx.move(uri, path);
-    }
+    pathIdx.delete(oldPath, address);
+    pathIdx.set(address, uri.getPath());
+    searchIdx.move(uri, path);
   }
 
   /**
@@ -573,7 +627,7 @@ public class ContentRepositoryIndex {
   }
 
   /**
-   * Returns <code>true</code> if the given uri exists.
+   * Returns <code>true</code> if the given uri exists in the given version.
    * 
    * @param uri
    *          the uri
@@ -581,9 +635,19 @@ public class ContentRepositoryIndex {
    */
   public boolean exists(ResourceURI uri) throws IOException {
     long address = toURIEntry(uri);
-    if (address == -1)
-      return false;
-    return versionIdx.hasVersion(address, uri.getVersion());
+    return address > -1 && versionIdx.hasVersion(address, uri.getVersion());
+  }
+
+  /**
+   * Returns <code>true</code> if the given uri exists in any version.
+   * 
+   * @param uri
+   *          the uri
+   * @return <code>true</code> if the uri exists in any version
+   */
+  public boolean existsInAnyVersion(ResourceURI uri) throws IOException {
+    long address = toURIEntry(uri);
+    return address > -1;
   }
 
   /**

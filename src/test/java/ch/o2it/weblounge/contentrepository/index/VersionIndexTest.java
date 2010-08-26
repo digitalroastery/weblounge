@@ -160,14 +160,14 @@ public class VersionIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#add(long, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.VersionIndex#addVersion(long, long)}
    * .
    */
   @Test
   public void testAddLongLong() {
     String uuid1 = UUID.randomUUID().toString();
     try {
-      long address = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address = idx.addVersion(idx.add(uuid1, Resource.LIVE), Resource.WORK);
       assertEquals(2, idx.getEntries());
       int size = 28 + uuid1.getBytes().length + 4 + versionsPerEntry  * 8;
       assertEquals(size, idx.size());
@@ -190,12 +190,12 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      idx.addVersion(idx.add(uuid1, Resource.LIVE), Resource.WORK);
       idx.add(uuid2, Resource.LIVE);
       int size = 28 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry  * 8);
       idx.delete(0);
       assertEquals(size, idx.size());
-      assertEquals(2, idx.getEntries());
+      assertEquals(1, idx.getEntries());
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -211,7 +211,7 @@ public class VersionIndexTest {
   public void testDeleteLongLong() {
     String uuid1 = UUID.randomUUID().toString();
     try {
-      long address = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address = idx.addVersion(idx.add(uuid1, Resource.LIVE), Resource.WORK);
       idx.delete(address, Resource.LIVE);
       assertEquals(1, idx.getVersions(address).length);
       assertEquals(Resource.WORK, idx.getVersions(address)[0]);
@@ -234,7 +234,7 @@ public class VersionIndexTest {
       idx.add(uuid, address);
       idx.clear();
       assertEquals(0, idx.getEntries());
-      assertEquals(versionsPerEntry, idx.getVersionsPerEntry());
+      assertEquals(versionsPerEntry, idx.getEntriesPerSlot());
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -251,7 +251,7 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address1 = idx.addVersion(idx.add(uuid1, Resource.LIVE), Resource.WORK);
       long address2 = idx.add(uuid2, Resource.LIVE);
       assertEquals(2, idx.getVersions(address1).length);
       assertEquals(Resource.LIVE, idx.getVersions(address1)[0]);
@@ -274,7 +274,7 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address1 = idx.addVersion(idx.add(uuid1, Resource.LIVE), Resource.WORK);
       long address2 = idx.add(uuid2, Resource.WORK);
       assertTrue(idx.hasVersion(address1, Resource.LIVE));
       assertTrue(idx.hasVersion(address1, Resource.WORK));
@@ -297,7 +297,7 @@ public class VersionIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, Resource.LIVE), Resource.WORK);
+      long address1 = idx.addVersion(idx.add(uuid1, Resource.LIVE), Resource.WORK);
       long address2 = idx.add(uuid2, Resource.WORK);
       idx.delete(address2, Resource.WORK);
       assertTrue(idx.hasVersions(address1));
@@ -325,7 +325,7 @@ public class VersionIndexTest {
       idx.add(uuid, version);
       slotsInIndex = idx.getEntries();
       idx.resize(bytesPerId, versionsPerEntry * 3);
-      assertEquals(versionsPerEntry * 3, idx.getVersionsPerEntry());
+      assertEquals(versionsPerEntry * 3, idx.getEntriesPerSlot());
       assertEquals(1, idx.getEntries());
       assertEquals(28 + (slotsInIndex * (bytesPerId + 4 + versionsPerEntry * 3 * 8)), idx.size());
       long[] versions = idx.getVersions(0);

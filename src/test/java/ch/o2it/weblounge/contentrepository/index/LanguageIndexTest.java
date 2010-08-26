@@ -37,13 +37,15 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * Test case for {@link LanguageIndex}.
  */
 public class LanguageIndexTest {
-  
+
   /** Language index */
   protected LanguageIndex idx = null;
 
@@ -55,15 +57,15 @@ public class LanguageIndexTest {
 
   /** The expected number of bytes used for this index */
   protected long expectedSize = -1;
-  
+
   /** English */
-  protected Language english = LanguageSupport.getLanguage("en"); 
+  protected Language english = LanguageSupport.getLanguage("en");
 
   /** German */
-  protected Language german = LanguageSupport.getLanguage("de"); 
+  protected Language german = LanguageSupport.getLanguage("de");
 
   /** Italian */
-  protected Language french = LanguageSupport.getLanguage("fr"); 
+  protected Language french = LanguageSupport.getLanguage("fr");
 
   /**
    * @throws java.lang.Exception
@@ -104,7 +106,8 @@ public class LanguageIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#size()}.
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#size()}
+   * .
    */
   @Test
   public void testSize() {
@@ -129,7 +132,7 @@ public class LanguageIndexTest {
   public void testGetEntries() {
     try {
       assertEquals(0, idx.getEntries());
-      idx.add(UUID.randomUUID().toString(), english);
+      idx.set(UUID.randomUUID().toString(), toSet(english));
       assertEquals(1, idx.getEntries());
     } catch (IOException e) {
       e.printStackTrace();
@@ -139,7 +142,7 @@ public class LanguageIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#add(java.lang.String, Language)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#set(java.lang.String, Language)}
    * .
    */
   @Test
@@ -148,16 +151,16 @@ public class LanguageIndexTest {
     String uuid2 = UUID.randomUUID().toString();
     String uuid3 = UUID.randomUUID().toString();
     try {
-      idx.add(uuid1, english);
-      idx.add(uuid2, english);
+      idx.set(uuid1, toSet(english));
+      idx.set(uuid2, toSet(english));
       assertEquals(2, idx.getEntries());
-      int size = 28 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry  * 8);
+      int size = 28 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry * 8);
       assertEquals(size, idx.size());
-      
+
       // test reusing slots
       idx.delete(0);
       assertEquals(size, idx.size());
-      long address = idx.add(uuid3, english);
+      long address = idx.set(uuid3, toSet(english));
       assertEquals(0, address);
       assertEquals(size, idx.size());
     } catch (IOException e) {
@@ -168,20 +171,43 @@ public class LanguageIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#add(long, Language)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#set(long, Language)}
    * .
    */
   @Test
-  public void testAddLongLong() {
+  public void testSetLongLanguage() {
     String uuid1 = UUID.randomUUID().toString();
     try {
-      long address = idx.add(idx.add(uuid1, english), german);
+      long address = idx.set(uuid1, toSet(english));
+      idx.add(address, german);
       assertEquals(2, idx.getEntries());
-      int size = 28 + uuid1.getBytes().length + 4 + versionsPerEntry  * 8;
+      int size = 28 + uuid1.getBytes().length + 4 + versionsPerEntry * 8;
       assertEquals(size, idx.size());
-      assertEquals(2, idx.getLanguages(address).length);
-      assertEquals(english, idx.getLanguages(address)[0]);
-      assertEquals(german, idx.getLanguages(address)[1]);
+      assertEquals(2, idx.get(address).length);
+      assertEquals(english, idx.get(address)[0]);
+      assertEquals(german, idx.get(address)[1]);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#set(long, Language)}
+   * .
+   */
+  @Test
+  public void testSetLongNull() {
+    String uuid1 = UUID.randomUUID().toString();
+    String uuid2 = UUID.randomUUID().toString();
+    try {
+      long address1 = idx.set(uuid1, toSet(english));
+      idx.set(address1, null);
+      long address2 = idx.set(uuid2, null);
+      assertEquals(0, idx.getEntries());
+      assertEquals(0, idx.get(address1).length);
+      assertEquals(0, idx.get(address2).length);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -198,12 +224,12 @@ public class LanguageIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      idx.add(idx.add(uuid1, english), german);
-      idx.add(uuid2, english);
-      int size = 28 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry  * 8);
+      idx.set(uuid1, toSet(english, german));
+      idx.set(uuid2, toSet(english));
+      int size = 28 + 2 * (uuid1.getBytes().length + 4 + versionsPerEntry * 8);
       idx.delete(0);
       assertEquals(size, idx.size());
-      assertEquals(2, idx.getEntries());
+      assertEquals(1, idx.getEntries());
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -219,10 +245,11 @@ public class LanguageIndexTest {
   public void testDeleteLongLanguage() {
     String uuid1 = UUID.randomUUID().toString();
     try {
-      long address = idx.add(idx.add(uuid1, english), german);
+      long address = idx.set(uuid1, toSet(english));
+      idx.add(address, german);
       idx.delete(address, english);
-      assertEquals(1, idx.getLanguages(address).length);
-      assertEquals(german, idx.getLanguages(address)[0]);
+      assertEquals(1, idx.get(address).length);
+      assertEquals(german, idx.get(address)[0]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -238,10 +265,10 @@ public class LanguageIndexTest {
   public void testClear() {
     String uuid = UUID.randomUUID().toString();
     try {
-      idx.add(uuid, german);
+      idx.set(uuid, toSet(german));
       idx.clear();
       assertEquals(0, idx.getEntries());
-      assertEquals(versionsPerEntry, idx.getLanguagesPerEntry());
+      assertEquals(versionsPerEntry, idx.getEntriesPerSlot());
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -250,7 +277,7 @@ public class LanguageIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#getLanguages(long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex#get(long)}
    * .
    */
   @Test
@@ -258,13 +285,13 @@ public class LanguageIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, english), german);
-      long address2 = idx.add(uuid2, english);
-      assertEquals(2, idx.getLanguages(address1).length);
-      assertEquals(english, idx.getLanguages(address1)[0]);
-      assertEquals(german, idx.getLanguages(address1)[1]);
-      assertEquals(1, idx.getLanguages(address2).length);
-      assertEquals(english, idx.getLanguages(address2)[0]);
+      long address1 = idx.set(uuid1, toSet(english, german));
+      long address2 = idx.set(uuid2, toSet(english));
+      assertEquals(2, idx.get(address1).length);
+      assertEquals(english, idx.get(address1)[0]);
+      assertEquals(german, idx.get(address1)[1]);
+      assertEquals(1, idx.get(address2).length);
+      assertEquals(english, idx.get(address2)[0]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -281,8 +308,8 @@ public class LanguageIndexTest {
     String uuid1 = UUID.randomUUID().toString();
     String uuid2 = UUID.randomUUID().toString();
     try {
-      long address1 = idx.add(idx.add(uuid1, english), german);
-      long address2 = idx.add(uuid2, german);
+      long address1 = idx.set(uuid1, toSet(english, german));
+      long address2 = idx.set(uuid2, toSet(german));
       assertTrue(idx.hasLanguage(address1, english));
       assertTrue(idx.hasLanguage(address1, german));
       assertFalse(idx.hasLanguage(address1, french));
@@ -307,16 +334,16 @@ public class LanguageIndexTest {
     String uuid = UUID.randomUUID().toString();
     long slotsInIndex = 0;
     int bytesPerId = uuid.getBytes().length;
-    
+
     // Resize to the same size
     try {
-      idx.add(uuid, german);
+      idx.set(uuid, toSet(german));
       slotsInIndex = idx.getEntries();
       idx.resize(bytesPerId, versionsPerEntry * 3);
-      assertEquals(versionsPerEntry * 3, idx.getLanguagesPerEntry());
+      assertEquals(versionsPerEntry * 3, idx.getEntriesPerSlot());
       assertEquals(1, idx.getEntries());
       assertEquals(28 + (slotsInIndex * (bytesPerId + 4 + versionsPerEntry * 3 * 8)), idx.size());
-      Language[] languages = idx.getLanguages(0);
+      Language[] languages = idx.get(0);
       assertEquals(1, languages.length);
       assertEquals(german, languages[0]);
     } catch (IOException e) {
@@ -344,6 +371,21 @@ public class LanguageIndexTest {
   @Test
   public void testGetIndexVersion() {
     assertEquals(VersionedContentRepositoryIndex.IDX_VERSION, idx.getIndexVersion());
+  }
+
+  /**
+   * Returns a set containing the languages.
+   * 
+   * @param languages
+   *          the languages
+   * @return the set
+   */
+  protected Set<Language> toSet(Language... languages) {
+    Set<Language> set = new HashSet<Language>();
+    for (Language l : languages) {
+      set.add(l);
+    }
+    return set;
   }
 
 }

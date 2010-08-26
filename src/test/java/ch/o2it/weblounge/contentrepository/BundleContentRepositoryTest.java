@@ -165,7 +165,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testGetVersions() {

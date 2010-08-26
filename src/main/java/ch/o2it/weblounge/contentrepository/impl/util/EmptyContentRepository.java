@@ -115,7 +115,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
@@ -187,9 +187,9 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersionCount()
+   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getRevisionCount()
    */
-  public long getVersionCount() {
+  public long getRevisionCount() {
     return 0;
   }
 

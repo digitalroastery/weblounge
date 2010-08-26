@@ -96,12 +96,12 @@ public class IdIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#getSlotSize()}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#getEntriesPerSlot()}
    * .
    */
   @Test
   public void testGetSlotSize() {
-    assertEquals(entriesPerSlot, idx.getSlotSize());
+    assertEquals(entriesPerSlot, idx.getEntriesPerSlot());
   }
 
   /**
@@ -114,10 +114,10 @@ public class IdIndexTest {
     assertEquals(0, idx.getLoadFactor());
 
     // Fill half of the index
-    long totalEntries = idx.getSlots() * idx.getSlotSize();
+    long totalEntries = idx.getSlots() * idx.getEntriesPerSlot();
     for (long i = 0; i < totalEntries / 2; i++) {
       try {
-        idx.add(UUID.randomUUID().toString(), i);
+        idx.set(i, UUID.randomUUID().toString());
       } catch (IOException e) {
         e.printStackTrace();
         fail(e.getMessage());
@@ -128,7 +128,7 @@ public class IdIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#add(java.lang.String, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#set(long, java.lang.String)}
    * .
    */
   @Test
@@ -136,7 +136,7 @@ public class IdIndexTest {
     String uuid = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(uuid, address);
+      idx.set(address, uuid);
       long[] candidates = idx.locate(uuid);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);
@@ -148,7 +148,7 @@ public class IdIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#delete(java.lang.String, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#delete(long, java.lang.String)}
    * .
    */
   @Test
@@ -156,8 +156,8 @@ public class IdIndexTest {
     String uuid = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(uuid, address);
-      idx.delete(uuid, address);
+      idx.set(address, uuid);
+      idx.delete(address, uuid);
       long[] candidates = idx.locate(uuid);
       assertEquals(0, candidates.length);
     } catch (IOException e) {
@@ -175,11 +175,11 @@ public class IdIndexTest {
     String uuid = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(uuid, address);
+      idx.set(address, uuid);
       idx.clear();
       assertEquals(0, idx.getEntries());
       assertEquals(slotsInIndex, idx.getSlots());
-      assertEquals(entriesPerSlot, idx.getSlotSize());
+      assertEquals(entriesPerSlot, idx.getEntriesPerSlot());
       assertEquals(0.0, idx.getLoadFactor());
     } catch (IOException e) {
       e.printStackTrace();
@@ -197,11 +197,11 @@ public class IdIndexTest {
     String uuid = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(uuid, address);
+      idx.set(address, uuid);
       long[] candidates = idx.locate(uuid);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);
-      idx.add(uuid, address + 1);
+      idx.set(address + 1, uuid);
       candidates = idx.locate(uuid);
       assertEquals(2, candidates.length);
     } catch (IOException e) {
@@ -221,10 +221,10 @@ public class IdIndexTest {
     
     // Resize to the same size
     try {
-      idx.add(uuid, address);
+      idx.set(address, uuid);
       idx.resize(slotsInIndex, entriesPerSlot * 3);
       assertEquals(slotsInIndex, idx.getSlots());
-      assertEquals(entriesPerSlot * 3, idx.getSlotSize());
+      assertEquals(entriesPerSlot * 3, idx.getEntriesPerSlot());
       assertEquals(1, idx.getEntries());
       assertEquals(20 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
       long[] candidates = idx.locate(uuid);

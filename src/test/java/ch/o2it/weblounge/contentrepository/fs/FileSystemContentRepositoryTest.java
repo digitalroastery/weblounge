@@ -20,13 +20,11 @@
 
 package ch.o2it.weblounge.contentrepository.fs;
 
-import static org.junit.Assert.assertFalse;
-
-import static org.junit.Assert.assertTrue;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Resource;
@@ -36,7 +34,6 @@ import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
@@ -314,10 +311,32 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testDeleteResourceURIBoolean() {
-    // TODO: Add another revision of a page to index
-    fail("Not yet implemented"); // TODO
+    ResourceURI workURI = new PageURIImpl(site, page1path, page1uuid, Resource.WORK);
+    Page workPage = new PageImpl(workURI);
+    int resources = populateRepository();
+    int revisions = resources;
+
+    // Add resources and additional work resource
+    try {
+      repository.put(workPage);
+      revisions ++;
+      assertEquals(resources, repository.getResourceCount());
+      assertEquals(revisions, repository.getRevisionCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error adding documents to the repository");
+    }
+
+    // Remove all versions of the page
+    try {
+      repository.delete(workURI, true);
+      assertEquals(resources - 1, repository.getResourceCount());
+      assertEquals(revisions - 2, repository.getRevisionCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error deleting document from the repository");
+    }
   }
 
   /**
@@ -362,7 +381,7 @@ public class FileSystemContentRepositoryTest {
 
     // Try to add a new resource
     try {
-      ((ResourceURIImpl) file.getURI()).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      file.getURI().setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
       repository.put(file);
       assertEquals(resources + 1, repository.getResourceCount());
     } catch (Exception e) {
@@ -439,7 +458,7 @@ public class FileSystemContentRepositoryTest {
       assertTrue(repository.exists(documentURI));
       assertTrue(repository.exists(imageURI));
 
-      ((ResourceURIImpl) documentURI).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      documentURI.setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
       assertFalse(repository.exists(documentURI));
     } catch (ContentRepositoryException e) {
       fail("Error checking for resource existence");
@@ -447,7 +466,7 @@ public class FileSystemContentRepositoryTest {
 
     // Test for non-existing resources
     try {
-      ((ResourceURIImpl) documentURI).setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      documentURI.setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
       assertFalse(repository.exists(documentURI));
     } catch (ContentRepositoryException e) {
       fail("Error checking for resource existence");
@@ -599,7 +618,7 @@ public class FileSystemContentRepositoryTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#getVersionCount()}
+   * {@link ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#getRevisionCount()}
    * .
    */
   @Test

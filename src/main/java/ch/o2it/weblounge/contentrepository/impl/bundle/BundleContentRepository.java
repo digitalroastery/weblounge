@@ -155,7 +155,7 @@ public class BundleContentRepository extends AbstractContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {

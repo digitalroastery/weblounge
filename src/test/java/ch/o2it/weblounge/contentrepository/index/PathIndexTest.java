@@ -99,12 +99,12 @@ public class PathIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.PathIndex#getSlotSize()}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.PathIndex#getEntriesPerSlot()}
    * .
    */
   @Test
   public void testGetSlotSize() {
-    assertEquals(entriesPerSlot, idx.getSlotSize());
+    assertEquals(entriesPerSlot, idx.getEntriesPerSlot());
   }
 
   /**
@@ -117,10 +117,10 @@ public class PathIndexTest {
     assertEquals(0, idx.getLoadFactor());
 
     // Fill half of the index
-    long totalEntries = idx.getSlots() * idx.getSlotSize();
+    long totalEntries = idx.getSlots() * idx.getEntriesPerSlot();
     for (long i = 0; i < totalEntries / 2; i++) {
       try {
-        idx.add(UUID.randomUUID().toString(), i);
+        idx.set(i, UUID.randomUUID().toString());
       } catch (IOException e) {
         e.printStackTrace();
         fail(e.getMessage());
@@ -131,7 +131,7 @@ public class PathIndexTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.index.PathIndex#add(java.lang.String, long)}
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.PathIndex#set(long, java.lang.String)}
    * .
    */
   @Test
@@ -139,7 +139,7 @@ public class PathIndexTest {
     String path = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(path, address);
+      idx.set(address, path);
       long[] candidates = idx.locate(path);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);
@@ -159,7 +159,7 @@ public class PathIndexTest {
     String path = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(path, address);
+      idx.set(address, path);
       idx.delete(path, address);
       long[] candidates = idx.locate(path);
       assertEquals(0, candidates.length);
@@ -178,11 +178,11 @@ public class PathIndexTest {
     String path = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(path, address);
+      idx.set(address, path);
       idx.clear();
       assertTrue(idx.getEntries() == 0);
       assertEquals(slotsInIndex, idx.getSlots());
-      assertEquals(entriesPerSlot, idx.getSlotSize());
+      assertEquals(entriesPerSlot, idx.getEntriesPerSlot());
       assertEquals(0.0, idx.getLoadFactor());
     } catch (IOException e) {
       e.printStackTrace();
@@ -200,11 +200,11 @@ public class PathIndexTest {
     String path = UUID.randomUUID().toString();
     long address = 2384762;
     try {
-      idx.add(path, address);
+      idx.set(address, path);
       long[] candidates = idx.locate(path);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);
-      idx.add(path, address + 1);
+      idx.set(address + 1, path);
       candidates = idx.locate(path);
       assertEquals(2, candidates.length);
     } catch (IOException e) {
@@ -224,10 +224,10 @@ public class PathIndexTest {
     
     // Resize to the same size
     try {
-      idx.add(path, address);
+      idx.set(address, path);
       idx.resize(slotsInIndex, entriesPerSlot * 3);
       assertEquals(slotsInIndex, idx.getSlots());
-      assertEquals(entriesPerSlot * 3, idx.getSlotSize());
+      assertEquals(entriesPerSlot * 3, idx.getEntriesPerSlot());
       assertEquals(1, idx.getEntries());
       assertEquals(20 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
       long[] candidates = idx.locate(path);

@@ -204,7 +204,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public long size() {
+  public synchronized long size() {
     return IDX_HEADER_SIZE + (slots * slotSizeInBytes);
   }
 
@@ -213,7 +213,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public int getSlots() {
+  public synchronized int getSlots() {
     return slots;
   }
 
@@ -222,7 +222,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries per slot
    */
-  public int getSlotSize() {
+  public synchronized int getEntriesPerSlot() {
     return entriesPerSlot;
   }
 
@@ -231,7 +231,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public long getEntries() {
+  public synchronized long getEntries() {
     return entries;
   }
 
@@ -241,21 +241,21 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public float getLoadFactor() {
-    return entries / (slots * entriesPerSlot);
+  public synchronized float getLoadFactor() {
+    return (float)entries / (float)(slots * entriesPerSlot);
   }
 
   /**
    * Adds the id to the index.
-   * 
-   * @param id
-   *          the page identifier
    * @param addressOfId
    *          slot number in main index
+   * @param id
+   *          the page identifier
+   * 
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized void add(String id, long addressOfId) throws IOException {
+  public synchronized void set(long addressOfId, String id) throws IOException {
     int slot = findSlot(id);
     long startOfSlot = IDX_HEADER_SIZE + (slot * slotSizeInBytes);
 
@@ -293,17 +293,17 @@ public class IdIndex implements VersionedContentRepositoryIndex {
 
   /**
    * Removes all entries for the given page uri from the index.
-   * 
-   * @param id
-   *          the identifier
    * @param addressOfId
    *          slot number in main index
+   * @param id
+   *          the identifier
+   * 
    * @throws IOException
    *           if removing the entry from the index fails
    * @throws IllegalStateException
    *           if the id is not part of the index
    */
-  public synchronized void delete(String id, long addressOfId)
+  public synchronized void delete(long addressOfId, String id)
       throws IOException {
 
     // Move to the beginning of the slot

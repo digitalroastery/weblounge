@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -231,7 +230,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public long size() {
+  public synchronized long size() {
     return IDX_HEADER_SIZE + (slots * bytesPerEntry);
   }
 
@@ -244,8 +243,18 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of languages per entry
    */
-  public int getLanguagesPerEntry() {
+  public synchronized int getEntriesPerSlot() {
     return languagesPerEntry;
+  }
+
+  /**
+   * Returns the load factor for this index, which is determined by the number
+   * of entries divided by the number of possible entries.
+   * 
+   * @return the load factor
+   */
+  public synchronized float getLoadFactor() {
+    return (float) entries / (float) (slots * languagesPerEntry);
   }
 
   /**
@@ -253,23 +262,8 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public long getEntries() {
+  public synchronized long getEntries() {
     return entries;
-  }
-
-  /**
-   * Adds id and language to the index and returns the index address.
-   * 
-   * @param id
-   *          the identifier
-   * @param language
-   *          the resource language
-   * @return the entry's address in this index
-   * @throws IOException
-   *           if writing to the index fails
-   */
-  public synchronized long add(String id, Language language) throws IOException {
-    return add(slots, id, language);
   }
 
   /**
@@ -283,34 +277,51 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized long setLanguages(String id, Set<Language> languages)
+  public synchronized long set(String id, Set<Language> languages)
       throws IOException {
-    if (languages.size() == 0)
-      return add(slots, id, null);
 
-    Iterator<Language> li = languages.iterator();
-    long address = add(slots, id, li.next());
-    while (li.hasNext()) {
-      add(address, li.next());
+    long entry = slots;
+
+    // See if there is an empty slot
+    long address = IDX_HEADER_SIZE;
+    long e = 0;
+    idx.seek(address);
+    while (e < slots) {
+      if (idx.readChar() == '\n') {
+        logger.debug("Found orphan line for reuse");
+        entry = e;
+        break;
+      }
+      idx.skipBytes(bytesPerEntry - 2);
+      address += bytesPerEntry;
+      e++;
     }
-    return address;
+
+    // If there are no languages to add, just add a place holder
+    if (languages == null || languages.size() == 0)
+      return set(entry, id, null);
+
+    // Otherwise, add the languages
+    for (Language l : languages) {
+      set(entry, id, l);
+    }
+
+    return entry;
   }
 
   /**
-   * Adds the language to the entry that is located in slot <code>entry</code>
-   * and returns the index address.
+   * Adds the language to the entry that is located in slot <code>entry</code>.
    * 
    * @param entry
    *          the entry where the language needs to be added
    * @param language
    *          the resource language
-   * @return the entry's address in this index
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized long add(long entry, Language language)
+  public synchronized void add(long entry, Language language)
       throws IOException {
-    return add(entry, null, language);
+    set(entry, null, language);
   }
 
   /**
@@ -321,18 +332,16 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    *          the entry where the language needs to be added
    * @param languages
    *          the resource languages
-   * @return the entry's address in this index
    * @throws IOException
    *           if writing to the index fails
    */
-  public void setLanguages(long entry, Set<Language> languages) throws IOException {
-    delete(entry, true);
+  public synchronized void set(long entry, Set<Language> languages)
+      throws IOException {
+    set(entry, null, null);
     if (languages == null || languages.size() == 0)
       return;
-    Iterator<Language> li = languages.iterator();
-    long address = add(entry, li.next());
-    while (li.hasNext()) {
-      add(address, li.next());
+    for (Language language : languages) {
+      set(entry, null, language);
     }
   }
 
@@ -350,43 +359,25 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  private long add(long entry, String id, Language language) throws IOException {
+  private long set(long entry, String id, Language language) throws IOException {
     if (id != null && id.getBytes().length != bytesPerId)
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     int existingLanguageCount = 0;
 
-    // See if there is an empty slot (only if we are adding a whole new entry)
-    if (entry >= slots) {
-      long address = IDX_HEADER_SIZE;
-      long e = 0;
-      idx.seek(address);
-      while (address < startOfEntry) {
-        if (idx.read() == '\n') {
-          logger.debug("Found orphan line for reuse");
-          startOfEntry = address;
-          entry = e;
-          break;
-        }
-        idx.skipBytes(bytesPerEntry - 1);
-        address += bytesPerEntry;
-        e++;
-      }
-    }
-
     // Make sure there is still room left for an additional entry
-    else {
-      idx.seek(startOfEntry);
-      byte[] bytes = new byte[bytesPerId];
-      idx.read(bytes);
-      id = new String(bytes);
+    idx.seek(startOfEntry);
+    if (idx.getFilePointer() < idx.length() && idx.readChar() != '\n') {
+      idx.skipBytes(bytesPerId - 2);
       existingLanguageCount = idx.readInt();
       if (existingLanguageCount >= languagesPerEntry) {
         logger.info("Adding additional language, triggering index resize");
         resize(bytesPerId, languagesPerEntry * 2);
         startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
       }
+    } else if (id == null) {
+      throw new IllegalArgumentException("Identifier required to create a new entry");
     }
 
     // Add the new address
@@ -396,6 +387,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
     else
       idx.skipBytes(bytesPerId);
 
+    // Write the language (or remove it)
     if (language != null) {
       idx.writeInt(existingLanguageCount + 1);
       idx.skipBytes(existingLanguageCount * bytesPerLanguage);
@@ -403,6 +395,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
       entries++;
     } else {
       idx.writeInt(0);
+      entries -= existingLanguageCount;
     }
 
     // Update the file header
@@ -431,51 +424,30 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
 
   /**
    * Removes all languages for the page uri that is located at slot
-   * <code>entry</code> from the index.
+   * <code>entry</code> from the index
    * 
    * @param entry
    *          start address of uri entry
-   * @param keepSlot
-   *          <code>true</code> to keep the slot assigned to the current id
    * @throws IOException
    *           if removing the entry from the index fails
    */
   public synchronized void delete(long entry) throws IOException {
-    delete(entry, false);
-  }
-
-  /**
-   * Removes all languages for the page uri that is located at slot
-   * <code>entry</code> from the index. If <code>keepSlot</code> is set to
-   * <code>true</code>, the languages will be removed but the slot is kept and
-   * remains assigned to the current id.
-   * 
-   * @param entry
-   *          start address of uri entry
-   * @param keepSlot
-   *          <code>true</code> to keep the slot assigned to the current id
-   * @throws IOException
-   *           if removing the entry from the index fails
-   */
-  protected synchronized void delete(long entry, boolean keepSlot)
-      throws IOException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+
+    idx.seek(startOfEntry + bytesPerId);
+    int existingLanguages = idx.readInt();
 
     // Remove the entry
     idx.seek(startOfEntry);
-    if (keepSlot) {
-      idx.skipBytes(IDX_BYTES_PER_ID);
-      idx.writeInt(0);
-      idx.write(new byte[languagesPerEntry * bytesPerEntry]);
-      logger.debug("Removed all languages at address '{}' from index", entry);
-    } else {
-      idx.write('\n');
-      idx.write(new byte[bytesPerEntry - 1]);
-      entries--;
-      idx.seek(IDX_ENTRIES_HEADER_LOCATION);
-      idx.writeLong(entries);
-      logger.debug("Removed entry at address '{}' from index", entry);
-    }
+    idx.writeChar('\n');
+    idx.write(new byte[bytesPerEntry - 2]);
+
+    // Adjust the header
+    entries -= existingLanguages;
+    idx.seek(IDX_ENTRIES_HEADER_LOCATION);
+    idx.writeLong(entries);
+
+    logger.debug("Removed entry at address '{}' from index", entry);
   }
 
   /**
@@ -497,9 +469,17 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
     int deleteEntry = -1;
-    int v = idx.readInt();
-    String[] languages = new String[v];
-    for (int i = 0; i < v; i++) {
+    int existingLanguages = idx.readInt();
+
+    // If this is the last language, simply remove the whole entry
+    if (existingLanguages == 1) {
+      delete(entry);
+      return;
+    }
+
+    // Loop over the languages and try to find the one to be deleted
+    String[] languages = new String[existingLanguages];
+    for (int i = 0; i < existingLanguages; i++) {
       byte[] l = new byte[bytesPerLanguage];
       idx.read(l);
       languages[i] = new String(l);
@@ -514,12 +494,17 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
 
     // Drop the language
     idx.seek(startOfEntry + bytesPerId);
-    idx.writeInt(v - 1);
+    idx.writeInt(existingLanguages - 1);
     idx.skipBytes(deleteEntry * 8);
-    for (int i = deleteEntry + 1; i < v; i++) {
+    for (int i = deleteEntry + 1; i < existingLanguages; i++) {
       idx.write(languages[i].getBytes());
     }
-    idx.write(new byte[(languagesPerEntry - v - 1) * 8]);
+    idx.write(new byte[(languagesPerEntry - existingLanguages - 1) * 8]);
+
+    // Adjust the header
+    entries--;
+    idx.seek(IDX_ENTRIES_HEADER_LOCATION);
+    idx.writeLong(entries);
 
     logger.debug("Removed language '{}' from uri '{}' from index", language, entry);
   }
@@ -545,7 +530,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized Language[] getLanguages(long entry) throws IOException,
+  public synchronized Language[] get(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
@@ -636,7 +621,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
 
     // If this file used to contain entries, we just null out the rest
     try {
-      byte[] bytes = new byte[bytesPerEntry - 1];
+      byte[] bytes = new byte[bytesPerEntry - 2];
       while (idx.getFilePointer() < idx.length()) {
         idx.write('\n');
         idx.write(bytes);

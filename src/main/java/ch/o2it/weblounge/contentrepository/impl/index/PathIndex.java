@@ -204,7 +204,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public long size() {
+  public synchronized long size() {
     return IDX_HEADER_SIZE + (slots * slotSizeInBytes);
   }
 
@@ -213,7 +213,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public int getSlots() {
+  public synchronized int getSlots() {
     return slots;
   }
 
@@ -222,7 +222,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries per slot
    */
-  public int getSlotSize() {
+  public synchronized int getEntriesPerSlot() {
     return entriesPerSlot;
   }
 
@@ -231,7 +231,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public long getEntries() {
+  public synchronized long getEntries() {
     return entries;
   }
 
@@ -241,21 +241,21 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public float getLoadFactor() {
+  public synchronized float getLoadFactor() {
     return entries / (slots * entriesPerSlot);
   }
 
   /**
    * Adds the path to the index.
-   * 
-   * @param path
-   *          the page path
    * @param addressOfPath
    *          slot number in main index
+   * @param path
+   *          the page path
+   * 
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized void add(String path, long addressOfPath)
+  public synchronized void set(long addressOfPath, String path)
       throws IOException {
 
     int slot = findSlot(path);
