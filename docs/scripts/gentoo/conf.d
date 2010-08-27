@@ -54,7 +54,7 @@ WEBLOUNGE_GROUP="weblounge"
 ##
 
 # Set's JAVA_HOME to current selected JRE
-JAVA_HOME="$(java-config -O)"
+JAVA_HOME="$(java-config --jre-home)"
 
 # JVM Memory configuration parameter
 JVM_MEMORY_OPTS="-Xmx1024m -Xms512m"
@@ -66,22 +66,24 @@ JVM_LIBRARY_PATH="-Djava.library.path=$(java-config -i sun-jai-bin)"
 JVM_AWT_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 
 # Options to pass to the JVM on behalf of Jetty. Uncomment to disable debugging
-JVM_DEBUG_OPTS="-Xdebug -ea:ch -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n"
+#JVM_DEBUG_OPTS="-Xdebug -ea:ch -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n"
 
 # Set the vm encoding
 JVM_ENCODING_OPTS="-Dfile.encoding=utf-8"
 
 
 ####
-# Java options and commandline. Don't change anything below this line, unless you
-# know excatly what you are doing.
+# Java options and commandline
 ##
 
 # The resulting weblounge-specific commandline options for java
-JAVA_WEBLOUNGE_OPTS="${FELIX_FILEINSTALL_OPTS} ${PAX_CONFMAN_OPTS} ${PAX_LOGGING_OPTS}"
+WEBLOUNGE_OPTS="${FELIX_FILEINSTALL_OPTS} ${PAX_CONFMAN_OPTS} ${PAX_LOGGING_OPTS}"
 
 # The resulting jvm-specific commandline options for java
-JAVA_JVM_OPTS="-server ${JVM_DEBUG_OPTS} ${JVM_MEMORY_OPTS} ${JVM_ENCODING_OPTS} ${JVM_LIBRARY_PATH} ${JVM_AWT_OPTS}"
+JVM_OPTS="-server ${JVM_DEBUG_OPTS} ${JVM_MEMORY_OPTS} ${JVM_ENCODING_OPTS} ${JVM_LIBRARY_PATH} ${JVM_AWT_OPTS}"
 
-# The java command to be executed
-JAVA_CMD="${JAVA_JVM_OPTS} ${JAVA_WEBLOUNGE_OPTS} -jar ${WEBLOUNGE_HOME}/bin/felix.jar ${FELIX_BUNDLECACHE}"
+# Final command
+RUN_CMD="${JAVA_HOME}/bin/java"
+
+# Final set of options to pass
+RUN_OPTS="${JVM_OPTS} ${WEBLOUNGE_OPTS} -jar ${WEBLOUNGE_HOME}/bin/felix.jar ${FELIX_BUNDLECACHE}"
