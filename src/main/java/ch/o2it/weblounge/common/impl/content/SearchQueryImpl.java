@@ -68,6 +68,9 @@ public class SearchQueryImpl implements SearchQuery {
   /** The template */
   protected String template = null;
 
+  /** The layout */
+  protected String layout = null;
+
   /** The list of required pagelets */
   protected List<Pagelet> pagelets = new ArrayList<Pagelet>();
 
@@ -204,9 +207,9 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withId(java.lang.String)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withIdentifier(java.lang.String)
    */
-  public SearchQuery withId(String id) {
+  public SearchQuery withIdentifier(String id) {
     if (id == null)
       throw new IllegalArgumentException("Id cannot be null");
     this.id = id;
@@ -216,9 +219,9 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#getId()
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getIdentifier()
    */
-  public String getId() {
+  public String getIdentifier() {
     return id;
   }
 
@@ -260,6 +263,25 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public String getTemplate() {
     return template;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withLayout(java.lang.String)
+   */
+  public SearchQuery withLayout(String layout) {
+    this.layout = layout;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getLayout()
+   */
+  public String getLayout() {
+    return layout;
   }
 
   /**

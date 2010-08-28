@@ -125,14 +125,14 @@ public class SearchQueryImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withId(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withIdentifier(java.lang.String)}
    * .
    */
   @Test
   public void testWithId() {
     String id = "4bb19980-8f98-4873-a813-71b6dfab22af";
-    query.withId(id);
-    assertEquals(id, query.getId());
+    query.withIdentifier(id);
+    assertEquals(id, query.getIdentifier());
   }
 
   /**
