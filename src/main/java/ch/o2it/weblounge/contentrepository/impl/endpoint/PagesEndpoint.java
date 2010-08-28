@@ -344,6 +344,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Delete the page
     try {
+      // TODO: Versions?
       contentRepository.delete(pageURI);
     } catch (SecurityException e) {
       logger.warn("Tried to delete page {} of site '{}' without permission", pageURI, site);

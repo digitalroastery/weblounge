@@ -49,7 +49,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public boolean delete(ResourceURI uri) throws ContentRepositoryException, IOException {
-    return delete(uri, true);
+    return delete(uri, false);
   }
 
   /**

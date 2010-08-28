@@ -30,10 +30,12 @@ import static org.junit.Assert.fail;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
@@ -479,9 +481,16 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testFind() {
-    fail("Not yet implemented"); // TODO
+    populateRepository();
+    SearchQuery q = null;
+    try {
+      q = new SearchQueryImpl(site).withTemplate("default");
+      assertEquals(1, repository.find(q).getDocumentCount());
+      assertEquals(1, repository.find(q).getHitCount());
+    } catch (ContentRepositoryException e) {
+      fail("Error searching");
+    }
   }
 
   /**
@@ -490,9 +499,20 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testGet() {
-    fail("Not yet implemented"); // TODO
+    populateRepository();
+    try {
+      Resource<?> r = repository.get(page1URI);
+      assertNotNull(r);
+      assertEquals(page1URI.getId(), r.getIdentifier());
+      assertNull(repository.get(new PageURIImpl(site, "/abc")));
+      assertNull(repository.get(new PageURIImpl(site, null, "a-b-c-d")));
+      assertNull(repository.get(new PageURIImpl(page1URI, Resource.WORK)));
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+      fail("Error trying to get resource");
+    }
+
   }
 
   /**
@@ -642,9 +662,25 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
-  public void testGetVersionCount() {
-    fail("Not yet implemented"); // TODO
+  public void testGetRevisionCount() {
+    int count = populateRepository();
+    assertEquals(count, repository.getRevisionCount());
+    
+    ResourceURI page1WorkURI = new PageURIImpl(page1URI, Resource.WORK);
+    Page page2Work = new PageImpl(page1WorkURI);
+
+    try {
+      repository.put(page2Work);
+      assertEquals(count + 1, repository.getRevisionCount());
+      repository.delete(page1URI, true);
+      assertEquals(count - 1, repository.getRevisionCount());
+      repository.delete(page2URI);
+      assertEquals(count - 2, repository.getRevisionCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+
   }
 
   /**

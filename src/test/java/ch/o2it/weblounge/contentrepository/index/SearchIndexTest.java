@@ -200,7 +200,7 @@ public class SearchIndexTest {
   public void testGetWithId() {
     populateIndex();
     try {
-      SearchQuery q = new SearchQueryImpl(site).withId(uuid1);
+      SearchQuery q = new SearchQueryImpl(site).withIdentifier(uuid1);
       assertEquals(1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();

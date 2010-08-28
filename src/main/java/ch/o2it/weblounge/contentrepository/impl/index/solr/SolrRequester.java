@@ -83,8 +83,8 @@ public class SolrRequester {
     StringBuilder solrQuery = new StringBuilder();
 
     // Id
-    if (query.getId() != null) {
-      and(solrQuery, SolrFields.ID, query.getId(), true, true);
+    if (query.getIdentifier() != null) {
+      and(solrQuery, SolrFields.ID, query.getIdentifier(), true, true);
     }
 
     // Path

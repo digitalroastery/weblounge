@@ -582,6 +582,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Delete the resource
     try {
+      // TODO: Versions?
       contentRepository.delete(resourceURI);
     } catch (IOException e) {
       logger.warn("Error deleting resource {} from site '{}': {}", new Object[] {
