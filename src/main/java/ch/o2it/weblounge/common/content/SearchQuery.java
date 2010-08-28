@@ -86,14 +86,14 @@ public interface SearchQuery {
    *          the identifier to look up
    * @return the query extended by this criterion
    */
-  SearchQuery withId(String id);
+  SearchQuery withIdentifier(String id);
 
   /**
    * Returns the identifier or <code>null</code> if no identifier was specified.
    * 
    * @return the identifier
    */
-  String getId();
+  String getIdentifier();
 
   /**
    * Return the resources with the given path.
@@ -126,6 +126,22 @@ public interface SearchQuery {
    * @return the template
    */
   String getTemplate();
+
+  /**
+   * Return the resources with the given layout.
+   * 
+   * @param layout
+   *          the layout to look up
+   * @return the query extended by this criterion
+   */
+  SearchQuery withLayout(String layout);
+
+  /**
+   * Returns the layout or <code>null</code> if no layout was specified.
+   * 
+   * @return the layout
+   */
+  String getLayout();
 
   /**
    * Return the resources with the given type.
