@@ -121,8 +121,8 @@ public interface WritableContentRepository extends ContentRepository {
       throws ContentRepositoryException, IOException;
 
   /**
-   * This method removes the given resource in all available versions from the
-   * database.
+   * This method removes the given resource in the specified version from the
+   * repository.
    * 
    * @param uri
    *          uri of the resource to remove
