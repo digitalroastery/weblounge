@@ -264,7 +264,7 @@ public class ResourceContentImpl implements ResourceContent {
    *          the string buffer
    * @return the modified string buffer
    */
-  protected StringBuffer addXml(StringBuffer xml) {
+  protected StringBuffer extendXml(StringBuffer xml) {
     return xml;
   }
 
@@ -283,7 +283,7 @@ public class ResourceContentImpl implements ResourceContent {
       buf.append("<mimetype>").append(mimetype).append("</mimetype>");
     if (size >= 0)
       buf.append("<size>").append(size).append("</size>");
-    addXml(buf);
+    extendXml(buf);
     buf.append("</content>");
     return buf.toString();
   }

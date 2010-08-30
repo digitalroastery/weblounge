@@ -25,8 +25,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.page.Composer;
-import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PagePreviewReader;
@@ -109,6 +107,7 @@ public class PagePreviewReaderTest {
    * .
    */
   @Test
+  @SuppressWarnings("null")
   public void testRead() {
     InputStream is = getClass().getResourceAsStream(previewFile);
     Composer preview = null;
@@ -129,9 +128,9 @@ public class PagePreviewReaderTest {
     // Test title module
     assertEquals(titleModule, previewTitle.getModule());
     assertEquals(titlePagelet, previewTitle.getIdentifier());
-    
+
     // TODO: Test pagelet contents
-    
+
   }
 
 }

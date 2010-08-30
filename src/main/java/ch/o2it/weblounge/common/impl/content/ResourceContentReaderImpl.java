@@ -191,13 +191,12 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
     // created
     else if ("created".equals(raw)) {
       User owner = (User) clipboard.remove("user");
-      if (owner == null)
-        throw new IllegalStateException("Creator not found");
       Date date = (Date) clipboard.remove("date");
       if (date == null)
         throw new IllegalStateException("Creation date not found");
-      content.setCreator(owner);
       content.setCreationDate(date);
+      if (owner != null)
+        content.setCreator(owner);
     }
 
     super.endElement(uri, local, raw);

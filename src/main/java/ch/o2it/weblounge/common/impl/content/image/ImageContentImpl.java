@@ -51,12 +51,49 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
    *          the language
    * @param mimetype
    *          the image's mime type
+   */
+  public ImageContentImpl(String filename, Language language, String mimetype) {
+    this(filename, language, mimetype, -1, -1, -1);
+  }
+
+  /**
+   * Creates a new image content representation.
+   * 
+   * @param filename
+   *          the original filename
+   * @param language
+   *          the language
+   * @param mimetype
+   *          the image's mime type
+   * @param width
+   *          the image width in pixels
+   * @param height
+   *          the image height in pixels
+   */
+  public ImageContentImpl(String filename, Language language, String mimetype, int width, int height) {
+    this(filename, language, mimetype, width, height, -1);
+  }
+
+  /**
+   * Creates a new image content representation.
+   * 
+   * @param filename
+   *          the original filename
+   * @param language
+   *          the language
+   * @param mimetype
+   *          the image's mime type
+   * @param width
+   *          the image width in pixels
+   * @param height
+   *          the image height in pixels
    * @param filesize
    *          the file size in bytes
    */
-  public ImageContentImpl(String filename, Language language, String mimetype,
-      long filesize) {
+  public ImageContentImpl(String filename, Language language, String mimetype, int width, int height, long filesize) {
     super(filename, language, mimetype, filesize);
+    this.width = width;
+    this.height = height;
   }
 
   /**
@@ -102,11 +139,11 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#addXml(java.lang.StringBuffer)
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#extendXml(java.lang.StringBuffer)
    */
   @Override
-  protected StringBuffer addXml(StringBuffer xml) {
-    xml = super.addXml(xml);
+  protected StringBuffer extendXml(StringBuffer xml) {
+    xml = super.extendXml(xml);
     if (width <= 0)
       throw new IllegalArgumentException("Image must be wider than 0 pixels");
     if (height <= 0)

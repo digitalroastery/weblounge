@@ -45,16 +45,26 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
    *          the language
    * @param mimetype
    *          the file's mimetype
+   */
+  public FileContentImpl(String filename, Language language, String mimetype) {
+    super(language, filename, mimetype, -1);
+  }
+
+  /**
+   * Creates a new file content representation.
+   * 
+   * @param filename
+   *          the original filename
+   * @param language
+   *          the language
+   * @param mimetype
+   *          the file's mimetype
    * @param filesize
    *          the file size in bytes
    */
   public FileContentImpl(String filename, Language language, String mimetype,
       long filesize) {
     super(language, filename, mimetype, filesize);
-    if (filename == null)
-      throw new IllegalArgumentException("Filename cannot be null");
-    if (filesize <= 0)
-      throw new IllegalArgumentException("File size needs to be larger than 0 bytes");
   }
 
   /**

@@ -43,6 +43,18 @@ public class ImageResourceImpl extends ResourceImpl<ImageContent> implements Ima
   /**
    * {@inheritDoc}
    *
+   * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#addContent(ch.o2it.weblounge.common.content.ResourceContent)
+   */
+  @Override
+  public void addContent(ImageContent content) {
+    if (content == null)
+      throw new IllegalArgumentException("Content must not be null");
+    super.addContent(content);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see ch.o2it.weblounge.common.impl.content.ResourceImpl#toXmlRootTag()
    */
   @Override
