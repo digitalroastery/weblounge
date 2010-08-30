@@ -52,14 +52,13 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.resource.Resource)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.Resource)
    */
-  @Override
-  protected void storeResource(Resource<?> resource) throws IOException {
+  protected <T extends ResourceContent, R extends Resource<T>> R storeResource(
+      R resource) throws IOException {
     // TODO Auto-generated method stub
-
+    return resource;
   }
-
 
   /**
    * {@inheritDoc}
@@ -77,7 +76,8 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    * 
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#openStreamToResource(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  protected InputStream openStreamToResource(ResourceURI uri) throws IOException {
+  protected InputStream openStreamToResource(ResourceURI uri)
+      throws IOException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -99,34 +99,35 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
    *      ch.o2it.weblounge.common.language.Language)
    */
   @Override
-  protected InputStream openStreamToResourceContent(ResourceURI uri, Language language)
-      throws IOException {
+  protected InputStream openStreamToResourceContent(ResourceURI uri,
+      Language language) throws IOException {
     // TODO Auto-generated method stub
     return null;
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.ResourceContent, java.io.InputStream)
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.content.ResourceContent, java.io.InputStream)
    */
-  @Override
-  protected <T extends ResourceContent> void storeResourceContent(
-      ResourceURI uri, T content, InputStream is) throws IOException {
+  protected <T extends ResourceContent> T storeResourceContent(ResourceURI uri,
+      T content, InputStream is) throws IOException {
     // TODO Auto-generated method stub
-    
+    return content;
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deleteResourceContent(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.content.ResourceContent)
+   * 
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#deleteResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
+   *      ch.o2it.weblounge.common.content.ResourceContent)
    */
   @Override
   protected <T extends ResourceContent> void deleteResourceContent(
       ResourceURI uri, T content) throws IOException {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

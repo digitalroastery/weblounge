@@ -551,6 +551,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throw new IOException("Unable to delete directory for resource " + uri, e);
     }
   }
+  
 
   /**
    * {@inheritDoc}
@@ -558,7 +559,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected void storeResource(Resource<?> resource) throws IOException {
+  protected <T extends ResourceContent, R extends Resource<T>> R storeResource(R resource) throws IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
     OutputStream os = null;
@@ -573,6 +574,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       IOUtils.closeQuietly(is);
       IOUtils.closeQuietly(os);
     }
+    return resource;
   }
 
   /**
@@ -582,7 +584,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      ch.o2it.weblounge.common.content.ResourceContent, java.io.InputStream)
    */
   @Override
-  protected <T extends ResourceContent> void storeResourceContent(
+  protected <T extends ResourceContent> T storeResourceContent(
       ResourceURI uri, T content, InputStream is) throws IOException {
 
     File contentFile = uriToContentFile(uri, content);
@@ -597,6 +599,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       IOUtils.closeQuietly(is);
       IOUtils.closeQuietly(os);
     }
+    
+    // Set the size
+    content.setSize(contentFile.length());
+    
+    return content;
   }
 
   /**
