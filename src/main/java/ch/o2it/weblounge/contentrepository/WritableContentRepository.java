@@ -59,8 +59,7 @@ public interface WritableContentRepository extends ContentRepository {
    *           than what is specified in the updated document
    * @return the updated resource
    */
-  Resource<? extends ResourceContent> put(
-      Resource<? extends ResourceContent> resource)
+  <T extends ResourceContent> Resource<T> put(Resource<T> resource)
       throws ContentRepositoryException, IOException, IllegalStateException;
 
   /**
