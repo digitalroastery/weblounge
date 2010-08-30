@@ -48,7 +48,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public boolean delete(ResourceURI uri) throws ContentRepositoryException, IOException {
+  public boolean delete(ResourceURI uri) throws ContentRepositoryException,
+      IOException {
     return delete(uri, false);
   }
 
@@ -64,7 +65,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       throw new IllegalStateException("Content repository is not connected");
 
     // See if the resource exists
-    if (allRevisions && ! index.existsInAnyVersion(uri) || !index.exists(uri)) {
+    if (allRevisions && !index.existsInAnyVersion(uri) || !index.exists(uri)) {
       logger.warn("Resource '{}' not found in repository index", uri);
       return false;
     }
@@ -103,7 +104,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#move(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.content.ResourceURI)
    */
-  public void move(ResourceURI uri, ResourceURI target) throws IOException, ContentRepositoryException {
+  public void move(ResourceURI uri, ResourceURI target) throws IOException,
+      ContentRepositoryException {
     if (!isStarted())
       throw new IllegalStateException("Content repository is not connected");
 
@@ -115,8 +117,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * 
    * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.Resource)
    */
-  public Resource<? extends ResourceContent> put(
-      Resource<? extends ResourceContent> resource)
+  public <T extends ResourceContent> Resource<T> put(Resource<T> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
 
     if (!isStarted())
@@ -127,13 +128,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
       if (resource.contents().size() > 0)
         throw new IllegalStateException("Cannot add content metadata without content");
       index.add(resource);
-    } 
-    
+    }
+
     // The resource exists in some version
     else {
       logger.debug("Checking content section of existing {} {}", resource.getType(), resource);
       Resource<?> r = get(resource.getURI());
-      
+
       // Does the resource exist in this version?
       if (r != null) {
         if (resource.contents().size() != r.contents().size())
@@ -143,8 +144,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
             throw new IllegalStateException("Cannot modify content metadata without content");
         }
         index.update(resource);
-      } 
-      
+      }
+
       // We are about to add a new version of a resource
       else {
         if (resource.contents().size() > 0)
@@ -188,7 +189,13 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
     }
 
     // Store the content and add entry to index
-    resource.addContent(content);
+    try {
+      resource.addContent(content);
+    } catch (ClassCastException e) {
+      logger.error("Trying to add content of type {} to incompatible resource", content.getClass());
+      throw new IllegalStateException(e);
+    }
+
     storeResourceContent(uri, content, is);
     storeResource(resource);
     index.update(resource);
@@ -241,8 +248,8 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  abstract protected void storeResource(
-      Resource<? extends ResourceContent> resource) throws IOException;
+  abstract protected <T extends ResourceContent, R extends Resource<T>> R storeResource(
+      R resource) throws IOException;
 
   /**
    * Writes the resource content to the repository storage.
@@ -256,7 +263,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  protected abstract <T extends ResourceContent> void storeResourceContent(
+  protected abstract <T extends ResourceContent> T storeResourceContent(
       ResourceURI uri, T content, InputStream is) throws IOException;
 
   /**

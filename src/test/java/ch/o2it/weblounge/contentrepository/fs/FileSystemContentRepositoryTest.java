@@ -32,12 +32,14 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.file.FileResource;
+import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageContentImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
@@ -60,11 +62,13 @@ import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
@@ -133,17 +137,53 @@ public class FileSystemContentRepositoryTest {
   /** The sample file */
   protected FileResource file = null;
 
-  /** The sample file */
-  protected ImageResource image = null;
+  /** The jpeg sample file */
+  protected ImageResource jpeg = null;
+
+  /** The jpeg image content path */
+  protected final static String jpegContentPath = "/image.jpg";
+  
+  /** The size of the jpeg image */
+  protected final long jpegFileSize = 73642L;
+
+  /** The jpeg image content url */
+  protected static URL jpegContentURL = null;
+
+  /** The jpeg image content object */
+  protected ImageContent jpegContent = null;
+
+  /** The png content path */
+  protected final static String pngContentPath = "/image.png";
+
+  /** The png content url */
+  protected static URL pngContentURL = null;
+  
+  /** The size of the png image */
+  protected final long pngFileSize = 543037L;
+
+  /** The png content object */
+  protected ImageContent pngContent = null;
 
   /** English */
-  protected Language english = LanguageSupport.getLanguage("en"); 
+  protected Language english = LanguageSupport.getLanguage("en");
 
   /** German */
-  protected Language german = LanguageSupport.getLanguage("de"); 
+  protected Language german = LanguageSupport.getLanguage("de");
 
   /** Italian */
-  protected Language french = LanguageSupport.getLanguage("fr"); 
+  protected Language french = LanguageSupport.getLanguage("fr");
+
+  /**
+   * Sets up everything valid for all test runs.
+   * 
+   * @throws Exception
+   *           if setup fails
+   */
+  @BeforeClass
+  public static void setUpClass() throws Exception {
+    jpegContentURL = FileSystemContentRepositoryTest.class.getResource(jpegContentPath);
+    pngContentURL = FileSystemContentRepositoryTest.class.getResource(pngContentPath);
+  }
 
   /**
    * @throws java.lang.Exception
@@ -208,8 +248,11 @@ public class FileSystemContentRepositoryTest {
     // Prepare the sample image
     ImageResourceReader imageReader = new ImageResourceReader();
     InputStream imageIs = this.getClass().getResourceAsStream("/image.xml");
-    image = imageReader.read(imageIs, site);
+    jpeg = imageReader.read(imageIs, site);
     IOUtils.closeQuietly(imageIs);
+    
+    jpegContent = new ImageContentImpl(jpegContentURL.getFile(), german, "image/jpeg", 1000, 666);
+    pngContent = new ImageContentImpl(pngContentURL.getFile(), english, "text/pdf", 1000, 666);
   }
 
   /**
@@ -322,7 +365,7 @@ public class FileSystemContentRepositoryTest {
     // Add resources and additional work resource
     try {
       repository.put(workPage);
-      revisions ++;
+      revisions++;
       assertEquals(resources, repository.getResourceCount());
       assertEquals(revisions, repository.getRevisionCount());
     } catch (Exception e) {
@@ -398,9 +441,46 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testPutContent() {
-    fail("Not yet implemented"); // TODO
+    populateRepository();
+    
+    // Add content items
+    try {
+      Resource<?> r = repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
+      assertEquals(1, repository.get(imageURI).contents().size());
+      assertEquals(jpegFileSize, r.getContent(jpegContent.getLanguage()).getSize());
+      r = repository.putContent(imageURI, pngContent, pngContentURL.openStream());
+      assertEquals(2, repository.get(imageURI).contents().size());
+      assertEquals(pngFileSize, r.getContent(pngContent.getLanguage()).getSize());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error adding content");
+    }
+
+    // Try to add content items to non-existing resources
+    try {
+      String newfilename = "newimage.jpeg";
+      String mimetype = "image/png";
+      Language language = jpegContent.getLanguage();
+      ImageContent updatedContent = new ImageContentImpl(newfilename, language, mimetype, 1000, 600);
+      Resource<?> r = repository.putContent(imageURI, updatedContent, pngContentURL.openStream());
+      ResourceContent c = r.getContent(language);
+      assertEquals(pngFileSize, c.getSize());
+      assertEquals(mimetype, c.getMimetype());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error replacing content");
+    }
+
+    // Try to add content items to non-existing resources
+    try {
+      ResourceURI uri = new ImageResourceURIImpl(site, "/x/y/z");
+      repository.putContent(uri, jpegContent, jpegContentURL.openStream());
+      fail("Managed to add content to non-existing resource");
+    } catch (Exception e) {
+      // Expected
+    }
+
   }
 
   /**
@@ -409,9 +489,30 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testDeleteContent() {
-    fail("Not yet implemented"); // TODO
+    populateRepository();
+    
+    // Add content items
+    try {
+      repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
+      repository.putContent(imageURI, pngContent, pngContentURL.openStream());
+      assertEquals(2, repository.get(imageURI).contents().size());
+      
+      // Does not exist
+      assertEquals(0, repository.deleteContent(documentURI, jpegContent).contents().size());
+
+      // Should exist
+      assertEquals(1, repository.deleteContent(imageURI, jpegContent).contents().size());
+      
+      // Try that again, should not change anything
+      assertEquals(1, repository.deleteContent(imageURI, jpegContent).contents().size());
+      
+      assertEquals(0, repository.deleteContent(imageURI, pngContent).contents().size());
+      assertEquals(0, repository.get(imageURI).contents().size());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error deleting content");
+    }
   }
 
   /**
@@ -521,9 +622,23 @@ public class FileSystemContentRepositoryTest {
    * .
    */
   @Test
-  @Ignore
   public void testGetContent() {
-    fail("Not yet implemented"); // TODO
+    populateRepository();
+    
+    // Add content items
+    try {
+      repository.putContent(imageURI, jpegContent, jpegContentURL.openStream());
+      repository.putContent(imageURI, pngContent, pngContentURL.openStream());
+      
+      assertEquals(2, repository.get(imageURI).contents().size());
+      assertNotNull(repository.getContent(imageURI, german));
+      assertNotNull(repository.getContent(imageURI, english));
+      assertNull(repository.getContent(imageURI, french));
+      assertNull(repository.getContent(documentURI, german));      
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Error adding content");
+    }
   }
 
   /**
@@ -665,7 +780,7 @@ public class FileSystemContentRepositoryTest {
   public void testGetRevisionCount() {
     int count = populateRepository();
     assertEquals(count, repository.getRevisionCount());
-    
+
     ResourceURI page1WorkURI = new PageURIImpl(page1URI, Resource.WORK);
     Page page2Work = new PageImpl(page1WorkURI);
 
@@ -720,10 +835,10 @@ public class FileSystemContentRepositoryTest {
     // Add the image
     try {
       List<ResourceContent> contents = new ArrayList<ResourceContent>();
-      for (ResourceContent content : image.contents()) {
-        contents.add(image.removeContent(content.getLanguage()));
+      for (ResourceContent content : jpeg.contents()) {
+        contents.add(jpeg.removeContent(content.getLanguage()));
       }
-      repository.put(image);
+      repository.put(jpeg);
       // TODO: Add resource contents
       count++;
     } catch (Exception e) {
