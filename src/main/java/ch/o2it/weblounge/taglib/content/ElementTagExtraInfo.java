@@ -25,6 +25,9 @@ import ch.o2it.weblounge.taglib.TagVariableDefinition;
 import ch.o2it.weblounge.taglib.TagVariableDefinitionParser;
 import ch.o2it.weblounge.taglib.TagVariableDefinitions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Iterator;
 
 import javax.servlet.jsp.tagext.TagData;
@@ -36,6 +39,9 @@ import javax.servlet.jsp.tagext.VariableInfo;
  * tag.
  */
 public class ElementTagExtraInfo extends TagExtraInfo {
+
+  /** Logging facility */
+  private final static Logger logger = LoggerFactory.getLogger(ElementTagExtraInfo.class);
 
   /**
    * Returns the information on the exported tag variables.
@@ -52,6 +58,7 @@ public class ElementTagExtraInfo extends TagExtraInfo {
         variables = TagVariableDefinitionParser.parse(definitions);
         size += variables.size();
       } catch (ParseException e) {
+        logger.error("Error parsing tag variable definitions: " + definitions);
       }
     }
 
@@ -66,7 +73,7 @@ public class ElementTagExtraInfo extends TagExtraInfo {
 
     // Add defined variables
 
-    if (definitions != null && variables != null) {
+    if (variables != null) {
       Iterator<TagVariableDefinition> vars = variables.variables();
       while (vars.hasNext()) {
         TagVariableDefinition def = vars.next();
