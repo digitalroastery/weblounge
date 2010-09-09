@@ -386,7 +386,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
         alias = alias.replace("*", ".*");
         if (serverName.matches(alias)) {
           site = e.getValue();
-          logger.info("Registering {} for site ", serverName, site);
+          logger.info("Registering {} for site {}", serverName, site);
           sitesByServerName.put(serverName, site);
           return site;
         }
