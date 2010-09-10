@@ -43,10 +43,10 @@ LOG_FILE="${WEBLOUNGE_LOGDIR}/weblounge.out"
 PID_FILE="/var/run/weblounge.pid"
 
 # Weblounge's user
-WEBLOUNGE_USER="weblounge"
+WEBLOUNGE_USER="felix"
 
 # Weblounge's group
-WEBLOUNGE_GROUP="weblounge"
+WEBLOUNGE_GROUP="felix"
 
 
 #####
