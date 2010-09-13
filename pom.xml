@@ -72,6 +72,11 @@
       <artifactId>commons-fileupload</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
     <!-- apache solr -->
     
     <dependency>
@@ -164,11 +169,6 @@
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
       <version>1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
     </dependency>
     
     <!-- testing -->
