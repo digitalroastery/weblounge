@@ -87,38 +87,38 @@
       <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-      <module>bootstrap</module>
-      <module>modules/weblounge-cache-api</module>
-      <module>modules/weblounge-cache</module>
-      <module>modules/weblounge-common-api</module>
-      <module>modules/weblounge-common</module>
-      <module>modules/weblounge-contentrepository-api</module>
-      <module>modules/weblounge-contentrepository</module>
-      <module>modules/weblounge-dispatcher-api</module>
-      <module>modules/weblounge-dispatcher</module>
-      <module>modules/weblounge-kernel</module>
-      <module>modules/weblounge-site</module>
-      <module>modules/weblounge-system</module>
-      <module>modules/weblounge-taglib</module>
-      <module>modules/weblounge-test</module>
-  
-      <!-- Attic (ui) -->
-      <!--
-      <module>modules/weblounge-assetdirectory-api</module>
-      <module>modules/weblounge-assetdirectory</module>
-      <module>modules/weblounge-asseteditor-api</module>
-      <module>modules/weblounge-asseteditor</module>
-      <module>modules/weblounge-pagedirectory-api</module>
-      <module>modules/weblounge-pagedirectory</module>
-      <module>modules/weblounge-pageeditor-api</module>
-      <module>modules/weblounge-pageeditor</module>
-      <module>modules/weblounge-user-api</module>
-      <module>modules/weblounge-user</module>
-      <module>modules/weblounge-userdirectory-api</module>
-      <module>modules/weblounge-userdirectory</module>
-      <module>modules/weblounge-workspace</module>
-      <module>modules/weblounge-workspace-api</module>
-      -->
+        <module>bootstrap</module>
+        <module>modules/weblounge-cache-api</module>
+        <module>modules/weblounge-cache</module>
+        <module>modules/weblounge-common-api</module>
+        <module>modules/weblounge-common</module>
+        <module>modules/weblounge-contentrepository-api</module>
+        <module>modules/weblounge-contentrepository</module>
+        <module>modules/weblounge-dispatcher-api</module>
+        <module>modules/weblounge-dispatcher</module>
+        <module>modules/weblounge-kernel</module>
+        <module>modules/weblounge-site</module>
+        <module>modules/weblounge-system</module>
+        <module>modules/weblounge-taglib</module>
+        <module>modules/weblounge-test</module>
+      
+          <!-- Attic (ui) -->
+          <!--
+        <module>modules/weblounge-assetdirectory-api</module>
+        <module>modules/weblounge-assetdirectory</module>
+        <module>modules/weblounge-asseteditor-api</module>
+        <module>modules/weblounge-asseteditor</module>
+        <module>modules/weblounge-pagedirectory-api</module>
+        <module>modules/weblounge-pagedirectory</module>
+        <module>modules/weblounge-pageeditor-api</module>
+        <module>modules/weblounge-pageeditor</module>
+        <module>modules/weblounge-user-api</module>
+        <module>modules/weblounge-user</module>
+        <module>modules/weblounge-userdirectory-api</module>
+        <module>modules/weblounge-userdirectory</module>
+        <module>modules/weblounge-workspace</module>
+        <module>modules/weblounge-workspace-api</module>
+          -->
       </modules>
     </profile>
   </profiles>
