@@ -88,6 +88,7 @@
               ch.o2it.weblounge.common.impl.request;version=${project.version},
               ch.o2it.weblounge.common.impl.url;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
+              ch.o2it.weblounge.common.impl.util.config;version=${project.version},
               ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.request;version=${project.version},
               ch.o2it.weblounge.common.security;version=${project.version},

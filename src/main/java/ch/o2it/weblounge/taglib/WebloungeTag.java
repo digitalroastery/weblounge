@@ -25,6 +25,11 @@ import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
@@ -146,6 +151,8 @@ public class WebloungeTag extends BodyTagSupport {
    *          the class name
    */
   protected void addCssClass(String c) {
+    if (StringUtils.trimToNull(c) == null)
+      return;
     if (css == null)
       css = c;
     else if (!css.startsWith(c + " ") && !css.endsWith(" " + c) && !css.contains(" " + c + " "))
@@ -448,65 +455,48 @@ public class WebloungeTag extends BodyTagSupport {
    * 
    * @return the standard html attributes
    */
-  protected String getStandardAttributes() {
-    StringBuffer b = new StringBuffer(" ");
-    if (css != null) {
-      b.append("class=\"".concat(css).concat("\" "));
-    }
-    if (getId() != null) {
-      b.append("id=\"".concat(getId()).concat("\" "));
-    }
-    if (name != null) {
-      b.append("name=\"".concat(name).concat("\" "));
-    }
-    if (style != null) {
-      b.append("style=\"".concat(style).concat("\" "));
-    }
-    if (lang != null) {
-      b.append("lang=\"".concat(lang).concat("\" "));
-    }
-    if (dir != null) {
-      b.append("dir=\"".concat(dir).concat("\" "));
-    }
-    if (title != null) {
-      b.append("title=\"".concat(title).concat("\" "));
-    }
+  protected Map<String, String> getStandardAttributes() {
+    Map<String, String> attributes = new HashMap<String, String>();
+    if (css != null)
+      attributes.put("class", css);
+    if (getId() != null)
+      attributes.put("id", getId());
+    if (name != null)
+      attributes.put("name", name);
+    if (style != null)
+      attributes.put("style", style);
+    if (lang != null)
+      attributes.put("lang", lang);
+    if (dir != null)
+      attributes.put("dir", dir);
+    if (title != null)
+      attributes.put("title", title);
 
     // Mouse events
-    if (onclick != null) {
-      b.append("onclick=\"".concat(onclick).concat("\" "));
-    }
-    if (ondblclick != null) {
-      b.append("ondblclick=\"".concat(ondblclick).concat("\" "));
-    }
-    if (onmousedown != null) {
-      b.append("onmousedown=\"".concat(onmousedown).concat("\" "));
-    }
-    if (onmousemove != null) {
-      b.append("onmousemove=\"".concat(onmousemove).concat("\""));
-    }
-    if (onmouseout != null) {
-      b.append("onmouseout=\"".concat(onmouseout).concat("\" "));
-    }
-    if (onmouseover != null) {
-      b.append("onmouseover=\"".concat(onmouseover).concat("\" "));
-    }
-    if (onmouseup != null) {
-      b.append("onmouseup=\"".concat(onmouseup).concat("\" "));
-    }
+    if (onclick != null)
+      attributes.put("onclick", name);
+    if (ondblclick != null)
+      attributes.put("ondblclick", ondblclick);
+    if (onmousedown != null)
+      attributes.put("onmousedown", onmousedown);
+    if (onmousemove != null)
+      attributes.put("onmousemove", onmousemove);
+    if (onmouseout != null)
+      attributes.put("onmouseout", onmouseout);
+    if (onmouseover != null)
+      attributes.put("onmouseover", onmouseover);
+    if (onmouseup != null)
+      attributes.put("onmouseup", onmouseup);
 
     // Keyboard events
-    if (onkeydown != null) {
-      b.append("onkeydown=\"".concat(onkeydown).concat("\" "));
-    }
-    if (onkeypress != null) {
-      b.append("onkeypress=\"".concat(onkeypress).concat("\" "));
-    }
-    if (onkeyup != null) {
-      b.append("onkeyup=\"".concat(onkeyup).concat("\" "));
-    }
+    if (onkeydown != null)
+      attributes.put("onkeydown", onkeydown);
+    if (onkeypress != null)
+      attributes.put("onkeypress", onkeypress);
+    if (onkeyup != null)
+      attributes.put("onkeyup", onkeyup);
 
-    return b.toString().trim();
+    return attributes;
   }
 
   /**
@@ -519,6 +509,29 @@ public class WebloungeTag extends BodyTagSupport {
     super.setPageContext(ctxt);
     request = unwrapRequest(pageContext.getRequest());
     response = unwrapResponse(pageContext.getResponse());
+  }
+
+  /**
+   * Returns the map of attributes as a string. If there are no attributes in
+   * the map, an empty string is returned.
+   * 
+   * @param attributes
+   *          the attributes as a string
+   * @return the attributes ready to be added to a tag
+   */
+  protected static String attributesToString(Map<String, String> attributes) {
+    if (attributes == null || attributes.size() == 0)
+      return "";
+    StringBuffer buf = new StringBuffer();
+    for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+      if (buf.length() > 0)
+        buf.append(" ");
+      buf.append(attribute.getKey());
+      buf.append("=\"");
+      buf.append(attribute.getValue());
+      buf.append("\"");
+    }
+    return buf.toString();
   }
 
   /**
