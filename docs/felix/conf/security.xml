@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:sec="http://www.springframework.org/schema/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+    <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Weblounge" entry-point-ref="userEntryPoint">
+
+        <!-- - - - - - - - - - - - - - - - - -->
+        <!-- Url security                    -->
+        <!-- - - - - - - - - - - - - - - - - -->
+        
+        <!-- Enable access to the login page for anyone -->
+        <sec:intercept-url pattern="/**/login" access="anonymous"/>
+
+        <!-- Secure the management urls -->
+        <sec:intercept-url pattern="/system/**" access="admin"/>
+
+        <!-- Everything else is accessible by anyone -->
+        <sec:intercept-url pattern="/**" access="anonymous"/>
+
+        <!-- - - - - - - - - - - - - - - - - -->
+        <!-- Login / Logout                  -->
+        <!-- - - - - - - - - - - - - - - - - -->
+
+        <!-- Enable and configure the failure URL for form-based logins -->
+        <sec:form-login authentication-failure-url="/login.html?error"/>
+
+        <!-- Enable support for OpenID -->
+        <sec:openid-login authentication-failure-url="/login.html?error"/>
+
+        <!-- - - - - - - - - - - - - - - - - -->
+        <!-- Additional features             -->
+        <!-- - - - - - - - - - - - - - - - - -->
+
+        <!-- Enables "remember me" functionality for form- and openid- based logins -->
+        <sec:remember-me key="weblounge"/>
+
+        <!-- Enable anonymous users -->
+        <sec:anonymous/>
+
+        <!-- Enable log out -->
+        <sec:logout/>
+
+    </sec:http>
+
+    <!-- User details -->
+    <sec:user-service id="userDetailsService">
+        <sec:user name="admin" password="weblounge" authorities="admin, user"/>
+    </sec:user-service>
+
+    <!-- Authentication handler -->
+    <sec:authentication-manager>
+        <sec:authentication-provider user-service-ref="userDetailsService"/>
+    </sec:authentication-manager>
+
+    <!-- Redirect unauthenticated requests to the login form -->
+    <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <property name="loginFormUrl" value="/login.html"/>
+    </bean>
+
+    <!-- Expose spring security's context holder via jsr 250 annotations -->
+    <sec:global-method-security jsr250-annotations="enabled"/>
+    
+    <!-- Logging interceptors -->
+    <bean class="org.springframework.security.access.event.LoggerListener"/>
+    <bean class="org.springframework.security.authentication.event.LoggerListener"/>
+
+</beans>
