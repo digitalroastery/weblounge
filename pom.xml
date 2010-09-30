@@ -447,6 +447,30 @@
       </dependency>
   
       <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>org.springframework.security.core</artifactId>
+        <version>3.0.2.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>org.springframework.security.config</artifactId>
+        <version>3.0.2.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>org.springframework.security.web</artifactId>
+        <version>3.0.2.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>org.springframework.security.openid</artifactId>
+        <version>3.0.2.RELEASE</version>
+      </dependency>
+  
+      <dependency>
         <groupId>org.ops4j.pax.web</groupId>
         <artifactId>pax-web-api</artifactId>
         <version>0.7.2</version>
