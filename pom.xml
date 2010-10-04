@@ -223,7 +223,6 @@
         <version>2.5</version>
         <configuration>
           <skip>${checkstyle.skip}</skip>
-          <sourceDirectory>${weblounge.basedir}</sourceDirectory>
           <configLocation>${weblounge.basedir}/docs/checkstyle/weblounge-rules.xml</configLocation>
           <headerLocation>${weblounge.basedir}/docs/checkstyle/header.txt</headerLocation>
           <consoleOutput>true</consoleOutput>
