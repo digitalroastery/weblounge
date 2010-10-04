@@ -14,7 +14,7 @@
 
   <properties>
     <weblounge.basedir>${project.parent.basedir}</weblounge.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
+    <checkstyle.skip>true</checkstyle.skip>
   </properties>
 
   <!-- 
