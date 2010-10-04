@@ -231,7 +231,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
 
     // Did we find a noticeable change?
     if (!configurationChanged) {
-      logger.info("Received updated but identical content repository service configuration");
+      logger.debug("Received updated but identical content repository service configuration");
       return false;
     }
 
