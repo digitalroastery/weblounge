@@ -66,8 +66,8 @@ public class ComposerTag extends ComposerTagSupport {
     Page targetPage = getTargetPage();
     Page contentPage = getContentProvider();
 
-    boolean isLocked = targetPage.isLocked();
-    boolean isLockedByCurrentUser = isLocked && user.equals(targetPage.getLockOwner());
+    boolean isLocked = targetPage != null && targetPage.isLocked();
+    boolean isLockedByCurrentUser = targetPage != null && isLocked && user.equals(targetPage.getLockOwner());
     boolean isWorkVersion = version == Resource.WORK;
     boolean allowContentInheritance = !isLockedByCurrentUser && !isWorkVersion;
     
@@ -78,7 +78,7 @@ public class ComposerTag extends ComposerTagSupport {
     if (isWorkVersion && isLockedByCurrentUser) {
       if (allowContentInheritance)
         addCssClass(CLASS_INHERIT_CONTENT);
-      if (!targetPage.equals(contentPage))
+      if (targetPage != null && !targetPage.equals(contentPage))
         addCssClass(CLASS_GHOST_CONTENT);
     }
 
