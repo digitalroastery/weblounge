@@ -192,6 +192,13 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
       this.slots = idx.readLong();
       this.entries = idx.readLong();
       this.bytesPerEntry = bytesPerId + 4 + languagesPerEntry * 8;
+      
+      // If the index contains entries, we can't reduce the index size 
+      if (this.entries > 0) {
+        idLengthInBytes = Math.max(this.bytesPerId, idLengthInBytes);
+        languages = Math.max(this.languagesPerEntry, languages);
+      }
+      
       if (this.bytesPerId != idLengthInBytes || this.languagesPerEntry != languages)
         resize(idLengthInBytes, languages);
     } catch (EOFException e) {

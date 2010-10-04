@@ -187,6 +187,13 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
       this.slots = idx.readLong();
       this.entries = idx.readLong();
       this.bytesPerEntry = bytesPerId + 4 + versionsPerEntry * 8;
+      
+      // If the index contains entries, we can't reduce the index size 
+      if (this.entries > 0) {
+        idLengthInBytes = Math.max(this.bytesPerId, idLengthInBytes);
+        versions = Math.max(this.versionsPerEntry, versions);
+      }
+
       if (this.bytesPerId != idLengthInBytes || this.versionsPerEntry != versions)
         resize(idLengthInBytes, versions);
     } catch (EOFException e) {

@@ -199,6 +199,14 @@ public class URIIndex implements VersionedContentRepositoryIndex {
       this.bytesPerPath = idx.readInt();
       this.entries = idx.readLong();
       this.bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
+      
+      // If the index contains entries, we can't reduce the index size 
+      if (this.entries > 0) {
+        idLengthInBytes = Math.max(this.bytesPerId, idLengthInBytes);
+        typeLengthInBytes = Math.max(this.bytesPerType, typeLengthInBytes);
+        pathLengthInBytes = Math.max(this.bytesPerPath, pathLengthInBytes);
+      }
+
       if (this.bytesPerId != idLengthInBytes || this.bytesPerType != typeLengthInBytes || this.bytesPerPath != pathLengthInBytes)
         bytesPerEntry = resize(idLengthInBytes, typeLengthInBytes, pathLengthInBytes);
     } catch (EOFException e) {
