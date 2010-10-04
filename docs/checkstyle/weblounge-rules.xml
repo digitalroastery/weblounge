@@ -41,9 +41,11 @@
 
     <!-- Checks for Naming Conventions.                  -->
     <!-- See http://checkstyle.sf.net/config_naming.html -->
+    <!--
     <module name="ConstantName">
       <property name="severity" value="warning" />
     </module>
+    -->
     <module name="LocalFinalVariableName">
       <property name="severity" value="warning" />
     </module>
@@ -80,7 +82,6 @@
       <property name="severity" value="warning" />
     </module>
 
-
     <!-- Checks for Size Violations.                    -->
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="LineLength">
@@ -93,7 +94,6 @@
     <module name="ParameterNumber">
       <property name="severity" value="warning" />
     </module>
-
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
@@ -127,7 +127,6 @@
       <property name="severity" value="warning" />
     </module>
 
-
     <!-- Modifier Checks                                    -->
     <!-- See http://checkstyle.sf.net/config_modifiers.html -->
     <module name="ModifierOrder">
@@ -137,25 +136,27 @@
       <property name="severity" value="warning" />
     </module>
 
-
     <!-- Checks for blocks. You know, those {}'s         -->
     <!-- See http://checkstyle.sf.net/config_blocks.html -->
+    <!--
     <module name="AvoidNestedBlocks">
       <property name="severity" value="warning" />
     </module>
     <module name="EmptyBlock">
       <property name="severity" value="warning" />
     </module>
+    -->
     <module name="LeftCurly">
       <property name="severity" value="warning" />
     </module>
+    <!--
     <module name="NeedBraces">
       <property name="severity" value="warning" />
     </module>
+    -->
     <module name="RightCurly">
       <property name="severity" value="warning" />
     </module>
-
 
     <!-- Checks for common coding problems               -->
     <!-- See http://checkstyle.sf.net/config_coding.html -->
@@ -193,7 +194,6 @@
 
     <!-- Checks for class design                         -->
     <!-- See http://checkstyle.sf.net/config_design.html -->
-    <!--  <module name="DesignForExtension"/> -->
     <module name="FinalClass">
       <property name="severity" value="warning" />
     </module>
@@ -241,6 +241,7 @@
     <module name="UpperEll">
       <property name="severity" value="warning" />
     </module>
+
   </module>
 
 </module>
