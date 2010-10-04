@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<module name="Checker">
+  <module name="SuppressionCommentFilter"/>
+  <module name="FileTabCharacter"/>
+  <module name="Header">
+    <property name="headerFile" value="${checkstyle.header.file}"/>
+    <property name="ignoreLines" value="3"/>
+    <property name="fileExtensions" value="java"/>
+  </module>
+  <module name="TreeWalker">
+    <module name="FileContentsHolder"/>
+    <module name="AvoidStarImport"/>
+    <module name="UnusedImports"/>
+    <module name="IllegalImport"/>
+    <module name="MethodLength"/>
+    <module name="ParameterNumber"/>
+    <module name="DoubleCheckedLocking"/>
+    <module name="EqualsHashCode"/>
+    <module name="IllegalInstantiation"/>
+  </module>
+</module>
