@@ -373,20 +373,33 @@
                   <tagListOptions>
                     <tagClasses>
                       <tagClass>
-                        <displayName>Todo Work</displayName>
+                        <displayName>To do</displayName>
                         <tags>
                           <tag>
                             <matchString>todo</matchString>
                             <matchType>ignoreCase</matchType>
                           </tag>
                           <tag>
+                            <matchString>@todo</matchString>
+                            <matchType>ignoreCase</matchType>
+                          </tag>
+                        </tags>
+                      </tagClass>
+                      <tagClass>
+                        <displayName>To be fixed</displayName>
+                        <tags>
+                          <tag>
                             <matchString>fixme</matchString>
                             <matchType>ignoreCase</matchType>
                           </tag>
                           <tag>
-                            <matchString>@todo</matchString>
+                            <matchString>hack</matchString>
                             <matchType>ignoreCase</matchType>
                           </tag>
+                        </tags>
+                      </tagClass>
+                      <tagClass>
+                        <displayName>To be replaced</displayName>
                           <tag>
                             <matchString>@deprecated</matchString>
                             <matchType>ignoreCase</matchType>
