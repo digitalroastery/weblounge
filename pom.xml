@@ -310,19 +310,21 @@
           <artifactId>maven-bundle-plugin</artifactId>
           <version>2.0.1</version>
           <inherited>true</inherited>
+          <extensions>true</extensions>
           <configuration>
-          <instructions>
-            <Bundle-Category>ch.o2it</Bundle-Category>
-            <Bundle-DocURL>http://digitalcafe.lighthouseapp.com/projects/35461/welcome</Bundle-DocURL>
-            <Bundle-Vendor>O2 IT Engineering</Bundle-Vendor>
-            <Bundle-Name>${project.name}</Bundle-Name>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-          </instructions>
+            <instructions>
+              <Bundle-Category>ch.o2it</Bundle-Category>
+              <Bundle-DocURL>http://digitalcafe.lighthouseapp.com/projects/35461/welcome</Bundle-DocURL>
+              <Bundle-Vendor>O2 IT Engineering</Bundle-Vendor>
+              <Bundle-Name>${project.name}</Bundle-Name>
+              <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            </instructions>
           </configuration>
         </plugin>
 
         <!-- Maven jar support -->
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>2.3.1</version>
           <configuration>
@@ -400,6 +402,7 @@
                       </tagClass>
                       <tagClass>
                         <displayName>To be replaced</displayName>
+                        <tags>
                           <tag>
                             <matchString>@deprecated</matchString>
                             <matchType>ignoreCase</matchType>
