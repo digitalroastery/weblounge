@@ -132,7 +132,7 @@
                     <artifactItem>
                       <groupId>org.apache.jmeter</groupId>
                       <artifactId>jmeter</artifactId>
-                      <version>${jmeter-version}</version>
+                      <version>${jmeter.version}</version>
                       <type>zip</type>
                     </artifactItem>
                   </artifactItems>
