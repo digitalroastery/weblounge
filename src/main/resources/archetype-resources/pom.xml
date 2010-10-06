@@ -74,9 +74,13 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
+        <inherited>true</inherited>
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-Name>${project.name}</Bundle-Name>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common.site;version=3.0-SNAPSHOT,
               ch.o2it.weblounge.common.impl.site;version=3.0-SNAPSHOT,
