@@ -19,8 +19,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <weblounge.basedir>${basedir}</weblounge.basedir>
     <checkstyle.skip>true</checkstyle.skip>
-    <jmeter-version>2.4</jmeter-version>
-    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter-version}</jmeter.home>
+    <jmeter.version>2.4</jmeter.version>
+    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
   </properties>
 
   <organization>
@@ -144,18 +144,9 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>chronos-maven-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
             <configuration>
               <input>${weblounge.basedir}/docs/jmeter/general.jmx</input>
             </configuration>
-            <executions>
-              <execution>
-                <id>performance-test</id>
-                <goals>
-                  <goal>jmeter</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
@@ -272,23 +263,6 @@
           </configuration>
         </plugin>
         
-        <!-- Unit tests -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>surefire-maven-plugin</artifactId>
-          <version>2.4.3</version>
-          <configuration>
-            <property value="UTF-8" name="encoding"/>
-            <property value="UTF-8" name="file.encoding"/>
-            <systemProperties>
-              <property>
-                <name>file.encoding</name>
-                <value>UTF-8</value>
-              </property>
-            </systemProperties>
-          </configuration>
-        </plugin>
-        
         <!-- OSGi declarative services support -->
         <plugin>
           <groupId>org.apache.felix</groupId>
@@ -344,6 +318,14 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>chronos-maven-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
+          <executions>
+            <execution>
+              <id>performance-test</id>
+              <goals>
+                <goal>jmeter</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <!-- Reporting (maven 3 only) -->
@@ -360,6 +342,19 @@
                 <configuration>
                   <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
                   <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+              </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.6.1</version>
+                <configuration>
+                  <aggregate>true</aggregate> -->
+                  <detectLinks>true</detectLinks>
+                  <detectJavaApiLink>true</detectJavaApiLink>
+                  <javadocVersion>1.6</javadocVersion>
+                  <maxmemory>2048m</maxmemory>
+                  <quiet>true</quiet>
                 </configuration>
               </plugin>
               <plugin>
