@@ -16,7 +16,7 @@
     <weblounge.basedir>${project.parent.basedir}</weblounge.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-
+  
   <dependencies>
 
     <!-- weblounge -->
