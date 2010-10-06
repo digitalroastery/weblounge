@@ -19,6 +19,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <weblounge.basedir>${basedir}</weblounge.basedir>
     <checkstyle.skip>true</checkstyle.skip>
+    <jmeter-version>2.4</jmeter-version>
+    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter-version}</jmeter.home>
   </properties>
 
   <organization>
@@ -83,10 +85,12 @@
   </issueManagement>
   
   <profiles>
+  
+    <!-- Build aggregator -->
     <profile>
       <id>full</id>
       <activation>
-      <activeByDefault>true</activeByDefault>
+        <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
         <module>modules/weblounge-cache-api</module>
@@ -102,170 +106,98 @@
         <module>modules/weblounge-system</module>
         <module>modules/weblounge-taglib</module>
         <module>modules/weblounge-test</module>
-      
-          <!-- Attic (ui) -->
-          <!--
-        <module>modules/weblounge-assetdirectory-api</module>
-        <module>modules/weblounge-assetdirectory</module>
-        <module>modules/weblounge-asseteditor-api</module>
-        <module>modules/weblounge-asseteditor</module>
-        <module>modules/weblounge-pagedirectory-api</module>
-        <module>modules/weblounge-pagedirectory</module>
-        <module>modules/weblounge-pageeditor-api</module>
-        <module>modules/weblounge-pageeditor</module>
-        <module>modules/weblounge-user-api</module>
-        <module>modules/weblounge-user</module>
-        <module>modules/weblounge-userdirectory-api</module>
-        <module>modules/weblounge-userdirectory</module>
-        <module>modules/weblounge-workspace</module>
-        <module>modules/weblounge-workspace-api</module>
-          -->
       </modules>
     </profile>
-  </profiles>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>1.2</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.6.1</version>
-        <configuration>
-          <aggregate>true</aggregate>
-          <links>
-          <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-          <link>http://java.sun.com/products/servlet/2.3/javadoc/</link>
-          <link>http://www.json.org/javadoc/</link>
-          <link>http://junit.sourceforge.net/javadoc/</link>
-          </links>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.1</version>
-        <configuration>
-          <aggregate>true</aggregate>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jdepend-maven-plugin</artifactId>
-        <version>2.0-beta-2</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <tags>
-          <tag>TODO</tag>
-          <tag>FIXME</tag>
-          <tag>@todo</tag>
-          <tag>@deprecated</tag>
-          </tags>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.4.3</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.3</version>
-      </plugin>
-    </plugins>
-  </reporting>
+    <!-- Performance testing -->
+    <profile>
+      <id>test</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-jmeter</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.apache.jmeter</groupId>
+                      <artifactId>jmeter</artifactId>
+                      <version>${jmeter-version}</version>
+                      <type>zip</type>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>chronos-maven-plugin</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <configuration>
+              <input>${weblounge.basedir}/docs/jmeter/general.jmx</input>
+            </configuration>
+            <executions>
+              <execution>
+                <id>performance-test</id>
+                <goals>
+                  <goal>jmeter</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
 
   <build>
     <defaultGoal>install</defaultGoal>
+    
     <plugins>
-
-      <!-- Require Java 5 or higher for building -->
+    
+      <!-- Compile -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-          <encoding>UTF-8</encoding>
-        </configuration>
       </plugin>
-  
-      <!-- Attach sources for all builds -->
+      
+      <!-- Attach sources to build artifacts -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.1.1</version>
-        <inherited>true</inherited>
-        <executions>
-          <execution>
-          <id>attach-sources</id>
-          <goals>
-            <goal>jar-no-fork</goal>
-          </goals>
-          </execution>
-        </executions>
       </plugin>
-  
-      <!-- Ensure that the source code matches the style rules -->
+      
+      <!-- Enforce the project's code rules -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <skip>${checkstyle.skip}</skip>
-          <configLocation>${weblounge.basedir}/docs/checkstyle/weblounge-rules.xml</configLocation>
-          <headerLocation>${weblounge.basedir}/docs/checkstyle/header.txt</headerLocation>
-          <consoleOutput>true</consoleOutput>
-          <logViolationsToConsole>true</logViolationsToConsole>
-          <excludes>**/package-info.java</excludes>
-          <failOnViolation>false</failOnViolation> 
-          <failsOnError>false</failsOnError> 
-        </configuration>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
-
-      <!-- Run tests and display test output in the console -->
+      
+      <!-- Run unit tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.3</version>
-        <configuration>
-          <useFile>false</useFile>
-          <encoding>UTF-8</encoding>
-            <systemProperties>
-              <property>
-                <name>file.encoding</name>
-                <value>UTF-8</value>
-              </property>
-              <property>
-                <name>java.awt.headless</name>
-                <value>true</value>
-              </property>
-            </systemProperties>
-        </configuration>
       </plugin>
 
     </plugins>
   
     <pluginManagement>
       <plugins>
+      
+        <!-- Require Java 5 or higher for building -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -276,6 +208,8 @@
             <encoding>UTF-8</encoding>
           </configuration>
         </plugin>
+        
+        <!-- Attach sources to build artifacts -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
@@ -291,28 +225,54 @@
              </execution>
           </executions>
         </plugin>
+        
+        <!-- Coding and styling rules for source code -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>2.4.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.0-alpha-4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2-beta-5</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.3.1</version>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.5</version>
           <configuration>
-            <forceCreation>true</forceCreation>
+            <skip>${checkstyle.skip}</skip>
+            <configLocation>${weblounge.basedir}/docs/checkstyle/weblounge-rules.xml</configLocation>
+            <headerLocation>${weblounge.basedir}/docs/checkstyle/header.txt</headerLocation>
+            <consoleOutput>true</consoleOutput>
+            <logViolationsToConsole>true</logViolationsToConsole>
+            <excludes>**/package-info.java</excludes>
+            <failOnViolation>false</failOnViolation> 
+            <failsOnError>false</failsOnError> 
+          </configuration>
+          <executions>
+            <execution>
+              <phase>validate</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Tests and test output -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.4.3</version>
+          <configuration>
+            <useFile>false</useFile>
+            <encoding>UTF-8</encoding>
+              <systemProperties>
+                <property>
+                  <name>file.encoding</name>
+                  <value>UTF-8</value>
+                </property>
+                <property>
+                  <name>java.awt.headless</name>
+                  <value>true</value>
+                </property>
+              </systemProperties>
           </configuration>
         </plugin>
+        
+        <!-- Unit tests -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>surefire-maven-plugin</artifactId>
@@ -328,6 +288,8 @@
             </systemProperties>
           </configuration>
         </plugin>
+        
+        <!-- OSGi declarative services support -->
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-scr-plugin</artifactId>
@@ -341,6 +303,8 @@
             </execution>
           </executions>
         </plugin>
+        
+        <!-- OSGi bundle generation -->
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
@@ -356,8 +320,111 @@
           </instructions>
           </configuration>
         </plugin>
+
+        <!-- Maven jar support -->
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.3.1</version>
+          <configuration>
+            <forceCreation>true</forceCreation>
+          </configuration>
+        </plugin>
+
+        <!-- Maven dependency management -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+
+        <!-- Maven wrapper for JMeter -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>chronos-maven-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
+        </plugin>
+
+        <!-- Reporting (maven 3 only) -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.0-beta-2</version>
+          <configuration>
+            <reportPlugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                  <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                  <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+              </plugin>
+              <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0-beta-2</version>
+              </plugin>
+              <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                  <tagListOptions>
+                    <tagClasses>
+                      <tagClass>
+                        <displayName>Todo Work</displayName>
+                        <tags>
+                          <tag>
+                            <matchString>todo</matchString>
+                            <matchType>ignoreCase</matchType>
+                          </tag>
+                          <tag>
+                            <matchString>fixme</matchString>
+                            <matchType>ignoreCase</matchType>
+                          </tag>
+                          <tag>
+                            <matchString>@todo</matchString>
+                            <matchType>ignoreCase</matchType>
+                          </tag>
+                          <tag>
+                            <matchString>@deprecated</matchString>
+                            <matchType>ignoreCase</matchType>
+                          </tag>
+                        </tags>
+                      </tagClass>
+                    </tagClasses>
+                  </tagListOptions>
+                </configuration>
+              </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                  <xrefLocation>${project.reporting.outputDirectory}/../xref-test</xrefLocation>
+                </configuration>
+              </plugin>
+              <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.3</version>
+              </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                  <aggregate>true</aggregate>
+                </configuration>
+              </plugin>
+            </reportPlugins>
+          </configuration>
+        </plugin>
+
       </plugins>
     </pluginManagement>
+    
   </build>
 
   <dependencyManagement>
@@ -517,14 +584,25 @@
   <pluginRepositories>
   
     <pluginRepository>
-      <id>apache Snapshots</id>
-      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+      <id>central</id>
+      <url>http://maven.o2it.ch/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+
+    <pluginRepository>
+      <id>snapshots</id>
+      <url>http://maven.o2it.ch/content/groups/public-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-      <releases>
-      <enabled>false</enabled>
-      </releases>
     </pluginRepository>
 
   </pluginRepositories>
