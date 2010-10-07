@@ -39,7 +39,7 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 public interface Page extends Resource<ResourceContent> {
 
   /** The resource type */
-  public final static String TYPE = "page";
+  public static final String TYPE = "page";
 
   /**
    * Sets the layout that should be applied to this page. The layout controls

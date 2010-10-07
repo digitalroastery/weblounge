@@ -28,6 +28,6 @@ import ch.o2it.weblounge.common.content.Resource;
 public interface FileResource extends Resource<FileContent> {
 
   /** The resource type */
-  public final static String TYPE = "file";
+  public static final String TYPE = "file";
 
 }

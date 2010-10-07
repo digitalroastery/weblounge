@@ -28,6 +28,6 @@ import ch.o2it.weblounge.common.content.Resource;
 public interface ImageResource extends Resource<ImageContent> {
 
   /** The resource type */
-  public final static String TYPE = "image";
+  public static final String TYPE = "image";
 
 }
