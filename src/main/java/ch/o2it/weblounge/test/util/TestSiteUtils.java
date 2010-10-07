@@ -59,7 +59,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class TestSiteUtils {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(TestSiteUtils.class);
+  protected static final Logger logger = LoggerFactory.getLogger(TestSiteUtils.class);
 
   /** Name of the properties file that defines the greetings */
   public static final String GREETING_PROPS = "/greetings.properties";

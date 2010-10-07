@@ -39,7 +39,7 @@ import java.util.Map;
 public class GreeterJob implements JobWorker {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(GreeterJob.class);
+  protected static final Logger logger = LoggerFactory.getLogger(GreeterJob.class);
 
   /** Hello world in many languages */
   protected static Map.Entry<String, String>[] greetings = null;

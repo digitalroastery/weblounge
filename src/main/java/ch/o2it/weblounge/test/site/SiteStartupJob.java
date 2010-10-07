@@ -37,7 +37,7 @@ import java.util.Dictionary;
 public class SiteStartupJob implements JobWorker {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(SiteStartupJob.class);
+  protected static final Logger logger = LoggerFactory.getLogger(SiteStartupJob.class);
 
   /**
    * {@inheritDoc}
