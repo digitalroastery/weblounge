@@ -59,7 +59,7 @@ public class LinkTag extends WebloungeTag {
   // Logging
 
   /** the logging facility provided by log4j */
-  private final static Logger log = LoggerFactory.getLogger(LinkTag.class);
+  private static final Logger log = LoggerFactory.getLogger(LinkTag.class);
 
   /**
    * Sets the id of the page to link.

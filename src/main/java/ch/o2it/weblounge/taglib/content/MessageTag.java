@@ -42,7 +42,7 @@ public class MessageTag extends WebloungeTag {
   private static final long serialVersionUID = -6915653732681218856L;
   
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(MessageTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(MessageTag.class);
 
   /**
    * Process the end tag for this instance.

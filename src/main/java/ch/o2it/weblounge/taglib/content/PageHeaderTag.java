@@ -46,7 +46,7 @@ public class PageHeaderTag extends WebloungeTag {
   private static final long serialVersionUID = 2047795554694030193L;
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(PageHeaderTag.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(PageHeaderTag.class.getName());
 
   /** The page identifier */
   private String pageId = null;

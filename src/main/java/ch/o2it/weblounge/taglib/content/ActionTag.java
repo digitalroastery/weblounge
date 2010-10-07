@@ -47,7 +47,7 @@ public class ActionTag extends WebloungeTag {
   private static final long serialVersionUID = 2609596492681590569L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(ActionTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(ActionTag.class);
 
   /** the module identifier */
   private Module module = null;

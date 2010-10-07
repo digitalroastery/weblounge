@@ -59,7 +59,7 @@ public class PageListTag extends WebloungeTag {
   private static final long serialVersionUID = -1825541321489778143L;
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(PageHeaderTag.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(PageHeaderTag.class.getName());
 
   /** The list of keywords */
   private List<String> subjects = null;

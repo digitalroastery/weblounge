@@ -49,7 +49,7 @@ public abstract class ElementCheckTag extends WebloungeTag {
   private static final long serialVersionUID = -2050782761487616751L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(ElementCheckTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(ElementCheckTag.class);
 
   /** The element identifier */
   private String name = null;

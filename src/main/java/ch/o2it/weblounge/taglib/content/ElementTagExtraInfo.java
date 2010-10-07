@@ -41,7 +41,7 @@ import javax.servlet.jsp.tagext.VariableInfo;
 public class ElementTagExtraInfo extends TagExtraInfo {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ElementTagExtraInfo.class);
+  private static final Logger logger = LoggerFactory.getLogger(ElementTagExtraInfo.class);
 
   /**
    * Returns the information on the exported tag variables.

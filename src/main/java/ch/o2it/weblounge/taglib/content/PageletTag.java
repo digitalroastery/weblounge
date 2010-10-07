@@ -48,7 +48,7 @@ public class PageletTag extends WebloungeTag {
   private static final long serialVersionUID = 2814154234296626814L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(PageletTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(PageletTag.class);
 
   /** The module identifier */
   private Module module = null;

@@ -41,7 +41,7 @@ import javax.servlet.jsp.tagext.VariableInfo;
 public class PropertyTagExtraInfo extends TagExtraInfo {
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(PropertyTagExtraInfo.class);
+  private static final Logger logger = LoggerFactory.getLogger(PropertyTagExtraInfo.class);
 
   /**
    * Returns the information on the exported tag variables.

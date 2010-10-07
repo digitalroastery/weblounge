@@ -63,7 +63,7 @@ public class ComposerTagSupport extends WebloungeTag {
   private static final long serialVersionUID = 3879878738066602501L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(ComposerTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(ComposerTag.class);
 
   /** The composer orientation */
   public enum Orientation {

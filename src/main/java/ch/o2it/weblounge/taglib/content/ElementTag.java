@@ -53,7 +53,7 @@ public class ElementTag extends WebloungeTag {
   private static final long serialVersionUID = -2005943868505143139L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(ElementTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(ElementTag.class);
 
   /** The element identifier */
   private String name = null;

@@ -40,7 +40,7 @@ public class MailtoTag extends WebloungeTag {
   private static final long serialVersionUID = -4045932330101731516L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(MailtoTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(MailtoTag.class);
 
   /** The login */
   private String login = null;

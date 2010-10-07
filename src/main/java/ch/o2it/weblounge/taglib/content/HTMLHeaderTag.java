@@ -50,7 +50,7 @@ public class HTMLHeaderTag extends WebloungeTag {
   private static final long serialVersionUID = -1813975272420106327L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(HTMLHeaderTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(HTMLHeaderTag.class);
 
   /**
    * Does the tag processing.

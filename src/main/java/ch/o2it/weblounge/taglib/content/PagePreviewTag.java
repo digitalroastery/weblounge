@@ -61,7 +61,7 @@ public class PagePreviewTag extends WebloungeTag {
   private static final long serialVersionUID = 1313539327041640005L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(PagePreviewTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(PagePreviewTag.class);
 
   /** Preview stop */
   private static enum Marker {

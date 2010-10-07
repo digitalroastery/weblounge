@@ -50,7 +50,7 @@ public class PropertyTag extends WebloungeTag {
   private static final long serialVersionUID = -4170115524572662846L;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(PropertyTag.class);
+  private static final Logger logger = LoggerFactory.getLogger(PropertyTag.class);
 
   /** The property identifier */
   private String name = null;
