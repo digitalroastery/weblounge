@@ -55,7 +55,7 @@ public class CacheManager {
   public static final String DEFAULT_ENCODING = "ISO-8859-1";
 
   /** The default cache size maximum */
-  public final static long DEFAULT_CACHE_SIZE = 10 * 1024 * 1024;
+  public static final long DEFAULT_CACHE_SIZE = 10 * 1024 * 1024;
 
   /** various statistical values */
   /* cache update events */

@@ -56,7 +56,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   private long cacheSize_ = CacheManager.DEFAULT_CACHE_SIZE;
 
   /** Logging facility provided by log4j */
-  private final static Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
   /**
    * Creates a new cache service.
