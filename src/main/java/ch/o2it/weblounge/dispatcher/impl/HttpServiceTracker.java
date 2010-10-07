@@ -47,7 +47,7 @@ public class HttpServiceTracker extends ServiceTracker {
   private WebloungeDispatcherServlet dispatcher = null;
   
   /** Context path of this dispatcher */
-  private final static String contextPath = "/";
+  private static final String contextPath = "/";
 
   /**
    * Creates a new HTTP service tracker that will, upon an appearing http

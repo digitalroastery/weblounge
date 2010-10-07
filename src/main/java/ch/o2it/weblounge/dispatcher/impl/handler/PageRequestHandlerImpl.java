@@ -67,10 +67,10 @@ import javax.servlet.http.HttpServletResponse;
 public final class PageRequestHandlerImpl implements PageRequestHandler {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(PageRequestHandlerImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(PageRequestHandlerImpl.class);
 
   /** The singleton handler instance */
-  private final static PageRequestHandlerImpl handler = new PageRequestHandlerImpl();
+  private static final PageRequestHandlerImpl handler = new PageRequestHandlerImpl();
 
   /**
    * Handles the request for a simple url available somewhere in the system. The

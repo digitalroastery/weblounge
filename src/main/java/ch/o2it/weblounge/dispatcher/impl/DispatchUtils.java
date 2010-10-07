@@ -40,10 +40,10 @@ import javax.servlet.http.HttpServletResponse;
 public class DispatchUtils {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(DispatchUtils.class);
+  private static final Logger logger = LoggerFactory.getLogger(DispatchUtils.class);
 
   /** List of dispatcher listeners */
-  private final static List<DispatchListener> dispatcher = new ArrayList<DispatchListener>();
+  private static final List<DispatchListener> dispatcher = new ArrayList<DispatchListener>();
 
   /**
    * Asks the client to do <code>HTTP</code> authentication by sending back the

@@ -76,7 +76,7 @@ import javax.servlet.http.HttpServletResponse;
 public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ActionRequestHandlerImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(ActionRequestHandlerImpl.class);
 
   /** The registered actions */
   private Map<UrlMatcher, ActionPool> actions = null;
