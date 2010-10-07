@@ -63,7 +63,7 @@ public class ContentRepositoryEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryEndpoint.class);
 
   /** Regular expression to match the resource type */
-  protected final static Pattern resourceTypeRegex = Pattern.compile(".*<\\s*([\\w]*) .*");
+  protected static final Pattern resourceTypeRegex = Pattern.compile(".*<\\s*([\\w]*) .*");
 
   /** The sites that are online */
   protected transient SiteManager sites = null;

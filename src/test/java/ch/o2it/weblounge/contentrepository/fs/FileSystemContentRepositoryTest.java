@@ -141,7 +141,7 @@ public class FileSystemContentRepositoryTest {
   protected ImageResource jpeg = null;
 
   /** The jpeg image content path */
-  protected final static String jpegContentPath = "/image.jpg";
+  protected static final String jpegContentPath = "/image.jpg";
   
   /** The size of the jpeg image */
   protected final long jpegFileSize = 73642L;
@@ -153,7 +153,7 @@ public class FileSystemContentRepositoryTest {
   protected ImageContent jpegContent = null;
 
   /** The png content path */
-  protected final static String pngContentPath = "/image.png";
+  protected static final String pngContentPath = "/image.png";
 
   /** The png content url */
   protected static URL pngContentURL = null;

@@ -82,7 +82,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   protected final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
   /** Regular expression to match the resource id, path and version */
-  protected final static Pattern resourceHeaderRegex = Pattern.compile(".*<\\s*([\\w]*) .*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*version=\"([^\"]*)\".*");
+  protected static final Pattern resourceHeaderRegex = Pattern.compile(".*<\\s*([\\w]*) .*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*version=\"([^\"]*)\".*");
 
   /**
    * {@inheritDoc}

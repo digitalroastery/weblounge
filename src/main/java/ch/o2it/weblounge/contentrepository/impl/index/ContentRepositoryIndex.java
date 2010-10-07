@@ -45,7 +45,7 @@ import java.util.UUID;
 public class ContentRepositoryIndex {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ContentRepositoryIndex.class);
+  private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryIndex.class);
 
   /** The uri index */
   protected URIIndex uriIdx = null;
