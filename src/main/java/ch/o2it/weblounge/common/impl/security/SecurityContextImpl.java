@@ -60,7 +60,7 @@ import javax.xml.xpath.XPath;
 public class SecurityContextImpl extends AbstractSecurityContext implements Cloneable {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(SecurityContextImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(SecurityContextImpl.class);
 
   /** Allowed authorizations */
   private Map<Permission, Set<Authority>> context_ = null;

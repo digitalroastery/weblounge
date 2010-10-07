@@ -62,10 +62,10 @@ public class XMLDocument {
   // Logging
 
   /** the class name, used for the logging facility */
-  private final static String className = XMLDocument.class.getName();
+  private static final String className = XMLDocument.class.getName();
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(className);
+  protected static final Logger logger = LoggerFactory.getLogger(className);
 
   /**
    * Creates a new <code>XMLDocument</code>. Calling <code>save</code> on a

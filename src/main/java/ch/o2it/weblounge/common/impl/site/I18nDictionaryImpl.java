@@ -51,7 +51,7 @@ import javax.xml.xpath.XPath;
 public class I18nDictionaryImpl implements I18nDictionary {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(I18nDictionaryImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(I18nDictionaryImpl.class);
 
   /** The i18n directories */
   protected Map<Language, Properties> i18n = new HashMap<Language, Properties>();

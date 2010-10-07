@@ -31,13 +31,11 @@ import ch.o2it.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -99,8 +97,6 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
    *          the <code>XML</code> node containing the admin configuration
    * @param site
    *          the associated site
-   * @throws ParserConfigurationException
-   * @throws SAXException
    */
   public static SiteAdminImpl fromXml(Node userNode, Site site)
       throws IllegalStateException {
@@ -128,8 +124,6 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
    *          the associated site
    * @param xpath
    *          the {@link XPath} processor
-   * @throws ParserConfigurationException
-   * @throws SAXException
    */
   public static SiteAdminImpl fromXml(Node userNode, Site site, XPath xpath)
       throws IllegalStateException {

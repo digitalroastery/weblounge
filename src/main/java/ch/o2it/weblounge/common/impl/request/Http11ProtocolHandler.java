@@ -63,7 +63,7 @@ import javax.servlet.http.HttpServletResponse;
 public class Http11ProtocolHandler implements Times, Http11Constants {
 
   /** Logging facility */
-  private final static Logger log = LoggerFactory.getLogger(Http11ProtocolHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(Http11ProtocolHandler.class);
 
   /**
    * This response type indicates a "501 Internal Server Error" response
@@ -260,7 +260,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
     StringTokenizer t = new StringTokenizer(eTagList, ",");
     while (t.hasMoreTokens()) {
       s = t.nextToken().trim();
-      if (s.equals("*") || s.equals(eTag))
+      if ("*".equals(s) || s.equals(eTag))
         return true;
     }
     return false;
@@ -343,7 +343,10 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
                 buffer.set(tmp);
               }
 
-              int read, copy = type.to - type.from, write;
+              int read = type.to - type.from;
+              int copy = read;
+              int write = 0;
+
               while (copy > 0 && (read = is.read(tmp)) >= 0) {
                 write = (copy -= read > 0 ? read : read + copy);
                 os.write(tmp, 0, write);

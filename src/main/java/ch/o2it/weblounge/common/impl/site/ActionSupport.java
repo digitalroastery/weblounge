@@ -80,7 +80,7 @@ import javax.xml.xpath.XPathFactory;
 public abstract class ActionSupport extends GeneralComposeable implements Action {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ActionSupport.class);
+  private static final Logger logger = LoggerFactory.getLogger(ActionSupport.class);
 
   /** The action mountpoint */
   protected String mountpoint = null;

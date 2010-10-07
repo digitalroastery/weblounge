@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.Publishable;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -55,7 +54,7 @@ import javax.xml.xpath.XPathFactory;
  * &lt;/published&gt;
  * </pre>
  * 
- * @see Publishable
+ * @see ch.o2it.weblounge.common.content.Publishable
  */
 public class PublishingContext implements Cloneable {
 

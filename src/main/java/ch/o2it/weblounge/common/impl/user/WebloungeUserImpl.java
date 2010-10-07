@@ -34,11 +34,11 @@ import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -208,15 +207,15 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
 
     String first = getFirstName();
     String last = getLastName();
-    if ((first == null || first.equals("")) && (last == null || last.equals("")))
+    if (StringUtils.trimToNull(first) == null && StringUtils.trimToNull(last) == null)
       return null;
 
     // Create the name
     StringBuffer name = new StringBuffer();
-    if (first != null && !first.equals("")) {
+    if (StringUtils.trimToNull(first) != null) {
       name.append(first);
     }
-    if (last != null && !last.trim().equals("")) {
+    if (StringUtils.trimToNull(last) != null) {
       if (name.length() > 0)
         name.append(" ");
       name.append(last);
@@ -279,7 +278,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     StringBuffer initials = new StringBuffer();
     String first = getFirstName();
     String last = getLastName();
-    if (first != null && !first.equals("") && last != null && !last.equals("")) {
+    if (!StringUtils.isBlank(first) && !StringUtils.isBlank(last)) {
       initials.append(first.substring(0, 1));
       initials.append(last.subSequence(0, 1));
       cachedInitials = initials.toString().toLowerCase();
@@ -366,8 +365,6 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    *          the <code>XML</code> node containing the user configuration
    * @param site
    *          the associated site
-   * @throws ParserConfigurationException
-   * @throws SAXException
    */
   public static WebloungeUserImpl fromXml(Node userNode, Site site)
       throws IllegalStateException {
@@ -385,8 +382,6 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    *          the associated site
    * @param xpath
    *          the {@link XPath} processor
-   * @throws ParserConfigurationException
-   * @throws SAXException
    */
   public static WebloungeUserImpl fromXml(Node userNode, Site site, XPath xpath)
       throws IllegalStateException {

@@ -45,7 +45,7 @@ import java.util.Dictionary;
 public class TestJob implements JobWorker {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(TestJob.class);
+  private static final Logger logger = LoggerFactory.getLogger(TestJob.class);
   
   /** String constant identifying the number of executions */
   public static final String CTX_EXECUTIONS = "executions";

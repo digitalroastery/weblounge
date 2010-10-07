@@ -38,7 +38,7 @@ import java.util.Date;
 public final class QuartzTriggerListener implements TriggerListener {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(QuartzTriggerListener.class);
+  protected static final Logger logger = LoggerFactory.getLogger(QuartzTriggerListener.class);
 
   /** Date formatter */
   private static DateFormat df = new SimpleDateFormat();

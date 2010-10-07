@@ -25,8 +25,6 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.IOException;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
@@ -109,7 +107,6 @@ public class HttpAuthCallback extends WebloungeCallback {
    * 
    * @param callbacks
    *          the callbacks
-   * @throws IOException
    * @throws UnsupportedCallbackException
    */
   public void handle(Callback[] callbacks) throws UnsupportedCallbackException {

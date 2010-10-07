@@ -78,8 +78,10 @@ public class Endpoint {
 
   /** Should paths automatically be generated */
   private boolean autoPathFormat = false;
-  String defaultOutputFormat = "";
-  String pathFormatHtml = "";
+
+  private String defaultOutputFormat = "";
+
+  private String pathFormatHtml = "";
 
   /**
    * Creates a new endpoint.
@@ -493,12 +495,32 @@ public class Endpoint {
   }
 
   /**
+   * Sets the default output format.
+   * 
+   * @param format
+   *          the output format
+   */
+  public void setDefaultOutputFormat(String format) {
+    this.defaultOutputFormat = format;
+  }
+
+  /**
    * Returns the default output format used to create urls.
    * 
    * @return the default format
    */
   public String getDefaultOutputFormat() {
     return defaultOutputFormat;
+  }
+
+  /**
+   * Sets the default html path format.
+   * 
+   * @param format
+   *          the path format
+   */
+  public void setPathFormatHtml(String format) {
+    this.pathFormatHtml = format;
   }
 
   public String getPathFormatHtml() {
@@ -511,7 +533,7 @@ public class Endpoint {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

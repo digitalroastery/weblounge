@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.content.image;
 
-import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.impl.content.ResourceContentReaderImpl;
 
@@ -42,11 +41,12 @@ import javax.xml.parsers.SAXParser;
 public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ImageContentReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(ImageContentReader.class);
 
   /**
    * Creates a new file content reader that will parse serialized XML version of
-   * the file content and store it in the {@link ResourceContent} that is returned
+   * the file content and store it in the
+   * {@link ch.o2it.weblounge.common.content.ResourceContent} that is returned
    * by the {@link #read} method.
    * 
    * @throws ParserConfigurationException
@@ -61,7 +61,8 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
   }
 
   /**
-   * This method is called to parse the serialized XML of a {@link ResourceContent}.
+   * This method is called to parse the serialized XML of a
+   * {@link ResourceContent}.
    * 
    * @param is
    *          the content data
@@ -86,14 +87,14 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.content.ResourceContentReaderImpl#createContent()
    */
   @Override
   protected ImageContent createContent() {
     return new ImageContentImpl();
   }
-  
+
   /**
    * Resets the pagelet parser.
    */
@@ -151,7 +152,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
       content.setHeight(Integer.parseInt(getCharacters()));
       logger.trace("Image's height is '{}'", content.getHeight());
     }
-    
+
     else {
       super.endElement(uri, local, raw);
     }

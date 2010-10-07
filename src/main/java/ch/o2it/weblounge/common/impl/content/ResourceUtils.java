@@ -40,9 +40,9 @@ public class ResourceUtils {
    * @return the version string
    */
   public static long getVersion(String version) {
-    if (version.equals("live") || version.equals("index")) {
+    if ("live".equals(version) || "index".equals(version)) {
       return Resource.LIVE;
-    } else if (version.equals("work")) {
+    } else if ("work".equals(version)) {
       return Resource.WORK;
     } else {
       try {

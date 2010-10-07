@@ -38,7 +38,6 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.HTMLAction;
 import ch.o2it.weblounge.common.site.I18nDictionary;
@@ -65,7 +64,7 @@ import java.util.List;
 public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(HTMLActionSupport.class);
+  protected static final Logger logger = LoggerFactory.getLogger(HTMLActionSupport.class);
 
   /** The default path to render on */
   protected String targetPath = null;
@@ -253,18 +252,18 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   }
 
   /**
-   * This implementation always returns {@link Action#EVAL_REQUEST} and simply
-   * sets the content type on the response to
-   * <code>text/html;charset=utf-8</code>. This means that subclasses should
-   * either overwrite this method to specify a different encoding or make sure
-   * that everything that is written to the response is encoded to
-   * <code>utf-8</code>.
+   * This implementation always returns
+   * {@link ch.o2it.weblounge.common.site.Action#EVAL_REQUEST} and simply sets
+   * the content type on the response to <code>text/html;charset=utf-8</code>.
+   * This means that subclasses should either overwrite this method to specify a
+   * different encoding or make sure that everything that is written to the
+   * response is encoded to <code>utf-8</code>.
    * 
    * @param request
    *          the servlet request
    * @param response
    *          the servlet response
-   * @return {@link Action#EVAL_REQUEST}
+   * @return {@link ch.o2it.weblounge.common.site.Action#EVAL_REQUEST}
    */
   public int startResponse(WebloungeRequest request, WebloungeResponse response)
       throws ActionException {
@@ -281,8 +280,8 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * <p>
    * Since this implementation collects all of the includes that are needed to
    * render the page by iterating over the included elements, it returns
-   * {@link HTMLAction#SKIP_HEADER} to tell the tag implementation that no
-   * further work is needed.
+   * {@link ch.o2it.weblounge.common.site.HTMLAction#SKIP_HEADER} to tell the
+   * tag implementation that no further work is needed.
    * 
    * @see ch.o2it.weblounge.common.site.HTMLAction#startHeader(ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse)
@@ -298,9 +297,10 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   }
 
   /**
-   * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
-   * leaves rendering to the actual content of the composer. This means that if
-   * this action is rendered on an existing page, a call to
+   * This method always returns
+   * {@link ch.o2it.weblounge.common.site.HTMLAction#EVAL_COMPOSER} and
+   * therefore leaves rendering to the actual content of the composer. This
+   * means that if this action is rendered on an existing page, a call to
    * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.page.Pagelet)}
    * for each of them will be issued.
    * 
@@ -319,9 +319,10 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   }
 
   /**
-   * This method always returns {@link HTMLAction#EVAL_COMPOSER} and therefore
-   * leaves rendering to the actual content of the composer. This means that if
-   * this action is rendered on an existing page, a call to
+   * This method always returns
+   * {@link ch.o2it.weblounge.common.site.HTMLAction#EVAL_COMPOSER} and
+   * therefore leaves rendering to the actual content of the composer. This
+   * means that if this action is rendered on an existing page, a call to
    * {@link #startPagelet(WebloungeRequest, WebloungeResponse, String, ch.o2it.weblounge.common.content.page.Pagelet)}
    * for each of them will be issued.
    * 
@@ -341,7 +342,8 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   }
 
   /**
-   * This method always returns {@link HTMLAction#EVAL_PAGELET} and therefore
+   * This method always returns
+   * {@link ch.o2it.weblounge.common.site.HTMLAction#EVAL_PAGELET} and therefore
    * leaves rendering to the pagelet.
    * 
    * @param request

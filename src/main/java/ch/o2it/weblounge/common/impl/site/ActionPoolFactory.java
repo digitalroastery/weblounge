@@ -41,7 +41,7 @@ import java.util.Map;
 public final class ActionPoolFactory extends BasePoolableObjectFactory {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ActionPoolFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(ActionPoolFactory.class);
 
   /** The action blueprint */
   protected Action blueprint = null;

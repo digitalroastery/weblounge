@@ -38,7 +38,7 @@ import javax.xml.xpath.XPathFactory;
 public class XPathHelper {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(XPathHelper.class);
+  protected static final Logger logger = LoggerFactory.getLogger(XPathHelper.class);
 
   /**
    * Returns the query result or <code>null</code>.

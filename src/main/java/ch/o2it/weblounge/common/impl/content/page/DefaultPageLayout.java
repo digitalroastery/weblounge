@@ -43,7 +43,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
   protected String identifier = "default";
 
   /** The layout name */
-  LocalizableContent<String> name = null;
+  private LocalizableContent<String> name = null;
 
   /**
    * Creates a new default layout.

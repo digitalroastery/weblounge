@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.JSONAction;
 
@@ -54,9 +53,9 @@ public class JSONActionSupport extends ActionSupport implements JSONAction {
   }
 
   /**
-   * This implementation always returns {@link Action#EVAL_REQUEST} and simply
-   * sets the content type on the response to
-   * <code>text/json;charset=utf-8</code>.
+   * This implementation always returns
+   * {@link ch.o2it.weblounge.common.site.Action#EVAL_REQUEST} and simply sets
+   * the content type on the response to <code>text/json;charset=utf-8</code>.
    * <p>
    * This means that subclasses should either overwrite this method to specify a
    * different encoding or make sure that everything that is written to the
@@ -66,7 +65,7 @@ public class JSONActionSupport extends ActionSupport implements JSONAction {
    *          the servlet request
    * @param response
    *          the servlet response
-   * @return {@link Action#EVAL_REQUEST}
+   * @return {@link ch.o2it.weblounge.common.site.Action#EVAL_REQUEST}
    */
   @Override
   public int startResponse(WebloungeRequest request, WebloungeResponse response)

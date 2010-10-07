@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.content.page;
 
-import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
@@ -49,7 +48,7 @@ import javax.xml.parsers.SAXParserFactory;
 public final class PageletReader extends WebloungeContentReader {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(PageletReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(PageletReader.class);
 
   /** Parser factory */
   private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -65,8 +64,9 @@ public final class PageletReader extends WebloungeContentReader {
 
   /**
    * Creates a new pagelet reader that will parse serialized XML version of a
-   * pagelet and store it in the {@link Pagelet} that is returned by the
-   * {@link #read} method.
+   * pagelet and store it in the
+   * {@link ch.o2it.weblounge.common.content.page.Pagelet} that is returned by
+   * the {@link #read} method.
    * 
    * @throws ParserConfigurationException
    *           if the SAX parser setup failed
@@ -80,7 +80,8 @@ public final class PageletReader extends WebloungeContentReader {
   }
 
   /**
-   * This method is called to parse the serialized XML of a {@link Pagelet}.
+   * This method is called to parse the serialized XML of a
+   * {@link ch.o2it.weblounge.common.content.page.Pagelet}.
    * 
    * @param is
    *          the pagelet data

@@ -41,7 +41,7 @@ import javax.security.auth.login.LoginException;
 public class AdminLoginModule extends AbstractLoginModule {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(AdminLoginModule.class);
+  private static final Logger logger = LoggerFactory.getLogger(AdminLoginModule.class);
 
   /**
    * @see ch.o2it.weblounge.core.security.jaas.AbstractLoginModule#checkUserAndPassword()

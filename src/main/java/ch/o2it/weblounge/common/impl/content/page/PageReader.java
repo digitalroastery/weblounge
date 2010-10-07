@@ -54,7 +54,7 @@ import javax.xml.parsers.SAXParserFactory;
 public class PageReader extends WebloungeContentReader implements ResourceReader<ResourceContent, Page> {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(PageReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(PageReader.class);
 
   /** Parser factory */
   private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();

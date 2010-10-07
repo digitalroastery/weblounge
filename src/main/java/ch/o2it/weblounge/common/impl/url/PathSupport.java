@@ -128,7 +128,7 @@ public class PathSupport {
    */
   private static String adjustSeparator(String path) {
     String sp = File.separator;
-    if (sp.equals("\\"))
+    if ("\\".equals(sp))
       sp = "\\\\";
     return path.replaceAll("/", sp);
   }

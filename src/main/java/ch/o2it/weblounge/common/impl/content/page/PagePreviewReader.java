@@ -50,7 +50,7 @@ import javax.xml.parsers.SAXParserFactory;
 public final class PagePreviewReader extends WebloungeContentReader {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(PagePreviewReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(PagePreviewReader.class);
 
   /** Parser factory */
   private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();

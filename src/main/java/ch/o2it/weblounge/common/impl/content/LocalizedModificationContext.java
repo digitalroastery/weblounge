@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.LocalizedModifiable;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
@@ -72,7 +71,7 @@ import javax.xml.xpath.XPathFactory;
  * &lt;/content&gt;
  * </pre>
  * 
- * @see LocalizedModifiable
+ * @see ch.o2it.weblounge.common.content.LocalizedModifiable
  */
 public class LocalizedModificationContext extends LocalizableObject implements Cloneable {
 

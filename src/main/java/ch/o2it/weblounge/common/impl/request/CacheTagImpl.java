@@ -28,10 +28,10 @@ import ch.o2it.weblounge.common.request.CacheTag;
 public final class CacheTagImpl implements CacheTag {
 
   /** Tag key */
-  String key = null;
+  protected String key = null;
 
   /** Tag value */
-  Object value = null;
+  protected Object value = null;
 
   /**
    * Creates a cache tag with an empty value. This kind of tag can be used to
@@ -47,7 +47,7 @@ public final class CacheTagImpl implements CacheTag {
   /**
    * Creates a cache tag with the given name and value.
    * <p>
-   * Note that a tag value of <code>null</code> is replaced by the final static
+   * Note that a tag value of <code>null</code> is replaced by the static final
    * field {@link #ANY}.
    * 
    * @param key

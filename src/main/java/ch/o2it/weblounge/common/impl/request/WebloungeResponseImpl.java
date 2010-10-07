@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 public class WebloungeResponseImpl extends HttpServletResponseWrapper implements WebloungeResponse {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(WebloungeResponseImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(WebloungeResponseImpl.class);
 
   /** Flag for invalidated responses that should not be cached */
   private boolean isValid = false;

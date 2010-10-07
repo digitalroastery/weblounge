@@ -25,7 +25,6 @@ import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import org.quartz.Calendar;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.Scheduler;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +42,9 @@ public final class QuartzJobTrigger extends Trigger {
 
   /**
    * <p>
-   * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
-   * situation, the <code>{@link QuartzJobTrigger}</code> wants to be fired now
-   * by <code>Scheduler</code>.
+   * Instructs the <code>{@link org.quartz.Scheduler}</code> that upon a
+   * mis-fire situation, the <code>{@link QuartzJobTrigger}</code> wants to be
+   * fired now by <code>Scheduler</code>.
    * </p>
    * 
    * <p>
@@ -60,8 +59,8 @@ public final class QuartzJobTrigger extends Trigger {
 
   /**
    * <p>
-   * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
-   * situation, the <code>{@link QuartzJobTrigger}</code> wants to be
+   * Instructs the <code>{@link org.quartz.Scheduler}</code> that upon a
+   * mis-fire situation, the <code>{@link QuartzJobTrigger}</code> wants to be
    * re-scheduled. This does obey the <code>Trigger</code> end-time however, so
    * if the next fire time is after the end-time the <code>Trigger</code> will
    * not fire again.
@@ -80,12 +79,12 @@ public final class QuartzJobTrigger extends Trigger {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(QuartzJobTrigger.class);
-  
+
   /** Weblounge job trigger */
   private JobTrigger trigger = null;
 
   /** True if the trigger may fire multiple times */
-  boolean mayFireAgain = true;
+  private boolean mayFireAgain = true;
 
   /** Start date */
   private Date startTime = null;
@@ -310,7 +309,7 @@ public final class QuartzJobTrigger extends Trigger {
     } finally {
       nextFireTime = getFireTimeAfter(nextFireTime);
     }
-  
+
     // Make sure the next fire time is not explicitly excluded
     while (nextFireTime != null && calendar != null && !calendar.isTimeIncluded(nextFireTime.getTime())) {
 

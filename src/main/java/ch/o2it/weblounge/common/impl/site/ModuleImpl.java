@@ -63,7 +63,7 @@ import javax.xml.xpath.XPathFactory;
 public class ModuleImpl implements Module {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(ModuleImpl.class);
+  protected static final Logger logger = LoggerFactory.getLogger(ModuleImpl.class);
 
   /** Regular expression to test the validity of a module identifier */
   private static final String MODULE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";

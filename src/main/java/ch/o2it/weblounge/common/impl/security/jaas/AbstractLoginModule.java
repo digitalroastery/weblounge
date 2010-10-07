@@ -32,7 +32,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
@@ -94,7 +93,7 @@ public abstract class AbstractLoginModule implements LoginModule {
    *          options specified in the login <code>Configuration</code> for this
    *          particular <code>LoginModule</code>.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public void initialize(Subject subject, CallbackHandler callbackHandler,
       Map sharedState, Map options) {
     this.subject = subject;
@@ -113,8 +112,6 @@ public abstract class AbstractLoginModule implements LoginModule {
    * 
    * @return true in all cases since this <code>LoginModule</code> should not be
    *         ignored.
-   * @exception FailedLoginException
-   *              if the authentication fails.
    * @exception LoginException
    *              if this <code>LoginModule</code> is unable to perform the
    *              authentication.

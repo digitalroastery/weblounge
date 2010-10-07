@@ -77,7 +77,7 @@ import java.util.Map.Entry;
 public final class PageletImpl extends LocalizableObject implements Pagelet {
 
   /** Logging facility */
-  protected final static Logger logger = LoggerFactory.getLogger(Pagelet.class);
+  protected static final Logger logger = LoggerFactory.getLogger(Pagelet.class);
 
   /** Module that defined the pagelet */
   private String moduleId = null;
@@ -86,25 +86,25 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   private String pageletId = null;
 
   /** The pagelet location */
-  PageletURI uri = null;
-
-  /** The security context */
-  SecurityContextImpl securityCtx = null;
-
-  /** The creation context */
-  CreationContext creationCtx = null;
-
-  /** The publishing context */
-  PublishingContext publishingCtx = null;
-
-  /** The modification context */
-  LocalizedModificationContext modificationCtx = null;
+  private PageletURI uri = null;
 
   /** The pagelet properties */
-  Map<String, String[]> properties = null;
+  private Map<String, String[]> properties = null;
 
   /** The content */
-  LocalizableContent<Map<String, String[]>> content = null;
+  private LocalizableContent<Map<String, String[]>> content = null;
+
+  /** The security context */
+  protected SecurityContextImpl securityCtx = null;
+
+  /** The creation context */
+  protected CreationContext creationCtx = null;
+
+  /** The publishing context */
+  protected PublishingContext publishingCtx = null;
+
+  /** The modification context */
+  protected LocalizedModificationContext modificationCtx = null;
 
   /**
    * Creates an empty pagelet. This constructor is for use by the

@@ -56,7 +56,7 @@ public class SystemRole extends RoleImpl {
   public static final Role SYSTEMADMIN = new SystemRole("systemadmin", SITEADMIN);
 
   /** The system roles collection */
-  public static Set<Role> roles_ = new HashSet<Role>();
+  private static Set<Role> roles_ = new HashSet<Role>();
   
   static {
     roles_.add(SystemRole.GUEST);

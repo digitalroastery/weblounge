@@ -99,7 +99,7 @@ public class SiteImpl implements Site {
   private static final long serialVersionUID = 5544198303137698222L;
 
   /** Logging facility */
-  final static Logger logger = LoggerFactory.getLogger(SiteImpl.class);
+  static final Logger logger = LoggerFactory.getLogger(SiteImpl.class);
 
   /** Bundle property name of the site identifier */
   public static final String PROP_IDENTIFIER = "site.identifier";

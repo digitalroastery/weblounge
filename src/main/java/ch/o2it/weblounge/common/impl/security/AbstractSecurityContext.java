@@ -44,10 +44,10 @@ public abstract class AbstractSecurityContext {
   private List<SecurityListener> listeners_ = null;
 
   /** Type mappings */
-  protected final static Map<String, String> shortcuts = new HashMap<String, String>();
+  protected static final Map<String, String> shortcuts = new HashMap<String, String>();
 
   /** Type mappings */
-  protected final static Map<String, String> qualifier = new HashMap<String, String>();
+  protected static final Map<String, String> qualifier = new HashMap<String, String>();
 
   /**
    * Initializes the static shortcut mappings.

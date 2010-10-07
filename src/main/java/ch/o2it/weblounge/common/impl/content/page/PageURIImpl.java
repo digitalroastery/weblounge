@@ -36,7 +36,7 @@ public class PageURIImpl extends ResourceURIImpl {
   private static final long serialVersionUID = -4786684576702578116L;
 
   /** The resource type */
-  public final static String TYPE = "page";
+  public static final String TYPE = "page";
 
   /**
    * Creates a new {@link PageURI} from the given request, which is used to

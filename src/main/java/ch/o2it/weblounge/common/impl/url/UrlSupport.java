@@ -168,7 +168,7 @@ public class UrlSupport {
    */
   private static String checkSeparator(String path) {
     String sp = File.separator;
-    if (sp.equals("\\"))
+    if ("\\".equals(sp))
       sp = "\\\\";
     return path.replaceAll(sp, "/");
   }

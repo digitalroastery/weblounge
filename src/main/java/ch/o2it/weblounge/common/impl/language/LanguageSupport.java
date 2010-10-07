@@ -46,10 +46,10 @@ import javax.xml.xpath.XPathFactory;
 public final class LanguageSupport {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(LanguageSupport.class);
+  private static final Logger logger = LoggerFactory.getLogger(LanguageSupport.class);
 
   /** Globally available languages */
-  private final static Map<String, Language> systemLanguages = new HashMap<String, Language>();
+  private static final Map<String, Language> systemLanguages = new HashMap<String, Language>();
 
   /**
    * Returns the language object that represents the given locale.

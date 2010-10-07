@@ -21,8 +21,6 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.content.page.PageReader;
-import ch.o2it.weblounge.common.impl.content.page.PageletReader;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler;
 import ch.o2it.weblounge.common.security.Authority;
@@ -43,8 +41,8 @@ import java.util.HashMap;
  * The implementation is intended to be used by the <code>PageReader</code> and
  * <code>PageletReader</code>.
  * 
- * @see PageReader
- * @see PageletReader
+ * @see ch.o2it.weblounge.common.impl.content.page.PageReader
+ * @see ch.o2it.weblounge.common.impl.content.page.PageletReader
  */
 public abstract class WebloungeContentReader extends WebloungeSAXHandler {
 

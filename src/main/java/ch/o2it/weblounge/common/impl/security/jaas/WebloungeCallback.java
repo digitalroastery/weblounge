@@ -22,8 +22,6 @@ package ch.o2it.weblounge.common.impl.security.jaas;
 
 import ch.o2it.weblounge.common.site.Site;
 
-import java.io.IOException;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
@@ -76,11 +74,10 @@ public abstract class WebloungeCallback implements CallbackHandler {
   }
 
   /**
-   * Handles the varous callbacks used to perform a user login.
+   * Handles the various callbacks used to perform a user login.
    * 
    * @param callbacks
    *          the callbacks
-   * @throws IOException
    * @throws UnsupportedCallbackException
    */
   public void handle(Callback[] callbacks) throws UnsupportedCallbackException {

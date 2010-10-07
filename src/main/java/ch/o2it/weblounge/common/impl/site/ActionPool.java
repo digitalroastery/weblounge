@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public final class ActionPool extends GenericObjectPool {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ActionPool.class);
+  private static final Logger logger = LoggerFactory.getLogger(ActionPool.class);
   
   /** The action name */
   private String actionName = null;

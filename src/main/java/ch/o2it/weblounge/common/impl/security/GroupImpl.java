@@ -40,13 +40,13 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   private String id_ = null;
 
   /** The group members */
-  final Set<GroupMember> members = new HashSet<GroupMember>();
+  private final Set<GroupMember> members = new HashSet<GroupMember>();
 
   /** Group memberships */
-  final Set<Group> groups = new HashSet<Group>();
+  private final Set<Group> groups = new HashSet<Group>();
 
   /** the roles directly owned by this group */
-  final Set<Role> roles = new HashSet<Role>();
+  private final Set<Role> roles = new HashSet<Role>();
 
   /**
    * Creates a new group with the given context and identifier.

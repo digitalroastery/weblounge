@@ -45,10 +45,10 @@ public class QuartzJobWorker implements org.quartz.Job {
   private static final Logger logger = LoggerFactory.getLogger(QuartzJobWorker.class);
 
   /** The class key */
-  public final static String CLASS = "ch.o2it.weblounge.Job";
+  public static final String CLASS = "ch.o2it.weblounge.Job";
 
   /** The class key */
-  public final static String CONTEXT = "ch.o2it.weblounge.JobContext";
+  public static final String CONTEXT = "ch.o2it.weblounge.JobContext";
 
   /** The job instance */
   private JobWorker jobInstance = null;

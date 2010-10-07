@@ -44,7 +44,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
   protected String type = null;
 
   /** The resource */
-  long version = Resource.LIVE;
+  protected long version = Resource.LIVE;
   
   /** The to string representation */
   private String external = null;

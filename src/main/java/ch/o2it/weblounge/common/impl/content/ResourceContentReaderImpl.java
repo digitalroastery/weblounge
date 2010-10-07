@@ -47,7 +47,7 @@ import javax.xml.parsers.SAXParserFactory;
 public abstract class ResourceContentReaderImpl<T extends ResourceContent> extends WebloungeSAXHandler implements ResourceContentReader<T> {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ResourceContentReaderImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(ResourceContentReaderImpl.class);
 
   /** Parser factory */
   protected static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();

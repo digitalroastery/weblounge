@@ -166,7 +166,7 @@ public class EndpointDocumentation {
         // Handle the endpoint auto format paths
         if (endpoint.isAutoPathFormat()) {
           if (!endpoint.getOutputFormats().isEmpty()) {
-            endpoint.defaultOutputFormat = "." + FORMAT_KEY;
+            endpoint.setDefaultOutputFormat("." + FORMAT_KEY);
             StringBuilder sb = new StringBuilder();
             sb.append(".{");
             for (Format format : endpoint.getOutputFormats()) {
@@ -176,11 +176,11 @@ public class EndpointDocumentation {
               sb.append(format.getName());
             }
             sb.append("}");
-            endpoint.pathFormatHtml = sb.toString();
+            endpoint.setPathFormatHtml(sb.toString());
           }
         } else {
-          endpoint.defaultOutputFormat = "";
-          endpoint.pathFormatHtml = "";
+          endpoint.setDefaultOutputFormat("");
+          endpoint.setPathFormatHtml("");
         }
       }
       collections.add(collection);
@@ -326,7 +326,7 @@ public class EndpointDocumentation {
     if (StringUtils.isBlank(path)) {
       valid = false;
     } else {
-      if (path.equals("/")) {
+      if ("/".equals(path)) {
         valid = true;
       } else if (path.endsWith("/") || !path.startsWith("/")) {
         valid = false;

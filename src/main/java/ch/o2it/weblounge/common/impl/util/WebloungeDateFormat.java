@@ -46,7 +46,7 @@ public final class WebloungeDateFormat {
    *          the date to format
    * @return the formatted date string
    */
-  public final String format(Date date) {
+  public String format(Date date) {
     return getDateFormat().format(date) + "Z";
   }
 
@@ -57,7 +57,7 @@ public final class WebloungeDateFormat {
    *          the date to format
    * @return the formatted date string
    */
-  public static final String formatStatic(Date date) {
+  public static String formatStatic(Date date) {
     return getDateFormat().format(date) + "Z";
   }
 
@@ -68,7 +68,7 @@ public final class WebloungeDateFormat {
    *          the time to format
    * @return the formatted date string
    */
-  public static final String formatStatic(long milliseconds) {
+  public static String formatStatic(long milliseconds) {
     return getDateFormat().format(new Date(milliseconds)) + "Z";
   }
 
@@ -81,7 +81,7 @@ public final class WebloungeDateFormat {
    * @throws ParseException
    *           if the date cannot be parsed
    */
-  public final Date parse(String source) throws ParseException {
+  public Date parse(String source) throws ParseException {
     return getDateFormat().parse(source);
   }
 
@@ -94,7 +94,7 @@ public final class WebloungeDateFormat {
    * @throws ParseException
    *           if the date cannot be parsed
    */
-  public static final Date parseStatic(String source) throws ParseException {
+  public static Date parseStatic(String source) throws ParseException {
     return getDateFormat().parse(source);
   }
 
@@ -103,7 +103,7 @@ public final class WebloungeDateFormat {
    * 
    * @return the date formatter for the current thread
    */
-  private static final DateFormat getDateFormat() {
+  private static DateFormat getDateFormat() {
     SoftReference<DateFormat> sr = ldf.get();
     DateFormat df;
     if (sr == null || (df = sr.get()) == null) {

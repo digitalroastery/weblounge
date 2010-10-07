@@ -27,6 +27,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,11 +81,11 @@ public class EndpointDocumentationGenerator {
 
     if (freemarkerConfig == null)
       throw new IllegalStateException("FreemarkerConfig is not initialized");
-    if (templateName == null || templateName.equals(""))
+    if (StringUtils.trimToNull(templateName) == null)
       throw new IllegalArgumentException("The templateName cannot be null or empty string, " + "please specify a key name to use when processing this template (can be anything moderately unique)");
     if (data == null || data.size() == 0)
       return textTemplate;
-    if (textTemplate == null || textTemplate.equals(""))
+    if (StringUtils.trimToNull(textTemplate) == null)
       throw new IllegalArgumentException("The textTemplate cannot be null or empty string, " + "please pass in at least something in the template or do not call this method");
 
     // get the template

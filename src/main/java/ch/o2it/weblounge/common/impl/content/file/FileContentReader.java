@@ -42,7 +42,7 @@ import javax.xml.parsers.SAXParserFactory;
 public class FileContentReader extends ResourceContentReaderImpl<FileContent> {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(FileContentReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(FileContentReader.class);
 
   /** Parser factory */
   protected static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();

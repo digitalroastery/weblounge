@@ -26,16 +26,16 @@ package ch.o2it.weblounge.common.impl.util.doc;
 public class Format {
 
   /** JSON output format */
-  public static String JSON = "json";
+  public static final String JSON = "json";
 
   /** XML output format */
-  public static String XML = "xml";
+  public static final String XML = "xml";
 
   /** JSON namespace url */
-  public static String JSON_URL = "http://www.json.org/";
+  public static final String JSON_URL = "http://www.json.org/";
 
   /** XML namespace url */
-  public static String XML_URL = "http://www.w3.org/XML/";
+  public static final String XML_URL = "http://www.w3.org/XML/";
 
   /** The format identifier */
   private String name = null;

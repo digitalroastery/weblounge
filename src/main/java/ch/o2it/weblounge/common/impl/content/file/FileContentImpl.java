@@ -70,6 +70,16 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.impl.content.ResourceContentImpl#equals(java.lang.Object)
    */
   @Override

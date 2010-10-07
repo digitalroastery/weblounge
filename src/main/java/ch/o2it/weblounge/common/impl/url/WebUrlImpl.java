@@ -50,10 +50,10 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   private static Logger logger = LoggerFactory.getLogger(WebUrlImpl.class);
 
   /** Regular expression for /path/to/resource/work_de.html */
-  private final static Pattern pathInspector = Pattern.compile("^(.*)/(work|index|live|[0-9]*)(_[a-zA-Z]+)?\\.([a-zA-Z0-9]+)$");
+  private static final Pattern pathInspector = Pattern.compile("^(.*)/(work|index|live|[0-9]*)(_[a-zA-Z]+)?\\.([a-zA-Z0-9]+)$");
 
   /** Regular expression for /path/to/resource/de/html */
-  private final static Pattern segmentInspector = Pattern.compile("^(.*://)?(.*?)(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
+  private static final Pattern segmentInspector = Pattern.compile("^(.*://)?(.*?)(/[a-zA-Z][a-zA-Z]+)?(/[a-zA-Z0-9]+)?/$");
 
   /** The default request flavor */
   private RequestFlavor defaultFlavor = RequestFlavor.ANY;

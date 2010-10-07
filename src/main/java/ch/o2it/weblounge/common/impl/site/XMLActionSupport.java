@@ -23,11 +23,9 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.XMLAction;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -62,9 +60,9 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
   }
 
   /**
-   * This implementation always returns {@link Action#EVAL_REQUEST} and simply
-   * sets the content type on the response to
-   * <code>text/xml;charset=utf-8</code>.
+   * This implementation always returns
+   * {@link ch.o2it.weblounge.common.site.Action#EVAL_REQUEST} and simply sets
+   * the content type on the response to <code>text/xml;charset=utf-8</code>.
    * <p>
    * This means that subclasses should either overwrite this method to specify a
    * different encoding or make sure that everything that is written to the
@@ -74,7 +72,7 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
    *          the servlet request
    * @param response
    *          the servlet response
-   * @return {@link Action#EVAL_REQUEST}
+   * @return {@link ch.o2it.weblounge.common.site.Action#EVAL_REQUEST}
    */
   @Override
   public int startResponse(WebloungeRequest request, WebloungeResponse response)
@@ -104,7 +102,7 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
    *          the xml transformer
    * @throws ActionException
    *           if transforming and sending the document fails
-   * @see #returnXML(Document)
+   * @see #returnXML(org.w3c.dom.Document)
    */
   protected void returnXML(Element doc, Transformer transformer)
       throws ActionException {
@@ -125,7 +123,8 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
    * If your implementation relies on specific transformer capabilities or
    * configurations, you may want to use the protected
    * <code>TransformerFactory</code> to create the transformer and then call
-   * {@link #returnXML(Document, Transformer)} instead of this method.
+   * {@link #returnXML(org.w3c.dom.Document, Transformer)} instead of this
+   * method.
    * 
    * @param doc
    *          the xml document
@@ -133,7 +132,7 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
    *          the xml transformer
    * @throws ActionException
    *           if transforming and sending the document fails
-   * @see #returnXML(Document, Transformer)
+   * @see #returnXML(org.w3c.dom.Document, Transformer)
    */
   protected void returnXML(Element doc) throws ActionException {
     try {

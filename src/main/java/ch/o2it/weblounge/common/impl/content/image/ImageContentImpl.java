@@ -70,7 +70,8 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
    * @param height
    *          the image height in pixels
    */
-  public ImageContentImpl(String filename, Language language, String mimetype, int width, int height) {
+  public ImageContentImpl(String filename, Language language, String mimetype,
+      int width, int height) {
     this(filename, language, mimetype, width, height, -1);
   }
 
@@ -90,7 +91,8 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
    * @param filesize
    *          the file size in bytes
    */
-  public ImageContentImpl(String filename, Language language, String mimetype, int width, int height, long filesize) {
+  public ImageContentImpl(String filename, Language language, String mimetype,
+      int width, int height, long filesize) {
     super(filename, language, mimetype, filesize);
     this.width = width;
     this.height = height;
@@ -151,6 +153,16 @@ public class ImageContentImpl extends FileContentImpl implements ImageContent {
     xml.append("<width>").append(width).append("</width>");
     xml.append("<height>").append(height).append("</height>");
     return xml;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.content.file.FileContentImpl#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return super.hashCode();
   }
 
   /**

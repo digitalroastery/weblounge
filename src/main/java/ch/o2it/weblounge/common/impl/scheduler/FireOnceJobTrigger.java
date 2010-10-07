@@ -34,7 +34,7 @@ import java.util.Date;
 public class FireOnceJobTrigger implements JobTrigger {
   
   /** The logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(FireOnceJobTrigger.class);
+  private static final Logger logger = LoggerFactory.getLogger(FireOnceJobTrigger.class);
 
   /** First date that the trigger was asked for */
   protected Date fireDate = null;

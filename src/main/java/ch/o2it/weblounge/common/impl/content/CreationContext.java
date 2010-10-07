@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.content.Creatable;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -53,7 +52,7 @@ import javax.xml.xpath.XPathFactory;
  * &lt;/created&gt;
  * </pre>
  * 
- * @see Creatable
+ * @see ch.o2it.weblounge.common.content.Creatable
  */
 public class CreationContext implements Cloneable {
 

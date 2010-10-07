@@ -38,7 +38,7 @@ import java.util.Map;
 public abstract class WebloungeSAXHandler extends DefaultHandler {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(WebloungeSAXHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(WebloungeSAXHandler.class);
 
   /** The attribute and element clipboard */
   protected Map<String, Object> clipboard = null;

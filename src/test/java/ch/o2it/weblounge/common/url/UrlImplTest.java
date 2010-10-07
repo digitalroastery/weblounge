@@ -57,10 +57,10 @@ public class UrlImplTest {
   protected String defaultParentFilePath = File.separator;
 
   /** The url path separator */
-  protected final static char urlPathSeparator = '/';
+  protected static final char urlPathSeparator = '/';
 
   /** The windows file path separator */
-  protected final static char filePathSeparator = File.separatorChar;
+  protected static final char filePathSeparator = File.separatorChar;
 
   /**
    * @throws java.lang.Exception

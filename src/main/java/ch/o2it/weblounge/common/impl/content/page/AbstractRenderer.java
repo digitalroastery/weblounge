@@ -32,6 +32,7 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -213,7 +214,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
       
       // Prepare a request to site resources
       String requestPath = renderer.getPath();
-      if (!request.getContextPath().equals(""))
+      if (!StringUtils.isBlank(request.getContextPath()))
         requestPath = requestPath.substring(request.getContextPath().length());
       SiteRequestWrapper siteRequest = new SiteRequestWrapper(request, requestPath, false);
 

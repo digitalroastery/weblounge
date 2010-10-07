@@ -43,7 +43,7 @@ import java.util.List;
 public final class RequestUtils {
 
   /** Logging facility */
-  private final static Logger logger = LoggerFactory.getLogger(ActionSupport.class);
+  private static final Logger logger = LoggerFactory.getLogger(ActionSupport.class);
 
   /**
    * RequestSupport is a static class and therefore has no constructor.
