@@ -123,7 +123,7 @@
             <executions>
               <execution>
                 <id>unpack-jmeter</id>
-                <phase>pre-integration-test</phase>
+                <phase>validate</phase>
                 <goals>
                   <goal>unpack</goal>
                 </goals>
