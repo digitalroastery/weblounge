@@ -359,8 +359,8 @@ public class ConfigurationUtils {
         text = text.replaceAll(variable, replacement);
       }
       for (Entry<String, String> entry : System.getenv().entrySet()) {
-        String variable = "\\$\\{" + (String)entry.getKey() + "\\}";
-        String replacement = (String)entry.getValue(); 
+        String variable = "\\$\\{" + entry.getKey() + "\\}";
+        String replacement = entry.getValue(); 
         text = text.replaceAll(variable, replacement);
       }
     }
