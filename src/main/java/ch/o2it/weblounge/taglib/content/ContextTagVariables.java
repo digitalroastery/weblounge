@@ -27,15 +27,16 @@ import ch.o2it.weblounge.taglib.TagVariableDefinitions;
  */
 public class ContextTagVariables {
 
-  public static final String URI = "uri";
-  public static final String URL = "url";
   public static final String ACTION = "action";
-  public static final String SITE = "site";
-  public static final String USER = "user";
+  public static final String COMPOSER = "composer";
   public static final String LANGUAGE = "language";
   public static final String PAGE = "page";
   public static final String PAGELET = "pagelet";
-  public static final String COMPOSER = "composer";
+  public static final String REPOSITORY = "repository";
+  public static final String SITE = "site";
+  public static final String URI = "uri";
+  public static final String URL = "url";
+  public static final String USER = "user";
 
   /** The variable definitions */
   private TagVariableDefinitions definitions = null;
@@ -78,6 +79,10 @@ public class ContextTagVariables {
 
   public final String getComposer() {
     return (definitions.exists(COMPOSER)) ? definitions.getAlias(COMPOSER) : null;
+  }
+
+  public final String getRepository() {
+    return (definitions.exists(REPOSITORY)) ? definitions.getAlias(REPOSITORY) : null;
   }
 
   public final int size() {

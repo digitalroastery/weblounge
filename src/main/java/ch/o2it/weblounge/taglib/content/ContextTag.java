@@ -21,32 +21,44 @@
 package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.contentrepository.ContentRepository;
+import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.ParseException;
 import ch.o2it.weblounge.taglib.TagVariableDefinitionParser;
 import ch.o2it.weblounge.taglib.WebloungeTag;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 
 /**
- * The <code>ContextTag</code> can be used to setup the context for a template
- * or a module. The context sets the following variables:
+ * The <code>ContextTag</code> can be used to setup the context for a jsp
+ * template or pagelet.
+ * <p>
+ * The context implementation supports the following variables:
  * <ul>
- * <li><code>uri</code> - the web applications uri</li>
- * <li><code>url</code> - the url information</li>
  * <li><code>action</code> - the action handler</li>
- * <li><code>site</code> - the site associated with the url
+ * <li><code>composer</code> - the current composer</li>
  * <li><code>language</code> - the current language</li>
- * <li><code>user</code> - the current user</li>
  * <li><code>page</code> - the current page</li>
  * <li><code>pagelet</code> - the current pagelet</li>
- * <li><code>composer</code> - the current composer</li>
+ * <li><code>repository</code> - the site's content repository</li>
+ * <li><code>site</code> - the site associated with the url
+ * <li><code>uri</code> - the web applications uri</li>
+ * <li><code>url</code> - the url information</li>
+ * <li><code>user</code> - the current user</li>
  * </ul>
  */
 public class ContextTag extends WebloungeTag {
 
   /** The serial version id */
   private static final long serialVersionUID = 1L;
+
+  /** Logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ContextTag.class);
 
   /** The tag variable definitions */
   private String definitions = null;
@@ -59,23 +71,7 @@ public class ContextTag extends WebloungeTag {
   private static String uri = "/";
 
   /**
-   * Sets the tag variable definitions. This tag supports the following
-   * variables:
-   * <ul>
-   * <li><code>uri</code> - the web applications uri</li>
-   * <li><code>url</code> - the url information</li>
-   * <li><code>action</code> - the action handler</li>
-   * <li><code>site</code> - the site associated with the url
-   * <li><code>language</code> - the current language</li>
-   * <li><code>user</code> - the current user</li>
-   * <li><code>page</code> - the current page</li>
-   * <li><code>pagelet</code> - the current pagelet</li>
-   * <li><code>composer</code> - the current composer</li>
-   * <li><code>history</code> - the history</li>
-   * <li><code>toolkit</code> - the template support</li>
-   * <li><code>location</code> - the pagelet location</li>
-   * <li><code>wizard</code> - the wizard handler</li>
-   * </ul>
+   * Defines the variables that should be set inside the context.
    * 
    * @param value
    *          the variable definitions
@@ -97,36 +93,38 @@ public class ContextTag extends WebloungeTag {
    * Process the start tag for this instance by setting up either the defined
    * variables or the following set of default variables:
    * <ul>
-   * <li><code>uri</code> - the web applications uri</li>
-   * <li><code>url</code> - the url information</li>
    * <li><code>action</code> - the action handler</li>
-   * <li><code>site</code> - the site associated with the url
    * <li><code>language</code> - the current language</li>
+   * <li><code>site</code> - the site associated with the url
+   * <li><code>url</code> - the url information</li>
    * <li><code>user</code> - the current user</li>
-   * <li><code>toolkit</code> - the jsp toolkit</li>
    * </ul>
    * 
    * @return either a EVAL_BODY_INCLUDE or a SKIP_BODY
    */
   public int doStartTag() throws JspException {
-    // Tag variable export
-    if (variables != null) {
-      define(variables.getUri(), uri);
-      define(variables.getSite(), request.getSite());
-      define(variables.getUrl(), request.getRequestedUrl());
-      define(variables.getAction(), request.getAttribute(WebloungeRequest.ACTION));
-      define(variables.getLanguage(), request.getLanguage());
-      define(variables.getUser(), request.getUser());
-      define(variables.getPage(), request.getAttribute(WebloungeRequest.PAGE));
-      define(variables.getPagelet(), request.getAttribute(WebloungeRequest.PAGELET));
-      define(variables.getComposer(), request.getAttribute(WebloungeRequest.COMPOSER));
-    } else {
-      define(ContextTagVariables.URI, uri);
-      define(ContextTagVariables.URL, request.getRequestedUrl());
-      define(ContextTagVariables.ACTION, request.getAttribute(WebloungeRequest.ACTION));
-      define(ContextTagVariables.SITE, request.getSite());
-      define(ContextTagVariables.LANGUAGE, request.getLanguage());
-      define(ContextTagVariables.USER, request.getUser());
+    try {
+      if (variables != null) {
+        define(variables.getAction(), request.getAttribute(WebloungeRequest.ACTION));
+        define(variables.getComposer(), request.getAttribute(WebloungeRequest.COMPOSER));
+        define(variables.getLanguage(), request.getLanguage());
+        define(variables.getPage(), request.getAttribute(WebloungeRequest.PAGE));
+        define(variables.getPagelet(), request.getAttribute(WebloungeRequest.PAGELET));
+        define(variables.getRepository(), getRepository(request.getSite()));
+        define(variables.getSite(), request.getSite());
+        define(variables.getUri(), uri);
+        define(variables.getUrl(), request.getRequestedUrl());
+        define(variables.getUser(), request.getUser());
+      } else {
+        define(ContextTagVariables.ACTION, request.getAttribute(WebloungeRequest.ACTION));
+        define(ContextTagVariables.LANGUAGE, request.getLanguage());
+        define(ContextTagVariables.SITE, request.getSite());
+        define(ContextTagVariables.URL, request.getRequestedUrl());
+        define(ContextTagVariables.USER, request.getUser());
+      }
+    } catch (IllegalStateException e) {
+      logger.error("Error creating context: {}", e.getMessage());
+      return SKIP_BODY;
     }
     return EVAL_BODY_INCLUDE;
   }
@@ -155,18 +153,31 @@ public class ContextTag extends WebloungeTag {
       if (variables.getComposer() != null)
         pageContext.removeAttribute(variables.getComposer());
     } else {
-      pageContext.removeAttribute(ContextTagVariables.URI);
-      pageContext.removeAttribute(ContextTagVariables.SITE);
-      pageContext.removeAttribute(ContextTagVariables.URL);
+      pageContext.removeAttribute(ContextTagVariables.ACTION);
       pageContext.removeAttribute(ContextTagVariables.LANGUAGE);
+      pageContext.removeAttribute(ContextTagVariables.SITE);
+      pageContext.removeAttribute(ContextTagVariables.URI);
+      pageContext.removeAttribute(ContextTagVariables.URL);
       pageContext.removeAttribute(ContextTagVariables.USER);
     }
     return EVAL_PAGE;
   }
 
   /**
+   * Returns the content repository that is associated with this site.
+   * 
+   * @param site
+   *          the site
+   * @return the site's repository
+   */
+  protected ContentRepository getRepository(Site site) {
+    return ContentRepositoryFactory.getRepository(site);
+  }
+
+  /**
    * Defines <code>value</code> under the specified key as an attribute in the
-   * page context.
+   * page context. This method throws an <code>InvalidStateException</code> if a
+   * different object is already defined in the request under the same key or
    * 
    * @param key
    *          the attribute name
@@ -174,8 +185,15 @@ public class ContextTag extends WebloungeTag {
    *          the attribute value
    */
   private void define(String key, Object value) {
-    if (key != null && pageContext.getAttribute(key) == null)
+    if (value == null)
+      throw new IllegalStateException("Context item " + key + " is null");
+    Object existingValue = pageContext.getAttribute(key);
+    if (existingValue != null && !existingValue.equals(value))
+      throw new IllegalStateException("Context item '" + key + "' is already defined as " + existingValue.getClass().getName());
+    if (key != null) {
       pageContext.setAttribute(key, value);
+      logger.debug("Defining context item '{}': {}", key, value);
+    }
   }
 
 }

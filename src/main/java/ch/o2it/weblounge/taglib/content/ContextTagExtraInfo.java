@@ -28,6 +28,7 @@ import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.AuthenticatedUser;
+import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.taglib.ParseException;
 import ch.o2it.weblounge.taglib.TagVariableDefinitionParser;
 
@@ -84,7 +85,9 @@ public class ContextTagExtraInfo extends TagExtraInfo {
           new VariableInfo(ContextTagVariables.URL, WebUrl.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.SITE, Site.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.USER, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED),
-          new VariableInfo(ContextTagVariables.LANGUAGE, Language.class.getName(), true, VariableInfo.NESTED) };
+          new VariableInfo(ContextTagVariables.LANGUAGE, Language.class.getName(), true, VariableInfo.NESTED),
+          new VariableInfo(ContextTagVariables.REPOSITORY, ContentRepository.class.getName(), true, VariableInfo.NESTED)
+      };
     }
   }
 
