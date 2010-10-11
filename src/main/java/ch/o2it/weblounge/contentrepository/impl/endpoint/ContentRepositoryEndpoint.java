@@ -60,7 +60,7 @@ import javax.ws.rs.core.StreamingOutput;
 public class ContentRepositoryEndpoint {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ContentRepositoryEndpoint.class);
+  static final Logger logger = LoggerFactory.getLogger(ContentRepositoryEndpoint.class);
 
   /** Regular expression to match the resource type */
   protected static final Pattern resourceTypeRegex = Pattern.compile(".*<\\s*([\\w]*) .*");
@@ -102,19 +102,27 @@ public class ContentRepositoryEndpoint {
     final Language selectedLanguage = language;
 
     // Create the response
+    final InputStream is;
+    try {
+      is = contentRepository.getContent(resource.getURI(), selectedLanguage);
+    } catch (IOException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ContentRepositoryException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Is the content locally available
+    if (is == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    // Write the file contents back
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
           WebApplicationException {
-        InputStream is = null;
         try {
-          try {
-            is = contentRepository.getContent(resource.getURI(), selectedLanguage);
-            if (is == null)
-              throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-          } catch (ContentRepositoryException e) {
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-          }
           IOUtils.copy(is, os);
+        } catch (IOException e) {
+          logger.warn("Error writing file contents to response", e);
         } finally {
           IOUtils.closeQuietly(is);
         }
@@ -133,7 +141,7 @@ public class ContentRepositoryEndpoint {
     }
 
     // Add an e-tag and send the response
-    response.header("Content-Disposition", "attachment; filename=" + resource.getContent(selectedLanguage).getFilename());
+    response.header("Content-Disposition", "inline; filename=" + resource.getContent(selectedLanguage).getFilename());
     response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
     response.lastModified(resource.getModificationDate());
     return response.build();
