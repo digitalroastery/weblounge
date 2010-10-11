@@ -177,23 +177,27 @@ public class ContextTag extends WebloungeTag {
   /**
    * Defines <code>value</code> under the specified key as an attribute in the
    * page context. This method throws an <code>InvalidStateException</code> if a
-   * different object is already defined in the request under the same key or
+   * different object is already defined in the request under the same key.
+   * <p>
+   * If <code>key</code> is null, this method returns silently.
    * 
    * @param key
    *          the attribute name
    * @param value
    *          the attribute value
+   * @throws IllegalStateException
+   *           if the value is <code>null</code> of if the variable is already
+   *           defined in the page context
    */
-  private void define(String key, Object value) {
-    if (value == null)
-      throw new IllegalStateException("Context item " + key + " is null");
+  private void define(String key, Object value) throws IllegalStateException {
+    if (key == null)
+      return;
     Object existingValue = pageContext.getAttribute(key);
-    if (existingValue != null && !existingValue.equals(value))
-      throw new IllegalStateException("Context item '" + key + "' is already defined as " + existingValue.getClass().getName());
-    if (key != null) {
-      pageContext.setAttribute(key, value);
-      logger.debug("Defining context item '{}': {}", key, value);
-    }
+    String existingType = (existingValue != null) ? existingValue.getClass().getName() : "null";
+    if (existingValue == null && value == null || existingValue != null && !existingValue.equals(value))
+      throw new IllegalStateException("Context item '" + key + "' is already defined as " + existingType);
+    pageContext.setAttribute(key, value);
+    logger.debug("Defining context item '{}': {}", key, value != null ? value : "null");
   }
 
 }
