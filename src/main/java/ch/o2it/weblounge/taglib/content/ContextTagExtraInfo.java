@@ -56,24 +56,36 @@ public class ContextTagExtraInfo extends TagExtraInfo {
         int i = 0;
 
         String name;
-        if ((name = variables.getUri()) != null)
-          varinfo[i++] = new VariableInfo(name, java.lang.String.class.getName(), true, VariableInfo.NESTED);
-        if ((name = variables.getUrl()) != null)
-          varinfo[i++] = new VariableInfo(name, WebUrl.class.getName(), true, VariableInfo.NESTED);
+        // Action
         if ((name = variables.getAction()) != null)
           varinfo[i++] = new VariableInfo(name, Action.class.getName(), true, VariableInfo.NESTED);
-        if ((name = variables.getSite()) != null)
-          varinfo[i++] = new VariableInfo(name, Site.class.getName(), true, VariableInfo.NESTED);
-        if ((name = variables.getUser()) != null)
-          varinfo[i++] = new VariableInfo(name, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED);
-        if ((name = variables.getLanguage()) != null)
-          varinfo[i++] = new VariableInfo(name, Language.class.getName(), true, VariableInfo.NESTED);
-        if ((name = variables.getPage()) != null)
-          varinfo[i++] = new VariableInfo(name, Page.class.getName(), true, VariableInfo.NESTED);
-        if ((name = variables.getPagelet()) != null)
-          varinfo[i++] = new VariableInfo(name, Pagelet.class.getName(), true, VariableInfo.NESTED);
+        // Composer
         if ((name = variables.getComposer()) != null)
           varinfo[i++] = new VariableInfo(name, Composer.class.getName(), true, VariableInfo.NESTED);
+        // Language
+        if ((name = variables.getLanguage()) != null)
+          varinfo[i++] = new VariableInfo(name, Language.class.getName(), true, VariableInfo.NESTED);
+        // User
+        if ((name = variables.getUser()) != null)
+          varinfo[i++] = new VariableInfo(name, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED);
+        // Page
+        if ((name = variables.getPage()) != null)
+          varinfo[i++] = new VariableInfo(name, Page.class.getName(), true, VariableInfo.NESTED);
+        // Pagelet
+        if ((name = variables.getPagelet()) != null)
+          varinfo[i++] = new VariableInfo(name, Pagelet.class.getName(), true, VariableInfo.NESTED);
+        // Repository
+        if ((name = variables.getRepository()) != null)
+          varinfo[i++] = new VariableInfo(name, ContentRepository.class.getName(), true, VariableInfo.NESTED);
+        // Site
+        if ((name = variables.getSite()) != null)
+          varinfo[i++] = new VariableInfo(name, Site.class.getName(), true, VariableInfo.NESTED);
+        // Uri
+        if ((name = variables.getUri()) != null)
+          varinfo[i++] = new VariableInfo(name, java.lang.String.class.getName(), true, VariableInfo.NESTED);
+        // Url
+        if ((name = variables.getUrl()) != null)
+          varinfo[i++] = new VariableInfo(name, WebUrl.class.getName(), true, VariableInfo.NESTED);
 
         return varinfo;
       } catch (ParseException ex) {
@@ -81,7 +93,6 @@ public class ContextTagExtraInfo extends TagExtraInfo {
       }
     } else {
       return new VariableInfo[] {
-          new VariableInfo(ContextTagVariables.URI, java.lang.String.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.URL, WebUrl.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.SITE, Site.class.getName(), true, VariableInfo.NESTED),
           new VariableInfo(ContextTagVariables.USER, AuthenticatedUser.class.getName(), true, VariableInfo.NESTED),

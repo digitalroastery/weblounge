@@ -105,16 +105,26 @@ public class ContextTag extends WebloungeTag {
   public int doStartTag() throws JspException {
     try {
       if (variables != null) {
-        define(variables.getAction(), request.getAttribute(WebloungeRequest.ACTION));
-        define(variables.getComposer(), request.getAttribute(WebloungeRequest.COMPOSER));
-        define(variables.getLanguage(), request.getLanguage());
-        define(variables.getPage(), request.getAttribute(WebloungeRequest.PAGE));
-        define(variables.getPagelet(), request.getAttribute(WebloungeRequest.PAGELET));
-        define(variables.getRepository(), getRepository(request.getSite()));
-        define(variables.getSite(), request.getSite());
-        define(variables.getUri(), uri);
-        define(variables.getUrl(), request.getRequestedUrl());
-        define(variables.getUser(), request.getUser());
+        if (variables.getAction() != null)
+          define(variables.getAction(), request.getAttribute(WebloungeRequest.ACTION));
+        if (variables.getComposer() != null)
+          define(variables.getComposer(), request.getAttribute(WebloungeRequest.COMPOSER));
+        if (variables.getLanguage() != null)
+          define(variables.getLanguage(), request.getLanguage());
+        if (variables.getPage() != null)
+          define(variables.getPage(), request.getAttribute(WebloungeRequest.PAGE));
+        if (variables.getPagelet() != null)
+          define(variables.getPagelet(), request.getAttribute(WebloungeRequest.PAGELET));
+        if (variables.getRepository() != null)
+          define(variables.getRepository(), getRepository(request.getSite()));
+        if (variables.getSite() != null)
+          define(variables.getSite(), request.getSite());
+        if (variables.getUri() != null)
+          define(variables.getUri(), uri);
+        if (variables.getUrl() != null)
+          define(variables.getUrl(), request.getRequestedUrl());
+        if (variables.getUser() != null)
+          define(variables.getUser(), request.getUser());
       } else {
         define(ContextTagVariables.ACTION, request.getAttribute(WebloungeRequest.ACTION));
         define(ContextTagVariables.LANGUAGE, request.getLanguage());
@@ -136,27 +146,28 @@ public class ContextTag extends WebloungeTag {
    */
   public int doEndTag() throws JspException {
     if (variables != null) {
-      if (variables.getUri() != null)
-        pageContext.removeAttribute(variables.getUri());
-      if (variables.getSite() != null)
-        pageContext.removeAttribute(variables.getSite());
-      if (variables.getUrl() != null)
-        pageContext.removeAttribute(variables.getUrl());
+      if (variables.getAction() != null)
+        pageContext.removeAttribute(variables.getAction());
+      if (variables.getComposer() != null)
+        pageContext.removeAttribute(variables.getComposer());
       if (variables.getLanguage() != null)
         pageContext.removeAttribute(variables.getLanguage());
-      if (variables.getUser() != null)
-        pageContext.removeAttribute(variables.getUser());
       if (variables.getPage() != null)
         pageContext.removeAttribute(variables.getPage());
       if (variables.getPagelet() != null)
         pageContext.removeAttribute(variables.getPagelet());
-      if (variables.getComposer() != null)
-        pageContext.removeAttribute(variables.getComposer());
+      if (variables.getSite() != null)
+        pageContext.removeAttribute(variables.getSite());
+      if (variables.getUri() != null)
+        pageContext.removeAttribute(variables.getUri());
+      if (variables.getUrl() != null)
+        pageContext.removeAttribute(variables.getUrl());
+      if (variables.getUser() != null)
+        pageContext.removeAttribute(variables.getUser());
     } else {
       pageContext.removeAttribute(ContextTagVariables.ACTION);
       pageContext.removeAttribute(ContextTagVariables.LANGUAGE);
       pageContext.removeAttribute(ContextTagVariables.SITE);
-      pageContext.removeAttribute(ContextTagVariables.URI);
       pageContext.removeAttribute(ContextTagVariables.URL);
       pageContext.removeAttribute(ContextTagVariables.USER);
     }
