@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -183,7 +184,7 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
       try {
         Date d = dateFormat.parse(getCharacters());
         clipboard.put("date", d);
-      } catch (Exception e) {
+      } catch (ParseException e) {
         throw new IllegalStateException("Reading date failed: '" + getCharacters() + "'");
       }
     }

@@ -623,8 +623,8 @@ public class ModuleImpl implements Module {
         Class<? extends Module> c = (Class<? extends Module>) classLoader.loadClass(className);
         module = c.newInstance();
         module.setIdentifier(identifier);
-      } catch (Exception e) {
-        throw new IllegalStateException("Unable to instantiate class " + className + " for module '" + identifier + ": " + e.getMessage(), e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Unable to instantiate class " + className + " for module '" + identifier + ": " + t.getMessage(), t);
       }
     } else {
       module = new ModuleImpl();

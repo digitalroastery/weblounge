@@ -36,16 +36,16 @@ import java.util.Set;
  * The set allows multiple tags with the same key, but only one tag with a
  * key-value pair.
  */
-public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
+public final class CacheTagSet implements Set<CacheTag> {
 
   /** The tags */
-  private List<CacheTag> tags_ = null;
+  private List<CacheTag> tags = null;
 
   /**
    * Creates a new set of cache tags.
    */
   public CacheTagSet() {
-    tags_ = new ArrayList<CacheTag>();
+    tags = new ArrayList<CacheTag>();
   }
 
   /**
@@ -66,8 +66,8 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#add(java.lang.Object)
    */
   public boolean add(CacheTag tag) {
-    if (!tags_.contains(tag))
-      return tags_.add(tag);
+    if (!tags.contains(tag))
+      return tags.add(tag);
     return false;
   }
 
@@ -113,8 +113,8 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
   public boolean addAll(Collection<? extends CacheTag> c) {
     boolean inserted = false;
     for (CacheTag tag : c) {
-      if (!tags_.contains(tag)) {
-        tags_.add(tag);
+      if (!tags.contains(tag)) {
+        tags.add(tag);
         inserted = true;
       }
     }
@@ -127,7 +127,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#clear()
    */
   public void clear() {
-    tags_.clear();
+    tags.clear();
   }
 
   /**
@@ -136,7 +136,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#contains(java.lang.Object)
    */
   public boolean contains(Object o) {
-    return tags_.contains(o);
+    return tags.contains(o);
   }
 
   /**
@@ -145,7 +145,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#containsAll(java.util.Collection)
    */
   public boolean containsAll(Collection<?> c) {
-    return tags_.containsAll(c);
+    return tags.containsAll(c);
   }
 
   /**
@@ -154,7 +154,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#isEmpty()
    */
   public boolean isEmpty() {
-    return tags_.size() == 0;
+    return tags.size() == 0;
   }
 
   /**
@@ -163,7 +163,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#iterator()
    */
   public Iterator<CacheTag> iterator() {
-    return tags_.iterator();
+    return tags.iterator();
   }
 
   /**
@@ -172,7 +172,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#remove(java.lang.Object)
    */
   public boolean remove(Object o) {
-    return tags_.remove(o);
+    return tags.remove(o);
   }
 
   /**
@@ -186,11 +186,11 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    */
   public boolean remove(String name, Object value) {
     List<CacheTag> candidates = new ArrayList<CacheTag>();
-    for (CacheTag t : tags_) {
+    for (CacheTag t : tags) {
       if (t.getName().equals(name) && t.getValue().equals(value))
         candidates.add(t);
     }
-    return tags_.removeAll(candidates);
+    return tags.removeAll(candidates);
   }
 
   /**
@@ -202,7 +202,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#removeAll(java.util.Collection)
    */
   public boolean removeAll(Collection<?> c) {
-    return tags_.removeAll(c);
+    return tags.removeAll(c);
   }
 
   /**
@@ -214,11 +214,11 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    */
   public boolean removeAllByTagName(String name) {
     List<CacheTag> candidates = new ArrayList<CacheTag>();
-    for (CacheTag t : tags_) {
+    for (CacheTag t : tags) {
       if (t.getName().equals(name))
         candidates.add(t);
     }
-    return tags_.removeAll(candidates);
+    return tags.removeAll(candidates);
   }
 
   /**
@@ -227,7 +227,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#retainAll(java.util.Collection)
    */
   public boolean retainAll(Collection<?> c) {
-    return tags_.retainAll(c);
+    return tags.retainAll(c);
   }
 
   /**
@@ -236,7 +236,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#size()
    */
   public int size() {
-    return tags_.size();
+    return tags.size();
   }
 
   /**
@@ -245,7 +245,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#toArray()
    */
   public Object[] toArray() {
-    return tags_.toArray();
+    return tags.toArray();
   }
 
   /**
@@ -254,7 +254,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.util.Set#toArray(T[])
    */
   public <T> T[] toArray(T[] a) {
-    return tags_.toArray(a);
+    return tags.toArray(a);
   }
 
   /**
@@ -263,7 +263,7 @@ public final class CacheTagSet implements Set<CacheTag>, Iterable<CacheTag> {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return tags_.toString();
+    return tags.toString();
   }
 
 }

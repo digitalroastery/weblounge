@@ -25,8 +25,15 @@ import ch.o2it.weblounge.common.scheduler.JobTrigger;
 /**
  * Helper class that makes creating special job triggers easy.
  */
-public class JobUtils {
+public final class JobUtils {
 
+  /**
+   * This class is not intended to be instantiated.
+   */
+  private JobUtils() {
+    // Nothing to be done here
+  }
+  
   /**
    * Returns a job trigger that is executed on site restart.
    * 

@@ -42,7 +42,14 @@ import javax.media.jai.RenderedOp;
 /**
  * Utility class used for dealing with images and image styles.
  */
-public class ImageStyleUtils {
+public final class ImageStyleUtils {
+
+  /**
+   * This class is not meant to be instantiated.
+   */
+  private ImageStyleUtils() {
+    // Utility classes should not have a public or default constructor
+  }
 
   /**
    * Returns the scaling factor in horizontal direction needed for the image in
@@ -56,7 +63,8 @@ public class ImageStyleUtils {
    *          the image style
    * @return the scaling factor
    */
-  public static float getScale(float imageWidth, float imageHeight, ImageStyle style) {
+  public static float getScale(float imageWidth, float imageHeight,
+      ImageStyle style) {
     boolean taller = imageWidth < imageHeight;
     float scale = 1.0f;
 
@@ -102,7 +110,8 @@ public class ImageStyleUtils {
    *          the image style
    * @return the horizontal cropping amount
    */
-  public static float getCropX(float imageWidth, float imageHeight, ImageStyle style) {
+  public static float getCropX(float imageWidth, float imageHeight,
+      ImageStyle style) {
     float cropX = 0;
     float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
@@ -119,7 +128,7 @@ public class ImageStyleUtils {
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
     }
-    
+
     return cropX;
   }
 
@@ -135,7 +144,8 @@ public class ImageStyleUtils {
    *          the image style
    * @return the vertical cropping amount
    */
-  public static float getCropY(float imageWidth, float imageHeight, ImageStyle style) {
+  public static float getCropY(float imageWidth, float imageHeight,
+      ImageStyle style) {
     float cropY = 0;
     float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
@@ -151,7 +161,7 @@ public class ImageStyleUtils {
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
     }
-    
+
     return cropY;
   }
 
@@ -166,12 +176,16 @@ public class ImageStyleUtils {
    *          the image format
    * @param style
    *          the style
+   * @throws IOException
+   *           if reading from or writing to the stream fails
+   * @throws OutOfMemoryError
+   *           if the image is too large to be processed in memoy
    */
   public static void style(InputStream is, OutputStream os, String format,
-      ImageStyle style) throws IOException {
+      ImageStyle style) throws IOException, OutOfMemoryError {
     if (style == null)
       throw new IllegalArgumentException("Image style cannot be null");
-    
+
     RenderedOp image = null;
     try {
 
@@ -180,13 +194,13 @@ public class ImageStyleUtils {
         IOUtils.copy(is, os);
         return;
       }
-      
+
       // Load the image from the given input stream
       SeekableStream seekableInputStream = new MemoryCacheSeekableStream(is);
       image = JAI.create("stream", seekableInputStream);
       if (image == null)
         throw new IOException("Error reading image from input stream");
-      
+
       // Get the original image size
       int imageWidth = image.getWidth();
       int imageHeight = image.getHeight();
@@ -202,11 +216,12 @@ public class ImageStyleUtils {
         scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
 
         // Quality related hints when scaling the image
-        RenderingHints scalingHints = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        RenderingHints scalingHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         scalingHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         scalingHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
         scalingHints.put(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-        //qualityHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        // qualityHints.put(RenderingHints.KEY_INTERPOLATION,
+        // RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         scalingHints.put(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
         image = JAI.create("scale", scaleParams, scalingHints);
@@ -217,14 +232,14 @@ public class ImageStyleUtils {
 
       // Cropping
 
-      float cropX = (float)Math.floor(getCropX(scaledWidth, scaledHeight, style));
-      float cropY = (float)Math.floor(getCropY(scaledWidth, scaledHeight , style));
-      
+      float cropX = (float) Math.floor(getCropX(scaledWidth, scaledHeight, style));
+      float cropY = (float) Math.floor(getCropY(scaledWidth, scaledHeight, style));
+
       if (cropX > 0 || cropY > 0) {
         ParameterBlock cropParams = new ParameterBlock();
         cropParams.addSource(image);
-        cropParams.add(cropX > 0 ? cropX/2.0f : 0.0f); // top left x
-        cropParams.add(cropY > 0 ? cropY/2.0f : 0.0f); // top left y
+        cropParams.add(cropX > 0 ? cropX / 2.0f : 0.0f); // top left x
+        cropParams.add(cropY > 0 ? cropY / 2.0f : 0.0f); // top left y
         cropParams.add(scaledWidth - cropX);
         cropParams.add(scaledHeight - cropY);
 
@@ -238,7 +253,7 @@ public class ImageStyleUtils {
       encodeParams.addSource(image).add(os).add(format);
       image = JAI.create("encode", encodeParams, null);
 
-    } catch (Throwable t) {
+    } catch (OutOfMemoryError t) {
       throw new IOException(t);
     } finally {
       if (image != null)

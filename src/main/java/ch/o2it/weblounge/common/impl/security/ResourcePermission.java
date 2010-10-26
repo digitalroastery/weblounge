@@ -65,9 +65,9 @@ public class ResourcePermission extends Permission {
   public boolean equals(Object obj) {
     if (obj instanceof ResourcePermission) {
       ResourcePermission p = (ResourcePermission)obj;
-      return getName().equals(p.getName()) &&
-            (resource.equals(p.resource)) &&
-            ((action == null && p.action == null) || action.equals(p.action));
+      return getName().equals(p.getName())
+        && (resource.equals(p.resource))
+        && ((action == null && p.action == null) || action.equals(p.action));
     }
     return false;
   }

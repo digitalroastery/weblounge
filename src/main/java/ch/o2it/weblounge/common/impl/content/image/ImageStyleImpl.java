@@ -72,9 +72,11 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    *          the scaling mode
    * @param composeable
    *          <code>true</code> if the image is composeable
+   * @throws IllegalArgumentException
+   *           if width and height parameter are zero or negative
    */
   public ImageStyleImpl(String id, int width, int height, ScalingMode scaling,
-      boolean composeable) {
+      boolean composeable) throws IllegalArgumentException {
     this.identifier = id;
     this.width = width;
     this.height = height;
@@ -84,20 +86,22 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
       case Cover:
       case Fill:
         if (width <= 0)
-          throw new IllegalArgumentException("Image width cannot be null with " + scaling.toString().toLowerCase() + " scaling");
+          throw new IllegalArgumentException("Image width (" + width + ") must be a positive, non-zero number");
         if (height <= 0)
-          throw new IllegalArgumentException("Image height cannot be null with " + scaling.toString().toLowerCase() + " scaling");
+          throw new IllegalArgumentException("Image height (" + height + ") must be a positive, non-zero number");
         break;
       case Width:
         if (width <= 0)
-          throw new IllegalArgumentException("Image width cannot be null with " + scaling.toString().toLowerCase() + " scaling");
+          throw new IllegalArgumentException("Image width (" + width + ") must be a positive, non-zero number");
         break;
       case Height:
         if (height <= 0)
-          throw new IllegalArgumentException("Image height cannot be null with " + scaling.toString().toLowerCase() + " scaling");
-        break;      
+          throw new IllegalArgumentException("Image height (" + height + ") must be a positive, non-zero number");
+        break;
       case None:
         break;
+      default:
+        throw new IllegalArgumentException("Scaling mode '" + scaling.toString().toLowerCase() + "' is unsupported");
     }
   }
 
@@ -122,10 +126,10 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   public ImageStyleImpl() {
     this(null, -1, -1, None, true);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.image.ImageStyle#scale(int, int)
    */
   public float scale(int width, int height) {

@@ -719,8 +719,8 @@ public class SiteImpl implements Site {
 
           // actions are being registered automatically
 
-        } catch (Exception e) {
-          logger.error("Error starting module '{}'", module, e);
+        } catch (Throwable t) {
+          logger.error("Error starting module '{}'", module, t);
         }
       }
     }
@@ -758,8 +758,8 @@ public class SiteImpl implements Site {
         try {
           logger.debug("Stopping module {}", module);
           module.stop();
-        } catch (Exception e) {
-          logger.error("Error stopping module {}", module, e);
+        } catch (Throwable t) {
+          logger.error("Error stopping module {}", module, t);
         }
       }
     }
@@ -1313,8 +1313,8 @@ public class SiteImpl implements Site {
         Class<? extends Site> c = (Class<? extends Site>) classLoader.loadClass(className);
         site = c.newInstance();
         site.setIdentifier(identifier);
-      } catch (Exception e) {
-        throw new IllegalStateException("Unable to instantiate class " + className + " for site '" + identifier + ": " + e.getMessage(), e);
+      } catch (Throwable t) {
+        throw new IllegalStateException("Unable to instantiate class " + className + " for site '" + identifier + ": " + t.getMessage(), t);
       }
     } else {
       site = new SiteImpl();

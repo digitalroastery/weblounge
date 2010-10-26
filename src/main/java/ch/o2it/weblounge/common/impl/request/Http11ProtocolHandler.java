@@ -60,7 +60,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @see ftp://ftp.rfc-editor.org/in-notes/rfc2616.txt
  */
-public class Http11ProtocolHandler implements Times, Http11Constants {
+public final class Http11ProtocolHandler implements Times, Http11Constants {
 
   /** Logging facility */
   private static final Logger log = LoggerFactory.getLogger(Http11ProtocolHandler.class);
@@ -127,17 +127,24 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
   private static final int BUFFER_SIZE = 8 * 1024;
 
   /** protocol handler statistics */
-  protected static long stats[] = new long[STATS_NOF_COUNTERS];
+  protected static long[] stats = new long[STATS_NOF_COUNTERS];
 
   /** per response code header statistics */
-  protected static long headerStats[] = new long[STATS_NOF_RESPONSE];
+  protected static long[] headerStats = new long[STATS_NOF_RESPONSE];
 
   /** per response code body statistics */
-  protected static long bodyStats[] = new long[STATS_NOF_RESPONSE];
+  protected static long[] bodyStats = new long[STATS_NOF_RESPONSE];
 
   /** holds a temporary buffer for data copying */
   private static final ThreadLocal<byte[]> buffer = new ThreadLocal<byte[]>();
 
+  /**
+   * This class is not intended to be instantiated.
+   */
+  private Http11ProtocolHandler() {
+    // Nothing to be done
+  }
+  
   /**
    * Method isError.
    * 
@@ -337,7 +344,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
             try {
 
               /* get the temporary buffer for this thread */
-              byte tmp[] = buffer.get();
+              byte[] tmp = buffer.get();
               if (tmp == null) {
                 tmp = new byte[BUFFER_SIZE];
                 buffer.set(tmp);
@@ -515,7 +522,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
    * @param type
    * @param stats
    */
-  protected static void incResponseStats(int type, long stats[]) {
+  protected static void incResponseStats(int type, long[] stats) {
     if (type < 0 || type >= stats.length)
       ++stats[RESPONSE_UNKNOWN];
     ++stats[type];
@@ -565,7 +572,7 @@ public class Http11ProtocolHandler implements Times, Http11Constants {
    * @param values
    * @return
    */
-  protected static long getResponseStats(int value, long values[]) {
+  protected static long getResponseStats(int value, long[] values) {
     if (value < 0 || value >= values.length)
       return -1;
     return values[value];

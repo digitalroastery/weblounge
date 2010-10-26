@@ -36,7 +36,7 @@ import java.util.List;
 public class SecuredObject implements Securable {
 
   /** The security context */
-  protected SecurityContextImpl securityCtx_ = null;
+  protected SecurityContextImpl securityCtx = null;
 
   /** Security listener */
   protected List<SecurityListener> listeners = null;
@@ -49,14 +49,14 @@ public class SecuredObject implements Securable {
    *          the object owner
    */
   public SecuredObject(User owner) {
-    securityCtx_ = new SecurityContextImpl(owner);
+    securityCtx = new SecurityContextImpl(owner);
   }
 
   /**
    * Creates a secured object with no security constraints applied to it.
    */
   public SecuredObject() {
-    securityCtx_ = new SecurityContextImpl();
+    securityCtx = new SecurityContextImpl();
   }
 
   /**
@@ -65,7 +65,7 @@ public class SecuredObject implements Securable {
    * @return the security context
    */
   public SecurityContextImpl getSecurityContext() {
-    return securityCtx_;
+    return securityCtx;
   }
 
   /**
@@ -75,8 +75,8 @@ public class SecuredObject implements Securable {
    *          the context owner
    */
   public void setOwner(User owner) {
-    User oldOwner = securityCtx_.getOwner();
-    securityCtx_.setOwner(owner);
+    User oldOwner = securityCtx.getOwner();
+    securityCtx.setOwner(owner);
     fireOwnerChanged(owner, oldOwner);
   }
 
@@ -86,7 +86,7 @@ public class SecuredObject implements Securable {
    * @return the owner
    */
   public User getOwner() {
-    return securityCtx_.getOwner();
+    return securityCtx.getOwner();
   }
 
   /**
@@ -100,7 +100,7 @@ public class SecuredObject implements Securable {
    * @return <code>true</code> if the authorization is sufficient
    */
   public boolean check(Permission permission, Authority authorization) {
-    return securityCtx_.check(permission, authorization);
+    return securityCtx.check(permission, authorization);
   }
 
   /**
@@ -115,7 +115,7 @@ public class SecuredObject implements Securable {
    * @return <code>true</code> if the object may obtain the permissions
    */
   public boolean check(PermissionSet permissions, Authority authorization) {
-    return securityCtx_.check(permissions, authorization);
+    return securityCtx.check(permissions, authorization);
   }
 
   /**
@@ -164,7 +164,7 @@ public class SecuredObject implements Securable {
    * @return the available permissions
    */
   public Permission[] permissions() {
-    return securityCtx_.permissions();
+    return securityCtx.permissions();
   }
 
   /**
@@ -179,7 +179,7 @@ public class SecuredObject implements Securable {
   public void allow(Permission permission, Authority authorization) {
     if (permission == null)
       throw new IllegalArgumentException("permission");
-    securityCtx_.allow(permission, authorization);
+    securityCtx.allow(permission, authorization);
     firePermissionChanged(permission);
   }
 
@@ -191,7 +191,7 @@ public class SecuredObject implements Securable {
    *          the permission
    */
   public void deny(Permission permission, Authority authorization) {
-    securityCtx_.deny(permission, authorization);
+    securityCtx.deny(permission, authorization);
     firePermissionChanged(permission);
   }
 

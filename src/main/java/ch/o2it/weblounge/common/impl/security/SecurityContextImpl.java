@@ -63,13 +63,13 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
   private static final Logger logger = LoggerFactory.getLogger(SecurityContextImpl.class);
 
   /** Allowed authorizations */
-  private Map<Permission, Set<Authority>> context_ = null;
+  private Map<Permission, Set<Authority>> context = null;
 
   /** Allowed default authorizations */
-  private Map<Permission, Set<Authority>> defaultContext_ = null;
+  private Map<Permission, Set<Authority>> defaultContext = null;
 
   /** The permissions */
-  private Permission[] permissions_ = null;
+  private Permission[] permissions = null;
 
   /**
    * Creates a default restriction set with no restrictions and a context
@@ -88,8 +88,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    */
   public SecurityContextImpl(User owner) {
     super(owner);
-    context_ = new HashMap<Permission, Set<Authority>>();
-    defaultContext_ = new HashMap<Permission, Set<Authority>>();
+    context = new HashMap<Permission, Set<Authority>>();
+    defaultContext = new HashMap<Permission, Set<Authority>>();
   }
 
   /**
@@ -111,14 +111,14 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       throw new IllegalArgumentException("Authority cannot be null");
     logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
 
-    Set<Authority> a = context_.get(permission);
+    Set<Authority> a = context.get(permission);
     if (a == null) {
       a = new HashSet<Authority>();
-      context_.put(permission, a);
-      permissions_ = null;
+      context.put(permission, a);
+      permissions = null;
     }
     a.add(authority);
-    defaultContext_.remove(permission);
+    defaultContext.remove(permission);
   }
 
   /**
@@ -137,11 +137,11 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
     if (authority == null)
       throw new IllegalArgumentException("Authority cannot be null");
     logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
-    Set<Authority> a = defaultContext_.get(permission);
+    Set<Authority> a = defaultContext.get(permission);
     if (a == null) {
       a = new HashSet<Authority>();
-      defaultContext_.put(permission, a);
-      permissions_ = null;
+      defaultContext.put(permission, a);
+      permissions = null;
     }
     a.add(authority);
   }
@@ -163,8 +163,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       throw new IllegalArgumentException("Authority cannot be null");
     logger.debug("Security context '{}' requires '{}' for permission '{}'", new Object[] {this, authority, permission});
 
-    deny(permission, authority, context_);
-    deny(permission, authority, defaultContext_);
+    deny(permission, authority, context);
+    deny(permission, authority, defaultContext);
   }
 
   /**
@@ -208,8 +208,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    *          the permission
    */
   public void denyAll(Permission permission) {
-    denyAll(permission, context_);
-    denyAll(permission, defaultContext_);
+    denyAll(permission, context);
+    denyAll(permission, defaultContext);
   }
 
   /**
@@ -233,8 +233,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * Denies everyone and everything.
    */
   public void denyAll() {
-    context_.clear();
-    defaultContext_.clear();
+    context.clear();
+    defaultContext.clear();
   }
 
   /**
@@ -254,7 +254,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
       throw new IllegalArgumentException("Authority cannot be null");
     logger.debug("Request to check permission '{}' for authority '{}' at {}", new Object[] {permission, authority, this});
 
-    return check(permission, authority, defaultContext_) || check(permission, authority, context_);
+    return check(permission, authority, defaultContext) || check(permission, authority, context);
   }
 
   /**
@@ -308,9 +308,9 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * @see ch.o2it.weblounge.common.security.SecurityContext#getAllowed(ch.o2it.weblounge.common.security.Permission)
    */
   public Authority[] getAllowed(Permission p) {
-    Set<Authority> authorities = defaultContext_.get(p);
+    Set<Authority> authorities = defaultContext.get(p);
     if (authorities == null) {
-      authorities = context_.get(p);
+      authorities = context.get(p);
     }
     if (authorities != null) {
       Authority[] a = new Authority[authorities.size()];
@@ -348,7 +348,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
         return true;
       }
     }
-    return (permissions.length == 0) || false;
+    return (permissions.length == 0);
   }
 
   /**
@@ -377,14 +377,14 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * @return the permissions
    */
   public Permission[] permissions() {
-    if (permissions_ == null) {
-      permissions_ = new Permission[context_.size() + defaultContext_.size()];
+    if (permissions == null) {
+      permissions = new Permission[context.size() + defaultContext.size()];
       List<Permission> permissionList = new ArrayList<Permission>();
-      permissionList.addAll(context_.keySet());
-      permissionList.addAll(defaultContext_.keySet());
-      permissionList.toArray(permissions_);
+      permissionList.addAll(context.keySet());
+      permissionList.addAll(defaultContext.keySet());
+      permissionList.toArray(permissions);
     }
-    return permissions_;
+    return permissions;
   }
 
   /**
@@ -396,8 +396,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    *          the XPath object used to parse the configuration
    */
   public void init(XPath path, Node context) {
-    context_.clear();
-    permissions_ = null;
+    this.context.clear();
+    permissions = null;
 
     // Read permissions
     NodeList permissions = XPathHelper.selectList(context, "/security/permission", path);
@@ -443,8 +443,8 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
     }
 
     // Permissions
-    for (Permission p : context_.keySet()) {
-      Map<String, Set<Authority>> authorities = groupByType(context_.get(p));
+    for (Permission p : context.keySet()) {
+      Map<String, Set<Authority>> authorities = groupByType(context.get(p));
       for (Map.Entry<String, Set<Authority>> entry : authorities.entrySet()) {
         String type = entry.getKey();
         b.append("<permission id=\"");
@@ -495,9 +495,9 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
   public Object clone() throws CloneNotSupportedException {
     SecurityContextImpl ctxt = (SecurityContextImpl)super.clone();
     ctxt.owner = owner;
-    ctxt.context_.putAll(context_);
-    ctxt.defaultContext_.putAll(defaultContext_);
-    ctxt.permissions_ = permissions_;
+    ctxt.context.putAll(context);
+    ctxt.defaultContext.putAll(defaultContext);
+    ctxt.permissions = permissions;
     ctxt.owner = owner;
     return ctxt;
   }

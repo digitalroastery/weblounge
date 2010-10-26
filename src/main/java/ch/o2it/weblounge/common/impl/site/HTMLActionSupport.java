@@ -382,15 +382,15 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
     }
     try {
       renderer.render(request, response);
-    } catch (Exception e) {
+    } catch (Throwable t) {
       String params = RequestUtils.dumpParameters(request);
       String msg = "Error including '" + renderer + "' in action '" + this + "' on " + request.getUrl() + " " + params;
-      Throwable o = e.getCause();
+      Throwable o = t.getCause();
       if (o != null) {
         msg += ": " + o.getMessage();
         logger.error(msg, o);
       } else {
-        logger.error(msg, e);
+        logger.error(msg, t);
       }
       response.invalidate();
     }

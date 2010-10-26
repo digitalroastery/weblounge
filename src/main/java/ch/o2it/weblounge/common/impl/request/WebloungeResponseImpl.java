@@ -26,9 +26,6 @@ import ch.o2it.weblounge.common.request.ResponseCache;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,9 +39,6 @@ import javax.servlet.http.HttpServletResponseWrapper;
  * Default implementation of the <code>WebloungeResponse</code>.
  */
 public class WebloungeResponseImpl extends HttpServletResponseWrapper implements WebloungeResponse {
-
-  /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(WebloungeResponseImpl.class);
 
   /** Flag for invalidated responses that should not be cached */
   private boolean isValid = false;
@@ -330,8 +324,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponsePart(java.lang.Iterable,
    *      long, long)
    */
-  public boolean startResponsePart(Iterable<CacheTag> uniqueTags, long validTime,
-      long recheckTime) {
+  public boolean startResponsePart(Iterable<CacheTag> uniqueTags,
+      long validTime, long recheckTime) {
     if (!isValid || cache == null)
       return false;
     if (cacheHandles == null)
@@ -339,12 +333,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
     // Do a cache lookup
     CacheHandle handle = null;
-    try {
-      handle = cache.startResponsePart(uniqueTags, this, validTime, recheckTime);
-    } catch (Exception e) {
-      logger.warn("Error starting response part in cache", e);
-      return false;
-    }
+    handle = cache.startResponsePart(uniqueTags, this, validTime, recheckTime);
 
     // Is the response part in the cache?
     if (handle == null)
@@ -366,14 +355,12 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       return;
     if (cacheHandles == null)
       throw new IllegalStateException("Cache root entry is missing");
-    if (cacheHandles.size() > 1)
-      throw new IllegalStateException("Unfinished response parts detected");
 
     // End the response and have the output sent back to the client
     try {
+      if (cacheHandles.size() > 1)
+        throw new IllegalStateException("Unfinished response parts detected");
       cache.endResponse(this);
-    } catch (Exception e) {
-      logger.warn("Error sending end of response to cache", e);
     } finally {
       cacheHandles.clear();
       cacheHandles = null;
@@ -391,16 +378,12 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
     if (cacheHandles == null || cacheHandles.size() < 1)
       throw new IllegalStateException("No response part has been started");
     CacheHandle handle = cacheHandles.pop();
-    try {
-      cache.endResponsePart(handle, this);
-    } catch (Exception e) {
-      logger.warn("Error sending end of response part to cache", e);
-    }
+    cache.endResponsePart(handle, this);
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#setRecheckTime(long)
    */
   public void setRecheckTime(long recheckTime) {
@@ -414,7 +397,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.WebloungeResponse#setValidTime(long)
    */
   public void setValidTime(long validTime) {

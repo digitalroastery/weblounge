@@ -32,10 +32,10 @@ import javax.servlet.http.HttpSession;
 public abstract class WebloungeCallback implements CallbackHandler {
 
   /** The site */
-  private Site site_;
+  protected Site site;
 
   /** The users's session */
-  private HttpSession session_;
+  protected HttpSession session;
 
   /**
    * Creates a new callback handler with a reference to the current site and
@@ -51,8 +51,8 @@ public abstract class WebloungeCallback implements CallbackHandler {
       throw new IllegalArgumentException("Site must not be null!");
     if (session == null)
       throw new IllegalArgumentException("Session must not be null!");
-    site_ = site;
-    session_ = session;
+    this.site = site;
+    this.session = session;
   }
 
   /**
@@ -61,7 +61,7 @@ public abstract class WebloungeCallback implements CallbackHandler {
    * @return the site
    */
   public Site getSite() {
-    return site_;
+    return site;
   }
 
   /**
@@ -70,7 +70,7 @@ public abstract class WebloungeCallback implements CallbackHandler {
    * @return the session
    */
   public HttpSession getSession() {
-    return session_;
+    return session;
   }
 
   /**

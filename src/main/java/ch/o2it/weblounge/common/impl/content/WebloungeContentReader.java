@@ -30,6 +30,7 @@ import ch.o2it.weblounge.common.user.User;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -196,7 +197,7 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
       try {
         Date d = dateFormat.parse(getCharacters());
         clipboard.put("date", d);
-      } catch (Exception e) {
+      } catch (ParseException e) {
         throw new IllegalStateException("Reading date failed: '" + getCharacters() + "'");
       }
     }
@@ -206,7 +207,7 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
       try {
         Date d = dateFormat.parse(getCharacters());
         clipboard.put("publish.start", d);
-      } catch (Exception e) {
+      } catch (ParseException e) {
         throw new IllegalStateException("Reading publishing start date failed: '" + getCharacters() + "'");
       }
     }
@@ -217,7 +218,7 @@ public abstract class WebloungeContentReader extends WebloungeSAXHandler {
         Date d = dateFormat.parse(getCharacters());
         if (d.getTime() < Times.MAX_DATE)
           clipboard.put("publish.end", d);
-      } catch (Exception e) {
+      } catch (ParseException e) {
         throw new IllegalStateException("Reading publishing end date failed: '" + getCharacters() + "'");
       }
     }

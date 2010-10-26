@@ -368,8 +368,8 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
    */
   public static WebloungeUserImpl fromXml(Node userNode, Site site)
       throws IllegalStateException {
-    XPath xpath_ = XPathFactory.newInstance().newXPath();
-    return fromXml(userNode, site, xpath_);
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(userNode, site, xpath);
   }
 
   /**

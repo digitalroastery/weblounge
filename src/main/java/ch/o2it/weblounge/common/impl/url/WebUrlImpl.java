@@ -68,7 +68,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   protected Language language = null;
 
   /** The link */
-  private transient String link_ = null;
+  private transient String link = null;
 
   /** The url flavor */
   protected RequestFlavor flavor = null;
@@ -209,15 +209,15 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @see ch.o2it.weblounge.common.url.WebUrl#getLink()
    */
   public String getLink() {
-    if (link_ == null) {
+    if (link == null) {
       try {
-        link_ = URLEncoder.encode(getLink(-1, null, null), "UTF-8");
+        link = URLEncoder.encode(getLink(-1, null, null), "UTF-8");
       } catch (UnsupportedEncodingException e) {
-        logger.error("Unexpected error while urlencoding link {}", link_, e);
+        logger.error("Unexpected error while urlencoding link {}", link, e);
       }
-      link_ = link_.replaceAll("%2F", "/");
+      link = link.replaceAll("%2F", "/");
     }
-    return link_;
+    return link;
   }
 
   /**

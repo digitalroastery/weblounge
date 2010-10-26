@@ -176,8 +176,9 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
         return passwordString.equals(password);
       case md5:
         return passwordString.equals(new String(DigestUtils.md5(password)));
+      default:
+        throw new IllegalStateException("Unsupported digest type '" + passwordDigestType + "'");
     }
-    return false;
   }
 
   /**

@@ -25,13 +25,14 @@ import java.io.File;
 /**
  * <code>PathSupport</code> is a helper class to deal with filesystem paths.
  */
-public class PathSupport {
+public final class PathSupport {
 
   /**
    * This class should not be instantiated, since it only provides static
    * utility methods.
    */
   private PathSupport() {
+    // Nothing to be done here
   }
 
   /**

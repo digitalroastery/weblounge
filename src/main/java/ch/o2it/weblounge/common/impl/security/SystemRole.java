@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * This class declares the roles used by the weblounge system.
  */
-public class SystemRole extends RoleImpl {
+public final class SystemRole extends RoleImpl {
 
   /** The System role context */
   public static final String CONTEXT = "system";
@@ -56,16 +56,16 @@ public class SystemRole extends RoleImpl {
   public static final Role SYSTEMADMIN = new SystemRole("systemadmin", SITEADMIN);
 
   /** The system roles collection */
-  private static Set<Role> roles_ = new HashSet<Role>();
+  private static Set<Role> roles = new HashSet<Role>();
   
   static {
-    roles_.add(SystemRole.GUEST);
-    roles_.add(SystemRole.TRANSLATOR);
-    roles_.add(SystemRole.EDITOR);
-    roles_.add(SystemRole.PUBLISHER);
-    roles_.add(SystemRole.DOMAINADMIN);
-    roles_.add(SystemRole.SITEADMIN);
-    roles_.add(SystemRole.SYSTEMADMIN);
+    roles.add(SystemRole.GUEST);
+    roles.add(SystemRole.TRANSLATOR);
+    roles.add(SystemRole.EDITOR);
+    roles.add(SystemRole.PUBLISHER);
+    roles.add(SystemRole.DOMAINADMIN);
+    roles.add(SystemRole.SITEADMIN);
+    roles.add(SystemRole.SYSTEMADMIN);
   }
 
   /**
@@ -145,7 +145,7 @@ public class SystemRole extends RoleImpl {
    * @return all system roles
    */
   public static Iterator<Role> roles() {
-    return roles_.iterator();
+    return roles.iterator();
   }
 
 }

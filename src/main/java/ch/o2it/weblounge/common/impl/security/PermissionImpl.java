@@ -33,10 +33,10 @@ import ch.o2it.weblounge.common.security.Permission;
 public class PermissionImpl extends LocalizableContent<String> implements Permission {
 
   /** PermissionImpl identifier */
-  private String identifier_ = null;
+  private String identifier = null;
 
   /** PermissionImpl identifier */
-  private String context_ = null;
+  private String context = null;
 
   /**
    * Creates a new permission from the parameter context::id.
@@ -49,8 +49,8 @@ public class PermissionImpl extends LocalizableContent<String> implements Permis
     int divider = permission.indexOf(':');
     if (divider <= 0 || divider >= (permission.length() - 1))
       throw new IllegalArgumentException("Permission must be of the form 'context:id'!");
-    context_ = permission.substring(0, divider);
-    identifier_ = permission.substring(divider + 1);
+    this.context = permission.substring(0, divider);
+    this.identifier = permission.substring(divider + 1);
   }
 
   /**
@@ -62,8 +62,8 @@ public class PermissionImpl extends LocalizableContent<String> implements Permis
    *          the permission identifier
    */
   public PermissionImpl(String context, String id) {
-    context_ = context;
-    identifier_ = id;
+    this.context = context;
+    this.identifier = id;
   }
 
   /**
@@ -72,7 +72,7 @@ public class PermissionImpl extends LocalizableContent<String> implements Permis
    * @return the permission identifier
    */
   public String getIdentifier() {
-    return identifier_;
+    return identifier;
   }
 
   /**
@@ -81,7 +81,7 @@ public class PermissionImpl extends LocalizableContent<String> implements Permis
    * @return the permission context
    */
   public String getContext() {
-    return context_;
+    return context;
   }
 
   /**
@@ -107,7 +107,7 @@ public class PermissionImpl extends LocalizableContent<String> implements Permis
    */
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof Permission) {
-      return ((Permission) obj).getIdentifier().equals(identifier_) && ((Permission) obj).getContext().equals(context_);
+      return ((Permission) obj).getIdentifier().equals(identifier) && ((Permission) obj).getContext().equals(context);
     }
     return false;
   }
@@ -120,7 +120,7 @@ public class PermissionImpl extends LocalizableContent<String> implements Permis
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return context_ + ":" + identifier_;
+    return context + ":" + identifier;
   }
 
 }

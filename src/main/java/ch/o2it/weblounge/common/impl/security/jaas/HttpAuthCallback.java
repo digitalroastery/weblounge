@@ -49,10 +49,10 @@ public class HttpAuthCallback extends WebloungeCallback {
   private WebloungeResponse response;
 
   /** The username */
-  private String login_;
+  protected String login;
 
   /** The password */
-  private String password_;
+  protected String password;
 
   /**
    * Creates a new handler for the given request.
@@ -98,12 +98,12 @@ public class HttpAuthCallback extends WebloungeCallback {
     super(request.getSite(), request.getSession());
     this.request = request;
     this.response = response;
-    login_ = login;
-    password_ = password;
+    this.login = login;
+    this.password = password;
   }
 
   /**
-   * Handles the varous callbacks used to perform a user login.
+   * Handles the various callbacks used to perform a user login.
    * 
    * @param callbacks
    *          the callbacks
@@ -151,14 +151,14 @@ public class HttpAuthCallback extends WebloungeCallback {
    * @return the login
    */
   public String getLogin() {
-    if (login_ != null) {
-      return login_;
+    if (login != null) {
+      return login;
     } else if (request.getParameter(PARAM_LOGIN) != null) {
-      login_ = request.getParameter(PARAM_LOGIN);
-      return login_;
+      login = request.getParameter(PARAM_LOGIN);
+      return login;
     } else {
       getLoginFromHeader();
-      return login_;
+      return login;
     }
   }
 
@@ -169,14 +169,14 @@ public class HttpAuthCallback extends WebloungeCallback {
    * @return the password
    */
   public String getPassword() {
-    if (password_ != null) {
-      return password_;
+    if (password != null) {
+      return password;
     } else if (request != null && request.getParameter(PARAM_PASSWORD) != null) {
-      password_ = request.getParameter(PARAM_PASSWORD);
-      return password_;
+      password = request.getParameter(PARAM_PASSWORD);
+      return password;
     } else {
       getLoginFromHeader();
-      return password_;
+      return password;
     }
   }
 
@@ -189,8 +189,8 @@ public class HttpAuthCallback extends WebloungeCallback {
     if (header != null) {
       int colon = header.indexOf(":");
       if (colon > 0 && colon < header.length()) {
-        login_ = header.substring(0, colon);
-        password_ = header.substring(colon + 1);
+        login = header.substring(0, colon);
+        password = header.substring(colon + 1);
       }
     }
   }

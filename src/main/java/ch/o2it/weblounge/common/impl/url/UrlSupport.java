@@ -29,13 +29,14 @@ import java.util.TreeSet;
 /**
  * <code>UrlSupport</code> is a helper class to deal with urls.
  */
-public class UrlSupport {
+public final class UrlSupport {
 
   /**
    * This class should not be instantiated, since it provides static utility
    * methods only.
    */
   private UrlSupport() {
+    // Nothing to be done here
   }
 
   /**

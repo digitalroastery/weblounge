@@ -219,6 +219,8 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
         case Original:
           l = getOriginalLanguage();
           break;
+        default:
+          throw new IllegalStateException(this + " is neither using default nor original language");
       }
       c = content.get(l);
     }
@@ -228,8 +230,8 @@ public class LocalizableContent<T> extends LocalizableObject implements Localiza
   /**
    * This implementation of the {@link LocalizationListener} switches
    * <code>this</code> to the same language, i. e.
-   * <code>this.switchTo(language)</code> is issued as a reaction to
-   * this callback.
+   * <code>this.switchTo(language)</code> is issued as a reaction to this
+   * callback.
    * 
    * @see ch.o2it.weblounge.common.language.LocalizationListener#switchedTo(ch.o2it.weblounge.common.language.Language,
    *      ch.o2it.weblounge.common.language.Language)

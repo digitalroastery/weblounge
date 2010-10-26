@@ -61,10 +61,10 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   private Logger logger = LoggerFactory.getLogger(WebloungeRequestImpl.class);
 
   /** The language extraction regular expression */
-  private static Pattern languageExtractor_ = Pattern.compile("_([a-zA-Z]+)\\.[\\w\\- ]+$");
+  private final static Pattern LANG_EXTRACTOR_REGEX = Pattern.compile("_([a-zA-Z]+)\\.[\\w\\- ]+$");
 
   /** The request counter */
-  private static long requestCounter_ = 0L;
+  private static long requestCounter = 0L;
 
   /** The request identifier */
   protected String id = null;
@@ -140,7 +140,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // access to this site. First thing we do is take a look at the url, where
     // language information might be encoded, e. g. index_en.xml
     if (language == null) {
-      Matcher m = languageExtractor_.matcher(getRequestURI());
+      Matcher m = LANG_EXTRACTOR_REGEX.matcher(getRequestURI());
       if (m.find()) {
         language = LanguageSupport.getLanguage(m.group(1));
         logger.trace("Selected language " + language + " from request uri");
@@ -154,7 +154,8 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       Enumeration<?> localeEnum = getLocales();
       while (localeEnum.hasMoreElements()) {
         String languageId = ((Locale) localeEnum.nextElement()).getLanguage();
-        if ((language = site.getLanguage(languageId)) != null) {
+        language = site.getLanguage(languageId);
+        if (language != null) {
           logger.trace("Selected language " + languageId + " from browser preferences");
           break;
         }
@@ -287,11 +288,11 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     this.site = site;
 
     // Update the request counter
-    id = Long.toString(requestCounter_);
-    if (requestCounter_ == Long.MAX_VALUE)
-      requestCounter_ = 0L;
+    id = Long.toString(requestCounter);
+    if (requestCounter == Long.MAX_VALUE)
+      requestCounter = 0L;
     else
-      requestCounter_++;
+      requestCounter++;
 
     // Handle changes to the users session that might be required should he/she
     // be surfing on another site

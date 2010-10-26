@@ -163,7 +163,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
         digestType = XPathHelper.valueOf(userNode, "ns:password/@type", xpath);
         user.passwordDigestType = DigestType.valueOf(digestType);
         user.password = password.getBytes();
-      } catch (Exception e) {
+      } catch (Throwable t) {
         throw new IllegalStateException("Unknown password digest found: " + digestType);
       }
     }

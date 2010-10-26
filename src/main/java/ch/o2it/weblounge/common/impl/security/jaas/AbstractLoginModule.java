@@ -189,7 +189,7 @@ public abstract class AbstractLoginModule implements LoginModule {
    *         or false otherwise.
    */
   public boolean commit() throws LoginException {
-    if (succeeded == false) {
+    if (!succeeded) {
       return false;
     } else {
       if (user != null && !subject.getPrincipals().contains(user)) {
@@ -198,8 +198,8 @@ public abstract class AbstractLoginModule implements LoginModule {
       // in any case, clean out state
       username = null;
       if (password != null) {
-        for (int i = 0; i < password.length; password[i++] = ' ')
-          ;
+        for (int i = 0; i < password.length; i++)
+          password[i] = ' ';
         password = null;
       }
 
@@ -225,15 +225,15 @@ public abstract class AbstractLoginModule implements LoginModule {
    *         failed, and true otherwise.
    */
   public boolean abort() throws LoginException {
-    if (succeeded == false) {
+    if (!succeeded) {
       return false;
-    } else if (succeeded == true && commitSucceeded == false) {
+    } else if (succeeded && !commitSucceeded) {
       // login succeeded but overall authentication failed
       succeeded = false;
       username = null;
       if (password != null) {
-        for (int i = 0; i < password.length; password[i++] = ' ')
-          ;
+        for (int i = 0; i < password.length; i++)
+          password[i] = ' ';
         password = null;
       }
       user = null;
@@ -260,8 +260,8 @@ public abstract class AbstractLoginModule implements LoginModule {
     succeeded = commitSucceeded;
     username = null;
     if (password != null) {
-      for (int i = 0; i < password.length; password[i++] = ' ')
-        ;
+      for (int i = 0; i < password.length; i++)
+        password[i] = ' ';
       password = null;
     }
 

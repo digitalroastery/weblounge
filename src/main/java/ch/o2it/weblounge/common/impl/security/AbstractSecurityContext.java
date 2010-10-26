@@ -41,7 +41,7 @@ public abstract class AbstractSecurityContext {
   protected User owner = null;
 
   /** The security listeners */
-  private List<SecurityListener> listeners_ = null;
+  private List<SecurityListener> listeners = null;
 
   /** Type mappings */
   protected static final Map<String, String> shortcuts = new HashMap<String, String>();
@@ -248,9 +248,9 @@ public abstract class AbstractSecurityContext {
    *          the security listener
    */
   public void addSecurityListener(SecurityListener listener) {
-    if (listeners_ == null)
-      listeners_ = new ArrayList<SecurityListener>();
-    listeners_.add(listener);
+    if (listeners == null)
+      listeners = new ArrayList<SecurityListener>();
+    listeners.add(listener);
   }
 
   /**
@@ -260,9 +260,9 @@ public abstract class AbstractSecurityContext {
    *          the security listener
    */
   public void removeSecurityListener(SecurityListener listener) {
-    if (listeners_ == null)
+    if (listeners == null)
       return;
-    listeners_.remove(listener);
+    listeners.remove(listener);
   }
 
 }

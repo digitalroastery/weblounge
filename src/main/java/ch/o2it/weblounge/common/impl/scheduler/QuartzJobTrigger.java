@@ -237,8 +237,8 @@ public final class QuartzJobTrigger extends Trigger {
   public Date getFireTimeAfter(Date date) {
     try {
       return trigger.getNextExecutionAfter(date);
-    } catch (Exception e) {
-      logger.error("Job implementation threw exception when asked for next trigger date", e);
+    } catch (Throwable t) {
+      logger.error("Job implementation threw exception when asked for next trigger date", t);
       return null;
     }
   }
@@ -304,8 +304,8 @@ public final class QuartzJobTrigger extends Trigger {
       timesTriggered++;
       previousFireTime = nextFireTime;
       trigger.triggered(previousFireTime);
-    } catch (Exception e) {
-      logger.error("Job implementation threw exception on trigger callback", e);
+    } catch (Throwable t) {
+      logger.error("Job implementation threw exception on trigger callback", t);
     } finally {
       nextFireTime = getFireTimeAfter(nextFireTime);
     }

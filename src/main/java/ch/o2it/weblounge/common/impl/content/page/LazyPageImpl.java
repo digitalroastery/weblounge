@@ -115,7 +115,7 @@ public class LazyPageImpl implements Page {
       isHeaderLoaded = true;
       isBodyLoaded = true;
       cleanupAfterLoading();
-    } catch (Exception e) {
+    } catch (Throwable e) {
       logger.error("Failed to lazy-load body of {}", uri);
       throw new IllegalStateException(e);
     }
@@ -149,7 +149,7 @@ public class LazyPageImpl implements Page {
       else
         headerXml = null;
 
-    } catch (Exception e) {
+    } catch (Throwable e) {
       logger.error("Failed to lazy-load header of {}", uri);
       throw new IllegalStateException(e);
     }
@@ -176,7 +176,7 @@ public class LazyPageImpl implements Page {
       else if (headerXml != null)
         pageXml = null;
 
-    } catch (Exception e) {
+    } catch (Throwable e) {
       logger.error("Failed to lazy-load body of {}", uri);
       throw new IllegalStateException(e);
     }
@@ -197,7 +197,7 @@ public class LazyPageImpl implements Page {
       PagePreviewReader reader = new PagePreviewReader();
       previewComposer = reader.read(IOUtils.toInputStream(previewXml, "UTF-8"), uri);
       previewXml = null;
-    } catch (Exception e) {
+    } catch (Throwable e) {
       logger.error("Failed to lazy-load preview of {}", uri);
       throw new IllegalStateException(e);
     }

@@ -138,8 +138,8 @@ public class XMLActionSupport extends ActionSupport implements XMLAction {
     try {
       Transformer transformer = transformerFactory.newTransformer();
       returnXML(doc, transformer);
-    } catch (Exception e) {
-      throw new ActionException("Unable to create an xml transformer", e);
+    } catch (Throwable t) {
+      throw new ActionException("Unable to create an xml transformer", t);
     }
   }
 

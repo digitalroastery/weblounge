@@ -661,7 +661,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
         Class<? extends Action> c = (Class<? extends Action>) classLoader.loadClass(className);
         action = c.newInstance();
         action.setIdentifier(identifier);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         throw new IllegalStateException("Unable to instantiate class " + className + " for action '" + identifier + ": " + e.getMessage(), e);
       }
     } else {

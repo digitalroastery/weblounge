@@ -174,7 +174,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
   /**
    * @see javax.servlet.ServletRequest#getAttributeNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public Enumeration getAttributeNames() {
     final Set s = new HashSet();
     for (Enumeration e = super.getAttributeNames(); e.hasMoreElements();)
@@ -201,39 +201,39 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
   /**
    * @see javax.servlet.ServletRequest#getParameterMap()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public Map getParameterMap() {
     if (params == null)
       return super.getParameterMap();
     Map m = new HashMap();
     m.putAll(super.getParameterMap());
     for (Iterator pi = params.keySet().iterator(); pi.hasNext();) {
-      Object o = pi.next();
-      Object o1 = params.get(o);
-      if (m.containsKey(o)) {
-        String[] s2 = (String[]) m.get(o);
+      Object name = pi.next();
+      Object value = params.get(name);
+      if (m.containsKey(name)) {
+        String[] s2 = (String[]) m.get(name);
         int len = s2.length;
-        if (o1 instanceof String[])
-          len += ((String[]) o1).length;
+        if (value instanceof String[])
+          len += ((String[]) value).length;
         else
           len += 1;
-        String s[] = new String[len];
+        String[] s = new String[len];
         len = 0;
-        if (o1 instanceof String[]) {
-          String s1[] = (String[]) o1;
+        if (value instanceof String[]) {
+          String[] s1 = (String[]) value;
           for (int i = 0; i < s1.length;)
-            s[len++] = s1[i++];
+            s[len++] = s1[i];
         } else
-          s[len++] = (String) o1;
+          s[len++] = (String) value;
         for (int i = 0; i < s2.length;)
-          s[len++] = s2[i++];
-        m.put(o, s);
-      } else if (o1 instanceof String[])
-        m.put(o, o1);
+          s[len++] = s2[i];
+        m.put(name, s);
+      } else if (value instanceof String[])
+        m.put(name, value);
       else {
-        String s[] = new String[1];
-        s[0] = (String) o1;
-        m.put(o, s);
+        String[] s = new String[1];
+        s[0] = (String) value;
+        m.put(name, s);
       }
     }
     return m;
@@ -242,7 +242,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
   /**
    * @see javax.servlet.ServletRequest#getParameterNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public Enumeration getParameterNames() {
     if (params == null)
       return super.getParameterNames();
@@ -260,7 +260,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     if (params != null) {
       Object o1 = params.get(name);
       if (o1 != null) {
-        String s1[];
+        String[] s1;
         if (o1 instanceof String[])
           s1 = (String[]) o1;
         else {
@@ -270,12 +270,12 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
         String[] s2 = super.getParameterValues(name);
         if (s2 == null)
           return s1;
-        String s[] = new String[s1.length + s2.length];
+        String[] s = new String[s1.length + s2.length];
         int len = 0;
         for (int i = 0; i < s1.length;)
-          s[len++] = s1[i++];
+          s[len++] = s1[i];
         for (int i = 0; i < s2.length;)
-          s[len++] = s2[i++];
+          s[len++] = s2[i];
         return s;
       }
     }

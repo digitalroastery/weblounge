@@ -34,19 +34,19 @@ import java.util.Set;
 public class GroupImpl extends LocalizableContent<String> implements Group {
 
   /** The group context */
-  private String context_ = null;
+  protected String context = null;
 
   /** The group identifier */
-  private String id_ = null;
+  protected String id = null;
 
   /** The group members */
-  private final Set<GroupMember> members = new HashSet<GroupMember>();
+  protected final Set<GroupMember> members = new HashSet<GroupMember>();
 
   /** Group memberships */
-  private final Set<Group> groups = new HashSet<Group>();
+  protected final Set<Group> groups = new HashSet<Group>();
 
   /** the roles directly owned by this group */
-  private final Set<Role> roles = new HashSet<Role>();
+  protected final Set<Role> roles = new HashSet<Role>();
 
   /**
    * Creates a new group with the given context and identifier.
@@ -57,8 +57,8 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    *          the group context
    */
   public GroupImpl(String id, String context) {
-    context_ = context;
-    id_ = id;
+    this.context = context;
+    this.id = id;
   }
 
   /**
@@ -67,7 +67,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    * @see ch.o2it.weblounge.common.security.Group#getContext()
    */
   public String getContext() {
-    return context_;
+    return context;
   }
 
   /**
@@ -76,7 +76,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    * @see ch.o2it.weblounge.common.security.Group#getIdentifier()
    */
   public String getIdentifier() {
-    return id_;
+    return id;
   }
 
   /**
@@ -85,7 +85,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    * @see java.security.Principal#getName()
    */
   public String getName() {
-    return id_;
+    return id;
   }
 
   /**
@@ -315,7 +315,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    */
   @Override
   public int hashCode() {
-    return context_.hashCode() | id_.hashCode() >> 16;
+    return context.hashCode() | id.hashCode() >> 16;
   }
 
   /**
@@ -327,7 +327,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
   public boolean equals(Object o) {
     if (o != null && o instanceof Group) {
       Group g = (Group) o;
-      return context_.equals(g.getContext()) && id_.equals(g.getIdentifier());
+      return context.equals(g.getContext()) && id.equals(g.getIdentifier());
     }
     return false;
   }
@@ -339,7 +339,7 @@ public class GroupImpl extends LocalizableContent<String> implements Group {
    * @return the string representation
    */
   public String toString() {
-    return context_ + ":" + id_;
+    return context + ":" + id;
   }
 
 }

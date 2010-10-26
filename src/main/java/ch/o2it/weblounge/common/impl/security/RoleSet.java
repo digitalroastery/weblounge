@@ -48,8 +48,8 @@ public class RoleSet extends TreeSet<Role> {
    */
   public RoleSet(Role[] roles) {
     if (roles != null) {
-      for (int i = 0; i < roles.length; add(roles[i++]))
-        ;
+      for (int i = 0; i < roles.length; i++)
+        add(roles[i]);
     }
   }
 

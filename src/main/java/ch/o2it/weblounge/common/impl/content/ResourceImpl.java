@@ -472,7 +472,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @return the keywords
    */
   public String[] getSubjects() {
-    String kw[] = new String[subjects.size()];
+    String[] kw = new String[ subjects.size() ];
     return subjects.toArray(kw);
   }
 

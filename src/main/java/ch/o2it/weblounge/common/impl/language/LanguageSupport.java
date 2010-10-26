@@ -52,6 +52,13 @@ public final class LanguageSupport {
   private static final Map<String, Language> systemLanguages = new HashMap<String, Language>();
 
   /**
+   * This class is not meant to be instantiated.
+   */
+  private LanguageSupport() {
+    // Nothing to be done here
+  }
+
+  /**
    * Returns the language object that represents the given locale.
    * 
    * @param locale
@@ -192,33 +199,29 @@ public final class LanguageSupport {
     if (o == null)
       o = new LocalizableContent<String>();
 
-    try {
-      NodeList nodes = XPathHelper.selectList(configuration, tagName, xpath);
-      for (int i = 0; i < nodes.getLength(); i++) {
-        Node name = nodes.item(i);
-        String description = XPathHelper.valueOf(name, "text()", xpath);
-        String lAttrib = XPathHelper.valueOf(name, "@language", xpath);
-        Language language = LanguageSupport.getLanguage(lAttrib);
-        if (language == null) {
-          logger.debug("Found name in unsupported language {}", lAttrib);
-          continue;
-        }
-
-        // Escape?
-        if (escape) {
-          description = description.replaceAll("\"", "");
-          description = description.replaceAll("'", "");
-        }
-
-        // Add the entry
-        logger.debug("Found description {}", description);
-        o.put(description, language);
-        if (language.equals(defaultLanguage)) {
-          o.setDefaultLanguage(defaultLanguage);
-        }
+    NodeList nodes = XPathHelper.selectList(configuration, tagName, xpath);
+    for (int i = 0; i < nodes.getLength(); i++) {
+      Node name = nodes.item(i);
+      String description = XPathHelper.valueOf(name, "text()", xpath);
+      String lAttrib = XPathHelper.valueOf(name, "@language", xpath);
+      Language language = LanguageSupport.getLanguage(lAttrib);
+      if (language == null) {
+        logger.debug("Found name in unsupported language {}", lAttrib);
+        continue;
       }
-    } catch (Exception e1) {
-      logger.warn("Error when reading language versions");
+
+      // Escape?
+      if (escape) {
+        description = description.replaceAll("\"", "");
+        description = description.replaceAll("'", "");
+      }
+
+      // Add the entry
+      logger.debug("Found description {}", description);
+      o.put(description, language);
+      if (language.equals(defaultLanguage)) {
+        o.setDefaultLanguage(defaultLanguage);
+      }
     }
     return o;
   }

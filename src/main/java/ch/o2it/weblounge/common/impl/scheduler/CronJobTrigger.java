@@ -127,8 +127,8 @@ public final class CronJobTrigger implements JobTrigger {
     try {
       init();
       parse(entry);
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Cron schedule " + entry + " is malformed: " + e.getMessage(), e);
+    } catch (Throwable t) {
+      throw new IllegalArgumentException("Cron schedule " + entry + " is malformed: " + t.getMessage(), t);
     }
   }
 
@@ -635,7 +635,8 @@ public final class CronJobTrigger implements JobTrigger {
         }
       } else {
         try {
-          start = end = Integer.parseInt(toNumber(str));
+          start = Integer.parseInt(toNumber(str));
+          end = start;
         } catch (NumberFormatException e) {
           throw new IllegalArgumentException("Invalid number: '" + str + "'");
         }

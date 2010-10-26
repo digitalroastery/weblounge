@@ -86,8 +86,8 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
    */
   public static WebloungeAdminImpl fromXml(Node userNode, Site site)
       throws IllegalStateException {
-    XPath xpath_ = XPathFactory.newInstance().newXPath();
-    return fromXml(userNode, site, xpath_);
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    return fromXml(userNode, site, xpath);
   }
 
   /**
@@ -135,7 +135,7 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
         digestType = XPathHelper.valueOf(userNode, "password/@type", xpath);
         user.passwordDigestType = DigestType.valueOf(digestType);
         user.password = password.getBytes();
-      } catch (Exception e) {
+      } catch (Throwable t) {
         throw new IllegalStateException("Unknown password digest found: " + digestType);
       }
     }

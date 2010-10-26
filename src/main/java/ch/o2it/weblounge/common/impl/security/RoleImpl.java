@@ -36,13 +36,13 @@ import java.util.Stack;
 public class RoleImpl extends LocalizableContent<String> implements Role {
 
   /** Role identifier */
-  private String identifier_ = null;
+  protected String identifier = null;
 
   /** The role context */
-  private String context_ = null;
+  protected String context = null;
 
   /** Roles that are extended by this role */
-  private Set<Role> ancestors_ = null;
+  protected Set<Role> ancestors = null;
 
   /**
    * Creates a new role from the parameter context::id.
@@ -52,9 +52,9 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    */
   public RoleImpl(String role) {
     assert role != null;
-    context_ = extractContext(role);
-    identifier_ = extractIdentifier(role);
-    ancestors_ = new HashSet<Role>();
+    this.context = extractContext(role);
+    this.identifier = extractIdentifier(role);
+    this.ancestors = new HashSet<Role>();
   }
 
   /**
@@ -66,9 +66,9 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    *          the role identifier
    */
   public RoleImpl(String context, String identifier) {
-    context_ = context;
-    identifier_ = identifier;
-    ancestors_ = new HashSet<Role>();
+    this.context = context;
+    this.identifier = identifier;
+    this.ancestors = new HashSet<Role>();
   }
 
   /**
@@ -91,7 +91,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @return the identifier
    */
   public String getIdentifier() {
-    return identifier_;
+    return identifier;
   }
 
   /**
@@ -100,7 +100,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @see java.security.Principal#getName()
    */
   public String getName() {
-    return identifier_;
+    return identifier;
   }
 
   /**
@@ -109,7 +109,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @see ch.o2it.weblounge.common.security.Role#extend(ch.o2it.weblounge.common.security.Role)
    */
   public void extend(Role ancestor) {
-    ancestors_.add(ancestor);
+    ancestors.add(ancestor);
   }
 
   /**
@@ -118,13 +118,13 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @see ch.o2it.weblounge.common.security.Role#isExtensionOf(ch.o2it.weblounge.common.security.Role)
    */
   public boolean isExtensionOf(Role ancestor) {
-    if (ancestors_.contains(ancestor))
+    if (ancestors.contains(ancestor))
       return true;
 
     // Obviously, there is no direct extension and we never looked
     // up this ancestor. Do an indirect ancestor search
 
-    for (Role role : ancestors_) {
+    for (Role role : ancestors) {
       if (role.isExtensionOf(ancestor)) {
         // Cache this lookup
         extend(ancestor);
@@ -140,7 +140,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @see ch.o2it.weblounge.common.security.Role#getExtendedRoles()
    */
   public Role[] getExtendedRoles() {
-    return ancestors_.toArray(new Role[ancestors_.size()]);
+    return ancestors.toArray(new Role[ancestors.size()]);
   }
 
   /**
@@ -160,7 +160,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
           stack.push(extendedRole);
       }
     }
-    return roles.toArray(new Role[ancestors_.size()]);
+    return roles.toArray(new Role[ancestors.size()]);
   }
 
   /**
@@ -169,7 +169,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @see ch.o2it.weblounge.common.security.Role#getContext()
    */
   public String getContext() {
-    return context_;
+    return context;
   }
 
   /**
@@ -187,7 +187,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @see ch.o2it.weblounge.common.security.Authority#getAuthorityId()
    */
   public String getAuthorityId() {
-    return context_ + ":" + identifier_;
+    return context + ":" + identifier;
   }
 
   /**
@@ -251,7 +251,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
-    return context_.hashCode() | identifier_.hashCode() >> 16;
+    return context.hashCode() | identifier.hashCode() >> 16;
   }
 
   /**
@@ -262,7 +262,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof Role) {
       Role r = (Role) obj;
-      return r.getIdentifier().equals(identifier_) && r.getContext().equals(context_);
+      return r.getIdentifier().equals(identifier) && r.getContext().equals(context);
     }
     return false;
   }
@@ -274,7 +274,7 @@ public class RoleImpl extends LocalizableContent<String> implements Role {
    * @return the role's string representation
    */
   public String toString() {
-    return context_ + ":" + identifier_;
+    return context + ":" + identifier;
   }
 
 }

@@ -23,10 +23,17 @@ package ch.o2it.weblounge.common.impl.content;
 import ch.o2it.weblounge.common.content.Resource;
 
 /**
- * This class contains utility methods intended to facilitate dealing with resource
- * versions and names.
+ * This class contains utility methods intended to facilitate dealing with
+ * resource versions and names.
  */
-public class ResourceUtils {
+public final class ResourceUtils {
+
+  /**
+   * This class is not intended to be instantiated.
+   */
+  private ResourceUtils() {
+    // Nothing to do here
+  }
 
   /**
    * Returns the version for the given version identifier. Available versions
