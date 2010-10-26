@@ -220,6 +220,7 @@
     </module>
     <module name="IllegalCatch">
       <property name="severity" value="warning" />
+      <property name="illegalClassNames" value="java.lang.Exception, java.lang.RuntimeException" />
     </module>
     <module name="IllegalThrows">
       <property name="severity" value="error" />
@@ -248,9 +249,11 @@
     <module name="HideUtilityClassConstructor">
       <property name="severity" value="warning" />
     </module>
+    <!--
     <module name="InterfaceIsType">
       <property name="severity" value="warning" />
     </module>
+    -->
     <module name="VisibilityModifier">
       <property name="protectedAllowed" value="true"/>
       <property name="severity" value="error" />
@@ -258,25 +261,35 @@
     
     <!-- Checks for metrics                               -->
     <!-- See http://checkstyle.sf.net/config_metrics.html -->
+    <!--
     <module name="ClassFanOutComplexity">
       <property name="severity" value="warning" />
     </module>
+    -->
+    <!--
     <module name="CyclomaticComplexity">
       <property name="severity" value="warning" />
     </module>
+    -->
+    <!--
     <module name="ClassDataAbstractionCoupling">
       <property name="severity" value="warning" />
     </module>
+    -->
     <module name="BooleanExpressionComplexity">
       <property name="max" value="7" />
       <property name="severity" value="warning" />
     </module>
+    <!--
     <module name="NPathComplexity">
       <property name="severity" value="warning" />
     </module>
+    -->
+    <!--
     <module name="JavaNCSS">
       <property name="severity" value="warning" />
     </module>
+    -->
 
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
