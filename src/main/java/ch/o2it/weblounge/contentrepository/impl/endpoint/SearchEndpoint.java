@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
-import static ch.o2it.weblounge.common.impl.util.doc.Status.BAD_REQUEST;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.ERROR;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.OK;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.SERVICE_UNAVAILABLE;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.badRequest;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.error;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.ok;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.serviceUnavailable;
 
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
@@ -150,10 +150,10 @@ public class SearchEndpoint {
     Endpoint searchEndpoint = new Endpoint("/{searchterms}", Method.GET, "search");
     searchEndpoint.setDescription("Returns the search result");
     searchEndpoint.addFormat(Format.xml());
-    searchEndpoint.addStatus(OK("the search query was executed and the result is returned as part of the response"));
-    searchEndpoint.addStatus(BAD_REQUEST("no search terms have been specified"));
-    searchEndpoint.addStatus(ERROR("executing the query resulted in an error"));
-    searchEndpoint.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
+    searchEndpoint.addStatus(ok("the search query was executed and the result is returned as part of the response"));
+    searchEndpoint.addStatus(badRequest("no search terms have been specified"));
+    searchEndpoint.addStatus(error("executing the query resulted in an error"));
+    searchEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     searchEndpoint.addPathParameter(new Parameter("searchterms", Parameter.Type.String, "The search terms"));
     searchEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Offset within the result set", "-1"));
     searchEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Number of result items to include", "-1"));

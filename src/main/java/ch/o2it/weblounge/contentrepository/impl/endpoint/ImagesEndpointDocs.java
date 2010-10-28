@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
-import static ch.o2it.weblounge.common.impl.util.doc.Status.BAD_REQUEST;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.NOT_FOUND;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.OK;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.SERVICE_UNAVAILABLE;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.badRequest;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.notFound;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.ok;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.serviceUnavailable;
 
 import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
 import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentation;
@@ -53,10 +53,10 @@ public final class ImagesEndpointDocs {
     Endpoint getImageMetadata = new Endpoint("/{image}/metadata", Method.GET, "getimagemetadata");
     getImageMetadata.setDescription("Returns the image with the given identifier");
     getImageMetadata.addFormat(new Format("image", null, null));
-    getImageMetadata.addStatus(OK("the image was found and is returned as part of the response"));
-    getImageMetadata.addStatus(NOT_FOUND("the image was not found or could not be loaded"));
-    getImageMetadata.addStatus(BAD_REQUEST("an invalid image identifier was received"));
-    getImageMetadata.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
+    getImageMetadata.addStatus(ok("the image was found and is returned as part of the response"));
+    getImageMetadata.addStatus(notFound("the image was not found or could not be loaded"));
+    getImageMetadata.addStatus(badRequest("an invalid image identifier was received"));
+    getImageMetadata.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     getImageMetadata.addPathParameter(new Parameter("image", Parameter.Type.String, "The resource identifier"));
     getImageMetadata.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getImageMetadata);
@@ -65,10 +65,10 @@ public final class ImagesEndpointDocs {
     Endpoint getOriginalImage = new Endpoint("/{image}/original", Method.GET, "originalimage");
     getOriginalImage.setDescription("Returns the original version of the image with the given identifier");
     getOriginalImage.addFormat(new Format("image", null, null));
-    getOriginalImage.addStatus(OK("the image was found and is returned as part of the response"));
-    getOriginalImage.addStatus(NOT_FOUND("the image was not found or could not be loaded"));
-    getOriginalImage.addStatus(BAD_REQUEST("an invalid image identifier was received"));
-    getOriginalImage.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
+    getOriginalImage.addStatus(ok("the image was found and is returned as part of the response"));
+    getOriginalImage.addStatus(notFound("the image was not found or could not be loaded"));
+    getOriginalImage.addStatus(badRequest("an invalid image identifier was received"));
+    getOriginalImage.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     getOriginalImage.addPathParameter(new Parameter("image", Parameter.Type.String, "The image identifier"));
     getOriginalImage.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getOriginalImage);
@@ -77,12 +77,12 @@ public final class ImagesEndpointDocs {
     Endpoint getOriginalLocalizedImage = new Endpoint("/{image}/locales/{language}/original", Method.GET, "originallocalizedimage");
     getOriginalLocalizedImage.setDescription("Returns the original version of the image with the given identifier and language");
     getOriginalLocalizedImage.addFormat(new Format("image", null, null));
-    getOriginalLocalizedImage.addStatus(OK("the image was found and is returned as part of the response"));
-    getOriginalLocalizedImage.addStatus(NOT_FOUND("the image was not found or could not be loaded"));
-    getOriginalLocalizedImage.addStatus(NOT_FOUND("the image does not exist in the specified language"));
-    getOriginalLocalizedImage.addStatus(BAD_REQUEST("an invalid image identifier was received"));
-    getOriginalLocalizedImage.addStatus(BAD_REQUEST("an invalid language identifier was specified"));
-    getOriginalLocalizedImage.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
+    getOriginalLocalizedImage.addStatus(ok("the image was found and is returned as part of the response"));
+    getOriginalLocalizedImage.addStatus(notFound("the image was not found or could not be loaded"));
+    getOriginalLocalizedImage.addStatus(notFound("the image does not exist in the specified language"));
+    getOriginalLocalizedImage.addStatus(badRequest("an invalid image identifier was received"));
+    getOriginalLocalizedImage.addStatus(badRequest("an invalid language identifier was specified"));
+    getOriginalLocalizedImage.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     getOriginalLocalizedImage.addPathParameter(new Parameter("image", Parameter.Type.String, "The image identifier"));
     getOriginalLocalizedImage.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
     getOriginalLocalizedImage.setTestForm(new TestForm());
@@ -92,10 +92,10 @@ public final class ImagesEndpointDocs {
     Endpoint getScaleImage = new Endpoint("/{image}/styles/{style}", Method.GET, "styledimage");
     getScaleImage.setDescription("Returns a scaled version of the image with the given identifier");
     getScaleImage.addFormat(new Format("image", null, null));
-    getScaleImage.addStatus(OK("the image was scaled using the specified image style and is returned as part of the response"));
-    getScaleImage.addStatus(NOT_FOUND("the image was not found or could not be loaded"));
-    getScaleImage.addStatus(BAD_REQUEST("an invalid image or image style identifier was received"));
-    getScaleImage.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
+    getScaleImage.addStatus(ok("the image was scaled using the specified image style and is returned as part of the response"));
+    getScaleImage.addStatus(notFound("the image was not found or could not be loaded"));
+    getScaleImage.addStatus(badRequest("an invalid image or image style identifier was received"));
+    getScaleImage.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     getScaleImage.addPathParameter(new Parameter("image", Parameter.Type.String, "The image identifier"));
     getScaleImage.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
     getScaleImage.setTestForm(new TestForm());
@@ -105,12 +105,12 @@ public final class ImagesEndpointDocs {
     Endpoint getScaleLocalizedImage = new Endpoint("/{image}/locales/{language}/styles/{style}", Method.GET, "localizedstyledimage");
     getScaleLocalizedImage.setDescription("Returns a scaled version of the image with the given identifier and language");
     getScaleLocalizedImage.addFormat(new Format("image", null, null));
-    getScaleLocalizedImage.addStatus(OK("the image was scaled using the specified image style and is returned as part of the response"));
-    getScaleLocalizedImage.addStatus(NOT_FOUND("the image was not found or could not be loaded"));
-    getScaleLocalizedImage.addStatus(NOT_FOUND("the image does not exist in the specified language"));
-    getScaleLocalizedImage.addStatus(BAD_REQUEST("an invalid image or image style identifier was received"));
-    getScaleLocalizedImage.addStatus(BAD_REQUEST("an invalid language identifier was specified"));
-    getScaleLocalizedImage.addStatus(SERVICE_UNAVAILABLE("the site or its content repository is temporarily offline"));
+    getScaleLocalizedImage.addStatus(ok("the image was scaled using the specified image style and is returned as part of the response"));
+    getScaleLocalizedImage.addStatus(notFound("the image was not found or could not be loaded"));
+    getScaleLocalizedImage.addStatus(notFound("the image does not exist in the specified language"));
+    getScaleLocalizedImage.addStatus(badRequest("an invalid image or image style identifier was received"));
+    getScaleLocalizedImage.addStatus(badRequest("an invalid language identifier was specified"));
+    getScaleLocalizedImage.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     getScaleLocalizedImage.addPathParameter(new Parameter("image", Parameter.Type.String, "The image identifier"));
     getScaleLocalizedImage.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
     getScaleLocalizedImage.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
@@ -121,8 +121,8 @@ public final class ImagesEndpointDocs {
     Endpoint getImageStyles = new Endpoint("/styles", Method.GET, "getstyles");
     getImageStyles.setDescription("Returns the image style");
     getImageStyles.addFormat(Format.xml());
-    getImageStyles.addStatus(OK("the image styles are returned as part of the response"));
-    getImageStyles.addStatus(SERVICE_UNAVAILABLE("the site is temporarily offline"));
+    getImageStyles.addStatus(ok("the image styles are returned as part of the response"));
+    getImageStyles.addStatus(serviceUnavailable("the site is temporarily offline"));
     getImageStyles.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getImageStyles);
 
@@ -130,10 +130,10 @@ public final class ImagesEndpointDocs {
     Endpoint getImageStyle = new Endpoint("/styles/{style}", Method.GET, "getstyle");
     getImageStyle.setDescription("Returns the image style");
     getImageStyle.addFormat(Format.xml());
-    getImageStyle.addStatus(OK("the image style was found and is returned as part of the response"));
-    getImageStyle.addStatus(NOT_FOUND("the image style was not found"));
-    getImageStyle.addStatus(BAD_REQUEST("an invalid image style identifier was received"));
-    getImageStyle.addStatus(SERVICE_UNAVAILABLE("the site is temporarily offline"));
+    getImageStyle.addStatus(ok("the image style was found and is returned as part of the response"));
+    getImageStyle.addStatus(notFound("the image style was not found"));
+    getImageStyle.addStatus(badRequest("an invalid image style identifier was received"));
+    getImageStyle.addStatus(serviceUnavailable("the site is temporarily offline"));
     getImageStyle.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
     getImageStyle.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getImageStyle);
