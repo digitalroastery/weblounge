@@ -22,12 +22,8 @@ package ch.o2it.weblounge.common.scheduler;
 
 import ch.o2it.weblounge.common.language.Language;
 
-import org.w3c.dom.Node;
-
 import java.io.Serializable;
 import java.util.Dictionary;
-
-import javax.xml.xpath.XPath;
 
 /**
  * A job object contains a worker implementation containing the logic to get
@@ -148,12 +144,12 @@ public interface Job {
    * &lt;/job&gt;
    * </pre>
    * 
-   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * Use {@link #fromXml(org.w3c.dom.Node))} or {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a
    * <code>QuartzJob</code> from the serialized output of this method.
    * 
    * @return the <code>XML</code> representation of the context
-   * @see #fromXml(Node)
-   * @see #fromXml(Node, XPath)
+   * @see #fromXml(org.w3c.dom.Node)
+   * @see #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)
    */
   String toXml();
 

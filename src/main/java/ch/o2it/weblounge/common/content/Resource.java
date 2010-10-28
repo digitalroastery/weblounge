@@ -37,7 +37,7 @@ import java.util.Set;
 public interface Resource<T extends ResourceContent> extends Localizable, Creatable, Modifiable, Publishable, Securable {
 
   /** The resource's permissions */
-  static final Permission[] permissions = new Permission[] {
+  Permission[] permissions = new Permission[] {
       SystemPermission.READ,
       SystemPermission.WRITE,
       SystemPermission.TRANSLATE,

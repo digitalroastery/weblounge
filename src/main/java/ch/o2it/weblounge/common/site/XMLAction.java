@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.site;
 
-import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
@@ -31,14 +30,17 @@ import java.io.IOException;
  * and that will be executed if these conditions hold:
  * <ol>
  * <li>The request is directly targeted at the action's mountpoint</li>
- * <li>The action supports the {@link RequestFlavor#XML} request flavor</li>
+ * <li>The action supports the
+ * {@link ch.o2it.weblounge.common.request.RequestFlavor#XML} request flavor</li>
  * <li>The client specifies that same flavor in his request</li>
  * </ol>
  * <p>
  * Once a request hits the mountpoint of an action, the action is then called in
  * this order:
  * <ol>
- * <li>{@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}</li>
+ * <li>
+ * {@link #configure(WebloungeRequest, WebloungeResponse, ch.o2it.weblounge.common.request.RequestFlavor)}
+ * </li>
  * <li>{@link #startResponse(WebloungeRequest, WebloungeResponse)}</li>
  * <li>{@link #startXML(WebloungeRequest, WebloungeResponse)}</li>
  * </ol>
@@ -51,8 +53,8 @@ public interface XMLAction extends Action {
 
   /**
    * Once the action has evaluated the request in
-   * {@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)} and
-   * the call to {@link #startResponse(WebloungeRequest, WebloungeResponse)}
+   * {@link #configure(WebloungeRequest, WebloungeResponse, ch.o2it.weblounge.common.request.RequestFlavor)}
+   * and the call to {@link #startResponse(WebloungeRequest, WebloungeResponse)}
    * returned {@link Action#EVAL_REQUEST}, this method is called to ask the
    * action to write the <code>XML</code> data to the response.
    * <p>

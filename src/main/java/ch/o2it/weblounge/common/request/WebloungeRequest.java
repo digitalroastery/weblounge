@@ -37,31 +37,31 @@ import javax.servlet.http.HttpServletRequest;
 public interface WebloungeRequest extends HttpServletRequest {
 
   /** The attribute name used to store the {@link User} in the session */
-  public static final String USER = "weblounge-user";
+  String USER = "weblounge-user";
 
   /** The attribute name used to store the {@link Language} in the session */
-  public static final String LANGUAGE = "weblounge-language";
+  String LANGUAGE = "weblounge-language";
 
   /** The attribute name used to store the {@link Site} in the session */
-  public static final String SITE = "weblounge-site";
+  String SITE = "weblounge-site";
 
   /** The attribute name used to store the {@link URL} in the session */
-  public static final String URL = "weblounge-url";
+  String URL = "weblounge-url";
 
   /** The attribute name used to store the {@link Page} in the request */
-  public static final String PAGE = "weblounge-page";
+  String PAGE = "weblounge-page";
 
   /** The attribute name used to store the {@link Action} in the request */
-  public static final String ACTION = "weblounge-action";
+  String ACTION = "weblounge-action";
 
   /** The attribute name used to store the {@link Renderer} in the request */
-  public static final String TEMPLATE = "weblounge-template";
+  String TEMPLATE = "weblounge-template";
 
   /** The attribute name used to store the {@link Composer} in the request */
-  public static final String COMPOSER = "weblounge-composer";
+  String COMPOSER = "weblounge-composer";
 
   /** The attribute name used to store the {@link Pagelet} in the request */
-  public static final String PAGELET = "weblounge-pagelet";
+  String PAGELET = "weblounge-pagelet";
 
   /**
    * Returns the requested language. The language is determined by evaluating

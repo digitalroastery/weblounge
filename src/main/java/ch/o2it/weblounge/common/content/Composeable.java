@@ -24,8 +24,6 @@ import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * This interface defines common methods and fields for composeable objects like
  * templates, pagelets, actions and images.
@@ -173,7 +171,7 @@ public interface Composeable extends Localizable {
   /**
    * Returns the &lt;link&gt; or &lt;script&gt; elements that have been defined
    * for this action. They will be set as attributes in the
-   * {@link HttpServletRequest}, where they are available to the page renderer
+   * {@link javax.servlet.http.HttpServletRequest}, where they are available to the page renderer
    * so that they can be included in the page's <code>&lt;head&gt;</code>
    * section.
    * 

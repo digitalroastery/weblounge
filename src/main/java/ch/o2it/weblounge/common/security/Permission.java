@@ -41,6 +41,6 @@ public interface Permission {
    * 
    * @return the permission context
    */
-  public String getContext();
+  String getContext();
 
 }

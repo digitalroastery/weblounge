@@ -26,23 +26,23 @@ package ch.o2it.weblounge.common.security;
 public interface PermissionSet {
 
   /** Value identifying conditions that have to match all */
-  public static final int MATCH_ALL = 0;
+  int MATCH_ALL = 0;
 
   /** Value identifying conditions where one of the have to be matched */
-  public static final int MATCH_SOME = 1;
+  int MATCH_SOME = 1;
 
   /**
    * Returns the permissions that have to be matched exactly.
    * 
    * @return the permissions to be exactly matched
    */
-  public abstract Permission[] all();
+  Permission[] all();
 
   /**
    * Returns the permissions that need to be matched one at least.
    * 
    * @return the permissions to match one
    */
-  public abstract Permission[] some();
+  Permission[] some();
 
 }

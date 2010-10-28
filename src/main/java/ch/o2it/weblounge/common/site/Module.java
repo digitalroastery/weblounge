@@ -28,10 +28,6 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.url.WebUrl;
 
-import org.w3c.dom.Node;
-
-import javax.xml.xpath.XPath;
-
 /**
  * The module interface defines the method that may be called on weblounge
  * module objects.
@@ -39,7 +35,7 @@ import javax.xml.xpath.XPath;
 public interface Module extends Customizable {
 
   /** Module descriptor */
-  public static final String CONFIG_FILE = "module.xml";
+  String CONFIG_FILE = "module.xml";
 
   /**
    * Sets the module identifier.
@@ -302,15 +298,15 @@ public interface Module extends Customizable {
   Job[] getJobs();
 
   /**
-   * Returns the job identified by <code>id</code> or <code>null</code> if
-   * no job with this identifier exists.
+   * Returns the job identified by <code>id</code> or <code>null</code> if no
+   * job with this identifier exists.
    * 
    * @param id
    *          the job identifier
    * @return the job
    */
   Job getJob(String id);
-  
+
   /**
    * Sets the module name in the given language.
    * 
@@ -341,12 +337,13 @@ public interface Module extends Customizable {
    * &lt;/module&gt;
    * </pre>
    * 
-   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
-   * <code>Module</code> from the serialized output of this method.
+   * Use {@link #fromXml(org.wc3.dom.Node))} or
+   * {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a <code>Module</code>
+   * from the serialized output of this method.
    * 
    * @return the <code>XML</code> representation of the module
-   * @see #fromXml(Node)
-   * @see #fromXml(Node, XPath)
+   * @see #fromXml(org.w3c.dom.Node)
+   * @see #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)
    */
   String toXml();
 

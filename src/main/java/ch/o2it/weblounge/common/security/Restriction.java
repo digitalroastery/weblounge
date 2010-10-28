@@ -27,10 +27,10 @@ package ch.o2it.weblounge.common.security;
 public interface Restriction {
 
   /** Evaluation order which first evaluates the allow, then the deny entries */
-  public static final int ALLOW_DENY = 0;
+  int ALLOW_DENY = 0;
 
   /** Evaluation order which first evaluates the deny, then the allow entries */
-  public static final int DENY_ALLOW = 1;
+  int DENY_ALLOW = 1;
 
   /**
    * Adds <code>authorization</code> to the list of allowed items.

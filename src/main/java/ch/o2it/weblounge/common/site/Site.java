@@ -41,10 +41,10 @@ import java.io.Serializable;
 public interface Site extends Customizable, RequestListener, Serializable {
 
   /** Site descriptor */
-  static final String CONFIG_FILE = "site.xml";
+  String CONFIG_FILE = "site.xml";
 
   /** The modules folder */
-  static final String MODULE_DIR = "module";
+  String MODULE_DIR = "module";
 
   /**
    * Sets the site identifier.

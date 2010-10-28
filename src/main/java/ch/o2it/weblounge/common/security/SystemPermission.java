@@ -31,7 +31,7 @@ import java.util.Set;
  * 
  * TODO Look over these permissions
  */
-public class SystemPermission implements Permission {
+public final class SystemPermission implements Permission {
 
   /** System context identifier */
   public static final String CONTEXT = "system";
@@ -64,10 +64,10 @@ public class SystemPermission implements Permission {
   public static final Permission PUBLISH = new SystemPermission("publish");
 
   /** Permission identifier */
-  private String identifier_ = null;
+  private String identifier = null;
 
   /** The permission titles */
-  private Map<Language, String> titles_ = null;
+  private Map<Language, String> titles = null;
 
   /** The selected language */
   private Language selectedLanguage = null;
@@ -80,8 +80,8 @@ public class SystemPermission implements Permission {
    *          the permission name
    */
   private SystemPermission(String permission) {
-    identifier_ = permission;
-    titles_ = new HashMap<Language, String>();
+    identifier = permission;
+    titles = new HashMap<Language, String>();
   }
 
   /**
@@ -90,7 +90,7 @@ public class SystemPermission implements Permission {
    * @return the permission identifier
    */
   public String getIdentifier() {
-    return identifier_;
+    return identifier;
   }
 
   /**
@@ -125,7 +125,7 @@ public class SystemPermission implements Permission {
    */
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof Permission) {
-      return ((Permission) obj).getIdentifier().equals(identifier_) && ((Permission) obj).getContext().equals(CONTEXT);
+      return ((Permission) obj).getIdentifier().equals(identifier) && ((Permission) obj).getContext().equals(CONTEXT);
     }
     return false;
   }
@@ -138,7 +138,7 @@ public class SystemPermission implements Permission {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return CONTEXT + ":" + identifier_;
+    return CONTEXT + ":" + identifier;
   }
 
   /**
@@ -147,7 +147,7 @@ public class SystemPermission implements Permission {
    * @see ch.o2it.weblounge.common.language.Localizable#languages()
    */
   public Set<Language> languages() {
-    return titles_.keySet();
+    return titles.keySet();
   }
 
   /**
@@ -156,7 +156,7 @@ public class SystemPermission implements Permission {
    * @see ch.o2it.weblounge.common.language.Localizable#supportsLanguage(ch.o2it.weblounge.common.language.Language)
    */
   public boolean supportsLanguage(Language language) {
-    return titles_.containsKey(language);
+    return titles.containsKey(language);
   }
 
   /**
@@ -165,7 +165,7 @@ public class SystemPermission implements Permission {
    * @see ch.o2it.weblounge.common.language.Localizable#switchTo(ch.o2it.weblounge.common.language.Language)
    */
   public Language switchTo(Language language) {
-    if (titles_.containsKey(language))
+    if (titles.containsKey(language))
       selectedLanguage = language;
     return selectedLanguage;
   }

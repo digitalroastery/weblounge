@@ -22,8 +22,6 @@ package ch.o2it.weblounge.common.user;
 
 import ch.o2it.weblounge.common.language.Language;
 
-import org.w3c.dom.Node;
-
 import java.util.Date;
 
 /**
@@ -134,8 +132,8 @@ public interface WebloungeUser extends AuthenticatedUser {
   /**
    * Property to set on this user.
    * <p>
-   * Well known property object types, such as {@link Node} will be serialized
-   * and deserialized with care. Others will be serialized using
+   * Well known property object types, such as {@link org.w3c.dom.Node} will be
+   * serialized and deserialized with care. Others will be serialized using
    * {@link Object#toString()}.
    * 
    * @param name

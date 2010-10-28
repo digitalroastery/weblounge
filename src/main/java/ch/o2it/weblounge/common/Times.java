@@ -26,27 +26,27 @@ package ch.o2it.weblounge.common;
 public interface Times {
 
   /** the number of milliseconds per second */
-  public static final long MS_PER_SECOND = 1000L;
+  long MS_PER_SECOND = 1000L;
 
   /** the number of milliseconds per minute */
-  public static final long MS_PER_MIN = 60L * MS_PER_SECOND;
+  long MS_PER_MIN = 60L * MS_PER_SECOND;
 
   /** the number of milliseconds per hour */
-  public static final long MS_PER_HOUR = 60L * MS_PER_MIN;
+  long MS_PER_HOUR = 60L * MS_PER_MIN;
 
   /** the number of milliseconds per day */
-  public static final long MS_PER_DAY = 24L * MS_PER_HOUR;
+  long MS_PER_DAY = 24L * MS_PER_HOUR;
 
   /** the number of milliseconds per week */
-  public static final long MS_PER_WEEK = 7L * MS_PER_DAY;
+  long MS_PER_WEEK = 7L * MS_PER_DAY;
 
   /** the number of milliseconds per month */
-  public static final long MS_PER_MONTH = 30L * MS_PER_DAY;
+  long MS_PER_MONTH = 30L * MS_PER_DAY;
 
   /** the number of milliseconds per year */
-  public static final long MS_PER_YEAR = 365L * MS_PER_DAY;
+  long MS_PER_YEAR = 365L * MS_PER_DAY;
   
   /** the maximum number of miliseconds */
-  public static final long MAX_DATE = 9223372036854775000L;
+  long MAX_DATE = 9223372036854775000L;
 
 }

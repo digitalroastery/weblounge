@@ -21,12 +21,10 @@
 package ch.o2it.weblounge.common.site;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
-import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
@@ -37,7 +35,8 @@ import java.io.IOException;
  * and that will be executed if these conditions hold:
  * <ol>
  * <li>The request is directly targeted at the action's mountpoint</li>
- * <li>The action supports the {@link RequestFlavor#HTML} request flavor</li>
+ * <li>The action supports the
+ * {@link ch.o2it.weblounge.common.request.RequestFlavor#HTML} request flavor</li>
  * <li>The client specifies that same flavor in his request</li>
  * </ol>
  * <p>
@@ -45,7 +44,9 @@ import java.io.IOException;
  * called in various ways, depending on whether it is rendered using a template
  * or not. The life cycle using a template follows this pattern:
  * <ol>
- * <li>{@link #configure(WebloungeRequest, WebloungeResponse, RequestFlavor)}</li>
+ * <li>
+ * {@link #configure(WebloungeRequest, WebloungeResponse, ch.o2it.weblounge.common.request.RequestFlavor)}
+ * </li>
  * <li>{@link #startResponse(WebloungeRequest, WebloungeResponse)}</li>
  * <li>{@link #startHeader(WebloungeRequest, WebloungeResponse)}</li>
  * <li>{@link #startStage(WebloungeRequest, WebloungeResponse)}</li>
@@ -224,7 +225,7 @@ public interface HTMLAction extends Action {
   /**
    * Sets the page that is used to render the action. This method is called
    * right before the action is executed by a call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
+   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, ch.o2it.weblounge.common.content.Renderer, String)}
    * .
    * 
    * @param page
@@ -236,7 +237,7 @@ public interface HTMLAction extends Action {
    * Returns the page that is used to deliver the initial content for this
    * action or <code>null</code> if no page has been set. In any case, the page
    * will be set prior to a call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
+   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, ch.o2it.weblounge.common.content.Renderer, String)}
    * .
    * 
    * @return the page
@@ -246,7 +247,7 @@ public interface HTMLAction extends Action {
   /**
    * Sets the page template that is used to render the action content. This
    * method is called right before the action is executed by a call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
+   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, ch.o2it.weblounge.common.content.Renderer, String)}
    * .
    * 
    * @param template
@@ -258,7 +259,7 @@ public interface HTMLAction extends Action {
    * Returns the page template that is used to render the action content or
    * <code>null</code> if no template has been specified. In any case, the
    * template will be set prior to a call to
-   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, Renderer, String)}
+   * {@link #configure(WebloungeRequest, WebloungeResponse, Page, ch.o2it.weblounge.common.content.Renderer, String)}
    * .
    * 
    * @return the page template

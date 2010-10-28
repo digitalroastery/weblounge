@@ -32,7 +32,7 @@ public class UnknownLanguageException extends RuntimeException {
   private static final long serialVersionUID = -2196419109593080065L;
 
   /** The unsupported language identifier */
-  private String language_;
+  private String language = null;
 
   /**
    * Constructor for class UnknownLanguageException.
@@ -50,7 +50,7 @@ public class UnknownLanguageException extends RuntimeException {
    */
   public UnknownLanguageException(String language) {
     super("Language " + language + " not supported!");
-    this.language_ = language;
+    this.language = language;
   }
 
   /**
@@ -59,7 +59,7 @@ public class UnknownLanguageException extends RuntimeException {
    * @return the language identifier
    */
   public String getLanguage() {
-    return language_;
+    return language;
   }
 
 }

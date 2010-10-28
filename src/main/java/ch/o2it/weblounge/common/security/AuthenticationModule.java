@@ -22,18 +22,16 @@ package ch.o2it.weblounge.common.security;
 
 import ch.o2it.weblounge.common.Customizable;
 
-import org.w3c.dom.Node;
-
-import javax.xml.xpath.XPath;
-
 /**
  * An authentication module defines an authentication facility that can be
  * activated and deactivated by configuration means.
  */
 public interface AuthenticationModule extends Customizable {
-  
+
   /** The relevance values for authentication modules */
-  public enum Relevance { required, requisite, sufficient, optional };
+  public enum Relevance {
+    required, requisite, sufficient, optional
+  };
 
   /**
    * Returns the name of the module's implementing class.
@@ -64,13 +62,14 @@ public interface AuthenticationModule extends Customizable {
    * &lt;loginmodule class="ch.o2it.weblounge.MyLoginModule" relevance="sufficient"/&gt;
    * </pre>
    * 
-   * Use {@link #fromXml(Node))} or {@link #fromXml(Node, XPath)} to create a
+   * Use {@link #fromXml(org.w3c.dom.Node))} or
+   * {@link #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)} to create a
    * <code>AuthenticationModule</code> from the serialized output of this
    * method.
    * 
    * @return the <code>XML</code> representation of the authentication module
-   * @see #fromXml(Node)
-   * @see #fromXml(Node, XPath)
+   * @see #fromXml(org.w3c.dom.Node)
+   * @see #fromXml(org.w3c.dom.Node, javax.xml.xpath.XPath)
    */
   String toXml();
 

@@ -42,7 +42,7 @@ import java.util.Date;
 public interface Pagelet extends Creatable, Publishable, LocalizedModifiable, Securable {
 
   /** The pagelet's permissions */
-  static final Permission[] permissions = new Permission[] {
+  Permission[] permissions = new Permission[] {
       SystemPermission.READ,
       SystemPermission.WRITE,
       SystemPermission.TRANSLATE,
