@@ -27,10 +27,15 @@
   <!-- Checks that property files contain the same keys.         -->
   <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
   <module name="Translation" />
+  
+  <!-- Checks that property files contain the same keys.         -->
+  <!-- See http://checkstyle.sf.net/config_duplicates.html -->
+  <!--
   <module name="StrictDuplicateCode">
     <property name="min" value="30" />
     <property name="severity" value="warning" />
   </module>
+  -->
   
   <!-- Checks for Size Violations.                    -->
   <!-- See http://checkstyle.sf.net/config_sizes.html -->
@@ -94,9 +99,11 @@
       <property name="severity" value="warning" />
     </module>
     -->
+    <!--
     <module name="MethodLength">
       <property name="severity" value="warning" />
     </module>
+    -->
     <module name="ParameterNumber">
       <property name="severity" value="warning" />
     </module>
