@@ -419,7 +419,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
         digestType = XPathHelper.valueOf(userNode, "security/password/@type", xpath);
         user.passwordDigestType = DigestType.valueOf(digestType);
         user.password = password.getBytes();
-      } catch (Exception e) {
+      } catch (Throwable t) {
         throw new IllegalStateException("Unknown password digest found: " + digestType);
       }
     }
@@ -433,7 +433,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
         digestType = XPathHelper.valueOf(userNode, "security/response/@type", xpath);
         user.responseDigestType = DigestType.valueOf(digestType);
         user.response = response.getBytes();
-      } catch (Exception e) {
+      } catch (Throwable t) {
         throw new IllegalStateException("Unknown response digest found: " + digestType);
       }
     }

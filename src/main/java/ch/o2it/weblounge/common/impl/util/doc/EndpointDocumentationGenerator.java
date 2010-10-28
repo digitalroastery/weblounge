@@ -41,7 +41,7 @@ import java.util.Map;
 /**
  * Model used to create endpoint documentation.
  */
-public class EndpointDocumentationGenerator {
+public final class EndpointDocumentationGenerator {
 
   /** Logger facility */
   private static final Logger logger = LoggerFactory.getLogger(EndpointDocumentationGenerator.class);
@@ -53,6 +53,13 @@ public class EndpointDocumentationGenerator {
     freemarkerConfig = new Configuration();
     freemarkerConfig.setObjectWrapper(new DefaultObjectWrapper());
     freemarkerConfig.clearTemplateCache();
+  }
+
+  /**
+   * This class is not intended to be instantiated.
+   */
+  private EndpointDocumentationGenerator() {
+    // Nothing to be done here
   }
 
   /**
@@ -108,8 +115,10 @@ public class EndpointDocumentationGenerator {
       result = output.toString();
       logger.debug("Generated complete document ({} chars) from template ({})", result.length(), templateName);
     } catch (TemplateException e) {
+      result = "Failed while processing the template (" + templateName + "): " + e.getMessage() + "\n";
+      result += "Template: " + textTemplate + "\n";
+      result += "Data: " + data;
       logger.error("Failed while processing the Doc template ({}): {}", templateName, e);
-      result = "ERROR:: Failed while processing the template (" + templateName + "): " + e + " \n Template: " + textTemplate + " \n Data: " + data;
     } catch (IOException e) {
       throw new RuntimeException("Failure while sending freemarker output to stream", e);
     }
@@ -164,10 +173,10 @@ public class EndpointDocumentationGenerator {
     try {
       in = EndpointDocumentationGenerator.class.getResourceAsStream(path);
       if (in == null) {
-        throw new NullPointerException("No template file could be found at: " + path);
+        throw new IllegalStateException("No template file could be found at: " + path);
       }
       textTemplate = new String(IOUtils.toByteArray(in));
-    } catch (Exception e) {
+    } catch (IOException e) {
       logger.error("failed to load template file from path (" + path + "): " + e, e);
       textTemplate = null;
     } finally {

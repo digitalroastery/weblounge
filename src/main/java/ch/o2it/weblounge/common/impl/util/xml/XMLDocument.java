@@ -47,25 +47,20 @@ import javax.xml.xpath.XPath;
  */
 public class XMLDocument {
 
+  /** Logging facility */
+  protected static final Logger logger = LoggerFactory.getLogger(XMLDocument.class);
+
   /** The cache file */
-  private File file_;
+  private File file = null;
 
   /** The xml document node */
-  protected Document document;
+  protected Document document = null;
 
   /** the XPath engine used by this document */
   protected XPath engine = XMLUtilities.getXPath();
 
   /** Dirty flag for the document */
-  protected boolean isDirty;
-
-  // Logging
-
-  /** the class name, used for the logging facility */
-  private static final String className = XMLDocument.class.getName();
-
-  /** Logging facility */
-  protected static final Logger logger = LoggerFactory.getLogger(className);
+  protected boolean isDirty = false;
 
   /**
    * Creates a new <code>XMLDocument</code>. Calling <code>save</code> on a
@@ -75,7 +70,7 @@ public class XMLDocument {
    * 
    */
   public XMLDocument() {
-    file_ = null;
+    file = null;
     isDirty = false;
   }
 
@@ -87,7 +82,7 @@ public class XMLDocument {
    *          the file
    */
   public XMLDocument(File file) {
-    file_ = file;
+    this.file = file;
     load();
     isDirty = false;
   }
@@ -99,7 +94,7 @@ public class XMLDocument {
    * @return the file
    */
   public File getFile() {
-    return file_;
+    return file;
   }
 
   /**
@@ -118,7 +113,7 @@ public class XMLDocument {
    *          the file
    */
   public void setFile(File file) {
-    file_ = file;
+    this.file = file;
     isDirty = true;
   }
 
@@ -148,19 +143,19 @@ public class XMLDocument {
     if (!isDirty)
       return true;
 
-    if (file_ == null) {
+    if (file == null) {
       throw new IllegalStateException("No filename specified!");
     }
-    if (!file_.exists() || !file_.canRead()) {
+    if (!file.exists() || !file.canRead()) {
       try {
-        file_.createNewFile();
+        file.createNewFile();
       } catch (IOException e) {
-        logger.error("Unable to create file {}", file_);
+        logger.error("Unable to create file {}", file);
         return false;
       }
     }
     try {
-      FileOutputStream fos = new FileOutputStream(file_);
+      FileOutputStream fos = new FileOutputStream(file);
       DOMSource domSource = new DOMSource(document);
       StreamResult streamResult = new StreamResult(fos);
       Transformer serializer = XMLUtilities.getTransformer();
@@ -171,16 +166,16 @@ public class XMLDocument {
       fos.flush();
       fos.close();
     } catch (FileNotFoundException e) {
-      logger.error("File {} was not found!", file_);
+      logger.error("File {} was not found!", file);
       return false;
     } catch (IOException e) {
-      logger.error("Error when serializing xml document to {}", file_);
+      logger.error("Error when serializing xml document to {}", file);
       return false;
     } catch (TransformerConfigurationException e) {
-      logger.error("Transformer configuration error when serializing xml document to {}", file_);
+      logger.error("Transformer configuration error when serializing xml document to {}", file);
       return false;
     } catch (TransformerException e) {
-      logger.error("Error when serializing xml document to {}", file_);
+      logger.error("Error when serializing xml document to {}", file);
       return false;
     }
     isDirty = false;
@@ -362,16 +357,16 @@ public class XMLDocument {
     DocumentBuilder docBuilder;
     try {
       docBuilder = XMLUtilities.getDocumentBuilder();
-      if (!file_.exists() || !file_.canRead()) {
+      if (!file.exists() || !file.canRead()) {
         document = docBuilder.newDocument();
       } else {
         try {
-          document = docBuilder.parse(file_);
+          document = docBuilder.parse(file);
         } catch (IOException e) {
-          logger.error("Unable to create file {}", file_);
+          logger.error("Unable to create file {}", file);
           document = docBuilder.newDocument();
         } catch (SAXException e) {
-          logger.error("SAX error when parsing file {}", file_);
+          logger.error("SAX error when parsing file {}", file);
           document = docBuilder.newDocument();
         }
       }

@@ -25,12 +25,13 @@ import java.util.concurrent.Callable;
 /**
  * Utilities for class loading.
  */
-public class ContextClassLoaderUtils {
+public final class ContextClassLoaderUtils {
 
   /**
    * Don't instantiate this class, use its static methods.
    */
   private ContextClassLoaderUtils() {
+    // Nothing to be done here
   }
 
   /**

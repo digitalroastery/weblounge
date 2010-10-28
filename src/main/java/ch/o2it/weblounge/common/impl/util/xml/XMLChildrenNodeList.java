@@ -33,14 +33,17 @@ import java.util.List;
  */
 public class XMLChildrenNodeList implements NodeList {
 
+  /** The nodes */
+  private List<Node> nodes = null;
+
   public XMLChildrenNodeList(Element root, String tagname) {
-    nodes_ = new ArrayList<Node>();
+    nodes = new ArrayList<Node>();
     NodeList children = root.getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
       Node child = children.item(i);
       String localName = child.getLocalName();
       if (localName != null && localName.equals(tagname)) {
-        nodes_.add(child);
+        nodes.add(child);
       }
     }
   }
@@ -49,16 +52,14 @@ public class XMLChildrenNodeList implements NodeList {
    * @see org.w3c.dom.NodeList#getLength()
    */
   public int getLength() {
-    return nodes_.size();
+    return nodes.size();
   }
 
   /**
    * @see org.w3c.dom.NodeList#item(int)
    */
   public Node item(int index) {
-    return nodes_.get(index);
+    return nodes.get(index);
   }
-
-  private List<Node> nodes_;
 
 }

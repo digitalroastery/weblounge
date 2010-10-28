@@ -42,7 +42,7 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Provides various utility routines for xml handling.
  */
-public class XMLUtilities {
+public final class XMLUtilities {
 
   /** the DOM parser factory */
   private static final DocumentBuilderFactory docBuilderFactory_;
@@ -77,17 +77,18 @@ public class XMLUtilities {
   }
 
   /** the xpath factory */
-  private static final XPathFactory xpathFactory_;
+  private static final XPathFactory xPathFactory;
 
   /** initialize the XPath factory */
   static {
-    xpathFactory_ = XPathFactory.newInstance();
+    xPathFactory = XPathFactory.newInstance();
   }
 
   /**
-   * Constructor for class XMLUtilities.
+   * This class is not intended to be instantiated.
    */
-  private XMLUtilities() { /* no instances */
+  private XMLUtilities() { 
+    // Nothing to be done here
   }
 
   /**
@@ -195,8 +196,8 @@ public class XMLUtilities {
    * @return a new XPath
    */
   public static XPath getXPath() {
-    synchronized (xpathFactory_) {
-      return xpathFactory_.newXPath();
+    synchronized (xPathFactory) {
+      return xPathFactory.newXPath();
     }
   }
 

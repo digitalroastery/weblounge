@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.common.impl.util.doc;
 
-
 /**
  * Represents a possible status result for an endpoint with a code and an
  * optional description of that status code.
@@ -61,7 +60,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status OK(String description) {
+  public static Status ok(String description) {
     return new Status(200, description);
   }
 
@@ -73,7 +72,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status NO_CONTENT(String description) {
+  public static Status noContent(String description) {
     return new Status(204, description);
   }
 
@@ -85,7 +84,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status BAD_REQUEST(String description) {
+  public static Status badRequest(String description) {
     return new Status(400, description);
   }
 
@@ -97,7 +96,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status UNAUTHORIZED(String description) {
+  public static Status unauthorized(String description) {
     return new Status(401, description);
   }
 
@@ -109,7 +108,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status FORBIDDEN(String description) {
+  public static Status forbidden(String description) {
     return new Status(403, description);
   }
 
@@ -121,7 +120,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status NOT_FOUND(String description) {
+  public static Status notFound(String description) {
     return new Status(404, description);
   }
 
@@ -133,7 +132,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status METHOD_NOT_ALLOWED(String description) {
+  public static Status methodNotAllowed(String description) {
     return new Status(405, description);
   }
 
@@ -145,7 +144,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status CONFLICT(String description) {
+  public static Status conflict(String description) {
     return new Status(409, description);
   }
 
@@ -157,7 +156,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status PRECONDITION_FAILED(String description) {
+  public static Status preconditionFailed(String description) {
     return new Status(412, description);
   }
 
@@ -169,7 +168,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status ERROR(String description) {
+  public static Status error(String description) {
     return new Status(500, description);
   }
 
@@ -181,7 +180,7 @@ public class Status {
    *          detailed meaning of this response status code
    * @return the status
    */
-  public static Status SERVICE_UNAVAILABLE(String description) {
+  public static Status serviceUnavailable(String description) {
     return new Status(503, description);
   }
 
@@ -223,8 +222,8 @@ public class Status {
   }
 
   /**
-   * This will resolve a human readable name for all known http status codes,
-   * taken from <a
+   * This will resolve <code>code</code> into a human readable name for all
+   * known http status codes, taken from <a
    * href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes">
    * wikipedia</a>.
    * 
@@ -236,7 +235,7 @@ public class Status {
    */
   private static String toString(int code) {
     // list from http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-    String result = "UNKNOWN";
+    String result = null;
     switch (code) {
       // 1xx Informational
       case 100:
@@ -408,6 +407,8 @@ public class Status {
       case 510:
         result = "Not Extended";
         break;
+      default:
+        result = "UNKNOWN";
     }
     return result;
   }

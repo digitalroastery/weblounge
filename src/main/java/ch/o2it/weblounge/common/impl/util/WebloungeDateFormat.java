@@ -105,8 +105,8 @@ public final class WebloungeDateFormat {
    */
   private static DateFormat getDateFormat() {
     SoftReference<DateFormat> sr = ldf.get();
-    DateFormat df;
-    if (sr == null || (df = sr.get()) == null) {
+    DateFormat df = (sr != null) ? sr.get() : null;
+    if (sr == null || df == null) {
       df = new SimpleDateFormat(DATE_FORMAT, Locale.US);
       df.setTimeZone(TimeZone.getTimeZone("UTC"));
       ldf.set(new SoftReference<DateFormat>(df));

@@ -35,11 +35,18 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Utility class to handle and simplify XPath queries.
  */
-public class XPathHelper {
+public final class XPathHelper {
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(XPathHelper.class);
 
+  /**
+   * This class is not intended to be instantiated.
+   */
+  private XPathHelper() {
+    // Nothing to be done here
+  }
+  
   /**
    * Returns the query result or <code>null</code>.
    * <p>

@@ -36,10 +36,10 @@ import javax.servlet.http.HttpServletResponseWrapper;
  * 
  * TODO: use set instead of array
  */
-public class Http11Utils implements Http11Constants {
+public final class Http11Utils implements Http11Constants {
 
   /** the request methods supported by this handler */
-  public static final String DEFAULT_METHODS[] = {
+  public static final String[] DEFAULT_METHODS = {
       METHOD_GET,
       METHOD_HEAD,
       METHOD_POST };
@@ -48,13 +48,20 @@ public class Http11Utils implements Http11Constants {
   public static final String DEFAULT_ALLOW = buildAllowString(DEFAULT_METHODS);
 
   /**
+   * This class is not intended to be instantiated.
+   */
+  private Http11Utils() {
+    // Nothing to be done here
+  }
+
+  /**
    * Constructs an HTTP "Allow" response header for the allowed request methods.
    * 
    * @param methods
    *          the allowed methods
    * @return an "Allow" response header
    */
-  private static String buildAllowString(String methods[]) {
+  private static String buildAllowString(String[] methods) {
     StringBuffer b = new StringBuffer(METHOD_OPTIONS);
     for (int i = 0; i < methods.length; i++) {
       b.append(',');
@@ -65,8 +72,7 @@ public class Http11Utils implements Http11Constants {
 
   /**
    * Checks the request against the default request methods that all <code>
-	 * RequestHandlers</code>
-   * must handle. These are:
+   * RequestHandlers</code> must handle. These are:
    * <ul>
    * <li>GET
    * <li>HEAD
@@ -124,7 +130,7 @@ public class Http11Utils implements Http11Constants {
    *         request has already been handled.
    */
   public static boolean checkMethods(String method,
-      HttpServletResponse response, String methods[]) {
+      HttpServletResponse response, String[] methods) {
     // handle OPTIONS requests
     if (METHOD_OPTIONS.equals(method)) {
       response.setHeader(HEADER_ALLOW, buildAllowString(methods));
@@ -165,7 +171,7 @@ public class Http11Utils implements Http11Constants {
 
   /**
    * Finishes a HEAD response that was started with <code>startHeadResponse()
-	 * <code>.
+   * <code>.
    * 
    * @param resp
    *          the original response

@@ -151,7 +151,7 @@ public final class Http11ProtocolHandler implements Times, Http11Constants {
    * @param type
    * @return <code>true</code> if the responsetype is an error
    */
-  public static final boolean isError(Http11ResponseType type) {
+  public static boolean isError(Http11ResponseType type) {
     return type.type != RESPONSE_OK && type.type != RESPONSE_PARTIAL_CONTENT;
   }
 
@@ -353,11 +353,14 @@ public final class Http11ProtocolHandler implements Times, Http11Constants {
               int read = type.to - type.from;
               int copy = read;
               int write = 0;
-
-              while (copy > 0 && (read = is.read(tmp)) >= 0) {
-                write = (copy -= read > 0 ? read : read + copy);
+              
+              read = is.read(tmp);
+              while (copy > 0 && read >= 0) {
+                copy -= read;
+                write = copy > 0 ? read : read + copy;
                 os.write(tmp, 0, write);
                 stats[STATS_BYTES_WRITTEN] += write;
+                read = is.read(tmp);
               }
               if (copy > 0) {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Premature end of input stream");

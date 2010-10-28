@@ -39,7 +39,14 @@ import java.util.regex.Pattern;
 /**
  * Utility class used to handle parameters from configuration files.
  */
-public class ConfigurationUtils {
+public final class ConfigurationUtils {
+  
+  /**
+   * This class is not intended to be instantiated.
+   */
+  private ConfigurationUtils() {
+    // Nothing to be done here
+  }
 
   /**
    * Returns the single option values as a <code>String[]</code> array. The

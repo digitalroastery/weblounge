@@ -61,7 +61,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
   private Logger logger = LoggerFactory.getLogger(WebloungeRequestImpl.class);
 
   /** The language extraction regular expression */
-  private final static Pattern LANG_EXTRACTOR_REGEX = Pattern.compile("_([a-zA-Z]+)\\.[\\w\\- ]+$");
+  private static final Pattern LANG_EXTRACTOR_REGEX = Pattern.compile("_([a-zA-Z]+)\\.[\\w\\- ]+$");
 
   /** The request counter */
   private static long requestCounter = 0L;

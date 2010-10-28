@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * This is able to parse text content and replace any weblounge formatting
  * codes by their xhtml equivalent.
  */
-public class Templates {
+public final class Templates {
 
 	/** Pattern to match tag definitions */
 	static final Pattern tag = Pattern.compile(
@@ -53,6 +53,13 @@ public class Templates {
 			"(\\w+)\\s*=\\s*&quot;(.*?)&quot;", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.UNICODE_CASE
 	);
 
+	/**
+   * This class is not intended to be instantiated.
+   */
+  private Templates() {
+    // Nothing to be done here
+  }
+	
 	/**
 	 * Formats the given text by resolving any known codes like formatting,
 	 * links etc.
