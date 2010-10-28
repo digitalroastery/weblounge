@@ -30,7 +30,7 @@ import java.util.Set;
  * factory will create instances of type <code>ResourceSerializer</code>
  * depending on the registered serializer implementations.
  */
-public class ResourceSerializerFactory {
+public final class ResourceSerializerFactory {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ResourceSerializerFactory.class);
@@ -39,13 +39,21 @@ public class ResourceSerializerFactory {
   private static ResourceSerializerService serializerService = null;
 
   /**
+   * This class is not intended to be instantiated.
+   */
+  private ResourceSerializerFactory() {
+    // Nothing to be done here
+  }
+
+  /**
    * This method is used to register the factory with a backing service
    * implementation.
    * 
    * @param service
    *          the resource serializer service
    */
-  public static void setResourceSerializerService(ResourceSerializerService service) {
+  public static void setResourceSerializerService(
+      ResourceSerializerService service) {
     serializerService = service;
   }
 
@@ -64,7 +72,7 @@ public class ResourceSerializerFactory {
     }
     return serializerService.getSerializer(resourceType);
   }
-  
+
   /**
    * Returns all registered <code>ResourceSerializer</code>s in a set.
    * 
@@ -75,7 +83,7 @@ public class ResourceSerializerFactory {
       logger.warn("Tried to access resource serializers while backing service is not yet configured");
       return null;
     }
-    return serializerService.getSerializers(); 
+    return serializerService.getSerializers();
   }
 
 }
