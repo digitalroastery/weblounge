@@ -464,6 +464,8 @@ public class ComposerTagSupport extends WebloungeTag {
       ContentRepositoryException {
     if (contentProvider == null)
       loadContent(contentInheritanceEnabled);
+    if (pagelets == null)
+      pagelets = new Pagelet[] {};
     return pagelets;
   }
 
