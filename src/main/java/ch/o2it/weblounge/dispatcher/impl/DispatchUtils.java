@@ -37,13 +37,20 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Utility class for error reporting using <code>HttpServletResponse</code>.
  */
-public class DispatchUtils {
+public final class DispatchUtils {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DispatchUtils.class);
 
   /** List of dispatcher listeners */
   private static final List<DispatchListener> dispatcher = new ArrayList<DispatchListener>();
+
+  /**
+   * This class is not intended to be instantiated.
+   */
+  private DispatchUtils() {
+    // Nothing to be done here
+  }
 
   /**
    * Asks the client to do <code>HTTP</code> authentication by sending back the
@@ -301,8 +308,8 @@ public class DispatchUtils {
       response.invalidate();
       if (!response.isCommitted())
         response.sendError(status, msg);
-    } catch (Exception e2) {
-      logger.error("I/O Error when sending back error message {}: {}", status, e2.getMessage());
+    } catch (Throwable t) {
+      logger.error("Error when sending back error message {}: {}", status, t.getMessage());
     }
   }
 

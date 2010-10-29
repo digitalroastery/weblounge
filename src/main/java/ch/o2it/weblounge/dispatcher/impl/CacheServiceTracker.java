@@ -19,7 +19,6 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.cache.CacheService;
 import ch.o2it.weblounge.common.request.ResponseCache;
 
 import org.osgi.framework.BundleContext;
@@ -30,8 +29,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The <code>CacheServiceTracker</code> watches OSGi services that implement the
- * {@link CacheService} interface and registers and unregisters the weblounge
- * dispatcher with the first service implementation to come.
+ * {@link ch.o2it.weblounge.cache.CacheService} interface and registers and
+ * unregisters the weblounge dispatcher with the first service implementation to
+ * come.
  */
 public class CacheServiceTracker extends ServiceTracker {
 

@@ -185,7 +185,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
     Action action = null;
     try {
       action = (Action) pool.borrowObject();
-    } catch (Exception e) {
+    } catch (Throwable t) {
+      logger.error("Error getting action from action pool", t);
       DispatchUtils.sendInternalError(request, response);
       return true;
     }
@@ -277,11 +278,11 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       try {
         // action.passivate();
         pool.returnObject(action);
-      } catch (Exception e) {
+      } catch (Throwable t) {
         logger.error("Error returning action {} to pool: {}", new Object[] {
             action,
-            e.getMessage(),
-            e });
+            t.getMessage(),
+            t });
       }
     }
 
