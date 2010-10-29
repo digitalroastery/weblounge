@@ -142,7 +142,7 @@ public class SearchEndpoint {
     if (docs != null)
       return docs;
 
-    String endpointUrl = "/system/search";
+    String endpointUrl = "/system/weblounge/search";
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "search");
     docs.setTitle("Weblounge Search");
 

@@ -286,7 +286,7 @@ public class ContentRepositoryIndex {
           else
             searchIdx.delete(uri);
         } else {
-          pathIdx.set(address, null);
+          pathIdx.set(address, id);
           languageIdx.set(id, null);
         }
       } catch (ContentRepositoryException e) {
