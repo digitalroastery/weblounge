@@ -66,7 +66,7 @@ public class GreeterTag extends TagSupport {
           greeting = "Excuse me?";
       } else {
         String[] languages = greetings.keySet().toArray(new String[greetings.size()]);
-        language = languages[(int)Math.random()*languages.length];
+        language = languages[(int)Math.random() * languages.length];
         greeting = greetings.get(language);
       }
       String encodedGreeting = StringEscapeUtils.escapeHtml(greeting);

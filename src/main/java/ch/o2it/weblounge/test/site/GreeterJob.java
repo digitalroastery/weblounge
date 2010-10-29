@@ -57,7 +57,7 @@ public class GreeterJob implements JobWorker {
    */
   public void execute(String name, Dictionary<String, Serializable> ctx)
       throws JobException {
-    int index = (int) ((greetings.length - 1)* Math.random());
+    int index = (int) ((greetings.length - 1) * Math.random());
     Map.Entry<String, String> entry = greetings[index];
     try {
       logger.info(new String(entry.getValue().getBytes("UTF-8")) + " (" + entry.getKey() + ")");

@@ -56,13 +56,20 @@ import javax.xml.parsers.DocumentBuilderFactory;
 /**
  * Utility class used to facilitate testing.
  */
-public class TestSiteUtils {
+public final class TestSiteUtils {
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(TestSiteUtils.class);
 
   /** Name of the properties file that defines the greetings */
   public static final String GREETING_PROPS = "/greetings.properties";
+
+  /**
+   * This class is not intended to be instantiated.
+   */
+  private TestSiteUtils() {
+    // Nothing to be done here.
+  }
 
   /**
    * Loads the greetings from <code>/greetings.properties</code> into a
@@ -124,13 +131,13 @@ public class TestSiteUtils {
         for (String[] param : params)
           formparams.add(new BasicNameValuePair(param[0], param[1]));
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
-        ((HttpPost)request).setEntity(entity);
+        ((HttpPost) request).setEntity(entity);
       } else if (request instanceof HttpPut) {
         List<NameValuePair> formparams = new ArrayList<NameValuePair>();
         for (String[] param : params)
           formparams.add(new BasicNameValuePair(param[0], param[1]));
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
-        ((HttpPut)request).setEntity(entity);
+        ((HttpPut) request).setEntity(entity);
       }
     }
     return httpClient.execute(request);

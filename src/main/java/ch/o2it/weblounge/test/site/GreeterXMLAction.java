@@ -72,8 +72,8 @@ public class GreeterXMLAction extends GreeterHTMLAction implements XMLAction {
       TransformerFactory factory = TransformerFactory.newInstance();
       Transformer transformer = factory.newTransformer();
       transformer.transform(new DOMSource(doc), new StreamResult(response.getWriter()));
-    } catch (Exception e) {
-      throw new ActionException("Unable to create and send xml response", e);
+    } catch (Throwable t) {
+      throw new ActionException("Unable to create and send xml response", t);
     }
   }
 

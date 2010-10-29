@@ -131,8 +131,8 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       testGetOriginalImageLanguage(requestUrl);
       testGetStyledImage(requestUrl);
       testGetStyledImageLanguage(requestUrl);
-    } catch (Exception e) {
-      fail("Error occured while testing endpoint: " + e.getMessage());
+    } catch (Throwable t) {
+      fail("Error occured while testing endpoint: " + t.getMessage());
     }
 
   }
@@ -235,8 +235,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     String url = UrlSupport.concat(new String[] {
         serverUrl,
         imageId,
-        "original"
-    });
+        "original" });
     HttpGet getStyleRequest = new HttpGet(url);
     httpClient = new DefaultHttpClient();
     try {
@@ -277,8 +276,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         imageId,
         "locales",
         "en",
-        "original"
-    });
+        "original" });
     HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
     httpClient = new DefaultHttpClient();
     try {
@@ -306,8 +304,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         imageId,
         "locales",
         "de",
-        "original"
-    });
+        "original" });
     HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
     httpClient = new DefaultHttpClient();
     try {
@@ -346,8 +343,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
           serverUrl,
           imageId,
           "styles",
-          styleId
-      });
+          styleId });
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
       try {
@@ -355,7 +351,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
-        
+
         // Test headers
         assertEquals(1, response.getHeaders("Content-Type").length);
         assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
@@ -392,8 +388,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
           "locales",
           "en",
           "styles",
-          styleId
-      });
+          styleId });
       HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
       httpClient = new DefaultHttpClient();
       try {
@@ -421,8 +416,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
           "locales",
           "de",
           "styles",
-          styleId
-      });
+          styleId });
       HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
       httpClient = new DefaultHttpClient();
       try {
@@ -488,6 +482,9 @@ public class ImagesEndpointTest extends IntegrationTestBase {
           case None:
             assertEquals(originalWidth, image.getWidth());
             assertEquals(originalHeight, image.getHeight());
+            break;
+          default:
+            fail("Unknown image style detected");
             break;
         }
       }

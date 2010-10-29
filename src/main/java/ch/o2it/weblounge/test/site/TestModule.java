@@ -22,13 +22,12 @@ package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.common.impl.site.ModuleImpl;
 import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.Module;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Test implementation of the {@link Module} interface.
+ * Test implementation of the {@link ch.o2it.weblounge.common.site.Module} interface.
  */
 public class TestModule extends ModuleImpl {
 

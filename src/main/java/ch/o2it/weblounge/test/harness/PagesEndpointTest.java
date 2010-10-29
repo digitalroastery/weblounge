@@ -187,8 +187,8 @@ public class PagesEndpointTest extends IntegrationTestBase {
     try {
       t = tf.newTransformer();
       t.transform(new DOMSource(doc), sr);
-    } catch (Exception e) {
-      throw new IllegalStateException("Unable to serialize dom", e);
+    } catch (Throwable th) {
+      throw new IllegalStateException("Unable to serialize dom", th);
     }
     return outText.toString();
   }
