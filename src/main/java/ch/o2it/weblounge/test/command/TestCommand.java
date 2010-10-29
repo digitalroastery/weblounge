@@ -251,9 +251,11 @@ public final class TestCommand {
    * @return <code>true</code> if the test passed
    */
   private boolean execute(IntegrationTest test) {
+    logger.info("");
     logger.info("------------------------------------------------------------------------");
     logger.info("Running test '" + test + "'");
     logger.info("------------------------------------------------------------------------");
+    logger.info("");
     try {
       test.execute("http://127.0.0.1:8080");
       logger.info("Test '" + test + "' succeeded");
