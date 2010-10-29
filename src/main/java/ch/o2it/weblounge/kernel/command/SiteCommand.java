@@ -502,8 +502,8 @@ public class SiteCommand {
     System.out.println("Starting site " + site);
     try {
       site.start();
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
   }
 
@@ -536,8 +536,8 @@ public class SiteCommand {
       } else if (site.isStartedAutomatically()) {
         site.start();
       }
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
   }
 

@@ -223,8 +223,8 @@ public class SiteManager {
     try {
       if (site.isRunning())
         site.stop();
-    } catch (Exception e) {
-      logger.error("Error stopping site '{}'", e);
+    } catch (Throwable t) {
+      logger.error("Error stopping site '{}'", site.getIdentifier(), t);
     }
 
     // Remove it from the registry
