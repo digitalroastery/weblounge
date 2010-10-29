@@ -127,6 +127,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
         if (resource == null) {
           throw new ContentRepositoryException("Unable to load " + uri.getType() + " " + uri + " from bundle");
         }
+        uri = resource.getURI(); // This uri contains the id in addition to just the path
         logger.info("Loading {} {}:{}", new Object[] { uri.getType(), site, uri });
         Set<? extends ResourceContent> content = resource.contents();
         if (content.size() == 0) {

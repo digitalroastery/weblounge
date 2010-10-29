@@ -97,9 +97,15 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       return Response.notModified().build();
     }
 
+    // Check the ETag
+    String eTagValue = getETagValue(resource, null);
+    if (isMatch(eTagValue, request)) {
+      return Response.notModified(new EntityTag(eTagValue)).build();
+    }
+
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.tag(new EntityTag(eTagValue));
     response.lastModified(resource.getModificationDate());
     return response.build();
   }
@@ -282,7 +288,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     // The image style was not found
     throw new WebApplicationException(Status.BAD_REQUEST);
   }
-  
+
   /**
    * Returns the list of image styles that are registered for a site.
    * 
@@ -297,7 +303,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     if (site == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-    
+
     StringBuffer buf = new StringBuffer("<styles>");
     for (Module m : site.getModules()) {
       ImageStyle[] styles = m.getImageStyles();
@@ -306,7 +312,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       }
     }
     buf.append("</styles>");
-    
+
     ResponseBuilder response = Response.ok(buf.toString());
     return response.build();
   }
@@ -325,7 +331,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
   @Path("/styles/{style}")
   public Response getImagestyle(@Context HttpServletRequest request,
       @PathParam("style") String styleId) {
-    
+
     Site site = getSite(request);
     ImageStyle style = null;
     for (Module m : site.getModules()) {
@@ -335,7 +341,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
         return response.build();
       }
     }
-    
+
     // The image style was not found
     throw new WebApplicationException(Status.NOT_FOUND);
   }
@@ -374,13 +380,19 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
+    // Check the ETag
+    String eTagValue = getETagValue(resource, language, style);
+    if (isMatch(eTagValue, request)) {
+      return Response.notModified(new EntityTag(eTagValue)).build();
+    }
+
     final String mimetype = ((ImageContent) resourceContent).getMimetype();
     final String format = mimetype.substring(mimetype.indexOf("/") + 1);
 
     Site site = getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
     final Language selectedLanguage = language;
-    
+
     // When there is no scaling required, just return the original
     if (ScalingMode.None.equals(style.getScalingMode())) {
       return getResourceContent(request, resource, selectedLanguage);
@@ -416,10 +428,34 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Add an e-tag and send the response
-    response.header("Content-Disposition", "attachment; filename=" + resource.getContent(selectedLanguage).getFilename());
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.header("Content-Disposition", "inline; filename=" + resource.getContent(selectedLanguage).getFilename());
+    response.tag(new EntityTag(eTagValue));
     response.lastModified(resource.getModificationDate());
     return response.build();
+  }
+
+  /**
+   * Returns the value for the <code>ETag</code> header field, which is
+   * calculated from the resource identifier, the language identifier and the
+   * resource's modification date.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the requested language
+   * @param style
+   *          the image style
+   * @return the <code>ETag</code> value
+   */
+  protected String getETagValue(Resource<?> resource, Language language,
+      ImageStyle style) {
+    long etag = resource.getIdentifier().hashCode();
+    if (language != null)
+      etag += language.getIdentifier().hashCode();
+    if (style != null)
+      etag += style.getIdentifier().hashCode();
+    etag += resource.getModificationDate().getTime();
+    return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
 
   /**

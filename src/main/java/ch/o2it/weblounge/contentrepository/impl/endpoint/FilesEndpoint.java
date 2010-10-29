@@ -116,9 +116,15 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       return Response.notModified().build();
     }
 
+    // Check the ETag
+    String eTagValue = getETagValue(resource, null);
+    if (isMatch(eTagValue, request)) {
+      return Response.notModified(new EntityTag(eTagValue)).build();
+    }
+
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.tag(new EntityTag(eTagValue));
     response.lastModified(resource.getModificationDate());
     return response.build();
   }
@@ -236,6 +242,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
+    // Check the ETag
+    String eTagValue = getETagValue(resource, null);
+    if (isMatch(eTagValue, request)) {
+      return Response.notModified(new EntityTag(eTagValue)).build();
+    }
+
     // Try to create the resource
     ResourceURI uri = resource.getURI();
     ResourceContent content = null;
@@ -278,7 +290,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.tag(new EntityTag(eTagValue));
     response.lastModified(resource.getModificationDate());
     return response.build();
   }
@@ -345,7 +357,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.tag(new EntityTag(getETagValue(resource, null)));
     response.lastModified(resource.getModificationDate());
     return response.build();
   }
@@ -440,7 +452,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.tag(new EntityTag(getETagValue(resource, null)));
     return response.build();
   }
 
@@ -543,7 +555,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.created(uri);
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.tag(new EntityTag(getETagValue(resource, null)));
     return response.build();
   }
 

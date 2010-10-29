@@ -34,6 +34,7 @@ import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 import ch.o2it.weblounge.kernel.SiteManager;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +98,12 @@ public class ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
 
+    // Check the ETag
+    String eTagValue = getETagValue(resource, null);
+    if (isMatch(eTagValue, request)) {
+      return Response.notModified(new EntityTag(eTagValue)).build();
+    }
+
     Site site = getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
     final Language selectedLanguage = language;
@@ -142,7 +149,7 @@ public class ContentRepositoryEndpoint {
 
     // Add an e-tag and send the response
     response.header("Content-Disposition", "inline; filename=" + resource.getContent(selectedLanguage).getFilename());
-    response.tag(new EntityTag(Long.toString(resource.getModificationDate().getTime())));
+    response.tag(new EntityTag(eTagValue));
     response.lastModified(resource.getModificationDate());
     return response.build();
   }
@@ -162,14 +169,54 @@ public class ContentRepositoryEndpoint {
    *           if the <code>If-Modified-Since</code> cannot be converted to a
    *           date.
    */
-  protected boolean isModified(Resource<?> resource, HttpServletRequest request) {
+  protected boolean isModified(Resource<?> resource, HttpServletRequest request) throws WebApplicationException {
     try {
       long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-      Date pageModificationDate = resource.getModificationDate();
-      return cachedModificationDate < pageModificationDate.getTime();
+      Date resourceModificationDate = resource.getModificationDate();
+      return cachedModificationDate < resourceModificationDate.getTime();
     } catch (IllegalArgumentException e) {
       throw new WebApplicationException(Status.BAD_REQUEST);
     }
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param eTag
+   *          the value of the ETag (without quotes)
+   * @param request
+   *          the client request
+   * @return <code>true</code> if the resource's calculated eTag matches the one
+   *         specified
+   */
+  protected boolean isMatch(String eTag, HttpServletRequest request) {
+    try {
+      String eTagHeader = request.getHeader("If-None-Match");
+      return !StringUtils.isBlank(eTagHeader) && eTagHeader.equals("\"" + eTag + "\"");
+    } catch (IllegalArgumentException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Returns the value for the <code>ETag</code> header field, which is
+   * calculated from the resource identifier, the language identifier and the
+   * resource's modification date.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the requested language
+   * @return the <code>ETag</code> value
+   */
+  protected String getETagValue(Resource<?> resource, Language language) {
+    long etag = resource.getIdentifier().hashCode();
+    if (language != null)
+      etag += language.getIdentifier().hashCode();
+    etag += resource.getModificationDate().getTime();
+    return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
 
   /**
