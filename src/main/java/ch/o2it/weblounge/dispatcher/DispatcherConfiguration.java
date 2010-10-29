@@ -26,33 +26,33 @@ package ch.o2it.weblounge.dispatcher;
 public interface DispatcherConfiguration {
 
   /** Property name for the web application context root (mountpoint) */
-  public static final String WEBAPP_CONTEXT_ROOT = "weblounge.http.CONTEXT_ROOT";
+  String WEBAPP_CONTEXT_ROOT = "weblounge.http.CONTEXT_ROOT";
   
   /** Property name for the bundles (sites) root path element */
-  public static final String BUNDLE_CONTEXT_ROOT_URI = "weblounge.http.BUNDLE_CONTEXT_ROOT_URI";
+  String BUNDLE_CONTEXT_ROOT_URI = "weblounge.http.BUNDLE_CONTEXT_ROOT_URI";
   
   /**
    * Property name for the bundle context root path (including the webapp
    * context root)
    */
-  public static final String BUNDLE_CONTEXT_ROOT = "weblounge.http.BUNDLE_CONTEXT_ROOT";
+  String BUNDLE_CONTEXT_ROOT = "weblounge.http.BUNDLE_CONTEXT_ROOT";
   
   /**
    * Property name for the bundle root path (including the webapp context root
    * and the bundle context root)
    */
-  public static final String BUNDLE_ROOT = "weblounge.http.BUNDLE_ROOT";
+  String BUNDLE_ROOT = "weblounge.http.BUNDLE_ROOT";
   
   /** Property name for the bundle name */
-  public static final String BUNDLE_NAME = "weblounge.http.BUNDLE_NAME";
+  String BUNDLE_NAME = "weblounge.http.BUNDLE_NAME";
   
   /** Property name for the bundle (site) path element */
-  public static final String BUNDLE_URI = "weblounge.http.BUNDLE_URI";
+  String BUNDLE_URI = "weblounge.http.BUNDLE_URI";
   
   /** Property name for the entry path into the bundle resources */
-  public static final String BUNDLE_ENTRY = "weblounge.http.BUNDLE_ENTRY";
+  String BUNDLE_ENTRY = "weblounge.http.BUNDLE_ENTRY";
   
   /** Semicolon delimited list of welcome files */
-  public static final String WELCOME_FILES = "weblounge.http.WELCOME_FILES";
+  String WELCOME_FILES = "weblounge.http.WELCOME_FILES";
 
 }
