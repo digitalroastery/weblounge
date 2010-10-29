@@ -70,7 +70,7 @@ public class StaticResourcesTest extends IntegrationTestBase {
     String requestUrl = UrlSupport.concat(serverUrl, IMAGE_PATH);
     
     // Value of the Etag header from the first response */
-    String etagValue = null; 
+    String eTagValue = null; 
 
     // Send and the request and examine the response
     HttpClient httpClient = new DefaultHttpClient();
@@ -90,7 +90,7 @@ public class StaticResourcesTest extends IntegrationTestBase {
       Header eTagHeader = response.getFirstHeader("Etag");
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
-      etagValue = eTagHeader.getValue();
+      eTagValue = eTagHeader.getValue();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -99,7 +99,7 @@ public class StaticResourcesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     try {
       HttpGet request = new HttpGet(requestUrl);
-      request.addHeader("If-None-Match", etagValue);
+      request.addHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", requestUrl);
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);

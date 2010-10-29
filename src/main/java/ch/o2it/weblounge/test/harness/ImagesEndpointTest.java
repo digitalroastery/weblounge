@@ -21,7 +21,9 @@
 package ch.o2it.weblounge.test.harness;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -34,6 +36,7 @@ import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -82,7 +85,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
 
   /** File size of the German version */
   private static final long sizeGerman = 88723L;
-
+  
   /** Mime type of the German version */
   private static final String mimetypeGerman = "image/jpeg";
 
@@ -180,7 +183,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
       try {
-        logger.info("Requesting image style '{}'", styleId);
+        logger.info("Requesting image style definition '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
@@ -223,7 +226,9 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests the <code>/{id}</code> method of the endpoint.
+   * Tests the <code>/{id}/original</code> method of the endpoint. Since the
+   * site's default language is <code>German</code>, this is what we expect to
+   * get.
    * 
    * @param serverUrl
    *          the base url
@@ -236,26 +241,48 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         serverUrl,
         imageId,
         "original" });
-    HttpGet getStyleRequest = new HttpGet(url);
+    HttpGet getOriginalImageRequest = new HttpGet(url);
     httpClient = new DefaultHttpClient();
+    String eTagValue = null; 
     try {
       logger.info("Requesting original image version");
-      HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
+      HttpResponse response = TestSiteUtils.request(httpClient, getOriginalImageRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
-      // Test headers
+      // Test general headers
       assertEquals(1, response.getHeaders("Content-Type").length);
-      assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
-      assertEquals(sizeEnglish, response.getEntity().getContentLength());
+      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeGerman, response.getEntity().getContentLength());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
-      assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+      assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
 
       // Test content
       assertTrue("Image size mismatch", checkSize(response, null));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+    
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpGet request = new HttpGet(url);
+      request.addHeader("If-None-Match", eTagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", url);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
   }
 
   /**
@@ -279,21 +306,42 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         "original" });
     HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
     httpClient = new DefaultHttpClient();
+    String eTagValue = null; 
     try {
       logger.info("Requesting original english image");
       HttpResponse response = TestSiteUtils.request(httpClient, getEnglishOriginalRequest, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
-      // Test headers
+      // Test general headers
       assertEquals(1, response.getHeaders("Content-Type").length);
       assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(sizeEnglish, response.getEntity().getContentLength());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
-      assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+      assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
 
       // Test content
       assertTrue("Image size mismatch", checkSize(response, null));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpGet request = new HttpGet(englishUrl);
+      request.addHeader("If-None-Match", eTagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", englishUrl);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -313,18 +361,39 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
-      // Test headers
+      // Test general headers
       assertEquals(1, response.getHeaders("Content-Type").length);
       assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(sizeGerman, response.getEntity().getContentLength());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
-      assertEquals("attachment; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+      assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
 
       // Test content
       assertTrue("Image size mismatch", checkSize(response, null));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpGet request = new HttpGet(germanUrl);
+      request.addHeader("If-None-Match", eTagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", germanUrl);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
   }
 
   /**
@@ -337,6 +406,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    */
   private void testGetStyledImage(String serverUrl) throws Exception {
     HttpClient httpClient = null;
+    List<String> eTags = new ArrayList<String>();
     for (ScalingMode mode : modes) {
       String styleId = mode.toString().toLowerCase();
       String url = UrlSupport.concat(new String[] {
@@ -346,23 +416,49 @@ public class ImagesEndpointTest extends IntegrationTestBase {
           styleId });
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
+      String eTagValue = null; 
       try {
         logger.info("Requesting scaled default image '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
-        // Test headers
+        // Test general headers
         assertEquals(1, response.getHeaders("Content-Type").length);
         assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
         assertEquals(1, response.getHeaders("Content-Disposition").length);
-        assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+        assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader("Etag");
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
+        
+        // Make sure ETags are created in a proper way (no duplicates)
+        assertFalse("Duplicate ETag returned by endpoint", eTags.contains(eTagValue));
+        eTags.add(eTagValue);
 
         // Test content
         assertTrue("Image size mismatch", checkSize(response, mode));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
+
+      // Test ETag support
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpGet request = new HttpGet(url);
+        request.addHeader("If-None-Match", eTagValue);
+
+        logger.info("Sending 'If-None-Match' request to {}", url);
+        HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+        assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        assertNull(response.getEntity());
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
     }
   }
 
@@ -377,6 +473,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    */
   private void testGetStyledImageLanguage(String serverUrl) throws Exception {
     HttpClient httpClient = null;
+    List<String> eTags = new ArrayList<String>();
 
     for (ScalingMode mode : modes) {
       String styleId = mode.toString().toLowerCase();
@@ -391,20 +488,47 @@ public class ImagesEndpointTest extends IntegrationTestBase {
           styleId });
       HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
       httpClient = new DefaultHttpClient();
+      String eTagValue = null; 
       try {
         logger.info("Requesting scaled english image '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getEnglishOriginalRequest, null);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
-        // Test headers
+        // Test general headers
         assertEquals(1, response.getHeaders("Content-Type").length);
         assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
         assertEquals(1, response.getHeaders("Content-Disposition").length);
-        assertEquals("attachment; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+        assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader("Etag");
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
+
+        // Make sure ETags are created in a proper way (no duplicates)
+        assertFalse("Duplicate ETag returned by endpoint", eTags.contains(eTagValue));
+        if (!"none".equals(styleId)) {
+          eTags.add(eTagValue);
+        }
 
         // Test content
         assertTrue("Image size mismatch", checkSize(response, mode));
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+      // Test ETag support
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpGet request = new HttpGet(englishUrl);
+        request.addHeader("If-None-Match", eTagValue);
+
+        logger.info("Sending 'If-None-Match' request to {}", englishUrl);
+        HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+        assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        assertNull(response.getEntity());
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
@@ -425,17 +549,44 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
 
-        // Test headers
+        // Test general headers
         assertEquals(1, response.getHeaders("Content-Type").length);
         assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
         assertEquals(1, response.getHeaders("Content-Disposition").length);
-        assertEquals("attachment; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+        assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader("Etag");
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
+
+        // Make sure ETags are created in a proper way (no duplicates)
+        assertFalse("Duplicate ETag returned by endpoint", eTags.contains(eTagValue));
+        if (!"none".equals(styleId)) {
+          eTags.add(eTagValue);
+        }
 
         // Test content
         assertTrue("Image size mismatch", checkSize(response, mode));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
+
+      // Test ETag support
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpGet request = new HttpGet(germanUrl);
+        request.addHeader("If-None-Match", eTagValue);
+
+        logger.info("Sending 'If-None-Match' request to {}", germanUrl);
+        HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+        assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        assertNull(response.getEntity());
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
     }
   }
 

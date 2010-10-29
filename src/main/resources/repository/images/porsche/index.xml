@@ -38,7 +38,7 @@
     </locked>
   </head>
   <body>
-    <content language="en">
+    <content language="en" original="true">
       <created>
         <user id="hans" realm="testland">Hans Muster</user>
         <date>2009-01-07T19:05:41Z</date>
