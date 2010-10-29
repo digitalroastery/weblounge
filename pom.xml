@@ -229,12 +229,11 @@
             <consoleOutput>true</consoleOutput>
             <logViolationsToConsole>true</logViolationsToConsole>
             <excludes>**/package-info.java</excludes>
-            <failOnViolation>false</failOnViolation> 
-            <failsOnError>false</failsOnError> 
+            <failOnViolation>true</failOnViolation> 
+            <failsOnError>true</failsOnError> 
           </configuration>
           <executions>
             <execution>
-              <phase>validate</phase>
               <goals>
                 <goal>check</goal>
               </goals>
