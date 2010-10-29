@@ -95,8 +95,10 @@ public class ComposerImpl implements Composer {
    * 
    * @param pagelet
    *          the pagelet to add
+   * @throws IllegalArgumentException
+   *           if <code>pagelet</code> is <code>null</code>
    */
-  public void addPagelet(Pagelet pagelet) {
+  public void addPagelet(Pagelet pagelet) throws IllegalArgumentException {
     if (pagelet == null)
       throw new IllegalArgumentException("Pagelet must not be null");
     this.pagelets.add(pagelet);
@@ -107,8 +109,10 @@ public class ComposerImpl implements Composer {
    * 
    * @param pagelet
    *          the pagelet to remove
+   * @throws IllegalArgumentException
+   *           if <code>pagelet</code> is <code>null</code>
    */
-  public void removePagelet(Pagelet pagelet) {
+  public void removePagelet(Pagelet pagelet) throws IllegalArgumentException {
     if (pagelet == null)
       throw new IllegalArgumentException("Pagelet must not be null");
     this.pagelets.remove(pagelet);
@@ -119,8 +123,12 @@ public class ComposerImpl implements Composer {
    * 
    * @param pagelets
    *          the pagelets;
+   * @throws IllegalArgumentException
+   *           if <code>pagelets</code> is <code>null</code>
    */
-  public void setPagelets(Pagelet[] pagelets) {
+  public void setPagelets(Pagelet[] pagelets) throws IllegalArgumentException {
+    if (pagelets == null)
+      throw new IllegalArgumentException("Pagelets must not be null");
     this.pagelets.clear();
     this.pagelets.addAll(Arrays.asList(pagelets));
   }
