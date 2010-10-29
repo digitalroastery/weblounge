@@ -80,8 +80,8 @@ public class SolrUtilsTest {
     d.set(Calendar.HOUR_OF_DAY, 0);
     Date startDate = d.getTime();
     d.add(Calendar.DAY_OF_MONTH, 2);
-    d.add(Calendar.HOUR, 5);
-    d.add(Calendar.MINUTE, 59);
+    d.set(Calendar.HOUR_OF_DAY, 5);
+    d.set(Calendar.MINUTE, 59);
     Date endDate = d.getTime();
     String serializedStartDate = df.format(startDate) + "T00:00:00Z";
     String serializedEndDate = df.format(endDate) + "T05:59:00Z";
