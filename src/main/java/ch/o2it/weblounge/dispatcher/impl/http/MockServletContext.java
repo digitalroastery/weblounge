@@ -219,7 +219,7 @@ public class MockServletContext implements ServletContext {
    * 
    * @see javax.servlet.ServletContext#getResourcePaths(java.lang.String)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Set getResourcePaths(String path) {
     String actualPath = (path.endsWith("/") ? path : path + "/");
     Resource resource = this.resourceLoader.getResource(getResourceLocation(actualPath));
@@ -317,7 +317,7 @@ public class MockServletContext implements ServletContext {
    * 
    * @see javax.servlet.ServletContext#getServlets()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Enumeration getServlets() {
     return Collections.enumeration(Collections.EMPTY_SET);
   }
@@ -327,7 +327,7 @@ public class MockServletContext implements ServletContext {
    * 
    * @see javax.servlet.ServletContext#getServletNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Enumeration getServletNames() {
     return Collections.enumeration(Collections.EMPTY_SET);
   }
@@ -415,7 +415,7 @@ public class MockServletContext implements ServletContext {
    * 
    * @see javax.servlet.ServletContext#getInitParameterNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getInitParameterNames() {
     return this.initParameters.keys();
   }
@@ -436,7 +436,7 @@ public class MockServletContext implements ServletContext {
    * 
    * @see javax.servlet.ServletContext#getAttributeNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getAttributeNames() {
     return this.attributes.keys();
   }
@@ -491,7 +491,15 @@ public class MockServletContext implements ServletContext {
    * Inner factory class used to just introduce a Java Activation Framework
    * dependency when actually asked to resolve a MIME type.
    */
-  private static class MimeTypeResolver {
+  private static final class MimeTypeResolver {
+
+    /**
+     * This class is not intended to be instantiated.
+     */
+    private MimeTypeResolver() {
+      // Nothing to be done here
+    }
+
     /**
      * 
      * @param filePath
@@ -500,7 +508,7 @@ public class MockServletContext implements ServletContext {
     public static String getMimeType(String filePath) {
       return null;
       // TODO Reactive java action framework (and solve bundle management)
-//      return FileTypeMap.getDefaultFileTypeMap().getContentType(filePath);
+      // return FileTypeMap.getDefaultFileTypeMap().getContentType(filePath);
     }
   }
 

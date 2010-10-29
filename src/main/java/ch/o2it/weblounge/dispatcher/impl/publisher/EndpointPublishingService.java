@@ -255,8 +255,8 @@ public class EndpointPublishingService implements ManagedService {
       } finally {
         Thread.currentThread().setContextClassLoader(bundleClassLoader);
       }
-    } catch (Exception e) {
-      logger.error("Error registering rest service at " + contextPath, e);
+    } catch (Throwable t) {
+      logger.error("Error registering rest service at " + contextPath, t);
       return;
     }
 
@@ -274,8 +274,8 @@ public class EndpointPublishingService implements ManagedService {
     // Remove the servlet from the http service
     try {
       httpService.unregister(contextPath);
-    } catch (Exception e) {
-      logger.error("Unable to unregister rest endpoint " + contextPath, e);
+    } catch (Throwable t) {
+      logger.error("Unable to unregister rest endpoint " + contextPath, t);
     }
 
     // Destroy the servlet
@@ -339,6 +339,9 @@ public class EndpointPublishingService implements ManagedService {
         case ServiceEvent.UNREGISTERING:
           logger.debug("Unregistering JAX-RS service {} from {}", service, contextPath);
           unregisterEndpoint(contextPath);
+          break;
+        default:
+          // We don't care about these cases
           break;
       }
     }

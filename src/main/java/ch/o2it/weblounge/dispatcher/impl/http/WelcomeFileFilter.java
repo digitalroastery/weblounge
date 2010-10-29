@@ -73,10 +73,10 @@ public class WelcomeFileFilter implements javax.servlet.Filter {
    */
   public void init(FilterConfig config) throws ServletException {
     appRoot = config.getInitParameter(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
-    if (appRoot == null || appRoot.equals("/"))
+    if (appRoot == null || "/".equals(appRoot))
       appRoot = "";
     bundleUriNamespace = config.getInitParameter(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
-    if (bundleUriNamespace == null || bundleUriNamespace.equals("/"))
+    if (bundleUriNamespace == null || "/".equals(bundleUriNamespace))
       bundleUriNamespace = "";
   }
 

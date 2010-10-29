@@ -61,20 +61,17 @@ public class WelcomeFileFilterServlet extends HttpServlet {
   public void service(HttpServletRequest req, HttpServletResponse res)
       throws ServletException, IOException {
 
-    if (req.getPathInfo() != null && req.getPathInfo().equals("/")) {
+    if (req.getPathInfo() != null && "/".equals(req.getPathInfo())) {
       if (!welcomeFileList.isEmpty()) {
         // use the first one for now:
         for (String welcomeFile : welcomeFileList) {
-          try {
-            if (welcomeFile.startsWith("/"))
-              welcomeFile = welcomeFile.substring(1);
-            RequestDispatcher dispatcher = req.getRequestDispatcher(welcomeFile);
-            // TODO: check if resource exists before forwarding
-            dispatcher.forward(req, res);
-            return;
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
+          String file = welcomeFile;
+          if (welcomeFile.startsWith("/"))
+            file = welcomeFile.substring(1);
+          RequestDispatcher dispatcher = req.getRequestDispatcher(file);
+          // TODO: check if resource exists before forwarding
+          dispatcher.forward(req, res);
+          return;
         }
       } else {
         req.getRequestDispatcher(req.getServletPath() + "/resources/index.html").forward(req, res); 
@@ -98,10 +95,10 @@ public class WelcomeFileFilterServlet extends HttpServlet {
     if (welcomeFilesDelimited != null)
       welcomeFileList = Arrays.asList(StringUtils.split(welcomeFilesDelimited, ";"));
     appRoot = config.getInitParameter(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
-    if (appRoot == null || appRoot.equals("/"))
+    if (appRoot == null || "/".equals(appRoot))
       appRoot = "";
     bundleUriNamespace = config.getInitParameter(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
-    if (bundleUriNamespace == null || bundleUriNamespace.equals("/"))
+    if (bundleUriNamespace == null || "/".equals(bundleUriNamespace))
       bundleUriNamespace = "";
   }
 

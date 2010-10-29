@@ -450,12 +450,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       } catch (NamespaceException e) {
         logger.error("The alias '{}' is already in use", siteRoot);
         return;
-      } catch (Exception e) {
+      } catch (Throwable t) {
         logger.error("Error registering resources for site '{}' at {}: {}", new Object[] {
             site,
             siteRoot,
-            e.getMessage() });
-        logger.error(e.getMessage(), e);
+            t.getMessage() });
+        logger.error(t.getMessage(), t);
       }
 
       siteServlets.put(site, siteServlet);
@@ -484,11 +484,11 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
       logger.debug("Site '{}' registered under site://{}", site, siteRoot);
 
-    } catch (Exception e) {
+    } catch (Throwable t) {
       logger.error("Error setting up site '{}' for http requests: {}", new Object[] {
           site,
-          e.getMessage() });
-      logger.error(e.getMessage(), e);
+          t.getMessage() });
+      logger.error(t.getMessage(), t);
     }
 
   }
@@ -506,8 +506,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
     for (String name : webXmlServlets.keySet()) {
       for (String mapping : webXmlServlets.get(name).getServletMappings()) {
-        mapping = siteRoot + mapping;
-        paxHttpService.unregister(mapping);
+        paxHttpService.unregister(UrlSupport.concat(siteRoot, mapping));
       }
     }
 

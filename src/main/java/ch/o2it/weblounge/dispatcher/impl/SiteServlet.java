@@ -114,9 +114,7 @@ public class SiteServlet extends HttpServlet {
       });
     } catch (ServletException e) {
       throw e;
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception ignore) {
+    } catch (Throwable ignore) {
       logger.error("Ignored exception", ignore);
     }
   }
@@ -213,11 +211,10 @@ public class SiteServlet extends HttpServlet {
     } catch (IOException e) {
       // re-thrown
       throw e;
-    } catch (RuntimeException e) {
+    } catch (Throwable t) {
       // re-thrown
-      throw e;
-    } catch (Exception e) {
-      logger.error("Wow, certainly didn't expect this to happen!", e);
+      logger.error("Wow, certainly didn't expect this to happen!", t);
+      throw new ServletException(t);
     }
   }
 
@@ -333,10 +330,8 @@ public class SiteServlet extends HttpServlet {
           return null;
         }
       });
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Wow, certainly didn't expect this to happen!", e);
+    } catch (Throwable t) {
+      logger.error("Wow, certainly didn't expect this to happen!", t);
     }
   }
 

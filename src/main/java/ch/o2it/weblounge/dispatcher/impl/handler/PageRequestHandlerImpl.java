@@ -225,33 +225,32 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         return true;
       }
 
+      // Add additional cache tags
+      response.addTag("webl:template", template.getIdentifier());
+      response.addTag("webl:pagetype", page.getType());
+      for (String keyword : page.getSubjects()) {
+        response.addTag("webl:keyword", keyword);
+      }
+
+      // Configure valid and recheck time according to the template
+      response.setRecheckTime(template.getRecheckTime());
+      response.setValidTime(template.getValidTime());
+
       // Select the actual renderer by method and have it render the
       // request. Since renderers are being pooled by the bundle, we
       // have to return it after the request has finished.
       try {
-
-        // Add additional cache tags
-        response.addTag("webl:template", template.getIdentifier());
-        response.addTag("webl:pagetype", page.getType());
-        for (String keyword : page.getSubjects()) {
-          response.addTag("webl:keyword", keyword);
-        }
-
-        // Configure valid and recheck time according to the template
-        response.setRecheckTime(template.getRecheckTime());
-        response.setValidTime(template.getValidTime());
-
         logger.debug("Rendering {} using page template '{}'", path, template);
         template.render(request, response);
-      } catch (Exception e) {
+      } catch (Throwable t) {
         String params = RequestUtils.dumpParameters(request);
         String msg = "Error rendering template '" + template + "' on '" + path + "' " + params;
-        Throwable o = e.getCause();
+        Throwable o = t.getCause();
         if (o != null) {
           msg += ": " + o.getMessage();
           logger.error(msg, o);
         } else {
-          logger.error(msg, e);
+          logger.error(msg, t);
         }
         DispatchUtils.sendInternalError(request, response);
       }

@@ -754,7 +754,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
      * 
      * @see java.io.PrintWriter#write(char[], int, int)
      */
-    public void write(char buf[], int off, int len) {
+    public void write(char[] buf, int off, int len) {
       super.write(buf, off, len);
       super.flush();
       setCommittedIfBufferSizeExceeded();

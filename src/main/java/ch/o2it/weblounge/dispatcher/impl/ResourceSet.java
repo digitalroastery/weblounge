@@ -56,7 +56,7 @@ public class ResourceSet {
    * @param excludes
    *          the exclude pattern
    */
-  public ResourceSet(String include, String excludes[]) {
+  public ResourceSet(String include, String[] excludes) {
     setInclude(include);
     setExcludes(excludes);
   }

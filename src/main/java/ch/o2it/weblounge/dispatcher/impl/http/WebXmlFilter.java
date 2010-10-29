@@ -24,13 +24,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class models filter information that usually goes into a web
+ * application's <code>web.xml</code>.
+ */
 public class WebXmlFilter {
 
-  String filterName;
-  Class<?> filterClass;
-  String loadOnStartup;
-  Map<String, String> initParams = new HashMap<String, String>();
-  ArrayList<String> filterMappings = new ArrayList<String>();
+  private String filterName;
+  private Class<?> filterClass;
+  private Map<String, String> initParams = new HashMap<String, String>();
+  private ArrayList<String> filterMappings = new ArrayList<String>();
 
   /**
    * Creates a new filter.
@@ -78,16 +81,22 @@ public class WebXmlFilter {
     return this;
   }
 
+  /**
+   * Returns the list of filter mappings.
+   * 
+   * @return the mappings
+   */
   public ArrayList<String> getFilterMappings() {
     return filterMappings;
   }
 
+  /**
+   * Returns the filter class.
+   * 
+   * @return the class
+   */
   public Class<?> getFilterClass() {
     return filterClass;
-  }
-
-  @SuppressWarnings("unused")
-  private WebXmlFilter() {
   }
 
   /**
