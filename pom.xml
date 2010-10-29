@@ -60,6 +60,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.system</Bundle-SymbolicName>
             <Fragment-Host>system.bundle; extension:=framework</Fragment-Host>
+            <Import-Package></Import-Package>
           </instructions>
         </configuration>
       </plugin>
