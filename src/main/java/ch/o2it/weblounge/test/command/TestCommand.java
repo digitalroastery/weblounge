@@ -255,7 +255,6 @@ public final class TestCommand {
     logger.info("------------------------------------------------------------------------");
     logger.info("Running test '" + test + "'");
     logger.info("------------------------------------------------------------------------");
-    logger.info("");
     try {
       test.execute("http://127.0.0.1:8080");
       logger.info("Test '" + test + "' succeeded");
