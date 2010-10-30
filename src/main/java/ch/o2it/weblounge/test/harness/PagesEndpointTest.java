@@ -78,7 +78,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     // TODO: Make this dynamic
     // serverUrl = UrlSupport.concat(serverUrl, "weblounge");
     String requestUrl = UrlSupport.concat(serverUrl, "system/weblounge/pages");
-    String testPath = "/testpath/";
+    String testPath = "/" + System.currentTimeMillis() + "/";
 
     // Prepare the request
     HttpPost createPageRequest = new HttpPost(requestUrl);
@@ -96,7 +96,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
       String locationHeader = response.getHeaders("Location")[0].getValue();
       assertTrue(locationHeader.startsWith(serverUrl));
       pageId = locationHeader.substring(locationHeader.lastIndexOf("/") + 1);
-      assertNotNull(pageId);
+      assertEquals("Identifier doesn't have correct length", 36, pageId.length());
       logger.debug("Id of the new page is {}", pageId);
     } finally {
       httpClient.getConnectionManager().shutdown();
@@ -124,7 +124,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     String updatedCreator = creator + " (updated)";
     NodeList creatorElements = pageXml.getElementsByTagName("created");
     creatorElements.item(0).getFirstChild().setTextContent(updatedCreator);
-    params = new String[][] { { "page", serializeDoc(pageXml) } };
+    params = new String[][] { { "content", serializeDoc(pageXml) } };
     httpClient = new DefaultHttpClient();
     logger.info("Updating page at {}", requestUrl);
     try {
