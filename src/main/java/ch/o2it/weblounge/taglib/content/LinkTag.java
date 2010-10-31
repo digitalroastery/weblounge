@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -112,14 +113,18 @@ public class LinkTag extends WebloungeTag {
       if (anchor_ != null && anchor_.length() > 0)
         link += "#" + anchor_;
 
-      String attributes = "";
+      StringBuffer attributes = new StringBuffer();
 
       // target
-      attributes += (target_ != null) ? "target=\"" + target_ + "\"" : "";
-      attributes += getStandardAttributes();
+      attributes.append((target_ != null) ? "target=\"" + target_ + "\"" : "");
+
+      // Add tag attributes
+      for (Map.Entry<String, String> attribute : getStandardAttributes().entrySet()) {
+        attributes.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
+      }
 
       JspWriter writer = pageContext.getOut();
-      writer.write("<a href=\"".concat(link).concat("\"").concat(attributes).concat(">"));
+      writer.write("<a href=\"".concat(link).concat("\"").concat(attributes.toString()).concat(">"));
       writer.flush();
       return EVAL_BODY_INCLUDE;
 

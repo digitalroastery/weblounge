@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
@@ -156,8 +157,10 @@ public class FormTag extends WebloungeTag {
     if (target != null)
       a.append("target=\"" + target + "\" ");
 
-    // Standard attributes
-    a.append(getStandardAttributes());
+    // Add tag attributes
+    for (Map.Entry<String, String> attribute : getStandardAttributes().entrySet()) {
+      a.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
+    }
 
     Action action = module.getAction(actionId);
     if (action == null) {

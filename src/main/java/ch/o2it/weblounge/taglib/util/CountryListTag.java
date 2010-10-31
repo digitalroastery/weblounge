@@ -76,7 +76,14 @@ public class CountryListTag extends WebloungeTag {
           set.add(new Country(key, name));
         }
         writer.print("<select");
-        writer.print(getStandardAttributes());
+
+        // Add tag attributes
+        StringBuffer buf = new StringBuffer();
+        for (Map.Entry<String, String> attribute : getStandardAttributes().entrySet()) {
+          buf.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
+        }
+        writer.print(buf.toString());
+
         writer.println(">");
 
         Iterator<Country> ci = set.iterator();

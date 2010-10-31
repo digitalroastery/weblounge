@@ -73,8 +73,15 @@ public class MonthListTag extends WebloungeTag {
 					set.add(new Integer(Integer.parseInt((String)pi.next())));
 				}
 				writer.print("<select");
-				writer.print(getStandardAttributes());
-				writer.println(">");
+
+				// Add tag attributes
+        StringBuffer buf = new StringBuffer();
+        for (Map.Entry<String, String> attribute : getStandardAttributes().entrySet()) {
+          buf.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
+        }
+        writer.print(buf.toString());
+
+        writer.println(">");
 				
 				Iterator<Integer> mi = set.iterator();
 				while (pi.hasNext()) {

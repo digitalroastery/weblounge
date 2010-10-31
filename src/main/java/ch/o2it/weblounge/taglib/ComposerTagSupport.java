@@ -221,7 +221,12 @@ public class ComposerTagSupport extends WebloungeTag {
     if (request.getVersion() == Resource.WORK && targetPage.isLocked()) {
       addCssClass(CLASS_LOCKED);
     }
-    buf.append(getStandardAttributes());
+    
+    // Add tag attributes
+    for (Map.Entry<String, String> attribute : getStandardAttributes().entrySet()) {
+      buf.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
+    }
+
     buf.append(">");
     writer.println(buf.toString());
   }

@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -64,8 +65,12 @@ public class MessageTag extends WebloungeTag {
     if (hasMessage) {
       JspWriter writer = pageContext.getOut();
       StringBuffer buf = new StringBuffer();
-      buf.append("<div ");
-      buf.append(getStandardAttributes());
+      buf.append("<div");
+
+      // Add tag attributes
+      for (Map.Entry<String, String> attribute : getStandardAttributes().entrySet()) {
+        buf.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
+      }
 
       // Create the base id for the error, warning and info <ul> element
       String baseId = getId();
