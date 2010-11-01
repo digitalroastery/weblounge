@@ -132,6 +132,15 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (site == null)
       throw new IllegalStateException("Site has not been set");
 
+    // The language might very well be encoded as part of the path, so asking
+    // for the url might give us the language for free.
+    if (url == null)
+      url = getUrl();
+    
+    // There is no url without a path, so we can safely assume that we will
+    // get an object back form getUrl().
+    language = url.getLanguage();
+
     // Extract the language from the session (a.k.a an earlier request). Then
     // make sure the language was put there for the current site.
     language = (Language) getSession(true).getAttribute(LANGUAGE);
@@ -200,7 +209,16 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
       return url;
     if (site == null)
       throw new IllegalStateException("Site has not been set");
+
+    // Let's create a url. The constructor will try to populate as many fields
+    // on the url as possible, including flavor, language and version which
+    // might all be encoded in the path.
     this.url = new WebUrlImpl(site, getRequestURI());
+    
+    // The language may be part of the path, so let's give that a try
+    if (language == null)
+      language = url.getLanguage();
+
     this.requestedUrl = url;
     return url;
   }

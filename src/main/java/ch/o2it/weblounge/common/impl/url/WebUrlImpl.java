@@ -186,12 +186,51 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    *          the url flavor
    */
   public WebUrlImpl(Site site, String path, long version, RequestFlavor flavor) {
+    this(site, path, version, flavor, null);
+  }
+
+  /**
+   * Constructor for a url with the given path, version and flavor.
+   * 
+   * @param site
+   *          the associated site
+   * @param path
+   *          the url path
+   * @param version
+   *          the required version
+   * @param flavor
+   *          the url flavor
+   * @param language
+   *          the language
+   */
+  public WebUrlImpl(Site site, String path, long version, RequestFlavor flavor,
+      Language language) {
     super(path, '/');
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     this.site = site;
     this.version = version;
     this.flavor = flavor;
+    this.language = language;
+  }
+
+  /**
+   * Creates a new url that has the same properties as <code>url</code> except
+   * for the <code>path</code>. This constructor is intended to be used when
+   * redirecting.
+   * 
+   * @param url
+   *          the original url
+   * @param path
+   *          the new path
+   */
+  public WebUrlImpl(WebUrl url, String path) {
+    super(path, url.getPathSeparator());
+    this.site = url.getSite();
+    this.version = url.getVersion();
+    this.flavor = url.getFlavor();
+    this.language = url.getLanguage();
+    this.link = url.getLink();
   }
 
   /**
@@ -449,13 +488,14 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
         }
       }
 
-      // Language
+      // Language (will be something like "_fr")
       String l = pathMatcher.group(3);
       if (l != null && !"".equals(l)) {
         l = l.substring(1);
         Language language = site.getLanguage(l);
         if (language == null) {
-          throw new UnknownLanguageException(l);
+          logger.debug("Switching request language {} for {}", l, site.getDefaultLanguage().getIdentifier());
+          this.language = site.getDefaultLanguage();
         }
         this.language = language;
       }

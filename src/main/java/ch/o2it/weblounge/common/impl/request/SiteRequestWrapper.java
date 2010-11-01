@@ -144,7 +144,7 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     String requestURI = servletPath + pathInfo;
     
     // Adjust the url
-    this.url = new WebUrlImpl(site, url);
+    this.url = new WebUrlImpl(request.getUrl(), url);
 
     if (include) {
       attrs = new HashMap<String, Object>(5);
