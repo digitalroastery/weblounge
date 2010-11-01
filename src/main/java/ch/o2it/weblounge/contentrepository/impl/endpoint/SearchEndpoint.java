@@ -29,12 +29,12 @@ import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
+import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentation;
 import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentationGenerator;
 import ch.o2it.weblounge.common.impl.util.doc.Format;
 import ch.o2it.weblounge.common.impl.util.doc.Parameter;
 import ch.o2it.weblounge.common.impl.util.doc.TestForm;
-import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -45,7 +45,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
@@ -90,13 +91,13 @@ public class SearchEndpoint {
   @Path("/{searchterms:.*}")
   public Response getPage(
       @Context HttpServletRequest request,
-      @PathParam("searchterms") List<String> terms,
+      @PathParam("searchterms") String terms,
       @QueryParam("offset") @DefaultValue("-1") int offset,
       @QueryParam("limit") @DefaultValue("-1") int limit
     ) {
 
     // Check the search terms
-    if (terms == null || terms.size() == 0 || StringUtils.isBlank(terms.get(0)))
+    if (StringUtils.isBlank(terms))
       return Response.status(Status.BAD_REQUEST).build();
 
     // Find the site
@@ -115,9 +116,13 @@ public class SearchEndpoint {
     
     // Create the search expression and the query
     SearchQuery query = new SearchQueryImpl(site);
-    query.withText(StringUtils.join(terms, " "));
-    query.withOffset(offset);
-    query.withLimit(limit);
+    try {
+      query.withText(URLDecoder.decode(terms, "UTF-8"));
+      query.withOffset(offset);
+      query.withLimit(limit);
+    } catch (UnsupportedEncodingException e) {
+      throw new WebApplicationException(e);
+    }
 
     // Return the result
     try {
