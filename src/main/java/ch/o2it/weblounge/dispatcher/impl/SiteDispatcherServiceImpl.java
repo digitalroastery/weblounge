@@ -464,6 +464,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
       // Did we already miss the "siteStarted()" event? If so, we trigger it
       // for ourselves, so the modules are being started.
+      site.addSiteListener(this);
       if (site.isRunning()) {
         siteStarted(site);
       }
@@ -471,7 +472,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       // Register this site for the findByXYZ() methods
       synchronized (sites) {
         sites.add(site);
-        site.addSiteListener(this);
         for (String name : site.getHostNames()) {
           if (site.equals(sitesByServerName.get(name))) {
             logger.error("Another site is already registered to " + name);
