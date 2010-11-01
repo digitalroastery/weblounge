@@ -164,6 +164,11 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
       cleanupAfterFailure();
       throw e;
     }
+    
+    // Log index statistics to console
+    long resourceCount = index.getResourceCount();
+    long resourceVersionCount = index.getRevisionCount();
+    logger.info("Index contains {} resources and {} revisions", resourceCount, resourceVersionCount - resourceCount);
   }
   
   /**

@@ -191,12 +191,14 @@ public class URIIndex implements VersionedContentRepositoryIndex {
 
     // Read index header information
     try {
+      idx.seek(0);
       this.indexVersion = idx.readInt();
       if (indexVersion != IDX_VERSION)
         logger.warn("URI index version mismatch (found {}, expected {}), consider reindex", indexVersion, IDX_VERSION);
       this.bytesPerId = idx.readInt();
       this.bytesPerType = idx.readInt();
       this.bytesPerPath = idx.readInt();
+      this.slots = idx.readLong();
       this.entries = idx.readLong();
       this.bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
       
@@ -565,6 +567,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     this.bytesPerType = bytesPerType;
     this.bytesPerPath = bytesPerPath;
     this.bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
+    this.entries = 0;
 
     logger.info("Creating uri index with {} bytes per entry", bytesPerEntry);
 
@@ -574,8 +577,8 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     idx.writeInt(bytesPerId);
     idx.writeInt(bytesPerType);
     idx.writeInt(bytesPerPath);
-    idx.writeLong(0);
-    idx.writeLong(0);
+    idx.writeLong(slots);
+    idx.writeLong(entries);
 
     // If this file used to contain entries, we just null out the rest
     try {
@@ -587,8 +590,6 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     } catch (EOFException e) {
       // That's ok, we wanted to write until the very end
     }
-
-    this.entries = 0;
 
     logger.debug("Uri index created");
   }

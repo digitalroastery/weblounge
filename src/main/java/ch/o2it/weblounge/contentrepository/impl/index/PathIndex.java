@@ -74,7 +74,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
   protected static final int IDX_HEADER_SIZE = 20;
 
   /** Default number of entries in index */
-  private static final int IDX_ENTRIES = 128;
+  private static final int IDX_SLOTS = 128;
 
   /** Default number of addresses per index entries */
   private static final int IDX_ADDRESSES_PER_ENTRY = 64;
@@ -95,7 +95,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
   protected boolean isReadOnly = false;
 
   /** Number of slots in the paths index */
-  protected int slots = IDX_ENTRIES;
+  protected int slots = IDX_SLOTS;
 
   /** Number of paths per slot */
   protected int entriesPerSlot = IDX_ADDRESSES_PER_ENTRY;
@@ -118,7 +118,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    *           if reading from the index fails
    */
   public PathIndex(File indexRootDir, boolean readOnly) throws IOException {
-    this(indexRootDir, readOnly, IDX_ENTRIES, IDX_ADDRESSES_PER_ENTRY);
+    this(indexRootDir, readOnly, IDX_SLOTS, IDX_ADDRESSES_PER_ENTRY);
   }
 
   /**
