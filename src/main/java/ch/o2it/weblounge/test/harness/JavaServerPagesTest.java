@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.test.harness;
 
+import static org.junit.Assert.assertNotNull;
+
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
@@ -49,7 +51,7 @@ public class JavaServerPagesTest extends IntegrationTestBase {
   private static final String CONTENT_TYPE_HTML = "text/html";
   
   /** Path to the jsp page */
-  private static final String JSP_PATH = "/weblounge-sites/weblounge-test/templates/template.jsp";
+  private static final String JSP_PATH = "/weblounge-sites/weblounge-test/templates/default.jsp";
 
   /**
    * Creates a new instance of the <code>JavaServerPagesTest</code> test.
@@ -80,20 +82,15 @@ public class JavaServerPagesTest extends IntegrationTestBase {
 
       // Test template contents
       Document xml = TestSiteUtils.parseXMLResponse(response);
-      String greeting = "Welcome to the Weblounge 3.0 testpage!";
-      String xpath = "/html/body/h1/text()";
-      Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));
+      String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");
+      assertNotNull("General template output does not work", templateOutput);
+      assertEquals("Template title is not as expected", "Weblounge Test Site", templateOutput);
       
       // Test site tag libraries
-      logger.info("Testing site taglibary on {}", requestUrl);
-      xpath = "/html/body/div[@id='greeting']";
-      Assert.assertNotNull(XPathHelper.valueOf(xml, xpath));
-
-      // Test site tag libraries
       logger.info("Testing weblounge taglibrary on {}", requestUrl);
-      xpath = "/html/head/meta[@name='generator']/@content";
-      Assert.assertNotNull(XPathHelper.valueOf(xml, xpath));
-      Assert.assertNotNull("Weblounge 3.0", XPathHelper.valueOf(xml, xpath));
+      String generator = "/html/head/meta[@name='generator']/@content";
+      Assert.assertNotNull("Generator tag not found", XPathHelper.valueOf(xml, generator));
+      Assert.assertNotNull("Weblounge 3.0", XPathHelper.valueOf(xml, generator));
 
     } finally {
       httpClient.getConnectionManager().shutdown();

@@ -111,9 +111,10 @@ public class PageContentTest extends IntegrationTestBase {
         // Get the document contents
         Document xml = TestSiteUtils.parseXMLResponse(response);
 
-        // Look for template output
-        String templateOutput = XPathHelper.valueOf(xml, "/html/body/h1[. = 'Welcome to the Weblounge 3.0 testpage!']");
+        // Test template output
+        String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");
         assertNotNull("General template output does not work", templateOutput);
+        assertEquals("Template title is not as expected", "Weblounge Test Site", templateOutput);
 
         // Look for included pagelet's elements
         String text = XPathHelper.valueOf(xml, "/html/body/div[@id='main']//span[@id='element']");

@@ -118,7 +118,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
       assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@page"));
       assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@pagesize"));
       assertEquals("1", XPathHelper.valueOf(xml, "count(/searchresult/result)"));
-      assertEquals("4bb19980-8f98-4873-a813-71b6dfab22ad", XPathHelper.valueOf(xml, "/searchresult/result/id"));
+      assertEquals("4bb19980-8f98-4873-a813-000000000006", XPathHelper.valueOf(xml, "/searchresult/result/id"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }

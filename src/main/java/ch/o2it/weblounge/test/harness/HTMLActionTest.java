@@ -99,8 +99,9 @@ public class HTMLActionTest extends IntegrationTestBase {
           Document xml = TestSiteUtils.parseXMLResponse(response);
 
           // Look for page content output
-          String templateOutput = XPathHelper.valueOf(xml, "/html/body/h1[. = 'Welcome to the Weblounge 3.0 testpage!']");
+          String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");
           assertNotNull("General template output does not work", templateOutput);
+          assertEquals("Template title is not as expected", "Welcome to Weblounge", templateOutput);
 
           // Look for action parameter handling and direct output of
           // startState()
