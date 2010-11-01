@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<page id="4bb19980-8f98-4873-a813-71b6dfab22ad" path="/test/htmlaction" version="live">
+  <head>
+    <template>default</template>
+    <promote>true</promote>
+    <index>true</index>
+    <metadata>
+      <title language="de"><![CDATA[Seitentitel]]></title>
+      <title language="fr"><![CDATA[Il titre de la page]]></title>
+      <description language="de"><![CDATA[Beschreibung]]></description>
+      <description language="fr"><![CDATA[Déscription]]></description>
+      <subject><![CDATA[Other topic]]></subject>
+      <subject><![CDATA[This subject]]></subject>
+      <type><![CDATA[Text]]></type>
+      <coverage language="de"><![CDATA[Zürich]]></coverage>
+      <coverage language="fr"><![CDATA[Zurich]]></coverage>
+      <rights language="de"><![CDATA[Copyright 2009 by T. Wunden]]></rights>
+    </metadata>
+    <created>
+      <user id="hans" realm="testland">Hans Muster</user>
+      <date>2009-01-07T19:05:41Z</date>
+    </created>
+    <modified>
+      <user id="amelie" realm="testland">Amélie Poulard</user>
+      <date>2009-02-18T21:06:40Z</date>
+    </modified>
+    <published>
+      <user id="hans" realm="testland">Hans Muster</user>
+      <from>2006-05-05T16:58:21Z</from>
+      <to>292278994-08-17T07:12:55Z</to>
+    </published>
+    <security>
+      <owner>
+        <user id="hans" realm="testland">Hans Muster</user>
+      </owner>
+    </security>
+    <locked>
+      <user id="amelie" realm="testland">Amélie Poulard</user>
+    </locked>
+  </head>
+  <body>
+    <composer id="main">
+      <pagelet module="test" id="content">
+        <security>
+          <owner>
+            <user id="hans" realm="testland">Hans Muster</user>
+          </owner>
+        </security>
+        <created>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <date>2009-01-07T19:05:41Z</date>
+        </created>
+        <published>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <from>2009-01-07T19:05:41Z</from>
+          <to>292278994-08-17T07:12:55Z</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="hans" realm="testland">Hans Muster</user>
+            <date>2009-01-07T19:05:41Z</date>
+          </modified>
+          <text id="credits"><![CDATA[Friedrich Nietzsche]]></text>
+          <text id="tag"><![CDATA[Neu]]></text>
+          <text id="tag"><![CDATA[Technik]]></text>
+          <text id="title"><![CDATA[Ein amüsanter Titel]]></text>
+        </locale>
+        <locale language="fr">
+          <modified>
+            <user id="amelie" realm="testland">Amélie Poulard</user>
+            <date>2009-02-18T21:06:40Z</date>
+          </modified>
+          <text id="tag"><![CDATA[Nouveau]]></text>
+          <text id="tag"><![CDATA[Technique]]></text>
+          <text id="title"><![CDATA[Un titre joyeux]]></text>
+        </locale>
+        <properties>
+          <property id="headline"><![CDATA[true]]></property>
+          <property id="tags"><![CDATA[a]]></property>
+          <property id="tags"><![CDATA[b]]></property>
+        </properties>
+      </pagelet>
+    </composer>
+  </body>
+</page>
