@@ -462,6 +462,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       httpRegistrations.put(site, webXml);
       logger.info("Site '{}' registered under site://{}", site, siteRoot);
 
+      // Did we already miss the "siteStarted()" event? If so, we trigger it
+      // for ourselves, so the modules are being started.
+      if (site.isRunning()) {
+        siteStarted(site);
+      }
+
       // Register this site for the findByXYZ() methods
       synchronized (sites) {
         sites.add(site);
