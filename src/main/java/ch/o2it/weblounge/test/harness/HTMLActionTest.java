@@ -21,14 +21,13 @@
 package ch.o2it.weblounge.test.harness;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -37,13 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Integration test to test <code>HTML</code> action output.
@@ -55,8 +51,8 @@ public class HTMLActionTest extends IntegrationTestBase {
 
   /** The paths to test */
   private static final String[] requestPaths = new String[] {
-    "/test/htmlaction",
-    "/test/htmlaction/html"
+    "/greeting/",
+    "/greeting/html"
   };
 
   /**
@@ -99,29 +95,21 @@ public class HTMLActionTest extends IntegrationTestBase {
           HttpResponse response = TestSiteUtils.request(httpClient, request, params);
           assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 
-          // Look at the document contents
-          String responseHTML = IOUtils.toString(response.getEntity().getContent(), "utf-8");
-          String responseXML = TestSiteUtils.unescapeHtml(responseHTML);
-          DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-          factory.setCoalescing(true);
-          factory.setIgnoringComments(true);
-          factory.setIgnoringElementContentWhitespace(true);
-          factory.setNamespaceAware(true);
-          DocumentBuilder builder = factory.newDocumentBuilder();
-          Document xml = builder.parse(new ByteArrayInputStream(responseXML.getBytes("utf-8")));
+          // Get the document contents
+          Document xml = TestSiteUtils.parseXMLResponse(response);
 
-          // Look for template output
+          // Look for page content output
           String templateOutput = XPathHelper.valueOf(xml, "/html/body/h1[. = 'Welcome to the Weblounge 3.0 testpage!']");
           assertNotNull("General template output does not work", templateOutput);
 
           // Look for action parameter handling and direct output of
           // startState()
-          String actualGreeting = XPathHelper.valueOf(xml, "/html/body/div[@class='vcomposer']/h1");
+          String actualGreeting = XPathHelper.valueOf(xml, "/html/body/div[@id='main']/h1");
           assertEquals(greeting, actualGreeting);
           logger.debug("Found greeting");
 
           // Look for included pagelets
-          assertNotNull("JSP include failed", XPathHelper.valueOf(xml, "/html/body/div[@class='vcomposer']/div[@class='greeting']"));
+          assertNotNull("JSP include failed", XPathHelper.valueOf(xml, "/html/body/div[@id='main']/div[@class='greeting']"));
           logger.debug("Found pagelet content");
 
           // Look for action header includes

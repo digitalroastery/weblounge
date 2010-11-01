@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -47,8 +48,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -155,10 +156,12 @@ public final class TestSiteUtils {
    */
   public static Document parseXMLResponse(HttpResponse response)
       throws Exception {
+    String responseXml = EntityUtils.toString(response.getEntity(), "UTF-8");
+    responseXml = StringEscapeUtils.unescapeHtml(responseXml);
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
     DocumentBuilder builder = factory.newDocumentBuilder();
-    return builder.parse(response.getEntity().getContent());
+    return builder.parse(new ByteArrayInputStream(responseXml.getBytes("UTF-8")));
   }
 
   /**
@@ -172,7 +175,7 @@ public final class TestSiteUtils {
    */
   public static JSONObject parseJSONResponse(HttpResponse response)
       throws Exception {
-    String responseJson = EntityUtils.toString(response.getEntity());
+    String responseJson = EntityUtils.toString(response.getEntity(), "UTF-8");
     JSONObject json = new JSONObject(responseJson);
     return json;
   }

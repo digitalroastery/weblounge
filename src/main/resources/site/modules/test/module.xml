@@ -39,6 +39,7 @@
       <name language="en">Greetings</name>
       <class>ch.o2it.weblounge.test.site.GreeterHTMLAction</class>
       <mountpoint>/greeting/</mountpoint>
+      <page>/test/htmlaction</page>
       <includes>
         <script src="file://${module.root}/scripts/greeting.js"
           type="javascript" />

@@ -35,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import java.net.URLEncoder;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -101,9 +103,9 @@ public class SearchEndpointTest extends IntegrationTestBase {
     }
 
     // Check for search terms that should yield a result
-    searchTerms = "Nietzsche";
+    searchTerms = "Friedrich Nietzsche Suchresultat";
     httpClient = new DefaultHttpClient();
-    searchRequest = new HttpGet(UrlSupport.concat(requestUrl, searchTerms));
+    searchRequest = new HttpGet(UrlSupport.concat(requestUrl, URLEncoder.encode(searchTerms, "UTF-8")));
     String[][] params = new String[][] {{"limit", "5"}};
     logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
     try {

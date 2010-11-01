@@ -28,6 +28,7 @@ import ch.o2it.weblounge.test.harness.ImagesEndpointTest;
 import ch.o2it.weblounge.test.harness.IntegrationTest;
 import ch.o2it.weblounge.test.harness.JSONActionTest;
 import ch.o2it.weblounge.test.harness.JavaServerPagesTest;
+import ch.o2it.weblounge.test.harness.PageContentTest;
 import ch.o2it.weblounge.test.harness.PagesEndpointTest;
 import ch.o2it.weblounge.test.harness.ProtectedStaticResourcesTest;
 import ch.o2it.weblounge.test.harness.SearchEndpointTest;
@@ -61,6 +62,7 @@ public final class TestCommand {
    * Creates a new test command.
    */
   public TestCommand() {
+    tests.add(new PageContentTest());
     tests.add(new HTMLActionTest());
     tests.add(new XMLActionTest());
     tests.add(new JSONActionTest());

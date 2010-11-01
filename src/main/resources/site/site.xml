@@ -5,6 +5,7 @@
   <name>Weblounge Test Site</name>
   <languages>
     <language default="true">de</language>
+    <language>fr</language>
     <language>en</language>
   </languages>
   <domains>
