@@ -36,6 +36,7 @@ import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
@@ -140,6 +141,7 @@ public class ContentRepositoryIndexTest {
    */
   @After
   public void tearDown() throws Exception {
+    idx.clear();
     idx.close();
     FileUtils.deleteDirectory(indexRootDirectory);
   }
@@ -169,6 +171,30 @@ public class ContentRepositoryIndexTest {
       e.printStackTrace();
       fail(e.getMessage());
     }
+    
+    String oldId = page.getURI().getId();
+    String oldPath = page.getURI().getPath();
+
+    // Try to add a new resource with existing id
+    try {
+      page.getURI().setPath(UrlSupport.concat(file.getURI().getPath(), "pathext"));
+      idx.add(page);
+      fail("Managed to add a resource with an existing identifier");
+    } catch (Exception e) {
+      // This is expected
+      page.getURI().setPath(oldPath);
+    }
+
+    // Try to add a new resource with existing id
+    try {
+      page.getURI().setIdentifier(page.getIdentifier().substring(1) + "x");
+      idx.add(page);
+      fail("Managed to add a resource with an existing path");
+    } catch (Exception e) {
+      // This is expected
+      page.getURI().setIdentifier(oldId);
+    }
+
   }
 
   /**

@@ -32,6 +32,7 @@ import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
@@ -120,33 +121,61 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     // initial bundle contents to the filesystem. Otherwise, keep working with
     // what's there already.
     logger.info("Loading resources for '{}' from bundle {}", site, bundle);
-    for (Iterator<ResourceURI> pi = getResourceURIsFromBundle(); pi.hasNext();) {
-      ResourceURI uri = pi.next();
-      try {
-        Resource<?> resource = loadResourceFromBundle(uri);
-        if (resource == null) {
-          throw new ContentRepositoryException("Unable to load " + uri.getType() + " " + uri + " from bundle");
-        }
-        uri = resource.getURI(); // This uri contains the id in addition to just the path
-        logger.info("Loading {} {}:{}", new Object[] { uri.getType(), site, uri });
-        Set<? extends ResourceContent> content = resource.contents();
-        if (content.size() == 0) {
-          put(resource);
-        } else {
-          for (ResourceContent c : content)
-            resource.removeContent(c.getLanguage());
-          put(resource);
-          for (ResourceContent c : content) {
-            InputStream is = loadResourceContentFromBundle(uri, c);
-            if (is == null)
-              throw new ContentRepositoryException("Resource content " + c + " missing from repository");
-            putContent(uri, c, is);
+    try {
+      for (Iterator<ResourceURI> pi = getResourceURIsFromBundle(); pi.hasNext();) {
+        ResourceURI uri = pi.next();
+  
+        try {
+          Resource<?> resource = loadResourceFromBundle(uri);
+          if (resource == null) {
+            throw new ContentRepositoryException("Unable to load " + uri.getType() + " " + uri + " from bundle");
           }
+  
+          // Update the uri, it now contains the id in addition to just the path
+          uri = resource.getURI();
+  
+          // Make sure we are not updating existing resources, since this is the
+          // first time import.
+          if (exists(uri)) {
+            throw new ContentRepositoryException("Error adding resource " + uri + " to repository: a resource with id '" + uri.getId() + "' or path '" + uri.getPath() + "' already exists");
+          }
+  
+          logger.info("Loading {} {}:{}", new Object[] { uri.getType(), site, uri });
+          Set<? extends ResourceContent> content = resource.contents();
+          if (content.size() == 0) {
+            put(resource);
+          } else {
+            for (ResourceContent c : content)
+              resource.removeContent(c.getLanguage());
+            put(resource);
+            for (ResourceContent c : content) {
+              InputStream is = loadResourceContentFromBundle(uri, c);
+              if (is == null)
+                throw new ContentRepositoryException("Resource content " + c + " missing from repository");
+              putContent(uri, c, is);
+            }
+          }
+        } catch (IOException e) {
+          logger.error("Error reading " + uri.getType() + " " + uri + ": " + e.getMessage(), e);
+          throw new ContentRepositoryException(e);
         }
-      } catch (IOException e) {
-        logger.error("Error reading " + uri.getType() + " " + uri + ": " + e.getMessage(), e);
-        throw new ContentRepositoryException(e);
       }
+    } catch (ContentRepositoryException e) {
+      cleanupAfterFailure();
+      throw e;
+    }
+  }
+  
+  /**
+   * Closes the index and removes the bundle directory from disk.
+   */
+  private void cleanupAfterFailure() {
+    try {
+      index.close();
+      FileUtils.deleteDirectory(repositoryRoot);
+      logger.error("Site index and repository directory have been reset");
+    } catch (IOException e2) {
+      logger.error("Unable to clean up index and repository directory " + repositoryRoot);
     }
   }
 
@@ -177,7 +206,10 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
           long v = ResourceUtils.getVersion(FilenameUtils.getBaseName(entry.getPath()));
           ResourceURI resourceURI = new ResourceURIImpl(serializer.getType(), site, path, v);
           resourceURIs.add(resourceURI);
-          logger.trace("Found revision '{}' of {} {}", new Object[] {v, resourceURI.getType(), entry});
+          logger.trace("Found revision '{}' of {} {}", new Object[] {
+              v,
+              resourceURI.getType(),
+              entry });
         }
       }
     }
@@ -237,8 +269,8 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
    * @throws IOException
    *           if reading the resource fails
    */
-  protected InputStream loadResourceContentFromBundle(ResourceURI uri, ResourceContent content)
-      throws IOException {
+  protected InputStream loadResourceContentFromBundle(ResourceURI uri,
+      ResourceContent content) throws IOException {
     String uriPath = uri.getPath();
     if (uriPath == null)
       throw new IllegalArgumentException("Resource uri needs a path");
@@ -249,8 +281,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
         bundlePathPrefix,
         uri.getType() + "s",
         uriPath,
-        documentName
-    });
+        documentName });
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;

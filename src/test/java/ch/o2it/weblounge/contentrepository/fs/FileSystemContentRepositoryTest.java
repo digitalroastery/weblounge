@@ -47,6 +47,7 @@ import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -414,6 +415,7 @@ public class FileSystemContentRepositoryTest {
   @Test
   public void testPut() {
     int resources = populateRepository();
+    String newId = "4bb19980-8f98-4873-0000-71b6dfab22af";
 
     // Try to add a duplicate resource
     try {
@@ -426,13 +428,15 @@ public class FileSystemContentRepositoryTest {
 
     // Try to add a new resource
     try {
-      file.getURI().setIdentifier("4bb19980-8f98-4873-0000-71b6dfab22af");
+      file.getURI().setIdentifier(newId);
+      file.getURI().setPath(UrlSupport.concat(file.getURI().getPath(), "2"));
       repository.put(file);
       assertEquals(resources + 1, repository.getResourceCount());
     } catch (Exception e) {
       e.printStackTrace();
       fail("Error moving resource");
     }
+
   }
 
   /**

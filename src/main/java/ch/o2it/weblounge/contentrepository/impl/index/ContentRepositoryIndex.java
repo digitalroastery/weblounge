@@ -250,6 +250,24 @@ public class ContentRepositoryIndex {
     String path = uri.getPath();
     String type = uri.getType();
     long version = uri.getVersion();
+    
+    // Make sure we are not asked to add a resource to the index that has the
+    // same id as an existing one
+    if (id != null) {
+      for (long address : idIdx.locate(id)) {
+        if (id.equals(uriIdx.getId(address)) && versionIdx.hasVersion(address, version))
+          throw new ContentRepositoryException("Resource id '" + id + "' already exists");
+      }
+    }
+
+    // Make sure we are not asked to add a resource to the index that has the
+    // same path as an existing one
+    if (path != null) {
+      for (long address : pathIdx.locate(path)) {
+        if (path.equals(uriIdx.getPath(address)) && versionIdx.hasVersion(address, version))
+          throw new ContentRepositoryException("Resource path '" + path + "' already exists");
+      }
+    }
 
     long address = -1;
     if (id != null || path != null) {

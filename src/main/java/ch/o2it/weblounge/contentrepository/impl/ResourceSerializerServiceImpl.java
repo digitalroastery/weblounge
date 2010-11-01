@@ -66,7 +66,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
     ResourceSerializerFactory.setResourceSerializerService(this);
     siteTracker = new ResourceSerializerTracker(this, bundleContext);
     siteTracker.open();
-    logger.debug("Content repository service activated");
+    logger.debug("Resource serializer service activated");
   }
 
   /**
@@ -82,7 +82,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
     ResourceSerializerFactory.setResourceSerializerService(null);
     siteTracker.close();
     siteTracker = null;
-    logger.info("Content repository service stopped");
+    logger.info("Resource serializer service stopped");
   }
 
   /**
