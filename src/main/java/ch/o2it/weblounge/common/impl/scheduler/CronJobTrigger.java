@@ -131,6 +131,14 @@ public final class CronJobTrigger implements JobTrigger {
       throw new IllegalArgumentException("Cron schedule " + entry + " is malformed: " + t.getMessage(), t);
     }
   }
+  
+  /**
+   * Resets this trigger's memory, which is equal to setting its last execution
+   * date to <code>-1</code>.
+   */
+  public void reset() {
+    lastExecution = -1;
+  }
 
   /**
    * {@inheritDoc}

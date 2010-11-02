@@ -44,6 +44,7 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
+import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
@@ -756,10 +757,10 @@ public class SiteImpl implements Site {
     synchronized (modules) {
       for (Module module : modules.values()) {
         try {
-          logger.debug("Stopping module {}", module);
+          logger.debug("Stopping module '{}'", module);
           module.stop();
         } catch (Throwable t) {
-          logger.error("Error stopping module {}", module, t);
+          logger.error("Error stopping module '{}'", module, t);
         }
       }
     }
@@ -1198,10 +1199,14 @@ public class SiteImpl implements Site {
     if (scheduler == null)
       return;
 
+    // If this scheduling operation is due to a site restart, the job needs to
+    // be reset, otherwise fire-once jobs won't work.
+    job.getTrigger().reset();
+
     // Throw the job at quartz
     String groupName = "site " + this.getIdentifier();
     String jobIdentifier = job.getIdentifier();
-    Class<?> jobClass = job.getWorker();
+    Class<? extends JobWorker> jobClass = job.getWorker();
     JobTrigger trigger = job.getTrigger();
 
     synchronized (jobs) {
@@ -1211,8 +1216,8 @@ public class SiteImpl implements Site {
       jobData.put(QuartzJobWorker.CLASS, jobClass);
       jobData.put(QuartzJobWorker.CONTEXT, job.getContext());
       job.getContext().put(Site.class.getName(), this);
-      JobDetail quartzJob = new JobDetail(jobIdentifier, groupName, QuartzJobWorker.class);
-      quartzJob.setJobDataMap(jobData);
+      JobDetail jobDetail = new JobDetail(jobIdentifier, groupName, QuartzJobWorker.class);
+      jobDetail.setJobDataMap(jobData);
 
       // Define the trigger
       Trigger quartzTrigger = new QuartzJobTrigger(jobIdentifier, groupName, trigger);
@@ -1220,14 +1225,15 @@ public class SiteImpl implements Site {
 
       // Schedule
       try {
-        Date date = scheduler.scheduleJob(quartzJob, quartzTrigger);
+        Date date = scheduler.scheduleJob(jobDetail, quartzTrigger);
+        jobs.put(jobIdentifier, new QuartzJob(jobIdentifier, jobClass, trigger));
         String repeat = trigger.getNextExecutionAfter(date) != null ? " first" : "";
         logger.info("Job '{}' scheduled,{} execution at {}", new Object[] {
             jobIdentifier,
             repeat,
             date });
       } catch (SchedulerException e) {
-        logger.error("Error trying to schedule job {}: {}", new Object[] {
+        logger.error("Error trying to schedule job '{}': {}", new Object[] {
             jobIdentifier,
             e.getMessage(),
             e });

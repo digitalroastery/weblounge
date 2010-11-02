@@ -69,6 +69,16 @@ public class FireOnceJobTrigger implements JobTrigger {
       throw new IllegalStateException("This trigger should be fired once only");
     fired = true;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#reset()
+   */
+  public void reset() {
+    fireDate = null;
+    fired = false;
+  }
 
   /**
    * {@inheritDoc}

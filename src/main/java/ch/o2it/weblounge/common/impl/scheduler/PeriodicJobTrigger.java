@@ -326,6 +326,16 @@ public class PeriodicJobTrigger implements JobTrigger {
   public void setStartImmediately(boolean startImmediately) {
     this.startImmediately = startImmediately;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.scheduler.JobTrigger#reset()
+   */
+  public void reset() {
+    triggerCount = 0;
+    firstExecution = true;
+  }
 
   /**
    * {@inheritDoc}

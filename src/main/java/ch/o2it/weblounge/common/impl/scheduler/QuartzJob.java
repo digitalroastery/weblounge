@@ -219,6 +219,15 @@ public final class QuartzJob implements Job {
   public JobTrigger getTrigger() {
     return trigger;
   }
+  
+  /**
+   * Resets the job, which means that there will be no more evidence that the
+   * job has been run already. This is especially useful in the case where a
+   * site is stopped and restarted for maintenance.
+   */
+  public void reset() {
+    trigger.reset();
+  }
 
   /**
    * Returns the string representation of this job, which is equal to the value
