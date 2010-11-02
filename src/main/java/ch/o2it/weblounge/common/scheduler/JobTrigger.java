@@ -51,5 +51,10 @@ public interface JobTrigger {
    * @param date the firing date
    */
   void triggered(Date date);
+  
+  /**
+   * Resets this trigger.
+   */
+  void reset();
 
 }
