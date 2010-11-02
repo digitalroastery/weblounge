@@ -349,9 +349,9 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
    * pointing to the same resource.
    */
   public boolean equals(Object o) {
-    if (o instanceof LinkImpl) {
-      LinkImpl l = (LinkImpl) o;
-      return href.equals(l.href);
+    if (o instanceof Link) {
+      Link l = (Link) o;
+      return href.equals(l.getHref());
     }
     return false;
   }

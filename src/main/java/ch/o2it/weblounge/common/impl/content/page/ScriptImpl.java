@@ -284,9 +284,9 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    * as well pointing to the same script.
    */
   public boolean equals(Object o) {
-    if (o instanceof ScriptImpl) {
-      ScriptImpl s = (ScriptImpl) o;
-      return href.equals(s.href);
+    if (o instanceof Script) {
+      Script s = (Script) o;
+      return href.equals(s.getHref());
     }
     return false;
   }

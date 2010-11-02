@@ -50,7 +50,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class is the default implementation for an <code>HTMLAction</code>. The
@@ -109,7 +111,6 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   public void passivate() {
     super.passivate();
     page = null;
-    headers = null;
     renderer = null;
     infoMessages = null;
     warningMessages = null;
@@ -288,9 +289,27 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
+    
+    // The headers returned by getHTMLHeaders() may contain configured as well
+    // as unconfigured (containing ${module.root} in their paths) elements. This
+    // is why we need to make sure that we are not writing duplicates to the
+    // response by configuring all elements and then removing duplicates.
+
+    Set<HTMLHeadElement> processedHeaders = new HashSet<HTMLHeadElement>();
+
+    // Configure the elements and add them to a set
     for (HTMLHeadElement header : getHTMLHeaders()) {
       if (header instanceof DeclarativeHTMLHeadElement)
         ((DeclarativeHTMLHeadElement) header).configure(request, site, module);
+      processedHeaders.add(header);
+    }
+
+    // Clean the headers collection and write to the response what's left
+    for (HTMLHeadElement header : processedHeaders) {
+      if (headers.contains(header)) {
+        headers.remove(header);
+        headers.add(header);
+      }
       response.getWriter().println(header.toXml());
     }
     return SKIP_HEADER;
