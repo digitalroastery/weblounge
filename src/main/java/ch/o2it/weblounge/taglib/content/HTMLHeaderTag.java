@@ -73,12 +73,12 @@ public class HTMLHeaderTag extends WebloungeTag {
 
     // Start with the default processing
     Set<HTMLHeadElement> headElements = new HashSet<HTMLHeadElement>();
+    Site site = request.getSite();
 
     // Pagelets links & scripts
     Page page = (Page) request.getAttribute(WebloungeRequest.PAGE);
     if (page != null) {
       Pagelet[] pagelets = page.getPagelets();
-      Site site = request.getSite();
       for (Pagelet p : pagelets) {
         String moduleId = p.getModule();
         Module module = site.getModule(moduleId);
@@ -102,8 +102,12 @@ public class HTMLHeaderTag extends WebloungeTag {
 
     // Action links & scripts
     if (action != null) {
-      for (HTMLHeadElement l : action.getHTMLHeaders())
+      Module module = action.getModule();
+      for (HTMLHeadElement l : action.getHTMLHeaders()) {
+        if (l instanceof DeclarativeHTMLHeadElement)
+          ((DeclarativeHTMLHeadElement)l).configure(request, site, module);
         headElements.add(l);
+      }
     }
 
     // Write links & scripts to output
