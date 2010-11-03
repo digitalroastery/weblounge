@@ -26,11 +26,11 @@ package ch.o2it.weblounge.contentrepository;
 public interface VersionedContentRepositoryIndex {
 
   /** Version of this index */
-  int IDX_VERSION = 1;
+  int INDEX_VERSION = 1;
 
   /**
    * Returns the index's version number. If that number is different from
-   * {@link #IDX_VERSION}, a reindex is needed, since the index's structure
+   * {@link #INDEX_VERSION}, a reindex is needed, since the index's structure
    * could have changed significantly.
    * 
    * @return the index version
