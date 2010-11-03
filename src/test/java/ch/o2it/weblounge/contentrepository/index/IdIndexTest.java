@@ -254,7 +254,7 @@ public class IdIndexTest {
    */
   @Test
   public void testGetIndexVersion() {
-    assertEquals(VersionedContentRepositoryIndex.IDX_VERSION, idx.getIndexVersion());
+    assertEquals(VersionedContentRepositoryIndex.INDEX_VERSION, idx.getIndexVersion());
   }
 
 }

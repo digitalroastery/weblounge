@@ -257,7 +257,7 @@ public class BundleContentRepository extends AbstractContentRepository {
     boolean success = false;
 
     // Make sure the version matches the implementation
-    if (index.getIndexVersion() != VersionedContentRepositoryIndex.IDX_VERSION) {
+    if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.warn("Index version does not match implementation, triggering reindex");
     }
 

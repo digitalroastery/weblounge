@@ -381,7 +381,7 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testIndexVersion() {
-    assertEquals(VersionedContentRepositoryIndex.IDX_VERSION, idx.getIndexVersion());
+    assertEquals(VersionedContentRepositoryIndex.INDEX_VERSION, idx.getIndexVersion());
     
     // Overwrite the version number with 0, which is an invalid value
     try {

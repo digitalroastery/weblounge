@@ -39,10 +39,18 @@ import java.io.RandomAccessFile;
  * to versions. In order to quickly get to an entry, use the <code>id</code> or
  * <code>path</code> index.
  * 
+ * Header:
  * <pre>
- * | slot | id      | versions
+ * | index version | bytes per id | # of versions per entry | # of slots | # of entries |  
+ * | (int)         | (int)        | (int)                   | (long)     | (long)       |  
+ * </pre>
+ * 
+ * <pre>
+ * Entries:
+ * <pre>
+ * | id      | count | versions
  * |------------------------------------------
- * | 1    | a-b-c-d | 1 876876876
+ * | a-b-c-d | 6     | 1 876876876
  * </pre>
  */
 public class VersionIndex implements VersionedContentRepositoryIndex {
@@ -53,29 +61,34 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
   /** Name for the version index file */
   public static final String VERSION_IDX_NAME = "version.idx";
 
+  
+  /** Start of the index's header */
+  protected static final long IDX_START_OF_HEADER = 0;
+
   /** Location of the version header */
-  protected static final long IDX_VERSION_HEADER_LOCATION = 0;
+  protected static final long IDX_HEADER_VERSION = IDX_START_OF_HEADER;
 
   /** Location of the bytes-per-id header */
-  protected static final long IDX_BYTES_PER_ID_HEADER_LOCATION = 4;
+  protected static final long IDX_HEADER_BYTES_PER_ID = IDX_HEADER_VERSION + 4;
 
   /** Location of the versions-per-entry header */
-  protected static final long IDX_VERSIONS_PER_ENTRY_HEADER_LOCATION = 8;
+  protected static final long IDX_HEADER_VERSIONS_PER_ENTRY = IDX_HEADER_BYTES_PER_ID + 4;
 
   /** Location of the entries header */
-  protected static final long IDX_SLOTS_HEADER_LOCATION = 12;
+  protected static final long IDX_HEADER_SLOTS = IDX_HEADER_VERSIONS_PER_ENTRY + 4;
 
   /** Location of the entries header */
-  protected static final long IDX_ENTRIES_HEADER_LOCATION = 20;
+  protected static final long IDX_HEADER_ENTRIES = IDX_HEADER_SLOTS + 8;
 
-  /** Number of bytes that are used for the index header */
-  protected static final int IDX_HEADER_SIZE = 28;
+  /** Start of the index's body */
+  protected static final long IDX_START_OF_CONTENT = IDX_HEADER_ENTRIES + 8;
 
+  
   /** Default number of bytes used per id */
-  private static final int IDX_BYTES_PER_ID = 36;
+  private static final int DEFAULT_BYTES_PER_ID = 36;
 
   /** Default number of versions per index entry */
-  private static final int IDX_VERSIONS_PER_ENTRY = 10;
+  private static final int DEFAULT_VERSIONS_PER_ENTRY = 10;
 
   /** The index file */
   protected RandomAccessFile idx = null;
@@ -90,13 +103,13 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
   protected int indexVersion = -1;
 
   /** Number of bytes per id */
-  protected int bytesPerId = IDX_BYTES_PER_ID;
+  protected int bytesPerId = DEFAULT_BYTES_PER_ID;
 
   /** Number of versions per entry */
-  protected int versionsPerEntry = IDX_VERSIONS_PER_ENTRY;
+  protected int versionsPerEntry = DEFAULT_VERSIONS_PER_ENTRY;
 
   /** Number of bytes per entry */
-  protected int bytesPerEntry = bytesPerId + IDX_VERSIONS_PER_ENTRY * 8;
+  protected int bytesPerEntry = bytesPerId + DEFAULT_VERSIONS_PER_ENTRY * 8;
 
   /** Number of entries */
   protected long entries = 0;
@@ -121,7 +134,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    *           if reading from the index fails
    */
   public VersionIndex(File indexRootDir, boolean readOnly) throws IOException {
-    this(indexRootDir, readOnly, IDX_BYTES_PER_ID, IDX_VERSIONS_PER_ENTRY);
+    this(indexRootDir, readOnly, DEFAULT_BYTES_PER_ID, DEFAULT_VERSIONS_PER_ENTRY);
   }
 
   /**
@@ -143,7 +156,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    */
   public VersionIndex(File indexRootDirectory, boolean readOnly, int versions)
       throws IOException {
-    this(indexRootDirectory, readOnly, IDX_BYTES_PER_ID, versions);
+    this(indexRootDirectory, readOnly, DEFAULT_BYTES_PER_ID, versions);
   }
 
   /**
@@ -179,13 +192,16 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
     // Read index header information
     try {
+      idx.seek(IDX_START_OF_HEADER);
       this.indexVersion = idx.readInt();
-      if (indexVersion != IDX_VERSION)
-        logger.warn("Version index version mismatch (found {}, expected {}), consider reindex", indexVersion, IDX_VERSION);
+      if (indexVersion != INDEX_VERSION)
+        logger.warn("Version index version mismatch (found {}, expected {}), consider reindex", indexVersion, INDEX_VERSION);
       this.bytesPerId = idx.readInt();
       this.versionsPerEntry = idx.readInt();
       this.slots = idx.readLong();
       this.entries = idx.readLong();
+      
+      // An entry consists of the id, the version count and the version entries
       this.bytesPerEntry = bytesPerId + 4 + versionsPerEntry * 8;
       
       // If the index contains entries, we can't reduce the index size 
@@ -233,7 +249,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @return the index size
    */
   public synchronized long size() {
-    return IDX_HEADER_SIZE + (slots * bytesPerEntry);
+    return IDX_START_OF_CONTENT + (slots * bytesPerEntry);
   }
 
   /**
@@ -283,7 +299,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     long entry = slots;
 
     // See if there is an empty slot
-    long address = IDX_HEADER_SIZE;
+    long address = IDX_START_OF_CONTENT;
     long e = 0;
     idx.seek(address);
     while (e < slots) {
@@ -335,7 +351,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     if (id != null && id.getBytes().length != bytesPerId)
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
-    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
     int existingVersionCount = 0;
 
     // Make sure there is still room left for an additional entry
@@ -346,7 +362,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
       if (existingVersionCount >= versionsPerEntry) {
         logger.info("Adding additional language, triggering index resize");
         resize(bytesPerId, versionsPerEntry * 2);
-        startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+        startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
       }
     } else if (id == null) {
       throw new IllegalArgumentException("Identifier required to create a new entry");
@@ -368,7 +384,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     // Update the file header
     if (entry >= slots) {
       slots++;
-      idx.seek(IDX_SLOTS_HEADER_LOCATION);
+      idx.seek(IDX_HEADER_SLOTS);
       idx.writeLong(slots);
       idx.writeLong(entries);
       logger.debug("Added uri with id '{}' and initial version '{}' as entry no {}", new Object[] {
@@ -376,7 +392,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
           ResourceUtils.getVersionString(version),
           entries });
     } else {
-      idx.seek(IDX_ENTRIES_HEADER_LOCATION);
+      idx.seek(IDX_HEADER_ENTRIES);
       idx.writeLong(entries);
       logger.debug("Added version '{}' to uri with id '{}'", ResourceUtils.getVersionString(version), id);
     }
@@ -394,7 +410,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    *           if removing the entry from the index fails
    */
   public synchronized void delete(long entry) throws IOException {
-    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
 
     idx.seek(startOfEntry + bytesPerId);
     int existingVersions = idx.readInt();
@@ -406,7 +422,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
     // Update the file header
     entries -= existingVersions;
-    idx.seek(IDX_ENTRIES_HEADER_LOCATION);
+    idx.seek(IDX_HEADER_ENTRIES);
     idx.writeLong(entries);
 
     logger.debug("Removed all versions at address '{}' from index", entry);
@@ -424,7 +440,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    *           if removing the entry from the index fails
    */
   public synchronized void delete(long entry, long version) throws IOException {
-    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
 
     // Remove the version from the indicated entry
     idx.seek(startOfEntry);
@@ -461,7 +477,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
     // Adjust the header
     entries--;
-    idx.seek(IDX_ENTRIES_HEADER_LOCATION);
+    idx.seek(IDX_HEADER_ENTRIES);
     idx.writeLong(entries);
 
     logger.debug("Removed version '{}' from uri '{}' from index", version, entry);
@@ -490,7 +506,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized long[] getVersions(long entry) throws IOException,
       EOFException {
-    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
     int v = idx.readInt();
@@ -517,7 +533,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized boolean hasVersion(long entry, long version)
       throws IOException, EOFException {
-    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
     int v = idx.readInt();
@@ -542,7 +558,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized boolean hasVersions(long entry) throws IOException,
       EOFException {
-    long startOfEntry = IDX_HEADER_SIZE + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
     return idx.readInt() > 0;
@@ -558,20 +574,23 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    *           writing to the index fails
    */
   private void init(int bytesPerId, int versionsPerEntry) throws IOException {
-    this.indexVersion = IDX_VERSION;
+    this.indexVersion = INDEX_VERSION;
     this.bytesPerId = bytesPerId;
     this.versionsPerEntry = versionsPerEntry;
     this.bytesPerEntry = bytesPerId + 4 + versionsPerEntry * 8;
 
+    this.slots = 0;
+    this.entries = 0;
+
     logger.info("Creating version index with {} bytes per entry", bytesPerEntry);
 
     // Write header
-    idx.seek(0);
+    idx.seek(IDX_START_OF_HEADER);
     idx.writeInt(indexVersion);
     idx.writeInt(bytesPerId);
     idx.writeInt(versionsPerEntry);
-    idx.writeLong(0);
-    idx.writeLong(0);
+    idx.writeLong(slots);
+    idx.writeLong(entries);
 
     // If this file used to contain entries, we just null out the rest
     try {
@@ -583,9 +602,6 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     } catch (EOFException e) {
       // That's ok, we wanted to write until the very end
     }
-
-    this.slots = 0;
-    this.entries = 0;
 
     logger.debug("Version index created");
   }
@@ -633,7 +649,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     }
 
     // Write header
-    idxNew.seek(0);
+    idxNew.seek(IDX_START_OF_HEADER);
     idxNew.writeInt(indexVersion);
     idxNew.writeInt(newBytesPerId);
     idxNew.writeInt(newVersionsPerEntry);
@@ -641,7 +657,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
     idxNew.writeLong(entries);
 
     // Copy the current index to the new one
-    idx.seek(IDX_HEADER_SIZE);
+    idx.seek(IDX_START_OF_CONTENT);
     for (int i = 0; i < this.entries; i++) {
       byte[] bytes = new byte[this.bytesPerEntry];
       idx.read(bytes);

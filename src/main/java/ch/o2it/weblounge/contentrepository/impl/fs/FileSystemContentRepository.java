@@ -644,7 +644,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     }
 
     // Make sure the version matches the implementation
-    else if (index.getIndexVersion() != VersionedContentRepositoryIndex.IDX_VERSION) {
+    else if (index.getIndexVersion() != VersionedContentRepositoryIndex.INDEX_VERSION) {
       logger.warn("Index version does not match implementation, triggering reindex");
       index();
     }
