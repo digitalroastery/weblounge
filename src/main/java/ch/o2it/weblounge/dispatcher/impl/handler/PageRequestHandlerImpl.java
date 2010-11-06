@@ -169,7 +169,10 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
             pageURI = getPageURIForAction(action, request);
           else
             pageURI = new PageURIImpl(request);
-          page = (Page)contentRepository.get(pageURI);
+
+          if (contentRepository.exists(pageURI)) {
+            page = (Page)contentRepository.get(pageURI);
+          }
         } catch (ContentRepositoryException e) {
           logger.error("Unable to load page {}: {}", new Object[] {
               pageURI,
