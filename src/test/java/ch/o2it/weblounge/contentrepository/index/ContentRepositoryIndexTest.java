@@ -33,6 +33,7 @@ import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
@@ -63,6 +64,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -115,12 +117,11 @@ public class ContentRepositoryIndexTest {
     FileUtils.deleteDirectory(indexRootDirectory);
     idx = new FileSystemContentRepositoryIndex(indexRootDirectory);
 
-    PageTemplate t = EasyMock.createNiceMock(PageTemplate.class);
-    EasyMock.expect(t.getStage()).andReturn("main");
-    EasyMock.replay(t);
+    PageTemplate t = new PageTemplateImpl("home", new URL("http://localhost/home.jsp"));
+    t.setStage("main");
 
     site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getTemplate("home")).andReturn(t);
+    EasyMock.expect(site.getTemplate((String)EasyMock.anyObject())).andReturn(t).anyTimes();
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
     EasyMock.replay(site);
 
@@ -145,7 +146,6 @@ public class ContentRepositoryIndexTest {
    */
   @After
   public void tearDown() throws Exception {
-    idx.clear();
     idx.close();
     FileUtils.deleteDirectory(indexRootDirectory);
   }
@@ -383,7 +383,7 @@ public class ContentRepositoryIndexTest {
       List<Page> pages = new ArrayList<Page>();
       for (int i = 0; i < 100; i++) {
         StringBuffer b = new StringBuffer("/");
-        for (int j = 0; j < (i % 3) + 1; j++) {
+        for (int j = 0; j < (i % 4) + 1; j++) {
           b.append(UUID.randomUUID().toString());
           b.append("/");
         }
@@ -391,6 +391,7 @@ public class ContentRepositoryIndexTest {
         String id = UUID.randomUUID().toString();
         Page p = new PageImpl(new PageURIImpl(site, path, id));
         p.setTemplate("home");
+        p.setTitle("title", english);
         pages.add(p);
         ResourceURI uri = idx.add(p);
         assertEquals(id, uri.getId());
@@ -403,7 +404,7 @@ public class ContentRepositoryIndexTest {
         assertTrue(idx.exists(p.getURI()));
         assertEquals(p.getURI().getId(), idx.getIdentifier(p.getURI()));
         assertEquals(p.getURI().getPath(), idx.getPath(p.getURI()));
-        assertEquals(0, idx.getLanguages(p.getURI()).length);
+        assertEquals(1, idx.getLanguages(p.getURI()).length);
         assertEquals(1, idx.getRevisions(p.getURI()).length);
       }
     } catch (Exception e) {
