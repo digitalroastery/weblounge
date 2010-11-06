@@ -375,8 +375,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     idx.seek(startOfEntry);
     idx.write(id.getBytes());
     idx.write(type.getBytes());
-    for (int i = 0; i < bytesPerType - type.length(); i++)
-      idx.writeByte(0);
+    idx.write(new byte[bytesPerType - type.getBytes().length]);
     idx.write(path.getBytes());
     idx.writeChar('\n');
     idx.write(new byte[bytesPerPath - pathLengthInBytes - 2]);
@@ -473,8 +472,8 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     // Write the path to the index
     idx.seek(startOfEntry);
     idx.skipBytes(bytesPerId);
-    idx.write(new byte[bytesPerType - type.length()]);
     idx.write(type.getBytes());
+    idx.write(new byte[bytesPerType - type.getBytes().length]);
     idx.write(path.getBytes());
     idx.writeChar('\n');
     idx.write(new byte[bytesPerPath - pathLengthInBytes - 2]);
@@ -592,7 +591,6 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     this.bytesPerPath = bytesPerPath;
     this.bytesPerSlot = bytesPerId + bytesPerType + bytesPerPath;
     this.entries = 0;
-    this.slots = 0;
 
     logger.info("Creating uri index with {} bytes per entry", bytesPerSlot);
 

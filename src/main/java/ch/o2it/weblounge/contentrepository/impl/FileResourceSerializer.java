@@ -75,4 +75,14 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
     return new FileContentReader();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "File serializer";
+  }
+
 }

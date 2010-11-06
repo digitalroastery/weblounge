@@ -73,5 +73,15 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
       throws ParserConfigurationException, SAXException {
     return null;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Page serializer";
+  }
 
 }

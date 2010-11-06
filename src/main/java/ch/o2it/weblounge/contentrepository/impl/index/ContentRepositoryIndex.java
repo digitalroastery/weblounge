@@ -285,7 +285,7 @@ public class ContentRepositoryIndex {
       }
 
       // Make sure we have a path
-      if (path == null || version != Resource.LIVE) {
+      if (path == null) {
         path = UrlSupport.concat("/" + type + "s", id);
       }
 
@@ -653,7 +653,11 @@ public class ContentRepositoryIndex {
    */
   public boolean exists(ResourceURI uri) throws IOException {
     long address = toURIEntry(uri);
-    return address > -1 && versionIdx.hasVersion(address, uri.getVersion());
+    if (address < 0)
+      return false;
+    if (uri.getType() != null && !uri.getType().equals(uriIdx.getType(address)))
+      return false;
+    return versionIdx.hasVersion(address, uri.getVersion());
   }
 
   /**

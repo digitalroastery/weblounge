@@ -52,8 +52,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -152,7 +150,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         return;
       }
       for (ResourceSerializer<?, ?> serializer : serializers) {
-        resourceCount += index(serializer.getType());
+        long added = index(serializer.getType());
+        if (added > 0)
+          logger.info("Added {} {}s to index", added, serializer.getType().toLowerCase());
+        resourceCount += added;
       }
 
       if (resourceCount > 0) {
@@ -204,7 +205,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     logger.info("Populating site index '{}' with {}s...", site, resourceType);
 
-    Map<String, ResourceSerializer<?, ?>> serializers = new HashMap<String, ResourceSerializer<?, ?>>();
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+    if (serializer == null) {
+      logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
+      return 0;
+    }
+
     File restructuredResources = new File(repositoryRoot, "." + resourceDirectory);
     long resourceCount = 0;
     long resourceVersionCount = 0;
@@ -230,19 +236,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
             uris.push(f);
           } else {
             try {
-              // Look for a suitable resource reader
-              ResourceSerializer<?, ?> serializer = serializers.get(resourceType);
-              if (serializer == null) {
-                serializer = ResourceSerializerFactory.getSerializer(resourceType);
-                if (serializer == null) {
-                  logger.warn("Skipping resource {}: no resource serializer found for type '{}'", f, resourceType);
-                  continue;
-                } else {
-                  serializers.put(resourceType, serializer);
-                }
-              }
-
-              // Load the resource
               Resource<?> resource = null;
               ResourceURI uri = null;
               ResourceReader<?, ?> reader = serializer.getReader();

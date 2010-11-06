@@ -83,4 +83,14 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
     return new ImageContentReader();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Image serializer";
+  }
+
 }

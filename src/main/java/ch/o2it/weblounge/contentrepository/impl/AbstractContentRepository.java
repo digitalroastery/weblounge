@@ -199,6 +199,8 @@ public abstract class AbstractContentRepository implements ContentRepository {
     try {
       if (uri.getType() == null) {
         uri.setType(index.getType(uri));
+      } else if (!uri.getType().equals(index.getType(uri))) {
+        return null;
       }
     } catch (IOException e) {
       logger.error("Error looking up type for {}: {}", uri, e.getMessage());
@@ -209,6 +211,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
     InputStream is = null;
     try {
       is = openStreamToResource(uri);
+      if (is == null) {
+        logger.debug("Resource {} not found, probably due to wrong resource type", uri);
+        return null;
+      }
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
