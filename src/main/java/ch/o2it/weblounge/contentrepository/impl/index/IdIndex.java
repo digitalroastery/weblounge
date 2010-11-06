@@ -38,11 +38,17 @@ import java.io.RandomAccessFile;
  * representations of page identifiers to slot numbers in the <code>URI</code>
  * or the <code>Tree</code> index.
  * 
+ * Header:
  * <pre>
- * | slot | entries | slot number in tree.idx
+ * | index version | # of ids per entry | # of slots | # of entries |  
+ * | (int)         | (int)              | (long)     | (long)       |  
+ * </pre>
+ * 
+ * <pre>
+ * | # entries in slot | slot number in tree.idx
  * |------------------------------------------
- * | 1    | 2       | addressOf(a-b-c-d), addressOf(e-f-g-h)
- * | 2    | 1       | addressOf(u-v-w-y)
+ * | 2                 | addressOf(a-b-c-d), addressOf(e-f-g-h)
+ * | 1                 | addressOf(u-v-w-y)
  * </pre>
  * 
  * The index is made up of a header which consists of the number of slots (4
@@ -72,7 +78,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
   protected static final long IDX_HEADER_SLOTS = IDX_HEADER_ENTRIES_PER_SLOT + 4;
 
   /** Location of the entries header */
-  protected static final long IDX_HEADER_ENTRIES = IDX_HEADER_ENTRIES_PER_SLOT + 8;
+  protected static final long IDX_HEADER_ENTRIES = IDX_HEADER_SLOTS + 8;
 
   /** Start of the index's body */
   protected static final long IDX_START_OF_CONTENT = IDX_HEADER_ENTRIES + 8;
@@ -81,8 +87,8 @@ public class IdIndex implements VersionedContentRepositoryIndex {
   /** Default number of slots in index */
   private static final int DEFAULT_SLOTS = 128;
 
-  /** Default number of addresses per index entries */
-  private static final int DEFAULT_ADDRESSES_PER_ENTRY = 64;
+  /** Default number of addresses per index slot */
+  private static final int DEFAULT_ENTRIES_PER_SLOT = 64;
 
   /** Size of an entry (long) in bytes */
   protected static final int DEFAULT_ENTRY_SIZE = 8;
@@ -100,10 +106,10 @@ public class IdIndex implements VersionedContentRepositoryIndex {
   protected int indexVersion = -1;
 
   /** Number of paths per slot */
-  protected int entriesPerSlot = DEFAULT_ADDRESSES_PER_ENTRY;
+  protected int entriesPerSlot = DEFAULT_ENTRIES_PER_SLOT;
 
   /** Number of paths per slot */
-  protected long slotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+  protected int slotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
 
   /** Number of slots in the ids index */
   protected long slots = DEFAULT_SLOTS;
@@ -123,7 +129,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    *           if reading from the index fails
    */
   public IdIndex(File indexRootDir, boolean readOnly) throws IOException {
-    this(indexRootDir, readOnly, DEFAULT_SLOTS, DEFAULT_ADDRESSES_PER_ENTRY);
+    this(indexRootDir, readOnly, DEFAULT_SLOTS, DEFAULT_ENTRIES_PER_SLOT);
   }
 
   /**
@@ -271,15 +277,16 @@ public class IdIndex implements VersionedContentRepositoryIndex {
     long slot = findSlot(id);
     long startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
 
-    // Make sure there is still room left
-    // for an additional address
+    // Make sure there is still room left for an additional address
     idx.seek(startOfSlot);
     int entriesInSlot = idx.readInt();
     if (entriesInSlot == entriesPerSlot) {
       logger.info("Maximum slot size reached, triggering index resize");
       resize(slots, entriesPerSlot * 2);
+      slot = findSlot(id);
       startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
       idx.seek(startOfSlot);
+      entriesInSlot = idx.readInt();
     }
 
     // Add the new address at the end
@@ -399,12 +406,12 @@ public class IdIndex implements VersionedContentRepositoryIndex {
     idx.seek(startOfSlot);
     int entriesInSlot = idx.readInt();
 
-    long[] ids = new long[entriesInSlot];
+    long[] addresses = new long[entriesInSlot];
     for (int i = 0; i < entriesInSlot; i++) {
       long address = idx.readLong();
-      ids[i] = address;
+      addresses[i] = address;
     }
-    return ids;
+    return addresses;
   }
 
   /**
@@ -440,7 +447,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
     idx.writeLong(entries);
 
     // Write entries
-    byte[] entry = new byte[4 + entriesPerSlot * 8];
+    byte[] entry = new byte[slotSizeInBytes];
     for (int i = 0; i < slots; i++) {
       idx.write(entry);
     }
@@ -468,29 +475,29 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized void resize(long slots, int entriesPerSlot)
       throws IOException {
-    if (this.slots != slots && this.entries > 0)
+    if (slots != this.slots && this.entries > 0)
       throw new IllegalStateException("Cannot resize the number of slots when there are entries in the index");
-    if (this.entriesPerSlot > entriesPerSlot && this.entries > 0)
+    if (entriesPerSlot < this.entriesPerSlot  && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of entries per slot when there are entries in the index");
     if (this.isReadOnly)
       throw new IllegalStateException("This index is readonly");
 
-    logger.info("Resizing id index with {} entries to {} bytes per entry", entries, entriesPerSlot);
+    logger.info("Resizing id index to {} ({}) slots and {} ({}) entries per slot", new Object[] { slots, this.slots, entriesPerSlot, this.entriesPerSlot });
 
-    String idxFilename = idxFile.getName();
-    String fileName = FilenameUtils.getBaseName(idxFilename);
-    String fileExtension = FilenameUtils.getExtension(idxFilename);
+    String fileName = FilenameUtils.getBaseName(idxFile.getName());
+    String fileExtension = FilenameUtils.getExtension(idxFile.getName());
     String idxFilenameNew = fileName + "_resized." + fileExtension;
-    File newIdxFile = new File(idxFile.getParentFile(), idxFilenameNew);
+    File idxNewFile = new File(idxFile.getParentFile(), idxFilenameNew);
     long time = System.currentTimeMillis();
 
-    logger.debug("Creating resized index at " + newIdxFile);
+    logger.debug("Creating resized index at " + idxNewFile);
 
+    // Create the new index
     RandomAccessFile idxNew = null;
     try {
-      idxNew = new RandomAccessFile(newIdxFile, "rwd");
+      idxNew = new RandomAccessFile(idxNewFile, "rwd");
     } catch (FileNotFoundException e) {
-      throw new IllegalArgumentException("Index file " + newIdxFile + " cannot be created: " + e.getMessage(), e);
+      throw new IllegalArgumentException("Index file " + idxNewFile + " cannot be created: " + e.getMessage(), e);
     }
 
     // Write header
@@ -500,34 +507,44 @@ public class IdIndex implements VersionedContentRepositoryIndex {
     idxNew.writeLong(slots);
     idxNew.writeLong(entries);
 
+    // Position to read the whole content
+    idx.seek(IDX_START_OF_CONTENT);
+    
     // Write entries
+    int newSlotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
     for (int i = 0; i < slots; i++) {
-      byte[] bytes = new byte[4 + entriesPerSlot * 8];
+      byte[] bytes = new byte[newSlotSizeInBytes];
       if (i < this.slots) {
-        idx.read(bytes, 0, 4 + this.entriesPerSlot * 8);
+        idx.read(bytes, 0, this.slotSizeInBytes);
         idxNew.write(bytes);
       } else {
+        // Write an empty line
         idxNew.write(bytes);
       }
     }
 
-    idxNew.close();
-
     logger.debug("Removing old index at " + idxFile);
-    idxFile.delete();
+
+    // Close and delete the old index
+    idx.close();
+    if (!idxFile.delete())
+      throw new IOException("Unable to delete old index file " + idxFile);
+
+    // Close the new index, and move it into the old index' place
     logger.debug("Moving resized index into regular position at " + idxFile);
-    newIdxFile.renameTo(idxFile);
+    idxNew.close();
+    if (!idxNewFile.renameTo(idxFile))
+      throw new IOException("Unable to move new index file to " + idxFile);
 
     try {
       idx = new RandomAccessFile(idxFile, "rwd");
     } catch (FileNotFoundException e) {
-      throw new IllegalArgumentException("Index file " + newIdxFile + " cannot be created: " + e.getMessage(), e);
+      throw new IllegalArgumentException("Index file " + idxNewFile + " cannot be created: " + e.getMessage(), e);
     }
 
     this.entriesPerSlot = entriesPerSlot;
-    this.idxFile = newIdxFile;
     this.slots = slots;
-    this.slotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+    this.slotSizeInBytes = newSlotSizeInBytes;
     long totalEntries = slots * entriesPerSlot;
 
     time = System.currentTimeMillis() - time;

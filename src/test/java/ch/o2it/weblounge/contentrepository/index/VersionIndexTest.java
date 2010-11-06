@@ -20,11 +20,9 @@
 
 package ch.o2it.weblounge.contentrepository.index;
 
-import static org.junit.Assert.assertFalse;
-
-import static org.junit.Assert.assertTrue;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Resource;
@@ -38,6 +36,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -177,6 +177,67 @@ public class VersionIndexTest {
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Adds some entries while making sure that a resize operation is triggered,
+   * then clears the index, adds the entries again and then makes sure
+   * everything can be looked up as expected.
+   */
+  @Test
+  public void testExercise() {
+    int entries = 2 * (int)idx.getSlots() * idx.getEntriesPerSlot();
+    Map<String, Long> ids = new HashMap<String, Long>(entries);
+    
+    // Add a number of entries to the index, clear and re-add
+    for (int take = 0; take < 2; take++) {
+    
+      for (int i = 0; i < entries; i++) {
+        String uuid = UUID.randomUUID().toString();
+        long initialVersion = uuid.hashCode();
+        try {
+          long address = idx.add(uuid, initialVersion);
+          ids.put(uuid, address);
+          assertEquals(i + 1, idx.getEntries());
+          for (int j = 0; j < (address % (2 * idx.getEntriesPerSlot())); j++)
+            idx.addVersion(address, initialVersion + j);
+          assertEquals(i + 1 + i % (2 * idx.getEntriesPerSlot()), idx.getEntries());
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+
+      // After the first take, clear the index
+      if (take == 0) {
+        try {
+          idx.clear();
+          ids.clear();
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+
+    }
+    
+    // Retrieve all of the entries
+    for (Map.Entry<String, Long> entry : ids.entrySet()) {
+      String uuid = entry.getKey();
+      long address = entry.getValue();
+      long expectedVersions = address % (2 * idx.getEntriesPerSlot());
+      long initialVersion = uuid.hashCode();
+      long[] versions;
+      try {
+        versions = idx.getVersions(address);
+        assertEquals(expectedVersions, versions.length);
+        for (int j = 1; j < expectedVersions; j++)
+          assertEquals("Expected version not found", initialVersion + j, versions[j]);
+      } catch (IOException e) {
+        e.printStackTrace();
+        fail(e.getMessage());
+      }
     }
   }
 

@@ -32,6 +32,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -64,7 +66,7 @@ public class IdIndexTest {
     if (indexFile.exists())
       indexFile.delete();
     idx = new IdIndex(tmpDir, false, slotsInIndex, entriesPerSlot);
-    expectedSize = 20 + (slotsInIndex * (4 + entriesPerSlot * 8));
+    expectedSize = 24 + (slotsInIndex * (4 + entriesPerSlot * 8));
   }
 
   /**
@@ -147,6 +149,67 @@ public class IdIndexTest {
   }
 
   /**
+   * Adds some entries while making sure that a resize operation is triggered,
+   * then clears the index, adds the entries again and then makes sure
+   * everything can be looked up as expected.
+   */
+  @Test
+  public void testExercise() {
+    int entries = 2 * (int) idx.getSlots() * idx.getEntriesPerSlot();
+    List<String> uuids = new ArrayList<String>(entries);
+
+    // Add a number of entries to the index, clear and re-add
+    for (int take = 0; take < 2; take++) {
+      
+      for (int i = 0; i < entries; i++) {
+        String uuid = UUID.randomUUID().toString();
+        uuids.add(uuid);
+        long address = uuid.hashCode();
+        try {
+          idx.set(address, uuid);
+          assertEquals(i + 1, idx.getEntries());
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+
+      // After the first take, clear the index
+      if (take == 0) {
+        try {
+          idx.clear();
+          uuids.clear();
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+
+    }
+
+    // Retrieve all of the entries
+    for (String uuid : uuids) {
+      long address = uuid.hashCode();
+      long[] possibleAddresses;
+      try {
+        possibleAddresses = idx.locate(uuid);
+        boolean found = false;
+        for (long a : possibleAddresses) {
+          if (a == address) {
+            found = true;
+            break;
+          }
+        }
+        if (!found)
+          fail("Address not found in candidates returned by index");
+      } catch (IOException e) {
+        e.printStackTrace();
+        fail(e.getMessage());
+      }
+    }
+  }
+
+  /**
    * Test method for
    * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#delete(long, java.lang.String)}
    * .
@@ -217,19 +280,27 @@ public class IdIndexTest {
   @Test
   public void testResize() {
     String uuid = UUID.randomUUID().toString();
-    long address = 2384762;
-    
+    long adressOfUUID = 12345;
+
+    int indexHeaderSize = 24;
+    long newEntriesPerSlot = entriesPerSlot * 3;
+    long newSlotSize = 4 + newEntriesPerSlot * 8;
+
     // Resize to the same size
     try {
-      idx.set(address, uuid);
+      idx.set(adressOfUUID, uuid);
       idx.resize(slotsInIndex, entriesPerSlot * 3);
       assertEquals(slotsInIndex, idx.getSlots());
-      assertEquals(entriesPerSlot * 3, idx.getEntriesPerSlot());
+      assertEquals(newEntriesPerSlot, idx.getEntriesPerSlot());
       assertEquals(1, idx.getEntries());
-      assertEquals(20 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
+
+      // Header size + (slots * slot size)
+      long newSize = indexHeaderSize + (slotsInIndex * newSlotSize);
+
+      assertEquals(newSize, idx.size());
       long[] candidates = idx.locate(uuid);
       assertEquals(1, candidates.length);
-      assertEquals(address, candidates[0]);
+      assertEquals(adressOfUUID, candidates[0]);
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -246,7 +317,7 @@ public class IdIndexTest {
       // Expected
     }
   }
-  
+
   /**
    * Test method for
    * {@link ch.o2it.weblounge.contentrepository.impl.index.IdIndex#getIndexVersion()}

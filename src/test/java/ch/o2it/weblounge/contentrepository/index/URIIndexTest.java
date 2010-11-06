@@ -33,6 +33,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -153,6 +155,80 @@ public class URIIndexTest {
     } catch (IOException e) {
       e.printStackTrace();
       fail("Error adding entry to the index");
+    }
+  }
+
+  /**
+   * Adds some entries while making sure that a resize operation is triggered,
+   * then clears the index, adds the entries again and then makes sure
+   * everything can be looked up as expected.
+   */
+  @Test
+  public void testExercise() {
+    int entries = 2 * (int)idx.getSlots();
+    String[] possibleTypes = new String[] { "page", "file", "image" };
+ 
+    List<Long> addresses = new ArrayList<Long>();
+    List<String> ids = new ArrayList<String>();
+    List<String> types = new ArrayList<String>();
+    List<String> paths = new ArrayList<String>();
+    
+    // Add a number of entries to the index, clear and re-add
+    for (int take = 0; take < 2; take++) {
+
+      for (int i = 0; i < entries; i++) {
+
+        String id = UUID.randomUUID().toString();
+        String type = possibleTypes[i % 3];
+        StringBuffer b = new StringBuffer();
+        for (int j = 0; j < (i % 4) + 1; j++) {
+          b.append("/");
+          b.append(UUID.randomUUID().toString());
+        }
+        String path = b.toString();
+  
+        try {
+          long address = idx.add(id, type, path);
+          assertEquals(i + 1, idx.getEntries());
+  
+          addresses.add(address);
+          ids.add(id);
+          types.add(type);
+          paths.add(path);
+          
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+      
+      // After the first take, clear the index
+      if (take == 0) {
+        try {
+          idx.clear();
+          addresses.clear();
+          ids.clear();
+          types.clear();
+          paths.clear();
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+
+    }
+    
+    // Retrieve all of the entries
+    for (int i = 0; i < addresses.size(); i++) {
+      long address = addresses.get(i);
+      try {
+        assertEquals(ids.get(i), idx.getId(address));
+        assertEquals(types.get(i), idx.getType(address));
+        assertEquals(paths.get(i), idx.getPath(address));
+      } catch (IOException e) {
+        e.printStackTrace();
+        fail(e.getMessage());
+      }
     }
   }
 

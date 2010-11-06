@@ -35,6 +35,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -67,7 +69,7 @@ public class PathIndexTest {
     if (indexFile.exists())
       indexFile.delete();
     idx = new PathIndex(tmpDir, false, slotsInIndex, entriesPerSlot);
-    expectedSize = 20 + (slotsInIndex * (4 + entriesPerSlot * 8));
+    expectedSize = 24 + (slotsInIndex * (4 + entriesPerSlot * 8));
   }
 
   /**
@@ -150,6 +152,72 @@ public class PathIndexTest {
   }
 
   /**
+   * Adds some entries while making sure that a resize operation is triggered,
+   * then clears the index, adds the entries again and then makes sure
+   * everything can be looked up as expected.
+   */
+  @Test
+  public void testExercise() {
+    int entries = 2 * (int) idx.getSlots() * idx.getEntriesPerSlot();
+    List<String> paths = new ArrayList<String>(entries);
+
+    // Add a number of entries to the index, clear and re-add
+    for (int take = 0; take < 2; take++) {
+
+      for (int i = 0; i < entries; i++) {
+        StringBuffer b = new StringBuffer();
+        for (int j = 0; j < (i % 4) + 1; j++) {
+          b.append("/");
+          b.append(UUID.randomUUID().toString());
+        }
+        String path = b.toString();
+        paths.add(path);
+        long address = path.hashCode();
+        try {
+          idx.set(address, path);
+          assertEquals(i + 1, idx.getEntries());
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+
+      // After the first take, clear the index
+      if (take == 0) {
+        try {
+          idx.clear();
+          paths.clear();
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+
+    }
+
+    // Retrieve all of the entries
+    for (String path : paths) {
+      long address = path.hashCode();
+      long[] possibleAddresses;
+      try {
+        possibleAddresses = idx.locate(path);
+        boolean found = false;
+        for (long a : possibleAddresses) {
+          if (a == address) {
+            found = true;
+            break;
+          }
+        }
+        if (!found)
+          fail("Address not found in candidates returned by index");
+      } catch (IOException e) {
+        e.printStackTrace();
+        fail(e.getMessage());
+      }
+    }
+  }
+
+  /**
    * Test method for
    * {@link ch.o2it.weblounge.contentrepository.impl.index.PathIndex#delete(java.lang.String, long)}
    * .
@@ -221,7 +289,7 @@ public class PathIndexTest {
   public void testResize() {
     String path = UUID.randomUUID().toString();
     long address = 2384762;
-    
+
     // Resize to the same size
     try {
       idx.set(address, path);
@@ -229,7 +297,7 @@ public class PathIndexTest {
       assertEquals(slotsInIndex, idx.getSlots());
       assertEquals(entriesPerSlot * 3, idx.getEntriesPerSlot());
       assertEquals(1, idx.getEntries());
-      assertEquals(20 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
+      assertEquals(24 + (slotsInIndex * (4 + entriesPerSlot * 3 * 8)), idx.size());
       long[] candidates = idx.locate(path);
       assertEquals(1, candidates.length);
       assertEquals(address, candidates[0]);

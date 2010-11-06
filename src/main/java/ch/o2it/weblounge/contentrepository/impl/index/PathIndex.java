@@ -38,11 +38,18 @@ import java.io.RandomAccessFile;
  * representations of paths to slot numbers in the <code>URI</code> or the
  * <code>Tree</code> index.
  * 
+ * Header:
  * <pre>
- * | slot | entries | slot number in tree.idx
- * |------------------------------------------
- * | 1    | 2       | addressOf(/var), addressOf(/usr/share)
- * | 2    | 1       | addressOf(/etc)
+ * | index version | # of entries per slot | # of slots | # of entries |  
+ * | (int)         | (int)                 | (long)     | (long)       |  
+ * </pre>
+ * 
+ * Entries:
+ * <pre>
+ * | entries | slot number in uri index
+ * |-------------------------------------------------
+ * | 2       | addressOf(/var), addressOf(/usr/share)
+ * | 1       | addressOf(/etc)
  * </pre>
  * 
  * The index is made up of a header which consists of the number of slots (4
@@ -72,7 +79,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
   protected static final long IDX_ENTRIES_HEADER = IDX_HEADER_ENTRIES_PER_SLOTS + 4;
 
   /** Location of the slots header */
-  protected static final long IDX_HEADER_SLOTS = IDX_ENTRIES_HEADER + 4;
+  protected static final long IDX_HEADER_SLOTS = IDX_ENTRIES_HEADER + 8;
 
   /** Start of the index's body */
   protected static final long IDX_START_OF_CONTENT = IDX_HEADER_SLOTS + 8;
@@ -103,7 +110,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
   protected int entriesPerSlot = DEFAULT_ENTRIES_PER_SLOT;
 
   /** Number of paths per slot */
-  protected long slotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+  protected int bytesPerSlot = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
 
   /** Number of slots in the paths index */
   protected long slots = DEFAULT_SLOTS;
@@ -132,8 +139,8 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * <p>
    * The number of slots and entries per slot defines the size of the index. At
    * creation time, the index implementation will allocate a file on disk which
-   * is <code>slots * entriesPerSlot * 8</code> bytes large, plus 16 bytes of
-   * header information.
+   * is <code>slots * entriesPerSlot * DEFAULT_ENTRY_SIZE</code> bytes large,
+   * plus 16 bytes of header information.
    * 
    * @param indexRootDir
    *          location of the index root directory
@@ -171,7 +178,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
       this.entriesPerSlot = idx.readInt();
       this.slots = idx.readLong();
       this.entries = idx.readLong();
-      this.slotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+      this.bytesPerSlot = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
       
       // If the index contains entries, we can't reduce the index size 
       if (this.entries > 0) {
@@ -218,7 +225,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * @return the index size
    */
   public synchronized long size() {
-    return IDX_START_OF_CONTENT + (slots * slotSizeInBytes);
+    return IDX_START_OF_CONTENT + (slots * bytesPerSlot);
   }
 
   /**
@@ -272,7 +279,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
       throws IOException {
 
     long slot = findSlot(path);
-    long startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
+    long startOfSlot = IDX_START_OF_CONTENT + (slot * bytesPerSlot);
 
     // Make sure there is still room left
     // for an additional address
@@ -281,8 +288,10 @@ public class PathIndex implements VersionedContentRepositoryIndex {
     if (entriesInSlot == entriesPerSlot) {
       logger.info("Maximum slot size reached, triggering index resize");
       resize(slots, entriesPerSlot * 2);
-      startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
+      slot = findSlot(path);
+      startOfSlot = IDX_START_OF_CONTENT + (slot * bytesPerSlot);
       idx.seek(startOfSlot);
+      entriesInSlot = idx.readInt();
     }
 
     // Add the new address at the end
@@ -323,7 +332,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
 
     // Move to the beginning of the slot
     long slot = findSlot(path);
-    long startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
+    long startOfSlot = IDX_START_OF_CONTENT + (slot * bytesPerSlot);
 
     // Read all entries from the current slot
     idx.seek(startOfSlot);
@@ -399,7 +408,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized long[] locate(String path) throws IOException {
     long slot = findSlot(path);
-    long startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
+    long startOfSlot = IDX_START_OF_CONTENT + (slot * bytesPerSlot);
     idx.seek(startOfSlot);
     int entries = idx.readInt();
 
@@ -425,7 +434,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
   private void init(long slots, int entriesPerSlot) throws IOException {
     this.indexVersion = INDEX_VERSION;
     this.entriesPerSlot = entriesPerSlot;
-    this.slotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+    this.bytesPerSlot = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
     this.slots = slots;
     this.entries = 0;
 
@@ -444,7 +453,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
     idx.writeLong(entries);
 
     // Write entries
-    byte[] entry = new byte[4 + entriesPerSlot * 8];
+    byte[] entry = new byte[bytesPerSlot];
     for (int i = 0; i < slots; i++) {
       idx.write(entry);
     }
@@ -479,22 +488,25 @@ public class PathIndex implements VersionedContentRepositoryIndex {
     if (this.isReadOnly)
       throw new IllegalStateException("This index is readonly");
 
-    logger.info("Resizing path index with {} entries to {} bytes per entry", entries, entriesPerSlot);
+    // Calculate new slot size
+    int newSlotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+    
+    logger.info("Resizing path index to {} ({}) slots and {} ({}) entries per slot", new Object[] { slots, this.slots, entriesPerSlot, this.entriesPerSlot });
 
-    String idxFilename = idxFile.getName();
-    String fileName = FilenameUtils.getBaseName(idxFilename);
-    String fileExtension = FilenameUtils.getExtension(idxFilename);
+    String fileName = FilenameUtils.getBaseName(idxFile.getName());
+    String fileExtension = FilenameUtils.getExtension(idxFile.getName());
     String idxFilenameNew = fileName + "_resized." + fileExtension;
-    File newIdxFile = new File(idxFile.getParentFile(), idxFilenameNew);
+    File idxNewFile = new File(idxFile.getParentFile(), idxFilenameNew);
     long time = System.currentTimeMillis();
 
-    logger.debug("Creating resized index at " + newIdxFile);
+    logger.debug("Creating resized index at " + idxNewFile);
 
+    // Create the new index
     RandomAccessFile idxNew = null;
     try {
-      idxNew = new RandomAccessFile(newIdxFile, "rwd");
+      idxNew = new RandomAccessFile(idxNewFile, "rwd");
     } catch (FileNotFoundException e) {
-      throw new IllegalArgumentException("Index file " + newIdxFile + " cannot be created: " + e.getMessage(), e);
+      throw new IllegalArgumentException("Index file " + idxNewFile + " cannot be created: " + e.getMessage(), e);
     }
 
     // Write header
@@ -504,34 +516,43 @@ public class PathIndex implements VersionedContentRepositoryIndex {
     idxNew.writeLong(slots);
     idxNew.writeLong(entries);
 
+    // Position to read the whole content
+    idx.seek(IDX_START_OF_CONTENT);
+    
     // Write entries
     for (int i = 0; i < slots; i++) {
-      byte[] bytes = new byte[4 + entriesPerSlot * 8];
+      byte[] bytes = new byte[newSlotSizeInBytes];
       if (i < this.slots) {
-        idx.read(bytes, 0, 4 + this.entriesPerSlot * 8);
+        idx.read(bytes, 0, this.bytesPerSlot);
         idxNew.write(bytes);
       } else {
+        // Write an empty line
         idxNew.write(bytes);
       }
     }
 
-    idxNew.close();
-
     logger.debug("Removing old index at " + idxFile);
-    idxFile.delete();
+
+    // Close and delete the old index
+    idx.close();
+    if (!idxFile.delete())
+      throw new IOException("Unable to delete old index file " + idxFile);
+
+    // Close the new index, and move it into the old index' place
     logger.debug("Moving resized index into regular position at " + idxFile);
-    newIdxFile.renameTo(idxFile);
+    idxNew.close();
+    if (!idxNewFile.renameTo(idxFile))
+      throw new IOException("Unable to move new index file to " + idxFile);
 
     try {
       idx = new RandomAccessFile(idxFile, "rwd");
     } catch (FileNotFoundException e) {
-      throw new IllegalArgumentException("Index file " + newIdxFile + " cannot be created: " + e.getMessage(), e);
+      throw new IllegalArgumentException("Index file " + idxNewFile + " cannot be created: " + e.getMessage(), e);
     }
 
     this.entriesPerSlot = entriesPerSlot;
-    this.idxFile = newIdxFile;
     this.slots = slots;
-    this.slotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+    this.bytesPerSlot = newSlotSizeInBytes;
     long totalEntries = slots * entriesPerSlot;
 
     time = System.currentTimeMillis() - time;

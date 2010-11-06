@@ -38,10 +38,17 @@ import java.io.RandomAccessFile;
  * to paths. In order to quickly get to an entry, use the <code>id</code> or
  * <code>path</code> index.
  * 
+ * Header:
  * <pre>
- * | slot | id      | path
+ * | index version | bytes per id | bytes per type | bytes per path | # of slots | # of entries |  
+ * | (int)         | (int)        | (int)          | (int)          | (long)     | (long)       |  
+ * </pre>
+ * 
+ * Entries:
+ * <pre>
+ * | id      | path
  * |------------------------------------------
- * | 1    | a-b-c-d | /etc/weblounge
+ * | a-b-c-d | /etc/weblounge
  * </pre>
  */
 public class URIIndex implements VersionedContentRepositoryIndex {
@@ -57,7 +64,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
   protected static final long IDX_START_OF_HEADER = 0;
 
   /** Location of the bytes-per-id header */
-  protected static final long IDX_HEADER_VERSION= IDX_START_OF_HEADER;
+  protected static final long IDX_HEADER_VERSION = IDX_START_OF_HEADER;
 
   /** Location of the bytes-per-id header */
   protected static final long IDX_HEADER_BYTES_PER_ID = IDX_HEADER_VERSION + 4;
@@ -109,7 +116,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
   protected int bytesPerPath = DEFAULT_BYTES_PER_PATH;
 
   /** Number of bytes per entry */
-  protected int bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
+  protected int bytesPerSlot = bytesPerId + bytesPerType + bytesPerPath;
 
   /** Number of entries */
   protected long entries = 0;
@@ -205,7 +212,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
       this.bytesPerPath = idx.readInt();
       this.slots = idx.readLong();
       this.entries = idx.readLong();
-      this.bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
+      this.bytesPerSlot = bytesPerId + bytesPerType + bytesPerPath;
       
       // If the index contains entries, we can't reduce the index size 
       if (this.entries > 0) {
@@ -215,7 +222,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
       }
 
       if (this.bytesPerId != idLengthInBytes || this.bytesPerType != typeLengthInBytes || this.bytesPerPath != pathLengthInBytes)
-        bytesPerEntry = resize(idLengthInBytes, typeLengthInBytes, pathLengthInBytes);
+        bytesPerSlot = resize(idLengthInBytes, typeLengthInBytes, pathLengthInBytes);
     } catch (EOFException e) {
       if (readOnly) {
         throw new IllegalStateException("Readonly index cannot be empty");
@@ -253,7 +260,16 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @return the index size
    */
   public synchronized long size() {
-    return IDX_START_OF_CONTENT + (slots * bytesPerEntry);
+    return IDX_START_OF_CONTENT + (slots * bytesPerSlot);
+  }
+
+  /**
+   * Returns the number of slots.
+   * 
+   * @return the number of slots
+   */
+  public synchronized long getSlots() {
+    return slots;
   }
 
   /**
@@ -262,7 +278,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @return the number of bytes per entry
    */
   public synchronized int getEntrySize() {
-    return bytesPerEntry;
+    return bytesPerSlot;
   }
 
   /**
@@ -333,11 +349,11 @@ public class URIIndex implements VersionedContentRepositoryIndex {
           newBytesPerPath *= 2;
       }
 
-      bytesPerEntry = resize(bytesPerId, newBytesPerType, newBytesPerPath);
+      bytesPerSlot = resize(bytesPerId, newBytesPerType, newBytesPerPath);
     }
 
     // See if there is an empty slot
-    long startOfEntry = IDX_START_OF_CONTENT + (entries * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entries * bytesPerSlot);
     long address = IDX_START_OF_CONTENT;
     long e = 0;
     boolean reusingSlot = false;
@@ -350,8 +366,8 @@ public class URIIndex implements VersionedContentRepositoryIndex {
         entry = e;
         break;
       }
-      idx.skipBytes(bytesPerEntry - 2);
-      address += bytesPerEntry;
+      idx.skipBytes(bytesPerSlot - 2);
+      address += bytesPerSlot;
       e++;
     }
 
@@ -391,12 +407,12 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    *           if removing the entry from the index fails
    */
   public synchronized void delete(long entry) throws IOException {
-    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
 
     // Remove the entry by writing a '\n' to the first byte
     idx.seek(startOfEntry);
     idx.writeChar('\n');
-    idx.write(new byte[bytesPerEntry - 2]);
+    idx.write(new byte[bytesPerSlot - 2]);
 
     // Update the file header
     entries--;
@@ -449,10 +465,10 @@ public class URIIndex implements VersionedContentRepositoryIndex {
           newBytesPerPath *= 2;
       }
 
-      bytesPerEntry = resize(bytesPerId, newBytesPerType, newBytesPerPath);
+      bytesPerSlot = resize(bytesPerId, newBytesPerType, newBytesPerPath);
     }
 
-    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
 
     // Write the path to the index
     idx.seek(startOfEntry);
@@ -490,12 +506,11 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    *           if reading from the index fails
    */
   public synchronized String getId(long entry) throws IOException, EOFException {
-    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     idx.seek(startOfEntry);
     byte[] bytes = new byte[bytesPerId];
     int bytesRead = idx.read(bytes);
-    String line = new String(bytes);
-    if (bytesRead < bytesPerId || line.charAt(0) == '\n')
+    if (bytesRead < bytesPerId || bytes[1] == '\n')
       throw new IllegalStateException("No data at address " + entry);
     return new String(bytes);
   }
@@ -513,9 +528,11 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized String getType(long entry) throws IOException,
       EOFException {
-    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     idx.seek(startOfEntry);
-    idx.skipBytes(bytesPerId);
+    if (idx.readChar() == '\n')
+      throw new IllegalStateException("No data at address " + entry);
+    idx.skipBytes(bytesPerId - 2);
 
     byte[] bytes = new byte[bytesPerType];
     idx.read(bytes);
@@ -540,9 +557,11 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized String getPath(long entry) throws IOException,
       EOFException {
-    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerEntry);
+    long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     idx.seek(startOfEntry);
-    idx.skipBytes(bytesPerId + bytesPerType);
+    if (idx.readChar() == '\n')
+      throw new IllegalStateException("No data at address " + entry);
+    idx.skipBytes(bytesPerId + bytesPerType - 2);
 
     byte[] bytes = new byte[bytesPerPath];
     idx.read(bytes);
@@ -571,10 +590,11 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     this.bytesPerId = bytesPerId;
     this.bytesPerType = bytesPerType;
     this.bytesPerPath = bytesPerPath;
-    this.bytesPerEntry = bytesPerId + bytesPerType + bytesPerPath;
+    this.bytesPerSlot = bytesPerId + bytesPerType + bytesPerPath;
     this.entries = 0;
+    this.slots = 0;
 
-    logger.info("Creating uri index with {} bytes per entry", bytesPerEntry);
+    logger.info("Creating uri index with {} bytes per entry", bytesPerSlot);
 
     // Write header
     idx.seek(IDX_START_OF_HEADER);
@@ -587,7 +607,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
 
     // If this file used to contain entries, we just null out the rest
     try {
-      byte[] bytes = new byte[bytesPerEntry - 2];
+      byte[] bytes = new byte[bytesPerSlot - 2];
       while (idx.getFilePointer() < idx.length()) {
         idx.writeChar('\n');
         idx.write(bytes);
@@ -625,24 +645,24 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     if (this.isReadOnly)
       throw new IllegalStateException("This index is readonly");
 
-    int newBytesPerEntry = newBytesPerId + newBytesPerType + newBytesPerPath;
+    int newBytesPerSlot = newBytesPerId + newBytesPerType + newBytesPerPath;
 
-    logger.info("Resizing uri index with {} entries to {} bytes per entry", entries, newBytesPerEntry);
+    logger.info("Resizing uri index to {} ({}) slots and {} ({}) bytes per entry", new Object[] { slots, this.slots, newBytesPerSlot, this.bytesPerSlot });
 
-    String idxFilename = idxFile.getName();
-    String fileName = FilenameUtils.getBaseName(idxFilename);
-    String fileExtension = FilenameUtils.getExtension(idxFilename);
+    String fileName = FilenameUtils.getBaseName(idxFile.getName());
+    String fileExtension = FilenameUtils.getExtension(idxFile.getName());
     String idxFilenameNew = fileName + "_resized." + fileExtension;
-    File newIdxFile = new File(idxFile.getParentFile(), idxFilenameNew);
+    File idxNewFile = new File(idxFile.getParentFile(), idxFilenameNew);
     long time = System.currentTimeMillis();
 
-    logger.debug("Creating resized index at " + newIdxFile);
+    logger.debug("Creating resized index at " + idxNewFile);
 
+    // Create the new index
     RandomAccessFile idxNew = null;
     try {
-      idxNew = new RandomAccessFile(newIdxFile, "rwd");
+      idxNew = new RandomAccessFile(idxNewFile, "rwd");
     } catch (FileNotFoundException e) {
-      throw new IllegalArgumentException("Index file " + newIdxFile + " cannot be created: " + e.getMessage(), e);
+      throw new IllegalArgumentException("Index file " + idxNewFile + " cannot be created: " + e.getMessage(), e);
     }
 
     // Write header
@@ -654,38 +674,48 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     idxNew.writeLong(slots);
     idxNew.writeLong(entries);
 
-    // Copy the current index to the new one
+    // Position to read the whole content
     idx.seek(IDX_START_OF_CONTENT);
-    for (int i = 0; i < this.entries; i++) {
-      byte[] bytes = new byte[this.bytesPerEntry];
-      idx.read(bytes);
-      idxNew.write(bytes);
-      for (int j = this.bytesPerEntry; j < newBytesPerEntry; j++)
-        idxNew.write(0);
+    
+    // Write entries
+    for (int i = 0; i < slots; i++) {
+      byte[] bytes = new byte[newBytesPerSlot];
+      if (i < this.slots) {
+        idx.read(bytes, 0, this.bytesPerSlot);
+        idxNew.write(bytes);
+      } else {
+        // Write an empty line
+        idxNew.write(bytes);
+      }
     }
 
-    idxNew.close();
-
     logger.debug("Removing old index at " + idxFile);
-    idxFile.delete();
+
+    // Close and delete the old index
+    idx.close();
+    if (!idxFile.delete())
+      throw new IOException("Unable to delete old index file " + idxFile);
+
+    // Close the new index, and move it into the old index' place
     logger.debug("Moving resized index into regular position at " + idxFile);
-    newIdxFile.renameTo(idxFile);
+    idxNew.close();
+    if (!idxNewFile.renameTo(idxFile))
+      throw new IOException("Unable to move new index file to " + idxFile);
 
     try {
       idx = new RandomAccessFile(idxFile, "rwd");
     } catch (FileNotFoundException e) {
-      throw new IllegalArgumentException("Index file " + newIdxFile + " cannot be created: " + e.getMessage(), e);
+      throw new IllegalArgumentException("Index file " + idxNewFile + " cannot be created: " + e.getMessage(), e);
     }
 
-    this.bytesPerEntry = newBytesPerEntry;
+    this.bytesPerSlot = newBytesPerSlot;
     this.bytesPerId = newBytesPerId;
     this.bytesPerType = newBytesPerType;
     this.bytesPerPath = newBytesPerPath;
-    this.idxFile = newIdxFile;
 
     time = System.currentTimeMillis() - time;
     logger.info("Uri index resized in {}", ConfigurationUtils.toHumanReadableDuration(time));
-    return newBytesPerEntry;
+    return newBytesPerSlot;
   }
 
 }

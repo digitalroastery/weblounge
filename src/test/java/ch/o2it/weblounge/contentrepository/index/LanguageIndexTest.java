@@ -37,7 +37,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -166,6 +168,80 @@ public class LanguageIndexTest {
     } catch (IOException e) {
       e.printStackTrace();
       fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Adds some entries while making sure that a resize operation is triggered,
+   * then clears the index, adds the entries again and then makes sure
+   * everything can be looked up as expected.
+   */
+  @Test
+  public void testExercise() {
+    int entries = 2 * (int)idx.getSlots() * idx.getEntriesPerSlot();
+    
+    List<Language> possibleLanguages = new ArrayList<Language>();
+    possibleLanguages.add(english);
+    possibleLanguages.add(german);
+    possibleLanguages.add(french);
+
+    List<Long> addresses = new ArrayList<Long>();
+    List<String> ids = new ArrayList<String>();
+    List<Set<Language>> languages = new ArrayList<Set<Language>>();
+    
+    // Add a number of entries to the index, clear and re-add
+    for (int take = 0; take < 2; take++) {
+
+      for (int i = 0; i < entries; i++) {
+        String uuid = UUID.randomUUID().toString();
+        Set<Language> languageSet = new HashSet<Language>();
+        for (int j = 0; j < (i % 2) + 1; j++) {
+          languageSet.add(possibleLanguages.get(j));
+        }
+        try {
+          long address = idx.set(uuid, languageSet);
+          ids.add(uuid);
+          languages.add(languageSet);
+          addresses.add(address);
+          assertEquals(i + 1, idx.getEntries());
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+      
+      // After the first take, clear the index
+      if (take == 0) {
+        try {
+          idx.clear();
+          addresses.clear();
+          ids.clear();
+          languages.clear();
+        } catch (IOException e) {
+          e.printStackTrace();
+          fail(e.getMessage());
+        }
+      }
+      
+    }
+    
+    // Retrieve all of the entries
+    for (int i = 0; i < addresses.size(); i++) {
+      long address = addresses.get(i);
+      Set<Language> languageSet = languages.get(i);
+      try {
+        assertTrue(idx.hasLanguage(address));
+        for (Language language : possibleLanguages) {
+          if (languageSet.contains(language)) {
+            assertTrue(idx.hasLanguage(address, language));
+          } else {
+            assertFalse(idx.hasLanguage(address, language));
+          }
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+        fail(e.getMessage());
+      }
     }
   }
 

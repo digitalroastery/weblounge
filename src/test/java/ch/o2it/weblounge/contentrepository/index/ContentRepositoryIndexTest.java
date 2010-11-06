@@ -48,6 +48,7 @@ import ch.o2it.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.IdIndex;
+import ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.PathIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.URIIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.VersionIndex;
@@ -62,7 +63,10 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Test case for the {@link ContentRepositoryIndex}.
@@ -151,9 +155,10 @@ public class ContentRepositoryIndexTest {
    */
   @Test
   public void testFilesystem() {
-    assertTrue(new File(structuralIndexRootDirectory, URIIndex.URI_IDX_NAME).exists());
     assertTrue(new File(structuralIndexRootDirectory, IdIndex.ID_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, LanguageIndex.LANGUAGE_IDX_NAME).exists());
     assertTrue(new File(structuralIndexRootDirectory, PathIndex.PATH_IDX_NAME).exists());
+    assertTrue(new File(structuralIndexRootDirectory, URIIndex.URI_IDX_NAME).exists());
     assertTrue(new File(structuralIndexRootDirectory, VersionIndex.VERSION_IDX_NAME).exists());
   }
   
@@ -361,7 +366,7 @@ public class ContentRepositoryIndexTest {
    * structures are reused in a consistent way.
    */
   @Test
-  public void testAddDeleteAddUpdate() {
+  public void testExercise() {
     try {
       idx.add(page);
       idx.add(otherPage);
@@ -370,10 +375,42 @@ public class ContentRepositoryIndexTest {
       idx.delete(otherPage.getURI());
       idx.update(page);
       assertTrue(idx.exists(page.getURI()));
+
+      // Clear the index
+      idx.clear();
+      
+      // Add a number of random pages
+      List<Page> pages = new ArrayList<Page>();
+      for (int i = 0; i < 100; i++) {
+        StringBuffer b = new StringBuffer("/");
+        for (int j = 0; j < (i % 3) + 1; j++) {
+          b.append(UUID.randomUUID().toString());
+          b.append("/");
+        }
+        String path = b.toString();
+        String id = UUID.randomUUID().toString();
+        Page p = new PageImpl(new PageURIImpl(site, path, id));
+        p.setTemplate("home");
+        pages.add(p);
+        ResourceURI uri = idx.add(p);
+        assertEquals(id, uri.getId());
+        assertEquals(path, uri.getPath());
+        assertEquals(i + 1, idx.size());
+      }
+      
+      // Test if everything can be found
+      for (Page p : pages) {
+        assertTrue(idx.exists(p.getURI()));
+        assertEquals(p.getURI().getId(), idx.getIdentifier(p.getURI()));
+        assertEquals(p.getURI().getPath(), idx.getPath(p.getURI()));
+        assertEquals(0, idx.getLanguages(p.getURI()).length);
+        assertEquals(1, idx.getRevisions(p.getURI()).length);
+      }
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
     }
+    
   }
   
   /**
