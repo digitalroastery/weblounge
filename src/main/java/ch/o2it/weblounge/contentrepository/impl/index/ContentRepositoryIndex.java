@@ -282,30 +282,29 @@ public class ContentRepositoryIndex {
       if (id == null) {
         id = UUID.randomUUID().toString();
         resource.setIdentifier(id);
+        uri.setIdentifier(id);
       }
 
       // Make sure we have a path
       if (path == null) {
         path = UrlSupport.concat("/" + type + "s", id);
+        uri.setPath(path);
       }
-
-      uri.setIdentifier(id);
-      uri.setPath(path);
 
       try {
         address = uriIdx.add(id, type, path);
         idIdx.set(address, id);
         versionIdx.add(id, version);
+        pathIdx.set(address, path);
         if (version == Resource.LIVE) {
-          pathIdx.set(address, path);
           languageIdx.set(id, resource.languages());
           if (resource.isIndexed())
             searchIdx.add(resource);
           else
             searchIdx.delete(uri);
         } else {
-          pathIdx.set(address, id);
-          languageIdx.set(id, null);
+          if (!languageIdx.hasLanguage(address))
+            languageIdx.set(id, null);
         }
       } catch (ContentRepositoryException e) {
         throw e;

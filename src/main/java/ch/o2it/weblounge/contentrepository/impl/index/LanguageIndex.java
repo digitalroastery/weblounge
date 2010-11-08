@@ -42,12 +42,14 @@ import java.util.Set;
  * <code>path</code> index.
  * 
  * Header:
+ * 
  * <pre>
  * | index version | bytes per id | # of languages per slot | # of slots | # of entries |  
- * | (int)         | (int)        | (int)                   | (long)     | (long)       |  
+ * | (int)         | (int)        | (int)                   | (long)     | (long)       |
  * </pre>
  * 
  * Entries:
+ * 
  * <pre>
  * | id      | languages
  * |------------------------------------------
@@ -62,10 +64,9 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
   /** Name for the language index file */
   public static final String LANGUAGE_IDX_NAME = "language.idx";
 
-  
   /** Start of the index's header */
   protected static final long IDX_START_OF_HEADER = 0;
-  
+
   /** Location of the version header */
   protected static final long IDX_HEADER_VERSION = IDX_START_OF_HEADER;
 
@@ -84,7 +85,6 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
   /** Start of the index's body */
   protected static final long IDX_START_OF_CONTENT = IDX_HEADER_ENTRIES + 8;
 
-  
   /** Default number of bytes used per id */
   private static final int DEFAULT_BYTES_PER_ID = 36;
 
@@ -207,13 +207,13 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
       this.slots = idx.readLong();
       this.entries = idx.readLong();
       this.bytesPerSlot = bytesPerId + 4 + languagesPerSlot * DEFAULT_BYTES_PER_ENTRY;
-      
-      // If the index contains entries, we can't reduce the index size 
+
+      // If the index contains entries, we can't reduce the index size
       if (this.entries > 0) {
         idLengthInBytes = Math.max(this.bytesPerId, idLengthInBytes);
         languages = Math.max(this.languagesPerSlot, languages);
       }
-      
+
       if (this.bytesPerId != idLengthInBytes || this.languagesPerSlot != languages)
         resize(idLengthInBytes, languages);
     } catch (EOFException e) {
@@ -620,9 +620,14 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
   public synchronized boolean hasLanguage(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
-    idx.seek(startOfEntry);
-    idx.skipBytes(bytesPerId);
-    return idx.readInt() > 0;
+    try {
+      idx.seek(startOfEntry);
+      idx.skipBytes(bytesPerId);
+      return idx.readInt() > 0;
+    } catch (EOFException e) {
+      // We tried to read beyond the file limits, so the entry doesn't exist
+      return false;
+    }
   }
 
   /**
@@ -691,7 +696,11 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
 
     int newSlotSizeInBytes = newBytesPerId + 4 + newLanguagesPerSlot * DEFAULT_BYTES_PER_ENTRY;
 
-    logger.info("Resizing language index to {} ({}) slots and {} ({}) languages per slot", new Object[] { slots, this.slots, newLanguagesPerSlot, this.languagesPerSlot });
+    logger.info("Resizing language index to {} ({}) slots and {} ({}) languages per slot", new Object[] {
+        slots,
+        this.slots,
+        newLanguagesPerSlot,
+        this.languagesPerSlot });
 
     String fileName = FilenameUtils.getBaseName(idxFile.getName());
     String fileExtension = FilenameUtils.getExtension(idxFile.getName());
@@ -719,7 +728,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
 
     // Position to read the whole content
     idx.seek(IDX_START_OF_CONTENT);
-    
+
     // Write entries
     for (int i = 0; i < slots; i++) {
       byte[] bytes = new byte[newSlotSizeInBytes];

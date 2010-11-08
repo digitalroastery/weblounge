@@ -315,11 +315,14 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    */
   public synchronized long add(String id, String type, String path)
       throws IOException {
+    if (id == null)
+      throw new IllegalArgumentException("Id cannot be null");
     if (type == null)
       throw new IllegalArgumentException("Type cannot be null");
     if (path == null)
       throw new IllegalArgumentException("Path cannot be null");
 
+    // Make sure this is a regular id
     if (id.getBytes().length != bytesPerId)
       throw new IllegalArgumentException(bytesPerId + " byte identifier required");
 
