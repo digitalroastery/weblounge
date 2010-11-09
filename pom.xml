@@ -196,6 +196,7 @@
               ch.o2it.weblounge.common.impl.security;version=${project.version},
               ch.o2it.weblounge.common.impl.security.jaas;version=${project.version},
               ch.o2it.weblounge.common.impl.site;version=${project.version},
+              ch.o2it.weblounge.common.impl.testing;version=${project.version},
               ch.o2it.weblounge.common.impl.url;version=${project.version},
               ch.o2it.weblounge.common.impl.user;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},

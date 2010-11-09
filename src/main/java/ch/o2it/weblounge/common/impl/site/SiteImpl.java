@@ -993,7 +993,7 @@ public class SiteImpl implements Site {
    *           if the site activation fails
    */
   @SuppressWarnings("unchecked")
-  void activate(ComponentContext context) throws Exception {
+  protected void activate(ComponentContext context) throws Exception {
 
     BundleContext bundleContext = context.getBundleContext();
     final Bundle bundle = bundleContext.getBundle();
@@ -1080,7 +1080,7 @@ public class SiteImpl implements Site {
    * @throws Exception
    *           if the site deactivation fails
    */
-  void deactivate(ComponentContext context) throws Exception {
+  protected void deactivate(ComponentContext context) throws Exception {
     try {
       isShutdownInProgress = true;
       logger.debug("Taking down site '{}'", this);
