@@ -204,7 +204,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
       this.entries = idx.readLong();
       
       // An entry consists of the id, the version count and the version entries
-      this.slotSizeInBytes = bytesPerId + 4 + versionsPerEntry * DEFAULT_ENTRY_SIZE;
+      this.slotSizeInBytes = bytesPerId + 4 + (versionsPerEntry * DEFAULT_ENTRY_SIZE);
       
       // If the index contains entries, we can't reduce the index size 
       if (this.entries > 0) {

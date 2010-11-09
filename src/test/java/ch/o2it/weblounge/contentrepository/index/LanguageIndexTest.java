@@ -54,6 +54,9 @@ public class LanguageIndexTest {
   /** The index file */
   protected File indexFile = null;
 
+  /** The index root directory */
+  protected File indexRootDir = null;
+
   /** Number of entries per slot */
   protected int versionsPerEntry = 8;
 
@@ -74,11 +77,11 @@ public class LanguageIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-    indexFile = new File(tmpDir, LanguageIndex.LANGUAGE_IDX_NAME);
+    indexRootDir = new File(System.getProperty("java.io.tmpdir"));
+    indexFile = new File(indexRootDir, LanguageIndex.LANGUAGE_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new LanguageIndex(tmpDir, false, versionsPerEntry);
+    idx = new LanguageIndex(indexRootDir, false, versionsPerEntry);
     expectedSize = 28;
   }
 
@@ -225,6 +228,14 @@ public class LanguageIndexTest {
       
     }
     
+    // Close and reopen the index
+    try {
+      idx.close();
+      idx = new LanguageIndex(indexRootDir, false, versionsPerEntry);
+    } catch (IOException e) {
+      fail("Error closing the index");
+    }
+
     // Retrieve all of the entries
     for (int i = 0; i < addresses.size(); i++) {
       long address = addresses.get(i);

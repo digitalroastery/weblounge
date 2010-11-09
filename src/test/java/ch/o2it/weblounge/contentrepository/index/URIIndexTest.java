@@ -48,6 +48,9 @@ public class URIIndexTest {
   /** The index file */
   protected File indexFile = null;
 
+  /** The index root directory */
+  protected File indexRootDir = null;
+
   /** Number of bytes for the header */
   protected int headerLength = 32;
 
@@ -65,11 +68,11 @@ public class URIIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-    indexFile = new File(tmpDir, URIIndex.URI_IDX_NAME);
+    indexRootDir = new File(System.getProperty("java.io.tmpdir"));
+    indexFile = new File(indexRootDir, URIIndex.URI_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new URIIndex(tmpDir, false, pathLength);
+    idx = new URIIndex(indexRootDir, false, pathLength);
   }
 
   /**
@@ -218,6 +221,14 @@ public class URIIndexTest {
 
     }
     
+    // Close and reopen the index
+    try {
+      idx.close();
+      idx = new URIIndex(indexRootDir, false, pathLength);
+    } catch (IOException e) {
+      fail("Error closing the index");
+    }
+
     // Retrieve all of the entries
     for (int i = 0; i < addresses.size(); i++) {
       long address = addresses.get(i);

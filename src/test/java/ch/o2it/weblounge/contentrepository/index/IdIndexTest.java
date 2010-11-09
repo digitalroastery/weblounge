@@ -47,6 +47,9 @@ public class IdIndexTest {
   /** The index file */
   protected File indexFile = null;
 
+  /** The index root directory */
+  protected File indexRootDir = null;
+
   /** The number of slots in this index */
   protected int slotsInIndex = 16;
 
@@ -61,11 +64,11 @@ public class IdIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-    indexFile = new File(tmpDir, IdIndex.ID_IDX_NAME);
+    indexRootDir = new File(System.getProperty("java.io.tmpdir"));
+    indexFile = new File(indexRootDir, IdIndex.ID_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new IdIndex(tmpDir, false, slotsInIndex, entriesPerSlot);
+    idx = new IdIndex(indexRootDir, false, slotsInIndex, entriesPerSlot);
     expectedSize = 24 + (slotsInIndex * (4 + entriesPerSlot * 8));
   }
 
@@ -185,6 +188,14 @@ public class IdIndexTest {
         }
       }
 
+    }
+
+    // Close and reopen the index
+    try {
+      idx.close();
+      idx = new IdIndex(indexRootDir, false, slotsInIndex, entriesPerSlot);
+    } catch (IOException e) {
+      fail("Error closing the index");
     }
 
     // Retrieve all of the entries

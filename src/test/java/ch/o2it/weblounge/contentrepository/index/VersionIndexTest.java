@@ -51,6 +51,9 @@ public class VersionIndexTest {
   /** The index file */
   protected File indexFile = null;
 
+  /** The index root directory */
+  protected File indexRootDir = null;
+
   /** Number of entries per slot */
   protected int versionsPerEntry = 8;
 
@@ -62,11 +65,11 @@ public class VersionIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-    indexFile = new File(tmpDir, VersionIndex.VERSION_IDX_NAME);
+    indexRootDir = new File(System.getProperty("java.io.tmpdir"));
+    indexFile = new File(indexRootDir, VersionIndex.VERSION_IDX_NAME);
     if (indexFile.exists())
       indexFile.delete();
-    idx = new VersionIndex(tmpDir, false, versionsPerEntry);
+    idx = new VersionIndex(indexRootDir, false, versionsPerEntry);
     expectedSize = 28;
   }
 
@@ -222,6 +225,14 @@ public class VersionIndexTest {
 
     }
     
+    // Close and reopen the index
+    try {
+      idx.close();
+      idx = new VersionIndex(indexRootDir, false, versionsPerEntry);
+    } catch (IOException e) {
+      fail("Error closing the index");
+    }
+
     // Retrieve all of the entries
     for (Map.Entry<String, Long> entry : ids.entrySet()) {
       String uuid = entry.getKey();

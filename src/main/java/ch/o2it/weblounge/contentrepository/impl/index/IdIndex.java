@@ -176,7 +176,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
       this.entriesPerSlot = idx.readInt();
       this.slots = idx.readLong();
       this.entries = idx.readLong();
-      this.slotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+      this.slotSizeInBytes = 4 + (this.entriesPerSlot * DEFAULT_ENTRY_SIZE);
       
       // If the index contains entries, we can't reduce the index size 
       if (this.entries > 0) {

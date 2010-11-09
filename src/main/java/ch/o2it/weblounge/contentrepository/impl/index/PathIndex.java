@@ -75,14 +75,14 @@ public class PathIndex implements VersionedContentRepositoryIndex {
   /** Location of the entries-per-slot header */
   protected static final long IDX_HEADER_ENTRIES_PER_SLOTS = IDX_HEADER_VERSION + 4;
 
-  /** Location of the entries header */
-  protected static final long IDX_ENTRIES_HEADER = IDX_HEADER_ENTRIES_PER_SLOTS + 4;
-
   /** Location of the slots header */
-  protected static final long IDX_HEADER_SLOTS = IDX_ENTRIES_HEADER + 8;
+  protected static final long IDX_HEADER_SLOTS = IDX_HEADER_ENTRIES_PER_SLOTS + 4;
+
+  /** Location of the entries header */
+  protected static final long IDX_HEADER_ENTRIES = IDX_HEADER_SLOTS + 8;
 
   /** Start of the index's body */
-  protected static final long IDX_START_OF_CONTENT = IDX_HEADER_SLOTS + 8;
+  protected static final long IDX_START_OF_CONTENT = IDX_HEADER_ENTRIES + 8;
 
   
   /** Default number of entries in index */
@@ -178,7 +178,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
       this.entriesPerSlot = idx.readInt();
       this.slots = idx.readLong();
       this.entries = idx.readLong();
-      this.bytesPerSlot = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+      this.bytesPerSlot = 4 + (this.entriesPerSlot * DEFAULT_ENTRY_SIZE);
       
       // If the index contains entries, we can't reduce the index size 
       if (this.entries > 0) {
@@ -306,7 +306,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
     idx.writeInt(entriesInSlot);
 
     // Update the number of entries
-    idx.seek(IDX_ENTRIES_HEADER);
+    idx.seek(IDX_HEADER_ENTRIES);
     idx.writeLong(entries);
 
     logger.debug("Added address of path {} as entry no {} to slot {}", new Object[] {
@@ -361,7 +361,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
 
     // Update the file header
     entries--;
-    idx.seek(IDX_ENTRIES_HEADER);
+    idx.seek(IDX_HEADER_ENTRIES);
     idx.writeLong(entries);
 
     logger.debug("Removed path '{}' from index", path);
@@ -489,7 +489,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
       throw new IllegalStateException("This index is readonly");
 
     // Calculate new slot size
-    int newSlotSizeInBytes = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
+    int newBytesPerSlot = 4 + (entriesPerSlot * DEFAULT_ENTRY_SIZE);
     
     logger.info("Resizing path index to {} ({}) slots and {} ({}) entries per slot", new Object[] { slots, this.slots, entriesPerSlot, this.entriesPerSlot });
 
@@ -521,7 +521,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
     
     // Write entries
     for (int i = 0; i < slots; i++) {
-      byte[] bytes = new byte[newSlotSizeInBytes];
+      byte[] bytes = new byte[newBytesPerSlot];
       if (i < this.slots) {
         idx.read(bytes, 0, this.bytesPerSlot);
         idxNew.write(bytes);
@@ -552,7 +552,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
 
     this.entriesPerSlot = entriesPerSlot;
     this.slots = slots;
-    this.bytesPerSlot = newSlotSizeInBytes;
+    this.bytesPerSlot = newBytesPerSlot;
     long totalEntries = slots * entriesPerSlot;
 
     time = System.currentTimeMillis() - time;
