@@ -618,11 +618,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   @GET
   @Path("/docs")
   @Produces(MediaType.TEXT_HTML)
-  public String getDocumentation() {
+  public String getDocumentation(@Context HttpServletRequest request) {
     if (docs == null) {
-      String endpointUrl = "/system/weblounge/files";
-      // TODO: determine endpoint url
-      docs = FilesEndpointDocs.createDocumentation(endpointUrl);
+      String docsPath = request.getRequestURI();
+      String docsPathExtension = request.getPathInfo();
+      String servicePath = request.getRequestURI().substring(0, docsPath.length() - docsPathExtension.length());
+      docs = FilesEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
   }

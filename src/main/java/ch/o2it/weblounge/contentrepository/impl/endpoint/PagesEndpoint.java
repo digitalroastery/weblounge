@@ -468,11 +468,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @GET
   @Path("/docs")
   @Produces(MediaType.TEXT_HTML)
-  public String getDocumentation() {
+  public String getDocumentation(@Context HttpServletRequest request) {
     if (docs == null) {
-      String endpointUrl = "/system/weblounge/pages";
-      // TODO: determine endpoint url
-      docs = PagesEndpointDocs.createDocumentation(endpointUrl);
+      String docsPath = request.getRequestURI();
+      String docsPathExtension = request.getPathInfo();
+      String servicePath = request.getRequestURI().substring(0, docsPath.length() - docsPathExtension.length());
+      docs = PagesEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
   }

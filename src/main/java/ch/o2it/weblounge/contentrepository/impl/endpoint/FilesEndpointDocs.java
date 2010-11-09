@@ -61,7 +61,7 @@ public final class FilesEndpointDocs {
     getFileEndpoint.addStatus(notFound("the file was not found or could not be loaded"));
     getFileEndpoint.addStatus(badRequest("an invalid file identifier was received"));
     getFileEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getFileEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The file identifier"));
+    getFileEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
     getFileEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getFileEndpoint);
 
