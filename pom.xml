@@ -60,7 +60,8 @@
               ch.o2it.weblounge.common.security;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.url;version=${project.version},
-              ch.o2it.weblounge.common.user;version=${project.version}
+              ch.o2it.weblounge.common.user;version=${project.version},
+              ch.o2it.weblounge.testing;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
