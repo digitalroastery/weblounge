@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -34,6 +35,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -71,20 +73,28 @@ public class PageContentTest extends IntegrationTestBase {
    * Creates a new instance of the <code>HTML</code> page test.
    */
   public PageContentTest() {
-    super("Page Content Test");
+    super("Page Content Test", WEBLOUNGE_TEST_GROUP);
+  }
+
+  /**
+   * Runs this test on the instance running at
+   * <code>http://127.0.0.1:8080</code>.
+   * 
+   * @throws Exception
+   *           if the test fails
+   */
+  @Test
+  public void execute() throws Exception {
+    execute("http://127.0.0.1:8080");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.test.harness.IntegrationTest#execute(java.lang.String)
+   * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of regular page content");
-
-    // Include the mountpoint
-    // TODO: Make this dynamic
-    // serverUrl = UrlSupport.concat(serverUrl, "weblounge");
 
     // Prepare the request
     logger.info("Testing regular page output");

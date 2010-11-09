@@ -165,6 +165,22 @@ public final class TestSiteUtils {
   }
 
   /**
+   * Parses the <code>HTTP</code> response body into a
+   * <code>java.lang.String</code>.
+   * 
+   * @param response
+   *          the response
+   * @return the response text
+   * @throws Exception
+   *           if extracting the text fails
+   */
+  public static String parseTextResponse(HttpResponse response)
+      throws Exception {
+    String responseText = EntityUtils.toString(response.getEntity(), "UTF-8");
+    return responseText;
+  }
+
+  /**
    * Parses the <code>HTTP</code> response body into a <code>JSON</code> object.
    * 
    * @param response

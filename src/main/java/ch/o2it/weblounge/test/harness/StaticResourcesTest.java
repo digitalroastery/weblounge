@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -33,6 +34,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Assert;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +58,25 @@ public class StaticResourcesTest extends IntegrationTestBase {
    * Creates a new instance of the <code>SiteResources</code> test.
    */
   public StaticResourcesTest() {
-    super("Static Resources Test");
+    super("Static Resources Test", WEBLOUNGE_TEST_GROUP);
+  }
+
+  /**
+   * Runs this test on the instance running at
+   * <code>http://127.0.0.1:8080</code>.
+   * 
+   * @throws Exception
+   *           if the test fails
+   */
+  @Test
+  public void execute() throws Exception {
+    execute("http://127.0.0.1:8080");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.test.harness.IntegrationTest#execute(java.lang.String)
+   * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
     logger.info("Testing loading of an image");

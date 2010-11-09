@@ -152,10 +152,12 @@
               ch.o2it.weblounge.common.impl.request;version=${project.version},
               ch.o2it.weblounge.common.impl.scheduler;version=${project.version},
               ch.o2it.weblounge.common.impl.site;version=${project.version},
+              ch.o2it.weblounge.common.impl.testing;version=${project.version},
               ch.o2it.weblounge.common.impl.url;version=${project.version}, 
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.common.impl.util.config;version=${project.version},
               ch.o2it.weblounge.common.impl.util.xml;version=${project.version},
+              ch.o2it.weblounge.testing;version=${project.version},
               ch.o2it.weblounge.taglib;version=${project.version},
               ch.o2it.weblounge.taglib.content;version=${project.version},
               ch.o2it.weblounge.taglib.security;version=${project.version},
@@ -191,8 +193,7 @@
               com.springsource.javax.media.jai.codec
             </Embed-Dependency>
             <Service-Component>
-              OSGI-INF/site-activator.xml,
-              OSGI-INF/test-command.xml
+              OSGI-INF/site-activator.xml
             </Service-Component>
           </instructions>
         </configuration>
