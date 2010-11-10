@@ -31,7 +31,7 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
-import org.mortbay.resource.Resource;
+import org.eclipse.jetty.util.resource.Resource;
 import org.ops4j.pax.web.jsp.JspServletWrapper;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
@@ -250,7 +250,7 @@ public class SiteServlet extends HttpServlet {
     }
 
     // Load the resource from the bundle
-    final Resource resource = Resource.newResource(url, false);
+    final Resource resource = Resource.newResource(url);
     if (!resource.exists()) {
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;

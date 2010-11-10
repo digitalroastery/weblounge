@@ -23,9 +23,6 @@ package ch.o2it.weblounge.dispatcher.impl.publisher;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.cxf.Bus;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -234,31 +231,18 @@ public class EndpointPublishingService implements ManagedService {
       String endpointPath) {
 
     // Register a new servlet with the http service
-    CXFNonSpringServlet servlet = new CXFNonSpringServlet();
-    logger.info("Registering {} at {}", service, contextPath);
     try {
+
+      CXFNonSpringServlet servlet = new JAXRSServlet(endpointPath, service);
       httpService.registerServlet(contextPath, servlet, new Hashtable<String, String>(), httpContext);
       servletMap.put(contextPath, servlet);
 
-      // Register the servlet with the JSR 311 annotated class
-      Bus bus = servlet.getBus();
-      JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-      factory.setBus(bus);
-      factory.setServiceClass(service.getClass());
-      factory.setResourceProvider(service.getClass(), new SingletonResourceProvider(service));
-      factory.setAddress(endpointPath);
-      ClassLoader bundleClassLoader = Thread.currentThread().getContextClassLoader();
-      ClassLoader delegateClassLoader = JAXRSServerFactoryBean.class.getClassLoader();
-      try {
-        Thread.currentThread().setContextClassLoader(delegateClassLoader);
-        factory.create();
-      } finally {
-        Thread.currentThread().setContextClassLoader(bundleClassLoader);
-      }
+      logger.info("Registering {} at {}", service, contextPath);
+
     } catch (Throwable t) {
       logger.error("Error registering rest service at " + contextPath, t);
       return;
-    }
+    }      
 
   }
 
