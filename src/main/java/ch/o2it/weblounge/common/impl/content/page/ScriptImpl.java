@@ -268,7 +268,7 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
       sb.append(" defer=\"true\"");
     }
 
-    sb.append("/>");
+    sb.append("></script>"); // self closing script tags not allowed in HTML
     return sb.toString();
   }
 
