@@ -22,20 +22,22 @@ package ch.o2it.weblounge.common.impl.url;
 
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
- * <code>UrlSupport</code> is a helper class to deal with urls.
+ * <code>UrlUtils</code> is a helper class to deal with urls.
  */
-public final class UrlSupport {
+public final class UrlUtils {
 
   /**
    * This class should not be instantiated, since it provides static utility
    * methods only.
    */
-  private UrlSupport() {
+  private UrlUtils() {
     // Nothing to be done here
   }
 
@@ -60,66 +62,41 @@ public final class UrlSupport {
   }
 
   /**
-   * Concatenates the two urls with respect to leading and trailing slashes.
-   * <p>
-   * Note that returned path will only end with a slash if <code>suffix</code>
-   * does. If you need a trailing slash, see
-   * {@link #concat(String, String, boolean)}.
-   * 
-   * @return the concatenated url of the two arguments
-   */
-  public static String concat(String prefix, String suffix) {
-    return concat(prefix, suffix, false);
-  }
-
-  /**
-   * Concatenates the two urls with respect to leading and trailing slashes. The
+   * Concatenates the url elements with respect to leading and trailing slashes. The
    * path will always end with a trailing slash.
    * 
+   * @param urlElements
+   *          the path elements
    * @return the concatenated url of the two arguments
+   * @throws IllegalArgumentException
+   *           if less than two path elements are provided
    */
-  public static String concat(String prefix, String suffix, boolean close) {
-    if ("".equals(prefix) || prefix == null)
+  public static String concat(String... urlElements)
+      throws IllegalArgumentException {
+    if (urlElements == null || urlElements.length < 1)
       throw new IllegalArgumentException("Prefix cannot be null or empty");
-    if ("".equals(suffix) || suffix == null)
+    if (urlElements.length < 2)
       throw new IllegalArgumentException("Suffix cannot be null or empty");
 
-    prefix = checkSeparator(prefix);
-    suffix = checkSeparator(suffix);
-    prefix = removeDoubleSeparator(prefix);
-    suffix = removeDoubleSeparator(suffix);
+    StringBuffer b = new StringBuffer();
+    for (String s : urlElements) {
+      if (StringUtils.isBlank(s))
+        throw new IllegalArgumentException("Path element cannot be null");
+      s = checkSeparator(s);
+      s = removeDoubleSeparator(s);
 
-    if (!prefix.endsWith("/") && !suffix.startsWith("/"))
-      prefix += "/";
-    if (prefix.endsWith("/") && suffix.startsWith("/"))
-      suffix = suffix.substring(1);
-
-    prefix += suffix;
-
-    // Close?
-    if (close && !prefix.endsWith("/")) {
-      prefix += "/";
+      if (b.length() == 0) {
+        b.append(s);
+      } else if (b.lastIndexOf("/") < b.length() - 1 && !s.startsWith("/")) {
+        b.append("/").append(s);
+      } else if (b.lastIndexOf("/") == b.length() - 1 && s.startsWith("/")) {
+        b.append(s.substring(1));
+      } else {
+        b.append(s);
+      }
     }
-    return prefix;
-  }
 
-  /**
-   * Concatenates the urls with respect to leading and trailing slashes.
-   * 
-   * @param parts
-   *          the parts to concat
-   * @return the concatenated url
-   */
-  public static String concat(String[] parts) {
-    if (parts == null)
-      throw new IllegalArgumentException("Parts cannot be null");
-    if (parts.length == 0)
-      throw new IllegalArgumentException("Array parts is empty");
-    String path = parts[0];
-    for (int i = 1; i < parts.length; i++) {
-      path = concat(path, parts[i]);
-    }
-    return path;
+    return b.toString();
   }
 
   /**

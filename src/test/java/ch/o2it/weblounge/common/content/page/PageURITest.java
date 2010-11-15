@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.junit.Before;
@@ -121,7 +121,7 @@ public class PageURITest {
    */
   @Test
   public void testGetPath() {
-    assertEquals(UrlSupport.trim(defaultPath), simpleURI.getPath());
+    assertEquals(UrlUtils.trim(defaultPath), simpleURI.getPath());
   }
 
   /**

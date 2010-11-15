@@ -29,7 +29,7 @@ import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
 import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -1045,7 +1045,7 @@ public class SiteImpl implements Site {
         }
 
         // Load i18n dictionaries
-        String i18nPath = UrlSupport.concat(moduleUrl.getPath(), "i18n");
+        String i18nPath = UrlUtils.concat(moduleUrl.getPath(), "i18n");
         i18nEnum = bundle.findEntries(i18nPath, "*.xml", true);
         while (i18nEnum != null && i18nEnum.hasMoreElements()) {
           i18n.addDictionary(i18nEnum.nextElement());

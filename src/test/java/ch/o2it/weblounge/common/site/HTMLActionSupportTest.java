@@ -32,7 +32,7 @@ import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.site.ActionSupport;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 
 import org.easymock.EasyMock;
@@ -97,7 +97,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
 
     pageURI = new PageURIImpl(site, pageURIPath);
     page = new PageImpl(pageURI);
-    actionUrl = new WebUrlImpl(site, UrlSupport.concat(siteUrl, mountpoint));
+    actionUrl = new WebUrlImpl(site, UrlUtils.concat(siteUrl, mountpoint));
   }
 
   /**

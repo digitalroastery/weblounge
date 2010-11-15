@@ -29,7 +29,7 @@ import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
@@ -144,7 +144,7 @@ public class SearchQueryImplTest {
   public void testWithPath() {
     String path = "/test";
     query.withPath(path);
-    assertEquals(PathSupport.trim(path), query.getPath());
+    assertEquals(PathUtils.trim(path), query.getPath());
   }
 
   /**

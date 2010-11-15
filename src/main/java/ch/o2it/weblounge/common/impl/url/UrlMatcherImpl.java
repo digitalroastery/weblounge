@@ -58,7 +58,7 @@ public class UrlMatcherImpl implements UrlMatcher {
    */
   public UrlMatcherImpl(Action action) {
     site = action.getSite();
-    path = UrlSupport.trim(UrlSupport.concat("/", action.getPath()));
+    path = UrlUtils.trim(UrlUtils.concat("/", action.getPath()));
     flavors.addAll(Arrays.asList(action.getFlavors()));
     // TODO: take extension into account
   }

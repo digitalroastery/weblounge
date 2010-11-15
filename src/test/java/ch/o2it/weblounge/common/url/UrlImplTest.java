@@ -24,9 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlImpl;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +77,7 @@ public class UrlImplTest {
   @Test
   public void testUrlImplUrlString() {
     Url u = new UrlImpl(defaultUrl, "a/b");
-    String extendedPath = UrlSupport.concat(defaultUrlPath, "a/b", true);
+    String extendedPath = UrlUtils.concat(defaultUrlPath, "a/b/");
     assertEquals(u.getPath(), extendedPath);
   }
 
@@ -95,8 +95,8 @@ public class UrlImplTest {
    */
   @Test
   public void testGetPath() {
-    assertEquals(UrlSupport.trim(defaultUrlPath), defaultUrl.getPath());
-    assertEquals(PathSupport.trim(defaultFilePath), defaultPath.getPath());
+    assertEquals(UrlUtils.trim(defaultUrlPath), defaultUrl.getPath());
+    assertEquals(PathUtils.trim(defaultFilePath), defaultPath.getPath());
     assertEquals("/", new UrlImpl("/").getPath());
     // TODO: Re-enable as soon as the trim() function is fixed in UrlImpl
     //assertEquals("/", new UrlImpl("//").getPath());

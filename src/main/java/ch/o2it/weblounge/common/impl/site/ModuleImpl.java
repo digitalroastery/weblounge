@@ -28,7 +28,7 @@ import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -73,7 +73,7 @@ public class ModuleImpl implements Module {
 
   /** The module identifier */
   protected String identifier = null;
-  
+
   /** The url that is used to reach module assets */
   protected WebUrl url = null;
 
@@ -146,7 +146,7 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#getUrl()
    */
   public WebUrl getUrl() {
@@ -154,11 +154,7 @@ public class ModuleImpl implements Module {
       return url;
     if (site == null)
       throw new IllegalStateException("Site has not yet been set");
-    url = new WebUrlImpl(site, UrlSupport.concat(new String[] {
-        site.getUrl().getPath(),
-        "module",
-        identifier
-    }));
+    url = new WebUrlImpl(site, UrlUtils.concat(site.getUrl().getPath(), "module", identifier));
     return url;
   }
 
@@ -211,7 +207,7 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#addAction(ch.o2it.weblounge.common.site.Action)
    */
   public void addAction(Action action) {
@@ -219,10 +215,10 @@ public class ModuleImpl implements Module {
     action.setModule(this);
     action.setSite(site);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#removeAction(ch.o2it.weblounge.common.site.Action)
    */
   public void removeAction(Action action) {
@@ -230,7 +226,7 @@ public class ModuleImpl implements Module {
     action.setModule(null);
     action.setSite(null);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -251,22 +247,22 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#addImageStyle(ch.o2it.weblounge.common.content.image.ImageStyle)
    */
   public void addImageStyle(ImageStyle imagestyle) {
     imagestyles.put(imagestyle.getIdentifier(), imagestyle);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#removeImageStyle(ch.o2it.weblounge.common.content.image.ImageStyle)
    */
   public void removeImageStyle(ImageStyle imagestyle) {
     imagestyles.remove(imagestyle.getIdentifier());
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -287,24 +283,24 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#addRenderer(ch.o2it.weblounge.common.content.page.PageletRenderer)
    */
   public void addRenderer(PageletRenderer renderer) {
     renderers.put(renderer.getIdentifier(), renderer);
     renderer.setModule(this);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#removeRenderer(ch.o2it.weblounge.common.content.page.PageletRenderer)
    */
   public void removeRenderer(PageletRenderer renderer) {
     renderers.remove(renderer.getIdentifier());
     renderer.setModule(null);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -325,7 +321,7 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#addJob(ch.o2it.weblounge.common.scheduler.Job)
    */
   public void addJob(Job job) {
@@ -334,31 +330,31 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#removeJob(ch.o2it.weblounge.common.scheduler.Job)
    */
   public void removeJob(Job job) {
     jobs.remove(job.getIdentifier());
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#getJob(java.lang.String)
    */
   public Job getJob(String id) {
     return jobs.get(id);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#getJobs()
    */
   public Job[] getJobs() {
     return jobs.values().toArray(new Job[jobs.size()]);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -607,7 +603,7 @@ public class ModuleImpl implements Module {
   @SuppressWarnings("unchecked")
   public static Module fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
-    
+
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     // identifier
@@ -643,11 +639,11 @@ public class ModuleImpl implements Module {
         throw new IllegalStateException("Found empty module name");
       module.setName(name, LanguageUtils.getLanguage(language));
     }
-    
+
     // pagelets
     NodeList pageletNodes = XPathHelper.selectList(config, "m:pagelets/m:pagelet", xpathProcessor);
     for (int i = 0; i < pageletNodes.getLength(); i++) {
-      PageletRenderer pagelet = PageletRendererImpl.fromXml(pageletNodes.item(i), xpathProcessor);      
+      PageletRenderer pagelet = PageletRendererImpl.fromXml(pageletNodes.item(i), xpathProcessor);
       module.addRenderer(pagelet);
     }
 
@@ -678,7 +674,7 @@ public class ModuleImpl implements Module {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Module#toXml()
    */
   public String toXml() {
@@ -686,7 +682,7 @@ public class ModuleImpl implements Module {
     b.append("<module id=\"");
     b.append(identifier);
     b.append("\" ");
-    
+
     // namespace and schema
     b.append("xmlns=\"http://www.o2it.ch/weblounge/3.0/module\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd\"");
 

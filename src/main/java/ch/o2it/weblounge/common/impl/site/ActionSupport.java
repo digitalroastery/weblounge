@@ -30,7 +30,7 @@ import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.content.page.ScriptImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
@@ -171,9 +171,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @return the action's link
    */
   public WebUrl getUrl() {
-    return new WebUrlImpl(site, UrlSupport.concat(new String[] {
-        site.getUrl().getPath(),
-        mountpoint }));
+    return new WebUrlImpl(site, UrlUtils.concat(site.getUrl().getPath(), mountpoint));
   }
 
   /**
@@ -182,7 +180,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.o2it.weblounge.common.site.Action#setPath(java.lang.String)
    */
   public void setPath(String path) {
-    this.mountpoint = UrlSupport.trim(path);
+    this.mountpoint = UrlUtils.trim(path);
   }
 
   /**
@@ -574,7 +572,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     if (o != null && o instanceof ActionSupport) {
       ActionSupport h = (ActionSupport) o;
       if (module == null && h.getModule() != null)
-         return false;
+        return false;
       if (module != null && !module.equals(h.getModule()))
         return false;
       return identifier.equals(h.identifier);

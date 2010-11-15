@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
@@ -323,10 +323,10 @@ public class WebUrlImplTest {
    */
   @Test
   public void testNormalize() {
-    assertEquals(UrlSupport.concat(hostname, segmentedPath), liveUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, flavoredSegmentedPath), flavoredSegmentedLiveUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, localizedSegmentedPath), localizedSegmentedLiveUrl.normalize());
-    assertEquals(UrlSupport.concat(hostname, flavoredLocalizedSegmentedPath), flavoredLocalizedSegmentedLiveUrl.normalize());
+    assertEquals(UrlUtils.concat(hostname, segmentedPath), liveUrl.normalize());
+    assertEquals(UrlUtils.concat(hostname, flavoredSegmentedPath), flavoredSegmentedLiveUrl.normalize());
+    assertEquals(UrlUtils.concat(hostname, localizedSegmentedPath), localizedSegmentedLiveUrl.normalize());
+    assertEquals(UrlUtils.concat(hostname, flavoredLocalizedSegmentedPath), flavoredLocalizedSegmentedLiveUrl.normalize());
   }
 
   /**
@@ -337,7 +337,7 @@ public class WebUrlImplTest {
   @Test
   public void testNormalizeBooleanBooleanBoolean() {
     WebUrl url = flavoredLocalizedVersionedUrl;
-    String fullUrl = UrlSupport.concat(hostname, flavoredLocalizedVersionedPath);
+    String fullUrl = UrlUtils.concat(hostname, flavoredLocalizedVersionedPath);
     assertEquals(fullUrl, url.normalize(true, true, true, true));
 
     // Everything

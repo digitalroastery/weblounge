@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 import ch.o2it.weblounge.common.content.page.Link;
 import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.site.ActionSupport;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -121,7 +121,7 @@ public class ActionSupportTest {
     module = EasyMock.createNiceMock(Module.class);
     EasyMock.replay(module);
 
-    actionUrl = new WebUrlImpl(site, UrlSupport.concat(siteUrl, mountpoint));
+    actionUrl = new WebUrlImpl(site, UrlUtils.concat(siteUrl, mountpoint));
   }
 
   /**

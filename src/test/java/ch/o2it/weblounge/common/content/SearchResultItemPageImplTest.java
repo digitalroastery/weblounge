@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.SearchResultItemImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultPageItemImpl;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -67,7 +67,7 @@ public class SearchResultItemPageImplTest extends SearchResultItemImplTest {
   @Test
   public void testGetPage() {
     assertNotNull(pageItem.getPage());
-    assertEquals(UrlSupport.trim(path), pageItem.getPage().getURI().getPath());
+    assertEquals(UrlUtils.trim(path), pageItem.getPage().getURI().getPath());
   }
 
   /**

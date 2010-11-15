@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.Guest;
 import ch.o2it.weblounge.common.language.Language;
@@ -136,7 +136,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // for the url might give us the language for free.
     if (url == null)
       url = getUrl();
-    
+
     // There is no url without a path, so we can safely assume that we will
     // get an object back form getUrl().
     language = url.getLanguage();
@@ -214,7 +214,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     // on the url as possible, including flavor, language and version which
     // might all be encoded in the path.
     this.url = new WebUrlImpl(site, getRequestURI());
-    
+
     // The language may be part of the path, so let's give that a try
     if (language == null)
       language = url.getLanguage();
@@ -328,9 +328,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
    */
   @Override
   public RequestDispatcher getRequestDispatcher(String path) {
-    final String servletPath = UrlSupport.concat(new String[] {
-        "/weblounge-sites/",
-        site.getIdentifier() });
+    final String servletPath = UrlUtils.concat("/weblounge-sites/", site.getIdentifier());
     if (siteServlet != null && path.startsWith(servletPath)) {
       return new RequestDispatcher() {
         public void include(ServletRequest request, ServletResponse response)

@@ -20,64 +20,59 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 
 /**
  * <code>PathSupport</code> is a helper class to deal with filesystem paths.
  */
-public final class PathSupport {
+public final class PathUtils {
 
   /**
    * This class should not be instantiated, since it only provides static
    * utility methods.
    */
-  private PathSupport() {
+  private PathUtils() {
     // Nothing to be done here
   }
 
   /**
-   * Concatenates the two urls with respect to leading and trailing slashes.
-   * 
-   * @return the concatenated url of the two arguments
-   */
-  public static String concat(String prefix, String suffix) {
-    if (prefix == null)
-      throw new IllegalArgumentException("Prefix cannot be null");
-    if (suffix == null)
-      throw new IllegalArgumentException("Suffix cannot be null");
-
-    prefix = adjustSeparator(prefix);
-    suffix = adjustSeparator(suffix);
-    prefix = removeDoubleSeparator(prefix);
-    suffix = removeDoubleSeparator(suffix);
-
-    if (!prefix.endsWith(File.separator) && !suffix.startsWith(File.separator))
-      prefix += File.separator;
-    if (prefix.endsWith(File.separator) && suffix.startsWith(File.separator))
-      suffix = suffix.substring(1);
-
-    prefix += suffix;
-    return prefix;
-  }
-
-  /**
    * Concatenates the path elements with respect to leading and trailing
-   * slashes.
+   * slashes. The path will always end with a trailing slash.
    * 
-   * @param parts
-   *          the parts to concat
-   * @return the concatenated path
+   * @param pathElements
+   *          the path elements
+   * @return the concatenated url of the two arguments
+   * @throws IllegalArgumentException
+   *           if less than two path elements are provided
    */
-  public static String concat(String[] parts) {
-    if (parts == null)
-      throw new IllegalArgumentException("Parts cannot be null");
-    if (parts.length == 0)
-      throw new IllegalArgumentException("Array parts is empty");
-    String path = removeDoubleSeparator(adjustSeparator(parts[0]));
-    for (int i = 1; i < parts.length; i++) {
-      path = concat(path, removeDoubleSeparator(adjustSeparator(parts[i])));
+  public static String concat(String... pathElements)
+      throws IllegalArgumentException {
+    if (pathElements == null || pathElements.length < 1)
+      throw new IllegalArgumentException("Prefix cannot be null or empty");
+    if (pathElements.length < 2)
+      throw new IllegalArgumentException("Suffix cannot be null or empty");
+
+    StringBuffer b = new StringBuffer();
+    for (String s : pathElements) {
+      if (StringUtils.isBlank(s))
+        throw new IllegalArgumentException("Path element cannot be null");
+      s = adjustSeparator(s);
+      s = removeDoubleSeparator(s);
+
+      if (b.length() == 0) {
+        b.append(s);
+      } else if (b.lastIndexOf(File.separator) < b.length() - 1 && !s.startsWith(File.separator)) {
+        b.append(File.separator).append(s);
+      } else if (b.lastIndexOf(File.separator) == b.length() - 1 && s.startsWith(File.separator)) {
+        b.append(s.substring(1));
+      } else {
+        b.append(s);
+      }
     }
-    return path;
+
+    return b.toString();
   }
 
   /**

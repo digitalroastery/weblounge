@@ -327,7 +327,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
     }
 
     if (selector.length() > 0)
-      return UrlSupport.concat(path, selector.toString());
+      return UrlUtils.concat(path, selector.toString());
     else
       return path;
   }
@@ -390,7 +390,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       }
     }
 
-    return UrlSupport.trim(buf.toString());
+    return UrlUtils.trim(buf.toString());
   }
 
   /**
