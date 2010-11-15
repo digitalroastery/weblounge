@@ -54,13 +54,6 @@ public interface RequestHandler {
   boolean service(WebloungeRequest request, WebloungeResponse response);
 
   /**
-   * Returns the request handler identifier.
-   * 
-   * @return the handler identifier
-   */
-  String getIdentifier();
-
-  /**
    * Returns the request handler name.
    * 
    * @return the handler name
