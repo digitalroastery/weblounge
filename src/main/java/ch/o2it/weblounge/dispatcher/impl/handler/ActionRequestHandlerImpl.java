@@ -125,7 +125,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       }
     }
 
-    logger.info("Action '{}' ({}) registered for site://{}", new Object[] { action, flavors.toString(), registration.toString() });
+    logger.info("Action '{}' ({}) registered for site://{}", new Object[] {
+        action,
+        flavors.toString(),
+        registration.toString() });
   }
 
   /**
@@ -575,9 +578,9 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       logger.warn("Content repository not available to read target page for action '{}'", action, target);
       return null;
     }
-    
+
     // Does the page exist?
-    page = (Page)contentRepository.get(target);
+    page = (Page) contentRepository.get(target);
     if (page == null) {
       if (targetForced) {
         logger.warn("Output of action '{}' is configured to render on non existing page {}", action, target);
@@ -586,7 +589,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
 
       // Fall back to site homepage
       target = new PageURIImpl(site, "/");
-      page = (Page)contentRepository.get(target);
+      page = (Page) contentRepository.get(target);
       if (page == null) {
         logger.debug("Site {} has no homepage as fallback to render actions", site);
         return null;
@@ -626,7 +629,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         }
       }
     }
-    
+
     // Still nothing?
     if (actionPool == null) {
       logger.debug("No action registered to handle {}", url);
@@ -643,14 +646,18 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getLanguage()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getIdentifier()
    */
   public String getIdentifier() {
     return "actionhandler";
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {
     return "action request handler";

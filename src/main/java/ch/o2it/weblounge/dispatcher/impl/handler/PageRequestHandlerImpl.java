@@ -93,10 +93,10 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     WebUrl url = request.getUrl();
     String path = url.getPath();
     RequestFlavor contentFlavor = request.getFlavor();
-    
+
     if (contentFlavor == null || contentFlavor.equals(ANY))
       contentFlavor = RequestFlavor.HTML;
-    
+
     // Check the request flavor
     // TODO: Criteria would be loading the page from the repository
     // TODO: Think about performance, page lookup is expensive
@@ -171,15 +171,15 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
             pageURI = new PageURIImpl(request);
 
           if (contentRepository.exists(pageURI)) {
-            page = (Page)contentRepository.get(pageURI);
+            page = (Page) contentRepository.get(pageURI);
           }
         } catch (ContentRepositoryException e) {
-          logger.error("Unable to load page {}: {}", new Object[] {
+          logger.error("Unable to load page {} from {}: {}", new Object[] {
               pageURI,
+              contentRepository,
               e.getMessage(),
               e });
           DispatchUtils.sendInternalError(request, response);
-          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           return true;
         }
 
@@ -193,7 +193,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       // Is it published?
       if (!page.isPublished()) {
         logger.debug("Access to unpublished page {}", pageURI);
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
         return true;
       }
 
@@ -288,7 +288,8 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
    *          the weblounge request
    * @return the target page
    */
-  protected ResourceURI getPageURIForAction(Action action, WebloungeRequest request) {
+  protected ResourceURI getPageURIForAction(Action action,
+      WebloungeRequest request) {
     ResourceURI target = null;
     Site site = request.getSite();
 
@@ -386,14 +387,18 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getLanguage()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getIdentifier()
    */
   public String getIdentifier() {
     return "page";
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {
     return "page request handler";
