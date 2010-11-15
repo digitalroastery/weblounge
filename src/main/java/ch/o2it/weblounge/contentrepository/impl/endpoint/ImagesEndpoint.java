@@ -42,7 +42,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -138,9 +137,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
 
     // Determine the language
     Site site = getSite(request);
-    Set<Language> resourceLanguages = resource.languages();
-    Language defaultLanguage = site.getDefaultLanguage();
-    Language preferred = LanguageUtils.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    Language preferred = LanguageUtils.getPreferredLanguage(resource, request, site);
     if (preferred == null) {
       preferred = resource.getOriginalContent().getLanguage();
     }
@@ -217,9 +214,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
 
     // Determine the language
     Site site = getSite(request);
-    Set<Language> resourceLanguages = resource.languages();
-    Language defaultLanguage = site.getDefaultLanguage();
-    Language preferred = LanguageUtils.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    Language preferred = LanguageUtils.getPreferredLanguage(resource, request, site);
     if (preferred == null) {
       preferred = resource.getOriginalContent().getLanguage();
     }

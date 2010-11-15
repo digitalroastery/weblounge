@@ -32,7 +32,6 @@ import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.LanguageSupportTest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
@@ -52,7 +51,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -158,9 +156,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Determine the language
     Site site = getSite(request);
-    Set<Language> resourceLanguages = resource.languages();
-    Language defaultLanguage = site.getDefaultLanguage();
-    Language preferred = LanguageUtils.getPreferredLanguage(resource, request, resource.getOriginalContent().getLanguage(), site.getDefaultLanguage());
+    Language preferred = LanguageUtils.getPreferredLanguage(resource, request, site);
     if (preferred == null) {
       preferred = resource.getOriginalContent().getLanguage();
     }
