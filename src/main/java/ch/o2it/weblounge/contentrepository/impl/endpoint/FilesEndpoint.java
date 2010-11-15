@@ -32,6 +32,7 @@ import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.LanguageSupportTest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
@@ -159,7 +160,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     Set<Language> resourceLanguages = resource.languages();
     Language defaultLanguage = site.getDefaultLanguage();
-    Language preferred = LanguageUtils.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    Language preferred = LanguageUtils.getPreferredLanguage(resource, request, resource.getOriginalContent().getLanguage(), site.getDefaultLanguage());
     if (preferred == null) {
       preferred = resource.getOriginalContent().getLanguage();
     }
