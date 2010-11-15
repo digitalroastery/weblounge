@@ -28,7 +28,7 @@ import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.site.Site;
@@ -286,7 +286,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Store the new page
     try {
       contentRepository.put(page);
-      uri = new URI(UrlSupport.concat(request.getRequestURL().toString(), pageURI.getId()));
+      uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), pageURI.getId()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for page {}: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

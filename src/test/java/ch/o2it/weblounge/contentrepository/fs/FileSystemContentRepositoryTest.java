@@ -46,8 +46,8 @@ import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.url.PathSupport;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -191,7 +191,7 @@ public class FileSystemContentRepositoryTest {
    */
   @Before
   public void setUp() throws Exception {
-    String rootPath = PathSupport.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
     repositoryRoot = new File(rootPath);
 
     // Template
@@ -429,7 +429,7 @@ public class FileSystemContentRepositoryTest {
     // Try to add a new resource
     try {
       file.getURI().setIdentifier(newId);
-      file.getURI().setPath(UrlSupport.concat(file.getURI().getPath(), "2"));
+      file.getURI().setPath(UrlUtils.concat(file.getURI().getPath(), "2"));
       repository.put(file);
       assertEquals(resources + 1, repository.getResourceCount());
     } catch (Exception e) {

@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
@@ -106,7 +106,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     // do anything. If not, we need to copy everything that's currently in the
     // bundle.
     for (ResourceSerializer<?, ?> serializer : serializers) {
-      String resourceDirectoryPath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), serializer.getType() + "s");
+      String resourceDirectoryPath = UrlUtils.concat(repositoryRoot.getAbsolutePath(), serializer.getType() + "s");
       File resourceDirectory = new File(resourceDirectoryPath);
       if (resourceDirectory.isDirectory() && resourceDirectory.list().length > 0) {
         logger.debug("Found existing {}s for site '{}' at {}", new Object[] {
@@ -124,23 +124,26 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     try {
       for (Iterator<ResourceURI> pi = getResourceURIsFromBundle(); pi.hasNext();) {
         ResourceURI uri = pi.next();
-  
+
         try {
           Resource<?> resource = loadResourceFromBundle(uri);
           if (resource == null) {
             throw new ContentRepositoryException("Unable to load " + uri.getType() + " " + uri + " from bundle");
           }
-  
+
           // Update the uri, it now contains the id in addition to just the path
           uri = resource.getURI();
-  
+
           // Make sure we are not updating existing resources, since this is the
           // first time import.
           if (exists(uri)) {
             throw new ContentRepositoryException("Error adding resource " + uri + " to repository: a resource with id '" + uri.getId() + "' or path '" + uri.getPath() + "' already exists");
           }
-  
-          logger.info("Loading {} {}:{}", new Object[] { uri.getType(), site, uri });
+
+          logger.info("Loading {} {}:{}", new Object[] {
+              uri.getType(),
+              site,
+              uri });
           Set<? extends ResourceContent> content = resource.contents();
           if (content.size() == 0) {
             put(resource);
@@ -164,13 +167,13 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
       cleanupAfterFailure();
       throw e;
     }
-    
+
     // Log index statistics to console
     long resourceCount = index.getResourceCount();
     long resourceVersionCount = index.getRevisionCount();
     logger.info("Index contains {} resources and {} revisions", resourceCount, resourceVersionCount - resourceCount);
   }
-  
+
   /**
    * Closes the index and removes the bundle directory from disk.
    */
@@ -201,7 +204,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();
     for (ResourceSerializer<?, ?> serializer : serializers) {
       String resourceDirectory = serializer.getType() + "s";
-      String resourcePathPrefix = UrlSupport.concat(bundlePathPrefix, resourceDirectory);
+      String resourcePathPrefix = UrlUtils.concat(bundlePathPrefix, resourceDirectory);
       Enumeration<URL> entries = bundle.findEntries(resourcePathPrefix, "*.xml", true);
       if (entries != null) {
         while (entries.hasMoreElements()) {
@@ -237,11 +240,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     String uriPath = uri.getPath();
     if (uriPath == null)
       throw new IllegalArgumentException("Resource uri needs a path");
-    String entryPath = UrlSupport.concat(new String[] {
-        bundlePathPrefix,
-        uri.getType() + "s",
-        uriPath,
-        ResourceUtils.getDocument(uri.getVersion()) });
+    String entryPath = UrlUtils.concat(bundlePathPrefix, uri.getType() + "s", uriPath, ResourceUtils.getDocument(uri.getVersion()));
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
@@ -282,11 +281,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     String documentName = content.getLanguage().getIdentifier();
     if (!"".equals(FilenameUtils.getExtension(content.getFilename())))
       documentName += "." + FilenameUtils.getExtension(content.getFilename());
-    String entryPath = UrlSupport.concat(new String[] {
-        bundlePathPrefix,
-        uri.getType() + "s",
-        uriPath,
-        documentName });
+    String entryPath = UrlUtils.concat(bundlePathPrefix, uri.getType() + "s", uriPath, documentName);
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;

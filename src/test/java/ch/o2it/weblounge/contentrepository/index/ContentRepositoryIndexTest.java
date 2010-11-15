@@ -36,8 +36,8 @@ import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.url.PathSupport;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
@@ -182,7 +182,7 @@ public class ContentRepositoryIndexTest {
 
     // Try to add a new resource with existing id
     try {
-      page.getURI().setPath(UrlSupport.concat(file.getURI().getPath(), "pathext"));
+      page.getURI().setPath(UrlUtils.concat(file.getURI().getPath(), "pathext"));
       idx.add(page);
       fail("Managed to add a resource with an existing identifier");
     } catch (Exception e) {
@@ -425,7 +425,7 @@ public class ContentRepositoryIndexTest {
     try {
       idx.close();
 
-      File idIdxFile = new File(PathSupport.concat(indexRootDirectory.getAbsolutePath(), "structure"), IdIndex.ID_IDX_NAME);
+      File idIdxFile = new File(PathUtils.concat(indexRootDirectory.getAbsolutePath(), "structure"), IdIndex.ID_IDX_NAME);
       RandomAccessFile index = new RandomAccessFile(idIdxFile, "rwd");
       index.seek(0);
       index.writeInt(0);

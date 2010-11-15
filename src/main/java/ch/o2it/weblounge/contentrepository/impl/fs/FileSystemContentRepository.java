@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -101,10 +101,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     // Detect the filesystem root directory
     String fsRootDir = (String) properties.get(OPT_ROOT_DIR);
     if (fsRootDir == null) {
-      fsRootDir = UrlSupport.concat(new String[] {
-          System.getProperty("java.io.tmpdir"),
-          "weblounge",
-          "repository" });
+      fsRootDir = UrlUtils.concat(System.getProperty("java.io.tmpdir"), "weblounge", "repository");
     }
     repositoryRoot = new File(fsRootDir, site.getIdentifier());
     logger.debug("Content repository root is located at {}", repositoryRoot);
@@ -195,7 +192,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
-    String homePath = UrlSupport.concat(repositoryRoot.getAbsolutePath(), resourceDirectory);
+    String homePath = UrlUtils.concat(repositoryRoot.getAbsolutePath(), resourceDirectory);
     File resourcesRootDirectory = new File(homePath);
     FileUtils.forceMkdir(resourcesRootDirectory);
     if (resourcesRootDirectory.list().length == 0) {
@@ -468,7 +465,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadResource()
    */
   @Override
-  protected InputStream openStreamToResource(ResourceURI uri) throws IOException {
+  protected InputStream openStreamToResource(ResourceURI uri)
+      throws IOException {
     if (uri.getType() == null) {
       uri.setType(index.getType(uri));
     }
@@ -485,8 +483,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      ch.o2it.weblounge.common.language.Language)
    */
   @Override
-  protected InputStream openStreamToResourceContent(ResourceURI uri, Language language)
-      throws IOException {
+  protected InputStream openStreamToResourceContent(ResourceURI uri,
+      Language language) throws IOException {
     File resourceFile = uriToFile(uri);
     if (resourceFile == null)
       return null;
@@ -544,7 +542,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throw new IOException("Unable to delete directory for resource " + uri, e);
     }
   }
-  
 
   /**
    * {@inheritDoc}
@@ -552,7 +549,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository#storeResource(ch.o2it.weblounge.common.content.resource.Resource)
    */
   @Override
-  protected <T extends ResourceContent, R extends Resource<T>> R storeResource(R resource) throws IOException {
+  protected <T extends ResourceContent, R extends Resource<T>> R storeResource(
+      R resource) throws IOException {
     File resourceUrl = uriToFile(resource.getURI());
     InputStream is = null;
     OutputStream os = null;
@@ -577,8 +575,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *      ch.o2it.weblounge.common.content.ResourceContent, java.io.InputStream)
    */
   @Override
-  protected <T extends ResourceContent> T storeResourceContent(
-      ResourceURI uri, T content, InputStream is) throws IOException {
+  protected <T extends ResourceContent> T storeResourceContent(ResourceURI uri,
+      T content, InputStream is) throws IOException {
 
     File contentFile = uriToContentFile(uri, content);
     OutputStream os = null;
@@ -592,10 +590,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       IOUtils.closeQuietly(is);
       IOUtils.closeQuietly(os);
     }
-    
+
     // Set the size
     content.setSize(contentFile.length());
-    
+
     return content;
   }
 

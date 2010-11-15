@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
@@ -287,7 +287,7 @@ public class ContentRepositoryIndex {
 
       // Make sure we have a path
       if (path == null) {
-        path = UrlSupport.concat("/" + type + "s", id);
+        path = UrlUtils.concat("/" + type + "s", id);
         uri.setPath(path);
       }
 

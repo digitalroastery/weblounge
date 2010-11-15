@@ -26,8 +26,8 @@ import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
-import ch.o2it.weblounge.common.impl.url.PathSupport;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -108,7 +108,7 @@ public class BundleContentRepository extends AbstractContentRepository {
       throw new ContentRepositoryException("Bundle was not found in connect properties");
 
     // Make sure we can create a temporary index
-    idxRootDir = new File(PathSupport.concat(new String[] {
+    idxRootDir = new File(PathUtils.concat(new String[] {
         System.getProperty("java.io.tmpdir"),
         "weblounge",
         "tmp",
@@ -354,7 +354,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         return null;
     }
 
-    String entryPath = UrlSupport.concat(uriPath, ResourceUtils.getDocument(uri.getVersion()));
+    String entryPath = UrlUtils.concat(uriPath, ResourceUtils.getDocument(uri.getVersion()));
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
@@ -386,7 +386,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         return null;
     }
 
-    String entryPath = UrlSupport.concat(uriPath, ResourceUtils.getDocument(uri.getVersion()));
+    String entryPath = UrlUtils.concat(uriPath, ResourceUtils.getDocument(uri.getVersion()));
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
