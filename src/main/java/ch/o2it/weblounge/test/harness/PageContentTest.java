@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNull;
 
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
@@ -56,7 +56,7 @@ public class PageContentTest extends IntegrationTestBase {
 
   /** The paths to test */
   private static final String requestPath = "/test/pagecontent";
-  
+
   /** The expected text */
   private static final Map<Language, String> texts = new HashMap<Language, String>();
 
@@ -68,7 +68,7 @@ public class PageContentTest extends IntegrationTestBase {
     texts.put(LanguageUtils.getLanguage(Locale.FRENCH), "Un titre joyeux");
     texts.put(LanguageUtils.getLanguage(Locale.ENGLISH), "Ein amüsanter Titel");
   }
-  
+
   /**
    * Creates a new instance of the <code>HTML</code> page test.
    */
@@ -101,15 +101,13 @@ public class PageContentTest extends IntegrationTestBase {
 
     for (Language language : texts.keySet()) {
 
-      String requestUrl = UrlSupport.concat(new String[] {
-         serverUrl,
-         requestPath,
-         language.getIdentifier()
-      });
+      String requestUrl = UrlUtils.concat(serverUrl, requestPath, language.getIdentifier());
 
       logger.info("Sending request to the {} version of {}", language.getLocale().getDisplayName(), requestUrl);
       HttpGet request = new HttpGet(requestUrl);
-      String[][] params = new String[][] { { "language", language.getIdentifier() } };
+      String[][] params = new String[][] { {
+          "language",
+          language.getIdentifier() } };
 
       // Send and the request and examine the response
       logger.debug("Sending request to {}", request.getURI());

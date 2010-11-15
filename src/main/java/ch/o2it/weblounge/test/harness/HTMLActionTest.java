@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -89,12 +89,12 @@ public class HTMLActionTest extends IntegrationTestBase {
 
     // Prepare the request
     logger.info("Testing greeter action's html output");
-    logger.info("Sending {} requests to {}", languages.size(), UrlSupport.concat(serverUrl, requestPaths[0]));
+    logger.info("Sending {} requests to {}", languages.size(), UrlUtils.concat(serverUrl, requestPaths[0]));
 
     for (String path : requestPaths) {
       for (String language : languages) {
         String greeting = greetings.get(language);
-        HttpGet request = new HttpGet(UrlSupport.concat(serverUrl, path));
+        HttpGet request = new HttpGet(UrlUtils.concat(serverUrl, path));
         String[][] params = new String[][] { { "language", language } };
 
         // Send and the request and examine the response

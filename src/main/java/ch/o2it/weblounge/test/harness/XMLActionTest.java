@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.test.harness;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -75,7 +75,7 @@ public class XMLActionTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of greeter action");
 
-    String requestUrl = UrlSupport.concat(serverUrl, "greeting/xml");
+    String requestUrl = UrlUtils.concat(serverUrl, "greeting/xml");
 
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();

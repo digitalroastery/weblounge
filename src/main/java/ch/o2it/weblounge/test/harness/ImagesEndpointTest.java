@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.site.ScalingMode;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
@@ -87,7 +87,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
 
   /** File size of the German version */
   private static final long sizeGerman = 88723L;
-  
+
   /** Mime type of the German version */
   private static final String mimetypeGerman = "image/jpeg";
 
@@ -111,7 +111,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     modes.add(ScalingMode.Height);
     modes.add(ScalingMode.None);
   }
-  
+
   /**
    * Creates a new instance of the content repository's image endpoint test.
    */
@@ -139,7 +139,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of images endpoint");
 
-    String requestUrl = UrlSupport.concat(serverUrl, baseURL);
+    String requestUrl = UrlUtils.concat(serverUrl, baseURL);
 
     try {
       testGetImageStyles(requestUrl);
@@ -164,7 +164,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetImageStyles(String serverUrl) throws Exception {
-    String url = UrlSupport.concat(serverUrl, "styles");
+    String url = UrlUtils.concat(serverUrl, "styles");
     HttpGet getStylesRequest = new HttpGet(url);
     HttpClient httpClient = new DefaultHttpClient();
     try {
@@ -191,10 +191,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     HttpClient httpClient = null;
     for (ScalingMode mode : modes) {
       String styleId = mode.toString().toLowerCase();
-      String url = UrlSupport.concat(new String[] {
-          serverUrl,
-          "styles",
-          styleId });
+      String url = UrlUtils.concat(serverUrl, "styles", styleId);
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
       try {
@@ -221,10 +218,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    */
   private void testGetImageMetadata(String serverUrl) throws Exception {
     HttpClient httpClient = null;
-    String url = UrlSupport.concat(new String[] {
-        serverUrl,
-        imageId,
-        "metadata" });
+    String url = UrlUtils.concat(serverUrl, imageId, "metadata");
     HttpGet getStyleRequest = new HttpGet(url);
     httpClient = new DefaultHttpClient();
     try {
@@ -252,13 +246,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    */
   private void testGetOriginalImage(String serverUrl) throws Exception {
     HttpClient httpClient = null;
-    String url = UrlSupport.concat(new String[] {
-        serverUrl,
-        imageId,
-        "original" });
+    String url = UrlUtils.concat(serverUrl, imageId, "original");
     HttpGet getOriginalImageRequest = new HttpGet(url);
     httpClient = new DefaultHttpClient();
-    String eTagValue = null; 
+    String eTagValue = null;
     try {
       logger.info("Requesting original image version");
       HttpResponse response = TestSiteUtils.request(httpClient, getOriginalImageRequest, null);
@@ -283,7 +274,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
+
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
@@ -313,15 +304,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     HttpClient httpClient = null;
 
     // English
-    String englishUrl = UrlSupport.concat(new String[] {
-        serverUrl,
-        imageId,
-        "locales",
-        "en",
-        "original" });
+    String englishUrl = UrlUtils.concat(serverUrl, imageId, "locales", "en", "original");
     HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
     httpClient = new DefaultHttpClient();
-    String eTagValue = null; 
+    String eTagValue = null;
     try {
       logger.info("Requesting original english image");
       HttpResponse response = TestSiteUtils.request(httpClient, getEnglishOriginalRequest, null);
@@ -362,12 +348,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     }
 
     // German
-    String germanUrl = UrlSupport.concat(new String[] {
-        serverUrl,
-        imageId,
-        "locales",
-        "de",
-        "original" });
+    String germanUrl = UrlUtils.concat(serverUrl, imageId, "locales", "de", "original");
     HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
     httpClient = new DefaultHttpClient();
     try {
@@ -424,14 +405,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     List<String> eTags = new ArrayList<String>();
     for (ScalingMode mode : modes) {
       String styleId = mode.toString().toLowerCase();
-      String url = UrlSupport.concat(new String[] {
-          serverUrl,
-          imageId,
-          "styles",
-          styleId });
+      String url = UrlUtils.concat(serverUrl, imageId, "styles", styleId);
       HttpGet getStyleRequest = new HttpGet(url);
       httpClient = new DefaultHttpClient();
-      String eTagValue = null; 
+      String eTagValue = null;
       try {
         logger.info("Requesting scaled default image '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
@@ -449,7 +426,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
         assertNotNull(eTagHeader);
         assertNotNull(eTagHeader.getValue());
         eTagValue = eTagHeader.getValue();
-        
+
         // Make sure ETags are created in a proper way (no duplicates)
         assertFalse("Duplicate ETag returned by endpoint", eTags.contains(eTagValue));
         eTags.add(eTagValue);
@@ -494,16 +471,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       String styleId = mode.toString().toLowerCase();
 
       // English
-      String englishUrl = UrlSupport.concat(new String[] {
-          serverUrl,
-          imageId,
-          "locales",
-          "en",
-          "styles",
-          styleId });
+      String englishUrl = UrlUtils.concat(serverUrl, imageId, "locales", "en", "styles", styleId);
       HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
       httpClient = new DefaultHttpClient();
-      String eTagValue = null; 
+      String eTagValue = null;
       try {
         logger.info("Requesting scaled english image '{}'", styleId);
         HttpResponse response = TestSiteUtils.request(httpClient, getEnglishOriginalRequest, null);
@@ -549,13 +520,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       }
 
       // German
-      String germanUrl = UrlSupport.concat(new String[] {
-          serverUrl,
-          imageId,
-          "locales",
-          "de",
-          "styles",
-          styleId });
+      String germanUrl = UrlUtils.concat(serverUrl, imageId, "locales", "de", "styles", styleId);
       HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
       httpClient = new DefaultHttpClient();
       try {

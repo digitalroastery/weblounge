@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.Header;
@@ -69,6 +69,9 @@ public class FilesTest extends IntegrationTestBase {
 
   /** File name of the German version */
   private static final String filenameGerman = "porsche.jpg";
+  
+  /** Resource identifier */
+  private static final String resourceId = "6bc19990-8f99-4873-a813-71b6dfac22ad";
 
   /**
    * Creates a new instance of the images test.
@@ -96,12 +99,10 @@ public class FilesTest extends IntegrationTestBase {
    */
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of file request handler");
-
-    String requestUrl = UrlSupport.concat(serverUrl, path);
-
     try {
-      testGetDocument(requestUrl);
-      testGetDocumentByLanguage(requestUrl);
+      testGetDocument(serverUrl);
+      testGetDocumentByLanguage(serverUrl);
+      testGetDocumentById(serverUrl);
     } catch (Throwable t) {
       fail("Error occured while testing files request handler: " + t.getMessage());
     }
@@ -121,7 +122,60 @@ public class FilesTest extends IntegrationTestBase {
    */
   private void testGetDocument(String serverUrl) throws Exception {
     HttpClient httpClient = null;
-    String url = serverUrl;
+    String url = UrlUtils.concat(serverUrl, path);
+    HttpGet getDocumentRequest = new HttpGet(url);
+    httpClient = new DefaultHttpClient();
+    String eTagValue = null;
+    try {
+      logger.info("Requesting original document version");
+      HttpResponse response = TestSiteUtils.request(httpClient, getDocumentRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue("No content received", response.getEntity().getContentLength() > 0);
+
+      // Test general headers
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeGerman, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpGet request = new HttpGet(url);
+      request.addHeader("If-None-Match", eTagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", url);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+  }
+
+  /**
+   * Tests for the special <code>/files</code> uri prefix that is provided by
+   * the file request handler. 
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetDocumentById(String serverUrl) throws Exception {
+    HttpClient httpClient = null;
+    String url = UrlUtils.concat(serverUrl, "files", resourceId);
     HttpGet getDocumentRequest = new HttpGet(url);
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
@@ -176,7 +230,7 @@ public class FilesTest extends IntegrationTestBase {
     HttpClient httpClient = null;
 
     // German
-    String englishUrl = UrlSupport.concat(serverUrl, "en");
+    String englishUrl = UrlUtils.concat(serverUrl, "en");
     HttpGet getEnglishDocumentRequest = new HttpGet(englishUrl);
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
@@ -217,7 +271,7 @@ public class FilesTest extends IntegrationTestBase {
     }
 
     // German
-    String germanUrl = UrlSupport.concat(serverUrl, "de");
+    String germanUrl = UrlUtils.concat(serverUrl, "de");
     HttpGet getGermanRequest = new HttpGet(germanUrl);
     httpClient = new DefaultHttpClient();
     try {

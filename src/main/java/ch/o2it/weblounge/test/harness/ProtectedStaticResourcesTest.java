@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.test.harness;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;
@@ -48,9 +48,8 @@ public class ProtectedStaticResourcesTest extends IntegrationTestBase {
 
   /** Paths to the protected resources */
   private static final String[] protectedResources = {
-    "/site.xml",
-    "/modules/test/module.xml"
-  };
+      "/site.xml",
+      "/modules/test/module.xml" };
 
   /**
    * Creates a new instance of the <code>SiteResources</code> test.
@@ -79,7 +78,7 @@ public class ProtectedStaticResourcesTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     for (String resource : protectedResources) {
       HttpClient httpClient = new DefaultHttpClient();
-      String requestUrl = UrlSupport.concat(new String[] { serverUrl, SITE_ROOT_PATH, resource });
+      String requestUrl = UrlUtils.concat(serverUrl, SITE_ROOT_PATH, resource);
       HttpGet request = new HttpGet(requestUrl);
       try {
         logger.info("Testing loading of the protected resource {}", resource);

@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.test.harness;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;
@@ -74,7 +74,7 @@ public class JSONActionTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of greeter action");
 
-    String requestUrl = UrlSupport.concat(serverUrl, "greeting/json");
+    String requestUrl = UrlUtils.concat(serverUrl, "greeting/json");
 
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();

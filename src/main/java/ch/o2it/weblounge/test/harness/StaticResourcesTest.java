@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.Header;
@@ -81,7 +81,7 @@ public class StaticResourcesTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Testing loading of an image");
     
-    String requestUrl = UrlSupport.concat(serverUrl, IMAGE_PATH);
+    String requestUrl = UrlUtils.concat(serverUrl, IMAGE_PATH);
     
     // Value of the Etag header from the first response */
     String eTagValue = null; 

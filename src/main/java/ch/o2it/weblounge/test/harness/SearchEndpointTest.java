@@ -23,7 +23,7 @@ package ch.o2it.weblounge.test.harness;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -77,7 +77,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of search rest api");
 
-    String requestUrl = UrlSupport.concat(serverUrl, "system/weblounge/search");
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/search");
     
     // Prepare the request
     logger.info("Searching for a page");
@@ -97,7 +97,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
     // Check for search terms that don't yield a result
     String searchTerms = "xyz";
     httpClient = new DefaultHttpClient();
-    searchRequest = new HttpGet(UrlSupport.concat(requestUrl, searchTerms));
+    searchRequest = new HttpGet(UrlUtils.concat(requestUrl, searchTerms));
     logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
     try {
       HttpResponse response = TestSiteUtils.request(httpClient, searchRequest, null);
@@ -116,7 +116,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
     // Check for search terms that should yield a result
     searchTerms = "Friedrich Nietzsche Suchresultat";
     httpClient = new DefaultHttpClient();
-    searchRequest = new HttpGet(UrlSupport.concat(requestUrl, URLEncoder.encode(searchTerms, "UTF-8")));
+    searchRequest = new HttpGet(UrlUtils.concat(requestUrl, URLEncoder.encode(searchTerms, "UTF-8")));
     String[][] params = new String[][] {{"limit", "5"}};
     logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
     try {

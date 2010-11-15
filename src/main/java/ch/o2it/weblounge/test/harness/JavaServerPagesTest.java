@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -82,7 +82,7 @@ public class JavaServerPagesTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Testing loading of java server page");
     
-    String requestUrl = UrlSupport.concat(serverUrl, JSP_PATH);
+    String requestUrl = UrlUtils.concat(serverUrl, JSP_PATH);
     HttpGet request = new HttpGet(requestUrl);
     logger.info("Sending request to {}", requestUrl);
 

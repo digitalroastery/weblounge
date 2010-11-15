@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -88,7 +88,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of pages endpoint");
 
-    String requestUrl = UrlSupport.concat(serverUrl, "system/weblounge/pages");
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
     String testPath = "/" + System.currentTimeMillis() + "/";
 
     // Prepare the request
@@ -114,7 +114,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     }
 
     // Check if a page has been created
-    HttpGet getPageRequest = new HttpGet(UrlSupport.concat(requestUrl, pageId));
+    HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, pageId));
     httpClient = new DefaultHttpClient();
     Document pageXml = null;
     String creator = null;
@@ -131,7 +131,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     }
 
     // Update the page
-    HttpPut updatePageRequest = new HttpPut(UrlSupport.concat(requestUrl, pageId));
+    HttpPut updatePageRequest = new HttpPut(UrlUtils.concat(requestUrl, pageId));
     String updatedCreator = creator + " (updated)";
     NodeList creatorElements = pageXml.getElementsByTagName("created");
     creatorElements.item(0).getFirstChild().setTextContent(updatedCreator);
@@ -146,7 +146,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     }
 
     // Make sure the update was successful
-    HttpGet getUpdatedPageRequest = new HttpGet(UrlSupport.concat(requestUrl, pageId));
+    HttpGet getUpdatedPageRequest = new HttpGet(UrlUtils.concat(requestUrl, pageId));
     httpClient = new DefaultHttpClient();
     logger.info("Requesting updated page at {}", requestUrl);
     try {
@@ -161,7 +161,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
     }
 
     // Delete the page
-    HttpDelete deletePageRequest = new HttpDelete(UrlSupport.concat(requestUrl, pageId));
+    HttpDelete deletePageRequest = new HttpDelete(UrlUtils.concat(requestUrl, pageId));
     httpClient = new DefaultHttpClient();
     logger.info("Sending delete request to {}", requestUrl);
     try {
