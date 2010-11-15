@@ -46,7 +46,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Test cases for the {@link LanguageUtils} implementation.
  */
-public class LanguageSupportTest {
+public class LanguageUtilsTest {
 
   /** English locale */
   protected Locale englishLocale = new Locale("en");
