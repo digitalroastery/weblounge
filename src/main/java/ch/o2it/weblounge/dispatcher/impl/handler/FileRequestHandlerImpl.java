@@ -123,7 +123,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     }
 
     // Determine the response language
-    Language language = LanguageUtils.getPreferredLanguage(fileResource, site, request.getLanguage(), fileResource.getOriginalContent().getLanguage(), site.getDefaultLanguage());
+    Language language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
     if (language == null) {
       logger.warn("File {} does not exist in any supported language", fileURI);
       DispatchUtils.sendNotFound(request, response);

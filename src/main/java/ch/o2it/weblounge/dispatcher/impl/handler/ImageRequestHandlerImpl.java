@@ -138,7 +138,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     }
 
     // Determine the response language
-    Language language = LanguageUtils.getPreferredLanguage(imageResource, site, request.getLanguage(), imageResource.getOriginalContent().getLanguage(), site.getDefaultLanguage());
+    Language language = LanguageUtils.getPreferredLanguage(imageResource, request, site);
     if (language == null) {
       logger.warn("Image {} does not exist in any supported language", imageURI);
       DispatchUtils.sendNotFound(request, response);
