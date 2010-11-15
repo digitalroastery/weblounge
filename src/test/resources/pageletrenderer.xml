@@ -7,6 +7,6 @@
   <valid>1w2d1H</valid>
   <preview>first</preview>
   <includes>
-    <link href="http://localhost/css.css"/>
+    <link href="http://localhost/css.css"></link>
   </includes>
 </pagelet>

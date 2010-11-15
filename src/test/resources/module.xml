@@ -12,7 +12,7 @@
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
       <includes>
-        <link href="http://localhost/css/stylesheet.css" type="text/css"/>
+        <link href="http://localhost/css/stylesheet.css" type="text/css"></link>
       </includes>
     </pagelet>
   </pagelets>
@@ -27,8 +27,8 @@
       <recheck>0</recheck>
       <valid>1M</valid>
       <includes>
-        <link href="http://localhost/css/stylesheet.css" type="text/css"/>
-        <script src="http://localhost/scripts/script.js" type="javascript"/>
+        <link href="http://localhost/css/stylesheet.css" type="text/css"></link>
+        <script src="http://localhost/scripts/script.js" type="javascript"></script>
       </includes>
       <options>
         <option>

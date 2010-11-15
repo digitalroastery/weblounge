@@ -8,7 +8,7 @@
   <recheck>2d</recheck>
   <valid>3w</valid>
   <includes>
-    <link href="http://localhost/css.css"/>
-    <script src="http://localhost/javascript.js"/>
+    <link href="http://localhost/css.css"></link>
+    <script src="http://localhost/javascript.js"></script>
   </includes>
 </template>

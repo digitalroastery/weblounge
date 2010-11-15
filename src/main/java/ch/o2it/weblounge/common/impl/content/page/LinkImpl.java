@@ -330,7 +330,7 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
       sb.append("\"");
     }
 
-    sb.append("/>");
+    sb.append("></link>");
     return sb.toString();
   }
 
