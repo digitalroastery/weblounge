@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -64,9 +64,9 @@ public class PageContentTest extends IntegrationTestBase {
    * Prepare the test data.
    */
   static {
-    texts.put(LanguageSupport.getLanguage(Locale.GERMAN), "Ein amüsanter Titel");
-    texts.put(LanguageSupport.getLanguage(Locale.FRENCH), "Un titre joyeux");
-    texts.put(LanguageSupport.getLanguage(Locale.ENGLISH), "Ein amüsanter Titel");
+    texts.put(LanguageUtils.getLanguage(Locale.GERMAN), "Ein amüsanter Titel");
+    texts.put(LanguageUtils.getLanguage(Locale.FRENCH), "Un titre joyeux");
+    texts.put(LanguageUtils.getLanguage(Locale.ENGLISH), "Ein amüsanter Titel");
   }
   
   /**

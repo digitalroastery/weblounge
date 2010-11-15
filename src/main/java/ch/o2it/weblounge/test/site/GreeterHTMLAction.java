@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.test.site;
 
 import ch.o2it.weblounge.common.content.page.Composer;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
 import ch.o2it.weblounge.common.language.Language;
@@ -105,7 +105,7 @@ public class GreeterHTMLAction extends HTMLActionSupport {
   protected String getLanguage(WebloungeRequest request) {
     String language = RequestUtils.getParameter(request, LANGUAGE_PARAM);
     if (language == null) {
-      Language en = LanguageSupport.getLanguage("en");
+      Language en = LanguageUtils.getLanguage("en");
       language = request.getLanguage().getDescription(en).toLowerCase();
       if (language == null) {
         language = "english";
