@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.Guest;
@@ -151,7 +151,7 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
     if (language == null) {
       Matcher m = LANG_EXTRACTOR_REGEX.matcher(getRequestURI());
       if (m.find()) {
-        language = LanguageSupport.getLanguage(m.group(1));
+        language = LanguageUtils.getLanguage(m.group(1));
         logger.trace("Selected language " + language + " from request uri");
       }
     }

@@ -29,7 +29,7 @@ import static ch.o2it.weblounge.common.site.ScalingMode.Width;
 
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.ScalingMode;
@@ -339,7 +339,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
       String name = XPathHelper.valueOf(localiziation, "text()", xpath);
       if (name == null)
         throw new IllegalStateException("Found empty imagestyle name");
-      imageStyle.setName(name, LanguageSupport.getLanguage(language));
+      imageStyle.setName(name, LanguageUtils.getLanguage(language));
     }
 
     return imageStyle;

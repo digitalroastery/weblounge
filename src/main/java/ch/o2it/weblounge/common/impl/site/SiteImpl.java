@@ -23,7 +23,7 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.content.page.PageLayout;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
@@ -1354,7 +1354,7 @@ public class SiteImpl implements Site {
       Node defaultAttribute = languageNode.getAttributes().getNamedItem("default");
       String languageId = languageNode.getFirstChild().getNodeValue();
       try {
-        Language language = LanguageSupport.getLanguage(languageId);
+        Language language = LanguageUtils.getLanguage(languageId);
         if (ConfigurationUtils.isTrue(defaultAttribute))
           site.setDefaultLanguage(language);
         else

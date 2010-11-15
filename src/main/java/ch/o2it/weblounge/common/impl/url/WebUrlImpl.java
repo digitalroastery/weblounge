@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.impl.url;
 
 import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.request.RequestFlavor;
@@ -560,7 +560,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
           group--;
         } else {
           try {
-            language = LanguageSupport.getLanguage(l);
+            language = LanguageUtils.getLanguage(l);
             if (language != null) {
               this.language = site.getDefaultLanguage();
               group--;

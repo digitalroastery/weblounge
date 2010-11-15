@@ -21,7 +21,9 @@
 package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.Site;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
@@ -166,7 +168,8 @@ public final class ImageStyleUtils {
   }
 
   /**
-   * Resizes the given image to what is defined by the image style.
+   * Resizes the given image to what is defined by the image style and writes
+   * the result to the output stream.
    * 
    * @param is
    *          the input stream
@@ -179,7 +182,7 @@ public final class ImageStyleUtils {
    * @throws IOException
    *           if reading from or writing to the stream fails
    * @throws OutOfMemoryError
-   *           if the image is too large to be processed in memoy
+   *           if the image is too large to be processed in memory
    */
   public static void style(InputStream is, OutputStream os, String format,
       ImageStyle style) throws IOException, OutOfMemoryError {
@@ -259,6 +262,30 @@ public final class ImageStyleUtils {
       if (image != null)
         image.dispose();
     }
+  }
+
+  /**
+   * Searches all modules of the given site for the image style identified by
+   * <code>styleId</code> and returns it. If no such style was found,
+   * <code>null</code> is returned.
+   * 
+   * @param styleId
+   *          the image style identifier
+   * @param site
+   *          the site
+   * @return the image style or <code>null</code> if the style was not found
+   */
+  public static ImageStyle findStyle(String styleId, Site site) {
+    if (styleId == null)
+      throw new IllegalArgumentException("Style identifier cannot be null");
+    if (site == null)
+      throw new IllegalArgumentException("Site cannot be null");
+    for (Module m : site.getModules()) {
+      ImageStyle style = m.getImageStyle(styleId);
+      if (style != null)
+        return style;
+    }
+    return null;
   }
 
 }

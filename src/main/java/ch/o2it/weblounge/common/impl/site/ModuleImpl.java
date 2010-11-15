@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
@@ -641,7 +641,7 @@ public class ModuleImpl implements Module {
       String name = XPathHelper.valueOf(localiziation, "text()", xpathProcessor);
       if (name == null)
         throw new IllegalStateException("Found empty module name");
-      module.setName(name, LanguageSupport.getLanguage(language));
+      module.setName(name, LanguageUtils.getLanguage(language));
     }
     
     // pagelets

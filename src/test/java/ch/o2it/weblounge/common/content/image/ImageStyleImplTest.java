@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.ScalingMode;
 
@@ -56,10 +56,10 @@ public class ImageStyleImplTest {
   protected boolean composeable = true;
 
   /** The German language */
-  protected Language german = LanguageSupport.getLanguage("de");
+  protected Language german = LanguageUtils.getLanguage("de");
 
   /** The English language */
-  protected Language english = LanguageSupport.getLanguage("en");
+  protected Language english = LanguageUtils.getLanguage("en");
   
   /** English image style name */
   protected String englishName = "Default";

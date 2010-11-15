@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
@@ -119,13 +119,13 @@ public class WebUrlImplTest {
   protected Site otherSiteMock = null;
 
   /** The English language */
-  protected Language english = LanguageSupport.getLanguage("en");
+  protected Language english = LanguageUtils.getLanguage("en");
 
   /** The German language */
-  protected Language german = LanguageSupport.getLanguage("de");
+  protected Language german = LanguageUtils.getLanguage("de");
 
   /** The French language */
-  protected Language french = LanguageSupport.getLanguage("fr");
+  protected Language french = LanguageUtils.getLanguage("fr");
 
   /**
    * @throws java.lang.Exception

@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.user;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -123,7 +123,7 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
     user.email = XPathHelper.valueOf(userNode, "email", xpath);
     String language = XPathHelper.valueOf(userNode, "language", xpath);
     if (language != null) {
-      Language l = LanguageSupport.getLanguage(language);
+      Language l = LanguageUtils.getLanguage(language);
       user.language = (l != null) ? l : site.getDefaultLanguage();
     }
 

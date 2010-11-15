@@ -23,7 +23,7 @@ package ch.o2it.weblounge.common.impl.content;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
@@ -314,7 +314,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
       if ("title".equals(raw) || "subject".equals(raw) || "description".equals(raw) || "coverage".equals(raw) || "rights".equals(raw)) {
         String language = attrs.getValue("language");
         if (language != null) {
-          Language l = LanguageSupport.getLanguage(language);
+          Language l = LanguageUtils.getLanguage(language);
           clipboard.put("language", l);
         } else {
           clipboard.remove("language");

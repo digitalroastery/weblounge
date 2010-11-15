@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.content;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
@@ -453,7 +453,7 @@ public class LocalizedModificationContext extends LocalizableObject implements C
       boolean original = originalNode != null && ConfigurationUtils.isTrue(originalNode.getNodeValue());
       if (languageNode == null)
         throw new IllegalStateException("Found locale without language");
-      Language language = LanguageSupport.getLanguage(languageNode.getNodeValue());
+      Language language = LanguageUtils.getLanguage(languageNode.getNodeValue());
 
       // Modifying user
       Node modifierNode = XPathHelper.select(locale, "modified/user", xpath);

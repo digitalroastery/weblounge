@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.site;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XMLUtilities;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -198,7 +198,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
     int lidstart = name.indexOf('_') + 1;
     if (lidstart > 0 && lidstart < name.length()) {
       languageId = name.substring(lidstart);
-      language = LanguageSupport.getLanguage(languageId);
+      language = LanguageUtils.getLanguage(languageId);
     }
     addDictionary(url, language);
   }

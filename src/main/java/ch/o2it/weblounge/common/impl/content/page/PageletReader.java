@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.content.page;
 
 import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
@@ -159,7 +159,7 @@ public final class PageletReader extends WebloungeContentReader {
     // locale
     else if ("locale".equals(raw)) {
       String language = attrs.getValue("language");
-      Language l = LanguageSupport.getLanguage(language);
+      Language l = LanguageUtils.getLanguage(language);
       if (l == null)
         throw new IllegalStateException("Found content without language");
       if ("true".equals(attrs.getValue("original")))

@@ -28,7 +28,7 @@ import ch.o2it.weblounge.common.content.page.Script;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
 import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.content.page.ScriptImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
@@ -733,7 +733,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       String name = XPathHelper.valueOf(localiziation, "text()", xpathProcessor);
       if (name == null)
         throw new IllegalStateException("Found empty action name");
-      action.setName(name, LanguageSupport.getLanguage(language));
+      action.setName(name, LanguageUtils.getLanguage(language));
     }
 
     // options

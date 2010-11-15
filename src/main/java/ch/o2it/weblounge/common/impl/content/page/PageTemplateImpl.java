@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.page.Link;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Script;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -318,7 +318,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       String name = XPathHelper.valueOf(localiziation, "text()", xpath);
       if (name == null)
         throw new IllegalStateException("Found empty page template name");
-      template.setName(name, LanguageSupport.getLanguage(language));
+      template.setName(name, LanguageUtils.getLanguage(language));
     }
 
     // scripts

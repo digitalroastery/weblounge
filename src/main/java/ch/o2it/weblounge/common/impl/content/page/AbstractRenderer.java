@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.RenderException;
 import ch.o2it.weblounge.common.content.Renderer;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.request.SiteRequestWrapper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
@@ -180,7 +180,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
     try {
       if ("file".equals(renderer.getProtocol())) {
         // Find the best match for the template
-        String[] filePaths = LanguageSupport.getLanguageVariantsByPriority(renderer.toExternalForm(), language, site.getDefaultLanguage());
+        String[] filePaths = LanguageUtils.getLanguageVariantsByPriority(renderer.toExternalForm(), language, site.getDefaultLanguage());
         for (String path : filePaths) {
           logger.trace("Looking for jsp {}", path);
           File f = new File(path);

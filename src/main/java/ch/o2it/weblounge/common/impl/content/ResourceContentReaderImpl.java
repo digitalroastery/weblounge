@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceContentReader;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler;
 import ch.o2it.weblounge.common.user.User;
@@ -138,7 +138,7 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
     if ("content".equals(raw)) {
       String languageId = attrs.getValue("language");
       content = createContent();
-      content.setLanguage(LanguageSupport.getLanguage(languageId));
+      content.setLanguage(LanguageUtils.getLanguage(languageId));
       logger.debug("Started reading file content {}", content);
     }
 

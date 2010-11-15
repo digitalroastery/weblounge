@@ -21,6 +21,14 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.language.Language;
+
+import org.apache.commons.lang.StringUtils;
+
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This class contains utility methods intended to facilitate dealing with
@@ -33,6 +41,136 @@ public final class ResourceUtils {
    */
   private ResourceUtils() {
     // Nothing to do here
+  }
+
+  /**
+   * Returns <code>true</code> if the resource either is more recent than the
+   * cached version on the client side or the request does not contain caching
+   * information.
+   * 
+   * @param resource
+   *          the resource
+   * @param request
+   *          the client request
+   * @return <code>true</code> if the page is more recent than the version that
+   *         is cached at the client.
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> header cannot be converted
+   *           to a date.
+   */
+  public static boolean isModified(Resource<?> resource,
+      HttpServletRequest request) throws IllegalArgumentException {
+    long cachedModificationDate = request.getDateHeader("If-Modified-Since");
+    Date resourceModificationDate = resource.getModificationDate();
+    return cachedModificationDate < resourceModificationDate.getTime();
+  }
+
+  /**
+   * Returns <code>true</code> if the resource has not been modified,
+   * <code>false</code> if the cached version on the client side is out dated or
+   * if the request did not contain caching information.
+   * <p>
+   * The decision is based on the availability and value of the
+   * <code>If-None-Match</code> header (called <code>ETag</code>).
+   * <p>
+   * Note that if <code>language</code> is <code>null</code>, the
+   * <code>ETag</code> calculation will be performed on the resource level
+   * rather than the resource content.
+   * 
+   * @param resource
+   *          the resource
+   * @param request
+   *          the client request
+   * @return <code>true</code> if the resource's calculated eTag matches the one
+   *         specified
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> cannot be converted to a
+   *           date.
+   */
+  public static boolean isMismatch(Resource<?> resource, Language language,
+      HttpServletRequest request) throws IllegalArgumentException {
+    String eTagHeader = request.getHeader("If-None-Match");
+    if (StringUtils.isBlank(eTagHeader))
+      return false;
+    String eTag = getETagValue(resource, language);
+    return !eTagHeader.equals("\"" + eTag + "\"");
+  }
+
+  /**
+   * Returns <code>true</code> if the resource has not been modified according
+   * to the expected <code>ETag</code> value, <code>false</code> if the cached
+   * version on the client side is out dated or if the request did not contain
+   * caching information.
+   * <p>
+   * The decision is based on the availability and value of the
+   * <code>If-None-Match</code> header (called <code>ETag</code>). The computed
+   * value of <code>eTag</code> is expected to be plain, i. e. without
+   * surrounding quotes.
+   * 
+   * @param eTag
+   *          the expected eTag value
+   * @param request
+   *          the client request
+   * @return <code>true</code> if the resource's calculated eTag matches the one
+   *         specified
+   * @throws IllegalArgumentException
+   *           if the <code>If-Modified-Since</code> cannot be converted to a
+   *           date.
+   */
+  public static boolean isMismatch(String eTag, HttpServletRequest request)
+      throws IllegalArgumentException {
+    String eTagHeader = request.getHeader("If-None-Match");
+    if (StringUtils.isBlank(eTagHeader))
+      return false;
+    return !eTagHeader.equals("\"" + eTag + "\"");
+  }
+
+  /**
+   * Returns the value for the <code>ETag</code> header field, which is
+   * calculated from the resource identifier, the language identifier and the
+   * resource's modification date.
+   * <p>
+   * Note that if <code>language</code> is <code>null</code>, the
+   * <code>ETag</code> calculation will be performed on the resource level
+   * rather than the resource content.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the requested language
+   * @return the <code>ETag</code> value
+   */
+  public static String getETagValue(Resource<?> resource, Language language) {
+    long etag = resource.getIdentifier().hashCode();
+    if (language != null)
+      etag += language.getIdentifier().hashCode();
+    etag += resource.getModificationDate().getTime();
+    return new StringBuffer().append("\"").append(etag).append("\"").toString();
+  }
+
+  /**
+   * Returns the value for the <code>ETag</code> header field, which is
+   * calculated from the resource identifier, the language identifier and the
+   * resource's modification date.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the requested language
+   * @param style
+   *          the image style
+   * @return the <code>ETag</code> value
+   */
+  public static String getETagValue(Resource<?> resource, Language language,
+      ImageStyle style) {
+    if (style == null)
+      return getETagValue(resource, language);
+    long etag = resource.getIdentifier().hashCode();
+    if (language != null)
+      etag += language.getIdentifier().hashCode();
+    etag += style.getIdentifier().hashCode();
+    etag += resource.getModificationDate().getTime();
+    return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
 
   /**

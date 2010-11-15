@@ -32,7 +32,7 @@ import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
 import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.content.page.ScriptImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 
 import org.junit.Before;
@@ -66,13 +66,13 @@ public class GeneralComposeableTest {
   protected long validTime = 3 * Times.MS_PER_WEEK;
 
   /** German language */
-  protected Language german = LanguageSupport.getLanguage("de");
+  protected Language german = LanguageUtils.getLanguage("de");
 
   /** English language */
-  protected Language english = LanguageSupport.getLanguage("en");
+  protected Language english = LanguageUtils.getLanguage("en");
 
   /** French language */
-  protected Language french = LanguageSupport.getLanguage("fr");
+  protected Language french = LanguageUtils.getLanguage("fr");
 
   /** German name */
   protected String germanName = "Standard Vorlage";

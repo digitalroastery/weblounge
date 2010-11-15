@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.language;
 
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 
 import org.slf4j.Logger;
@@ -43,10 +44,10 @@ import javax.xml.xpath.XPathFactory;
  * <code>LanguageSupport</code> is a helper class the facilitates the handling
  * of languages in numerous ways.
  */
-public final class LanguageSupport {
+public final class LanguageUtils {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(LanguageSupport.class);
+  private static final Logger logger = LoggerFactory.getLogger(LanguageUtils.class);
 
   /** Globally available languages */
   private static final Map<String, Language> systemLanguages = new HashMap<String, Language>();
@@ -54,7 +55,7 @@ public final class LanguageSupport {
   /**
    * This class is not meant to be instantiated.
    */
-  private LanguageSupport() {
+  private LanguageUtils() {
     // Nothing to be done here
   }
 
@@ -204,7 +205,7 @@ public final class LanguageSupport {
       Node name = nodes.item(i);
       String description = XPathHelper.valueOf(name, "text()", xpath);
       String lAttrib = XPathHelper.valueOf(name, "@language", xpath);
-      Language language = LanguageSupport.getLanguage(lAttrib);
+      Language language = LanguageUtils.getLanguage(lAttrib);
       if (language == null) {
         logger.debug("Found name in unsupported language {}", lAttrib);
         continue;
@@ -392,6 +393,7 @@ public final class LanguageSupport {
    *          the default language fallback
    * @param request
    *          the http request
+   * @return the preferred langauge
    */
   public static Language getPreferredLanguage(Set<Language> choices,
       HttpServletRequest request, Language defaultLanguage) {
@@ -400,6 +402,32 @@ public final class LanguageSupport {
       return defaultLanguage;
     }
     return preferred;
+  }
+
+  /**
+   * Returns the first language out of <code>choices</code> that is supported by
+   * the <code>localizable</code>. If there is no such language,
+   * <code>null</code> is returned.
+   * 
+   * @param localizable
+   *          the localizable object
+   * @param languages
+   *          the prioritized list of possible languages
+   * @return the first matching language or <code>null</code>
+   * @throws IllegalArgumentException
+   *           if <code>localizable</code> is <code>null</code>
+   */
+  public static Language getPreferredLanguage(Localizable localizable,
+      Language... languages) {
+    if (localizable == null)
+      throw new IllegalArgumentException("Localizable cannot be null");
+    if (languages == null)
+      return null;
+    for (Language l : languages) {
+      if (localizable.supportsLanguage(l))
+        return l;
+    }
+    return null;
   }
 
 }

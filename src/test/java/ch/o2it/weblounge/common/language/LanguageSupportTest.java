@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 
 import org.junit.Before;
@@ -44,7 +44,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * Test cases for the {@link LanguageSupport} implementation.
+ * Test cases for the {@link LanguageUtils} implementation.
  */
 public class LanguageSupportTest {
 
@@ -75,24 +75,24 @@ public class LanguageSupportTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.language.LanguageSupport#getLanguage(java.util.Locale)}
+   * {@link ch.o2it.weblounge.common.impl.language.LanguageUtils#getLanguage(java.util.Locale)}
    * .
    */
   @Test
   public void testGetLanguageLocale() {
-    assertEquals(italian, LanguageSupport.getLanguage(italianLocale));
+    assertEquals(italian, LanguageUtils.getLanguage(italianLocale));
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.language.LanguageSupport#getLanguage(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.language.LanguageUtils#getLanguage(java.lang.String)}
    * .
    */
   @Test
   public void testGetLanguageString() {
-    assertEquals(italian, LanguageSupport.getLanguage("it"));
+    assertEquals(italian, LanguageUtils.getLanguage("it"));
     try {
-      LanguageSupport.getLanguage("xyz");
+      LanguageUtils.getLanguage("xyz");
       fail("Language xyz should not be resolved");
     } catch (UnknownLanguageException e) {
       // Expected
@@ -101,7 +101,7 @@ public class LanguageSupportTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.language.LanguageSupport#addDescriptions(javax.xml.xpath.XPath, org.w3c.dom.Node, java.lang.String, ch.o2it.weblounge.common.language.Language, ch.o2it.weblounge.common.impl.language.LocalizableContent, boolean)}
+   * {@link ch.o2it.weblounge.common.impl.language.LanguageUtils#addDescriptions(javax.xml.xpath.XPath, org.w3c.dom.Node, java.lang.String, ch.o2it.weblounge.common.language.Language, ch.o2it.weblounge.common.impl.language.LocalizableContent, boolean)}
    * .
    */
   @Test
@@ -125,38 +125,38 @@ public class LanguageSupportTest {
     }
 
     // Test happy path
-    names = LanguageSupport.addDescriptions(xml, "name", french, null, false);
+    names = LanguageUtils.addDescriptions(xml, "name", french, null, false);
     assertEquals(2, names.size());
     assertTrue(names.supportsLanguage(english));
     assertTrue(names.supportsLanguage(french));
     assertEquals(french, names.getDefaultLanguage());
 
     // Test missing default language
-    names = LanguageSupport.addDescriptions(xml, "name", italian, null, false);
+    names = LanguageUtils.addDescriptions(xml, "name", italian, null, false);
     assertEquals(2, names.size());
     assertNull(names.getDefaultLanguage());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.language.LanguageSupport#getLanguageVariant(java.lang.String, ch.o2it.weblounge.common.language.Language)}
+   * {@link ch.o2it.weblounge.common.impl.language.LanguageUtils#getLanguageVariant(java.lang.String, ch.o2it.weblounge.common.language.Language)}
    * .
    */
   @Test
   public void testGetLanguageVariant() {
-    assertEquals("test_en", LanguageSupport.getLanguageVariant("test", english));
-    assertEquals("test_en.jsp", LanguageSupport.getLanguageVariant("test.jsp", english));
-    assertEquals("/a/test_en.jsp", LanguageSupport.getLanguageVariant("/a/test.jsp", english));
+    assertEquals("test_en", LanguageUtils.getLanguageVariant("test", english));
+    assertEquals("test_en.jsp", LanguageUtils.getLanguageVariant("test.jsp", english));
+    assertEquals("/a/test_en.jsp", LanguageUtils.getLanguageVariant("/a/test.jsp", english));
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.language.LanguageSupport#getLanguageVariantsByPriority(java.lang.String, ch.o2it.weblounge.common.language.Language, ch.o2it.weblounge.common.site.Site)}
+   * {@link ch.o2it.weblounge.common.impl.language.LanguageUtils#getLanguageVariantsByPriority(java.lang.String, ch.o2it.weblounge.common.language.Language, ch.o2it.weblounge.common.site.Site)}
    * .
    */
   @Test
   public void testGetLanguageVariantsByPriority() {
-    String result[] = LanguageSupport.getLanguageVariantsByPriority("test.jsp", french, italian);
+    String result[] = LanguageUtils.getLanguageVariantsByPriority("test.jsp", french, italian);
     assertEquals(3, result.length);
     assertEquals("test_fr.jsp", result[0]);
     assertEquals("test_it.jsp", result[1]);
@@ -165,13 +165,13 @@ public class LanguageSupportTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.language.LanguageSupport#getLanguageVariants(java.lang.String, ch.o2it.weblounge.common.language.Language[])}
+   * {@link ch.o2it.weblounge.common.impl.language.LanguageUtils#getLanguageVariants(java.lang.String, ch.o2it.weblounge.common.language.Language[])}
    * .
    */
   @Test
   public void testGetLanguageVariantsStringLanguageArray() {
     Language[] languages = new Language[] { english, french };
-    String result[] = LanguageSupport.getLanguageVariants("test.jsp", languages);
+    String result[] = LanguageUtils.getLanguageVariants("test.jsp", languages);
     assertEquals(3, result.length);
     assertEquals("test_en.jsp", result[0]);
     assertEquals("test_fr.jsp", result[1]);
@@ -180,14 +180,14 @@ public class LanguageSupportTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.language.LanguageSupport#getBaseVersion(java.lang.String, ch.o2it.weblounge.common.language.LanguageManager)}
+   * {@link ch.o2it.weblounge.common.impl.language.LanguageUtils#getBaseVersion(java.lang.String, ch.o2it.weblounge.common.language.LanguageManager)}
    * .
    */
   @Test
   public void testGetBaseVersion() {
-    assertEquals("test.jsp", LanguageSupport.getBaseVersion("test_en.jsp"));
+    assertEquals("test.jsp", LanguageUtils.getBaseVersion("test_en.jsp"));
     try {
-      LanguageSupport.getBaseVersion("test_xyz.jsp");
+      LanguageUtils.getBaseVersion("test_xyz.jsp");
       fail("LanguageSupport failed when presented with by non existent language xyz");
     } catch (UnknownLanguageException e) {
       // Expected
@@ -196,15 +196,15 @@ public class LanguageSupportTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.language.LanguageSupport#extractLanguage(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.language.LanguageUtils#extractLanguage(java.lang.String)}
    * .
    */
   @Test
   public void testExtractLanguage() {
-    assertEquals(italian, LanguageSupport.extractLanguage("test_it.jsp"));
-    assertTrue(LanguageSupport.extractLanguage("test.jsp") == null);
+    assertEquals(italian, LanguageUtils.extractLanguage("test_it.jsp"));
+    assertTrue(LanguageUtils.extractLanguage("test.jsp") == null);
     try {
-      assertEquals(italian, LanguageSupport.extractLanguage("test_xyz.jsp"));
+      assertEquals(italian, LanguageUtils.extractLanguage("test_xyz.jsp"));
       fail("LanguageSupport was fooled by non existent language xyz");
     } catch (UnknownLanguageException e) {
       // Expected

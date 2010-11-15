@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileContentImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.user.User;
@@ -48,7 +48,7 @@ public class FileContentImplTest {
   protected String filename = "document.pdf";
   
   /** The German language */
-  protected Language german = LanguageSupport.getLanguage("de");
+  protected Language german = LanguageUtils.getLanguage("de");
   
   /** The file size */
   protected long size = 1408338L;

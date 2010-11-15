@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
@@ -326,7 +326,7 @@ public class PageReader extends WebloungeContentReader implements ResourceReader
       if ("title".equals(raw) || "subject".equals(raw) || "description".equals(raw) || "coverage".equals(raw) || "rights".equals(raw)) {
         String language = attrs.getValue("language");
         if (language != null) {
-          Language l = LanguageSupport.getLanguage(language);
+          Language l = LanguageUtils.getLanguage(language);
           clipboard.put("language", l);
         } else {
           clipboard.remove("language");

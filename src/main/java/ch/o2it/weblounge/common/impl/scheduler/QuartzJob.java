@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.scheduler;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -330,7 +330,7 @@ public final class QuartzJob implements Job {
       String name = XPathHelper.valueOf(localiziation, "text()", xPathProcessor);
       if (name == null)
         throw new IllegalStateException("Found empty job name");
-      job.setName(name, LanguageSupport.getLanguage(language));
+      job.setName(name, LanguageUtils.getLanguage(language));
     }
 
     return job;

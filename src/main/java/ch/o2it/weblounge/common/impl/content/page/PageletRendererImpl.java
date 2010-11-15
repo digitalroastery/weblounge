@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.content.page.Link;
 import ch.o2it.weblounge.common.content.page.PagePreviewMode;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.content.page.Script;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
@@ -343,7 +343,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       String name = XPathHelper.valueOf(localiziation, "text()", xpath);
       if (name == null)
         throw new IllegalStateException("Found empty pagelet name");
-      renderer.setName(name, LanguageSupport.getLanguage(language));
+      renderer.setName(name, LanguageUtils.getLanguage(language));
     }
 
     // scripts
