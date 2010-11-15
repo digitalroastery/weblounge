@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -393,9 +394,35 @@ public final class LanguageUtils {
    *          the default language fallback
    * @param request
    *          the http request
-   * @return the preferred langauge
+   * @return the preferred language
    */
   public static Language getPreferredLanguage(Set<Language> choices,
+      HttpServletRequest request, Language defaultLanguage) {
+    Language preferred = getPreferredLanguage(choices, request);
+    if (preferred == null && choices.contains(defaultLanguage)) {
+      return defaultLanguage;
+    }
+    return preferred;
+  }
+
+  /**
+   * Returns the language out of <code>choices</code> that matches the client's
+   * requirements as indicated through the <code>Accept-Language</code> header.
+   * If no match is possible, it is determined if <code>choices</code> contains
+   * <code>defaultLanguage</code> in which case that language is returned. If
+   * neither of this is the case, <code>null</code> is returned.
+   * 
+   * @param choices
+   *          the available locales
+   * @param site
+   *          the site
+   * @param defaultLanguage
+   *          the default language fallback
+   * @param request
+   *          the http request
+   * @return the preferred language
+   */
+  public static Language getPreferredLanguage(Set<Language> choices, Site site,
       HttpServletRequest request, Language defaultLanguage) {
     Language preferred = getPreferredLanguage(choices, request);
     if (preferred == null && choices.contains(defaultLanguage)) {
@@ -419,6 +446,34 @@ public final class LanguageUtils {
    */
   public static Language getPreferredLanguage(Localizable localizable,
       Language... languages) {
+    if (localizable == null)
+      throw new IllegalArgumentException("Localizable cannot be null");
+    if (languages == null)
+      return null;
+    for (Language l : languages) {
+      if (localizable.supportsLanguage(l))
+        return l;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the first language out of <code>choices</code> that is supported by
+   * the <code>localizable</code> and that is supported by the site. If there is
+   * no such language, <code>null</code> is returned.
+   * 
+   * @param localizable
+   *          the localizable object
+   * @param site
+   *          the site
+   * @param languages
+   *          the prioritized list of possible languages
+   * @return the first matching language or <code>null</code>
+   * @throws IllegalArgumentException
+   *           if <code>localizable</code> is <code>null</code>
+   */
+  public static Language getPreferredLanguage(Localizable localizable,
+      Site site, Language... languages) {
     if (localizable == null)
       throw new IllegalArgumentException("Localizable cannot be null");
     if (languages == null)

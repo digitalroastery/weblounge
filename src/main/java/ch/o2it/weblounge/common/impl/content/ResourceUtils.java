@@ -91,7 +91,7 @@ public final class ResourceUtils {
       HttpServletRequest request) throws IllegalArgumentException {
     String eTagHeader = request.getHeader("If-None-Match");
     if (StringUtils.isBlank(eTagHeader))
-      return false;
+      return true;
     String eTag = getETagValue(resource, language);
     return !eTagHeader.equals("\"" + eTag + "\"");
   }
@@ -121,7 +121,7 @@ public final class ResourceUtils {
       throws IllegalArgumentException {
     String eTagHeader = request.getHeader("If-None-Match");
     if (StringUtils.isBlank(eTagHeader))
-      return false;
+      return true;
     return !eTagHeader.equals("\"" + eTag + "\"");
   }
 
