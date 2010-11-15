@@ -35,7 +35,7 @@ import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.language.Language;
@@ -97,13 +97,13 @@ public class ContentRepositoryIndexTest {
   protected Site site = null;
   
   /** English */
-  protected Language english = LanguageSupport.getLanguage("en"); 
+  protected Language english = LanguageUtils.getLanguage("en"); 
 
   /** German */
-  protected Language german = LanguageSupport.getLanguage("de"); 
+  protected Language german = LanguageUtils.getLanguage("de"); 
 
   /** Italian */
-  protected Language french = LanguageSupport.getLanguage("fr"); 
+  protected Language french = LanguageUtils.getLanguage("fr"); 
   
   /**
    * Sets up data structures for each test case.

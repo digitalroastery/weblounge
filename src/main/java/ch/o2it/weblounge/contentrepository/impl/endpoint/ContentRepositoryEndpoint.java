@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -34,14 +35,12 @@ import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 import ch.o2it.weblounge.kernel.SiteManager;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,7 +87,7 @@ public class ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModified(resource, request)) {
+    if (!ResourceUtils.isModified(resource, request)) {
       return Response.notModified().build();
     }
 
@@ -99,8 +98,8 @@ public class ContentRepositoryEndpoint {
     }
 
     // Check the ETag
-    String eTagValue = getETagValue(resource, null);
-    if (isMatch(eTagValue, request)) {
+    String eTagValue = ResourceUtils.getETagValue(resource, null);
+    if (!ResourceUtils.isMismatch(resource, language, request)) {
       return Response.notModified(new EntityTag(eTagValue)).build();
     }
 
@@ -152,71 +151,6 @@ public class ContentRepositoryEndpoint {
     response.tag(new EntityTag(eTagValue));
     response.lastModified(resource.getModificationDate());
     return response.build();
-  }
-
-  /**
-   * Returns <code>true</code> if the resource either is more recent than the
-   * cached version on the client side or the request does not contain caching
-   * information.
-   * 
-   * @param resource
-   *          the resource
-   * @param request
-   *          the client request
-   * @return <code>true</code> if the page is more recent than the version that
-   *         is cached at the client.
-   * @throws WebApplicationException
-   *           if the <code>If-Modified-Since</code> cannot be converted to a
-   *           date.
-   */
-  protected boolean isModified(Resource<?> resource, HttpServletRequest request) throws WebApplicationException {
-    try {
-      long cachedModificationDate = request.getDateHeader("If-Modified-Since");
-      Date resourceModificationDate = resource.getModificationDate();
-      return cachedModificationDate < resourceModificationDate.getTime();
-    } catch (IllegalArgumentException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
-    }
-  }
-
-  /**
-   * Returns <code>true</code> if the resource either is more recent than the
-   * cached version on the client side or the request does not contain caching
-   * information.
-   * 
-   * @param eTag
-   *          the value of the ETag (without quotes)
-   * @param request
-   *          the client request
-   * @return <code>true</code> if the resource's calculated eTag matches the one
-   *         specified
-   */
-  protected boolean isMatch(String eTag, HttpServletRequest request) {
-    try {
-      String eTagHeader = request.getHeader("If-None-Match");
-      return !StringUtils.isBlank(eTagHeader) && eTagHeader.equals("\"" + eTag + "\"");
-    } catch (IllegalArgumentException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
-    }
-  }
-
-  /**
-   * Returns the value for the <code>ETag</code> header field, which is
-   * calculated from the resource identifier, the language identifier and the
-   * resource's modification date.
-   * 
-   * @param resource
-   *          the resource
-   * @param language
-   *          the requested language
-   * @return the <code>ETag</code> value
-   */
-  protected String getETagValue(Resource<?> resource, Language language) {
-    long etag = resource.getIdentifier().hashCode();
-    if (language != null)
-      etag += language.getIdentifier().hashCode();
-    etag += resource.getModificationDate().getTime();
-    return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
 
   /**

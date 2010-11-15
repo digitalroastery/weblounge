@@ -25,7 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.LanguageIndex;
@@ -64,13 +64,13 @@ public class LanguageIndexTest {
   protected long expectedSize = -1;
 
   /** English */
-  protected Language english = LanguageSupport.getLanguage("en");
+  protected Language english = LanguageUtils.getLanguage("en");
 
   /** German */
-  protected Language german = LanguageSupport.getLanguage("de");
+  protected Language german = LanguageUtils.getLanguage("de");
 
   /** Italian */
-  protected Language french = LanguageSupport.getLanguage("fr");
+  protected Language french = LanguageUtils.getLanguage("fr");
 
   /**
    * @throws java.lang.Exception

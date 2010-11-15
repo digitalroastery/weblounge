@@ -25,8 +25,9 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
@@ -57,7 +58,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -112,13 +112,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModified(resource, request)) {
+    if (!ResourceUtils.isModified(resource, request)) {
       return Response.notModified().build();
     }
 
     // Check the ETag
-    String eTagValue = getETagValue(resource, null);
-    if (isMatch(eTagValue, request)) {
+    String eTagValue = ResourceUtils.getETagValue(resource, null);
+    if (!ResourceUtils.isMismatch(resource, null, request)) {
       return Response.notModified(new EntityTag(eTagValue)).build();
     }
 
@@ -159,7 +159,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     Set<Language> resourceLanguages = resource.languages();
     Language defaultLanguage = site.getDefaultLanguage();
-    Language preferred = LanguageSupport.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    Language preferred = LanguageUtils.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
     if (preferred == null) {
       preferred = resource.getOriginalContent().getLanguage();
     }
@@ -191,7 +191,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
-    Language language = LanguageSupport.getLanguage(languageId);
+    Language language = LanguageUtils.getLanguage(languageId);
     if (language == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -231,7 +231,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
-    Language language = LanguageSupport.getLanguage(languageId);
+    Language language = LanguageUtils.getLanguage(languageId);
     if (language == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
@@ -243,9 +243,8 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Check the ETag
-    String eTagValue = getETagValue(resource, null);
-    if (isMatch(eTagValue, request)) {
-      return Response.notModified(new EntityTag(eTagValue)).build();
+    if (ResourceUtils.isMismatch(resource, language, request)) {
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
 
     // Try to create the resource
@@ -290,7 +289,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(eTagValue));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, language)));
     response.lastModified(resource.getModificationDate());
     return response.build();
   }
@@ -319,7 +318,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
-    Language language = LanguageSupport.getLanguage(languageId);
+    Language language = LanguageUtils.getLanguage(languageId);
     if (language == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
@@ -357,7 +356,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(getETagValue(resource, null)));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
     response.lastModified(resource.getModificationDate());
     return response.build();
   }
@@ -381,8 +380,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   @Path("/{resource}")
   public Response updateFile(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId,
-      @FormParam("content") String resourceXml,
-      @HeaderParam("If-Match") String ifMatchHeader) {
+      @FormParam("content") String resourceXml) {
 
     // Check the parameters
     if (resourceId == null)
@@ -407,17 +405,14 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Check the value of the If-Match header against the etag
-    if (ifMatchHeader != null) {
-      try {
-        Resource<?> currentResource = contentRepository.get(resourceURI);
-        String etag = Long.toString(currentResource.getModificationDate().getTime());
-        if (!etag.equals(ifMatchHeader)) {
-          throw new WebApplicationException(Status.PRECONDITION_FAILED);
-        }
-      } catch (ContentRepositoryException e) {
-        logger.warn("Error reading current resource {} from repository: {}", resourceURI, e.getMessage());
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    try {
+      Resource<?> currentResource = contentRepository.get(resourceURI);
+      if (ResourceUtils.isMismatch(currentResource, null, request)) {
+        throw new WebApplicationException(Status.PRECONDITION_FAILED);
       }
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error reading current resource {} from repository: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     // Parse the resource and update it in the repository
@@ -452,7 +447,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.ok();
-    response.tag(new EntityTag(getETagValue(resource, null)));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
     return response.build();
   }
 
@@ -555,7 +550,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Create the response
     ResponseBuilder response = Response.created(uri);
-    response.tag(new EntityTag(getETagValue(resource, null)));
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
     return response.build();
   }
 

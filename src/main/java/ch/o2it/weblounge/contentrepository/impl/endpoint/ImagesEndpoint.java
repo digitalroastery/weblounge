@@ -26,8 +26,9 @@ import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.site.Module;
@@ -93,13 +94,13 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModified(resource, request)) {
+    if (!ResourceUtils.isModified(resource, request)) {
       return Response.notModified().build();
     }
 
     // Check the ETag
-    String eTagValue = getETagValue(resource, null);
-    if (isMatch(eTagValue, request)) {
+    String eTagValue = ResourceUtils.getETagValue(resource, null);
+    if (!ResourceUtils.isMismatch(resource, null, request)) {
       return Response.notModified(new EntityTag(eTagValue)).build();
     }
 
@@ -139,7 +140,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     Set<Language> resourceLanguages = resource.languages();
     Language defaultLanguage = site.getDefaultLanguage();
-    Language preferred = LanguageSupport.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    Language preferred = LanguageUtils.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
     if (preferred == null) {
       preferred = resource.getOriginalContent().getLanguage();
     }
@@ -173,7 +174,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     // Extract the language
     Language language = null;
     try {
-      language = LanguageSupport.getLanguage(languageId);
+      language = LanguageUtils.getLanguage(languageId);
     } catch (UnknownLanguageException e) {
       throw new WebApplicationException(Status.BAD_REQUEST);
     }
@@ -218,7 +219,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     Site site = getSite(request);
     Set<Language> resourceLanguages = resource.languages();
     Language defaultLanguage = site.getDefaultLanguage();
-    Language preferred = LanguageSupport.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
+    Language preferred = LanguageUtils.getPreferredLanguage(resourceLanguages, request, defaultLanguage);
     if (preferred == null) {
       preferred = resource.getOriginalContent().getLanguage();
     }
@@ -265,7 +266,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     // Extract the language
     Language language = null;
     try {
-      language = LanguageSupport.getLanguage(languageId);
+      language = LanguageUtils.getLanguage(languageId);
     } catch (UnknownLanguageException e) {
       throw new WebApplicationException(Status.BAD_REQUEST);
     }
@@ -368,7 +369,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModified(resource, request)) {
+    if (!ResourceUtils.isModified(resource, request)) {
       return Response.notModified().build();
     }
 
@@ -381,8 +382,8 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Check the ETag
-    String eTagValue = getETagValue(resource, language, style);
-    if (isMatch(eTagValue, request)) {
+    String eTagValue = ResourceUtils.getETagValue(resource, language, style);
+    if (!ResourceUtils.isMismatch(resource, language, request)) {
       return Response.notModified(new EntityTag(eTagValue)).build();
     }
 
@@ -432,30 +433,6 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     response.tag(new EntityTag(eTagValue));
     response.lastModified(resource.getModificationDate());
     return response.build();
-  }
-
-  /**
-   * Returns the value for the <code>ETag</code> header field, which is
-   * calculated from the resource identifier, the language identifier and the
-   * resource's modification date.
-   * 
-   * @param resource
-   *          the resource
-   * @param language
-   *          the requested language
-   * @param style
-   *          the image style
-   * @return the <code>ETag</code> value
-   */
-  protected String getETagValue(Resource<?> resource, Language language,
-      ImageStyle style) {
-    long etag = resource.getIdentifier().hashCode();
-    if (language != null)
-      etag += language.getIdentifier().hashCode();
-    if (style != null)
-      etag += style.getIdentifier().hashCode();
-    etag += resource.getModificationDate().getTime();
-    return new StringBuffer().append("\"").append(etag).append("\"").toString();
   }
 
   /**

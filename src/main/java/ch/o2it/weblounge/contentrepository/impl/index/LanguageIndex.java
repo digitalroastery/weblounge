@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
@@ -571,7 +571,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
     for (int i = 0; i < v; i++) {
       byte[] language = new byte[bytesPerLanguage];
       idx.read(language);
-      languages[i] = LanguageSupport.getLanguage(new String(language));
+      languages[i] = LanguageUtils.getLanguage(new String(language));
     }
     return languages;
   }

@@ -24,6 +24,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
@@ -106,7 +107,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModified(page, request)) {
+    if (!ResourceUtils.isModified(page, request)) {
       return Response.notModified().build();
     }
 
@@ -398,7 +399,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModified(page, request)) {
+    if (!ResourceUtils.isModified(page, request)) {
       return Response.notModified().build();
     }
 
@@ -446,7 +447,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Is there an up-to-date, cached version on the client side?
-    if (!isModified(page, request)) {
+    if (!ResourceUtils.isModified(page, request)) {
       return Response.notModified().build();
     }
 

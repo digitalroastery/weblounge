@@ -33,7 +33,7 @@ import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
@@ -139,8 +139,8 @@ public class SearchIndexTest {
     EasyMock.replay(template);
     
     Set<Language> languages = new HashSet<Language>();
-    languages.add(LanguageSupport.getLanguage("en"));
-    languages.add(LanguageSupport.getLanguage("de"));
+    languages.add(LanguageUtils.getLanguage("en"));
+    languages.add(LanguageUtils.getLanguage("de"));
     
     // Site
     site = EasyMock.createNiceMock(Site.class);

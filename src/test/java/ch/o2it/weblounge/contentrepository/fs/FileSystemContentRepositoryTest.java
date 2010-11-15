@@ -45,7 +45,7 @@ import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.url.PathSupport;
 import ch.o2it.weblounge.common.impl.url.UrlSupport;
 import ch.o2it.weblounge.common.language.Language;
@@ -166,13 +166,13 @@ public class FileSystemContentRepositoryTest {
   protected ImageContent pngContent = null;
 
   /** English */
-  protected Language english = LanguageSupport.getLanguage("en");
+  protected Language english = LanguageUtils.getLanguage("en");
 
   /** German */
-  protected Language german = LanguageSupport.getLanguage("de");
+  protected Language german = LanguageUtils.getLanguage("de");
 
   /** Italian */
-  protected Language french = LanguageSupport.getLanguage("fr");
+  protected Language french = LanguageUtils.getLanguage("fr");
 
   /**
    * Sets up everything valid for all test runs.
@@ -201,8 +201,8 @@ public class FileSystemContentRepositoryTest {
     EasyMock.replay(template);
 
     Set<Language> languages = new HashSet<Language>();
-    languages.add(LanguageSupport.getLanguage("en"));
-    languages.add(LanguageSupport.getLanguage("de"));
+    languages.add(LanguageUtils.getLanguage("en"));
+    languages.add(LanguageUtils.getLanguage("de"));
 
     // Site
     site = EasyMock.createNiceMock(Site.class);
