@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.content.page.Pagelet;
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.util.Templates;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -139,7 +139,7 @@ public class ElementTag extends WebloungeTag {
    *          the element language
    */
   public final void setLanguage(String value) throws JspException {
-    language = LanguageSupport.getLanguage(value);
+    language = LanguageUtils.getLanguage(value);
     if (language == null) {
       throw new JspException("Language '" + value + "' does not exist!");
     }

@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.impl.language.LanguageSupport;
+import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
@@ -84,7 +84,7 @@ public class PageletElementTag extends WebloungeTag {
    */
   public int doEndTag() throws JspException {
     if ((getParent() != null) && (getParent() instanceof PageletTag)) {
-      Language l = LanguageSupport.getLanguage(language);
+      Language l = LanguageUtils.getLanguage(language);
       if (l != null && !"".equals(name)) {
         ((PageletTag) getParent()).setElement(name, value, l);
       }
