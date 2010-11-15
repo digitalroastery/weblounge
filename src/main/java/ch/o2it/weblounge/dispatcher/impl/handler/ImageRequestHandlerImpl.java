@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
-import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
@@ -41,6 +41,7 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -49,11 +50,16 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.ws.rs.core.MediaType;
+
 /**
  * This request handler is used to handle requests to scaled images in the
  * repository.
  */
 public final class ImageRequestHandlerImpl implements RequestHandler {
+
+  /** Alternate uri prefix */
+  protected static final String ALT_URI_PREFIX = "/images";
 
   /** Name of the image style parameter */
   protected static final String OPT_IMAGE_STYLE = "style";
@@ -94,17 +100,22 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return false;
     }
 
-    // Check if there is an image
-    ResourceURI imageURI = new ImageResourceURIImpl(site, path);
+    ResourceURI imageURI = null;
     ImageResource imageResource = null;
     try {
-      imageResource = (ImageResource) contentRepository.get(imageURI);
+      if (path.startsWith(ALT_URI_PREFIX)) {
+        String id = FilenameUtils.getBaseName(StringUtils.chomp(path, "/"));
+        imageURI = new FileResourceURIImpl(site, null, id);
+      } else {
+        imageURI = new FileResourceURIImpl(site, path);
+      }
+      imageResource = (ImageResource)contentRepository.get(imageURI);
       if (imageResource == null) {
         logger.debug("No image found at {}", imageURI);
         return false;
       }
     } catch (ContentRepositoryException e) {
-      logger.error("Error loading image resource from {}: {}", contentRepository, e);
+      logger.error("Error loading image from {}: {}", contentRepository, e);
       DispatchUtils.sendInternalError(request, response);
       return true;
     }
@@ -164,6 +175,25 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Load the image contents from the repository
     ImageContent imageContents = imageResource.getContent(language);
     InputStream imageInputStream = null;
+    
+    // Add mime type header
+    String contentType = imageContents.getMimetype();
+    if (contentType == null)
+      contentType = MediaType.APPLICATION_OCTET_STREAM;
+    response.setContentType(contentType);
+
+    // Add last modified header
+    response.setDateHeader("Last-Modified", imageResource.getModificationDate().getTime());
+    
+    // Add ETag header
+    String eTag = ResourceUtils.getETagValue(imageResource, language);
+    response.setHeader("ETag", "\"" + eTag + "\"");
+    
+    // Add content disposition header
+    StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(imageContents.getFilename()));
+    filename.append("_").append(imageContents.getWidth()).append("x").append(imageContents.getHeight()).append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
+    response.setHeader("Content-Disposition", "inline; filename=" + filename.toString());
+
     try {
       imageInputStream = contentRepository.getContent(imageURI, language);
     } catch (Throwable t) {
@@ -181,7 +211,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // When there is no scaling required, just return the original
     if (style == null || ScalingMode.None.equals(style.getScalingMode())) {
       try {
+        response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
         IOUtils.copyLarge(imageInputStream, response.getOutputStream());
+        response.getOutputStream().flush();
       } catch (IOException e) {
         logger.error("Error writing {} image '{}' back to client: {}", new Object[] { language, imageResource });
       } finally {
@@ -192,6 +224,8 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Write the file back to the response
     try {
+      // TODO: What is the scaled file size?
+      // response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
       InputStream is = contentRepository.getContent(imageURI, language);
       ImageStyleUtils.style(is, response.getOutputStream(), format, style);
       response.getOutputStream().flush();

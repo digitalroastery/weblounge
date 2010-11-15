@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl.publisher;
 
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
@@ -308,7 +308,7 @@ public class EndpointPublishingService implements ManagedService {
       // Adjust relative context paths
       String contextPath = contextPathProperty.toString();
       if (!contextPath.startsWith("/")) {
-        contextPath = UrlSupport.concat(defaultContextPathPrefix, contextPath);
+        contextPath = UrlUtils.concat(defaultContextPathPrefix, contextPath);
       }
 
       // Process the event

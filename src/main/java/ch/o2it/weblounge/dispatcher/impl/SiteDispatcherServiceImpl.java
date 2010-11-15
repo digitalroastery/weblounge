@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.common.impl.url.PathSupport;
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Module;
@@ -67,8 +67,8 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * The site dispatcher watches sites coming and going and registers them
- * with the weblounge dispatcher.
+ * The site dispatcher watches sites coming and going and registers them with
+ * the weblounge dispatcher.
  */
 public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteListener, ManagedService {
 
@@ -156,9 +156,10 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     BundleContext bundleContext = context.getBundleContext();
     logger.info("Starting site dispatcher");
 
-    // Configure the default jasper work directory where compiled java classes go
+    // Configure the default jasper work directory where compiled java classes
+    // go
     String tmpDir = System.getProperty("java.io.tmpdir");
-    String scratchDir = PathSupport.concat(tmpDir, DEFAULT_JASPER_WORK_DIR);
+    String scratchDir = PathUtils.concat(tmpDir, DEFAULT_JASPER_WORK_DIR);
     jasperConfig.put(OPT_JASPER_SCRATCHDIR, scratchDir);
 
     // Try to get hold of the service configuration
@@ -430,10 +431,8 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     String bundleEntry = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ENTRY, DEFAULT_BUNDLE_ENTRY);
     String bundleURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_URI, site.getIdentifier());
     String siteContextURI = webXml.getContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, DEFAULT_BUNDLE_CONTEXT_ROOT_URI);
-    String siteContextRoot = UrlSupport.concat(contextRoot, siteContextURI);
-    String siteRoot = UrlSupport.concat(new String[] {
-        siteContextRoot,
-        bundleURI });
+    String siteContextRoot = UrlUtils.concat(contextRoot, siteContextURI);
+    String siteRoot = UrlUtils.concat(siteContextRoot, bundleURI);
 
     try {
       // Create the common http context
@@ -512,7 +511,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
     for (String name : webXmlServlets.keySet()) {
       for (String mapping : webXmlServlets.get(name).getServletMappings()) {
-        paxHttpService.unregister(UrlSupport.concat(siteRoot, mapping));
+        paxHttpService.unregister(UrlUtils.concat(siteRoot, mapping));
       }
     }
 
@@ -648,14 +647,14 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI, sitesRoot);
 
     // Bundle context root
-    sitesRoot = UrlSupport.concat(webappRoot, sitesRoot);
+    sitesRoot = UrlUtils.concat(webappRoot, sitesRoot);
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT, sitesRoot);
 
     // Bundle uri
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_URI, site.getIdentifier());
 
     // Bundle root
-    String bundleRoot = UrlSupport.concat(sitesRoot, site.getIdentifier());
+    String bundleRoot = UrlUtils.concat(sitesRoot, site.getIdentifier());
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_ROOT, bundleRoot);
 
     // Bundle entry

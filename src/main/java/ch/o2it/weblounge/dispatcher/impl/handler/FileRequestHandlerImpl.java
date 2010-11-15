@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
@@ -37,17 +38,24 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.ws.rs.core.MediaType;
+
 /**
  * This request handler is used to handle requests to files in the repository.
  */
 public final class FileRequestHandlerImpl implements RequestHandler {
+  
+  /** Alternate uri prefix */
+  protected static final String ALT_URI_PREFIX = "/files";
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(FileRequestHandlerImpl.class);
@@ -85,17 +93,23 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       return false;
     }
     
-    // Check if there is a file
-    ResourceURI fileURI = new FileResourceURIImpl(site, path);
+    // Check if there is a file with the current path
+    ResourceURI fileURI = null;
     FileResource fileResource = null;
     try {
+      if (path.startsWith(ALT_URI_PREFIX)) {
+        String id = FilenameUtils.getBaseName(StringUtils.chomp(path, "/"));
+        fileURI = new FileResourceURIImpl(site, null, id);
+      } else {
+        fileURI = new FileResourceURIImpl(site, path);
+      }
       fileResource = (FileResource)contentRepository.get(fileURI);
       if (fileResource == null) {
         logger.debug("No file found at {}", fileURI);
         return false;
       }
     } catch (ContentRepositoryException e) {
-      logger.error("Error loading file resource from {}: {}", contentRepository, e);
+      logger.error("Error loading file from {}: {}", contentRepository, e);
       DispatchUtils.sendInternalError(request, response);
       return true;
     }
@@ -143,6 +157,26 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       logger.debug("File {} was not modified", fileURI);
       return true;
     }
+
+    // Add mime type header
+    FileContent content = fileResource.getContent(language);
+    String contentType = content.getMimetype();
+    if (contentType == null)
+      contentType = MediaType.APPLICATION_OCTET_STREAM;
+    response.setContentType(contentType);
+
+    // Add last modified header
+    response.setDateHeader("Last-Modified", fileResource.getModificationDate().getTime());
+    
+    // Add content size
+    response.setHeader("Content-Length", Long.toString(content.getSize()));
+
+    // Add ETag header
+    String eTag = ResourceUtils.getETagValue(fileResource, language);
+    response.setHeader("ETag", "\"" + eTag + "\"");
+    
+    // Add content disposition header
+    response.setHeader("Content-Disposition", "inline; filename=" + content.getFilename());
 
     // Write the file back to the response
     InputStream fileContents = null;

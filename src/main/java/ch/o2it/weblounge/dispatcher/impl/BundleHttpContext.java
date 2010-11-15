@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 
 import org.osgi.framework.Bundle;
 import org.osgi.service.http.HttpContext;
@@ -144,7 +144,7 @@ public class BundleHttpContext implements HttpContext {
     if (resourceName.startsWith(siteURI))
       resourceName = resourceName.substring(siteURI.length());
     if (bundlePath != null && !resourceName.startsWith(WEB_INF))
-      resourceName = UrlSupport.concat(bundlePath, resourceName);
+      resourceName = UrlUtils.concat(bundlePath, resourceName);
     return bundle.getResource(resourceName);
   }
 

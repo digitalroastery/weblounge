@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl.http;
 
-import ch.o2it.weblounge.common.impl.url.PathSupport;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +140,7 @@ public class MockServletContext implements ServletContext {
    * @return the full resource path
    */
   protected String getResourceLocation(String path) {
-    return PathSupport.concat(resourceBasePath, path);
+    return PathUtils.concat(resourceBasePath, path);
   }
 
   /**
@@ -231,7 +231,7 @@ public class MockServletContext implements ServletContext {
       }
       Set resourcePaths = new LinkedHashSet(fileList.length);
       for (int i = 0; i < fileList.length; i++) {
-        String resultPath = PathSupport.concat(actualPath, fileList[i]);
+        String resultPath = PathUtils.concat(actualPath, fileList[i]);
         if (resourceLoader.getResource(resultPath).getFile().isDirectory()) {
           resultPath += "/";
         }

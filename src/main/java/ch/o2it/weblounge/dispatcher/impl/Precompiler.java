@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.common.impl.url.UrlSupport;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.dispatcher.impl.http.MockHttpServletRequest;
 import ch.o2it.weblounge.dispatcher.impl.http.MockHttpServletResponse;
@@ -139,7 +139,7 @@ public class Precompiler {
         String path = entry.getPath();
         String pathInfo = path.substring(path.indexOf(bundlePath) + bundlePath.length());
         request.setPathInfo(pathInfo);
-        request.setRequestURI(UrlSupport.concat(httpContextURI, pathInfo));
+        request.setRequestURI(UrlUtils.concat(httpContextURI, pathInfo));
         try {
           logger.debug("Precompiling {}:/{}", site, pathInfo);
           servlet.service(request, response);
