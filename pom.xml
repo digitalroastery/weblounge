@@ -316,6 +316,8 @@
               OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/dispatcher-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,
+              OSGI-INF/file-requesthandler.xml,
+              OSGI-INF/image-requesthandler.xml,
               OSGI-INF/page-requesthandler.xml,
               OSGI-INF/site-dispatcher-service.xml
             </Service-Component>

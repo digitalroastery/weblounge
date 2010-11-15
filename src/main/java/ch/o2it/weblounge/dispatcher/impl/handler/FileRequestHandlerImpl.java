@@ -34,6 +34,7 @@ import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -46,13 +47,10 @@ import java.io.InputStream;
 /**
  * This request handler is used to handle requests to files in the repository.
  */
-public final class FileRequestHandlerImpl {
+public final class FileRequestHandlerImpl implements RequestHandler {
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(FileRequestHandlerImpl.class);
-
-  /** The singleton handler instance */
-  private static final FileRequestHandlerImpl handler = new FileRequestHandlerImpl();
 
   /**
    * Handles the request for a file resource that is believed to be in the
@@ -123,15 +121,9 @@ public final class FileRequestHandlerImpl {
       DispatchUtils.sendAccessDenied(request, response);
       return true;
     }
-    
-    // Check the modified headers
-    if (!ResourceUtils.isModified(fileResource, request)) {
-      logger.debug("File {} was not modified", fileURI);
-      return true;
-    }
 
     // Determine the response language
-    Language language = LanguageUtils.getPreferredLanguage(fileResource, request.getLanguage(), site.getDefaultLanguage());
+    Language language = LanguageUtils.getPreferredLanguage(fileResource, site, request.getLanguage(), fileResource.getOriginalContent().getLanguage(), site.getDefaultLanguage());
     if (language == null) {
       logger.warn("File {} does not exist in any supported language", fileURI);
       DispatchUtils.sendNotFound(request, response);
@@ -146,11 +138,18 @@ public final class FileRequestHandlerImpl {
       return true;
     }
 
+    // Check the modified headers
+    if (!ResourceUtils.isModified(fileResource, request)) {
+      logger.debug("File {} was not modified", fileURI);
+      return true;
+    }
+
     // Write the file back to the response
     InputStream fileContents = null;
     try {
       fileContents = contentRepository.getContent(fileURI, language);
-      IOUtils.copyLarge(fileContents, response.getOutputStream());
+      IOUtils.copy(fileContents, response.getOutputStream());
+      response.getOutputStream().flush();
       return true;
     } catch (ContentRepositoryException e) {
       logger.error("Unable to load file {}: {}", new Object[] {
@@ -166,15 +165,6 @@ public final class FileRequestHandlerImpl {
     } finally {
       IOUtils.closeQuietly(fileContents);
     }
-  }
-
-  /**
-   * Returns the singleton instance of this class.
-   * 
-   * @return the request handler instance
-   */
-  public static FileRequestHandlerImpl getInstance() {
-    return handler;
   }
 
   /**

@@ -389,15 +389,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getIdentifier()
-   */
-  public String getIdentifier() {
-    return "page";
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {

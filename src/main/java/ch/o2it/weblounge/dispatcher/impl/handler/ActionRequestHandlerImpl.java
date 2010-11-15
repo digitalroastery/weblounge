@@ -648,39 +648,10 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getIdentifier()
-   */
-  public String getIdentifier() {
-    return "actionhandler";
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {
     return "action request handler";
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    return getIdentifier().hashCode();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    return super.equals(obj);
   }
 
   /**

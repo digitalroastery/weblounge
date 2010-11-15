@@ -38,6 +38,7 @@ import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
+import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -52,16 +53,13 @@ import java.io.InputStream;
  * This request handler is used to handle requests to scaled images in the
  * repository.
  */
-public final class ImageRequestHandlerImpl {
+public final class ImageRequestHandlerImpl implements RequestHandler {
 
   /** Name of the image style parameter */
   protected static final String OPT_IMAGE_STYLE = "style";
   
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(ImageRequestHandlerImpl.class);
-
-  /** The singleton handler instance */
-  private static final ImageRequestHandlerImpl handler = new ImageRequestHandlerImpl();
 
   /**
    * Handles the request for an image resource that is believed to be in the
@@ -140,7 +138,7 @@ public final class ImageRequestHandlerImpl {
     }
 
     // Determine the response language
-    Language language = LanguageUtils.getPreferredLanguage(imageResource, request.getLanguage(), imageResource.getOriginalContent().getLanguage(), site.getDefaultLanguage());
+    Language language = LanguageUtils.getPreferredLanguage(imageResource, site, request.getLanguage(), imageResource.getOriginalContent().getLanguage(), site.getDefaultLanguage());
     if (language == null) {
       logger.warn("Image {} does not exist in any supported language", imageURI);
       DispatchUtils.sendNotFound(request, response);
@@ -196,6 +194,7 @@ public final class ImageRequestHandlerImpl {
     try {
       InputStream is = contentRepository.getContent(imageURI, language);
       ImageStyleUtils.style(is, response.getOutputStream(), format, style);
+      response.getOutputStream().flush();
       return true;
     } catch (ContentRepositoryException e) {
       logger.error("Unable to load image {}: {}", new Object[] {
@@ -214,19 +213,10 @@ public final class ImageRequestHandlerImpl {
   }
 
   /**
-   * Returns the singleton instance of this class.
-   * 
-   * @return the request handler instance
-   */
-  public static ImageRequestHandlerImpl getInstance() {
-    return handler;
-  }
-
-  /**
    * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
    */
   public String getName() {
-    return "file request handler";
+    return "image request handler";
   }
 
   /**
