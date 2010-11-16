@@ -25,13 +25,13 @@ import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
@@ -108,9 +108,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     try {
       if (path.startsWith(ALT_URI_PREFIX)) {
         String id = FilenameUtils.getBaseName(StringUtils.chomp(path, "/"));
-        imageURI = new FileResourceURIImpl(site, null, id);
+        imageURI = new ImageResourceURIImpl(site, null, id);
       } else {
-        imageURI = new FileResourceURIImpl(site, path);
+        imageURI = new ImageResourceURIImpl(site, path);
       }
       imageResource = (ImageResource)contentRepository.get(imageURI);
       if (imageResource == null) {
@@ -195,8 +195,14 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     response.setHeader("ETag", "\"" + eTag + "\"");
     
     // Add content disposition header
-    StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(imageContents.getFilename()));
-    filename.append("_").append(imageContents.getWidth()).append("x").append(imageContents.getHeight()).append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
+    StringBuffer filename = new StringBuffer();
+    if (style != null) {
+      filename.append(FilenameUtils.getBaseName(imageContents.getFilename()));
+      filename.append("_").append(style.getWidth()).append("x").append(style.getHeight()).append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
+      filename.append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
+    } else {
+      filename.append(imageContents.getFilename());
+    }
     response.setHeader("Content-Disposition", "inline; filename=" + filename.toString());
 
     try {
@@ -214,13 +220,13 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     final String format = mimetype.substring(mimetype.indexOf("/") + 1);
 
     // When there is no scaling required, just return the original
-    if (style == null || ScalingMode.None.equals(style.getScalingMode())) {
+    if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
       try {
         response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
-        IOUtils.copyLarge(imageInputStream, response.getOutputStream());
+        IOUtils.copy(imageInputStream, response.getOutputStream());
         response.getOutputStream().flush();
       } catch (IOException e) {
-        logger.error("Error writing {} image '{}' back to client: {}", new Object[] { language, imageResource });
+        logger.error("Error writing {} image '{}' back to client: {}", new Object[] { language, imageResource, e.getMessage() });
       } finally {
         IOUtils.closeQuietly(imageInputStream);
       }
