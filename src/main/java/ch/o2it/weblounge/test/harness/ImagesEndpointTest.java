@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
@@ -68,7 +68,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   private static final String baseURL = "system/weblounge/images";
 
   /** The scaling modes to test */
-  private static final List<ScalingMode> modes = new ArrayList<ScalingMode>();
+  private static final List<ImageScalingMode> modes = new ArrayList<ImageScalingMode>();
 
   /** The original image's width */
   private static final float originalWidth = 1000;
@@ -104,12 +104,12 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   private static final String imageId = "5bc19990-8f99-4873-a813-71b6dfac22ad";
 
   static {
-    modes.add(ScalingMode.Box);
-    modes.add(ScalingMode.Cover);
-    modes.add(ScalingMode.Fill);
-    modes.add(ScalingMode.Width);
-    modes.add(ScalingMode.Height);
-    modes.add(ScalingMode.None);
+    modes.add(ImageScalingMode.Box);
+    modes.add(ImageScalingMode.Cover);
+    modes.add(ImageScalingMode.Fill);
+    modes.add(ImageScalingMode.Width);
+    modes.add(ImageScalingMode.Height);
+    modes.add(ImageScalingMode.None);
   }
 
   /**
@@ -189,7 +189,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    */
   private void testGetImageStyle(String serverUrl) throws Exception {
     HttpClient httpClient = null;
-    for (ScalingMode mode : modes) {
+    for (ImageScalingMode mode : modes) {
       String styleId = mode.toString().toLowerCase();
       String url = UrlUtils.concat(serverUrl, "styles", styleId);
       HttpGet getStyleRequest = new HttpGet(url);
@@ -403,7 +403,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
   private void testGetStyledImage(String serverUrl) throws Exception {
     HttpClient httpClient = null;
     List<String> eTags = new ArrayList<String>();
-    for (ScalingMode mode : modes) {
+    for (ImageScalingMode mode : modes) {
       String styleId = mode.toString().toLowerCase();
       String url = UrlUtils.concat(serverUrl, imageId, "styles", styleId);
       HttpGet getStyleRequest = new HttpGet(url);
@@ -467,7 +467,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     HttpClient httpClient = null;
     List<String> eTags = new ArrayList<String>();
 
-    for (ScalingMode mode : modes) {
+    for (ImageScalingMode mode : modes) {
       String styleId = mode.toString().toLowerCase();
 
       // English
@@ -580,7 +580,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    * @return <code>true</code> if the image size is in line with the scaling
    *         mode
    */
-  private boolean checkSize(HttpResponse response, ScalingMode mode) {
+  private boolean checkSize(HttpResponse response, ImageScalingMode mode) {
     SeekableStream imageInputStream = null;
     try {
       imageInputStream = new MemoryCacheSeekableStream(response.getEntity().getContent());

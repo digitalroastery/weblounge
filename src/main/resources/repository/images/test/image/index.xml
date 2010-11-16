@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<image id="5bc19990-8f99-4873-a813-71b6dfac22ad" path="/porsche/" version="live">
+<image id="5bc19990-8f99-4873-a813-71b6dfac22ad" path="/test/image/" version="live">
   <head>
     <promote>true</promote>
     <index>true</index>

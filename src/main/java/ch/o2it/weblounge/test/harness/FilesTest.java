@@ -111,10 +111,7 @@ public class FilesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests the whether the original document is returned. Since the site's
-   * default language is <code>German</code>, and we are not providing
-   * additional information on the request language, the German version is what
-   * we expect to get.
+   * Tests the whether the original document is returned.
    * 
    * @param serverUrl
    *          the base url
@@ -129,7 +126,7 @@ public class FilesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
     try {
-      logger.info("Requesting original document version");
+      logger.info("Requesting original document from {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
@@ -184,7 +181,7 @@ public class FilesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
     try {
-      logger.info("Requesting German document version");
+      logger.info("Requesting German document version from {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
@@ -239,7 +236,7 @@ public class FilesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
     try {
-      logger.info("Requesting English document");
+      logger.info("Requesting English document from {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
@@ -279,7 +276,7 @@ public class FilesTest extends IntegrationTestBase {
     request = new HttpGet(germanUrl);
     httpClient = new DefaultHttpClient();
     try {
-      logger.info("Requesting German document");
+      logger.info("Requesting German document from {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
@@ -336,7 +333,7 @@ public class FilesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
     try {
-      logger.info("Requesting English document");
+      logger.info("Requesting English document from {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
@@ -377,7 +374,7 @@ public class FilesTest extends IntegrationTestBase {
     request.setHeader("Accept-Language", "de");
     httpClient = new DefaultHttpClient();
     try {
-      logger.info("Requesting German document");
+      logger.info("Requesting German document from {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
