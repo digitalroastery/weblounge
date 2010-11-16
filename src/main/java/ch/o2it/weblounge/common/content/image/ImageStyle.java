@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.content.image;
 
 import ch.o2it.weblounge.common.content.Composeable;
-import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.ImageScalingMode;
 
 /**
  * The <code>ImageStyle</code> defines a presentation style for images of a
@@ -37,14 +37,14 @@ public interface ImageStyle extends Composeable {
    * @param mode
    *          the scaling mode
    */
-  void setScalingMode(ScalingMode mode);
+  void setScalingMode(ImageScalingMode mode);
 
   /**
    * Returns the scaling mode for this image style.
    * 
    * @return the scaling mode
    */
-  ScalingMode getScalingMode();
+  ImageScalingMode getScalingMode();
 
   /**
    * Sets the image height.

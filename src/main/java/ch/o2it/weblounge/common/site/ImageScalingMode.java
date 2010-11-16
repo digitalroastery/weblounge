@@ -24,7 +24,7 @@ package ch.o2it.weblounge.common.site;
  * The <code>ScalingMode</code> defines how an image will be scaled with respect
  * to the <code>ImageStyle</code> that is used.
  */
-public enum ScalingMode {
+public enum ImageScalingMode {
 
   /**
    * Scales the image until the width defined by the image style is reached.
@@ -82,7 +82,7 @@ public enum ScalingMode {
    *          the value
    * @return the scaling mode
    */
-  public static ScalingMode parseString(String value) {
+  public static ImageScalingMode parseString(String value) {
     if (Width.toString().equalsIgnoreCase(value))
       return Width;
     else if (Height.toString().equalsIgnoreCase(value))
