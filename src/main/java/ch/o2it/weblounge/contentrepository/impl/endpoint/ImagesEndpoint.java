@@ -32,7 +32,7 @@ import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
@@ -390,7 +390,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     final Language selectedLanguage = language;
 
     // When there is no scaling required, just return the original
-    if (ScalingMode.None.equals(style.getScalingMode())) {
+    if (ImageScalingMode.None.equals(style.getScalingMode())) {
       return getResourceContent(request, resource, selectedLanguage);
     }
 
