@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -404,6 +405,18 @@ public final class LanguageUtils {
    */
   public static Language getPreferredLanguage(Localizable localizable,
       HttpServletRequest request, Site site) {
+    
+    // Path
+    String[] pathElements = StringUtils.split(request.getRequestURI(), "/");
+    for (String element : pathElements) {
+      for (Language l : localizable.languages()) {
+        if (l.getIdentifier().equals(element)) {
+          return l;
+        }
+      }
+    }
+    
+    // Accept-Language header
     if (request.getHeader("Accept-Language") != null) {
       Enumeration<?> locales = request.getLocales();
       while (locales.hasMoreElements()) {
