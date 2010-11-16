@@ -69,7 +69,7 @@ public class FilesTest extends IntegrationTestBase {
 
   /** File name of the German version */
   private static final String filenameGerman = "porsche.jpg";
-  
+
   /** Resource identifier */
   private static final String resourceId = "6bc19990-8f99-4873-a813-71b6dfac22ad";
 
@@ -101,8 +101,9 @@ public class FilesTest extends IntegrationTestBase {
     logger.info("Preparing test of file request handler");
     try {
       testGetDocument(serverUrl);
-      testGetDocumentByLanguage(serverUrl);
       testGetDocumentById(serverUrl);
+      testGetDocumentByPathLanguage(serverUrl);
+      testGetDocumentByHeaderLanguage(serverUrl);
     } catch (Throwable t) {
       fail("Error occured while testing files request handler: " + t.getMessage());
     }
@@ -123,12 +124,13 @@ public class FilesTest extends IntegrationTestBase {
   private void testGetDocument(String serverUrl) throws Exception {
     HttpClient httpClient = null;
     String url = UrlUtils.concat(serverUrl, path);
-    HttpGet getDocumentRequest = new HttpGet(url);
+    HttpGet request = new HttpGet(url);
+    request.setHeader("Accept-Language", "de");
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
     try {
       logger.info("Requesting original document version");
-      HttpResponse response = TestSiteUtils.request(httpClient, getDocumentRequest, null);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -151,7 +153,8 @@ public class FilesTest extends IntegrationTestBase {
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
-      HttpGet request = new HttpGet(url);
+      request = new HttpGet(url);
+      request.setHeader("Accept-Language", "de");
       request.addHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", url);
@@ -166,7 +169,7 @@ public class FilesTest extends IntegrationTestBase {
 
   /**
    * Tests for the special <code>/files</code> uri prefix that is provided by
-   * the file request handler. 
+   * the file request handler.
    * 
    * @param serverUrl
    *          the base url
@@ -176,12 +179,13 @@ public class FilesTest extends IntegrationTestBase {
   private void testGetDocumentById(String serverUrl) throws Exception {
     HttpClient httpClient = null;
     String url = UrlUtils.concat(serverUrl, "files", resourceId);
-    HttpGet getDocumentRequest = new HttpGet(url);
+    HttpGet request = new HttpGet(url);
+    request.setHeader("Accept-Language", "de");
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
     try {
-      logger.info("Requesting original document version");
-      HttpResponse response = TestSiteUtils.request(httpClient, getDocumentRequest, null);
+      logger.info("Requesting German document version");
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -204,8 +208,9 @@ public class FilesTest extends IntegrationTestBase {
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
-      HttpGet request = new HttpGet(url);
+      request = new HttpGet(url);
       request.addHeader("If-None-Match", eTagValue);
+      request.setHeader("Accept-Language", "de");
 
       logger.info("Sending 'If-None-Match' request to {}", url);
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
@@ -218,25 +223,24 @@ public class FilesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests the <code>/{id}/{language}/styles/original</code> method of the
-   * endpoint.
+   * Tests requests that send the required language as part of the request url.
    * 
    * @param serverUrl
    *          the base url
    * @throws Exception
    *           if an exception occurs
    */
-  private void testGetDocumentByLanguage(String serverUrl) throws Exception {
+  private void testGetDocumentByPathLanguage(String serverUrl) throws Exception {
     HttpClient httpClient = null;
 
-    // German
-    String englishUrl = UrlUtils.concat(serverUrl, "en");
-    HttpGet getEnglishDocumentRequest = new HttpGet(englishUrl);
+    // English
+    String englishUrl = UrlUtils.concat(serverUrl, path, "en");
+    HttpGet request = new HttpGet(englishUrl);
     httpClient = new DefaultHttpClient();
     String eTagValue = null;
     try {
       logger.info("Requesting English document");
-      HttpResponse response = TestSiteUtils.request(httpClient, getEnglishDocumentRequest, null);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -259,7 +263,7 @@ public class FilesTest extends IntegrationTestBase {
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
-      HttpGet request = new HttpGet(englishUrl);
+      request = new HttpGet(englishUrl);
       request.addHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", englishUrl);
@@ -271,12 +275,12 @@ public class FilesTest extends IntegrationTestBase {
     }
 
     // German
-    String germanUrl = UrlUtils.concat(serverUrl, "de");
-    HttpGet getGermanRequest = new HttpGet(germanUrl);
+    String germanUrl = UrlUtils.concat(serverUrl, path, "de");
+    request = new HttpGet(germanUrl);
     httpClient = new DefaultHttpClient();
     try {
       logger.info("Requesting German document");
-      HttpResponse response = TestSiteUtils.request(httpClient, getGermanRequest, null);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -299,8 +303,107 @@ public class FilesTest extends IntegrationTestBase {
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
-      HttpGet request = new HttpGet(germanUrl);
+      request = new HttpGet(germanUrl);
       request.addHeader("If-None-Match", eTagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", germanUrl);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+  }
+
+  /**
+   * Tests requests that send the required language as part of the
+   * <code>Accept-Language</code> header.
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetDocumentByHeaderLanguage(String serverUrl)
+      throws Exception {
+    HttpClient httpClient = null;
+
+    // German
+    String englishUrl = UrlUtils.concat(serverUrl, path);
+    HttpGet request = new HttpGet(englishUrl);
+    request.setHeader("Accept-Language", "en");
+    httpClient = new DefaultHttpClient();
+    String eTagValue = null;
+    try {
+      logger.info("Requesting English document");
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue("No content received", response.getEntity().getContentLength() > 0);
+
+      // Test general headers
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeEnglish, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      request = new HttpGet(englishUrl);
+      request.addHeader("If-None-Match", eTagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", englishUrl);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // German
+    String germanUrl = UrlUtils.concat(serverUrl, path);
+    request = new HttpGet(germanUrl);
+    request.setHeader("Accept-Language", "de");
+    httpClient = new DefaultHttpClient();
+    try {
+      logger.info("Requesting German document");
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue("No content received", response.getEntity().getContentLength() > 0);
+
+      // Test general headers
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeGerman, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      request = new HttpGet(germanUrl);
+      request.addHeader("If-None-Match", eTagValue);
+      request.setHeader("Accept-Language", "de");
 
       logger.info("Sending 'If-None-Match' request to {}", germanUrl);
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);

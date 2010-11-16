@@ -136,13 +136,17 @@ public class ImagesTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of images endpoint");
 
-    String requestUrl = UrlUtils.concat(serverUrl, path);
+    String requestUrl = serverUrl;
 
     try {
       testGetOriginalImage(requestUrl);
-      testGetOriginalImageLanguage(requestUrl);
+      testGetOriginalImageById(requestUrl);
+      testGetOriginalImageByPathLanguage(requestUrl);
+      testGetOriginalImageByHeaderLanguage(requestUrl);
       testGetStyledImage(requestUrl);
-      testGetStyledImageLanguage(requestUrl);
+      testGetStyledImageById(requestUrl);
+      testGetStyledImageByPathLanguage(requestUrl);
+      testGetStyledImageByHeaderLanguage(requestUrl);
     } catch (Throwable t) {
       fail("Error occured while testing endpoint: " + t.getMessage());
     }
@@ -207,6 +211,62 @@ public class ImagesTest extends IntegrationTestBase {
   }
 
   /**
+   * Tests for the special <code>/images</code> uri prefix that is provided by
+   * the file request handler.
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetOriginalImageById(String serverUrl) throws Exception {
+    HttpClient httpClient = null;
+    String url = UrlUtils.concat(serverUrl, imageId, "original");
+    HttpGet getOriginalImageRequest = new HttpGet(url);
+    httpClient = new DefaultHttpClient();
+    String eTagValue = null;
+    try {
+      logger.info("Requesting original image version");
+      HttpResponse response = TestSiteUtils.request(httpClient, getOriginalImageRequest, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
+
+      // Test general headers
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeGerman, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+
+      // Test content
+      assertTrue("Image size mismatch", checkSize(response, null));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpGet request = new HttpGet(url);
+      request.addHeader("If-None-Match", eTagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", url);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+  }
+
+  /**
    * Tests the <code>/{id}/{language}/styles/original</code> method of the
    * endpoint.
    * 
@@ -215,7 +275,8 @@ public class ImagesTest extends IntegrationTestBase {
    * @throws Exception
    *           if an exception occurs
    */
-  private void testGetOriginalImageLanguage(String serverUrl) throws Exception {
+  private void testGetOriginalImageByPathLanguage(String serverUrl)
+      throws Exception {
     HttpClient httpClient = null;
 
     // English
@@ -308,6 +369,105 @@ public class ImagesTest extends IntegrationTestBase {
   }
 
   /**
+   * Tests requests that send the required language as part of the
+   * <code>Accept-Language</code> header.
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetOriginalImageByHeaderLanguage(String serverUrl)
+      throws Exception {
+    HttpClient httpClient = null;
+
+    // German
+    String englishUrl = UrlUtils.concat(serverUrl, path);
+    HttpGet request = new HttpGet(englishUrl);
+    request.setHeader("Accept-Language", "en");
+    httpClient = new DefaultHttpClient();
+    String eTagValue = null;
+    try {
+      logger.info("Requesting original English image");
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue("No content received", response.getEntity().getContentLength() > 0);
+
+      // Test general headers
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeEnglish, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      request = new HttpGet(englishUrl);
+      request.addHeader("If-None-Match", eTagValue);
+
+      logger.info("Sending 'If-None-Match' request to {}", englishUrl);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // German
+    String germanUrl = UrlUtils.concat(serverUrl, path);
+    request = new HttpGet(germanUrl);
+    request.setHeader("Accept-Language", "de");
+    httpClient = new DefaultHttpClient();
+    try {
+      logger.info("Requesting original German image");
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue("No content received", response.getEntity().getContentLength() > 0);
+
+      // Test general headers
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeGerman, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+
+      // Test ETag header
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      request = new HttpGet(germanUrl);
+      request.addHeader("If-None-Match", eTagValue);
+      request.setHeader("Accept-Language", "de");
+
+      logger.info("Sending 'If-None-Match' request to {}", germanUrl);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+  }
+
+  /**
    * Tests the <code>/{id}/styles/{style}</code> method of the endpoint.
    * 
    * @param serverUrl
@@ -370,6 +530,69 @@ public class ImagesTest extends IntegrationTestBase {
   }
 
   /**
+   * Tests for the special <code>/images</code> uri prefix that is provided by
+   * the file request handler.
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetStyledImageById(String serverUrl) throws Exception {
+    HttpClient httpClient = null;
+    List<String> eTags = new ArrayList<String>();
+    for (ScalingMode mode : modes) {
+      String styleId = mode.toString().toLowerCase();
+      String url = UrlUtils.concat(serverUrl, imageId, "styles", styleId);
+      HttpGet getStyleRequest = new HttpGet(url);
+      httpClient = new DefaultHttpClient();
+      String eTagValue = null;
+      try {
+        logger.info("Requesting scaled default image '{}'", styleId);
+        HttpResponse response = TestSiteUtils.request(httpClient, getStyleRequest, null);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
+
+        // Test general headers
+        assertEquals(1, response.getHeaders("Content-Type").length);
+        assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
+        assertEquals(1, response.getHeaders("Content-Disposition").length);
+        assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader("Etag");
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
+
+        // Make sure ETags are created in a proper way (no duplicates)
+        assertFalse("Duplicate ETag returned by endpoint", eTags.contains(eTagValue));
+        eTags.add(eTagValue);
+
+        // Test content
+        assertTrue("Image size mismatch", checkSize(response, mode));
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+      // Test ETag support
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpGet request = new HttpGet(url);
+        request.addHeader("If-None-Match", eTagValue);
+
+        logger.info("Sending 'If-None-Match' request to {}", url);
+        HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+        assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        assertNull(response.getEntity());
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+    }
+  }
+
+  /**
    * Tests the <code>/{id}/{language}/styles/{style}</code> method of the
    * endpoint.
    * 
@@ -378,7 +601,7 @@ public class ImagesTest extends IntegrationTestBase {
    * @throws Exception
    *           if an exception occurs
    */
-  private void testGetStyledImageLanguage(String serverUrl) throws Exception {
+  private void testGetStyledImageByPathLanguage(String serverUrl) throws Exception {
     HttpClient httpClient = null;
     List<String> eTags = new ArrayList<String>();
 
@@ -387,6 +610,122 @@ public class ImagesTest extends IntegrationTestBase {
 
       // English
       String englishUrl = UrlUtils.concat(serverUrl, imageId, "locales", "en", "styles", styleId);
+      HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
+      httpClient = new DefaultHttpClient();
+      String eTagValue = null;
+      try {
+        logger.info("Requesting scaled english image '{}'", styleId);
+        HttpResponse response = TestSiteUtils.request(httpClient, getEnglishOriginalRequest, null);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
+
+        // Test general headers
+        assertEquals(1, response.getHeaders("Content-Type").length);
+        assertEquals(mimetypeEnglish, response.getHeaders("Content-Type")[0].getValue());
+        assertEquals(1, response.getHeaders("Content-Disposition").length);
+        assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader("Etag");
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
+
+        // Make sure ETags are created in a proper way (no duplicates)
+        assertFalse("Duplicate ETag returned by endpoint", eTags.contains(eTagValue));
+        if (!"none".equals(styleId)) {
+          eTags.add(eTagValue);
+        }
+
+        // Test content
+        assertTrue("Image size mismatch", checkSize(response, mode));
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+      // Test ETag support
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpGet request = new HttpGet(englishUrl);
+        request.addHeader("If-None-Match", eTagValue);
+
+        logger.info("Sending 'If-None-Match' request to {}", englishUrl);
+        HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+        assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        assertNull(response.getEntity());
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+      // German
+      String germanUrl = UrlUtils.concat(serverUrl, imageId, "locales", "de", "styles", styleId);
+      HttpGet getGermanOriginalRequest = new HttpGet(germanUrl);
+      httpClient = new DefaultHttpClient();
+      try {
+        logger.info("Requesting scaled german image '{}'", styleId);
+        HttpResponse response = TestSiteUtils.request(httpClient, getGermanOriginalRequest, null);
+        assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+        assertTrue("Endpoint returned no content", response.getEntity().getContentLength() > 0);
+
+        // Test general headers
+        assertEquals(1, response.getHeaders("Content-Type").length);
+        assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
+        assertEquals(1, response.getHeaders("Content-Disposition").length);
+        assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+
+        // Test ETag header
+        Header eTagHeader = response.getFirstHeader("Etag");
+        assertNotNull(eTagHeader);
+        assertNotNull(eTagHeader.getValue());
+        eTagValue = eTagHeader.getValue();
+
+        // Make sure ETags are created in a proper way (no duplicates)
+        assertFalse("Duplicate ETag returned by endpoint", eTags.contains(eTagValue));
+        if (!"none".equals(styleId)) {
+          eTags.add(eTagValue);
+        }
+
+        // Test content
+        assertTrue("Image size mismatch", checkSize(response, mode));
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+      // Test ETag support
+      httpClient = new DefaultHttpClient();
+      try {
+        HttpGet request = new HttpGet(germanUrl);
+        request.addHeader("If-None-Match", eTagValue);
+
+        logger.info("Sending 'If-None-Match' request to {}", germanUrl);
+        HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+        assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+        assertNull(response.getEntity());
+      } finally {
+        httpClient.getConnectionManager().shutdown();
+      }
+
+    }
+  }
+
+  /**
+   * Tests the <code>/{id}/styles/{style}</code> method of the
+   * endpoint.
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetStyledImageByHeaderLanguage(String serverUrl) throws Exception {
+    HttpClient httpClient = null;
+    List<String> eTags = new ArrayList<String>();
+
+    for (ScalingMode mode : modes) {
+      String styleId = mode.toString().toLowerCase();
+
+      // English
+      String englishUrl = UrlUtils.concat(serverUrl, imageId, "locales", "styles", styleId);
       HttpGet getEnglishOriginalRequest = new HttpGet(englishUrl);
       httpClient = new DefaultHttpClient();
       String eTagValue = null;
