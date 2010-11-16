@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.common.site.Site;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
@@ -193,7 +193,7 @@ public final class ImageStyleUtils {
     try {
 
       // Do we need to do any work at all?
-      if (ScalingMode.None.equals(style.getScalingMode())) {
+      if (ImageScalingMode.None.equals(style.getScalingMode())) {
         IOUtils.copy(is, os);
         return;
       }

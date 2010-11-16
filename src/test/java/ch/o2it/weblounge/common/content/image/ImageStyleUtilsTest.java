@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
-import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.ImageScalingMode;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
@@ -77,12 +77,12 @@ public class ImageStyleUtilsTest {
     imageURL = ImageStyleUtilsTest.class.getResource(imagePath).toURI().toURL();
 
     styles = new ArrayList<ImageStyle>();
-    styles.add(new ImageStyleImpl("box", (int)width, (int)height, ScalingMode.Box, false));
-    styles.add(new ImageStyleImpl("cover", (int)width, (int)height, ScalingMode.Cover, false));
-    styles.add(new ImageStyleImpl("fill", (int)width, (int)height, ScalingMode.Fill, false));
-    styles.add(new ImageStyleImpl("width", (int)width, (int)height, ScalingMode.Width, false));
-    styles.add(new ImageStyleImpl("height", (int)width, (int)height, ScalingMode.Height, false));
-    styles.add(new ImageStyleImpl("none", (int)width, (int)height, ScalingMode.None, false));
+    styles.add(new ImageStyleImpl("box", (int)width, (int)height, ImageScalingMode.Box, false));
+    styles.add(new ImageStyleImpl("cover", (int)width, (int)height, ImageScalingMode.Cover, false));
+    styles.add(new ImageStyleImpl("fill", (int)width, (int)height, ImageScalingMode.Fill, false));
+    styles.add(new ImageStyleImpl("width", (int)width, (int)height, ImageScalingMode.Width, false));
+    styles.add(new ImageStyleImpl("height", (int)width, (int)height, ImageScalingMode.Height, false));
+    styles.add(new ImageStyleImpl("none", (int)width, (int)height, ImageScalingMode.None, false));
     
     // Make sure it's working on headless systems
     System.setProperty("java.awt.headless", "true");

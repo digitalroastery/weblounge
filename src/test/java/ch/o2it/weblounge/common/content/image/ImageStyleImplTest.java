@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.ImageScalingMode;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class ImageStyleImplTest {
   protected int height = 300; 
   
   /** Scaling mode */
-  protected ScalingMode scalingMode = ScalingMode.Cover;
+  protected ImageScalingMode scalingMode = ImageScalingMode.Cover;
 
   /** Is the style composeable? */
   protected boolean composeable = true;

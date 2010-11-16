@@ -20,19 +20,19 @@
 
 package ch.o2it.weblounge.common.impl.content.image;
 
-import static ch.o2it.weblounge.common.site.ScalingMode.Box;
-import static ch.o2it.weblounge.common.site.ScalingMode.Cover;
-import static ch.o2it.weblounge.common.site.ScalingMode.Fill;
-import static ch.o2it.weblounge.common.site.ScalingMode.Height;
-import static ch.o2it.weblounge.common.site.ScalingMode.None;
-import static ch.o2it.weblounge.common.site.ScalingMode.Width;
+import static ch.o2it.weblounge.common.site.ImageScalingMode.Box;
+import static ch.o2it.weblounge.common.site.ImageScalingMode.Cover;
+import static ch.o2it.weblounge.common.site.ImageScalingMode.Fill;
+import static ch.o2it.weblounge.common.site.ImageScalingMode.Height;
+import static ch.o2it.weblounge.common.site.ImageScalingMode.None;
+import static ch.o2it.weblounge.common.site.ImageScalingMode.Width;
 
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.site.ScalingMode;
+import ch.o2it.weblounge.common.site.ImageScalingMode;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -54,7 +54,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   protected int height = -1;
 
   /** the scaling mode */
-  protected ScalingMode scalingMode = null;
+  protected ImageScalingMode scalingMode = null;
 
   /**
    * Creates a new image style with the name as its identifier, width and
@@ -75,7 +75,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    * @throws IllegalArgumentException
    *           if width and height parameter are zero or negative
    */
-  public ImageStyleImpl(String id, int width, int height, ScalingMode scaling,
+  public ImageStyleImpl(String id, int width, int height, ImageScalingMode scaling,
       boolean composeable) throws IllegalArgumentException {
     this.identifier = id;
     this.width = width;
@@ -107,7 +107,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
   /**
    * Creates a new composeable image style with width, height and a default
-   * scaling mode of {@link ScalingMode#None}.
+   * scaling mode of {@link ImageScalingMode#None}.
    * 
    * @param id
    *          the style identifier
@@ -178,9 +178,9 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.image.ImageStyle#setScalingMode(ch.o2it.weblounge.common.site.ScalingMode)
+   * @see ch.o2it.weblounge.common.content.image.ImageStyle#setScalingMode(ch.o2it.weblounge.common.site.ImageScalingMode)
    */
-  public void setScalingMode(ScalingMode mode) {
+  public void setScalingMode(ImageScalingMode mode) {
     this.scalingMode = mode;
   }
 
@@ -189,7 +189,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
    * 
    * @see ch.o2it.weblounge.common.content.image.ImageStyle#getScalingMode()
    */
-  public ScalingMode getScalingMode() {
+  public ImageScalingMode getScalingMode() {
     return scalingMode;
   }
 
@@ -313,7 +313,7 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
     // Scaling mode
     String mode = XPathHelper.valueOf(node, "m:scalingmode", xpath);
-    ScalingMode scalingMode = mode == null ? None : ScalingMode.parseString(mode);
+    ImageScalingMode scalingMode = mode == null ? None : ImageScalingMode.parseString(mode);
 
     if (Width.equals(scalingMode) && width <= 0)
       throw new IllegalStateException("Width scaling needs positive width");
