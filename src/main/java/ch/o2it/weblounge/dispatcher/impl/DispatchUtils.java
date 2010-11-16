@@ -284,7 +284,36 @@ public final class DispatchUtils {
   }
 
   /**
+   * Sends a <code>400 - Bad Request</code> message back to the client.
+   * 
+   * @param msg
+   *          the error message
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendBadRequest(String msg, WebloungeRequest request,
+      WebloungeResponse response) {
+    sendError(HttpServletResponse.SC_BAD_REQUEST, msg, request, response);
+  }
+
+  /**
+   * Sends a <code>400 - Bad Request</code> message back to the client.
+   * 
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendBadRequest(WebloungeRequest request,
+      WebloungeResponse response) {
+    sendError(HttpServletResponse.SC_BAD_REQUEST, null, request, response);
+  }
+
+  /**
    * Sends the response status <code>status</code> back to the client.
+   * 
    * @param status
    *          the response status
    * @param request
@@ -292,8 +321,8 @@ public final class DispatchUtils {
    * @param response
    *          the response object
    */
-  public static void sendStatus(int status,
-      WebloungeRequest request, WebloungeResponse response) {
+  public static void sendStatus(int status, WebloungeRequest request,
+      WebloungeResponse response) {
     try {
       response.setStatus(status);
     } catch (Throwable t) {

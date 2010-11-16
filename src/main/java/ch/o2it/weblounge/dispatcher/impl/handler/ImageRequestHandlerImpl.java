@@ -167,6 +167,10 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     String styleId = StringUtils.trimToNull(request.getParameter(OPT_IMAGE_STYLE));
     if (styleId != null) {
       style = ImageStyleUtils.findStyle(styleId, site);
+      if (style == null) {
+        DispatchUtils.sendBadRequest("Image style '" + styleId + "' not found", request, response);
+        return true;
+      }
     }
 
     // Check the ETag value
@@ -193,26 +197,15 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(imageResource, language);
     response.setHeader("ETag", "\"" + eTag + "\"");
-    
-    // Add content disposition header
-    StringBuffer filename = new StringBuffer();
-    if (style != null) {
-      filename.append(FilenameUtils.getBaseName(imageContents.getFilename()));
-      filename.append("_").append(style.getWidth()).append("x").append(style.getHeight()).append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
-      filename.append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
-    } else {
-      filename.append(imageContents.getFilename());
-    }
-    response.setHeader("Content-Disposition", "inline; filename=" + filename.toString());
 
+    // Load the input stream from the repository
     try {
       imageInputStream = contentRepository.getContent(imageURI, language);
     } catch (Throwable t) {
       logger.error("Error loading {} image '{}' from {}: {}", new Object[] { language, imageResource, contentRepository, t.getMessage() });
       logger.error(t.getMessage(), t);
-      return false;
-    } finally {
       IOUtils.closeQuietly(imageInputStream);
+      return false;
     }
     
     // Get the mime type
@@ -223,6 +216,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
       try {
         response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
+        response.setHeader("Content-Disposition", "inline; filename=" + imageContents.getFilename());
         IOUtils.copy(imageInputStream, response.getOutputStream());
         response.getOutputStream().flush();
       } catch (IOException e) {
@@ -237,6 +231,13 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     try {
       // TODO: What is the scaled file size?
       // response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
+
+      // Add Content-Disposition header
+      StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(imageContents.getFilename()));
+      filename.append("_").append(style.getWidth()).append("x").append(style.getHeight()).append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
+      filename.append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
+      response.setHeader("Content-Disposition", "inline; filename=" + filename.toString());
+
       InputStream is = contentRepository.getContent(imageURI, language);
       ImageStyleUtils.style(is, response.getOutputStream(), format, style);
       response.getOutputStream().flush();
