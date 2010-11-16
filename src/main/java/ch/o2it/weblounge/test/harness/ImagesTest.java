@@ -400,10 +400,7 @@ public class ImagesTest extends IntegrationTestBase {
       assertEquals(1, response.getHeaders("Content-Disposition").length);
 
       // Test filename
-      StringBuffer fileName = new StringBuffer(FilenameUtils.getBaseName(filenameEnglish));
-      fileName.append("_").append((int)originalWidth).append("x").append((int)originalHeight);
-      fileName.append(".").append(FilenameUtils.getExtension(filenameEnglish));
-      assertEquals("inline; filename=" + fileName.toString(), response.getHeaders("Content-Disposition")[0].getValue());
+      assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("Etag");
@@ -419,7 +416,7 @@ public class ImagesTest extends IntegrationTestBase {
     try {
       request.addHeader("If-None-Match", eTagValue);
 
-      logger.info("Sending 'If-None-Match' request to {}", request.toString());
+      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
@@ -466,7 +463,7 @@ public class ImagesTest extends IntegrationTestBase {
     try {
       request.addHeader("If-None-Match", eTagValue);
 
-      logger.info("Sending 'If-None-Match' request to {}", request.toString());
+      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
@@ -524,7 +521,7 @@ public class ImagesTest extends IntegrationTestBase {
     try {
       request.addHeader("If-None-Match", eTagValue);
 
-      logger.info("Sending 'If-None-Match' request to {}", request.toString());
+      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
@@ -585,7 +582,7 @@ public class ImagesTest extends IntegrationTestBase {
     try {
       request.addHeader("If-None-Match", eTagValue);
 
-      logger.info("Sending 'If-None-Match' request to {}", request.toString());
+      logger.info("Sending 'If-None-Match' request to {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
