@@ -100,6 +100,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return false;
     }
 
+    // Check if the request uri matches the special uri for images. If so, try
+    // to extract the id from the last part of the path. If not, check if there
+    // is an image with the current path.
     ResourceURI imageURI = null;
     ImageResource imageResource = null;
     try {
@@ -145,6 +148,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Check the modified headers
     if (!ResourceUtils.isModified(imageResource, request)) {
       logger.debug("Image {} was not modified", imageURI);
+      DispatchUtils.sendNotModified(request, response);
       return true;
     }
 
@@ -169,6 +173,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     String eTagValue = ResourceUtils.getETagValue(imageResource, language, style);
     if (!ResourceUtils.isMismatch(eTagValue, request)) {
       logger.debug("Image {} was not modified", imageURI);
+      DispatchUtils.sendNotModified(request, response);
       return true;
     }
 

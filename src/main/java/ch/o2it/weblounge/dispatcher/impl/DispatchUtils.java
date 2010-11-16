@@ -155,6 +155,19 @@ public final class DispatchUtils {
   }
 
   /**
+   * Sends a <code>304 - Not modified</code> message back to the client.
+   * 
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendNotModified(WebloungeRequest request,
+      WebloungeResponse response) {
+    sendStatus(HttpServletResponse.SC_NOT_MODIFIED, request, response);
+  }
+
+  /**
    * Sends a <code>500 - Internal server error</code> message back to the
    * client.
    * 
@@ -268,6 +281,24 @@ public final class DispatchUtils {
   public static void sendAccessDenied(String msg, WebloungeRequest request,
       WebloungeResponse response) {
     sendError(HttpServletResponse.SC_FORBIDDEN, msg, request, response);
+  }
+
+  /**
+   * Sends the response status <code>status</code> back to the client.
+   * @param status
+   *          the response status
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the response object
+   */
+  public static void sendStatus(int status,
+      WebloungeRequest request, WebloungeResponse response) {
+    try {
+      response.setStatus(status);
+    } catch (Throwable t) {
+      logger.error("Unable to send response status {} to client", status);
+    }
   }
 
   /**

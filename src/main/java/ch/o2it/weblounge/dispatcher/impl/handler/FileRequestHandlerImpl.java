@@ -53,7 +53,7 @@ import javax.ws.rs.core.MediaType;
  * This request handler is used to handle requests to files in the repository.
  */
 public final class FileRequestHandlerImpl implements RequestHandler {
-  
+
   /** Alternate uri prefix */
   protected static final String ALT_URI_PREFIX = "/files";
 
@@ -78,22 +78,24 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     WebUrl url = request.getUrl();
     Site site = request.getSite();
     String path = url.getPath();
-    
+
     // Check the request method. Only GET is supported right now.
     String requestMethod = request.getMethod();
     if (!"GET".equals(requestMethod)) {
       logger.debug("File request handler does not support {} requests", requestMethod);
       return false;
     }
-    
+
     // Get hold of the content repository
     ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
     if (contentRepository == null) {
       logger.warn("No content repository found for site '{}'", site);
       return false;
     }
-    
-    // Check if there is a file with the current path
+
+    // Check if the request uri matches the special uri for files. If so, try
+    // to extract the id from the last part of the path. If not, check if there
+    // is a file with the current path.
     ResourceURI fileURI = null;
     FileResource fileResource = null;
     try {
@@ -103,7 +105,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       } else {
         fileURI = new FileResourceURIImpl(site, path);
       }
-      fileResource = (FileResource)contentRepository.get(fileURI);
+      fileResource = (FileResource) contentRepository.get(fileURI);
       if (fileResource == null) {
         logger.debug("No file found at {}", fileURI);
         return false;
@@ -149,12 +151,14 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     // Check the ETag value
     if (!ResourceUtils.isMismatch(fileResource, language, request)) {
       logger.debug("File {} was not modified", fileURI);
+      DispatchUtils.sendNotModified(request, response);
       return true;
     }
 
     // Check the modified headers
     if (!ResourceUtils.isModified(fileResource, request)) {
       logger.debug("File {} was not modified", fileURI);
+      DispatchUtils.sendNotModified(request, response);
       return true;
     }
 
@@ -167,14 +171,14 @@ public final class FileRequestHandlerImpl implements RequestHandler {
 
     // Add last modified header
     response.setDateHeader("Last-Modified", fileResource.getModificationDate().getTime());
-    
+
     // Add content size
     response.setHeader("Content-Length", Long.toString(content.getSize()));
 
     // Add ETag header
     String eTag = ResourceUtils.getETagValue(fileResource, language);
     response.setHeader("ETag", "\"" + eTag + "\"");
-    
+
     // Add content disposition header
     response.setHeader("Content-Disposition", "inline; filename=" + content.getFilename());
 
