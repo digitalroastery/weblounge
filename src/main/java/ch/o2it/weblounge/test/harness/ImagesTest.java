@@ -69,10 +69,10 @@ public class ImagesTest extends IntegrationTestBase {
   private static final List<ImageStyle> styles = new ArrayList<ImageStyle>();
 
   /** The original image's width */
-  private static final float originalWidth = 1000;
+  private static final int originalWidth = 1000;
 
   /** The original image's height */
-  private static final float originalHeight = 666;
+  private static final int originalHeight = 666;
 
   /** File size of the English version */
   private static final long sizeEnglish = 73642L;
@@ -96,10 +96,10 @@ public class ImagesTest extends IntegrationTestBase {
   private static final String filenameGerman = "porsche.jpg";
 
   /** The style's width */
-  private static final float width = 250;
+  private static final int width = 250;
 
   /** The style's height */
-  private static final float height = 250;
+  private static final int height = 250;
 
   /** Image resource identifier */
   private static final String imageId = "5bc19990-8f99-4873-a813-71b6dfac22ad";
@@ -247,16 +247,15 @@ public class ImagesTest extends IntegrationTestBase {
     List<String> eTags = new ArrayList<String>();
     for (ImageStyle style : styles) {
       String url = UrlUtils.concat(serverUrl, "images", imageId);
-      HttpGet getStyleRequest = new HttpGet(url);
-      getStyleRequest.getParams().setParameter("style", style.getIdentifier());
+      HttpGet request = new HttpGet(url + "?style=" + style.getIdentifier());
 
       // English
-      getStyleRequest.setHeader("Accept-Language", "en");
-      testEnglishScaled(getStyleRequest, style, eTags);
+      request.setHeader("Accept-Language", "en");
+      testEnglishScaled(request, style, eTags);
 
       // German
-      getStyleRequest.setHeader("Accept-Language", "de");
-      testGermanScaled(getStyleRequest, style, eTags);
+      request.setHeader("Accept-Language", "de");
+      testGermanScaled(request, style, eTags);
     }
   }
 
@@ -277,15 +276,15 @@ public class ImagesTest extends IntegrationTestBase {
 
       // English
       String englishUrl = UrlUtils.concat(serverUrl, imagePath);
-      HttpGet request = new HttpGet(englishUrl);
+      HttpGet request = new HttpGet(englishUrl + "?style=" + style.getIdentifier());
       request.setHeader("Accept-Language", "en");
       request.getParams().setParameter("style", style.getIdentifier());
       testEnglishScaled(request, style, eTags);
 
       // German
-      String GermanUrl = UrlUtils.concat(serverUrl, imagePath);
+      String germanUrl = UrlUtils.concat(serverUrl, imagePath);
       request.setHeader("Accept-Language", "de");
-      request = new HttpGet(GermanUrl);
+      request = new HttpGet(germanUrl + "?style=" + style.getIdentifier());
       request.getParams().setParameter("style", style.getIdentifier());
       testGermanScaled(request, style, eTags);
     }
@@ -307,13 +306,12 @@ public class ImagesTest extends IntegrationTestBase {
 
       // English
       String englishUrl = UrlUtils.concat(serverUrl, imagePath, "en");
-      HttpGet request = new HttpGet(englishUrl);
-      request.getParams().setParameter("style", style.getIdentifier());
+      HttpGet request = new HttpGet(englishUrl + "?style=" + style.getIdentifier());
       testEnglishScaled(request, style, eTags);
 
       // German
-      String GermanUrl = UrlUtils.concat(serverUrl, imagePath, "de");
-      request = new HttpGet(GermanUrl);
+      String germanUrl = UrlUtils.concat(serverUrl, imagePath, "de");
+      request = new HttpGet(germanUrl + "?style=" + style.getIdentifier());
       request.getParams().setParameter("style", style.getIdentifier());
       testGermanScaled(request, style, eTags);
     }
@@ -342,11 +340,14 @@ public class ImagesTest extends IntegrationTestBase {
         switch (mode) {
           case Box:
             assertEquals(width, image.getWidth());
-            assertEquals(originalHeight * (width / originalWidth), image.getHeight());
+            assertEquals((int)(originalHeight * ((float)width / (float)originalWidth)), image.getHeight());
             break;
           case Cover:
-            assertEquals(originalWidth * (height / originalHeight), image.getWidth());
-            assertEquals(height, image.getHeight());
+            float scaleY = (float)height / (float)originalHeight;
+            float scaleX = (float)width / (float)originalWidth;
+            float scale = Math.min(scaleY, scaleX);
+            assertEquals((int)(originalWidth * scale), image.getWidth());
+            assertEquals((int)(originalHeight * scale), image.getHeight());
             break;
           case Fill:
             assertEquals(width + 1, image.getWidth());
@@ -354,10 +355,10 @@ public class ImagesTest extends IntegrationTestBase {
             break;
           case Width:
             assertEquals(width, image.getWidth());
-            assertEquals(originalHeight * (width / originalWidth), image.getHeight());
+            assertEquals((int)(originalHeight * ((float)width / (float)originalWidth)), image.getHeight());
             break;
           case Height:
-            assertEquals(originalWidth * (height / originalHeight), image.getWidth());
+            assertEquals((int)(originalWidth * ((float)height / (float)originalHeight)), image.getWidth());
             assertEquals(height, image.getHeight());
             break;
           case None:
@@ -414,7 +415,7 @@ public class ImagesTest extends IntegrationTestBase {
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
-      request.addHeader("If-None-Match", eTagValue);
+      request.setHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
@@ -461,7 +462,7 @@ public class ImagesTest extends IntegrationTestBase {
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
-      request.addHeader("If-None-Match", eTagValue);
+      request.setHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
@@ -496,7 +497,10 @@ public class ImagesTest extends IntegrationTestBase {
       assertEquals(1, response.getHeaders("Content-Disposition").length);
 
       // Test filename
-      assertEquals("inline; filename=" + filenameEnglish, response.getHeaders("Content-Disposition")[0].getValue());
+      StringBuffer fileName = new StringBuffer(FilenameUtils.getBaseName(filenameEnglish));
+      fileName.append("_").append(style.getWidth()).append("x").append(style.getHeight());
+      fileName.append(".").append(FilenameUtils.getExtension(filenameEnglish));
+      assertEquals("inline; filename=" + fileName.toString(), response.getHeaders("Content-Disposition")[0].getValue());
 
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("Etag");
@@ -519,7 +523,7 @@ public class ImagesTest extends IntegrationTestBase {
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
-      request.addHeader("If-None-Match", eTagValue);
+      request.setHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
@@ -580,7 +584,7 @@ public class ImagesTest extends IntegrationTestBase {
     // Test ETag support
     httpClient = new DefaultHttpClient();
     try {
-      request.addHeader("If-None-Match", eTagValue);
+      request.setHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", request.getURI());
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
