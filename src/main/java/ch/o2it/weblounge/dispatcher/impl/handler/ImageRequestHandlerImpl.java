@@ -28,6 +28,7 @@ import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -41,12 +42,16 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -63,7 +68,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
   /** Name of the image style parameter */
   protected static final String OPT_IMAGE_STYLE = "style";
-  
+
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(ImageRequestHandlerImpl.class);
 
@@ -112,7 +117,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       } else {
         imageURI = new ImageResourceURIImpl(site, path);
       }
-      imageResource = (ImageResource)contentRepository.get(imageURI);
+      imageResource = (ImageResource) contentRepository.get(imageURI);
       if (imageResource == null) {
         logger.debug("No image found at {}", imageURI);
         return false;
@@ -161,7 +166,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     } else {
       imageResource.switchTo(request.getLanguage());
     }
-    
+
     // Extract the image style and scale the image
     ImageStyle style = null;
     String styleId = StringUtils.trimToNull(request.getParameter(OPT_IMAGE_STYLE));
@@ -174,8 +179,8 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     }
 
     // Check the ETag value
-    String eTagValue = ResourceUtils.getETagValue(imageResource, language, style);
-    if (!ResourceUtils.isMismatch(eTagValue, request)) {
+    String eTag = ResourceUtils.getETagValue(imageResource, language, style);
+    if (!ResourceUtils.isMismatch(eTag, request)) {
       logger.debug("Image {} was not modified", imageURI);
       DispatchUtils.sendNotModified(request, response);
       return true;
@@ -184,7 +189,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Load the image contents from the repository
     ImageContent imageContents = imageResource.getContent(language);
     InputStream imageInputStream = null;
-    
+
     // Add mime type header
     String contentType = imageContents.getMimetype();
     if (contentType == null)
@@ -193,21 +198,24 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
     // Add last modified header
     response.setDateHeader("Last-Modified", imageResource.getModificationDate().getTime());
-    
+
     // Add ETag header
-    String eTag = ResourceUtils.getETagValue(imageResource, language);
     response.setHeader("ETag", "\"" + eTag + "\"");
 
     // Load the input stream from the repository
     try {
       imageInputStream = contentRepository.getContent(imageURI, language);
     } catch (Throwable t) {
-      logger.error("Error loading {} image '{}' from {}: {}", new Object[] { language, imageResource, contentRepository, t.getMessage() });
+      logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
+          language,
+          imageResource,
+          contentRepository,
+          t.getMessage() });
       logger.error(t.getMessage(), t);
       IOUtils.closeQuietly(imageInputStream);
       return false;
     }
-    
+
     // Get the mime type
     final String mimetype = imageContents.getMimetype();
     final String format = mimetype.substring(mimetype.indexOf("/") + 1);
@@ -220,26 +228,36 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         IOUtils.copy(imageInputStream, response.getOutputStream());
         response.getOutputStream().flush();
       } catch (IOException e) {
-        logger.error("Error writing {} image '{}' back to client: {}", new Object[] { language, imageResource, e.getMessage() });
+        logger.error("Error writing {} image '{}' back to client: {}", new Object[] {
+            language,
+            imageResource,
+            e.getMessage() });
       } finally {
         IOUtils.closeQuietly(imageInputStream);
       }
       return true;
     }
 
-    // Write the file back to the response
+    // Write the scaled file back to the response
     try {
-      // TODO: What is the scaled file size?
-      // response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
 
-      // Add Content-Disposition header
-      StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(imageContents.getFilename()));
-      filename.append("_").append(style.getWidth()).append("x").append(style.getHeight()).append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
-      filename.append(".").append(FilenameUtils.getExtension(imageContents.getFilename()));
-      response.setHeader("Content-Disposition", "inline; filename=" + filename.toString());
+      // If the scaled version is not there yet, create it
+      File scaledImageFile = getScaledImageFile(imageResource, imageContents, site, style);
+      long lastModified = imageResource.getModificationDate().getTime();
+      if (!scaledImageFile.isFile() || scaledImageFile.lastModified() < lastModified) {
+        InputStream is = contentRepository.getContent(imageURI, language);
+        FileOutputStream fos = new FileOutputStream(scaledImageFile);
+        logger.debug("Creating scaled image '{}' at {}", imageResource, scaledImageFile);
+        ImageStyleUtils.style(is, fos, format, style);
+        IOUtils.closeQuietly(is);
+        IOUtils.closeQuietly(fos);
+        scaledImageFile.setLastModified(lastModified);
+      }
 
-      InputStream is = contentRepository.getContent(imageURI, language);
-      ImageStyleUtils.style(is, response.getOutputStream(), format, style);
+      response.setHeader("Content-Disposition", "inline; filename=" + scaledImageFile.getName());
+      response.setHeader("Content-Length", Long.toString(scaledImageFile.length()));
+      imageInputStream = new FileInputStream(scaledImageFile);
+      IOUtils.copy(imageInputStream, response.getOutputStream());
       response.getOutputStream().flush();
       return true;
     } catch (ContentRepositoryException e) {
@@ -256,6 +274,52 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     } finally {
       IOUtils.closeQuietly(imageInputStream);
     }
+  }
+
+  /**
+   * Creates a file for the scaled image that is identified by
+   * <code>image</code>, <code>contents</code>, <code>site</code> and
+   * <code>style</code>.
+   * 
+   * @param resource
+   *          the image resource
+   * @param image
+   *          the image contents
+   * @param site
+   *          the site
+   * @param style
+   *          the image style
+   * @throws IOException
+   *           if creating the file fails
+   * @throws IllegalStateException
+   *           if a file is found at the parent directory location
+   * @return
+   */
+  private File getScaledImageFile(ImageResource resource, ImageContent image, Site site,
+      ImageStyle style) throws IOException, IllegalStateException {
+
+    // If needed, create the scaled file's parent directory
+    File dir = new File(PathUtils.concat(
+        System.getProperty("java.io.tmpdir"),
+        "weblounge",
+        "images",
+        site.getIdentifier(),
+        style.getIdentifier(),
+        resource.getIdentifier(),
+        image.getLanguage().getIdentifier()
+    ));
+
+    if (dir.exists() && !dir.isDirectory())
+      throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
+    if (!dir.isDirectory())
+      FileUtils.forceMkdir(dir);
+    
+    // Create the filename
+    StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(image.getFilename()));
+    filename.append("_").append(style.getWidth()).append("x").append(style.getHeight());
+    filename.append(".").append(FilenameUtils.getExtension(image.getFilename()));
+
+    return new File(dir, filename.toString());
   }
 
   /**
