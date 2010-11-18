@@ -67,31 +67,26 @@ public final class ImageStyleUtils {
    */
   public static float getScale(float imageWidth, float imageHeight,
       ImageStyle style) {
-    boolean taller = imageWidth < imageHeight;
     float scale = 1.0f;
+    float scaleX = (float) style.getWidth() / imageWidth;
+    float scaleY = (float) style.getHeight() / imageHeight;
 
     switch (style.getScalingMode()) {
       case Box:
-        if (taller)
-          scale = style.getHeight() / imageHeight;
-        else
-          scale = style.getWidth() / imageWidth;
+        scale = Math.min(scaleX, scaleY);
         break;
       case Cover:
       case Fill:
-        if (taller)
-          scale = style.getWidth() / imageWidth;
-        else
-          scale = style.getHeight() / imageHeight;
+        scale = Math.max(scaleX, scaleY);
         break;
       case Height:
-        scale = style.getHeight() / imageHeight;
+        scale = scaleY;
         break;
       case None:
         scale = 1.0f;
         break;
       case Width:
-        scale = style.getWidth() / imageWidth;
+        scale = scaleX;
         break;
       default:
         throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
@@ -102,7 +97,7 @@ public final class ImageStyleUtils {
 
   /**
    * Returns the cropping value in horizontal direction needed for the image in
-   * order to comply the image style.
+   * order to comply with the image style.
    * 
    * @param imageWidth
    *          width of the original image
@@ -115,10 +110,9 @@ public final class ImageStyleUtils {
   public static float getCropX(float imageWidth, float imageHeight,
       ImageStyle style) {
     float cropX = 0;
-    float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
-        cropX = (imageWidth * scale) - style.getWidth();
+        cropX = imageWidth - style.getWidth();
         break;
       case Box:
       case Cover:
@@ -136,7 +130,7 @@ public final class ImageStyleUtils {
 
   /**
    * Returns the cropping value in vertical direction needed for the image in
-   * order to comply the image style.
+   * order to comply with the image style.
    * 
    * @param imageWidth
    *          width of the original image
@@ -149,10 +143,9 @@ public final class ImageStyleUtils {
   public static float getCropY(float imageWidth, float imageHeight,
       ImageStyle style) {
     float cropY = 0;
-    float scale = getScale(imageWidth, imageHeight, style);
     switch (style.getScalingMode()) {
       case Fill:
-        cropY = (imageHeight * scale) - style.getHeight();
+        cropY = imageHeight - style.getHeight();
         break;
       case Box:
       case Cover:
@@ -235,20 +228,21 @@ public final class ImageStyleUtils {
 
       // Cropping
 
-      float cropX = (float) Math.floor(getCropX(scaledWidth, scaledHeight, style));
-      float cropY = (float) Math.floor(getCropY(scaledWidth, scaledHeight, style));
+      float cropX = (float) Math.ceil(getCropX(scaledWidth, scaledHeight, style));
+      float cropY = (float) Math.ceil(getCropY(scaledWidth, scaledHeight, style));
 
       if (cropX > 0 || cropY > 0) {
-        ParameterBlock cropParams = new ParameterBlock();
-        cropParams.addSource(image);
-        cropParams.add(cropX > 0 ? cropX / 2.0f : 0.0f); // top left x
-        cropParams.add(cropY > 0 ? cropY / 2.0f : 0.0f); // top left y
-        cropParams.add(scaledWidth - cropX);
-        cropParams.add(scaledHeight - cropY);
+
+        ParameterBlock cropTopLeftParams = new ParameterBlock();
+        cropTopLeftParams.addSource(image);
+        cropTopLeftParams.add(cropX > 0 ? ((float)Math.floor(cropX / 2.0f)) : 0.0f); // top left x
+        cropTopLeftParams.add(cropY > 0 ? ((float)Math.floor(cropY / 2.0f)) : 0.0f); // top left y
+        cropTopLeftParams.add(scaledWidth - Math.max(cropX, 0.0f)); // width
+        cropTopLeftParams.add(scaledHeight - Math.max(cropY, 0.0f)); // height
 
         RenderingHints croppingHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
-        image = JAI.create("crop", cropParams, croppingHints);
+        image = JAI.create("crop", cropTopLeftParams, croppingHints);
       }
 
       // Create the cropped and resized image

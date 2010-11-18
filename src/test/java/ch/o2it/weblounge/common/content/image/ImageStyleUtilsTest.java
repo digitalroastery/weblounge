@@ -131,10 +131,9 @@ public class ImageStyleUtilsTest {
   public void testGetCropX() {
     for (ImageStyle style : styles) {
       float cropX = ImageStyleUtils.getCropX((int)originalWidth, (int)originalHeight, style);
-      float scaleToHeight = height / originalHeight;
       switch (style.getScalingMode()) {
         case Fill:
-          assertEquals((originalWidth * scaleToHeight) - width, cropX);
+          assertEquals(originalWidth - width, cropX);
           break;
         case Box:
         case Cover:
@@ -158,7 +157,7 @@ public class ImageStyleUtilsTest {
       float cropY = ImageStyleUtils.getCropY((int)originalWidth, (int)originalHeight, style);
       switch (style.getScalingMode()) {
         case Fill:
-          assertEquals(0.0f, cropY);
+          assertEquals(originalHeight - height, cropY);
           break;
         case Box:
         case Cover:
