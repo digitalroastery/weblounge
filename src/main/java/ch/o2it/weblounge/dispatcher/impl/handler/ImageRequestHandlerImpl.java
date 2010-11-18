@@ -313,7 +313,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       FileUtils.forceMkdir(dir);
     
     // Get scaled width and height
-    float scale = ImageStyleUtils.getScale(image.getWidth(), image.getHeight(), style);
     float styledWidth = image.getWidth() - ImageStyleUtils.getCropX(image.getWidth(), image.getHeight(), style);
     float styledHeight = image.getHeight() - ImageStyleUtils.getCropY(image.getWidth(), image.getHeight(), style);
     
