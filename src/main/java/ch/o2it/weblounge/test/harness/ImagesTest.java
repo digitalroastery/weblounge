@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
@@ -96,20 +97,20 @@ public class ImagesTest extends IntegrationTestBase {
   private static final String filenameGerman = "porsche.jpg";
 
   /** The style's width */
-  private static final int width = 250;
+  private static final int BOX_WIDTH = 250;
 
   /** The style's height */
-  private static final int height = 250;
+  private static final int BOX_HEIGHT = 250;
 
   /** Image resource identifier */
   private static final String imageId = "5bc19990-8f99-4873-a813-71b6dfac22ad";
 
   static {
-    styles.add(new ImageStyleImpl("box", 250, 250, ImageScalingMode.Box, false));
-    styles.add(new ImageStyleImpl("cover", 250, 250, ImageScalingMode.Cover, false));
-    styles.add(new ImageStyleImpl("fill", 250, 250, ImageScalingMode.Fill, false));
-    styles.add(new ImageStyleImpl("width", 250, -1, ImageScalingMode.Width, false));
-    styles.add(new ImageStyleImpl("height", -1, 250, ImageScalingMode.Height, false));
+    styles.add(new ImageStyleImpl("box", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Box, false));
+    styles.add(new ImageStyleImpl("cover", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Cover, false));
+    styles.add(new ImageStyleImpl("fill", BOX_WIDTH, BOX_HEIGHT, ImageScalingMode.Fill, false));
+    styles.add(new ImageStyleImpl("width", BOX_WIDTH, -1, ImageScalingMode.Width, false));
+    styles.add(new ImageStyleImpl("height", -1, BOX_HEIGHT, ImageScalingMode.Height, false));
     styles.add(new ImageStyleImpl("none", -1, -1, ImageScalingMode.None, false));
   }
 
@@ -165,6 +166,11 @@ public class ImagesTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetOriginalImage(String serverUrl) throws Exception {
+    
+    logger.info("");
+    logger.info("Testing original, (header-based) localized image by path");
+    logger.info("");
+
     String url = UrlUtils.concat(serverUrl, imagePath);
     HttpGet request = new HttpGet(url);
     request.setHeader("Accept-Language", "de");
@@ -181,6 +187,11 @@ public class ImagesTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetOriginalImageById(String serverUrl) throws Exception {
+    
+    logger.info("");
+    logger.info("Testing original, (header-based) localized image by id");
+    logger.info("");
+
     String url = UrlUtils.concat(serverUrl, "images", imageId);
     HttpGet request = new HttpGet(url);
     request.setHeader("Accept-Language", "de");
@@ -198,6 +209,10 @@ public class ImagesTest extends IntegrationTestBase {
    */
   private void testGetOriginalImageByPathLanguage(String serverUrl)
       throws Exception {
+
+    logger.info("");
+    logger.info("Testing original, (path-based) localized image by path");
+    logger.info("");
 
     // English
     String englishUrl = UrlUtils.concat(serverUrl, imagePath, "en");
@@ -222,6 +237,10 @@ public class ImagesTest extends IntegrationTestBase {
   private void testGetOriginalImageByHeaderLanguage(String serverUrl)
       throws Exception {
 
+    logger.info("");
+    logger.info("Testing original, (header-based) localized images");
+    logger.info("");
+
     // English
     String url = UrlUtils.concat(serverUrl, imagePath);
     HttpGet request = new HttpGet(url);
@@ -244,6 +263,11 @@ public class ImagesTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetStyledImageById(String serverUrl) throws Exception {
+    
+    logger.info("");
+    logger.info("Testing styled, (header-based) localized images by id");
+    logger.info("");
+
     List<String> eTags = new ArrayList<String>();
     for (ImageStyle style : styles) {
       String url = UrlUtils.concat(serverUrl, "images", imageId);
@@ -271,19 +295,20 @@ public class ImagesTest extends IntegrationTestBase {
   private void testGetStyledImageByPathLanguage(String serverUrl)
       throws Exception {
 
+    logger.info("");
+    logger.info("Testing styled, (path-based) localized images by path");
+    logger.info("");
+
     List<String> eTags = new ArrayList<String>();
     for (ImageStyle style : styles) {
 
       // English
-      String englishUrl = UrlUtils.concat(serverUrl, imagePath);
+      String englishUrl = UrlUtils.concat(serverUrl, imagePath, "en");
       HttpGet request = new HttpGet(englishUrl + "?style=" + style.getIdentifier());
-      request.setHeader("Accept-Language", "en");
-      request.getParams().setParameter("style", style.getIdentifier());
       testEnglishScaled(request, style, eTags);
 
       // German
-      String germanUrl = UrlUtils.concat(serverUrl, imagePath);
-      request.setHeader("Accept-Language", "de");
+      String germanUrl = UrlUtils.concat(serverUrl, imagePath, "de");
       request = new HttpGet(germanUrl + "?style=" + style.getIdentifier());
       request.getParams().setParameter("style", style.getIdentifier());
       testGermanScaled(request, style, eTags);
@@ -300,19 +325,22 @@ public class ImagesTest extends IntegrationTestBase {
    */
   private void testGetStyledImageByHeaderLanguage(String serverUrl)
       throws Exception {
+
+    logger.info("");
+    logger.info("Testing styled, (header-based) localized images by path");
+    logger.info("");
     
     List<String> eTags = new ArrayList<String>();
     for (ImageStyle style : styles) {
+      String url = UrlUtils.concat(serverUrl, imagePath);
+      HttpGet request = new HttpGet(url + "?style=" + style.getIdentifier());
 
       // English
-      String englishUrl = UrlUtils.concat(serverUrl, imagePath, "en");
-      HttpGet request = new HttpGet(englishUrl + "?style=" + style.getIdentifier());
+      request.setHeader("Accept-Language", "en");
       testEnglishScaled(request, style, eTags);
 
       // German
-      String germanUrl = UrlUtils.concat(serverUrl, imagePath, "de");
-      request = new HttpGet(germanUrl + "?style=" + style.getIdentifier());
-      request.getParams().setParameter("style", style.getIdentifier());
+      request.setHeader("Accept-Language", "de");
       testGermanScaled(request, style, eTags);
     }
 
@@ -339,31 +367,28 @@ public class ImagesTest extends IntegrationTestBase {
       } else {
         switch (mode) {
           case Box:
-            assertEquals(width, image.getWidth());
-            assertEquals((int)(originalHeight * ((float)width / (float)originalWidth)), image.getHeight());
+            assertTrue(BOX_WIDTH == image.getWidth() || BOX_HEIGHT == image.getHeight());
+            assertTrue("Image width is too large", image.getWidth() <= BOX_WIDTH);
+            assertTrue("Image height is too large", image.getHeight() <= BOX_HEIGHT);
             break;
           case Cover:
-            float scaleY = (float)height / (float)originalHeight;
-            float scaleX = (float)width / (float)originalWidth;
-            float scale = Math.min(scaleY, scaleX);
-            assertEquals((int)(originalWidth * scale), image.getWidth());
-            assertEquals((int)(originalHeight * scale), image.getHeight());
+            assertTrue(BOX_WIDTH == image.getWidth() || BOX_HEIGHT == image.getHeight());
+            assertTrue("Image width is too small", image.getWidth() >= BOX_WIDTH);
+            assertTrue("Image height is too small", image.getHeight() >= BOX_HEIGHT);
             break;
           case Fill:
-            assertEquals(width + 1, image.getWidth());
-            assertEquals(height, image.getHeight());
-            break;
-          case Width:
-            assertEquals(width, image.getWidth());
-            assertEquals((int)(originalHeight * ((float)width / (float)originalWidth)), image.getHeight());
+            assertEquals("Image width is wrong", BOX_WIDTH, image.getWidth());
+            assertEquals("Image height is wrong", BOX_HEIGHT, image.getHeight());
             break;
           case Height:
-            assertEquals((int)(originalWidth * ((float)height / (float)originalHeight)), image.getWidth());
-            assertEquals(height, image.getHeight());
+            assertEquals("Image height is wrong", BOX_HEIGHT, image.getHeight());
             break;
           case None:
-            assertEquals(originalWidth, image.getWidth());
-            assertEquals(originalHeight, image.getHeight());
+            assertEquals("Image width is wrong", originalWidth, image.getWidth());
+            assertEquals("Image height is wrong", originalHeight, image.getHeight());
+            break;
+          case Width:
+            assertEquals("Image width is wrong", BOX_WIDTH, image.getWidth());
             break;
           default:
             fail("Unknown image style detected");
@@ -498,7 +523,12 @@ public class ImagesTest extends IntegrationTestBase {
 
       // Test filename
       StringBuffer fileName = new StringBuffer(FilenameUtils.getBaseName(filenameEnglish));
-      fileName.append("_").append(style.getWidth()).append("x").append(style.getHeight());
+      if (!ImageScalingMode.None.equals(style.getScalingMode())) {
+        float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
+        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth, originalHeight, style);
+        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth, originalHeight, style);
+        fileName.append("_").append((int)scaledWidth).append("x").append((int)scaledHeight);
+      }
       fileName.append(".").append(FilenameUtils.getExtension(filenameEnglish));
       assertEquals("inline; filename=" + fileName.toString(), response.getHeaders("Content-Disposition")[0].getValue());
 
@@ -559,7 +589,12 @@ public class ImagesTest extends IntegrationTestBase {
 
       // Test filename
       StringBuffer fileName = new StringBuffer(FilenameUtils.getBaseName(filenameGerman));
-      fileName.append("_").append(style.getWidth()).append("x").append(style.getHeight());
+      if (!ImageScalingMode.None.equals(style.getScalingMode())) {
+        float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
+        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth, originalHeight, style);
+        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth, originalHeight, style);
+        fileName.append("_").append((int)scaledWidth).append("x").append((int)scaledHeight);
+      }
       fileName.append(".").append(FilenameUtils.getExtension(filenameGerman));
       assertEquals("inline; filename=" + fileName.toString(), response.getHeaders("Content-Disposition")[0].getValue());
 
