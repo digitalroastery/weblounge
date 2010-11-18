@@ -21,8 +21,8 @@
 package ch.o2it.weblounge.common.impl.content.image;
 
 import ch.o2it.weblounge.common.content.image.ImageStyle;
-import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
+import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
@@ -45,6 +46,12 @@ import javax.media.jai.RenderedOp;
  * Utility class used for dealing with images and image styles.
  */
 public final class ImageStyleUtils {
+
+  /** width of one image tile */
+  private static final int TILE_WIDTH = 256;
+
+  /** height of one image tile */
+  private static final int TILE_HEIGHT = 256;
 
   /**
    * This class is not meant to be instantiated.
@@ -68,8 +75,8 @@ public final class ImageStyleUtils {
   public static float getScale(float imageWidth, float imageHeight,
       ImageStyle style) {
     float scale = 1.0f;
-    float scaleX = (float) style.getWidth() / imageWidth;
-    float scaleY = (float) style.getHeight() / imageHeight;
+    float scaleX = (float)style.getWidth() / imageWidth;
+    float scaleY = (float)style.getHeight() / imageHeight;
 
     switch (style.getScalingMode()) {
       case Box:
@@ -201,8 +208,16 @@ public final class ImageStyleUtils {
       int imageWidth = image.getWidth();
       int imageHeight = image.getHeight();
 
-      // Resizing
+      // Tiling
+      ImageLayout tileLayout = new ImageLayout(image);
+      tileLayout.setTileWidth(TILE_WIDTH);
+      tileLayout.setTileHeight(TILE_HEIGHT);
+      RenderingHints tileHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, tileLayout);
+      ParameterBlock tileParams = new ParameterBlock();
+      tileParams.addSource(image);
+      image = JAI.create("format", tileParams, tileHints);
 
+      // Resizing
       float scale = getScale(imageWidth, imageHeight, style);
 
       if (scale != 1.0) {
@@ -228,15 +243,19 @@ public final class ImageStyleUtils {
 
       // Cropping
 
-      float cropX = (float) Math.ceil(getCropX(scaledWidth, scaledHeight, style));
-      float cropY = (float) Math.ceil(getCropY(scaledWidth, scaledHeight, style));
+      float cropX = (float)Math.ceil(getCropX(scaledWidth, scaledHeight, style));
+      float cropY = (float)Math.ceil(getCropY(scaledWidth, scaledHeight, style));
 
       if (cropX > 0 || cropY > 0) {
 
         ParameterBlock cropTopLeftParams = new ParameterBlock();
         cropTopLeftParams.addSource(image);
-        cropTopLeftParams.add(cropX > 0 ? ((float)Math.floor(cropX / 2.0f)) : 0.0f); // top left x
-        cropTopLeftParams.add(cropY > 0 ? ((float)Math.floor(cropY / 2.0f)) : 0.0f); // top left y
+        cropTopLeftParams.add(cropX > 0 ? ((float)Math.floor(cropX / 2.0f)) : 0.0f); // top
+                                                                                     // left
+                                                                                     // x
+        cropTopLeftParams.add(cropY > 0 ? ((float)Math.floor(cropY / 2.0f)) : 0.0f); // top
+                                                                                     // left
+                                                                                     // y
         cropTopLeftParams.add(scaledWidth - Math.max(cropX, 0.0f)); // width
         cropTopLeftParams.add(scaledHeight - Math.max(cropY, 0.0f)); // height
 
