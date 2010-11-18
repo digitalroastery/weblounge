@@ -324,7 +324,10 @@ public final class DispatchUtils {
   public static void sendStatus(int status, WebloungeRequest request,
       WebloungeResponse response) {
     try {
-      response.setStatus(status);
+      if (!response.isCommitted()) {
+        response.setStatus(status);
+        response.getOutputStream().flush();
+      }
     } catch (Throwable t) {
       logger.error("Unable to send response status {} to client", status);
     }
@@ -366,8 +369,10 @@ public final class DispatchUtils {
       WebloungeRequest request, WebloungeResponse response) {
     try {
       response.invalidate();
-      if (!response.isCommitted())
+      if (!response.isCommitted()) {
         response.sendError(status, msg);
+        response.getOutputStream().flush();
+      }
     } catch (Throwable t) {
       logger.error("Error when sending back error message {}: {}", status, t.getMessage());
     }

@@ -163,8 +163,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       logger.warn("Image {} does not exist in any supported language", imageURI);
       DispatchUtils.sendNotFound(request, response);
       return true;
-    } else {
-      imageResource.switchTo(request.getLanguage());
     }
 
     // Extract the image style and scale the image
@@ -314,9 +312,14 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     if (!dir.isDirectory())
       FileUtils.forceMkdir(dir);
     
+    // Get scaled width and height
+    float scale = ImageStyleUtils.getScale(image.getWidth(), image.getHeight(), style);
+    float styledWidth = image.getWidth() * scale - ImageStyleUtils.getCropX(image.getWidth(), image.getHeight(), style);
+    float styledHeight = image.getHeight() * scale - ImageStyleUtils.getCropY(image.getWidth(), image.getHeight(), style);
+    
     // Create the filename
     StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(image.getFilename()));
-    filename.append("_").append(style.getWidth()).append("x").append(style.getHeight());
+    filename.append("_").append((int)styledWidth).append("x").append((int)styledHeight);
     filename.append(".").append(FilenameUtils.getExtension(image.getFilename()));
 
     return new File(dir, filename.toString());
