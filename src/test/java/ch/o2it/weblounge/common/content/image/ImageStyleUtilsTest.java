@@ -204,7 +204,7 @@ public class ImageStyleUtilsTest {
             assertEquals(height, image.getHeight());
             break;
           case Fill:
-            assertEquals(width + 1, image.getWidth());
+            assertEquals(width, image.getWidth());
             assertEquals(height, image.getHeight());
             break;
           case Height:
