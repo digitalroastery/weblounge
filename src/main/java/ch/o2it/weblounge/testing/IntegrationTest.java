@@ -31,8 +31,11 @@ package ch.o2it.weblounge.testing;
  */
 public interface IntegrationTest {
 
-  /** Special group for weblounge */
-  String WEBLOUNGE_TEST_GROUP = "WEBLOUNGE TEST SUITE";
+  /** Special group for weblounge content tests */
+  String WEBLOUNGE_CONTENT_TEST_GROUP = "WEBLOUNGE CONTENT TESTS";
+
+  /** Special group for weblounge rest endpoint tests */
+  String WEBLOUNGE_ENDPOINT_TEST_GROUP = "WEBLOUNGE ENDPOINT TESTS";
 
   /**
    * Runs the integration test.
