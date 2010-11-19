@@ -20,7 +20,10 @@
 
 package ch.o2it.weblounge.common.impl.content.image;
 
+import ch.o2it.weblounge.common.content.image.ImageContent;
+import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
@@ -28,10 +31,13 @@ import ch.o2it.weblounge.common.site.Site;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.awt.RenderingHints;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -75,8 +81,8 @@ public final class ImageStyleUtils {
   public static float getScale(float imageWidth, float imageHeight,
       ImageStyle style) {
     float scale = 1.0f;
-    float scaleX = (float)style.getWidth() / imageWidth;
-    float scaleY = (float)style.getHeight() / imageHeight;
+    float scaleX = style.getWidth() / imageWidth;
+    float scaleY = style.getHeight() / imageHeight;
 
     switch (style.getScalingMode()) {
       case Box:
@@ -243,8 +249,8 @@ public final class ImageStyleUtils {
 
       // Cropping
 
-      float cropX = (float)Math.ceil(getCropX(scaledWidth, scaledHeight, style));
-      float cropY = (float)Math.ceil(getCropY(scaledWidth, scaledHeight, style));
+      float cropX = (float) Math.ceil(getCropX(scaledWidth, scaledHeight, style));
+      float cropY = (float) Math.ceil(getCropY(scaledWidth, scaledHeight, style));
 
       if (cropX > 0 || cropY > 0) {
 
@@ -299,6 +305,58 @@ public final class ImageStyleUtils {
         return style;
     }
     return null;
+  }
+
+  /**
+   * Creates a file for the scaled image that is identified by
+   * <code>image</code>, <code>contents</code>, <code>site</code> and
+   * <code>style</code>.
+   * 
+   * @param resource
+   *          the image resource
+   * @param image
+   *          the image contents
+   * @param site
+   *          the site
+   * @param style
+   *          the image style
+   * @throws IOException
+   *           if creating the file fails
+   * @throws IllegalStateException
+   *           if a file is found at the parent directory location
+   * @return
+   */
+  public static File getScaledImageFile(ImageResource resource, ImageContent image, Site site,
+      ImageStyle style) throws IOException, IllegalStateException {
+
+    // If needed, create the scaled file's parent directory
+    File dir = new File(PathUtils.concat(
+        System.getProperty("java.io.tmpdir"),
+        "weblounge",
+        "sites",
+        site.getIdentifier(),
+        "images",
+        style.getIdentifier(),
+        resource.getIdentifier(),
+        image.getLanguage().getIdentifier()
+    ));
+
+    if (dir.exists() && !dir.isDirectory())
+      throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
+    if (!dir.isDirectory())
+      FileUtils.forceMkdir(dir);
+    
+    // Get scaled width and height
+    float scale = ImageStyleUtils.getScale(image.getWidth(), image.getHeight(), style);
+    float styledWidth = image.getWidth() * scale - ImageStyleUtils.getCropX(image.getWidth(), image.getHeight(), style);
+    float styledHeight = image.getHeight() * scale - ImageStyleUtils.getCropY(image.getWidth(), image.getHeight(), style);
+    
+    // Create the filename
+    StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(image.getFilename()));
+    filename.append("_").append((int)styledWidth).append("x").append((int)styledHeight);
+    filename.append(".").append(FilenameUtils.getExtension(image.getFilename()));
+
+    return new File(dir, filename.toString());
   }
 
 }
