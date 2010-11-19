@@ -28,6 +28,9 @@ import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
+import com.sun.media.jai.codec.ImageCodec;
+import com.sun.media.jai.codec.ImageEncoder;
+import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 
@@ -43,7 +46,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
@@ -53,11 +55,8 @@ import javax.media.jai.RenderedOp;
  */
 public final class ImageStyleUtils {
 
-  /** width of one image tile */
-  private static final int TILE_WIDTH = 256;
-
-  /** height of one image tile */
-  private static final int TILE_HEIGHT = 256;
+  /** JPEG image quality */
+  private static final float JPEG_IMAGE_QUALITY = 0.75f;
 
   /**
    * This class is not meant to be instantiated.
@@ -214,41 +213,30 @@ public final class ImageStyleUtils {
       int imageWidth = image.getWidth();
       int imageHeight = image.getHeight();
 
-      // Tiling
-      ImageLayout tileLayout = new ImageLayout(image);
-      tileLayout.setTileWidth(TILE_WIDTH);
-      tileLayout.setTileHeight(TILE_HEIGHT);
-      RenderingHints tileHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, tileLayout);
-      ParameterBlock tileParams = new ParameterBlock();
-      tileParams.addSource(image);
-      image = JAI.create("format", tileParams, tileHints);
-
       // Resizing
-      float scale = getScale(imageWidth, imageHeight, style);
+      double scale = getScale(imageWidth, imageHeight, style);
 
-      if (scale != 1.0) {
-        ParameterBlock scaleParams = new ParameterBlock();
-        scaleParams.addSource(image);
-        scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
-        scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
+      ParameterBlock scaleParams = new ParameterBlock();
+      scaleParams.addSource(image);
+      scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
+      scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
 
-        // Quality related hints when scaling the image
-        RenderingHints scalingHints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        scalingHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        scalingHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-        scalingHints.put(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-        // qualityHints.put(RenderingHints.KEY_INTERPOLATION,
-        // RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        scalingHints.put(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+      RenderingHints scaleHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      scaleHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+      scaleHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+      scaleHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-        image = JAI.create("scale", scaleParams, scalingHints);
+      if (scale > 1.0) {
+        image = JAI.create("scale", scaleParams, scaleHints);
+      }
+      if (scale < 1.0) {
+        image = JAI.create("SubsampleAverage", scaleParams, scaleHints);
       }
 
       float scaledWidth = image.getWidth();
       float scaledHeight = image.getHeight();
 
       // Cropping
-
       float cropX = (float) Math.ceil(getCropX(scaledWidth, scaledHeight, style));
       float cropY = (float) Math.ceil(getCropY(scaledWidth, scaledHeight, style));
 
@@ -256,12 +244,8 @@ public final class ImageStyleUtils {
 
         ParameterBlock cropTopLeftParams = new ParameterBlock();
         cropTopLeftParams.addSource(image);
-        cropTopLeftParams.add(cropX > 0 ? ((float)Math.floor(cropX / 2.0f)) : 0.0f); // top
-                                                                                     // left
-                                                                                     // x
-        cropTopLeftParams.add(cropY > 0 ? ((float)Math.floor(cropY / 2.0f)) : 0.0f); // top
-                                                                                     // left
-                                                                                     // y
+        cropTopLeftParams.add(cropX > 0 ? ((float) Math.floor(cropX / 2.0f)) : 0.0f);
+        cropTopLeftParams.add(cropY > 0 ? ((float) Math.floor(cropY / 2.0f)) : 0.0f);
         cropTopLeftParams.add(scaledWidth - Math.max(cropX, 0.0f)); // width
         cropTopLeftParams.add(scaledHeight - Math.max(cropY, 0.0f)); // height
 
@@ -270,10 +254,17 @@ public final class ImageStyleUtils {
         image = JAI.create("crop", cropTopLeftParams, croppingHints);
       }
 
-      // Create the cropped and resized image
-      ParameterBlock encodeParams = new ParameterBlock();
-      encodeParams.addSource(image).add(os).add(format);
-      image = JAI.create("encode", encodeParams, null);
+      JPEGEncodeParam jpegEncodeParam = new JPEGEncodeParam();
+      jpegEncodeParam.setQuality(JPEG_IMAGE_QUALITY);
+      jpegEncodeParam.setHorizontalSubsampling(0, 1);
+      jpegEncodeParam.setHorizontalSubsampling(1, 1);
+      jpegEncodeParam.setHorizontalSubsampling(2, 1);
+      jpegEncodeParam.setVerticalSubsampling(0, 1);
+      jpegEncodeParam.setVerticalSubsampling(1, 1);
+      jpegEncodeParam.setVerticalSubsampling(2, 1);
+
+      ImageEncoder encoder = ImageCodec.createImageEncoder("JPEG", os, jpegEncodeParam);
+      encoder.encode(image.getAsBufferedImage());
 
     } catch (OutOfMemoryError t) {
       throw new IOException(t);
@@ -326,34 +317,26 @@ public final class ImageStyleUtils {
    *           if a file is found at the parent directory location
    * @return
    */
-  public static File getScaledImageFile(ImageResource resource, ImageContent image, Site site,
-      ImageStyle style) throws IOException, IllegalStateException {
+  public static File getScaledImageFile(ImageResource resource,
+      ImageContent image, Site site, ImageStyle style) throws IOException,
+      IllegalStateException {
 
     // If needed, create the scaled file's parent directory
-    File dir = new File(PathUtils.concat(
-        System.getProperty("java.io.tmpdir"),
-        "weblounge",
-        "sites",
-        site.getIdentifier(),
-        "images",
-        style.getIdentifier(),
-        resource.getIdentifier(),
-        image.getLanguage().getIdentifier()
-    ));
+    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "weblounge", "sites", site.getIdentifier(), "images", style.getIdentifier(), resource.getIdentifier(), image.getLanguage().getIdentifier()));
 
     if (dir.exists() && !dir.isDirectory())
       throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
     if (!dir.isDirectory())
       FileUtils.forceMkdir(dir);
-    
+
     // Get scaled width and height
     float scale = ImageStyleUtils.getScale(image.getWidth(), image.getHeight(), style);
     float styledWidth = image.getWidth() * scale - ImageStyleUtils.getCropX(image.getWidth(), image.getHeight(), style);
     float styledHeight = image.getHeight() * scale - ImageStyleUtils.getCropY(image.getWidth(), image.getHeight(), style);
-    
+
     // Create the filename
     StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(image.getFilename()));
-    filename.append("_").append((int)styledWidth).append("x").append((int)styledHeight);
+    filename.append("_").append((int) styledWidth).append("x").append((int) styledHeight);
     filename.append(".").append(FilenameUtils.getExtension(image.getFilename()));
 
     return new File(dir, filename.toString());
