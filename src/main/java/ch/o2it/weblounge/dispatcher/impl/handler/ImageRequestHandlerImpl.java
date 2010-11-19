@@ -28,7 +28,6 @@ import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -42,7 +41,6 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -240,7 +238,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     try {
 
       // If the scaled version is not there yet, create it
-      File scaledImageFile = getScaledImageFile(imageResource, imageContents, site, style);
+      File scaledImageFile = ImageStyleUtils.getScaledImageFile(imageResource, imageContents, site, style);
       long lastModified = imageResource.getModificationDate().getTime();
       if (!scaledImageFile.isFile() || scaledImageFile.lastModified() < lastModified) {
         InputStream is = contentRepository.getContent(imageURI, language);
@@ -272,56 +270,6 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     } finally {
       IOUtils.closeQuietly(imageInputStream);
     }
-  }
-
-  /**
-   * Creates a file for the scaled image that is identified by
-   * <code>image</code>, <code>contents</code>, <code>site</code> and
-   * <code>style</code>.
-   * 
-   * @param resource
-   *          the image resource
-   * @param image
-   *          the image contents
-   * @param site
-   *          the site
-   * @param style
-   *          the image style
-   * @throws IOException
-   *           if creating the file fails
-   * @throws IllegalStateException
-   *           if a file is found at the parent directory location
-   * @return
-   */
-  private File getScaledImageFile(ImageResource resource, ImageContent image, Site site,
-      ImageStyle style) throws IOException, IllegalStateException {
-
-    // If needed, create the scaled file's parent directory
-    File dir = new File(PathUtils.concat(
-        System.getProperty("java.io.tmpdir"),
-        "weblounge",
-        "images",
-        site.getIdentifier(),
-        style.getIdentifier(),
-        resource.getIdentifier(),
-        image.getLanguage().getIdentifier()
-    ));
-
-    if (dir.exists() && !dir.isDirectory())
-      throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
-    if (!dir.isDirectory())
-      FileUtils.forceMkdir(dir);
-    
-    // Get scaled width and height
-    float styledWidth = image.getWidth() - ImageStyleUtils.getCropX(image.getWidth(), image.getHeight(), style);
-    float styledHeight = image.getHeight() - ImageStyleUtils.getCropY(image.getWidth(), image.getHeight(), style);
-    
-    // Create the filename
-    StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(image.getFilename()));
-    filename.append("_").append((int)styledWidth).append("x").append((int)styledHeight);
-    filename.append(".").append(FilenameUtils.getExtension(image.getFilename()));
-
-    return new File(dir, filename.toString());
   }
 
   /**
