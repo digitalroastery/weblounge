@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.harness;
+package ch.o2it.weblounge.test.harness.content;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -77,7 +77,7 @@ public class FilesTest extends IntegrationTestBase {
    * Creates a new instance of the images test.
    */
   public FilesTest() {
-    super("Files Test", WEBLOUNGE_TEST_GROUP);
+    super("Files Test", WEBLOUNGE_CONTENT_TEST_GROUP);
   }
 
   /**

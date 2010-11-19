@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.harness;
+package ch.o2it.weblounge.test.harness.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -65,7 +65,7 @@ public class PagesEndpointTest extends IntegrationTestBase {
    * Creates a new instance of the content repository's page endpoint test.
    */
   public PagesEndpointTest() {
-    super("Page Endpoint Test", WEBLOUNGE_TEST_GROUP);
+    super("Page Endpoint Test", WEBLOUNGE_ENDPOINT_TEST_GROUP);
   }
 
   /**

@@ -18,22 +18,21 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.harness;
+package ch.o2it.weblounge.test.harness.content;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import java.util.Map;
 import java.util.Set;
@@ -41,18 +40,18 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Integration test to test <code>XML</code> action output.
+ * Integration test to test JSON action output.
  */
-public class XMLActionTest extends IntegrationTestBase {
+public class JSONActionTest extends IntegrationTestBase {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(XMLActionTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(JSONActionTest.class);
 
   /**
-   * Creates a new instance of the xml action test.
+   * Creates a new instance of the json action test.
    */
-  public XMLActionTest() {
-    super("XML Action Test", WEBLOUNGE_TEST_GROUP);
+  public JSONActionTest() {
+    super("JSON Action Test", WEBLOUNGE_CONTENT_TEST_GROUP);
   }
 
   /**
@@ -69,22 +68,22 @@ public class XMLActionTest extends IntegrationTestBase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of greeter action");
 
-    String requestUrl = UrlUtils.concat(serverUrl, "greeting/xml");
+    String requestUrl = UrlUtils.concat(serverUrl, "greeting/json");
 
     // Load the test data
     Map<String, String> greetings = TestSiteUtils.loadGreetings();
     Set<String> languages = greetings.keySet();
 
     // Prepare the request
-    logger.info("Testing greeter action's xml output");
+    logger.info("Testing greeter action's json output");
     logger.info("Sending requests to {}", requestUrl);
-
+    
     for (String language : languages) {
       String greeting = greetings.get(language);
       HttpGet request = new HttpGet(requestUrl);
@@ -96,13 +95,12 @@ public class XMLActionTest extends IntegrationTestBase {
       try {
         HttpResponse response = TestSiteUtils.request(httpClient, request, params);
         Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        Document xml = TestSiteUtils.parseXMLResponse(response);
-        String xpath = "/greetings/greeting[@language=\"" + language + "\"]/text()";
-        Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));    
+        JSONObject json = TestSiteUtils.parseJSONResponse(response);
+        Assert.assertEquals(greeting, json.getJSONObject("greetings").getString(language));    
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
     }
   }
-
+  
 }

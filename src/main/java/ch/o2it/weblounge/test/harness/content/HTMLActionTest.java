@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.harness;
+package ch.o2it.weblounge.test.harness.content;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -60,7 +60,7 @@ public class HTMLActionTest extends IntegrationTestBase {
    * Creates a new instance of the <code>HTML</code> action test.
    */
   public HTMLActionTest() {
-    super("HTML Action Test", WEBLOUNGE_TEST_GROUP);
+    super("HTML Action Test", WEBLOUNGE_CONTENT_TEST_GROUP);
   }
 
   /**

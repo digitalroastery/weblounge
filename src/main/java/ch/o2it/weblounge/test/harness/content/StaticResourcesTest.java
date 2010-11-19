@@ -18,15 +18,17 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.harness;
+package ch.o2it.weblounge.test.harness.content;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -35,26 +37,28 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Integration test for i18n.
+ * Integration test for the loading of site resources.
  */
-public class I18nTest extends IntegrationTestBase {
+public class StaticResourcesTest extends IntegrationTestBase {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(I18nTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(StaticResourcesTest.class);
 
-  /** Path to the i18n test page */
-  private static final String TEST_URL = "/test/i18n";
+  /** The image content type */
+  private static final String CONTENT_TYPE_IMAGE = "image/jpeg";
+
+  /** Path to the image */
+  private static final String IMAGE_PATH = "/weblounge-sites/weblounge-test/web/images/porsche.jpg";
 
   /**
-   * Creates a new instance of the <code>I18nTest</code> test.
+   * Creates a new instance of the <code>SiteResources</code> test.
    */
-  public I18nTest() {
-    super("I18n Test", WEBLOUNGE_TEST_GROUP);
+  public StaticResourcesTest() {
+    super("Static Resources Test", WEBLOUNGE_CONTENT_TEST_GROUP);
   }
 
   /**
@@ -75,29 +79,46 @@ public class I18nTest extends IntegrationTestBase {
    * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
-    logger.info("Testing i18n dictionary and tag");
-
-    String requestUrl = UrlUtils.concat(serverUrl, TEST_URL);
-    HttpGet request = new HttpGet(requestUrl);
-    logger.info("Sending request to {}", requestUrl);
+    logger.info("Testing loading of an image");
+    
+    String requestUrl = UrlUtils.concat(serverUrl, IMAGE_PATH);
+    
+    // Value of the Etag header from the first response */
+    String eTagValue = null; 
 
     // Send and the request and examine the response
     HttpClient httpClient = new DefaultHttpClient();
     try {
+      HttpGet request = new HttpGet(requestUrl);
+
+      logger.info("Sending request to {}", requestUrl);
       HttpResponse response = TestSiteUtils.request(httpClient, request, null);
-      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      String contentType = response.getEntity().getContentType().getValue();
+      assertEquals(CONTENT_TYPE_IMAGE, contentType.split(";")[0]);
+      
+      // Read the content
+      response.getEntity().consumeContent();
+      
+      // Read and store Etag
+      Header eTagHeader = response.getFirstHeader("Etag");
+      assertNotNull(eTagHeader);
+      assertNotNull(eTagHeader.getValue());
+      eTagValue = eTagHeader.getValue();
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
 
-      Document xml = TestSiteUtils.parseXMLResponse(response);
+    // Test ETag support
+    httpClient = new DefaultHttpClient();
+    try {
+      HttpGet request = new HttpGet(requestUrl);
+      request.addHeader("If-None-Match", eTagValue);
 
-      // Test i18n values defined at the module level
-      String i18nModuleValue = "I18n Module Value";
-      String xpath = "/html/body//div[@id='i18n-module']";
-      Assert.assertEquals(i18nModuleValue, XPathHelper.valueOf(xml, xpath));
-
-      // Test i18n values defined at the page level
-      String i18nPageValue = "I18n Page Value";
-      xpath = "/html/body//div[@id='i18n-page']";
-      Assert.assertEquals(i18nPageValue, XPathHelper.valueOf(xml, xpath));
+      logger.info("Sending 'If-None-Match' request to {}", requestUrl);
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
+      assertNull(response.getEntity());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
