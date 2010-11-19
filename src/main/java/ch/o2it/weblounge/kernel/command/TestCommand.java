@@ -123,7 +123,8 @@ public final class TestCommand {
         // Look up the test
         IntegrationTest test = null;
         try {
-          test = tests.get(Integer.parseInt(id) - 1);
+          int testIndex = Integer.parseInt(id);
+          test = tests.get(testIndex - 1);
           List<IntegrationTest> tests = new ArrayList<IntegrationTest>();
           tests.add(test);
           executeAll(tests);
@@ -160,6 +161,7 @@ public final class TestCommand {
       if ("".equals(group))
         group = "DEFAULT";
       if (!group.equals(currentGroup)) {
+        System.out.println("");
         System.out.println(group);
         System.out.println("   ID|Name");
         currentGroup = group;
@@ -170,6 +172,7 @@ public final class TestCommand {
       buf.append(test.getName());
       System.out.println(buf.toString());
     }
+    System.out.println("");
   }
 
   /**
@@ -207,6 +210,7 @@ public final class TestCommand {
 
     Date endDate = new Date();
     long time = endDate.getTime() - startDate.getTime();
+    String testcount = Integer.toString(tests.size());
 
     // Print the summary
     logger.info(" ");
@@ -215,8 +219,28 @@ public final class TestCommand {
     logger.info("Test Summary:");
     logger.info("------------------------------------------------------------------------");
     for (IntegrationTest test : tests) {
-      StringBuffer buf = new StringBuffer(test.getName());
+      StringBuffer buf = new StringBuffer();
+      
+      // Test number
+      int pos = 0;
+      for (int i = 0; i < this.tests.size(); i++) {
+        if (this.tests.get(i) == test) {
+          pos = i + 1;
+          break;
+        }
+      }
+      
+      // Test number
+      String num = Integer.toString(pos);
+      for (int i = num.length(); i < testcount.length(); i++)
+        buf.append(" ");
+      buf.append(num);
       buf.append(" ");
+
+      // Test name
+      buf.append(test.getName());
+      buf.append(" ");
+
       int testNameLenght = buf.length();
       if (succeeded.contains(test)) {
         for (int i = 0; i < 64 - testNameLenght; i++)
@@ -228,6 +252,7 @@ public final class TestCommand {
         buf.append(" FAILURE");
       }
       logger.info(buf.toString());
+      pos++;
     }
     logger.info("------------------------------------------------------------------------");
     logger.info("------------------------------------------------------------------------");
@@ -287,9 +312,13 @@ public final class TestCommand {
       String otherTestGroup = StringUtils.trimToEmpty(otherTest.getGroup());
       int groupComparison = testGroup.compareTo(otherTestGroup);
       if (groupComparison != 0) {
-        if (IntegrationTest.WEBLOUNGE_TEST_GROUP.equals(testGroup))
+        if (IntegrationTest.WEBLOUNGE_CONTENT_TEST_GROUP.equals(testGroup))
           return -1;
-        else if (IntegrationTest.WEBLOUNGE_TEST_GROUP.equals(otherTestGroup))
+        else if (IntegrationTest.WEBLOUNGE_ENDPOINT_TEST_GROUP.equals(otherTestGroup))
+          return -1;
+        else if (IntegrationTest.WEBLOUNGE_CONTENT_TEST_GROUP.equals(otherTestGroup))
+          return 1;
+        else if (IntegrationTest.WEBLOUNGE_ENDPOINT_TEST_GROUP.equals(otherTestGroup))
           return 1;
         return groupComparison;
       }
