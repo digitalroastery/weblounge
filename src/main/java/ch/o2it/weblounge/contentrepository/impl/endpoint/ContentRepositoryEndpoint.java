@@ -98,7 +98,7 @@ public class ContentRepositoryEndpoint {
     }
 
     // Check the ETag
-    String eTagValue = ResourceUtils.getETagValue(resource, null);
+    String eTagValue = ResourceUtils.getETagValue(resource, language);
     if (!ResourceUtils.isMismatch(resource, language, request)) {
       return Response.notModified(new EntityTag(eTagValue)).build();
     }

@@ -22,7 +22,7 @@ package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
-import ch.o2it.weblounge.common.content.file.FileContent;
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
@@ -31,14 +31,17 @@ import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
-import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
+import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -136,11 +139,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Determine the language
-    Site site = getSite(request);
-    Language preferred = LanguageUtils.getPreferredLanguage(resource, request, site);
-    if (preferred == null) {
-      preferred = resource.getOriginalContent().getLanguage();
-    }
+    Language preferred = resource.getOriginalContent().getLanguage();
 
     return getResourceContent(request, resource, preferred);
   }
@@ -211,6 +210,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
+    ImageResource imageResource = (ImageResource)resource;
 
     // Determine the language
     Site site = getSite(request);
@@ -224,7 +224,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     for (Module m : site.getModules()) {
       style = m.getImageStyle(styleId);
       if (style != null) {
-        return getScaledImage(request, resource, preferred, style);
+        return getScaledImage(request, imageResource, preferred, style);
       }
     }
 
@@ -270,6 +270,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
     if (resource == null || resource.contents().isEmpty())
       throw new WebApplicationException(Status.NOT_FOUND);
+    ImageResource imageResource = (ImageResource)resource;
 
     // Find the image style
     Site site = getSite(request);
@@ -277,7 +278,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     for (Module m : site.getModules()) {
       style = m.getImageStyle(styleId);
       if (style != null) {
-        return getScaledImage(request, resource, language, style);
+        return getScaledImage(request, imageResource, language, style);
       }
     }
 
@@ -347,7 +348,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * 
    * @param request
    *          the servlet request
-   * @param resource
+   * @param imageResource
    *          the resource
    * @param language
    *          the language
@@ -356,20 +357,20 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the resource content
    */
   protected Response getScaledImage(HttpServletRequest request,
-      final Resource<?> resource, final Language language,
+      final ImageResource imageResource, final Language language,
       final ImageStyle style) {
 
     // Check the parameters
-    if (resource == null)
+    if (imageResource == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(resource, request)) {
+    if (!ResourceUtils.isModified(imageResource, request)) {
       return Response.notModified().build();
     }
 
     // Load the content
-    ResourceContent resourceContent = resource.getContent(language);
+    ResourceContent resourceContent = imageResource.getContent(language);
     if (resourceContent == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
     } else if (!(resourceContent instanceof ImageContent)) {
@@ -377,56 +378,98 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Check the ETag
-    String eTagValue = ResourceUtils.getETagValue(resource, language, style);
-    if (!ResourceUtils.isMismatch(resource, language, request)) {
-      return Response.notModified(new EntityTag(eTagValue)).build();
+    String eTag = ResourceUtils.getETagValue(imageResource, language, style);
+    if (!ResourceUtils.isMismatch(eTag, request)) {
+      return Response.notModified(new EntityTag(eTag)).build();
     }
 
     final String mimetype = ((ImageContent) resourceContent).getMimetype();
     final String format = mimetype.substring(mimetype.indexOf("/") + 1);
+    ResourceURI imageURI = imageResource.getURI();
 
     Site site = getSite(request);
     final ContentRepository contentRepository = getContentRepository(site, false);
-    final Language selectedLanguage = language;
 
     // When there is no scaling required, just return the original
     if (ImageScalingMode.None.equals(style.getScalingMode())) {
-      return getResourceContent(request, resource, selectedLanguage);
+      return getResourceContent(request, imageResource, language);
     }
 
-    // Create the response
+    // Load the image contents from the repository
+    ImageContent imageContents = imageResource.getContent(language);
+    InputStream imageInputStream = null;
+    String filename = null;
+    long contentLength = -1;
+
+    // Load the input stream from the scaled image
+    InputStream contentRepositoryIs = null;
+    FileOutputStream fos = null;
+    try {
+      File scaledImageFile = ImageStyleUtils.getScaledImageFile(imageResource, imageContents, site, style);
+      long lastModified = imageResource.getModificationDate().getTime();
+      if (!scaledImageFile.isFile() || scaledImageFile.lastModified() < lastModified) {
+        contentRepositoryIs = contentRepository.getContent(imageURI, language);
+        fos = new FileOutputStream(scaledImageFile);
+        logger.debug("Creating scaled image '{}' at {}", imageResource, scaledImageFile);
+        ImageStyleUtils.style(contentRepositoryIs, fos, format, style);
+        scaledImageFile.setLastModified(lastModified);
+      }
+
+      // The scaled image should now exist
+      imageInputStream = new FileInputStream(scaledImageFile);
+      filename = scaledImageFile.getName();
+      contentLength = scaledImageFile.length();
+    } catch (ContentRepositoryException e) {
+      logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
+          language,
+          imageResource,
+          contentRepository,
+          e.getMessage() });
+      logger.error(e.getMessage(), e);
+      IOUtils.closeQuietly(imageInputStream);
+      throw new WebApplicationException();
+    } catch (IOException e) {
+      logger.error("Error scaling image '{}': {}", imageURI, e.getMessage());
+      IOUtils.closeQuietly(imageInputStream);
+      throw new WebApplicationException();
+    } finally {
+      IOUtils.closeQuietly(contentRepositoryIs);
+      IOUtils.closeQuietly(fos);
+    }
+
+     // Create the response
+    final InputStream is = imageInputStream;
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
           WebApplicationException {
-        InputStream is = null;
         try {
-          try {
-            is = contentRepository.getContent(resource.getURI(), selectedLanguage);
-            if (is == null)
-              throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-            ImageStyleUtils.style(is, os, format, style);
-          } catch (ContentRepositoryException e) {
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-          }
+          IOUtils.copy(is, os);
+          os.flush();
         } finally {
           IOUtils.closeQuietly(is);
         }
       }
     });
 
-    // Set file-related response information
-    if (resourceContent instanceof FileContent) {
-      FileContent fileContent = (FileContent) resourceContent;
-      if (fileContent.getMimetype() != null)
-        response.type(fileContent.getMimetype());
-      else
-        response.type(MediaType.APPLICATION_OCTET_STREAM);
-    }
+    // Add mime type header
+    String contentType = imageContents.getMimetype();
+    if (contentType == null)
+      contentType = MediaType.APPLICATION_OCTET_STREAM;
+    response.type(contentType);
 
-    // Add an e-tag and send the response
-    response.header("Content-Disposition", "inline; filename=" + resource.getContent(selectedLanguage).getFilename());
-    response.tag(new EntityTag(eTagValue));
-    response.lastModified(resource.getModificationDate());
+    // Add last modified header
+    response.lastModified(imageResource.getModificationDate());
+
+    // Add ETag header
+    response.tag(new EntityTag(eTag));
+
+    // Add filename header
+    response.header("Content-Disposition", "inline; filename=" + filename);
+
+    // Content length
+    response.header("Content-Length", Long.toString(contentLength));
+
+    // Send the response
     return response.build();
   }
 
@@ -438,11 +481,12 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
   @GET
   @Path("/docs")
   @Produces(MediaType.TEXT_HTML)
-  public String getDocumentation() {
+  public String getDocumentation(@Context HttpServletRequest request) {
     if (docs == null) {
-      String endpointUrl = "/system/weblounge/images";
-      // TODO: determine endpoint url
-      docs = ImagesEndpointDocs.createDocumentation(endpointUrl);
+      String docsPath = request.getRequestURI();
+      String docsPathExtension = request.getPathInfo();
+      String servicePath = request.getRequestURI().substring(0, docsPath.length() - docsPathExtension.length());
+      docs = ImagesEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
   }
