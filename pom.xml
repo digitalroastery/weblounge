@@ -165,12 +165,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
       
-      <!-- Attach sources to build artifacts -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      </plugin>
-      
       <!-- Enforce the project's code rules -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
