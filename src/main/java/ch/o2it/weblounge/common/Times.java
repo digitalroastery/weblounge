@@ -46,7 +46,7 @@ public interface Times {
   /** the number of milliseconds per year */
   long MS_PER_YEAR = 365L * MS_PER_DAY;
   
-  /** the maximum number of miliseconds */
+  /** the maximum number of milliseconds */
   long MAX_DATE = 9223372036854775000L;
 
 }
