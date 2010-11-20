@@ -38,10 +38,10 @@
     </locked>
   </head>
   <body>
-    <content language="en" original="true">
+    <content language="en">
       <created>
         <user id="hans" realm="testland">Hans Muster</user>
-        <date>2009-01-07T19:05:41Z</date>
+        <date>2009-02-18T21:06:40Z</date>
       </created>
       <filename><![CDATA[porsche.jpg]]></filename>
       <mimetype>image/jpeg</mimetype>
@@ -52,7 +52,7 @@
     <content language="de">
       <created>
         <user id="amelie" realm="testland">Amélie Poulard</user>
-        <date>2009-02-18T21:06:40Z</date>
+        <date>2009-01-07T19:05:41Z</date>
       </created>
       <filename><![CDATA[porsche.jpg]]></filename>
       <mimetype>image/jpeg</mimetype>
