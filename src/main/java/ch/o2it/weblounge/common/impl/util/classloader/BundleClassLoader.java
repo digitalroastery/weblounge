@@ -196,7 +196,7 @@ public class BundleClassLoader extends ClassLoader {
   @SuppressWarnings("unchecked")
   protected Enumeration<URL> findResources(final String name)
       throws IOException {
-    Enumeration resources = bundle.getResources(name);
+    Enumeration<URL> resources = bundle.getResources(name);
     // Bundle.getResources may return null, in such case return empty
     // enumeration
     if (resources == null) {
