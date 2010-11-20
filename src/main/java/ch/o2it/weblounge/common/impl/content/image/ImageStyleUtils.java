@@ -66,8 +66,8 @@ public final class ImageStyleUtils {
   }
 
   /**
-   * Returns the scaling factor in horizontal direction needed for the image in
-   * order to comply the image style.
+   * Returns the scaling factor direction needed for the image in order to
+   * comply the image style.
    * 
    * @param imageWidth
    *          width of the original image
@@ -170,6 +170,78 @@ public final class ImageStyleUtils {
     }
 
     return cropY;
+  }
+
+  /**
+   * Returns the width of the image after scaling with the given style.
+   * 
+   * @param imageWidth
+   *          width of the original image
+   * @param imageHeight
+   *          height of the original image
+   * @param style
+   *          the image style
+   * @return the width of the scaled image
+   */
+  public static int getStyledWidth(int imageWidth, int imageHeight,
+      ImageStyle style) {
+    int width = 0;
+    float scale = getScale(imageWidth, imageHeight, style);
+    switch (style.getScalingMode()) {
+      case Fill:
+      case Width:
+        width = style.getWidth();
+        break;
+      case Box:
+      case Cover:
+        width = Math.round(scale * imageWidth);
+        break;
+      case Height:
+        width = Math.min(Math.round(scale * imageWidth), style.getWidth());
+        break;
+      case None:
+        width = imageWidth;
+        break;
+      default:
+        throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
+    }
+    return width;
+  }
+
+  /**
+   * Returns the height of the image after scaling with the given style.
+   * 
+   * @param imageWidth
+   *          width of the original image
+   * @param imageHeight
+   *          height of the original image
+   * @param style
+   *          the image style
+   * @return the width of the scaled image
+   */
+  public static int getStyledHeight(int imageWidth, int imageHeight,
+      ImageStyle style) {
+    int height = 0;
+    float scale = getScale(imageWidth, imageHeight, style);
+    switch (style.getScalingMode()) {
+      case Fill:
+      case Height:
+        height = style.getHeight();
+        break;
+      case Box:
+      case Cover:
+        height = Math.round(scale * imageHeight);
+        break;
+      case Width:
+        height = Math.min(Math.round(scale * imageHeight), style.getHeight());
+        break;
+      case None:
+        height = imageHeight;
+        break;
+      default:
+        throw new IllegalStateException("Image style " + style + " contains an unknown scaling mode '" + style.getScalingMode() + "'");
+    }
+    return height;
   }
 
   /**

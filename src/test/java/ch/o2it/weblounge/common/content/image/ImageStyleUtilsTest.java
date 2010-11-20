@@ -77,13 +77,13 @@ public class ImageStyleUtilsTest {
     imageURL = ImageStyleUtilsTest.class.getResource(imagePath).toURI().toURL();
 
     styles = new ArrayList<ImageStyle>();
-    styles.add(new ImageStyleImpl("box", (int)width, (int)height, ImageScalingMode.Box, false));
-    styles.add(new ImageStyleImpl("cover", (int)width, (int)height, ImageScalingMode.Cover, false));
-    styles.add(new ImageStyleImpl("fill", (int)width, (int)height, ImageScalingMode.Fill, false));
-    styles.add(new ImageStyleImpl("width", (int)width, (int)height, ImageScalingMode.Width, false));
-    styles.add(new ImageStyleImpl("height", (int)width, (int)height, ImageScalingMode.Height, false));
-    styles.add(new ImageStyleImpl("none", (int)width, (int)height, ImageScalingMode.None, false));
-    
+    styles.add(new ImageStyleImpl("box", (int) width, (int) height, ImageScalingMode.Box, false));
+    styles.add(new ImageStyleImpl("cover", (int) width, (int) height, ImageScalingMode.Cover, false));
+    styles.add(new ImageStyleImpl("fill", (int) width, (int) height, ImageScalingMode.Fill, false));
+    styles.add(new ImageStyleImpl("width", (int) width, (int) height, ImageScalingMode.Width, false));
+    styles.add(new ImageStyleImpl("height", (int) width, (int) height, ImageScalingMode.Height, false));
+    styles.add(new ImageStyleImpl("none", (int) width, (int) height, ImageScalingMode.None, false));
+
     // Make sure it's working on headless systems
     System.setProperty("java.awt.headless", "true");
   }
@@ -98,7 +98,7 @@ public class ImageStyleUtilsTest {
     float scaleToWidth = width / originalWidth;
     float scaleToHeight = height / originalHeight;
     for (ImageStyle style : styles) {
-      float scale = ImageStyleUtils.getScale((int)originalWidth, (int)originalHeight, style);
+      float scale = ImageStyleUtils.getScale((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
         case Box:
           assertEquals(scaleToWidth, scale);
@@ -118,7 +118,7 @@ public class ImageStyleUtilsTest {
         case None:
           assertEquals(1.0f, scale);
           break;
-      }    
+      }
     }
   }
 
@@ -130,7 +130,7 @@ public class ImageStyleUtilsTest {
   @Test
   public void testGetCropX() {
     for (ImageStyle style : styles) {
-      float cropX = ImageStyleUtils.getCropX((int)originalWidth, (int)originalHeight, style);
+      float cropX = ImageStyleUtils.getCropX((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
         case Fill:
           assertEquals(originalWidth - width, cropX);
@@ -142,7 +142,7 @@ public class ImageStyleUtilsTest {
         case None:
           assertEquals(0.0f, cropX);
           break;
-      }    
+      }
     }
   }
 
@@ -154,7 +154,7 @@ public class ImageStyleUtilsTest {
   @Test
   public void testGetCropY() {
     for (ImageStyle style : styles) {
-      float cropY = ImageStyleUtils.getCropY((int)originalWidth, (int)originalHeight, style);
+      float cropY = ImageStyleUtils.getCropY((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
         case Fill:
           assertEquals(originalHeight - height, cropY);
@@ -166,7 +166,69 @@ public class ImageStyleUtilsTest {
         case None:
           assertEquals(0.0f, cropY);
           break;
-      }    
+      }
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils#getStyledWidth(int, int, ch.o2it.weblounge.common.content.image.ImageStyle)}
+   */
+  @Test
+  public void testGetStyledWidth() {
+    for (ImageStyle style : styles) {
+      int scaledWidth = ImageStyleUtils.getStyledWidth((int) originalWidth, (int) originalHeight, style);
+      float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
+      switch (style.getScalingMode()) {
+        case Fill:
+        case Box:
+          assertEquals(width, scaledWidth);
+          break;
+        case Cover:
+          assertEquals(Math.max(scale * originalWidth, width), scaledWidth);
+          break;
+        case Width:
+          assertEquals(width, scaledWidth);
+          break;
+        case Height:
+          assertEquals(Math.min(width, scale * originalWidth), scaledWidth);
+          break;
+        case None:
+          assertEquals(originalWidth, scaledWidth);
+          break;
+      }
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils#getStyledHeight(int, int, ch.o2it.weblounge.common.content.image.ImageStyle)}
+   */
+  @Test
+  public void testGetStyledHeight() {
+    for (ImageStyle style : styles) {
+      int scaledHeight = ImageStyleUtils.getStyledHeight((int) originalWidth, (int) originalHeight, style);
+      float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
+      switch (style.getScalingMode()) {
+        case Fill:
+          assertEquals(height, scaledHeight);
+          break;
+        case Box:
+          assertEquals(Math.round(scale * originalHeight), scaledHeight);
+          break;
+        case Cover:
+          assertEquals(height, scaledHeight);
+          break;
+        case Width:
+          assertEquals(Math.round(Math.min(height, scale * originalHeight)), scaledHeight);
+          break;
+        case Height:
+          assertEquals(height, scaledHeight);
+          break;
+        case None:
+          assertEquals(originalHeight, scaledHeight);
+          break;
+      }
     }
   }
 
@@ -183,7 +245,7 @@ public class ImageStyleUtilsTest {
       ByteArrayInputStream bis = null;
       try {
         is = imageURL.openStream();
-        
+
         // Style the original image
         bos = new ByteArrayOutputStream();
         ImageStyleUtils.style(is, bos, "jpeg", style);
@@ -192,7 +254,7 @@ public class ImageStyleUtilsTest {
         bis = new ByteArrayInputStream(bos.toByteArray());
         SeekableStream seekableInputStream = new MemoryCacheSeekableStream(bis);
         RenderedOp image = JAI.create("stream", seekableInputStream);
-        
+
         // Test width and height
         switch (style.getScalingMode()) {
           case Box:
