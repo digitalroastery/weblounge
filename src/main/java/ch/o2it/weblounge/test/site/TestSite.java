@@ -48,7 +48,7 @@ public class TestSite extends SiteImpl {
   private static final Logger logger = LoggerFactory.getLogger(TestSite.class);
 
   /** Name of the package containing the tests */
-  private final static String TEST_PKG = "ch/o2it/weblounge/test/harness";
+  private static final String TEST_PKG = "ch/o2it/weblounge/test/harness";
 
   /**
    * Creates a new test site implementation.
