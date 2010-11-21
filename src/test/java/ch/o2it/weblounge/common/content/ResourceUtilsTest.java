@@ -42,14 +42,14 @@ public class ResourceUtilsTest {
     // Test special values
     assertEquals("0B", ResourceUtils.formatFileSize(0));
     assertEquals("1B", ResourceUtils.formatFileSize(1));
-    assertEquals("1KB", ResourceUtils.formatFileSize(1024));
+    assertEquals("1kB", ResourceUtils.formatFileSize(1024));
     
-    assertEquals("1.2GB", ResourceUtils.formatFileSize((long)fileSize));
-    fileSize /= 1024.0d;
-    assertEquals("1.2MB", ResourceUtils.formatFileSize((long)fileSize));
-    fileSize /= 1024.0d;
-    assertEquals("1.2KB", ResourceUtils.formatFileSize((long)fileSize));
-    fileSize /= 1024.0d;
+    assertEquals("1.3GB", ResourceUtils.formatFileSize((long)fileSize));
+    fileSize /= 1000.0d;
+    assertEquals("1.3MB", ResourceUtils.formatFileSize((long)fileSize));
+    fileSize /= 1000.0d;
+    assertEquals("1.3kB", ResourceUtils.formatFileSize((long)fileSize));
+    fileSize /= 1000.0d;
     assertEquals("1B", ResourceUtils.formatFileSize((long)fileSize));
   }
 

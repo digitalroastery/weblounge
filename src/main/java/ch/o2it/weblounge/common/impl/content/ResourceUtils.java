@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.language.Language;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Date;
 
@@ -39,7 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 public final class ResourceUtils {
 
   /** File size units */
-  private static final String[] SIZE_UNITS = { "B", "KB", "MB", "GB", "TB" };
+  private static final String[] SIZE_UNITS = { "B", "kB", "MB", "GB", "TB" };
 
   /**
    * This class is not intended to be instantiated.
@@ -263,8 +264,8 @@ public final class ResourceUtils {
 
   /**
    * Returns the file size formatted in <tt>bytes</tt>, <tt>kilobytes</tt>,
-   * <tt>megabytes</tt>, <tt>gigabytes</tt> and <tt>terabytes</tt>, where 1 KB
-   * is equal to 1'024 bytes.
+   * <tt>megabytes</tt>, <tt>gigabytes</tt> and <tt>terabytes</tt>, where 1 kB
+   * is equal to 1'000 bytes.
    * <p>
    * If no {@link NumberFormat} was provided,
    * <code>new DecimalFormat("0.#)</code> is used.
@@ -284,14 +285,17 @@ public final class ResourceUtils {
     double size = sizeInBytes;
 
     // Calculate the size to display
-    while (size >= 1024 && unitSelector < SIZE_UNITS.length) {
-      size /= 1024.0d;
+    while (size >= 1000 && unitSelector < SIZE_UNITS.length) {
+      size /= 1000.0d;
       unitSelector++;
     }
 
     // Create a number formatter, if none was provided
-    if (format == null)
-      format = new DecimalFormat("0.#");
+    if (format == null) {
+      DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
+      formatSymbols.setDecimalSeparator('.');
+      format = new DecimalFormat("0.#", formatSymbols);
+    }
 
     return format.format(size) + SIZE_UNITS[unitSelector];
   }
