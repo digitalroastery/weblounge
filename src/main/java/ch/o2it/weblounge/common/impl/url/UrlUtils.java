@@ -82,17 +82,17 @@ public final class UrlUtils {
     for (String s : urlElements) {
       if (StringUtils.isBlank(s))
         throw new IllegalArgumentException("Path element cannot be null");
-      s = checkSeparator(s);
-      s = removeDoubleSeparator(s);
+      String element = checkSeparator(s);
+      element = removeDoubleSeparator(element);
 
       if (b.length() == 0) {
-        b.append(s);
-      } else if (b.lastIndexOf("/") < b.length() - 1 && !s.startsWith("/")) {
-        b.append("/").append(s);
-      } else if (b.lastIndexOf("/") == b.length() - 1 && s.startsWith("/")) {
-        b.append(s.substring(1));
+        b.append(element);
+      } else if (b.lastIndexOf("/") < b.length() - 1 && !element.startsWith("/")) {
+        b.append("/").append(element);
+      } else if (b.lastIndexOf("/") == b.length() - 1 && element.startsWith("/")) {
+        b.append(element.substring(1));
       } else {
-        b.append(s);
+        b.append(element);
       }
     }
 

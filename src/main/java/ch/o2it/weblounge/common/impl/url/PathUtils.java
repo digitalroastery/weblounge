@@ -58,17 +58,17 @@ public final class PathUtils {
     for (String s : pathElements) {
       if (StringUtils.isBlank(s))
         throw new IllegalArgumentException("Path element cannot be null");
-      s = adjustSeparator(s);
-      s = removeDoubleSeparator(s);
+      String element = adjustSeparator(s);
+      element = removeDoubleSeparator(element);
 
       if (b.length() == 0) {
-        b.append(s);
-      } else if (b.lastIndexOf(File.separator) < b.length() - 1 && !s.startsWith(File.separator)) {
-        b.append(File.separator).append(s);
-      } else if (b.lastIndexOf(File.separator) == b.length() - 1 && s.startsWith(File.separator)) {
-        b.append(s.substring(1));
+        b.append(element);
+      } else if (b.lastIndexOf(File.separator) < b.length() - 1 && !element.startsWith(File.separator)) {
+        b.append(File.separator).append(element);
+      } else if (b.lastIndexOf(File.separator) == b.length() - 1 && element.startsWith(File.separator)) {
+        b.append(element.substring(1));
       } else {
-        b.append(s);
+        b.append(element);
       }
     }
 
