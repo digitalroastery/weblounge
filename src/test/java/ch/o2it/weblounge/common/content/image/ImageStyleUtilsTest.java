@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.content.image;
 
 import static org.junit.Assert.assertEquals;
 
+import ch.o2it.weblounge.common.impl.content.image.ImageContentImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
@@ -286,6 +287,52 @@ public class ImageStyleUtilsTest {
         IOUtils.closeQuietly(is);
         IOUtils.closeQuietly(bos);
         IOUtils.closeQuietly(bis);
+      }
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils#getWidth(ImageContent, ch.o2it.weblounge.common.content.image.ImageStyle)}
+   * and
+   * {@link ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils#getWidth(ImageContent, ch.o2it.weblounge.common.content.image.ImageStyle)}
+   * .
+   */
+  @Test
+  public void testGetWidthAndHeigth() {
+    for (ImageStyle style : styles) {
+      ImageContent imageContent = new ImageContentImpl();
+      imageContent.setWidth((int) originalWidth);
+      imageContent.setHeight((int) originalHeight);
+
+      int scaledWidth = ImageStyleUtils.getWidth(imageContent, style);
+      int scaledHeight = ImageStyleUtils.getHeight(imageContent, style);
+
+      switch (style.getScalingMode()) {
+        case Box:
+          assertEquals(width, scaledWidth);
+          assertEquals(originalHeight * (width / originalWidth), scaledHeight);
+          break;
+        case Cover:
+          assertEquals(originalWidth * (height / originalHeight), scaledWidth);
+          assertEquals(height, scaledHeight);
+          break;
+        case Fill:
+          assertEquals(width, scaledWidth);
+          assertEquals(height, scaledHeight);
+          break;
+        case Height:
+          assertEquals(originalWidth * (height / originalHeight), scaledWidth);
+          assertEquals(height, scaledHeight);
+          break;
+        case None:
+          assertEquals(originalWidth, scaledWidth);
+          assertEquals(originalHeight, scaledHeight);
+          break;
+        case Width:
+          assertEquals(width, scaledWidth);
+          assertEquals(originalHeight * (width / originalWidth), scaledHeight);
+          break;
       }
     }
   }

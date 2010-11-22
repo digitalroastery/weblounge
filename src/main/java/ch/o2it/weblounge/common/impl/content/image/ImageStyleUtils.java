@@ -66,8 +66,45 @@ public final class ImageStyleUtils {
   }
 
   /**
-   * Returns the scaling factor direction needed for the image in order to
-   * comply the image style.
+<<<<<<< .mine
+   * Returns the calculated width in pixels for the image with the given image
+   * style applied to it.
+   * 
+   * @param image
+   *          the image
+   * @param style
+   *          the image style
+   * @return the width
+   */
+  public static int getWidth(ImageContent image, ImageStyle style) {
+    float width = image.getWidth();
+    float height = image.getHeight();
+    width *= getScale(width, height, style);
+    width -= getCropX(width, height, style);
+    return (int)width;
+  }
+  
+  /**
+   * Returns the calculated height in pixels for the image with the given image
+   * style applied to it.
+   * 
+   * @param image
+   *          the image
+   * @param style
+   *          the image style
+   * @return the height
+   */
+  public static int getHeight(ImageContent image, ImageStyle style) {
+    float width = image.getWidth();
+    float height = image.getHeight();
+    height *= getScale(width, height, style);
+    height -= getCropY(width, height, style);
+    return (int)height;
+  }
+
+  /**
+   * Returns the scaling factor needed for the image in order to
+   * comply with the image style.
    * 
    * @param imageWidth
    *          width of the original image
@@ -394,7 +431,16 @@ public final class ImageStyleUtils {
       IllegalStateException {
 
     // If needed, create the scaled file's parent directory
-    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "weblounge", "sites", site.getIdentifier(), "images", style.getIdentifier(), resource.getIdentifier(), image.getLanguage().getIdentifier()));
+    File dir = new File(PathUtils.concat(
+        System.getProperty("java.io.tmpdir"),
+        "weblounge",
+        "sites",
+        site.getIdentifier(),
+        "images",
+        style.getIdentifier(),
+        resource.getIdentifier(),
+        image.getLanguage().getIdentifier()
+    ));
 
     if (dir.exists() && !dir.isDirectory())
       throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
