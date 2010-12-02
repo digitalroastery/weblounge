@@ -66,7 +66,6 @@ public final class ImageStyleUtils {
   }
 
   /**
-<<<<<<< .mine
    * Returns the calculated width in pixels for the image with the given image
    * style applied to it.
    * 
