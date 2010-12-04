@@ -81,7 +81,7 @@ public final class TestCommand {
     if (!tests.contains(test)) {
       tests.add(test);
       Collections.sort(tests, testComparator);
-      logger.info("Installing {}", test.getName());
+      logger.debug("Installing {}", test.getName());
     }
   }
 
@@ -95,6 +95,7 @@ public final class TestCommand {
    */
   void removeIntegrationTest(IntegrationTest test) {
     tests.remove(test);
+    logger.debug("Removed {}", test.getName());
   }
 
   /**
