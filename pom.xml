@@ -180,7 +180,7 @@
             <Private-Package>
               org.apache.commons.*,
               org.json.*,
-              ch.o2it.weblounge.test.harness,
+              ch.o2it.weblounge.test.harness.*,
               ch.o2it.weblounge.test.util
             </Private-Package>
             <Embed-Dependency>
