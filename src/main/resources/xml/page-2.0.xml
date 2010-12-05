@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page partition="service" path="/test" version="live">
+  <header>
+    <renderer>default</renderer>
+    <layout>default</layout>
+    <type>default</type>
+    <publish>
+      <from>2006/05/05 16:58:21 GMT</from>
+      <to>292278994/08/17 07:12:55 GMT</to>
+    </publish>
+    <security>
+      <owner>www</owner>
+      <permission id="system:translate" type="role">system:translator</permission>
+      <permission id="system:manage" type="role">system:editor</permission>
+      <permission id="system:write" type="role">system:editor</permission>
+      <permission id="system:publish" type="role">system:publisher</permission>
+      <permission id="system:read" type="role">system:guest</permission>
+    </security>
+    <keywords>
+      <keyword>su</keyword>
+      <keyword>wo</keyword>
+    </keywords>
+    <title language="de"><![CDATA[Service]]></title>
+    <title language="it">Servizio</title>
+    <title language="fr">Services</title>
+    <modified>
+      <date>2007/05/02 21:07:00 GMT</date>
+      <user>thorsten.brigmann</user>
+    </modified>
+  </header>
+  <body>
+    <composer id="main">
+      <pagelet id="title" module="text">
+        <publish>
+          <from>2005/02/11 16:06:07 GMT</from>
+          <to>292278994/08/17 07:12:55 GMT</to>
+        </publish>
+        <security>
+          <owner>tobias.wunden</owner>
+          <permission id="system:translate" type="role">system:translator</permission>
+          <permission id="system:manage" type="role">system:editor</permission>
+          <permission id="system:write" type="role">system:editor</permission>
+          <permission id="system:publish" type="role">system:publisher</permission>
+          <permission id="system:read" type="role">system:guest</permission>
+        </security>
+        <content language="de" original="true">
+          <modified>
+            <date>2006/01/07 19:05:41 GMT</date>
+            <user>simon.betschmann</user>
+          </modified>
+          <text id="title">
+            Service auf swissunihockey.ch
+                    </text>
+          <text id="keyword">Service</text>
+          <text id="lead" />
+        </content>
+        <content language="fr">
+          <modified>
+            <date>2006/10/18 21:06:40 GMT</date>
+            <user>markus.jauss</user>
+          </modified>
+          <text id="title">
+            Services sur swissunihockey.ch
+                    </text>
+          <text id="keyword">Services</text>
+          <text id="lead">
+            Les nouveaux et les anciens services sont sous
+            cette rubrique.
+                    </text>
+        </content>
+        <properties>
+          <property id="author">false</property>
+          <property id="date">false</property>
+        </properties>
+      </pagelet>
+    </composer>
+  </body>
+</page>
