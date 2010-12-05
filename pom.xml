@@ -1,45 +1,66 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <packaging>jar</packaging>
-  <groupId>ch.o2it.weblounge</groupId>
-  <artifactId>weblounge-importer</artifactId>
-  <name>Weblounge Importer</name>
-  <parent>
-    <groupId>ch.o2it.weblounge</groupId>
-    <artifactId>weblounge-base</artifactId>
-    <version>3.0-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
-  </parent>
-  <dependencies>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
+	<groupId>ch.o2it.weblounge</groupId>
+	<artifactId>weblounge-importer</artifactId>
+	<name>Weblounge Importer</name>
 
-    <!-- weblounge -->
+	<parent>
+		<groupId>ch.o2it.weblounge</groupId>
+		<artifactId>weblounge-base</artifactId>
+		<version>3.0-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
 
-    <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
-      <artifactId>weblounge-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>ch.o2it.weblounge.tools.importer.Importer</mainClass>
+						</manifest>
+					</archive>
+					<useDefaultManifestFile>true</useDefaultManifestFile>
+					<finalName>weblounge-importer</finalName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-    <!-- thirdparty -->
+	<dependencies>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
+		<!-- weblounge -->
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>
+		<dependency>
+			<groupId>ch.o2it.weblounge</groupId>
+			<artifactId>weblounge-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-    <!-- testing -->
+		<!-- thirdparty -->
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 
-  </dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+
+		<!-- testing -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+
+	</dependencies>
 
 </project>
