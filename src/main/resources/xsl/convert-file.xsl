@@ -14,7 +14,7 @@
   </xsl:variable>
 
   <xsl:template match="/">
-    <file xmlns="http://www.o2it.ch/weblounge/3.0/resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/resource http://www.o2it.ch/xsd/weblounge/3.0/resource.xsd">
+    <file xmlns="http://www.o2it.ch/weblounge/3.0/file" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/file http://www.o2it.ch/xsd/weblounge/3.0/file.xsd">
       <xsl:attribute name="id">
         <xsl:value-of select="$uuid" />
       </xsl:attribute>
