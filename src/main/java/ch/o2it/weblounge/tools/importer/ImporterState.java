@@ -65,7 +65,11 @@ public class ImporterState {
    *          uuid
    */
   public void putUUID(String path, UUID uuid) {
-    uuidStore.put(path, uuid);
+    try {
+      uuidStore.put(path, uuid);
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
   }
 
   /**
