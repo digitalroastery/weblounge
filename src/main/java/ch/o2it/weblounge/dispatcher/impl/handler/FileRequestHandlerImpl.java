@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
+import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
@@ -55,7 +56,10 @@ import javax.ws.rs.core.MediaType;
 public final class FileRequestHandlerImpl implements RequestHandler {
 
   /** Alternate uri prefix */
-  protected static final String ALT_URI_PREFIX = "/files";
+  protected static final String URI_PREFIX = "/files/";
+
+  /** Length of a UUID */
+  protected static final int UUID_LENGTH = 36;
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(FileRequestHandlerImpl.class);
@@ -78,6 +82,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     WebUrl url = request.getUrl();
     Site site = request.getSite();
     String path = url.getPath();
+    String fileName = null;
 
     // Check the request method. Only GET is supported right now.
     String requestMethod = request.getMethod();
@@ -99,12 +104,35 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     ResourceURI fileURI = null;
     FileResource fileResource = null;
     try {
-      if (path.startsWith(ALT_URI_PREFIX)) {
-        String id = FilenameUtils.getBaseName(StringUtils.chomp(path, "/"));
-        fileURI = new FileResourceURIImpl(site, null, id);
+      String id = null;
+      String filePath = null;
+      
+      if (path.startsWith(URI_PREFIX)) {
+        String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
+
+        // Check whether we are looking at a uuid or a url path
+        if (uriSuffix.length() == UUID_LENGTH) {
+          id = uriSuffix;
+        } else if (uriSuffix.length() >= UUID_LENGTH) {
+          int lastSeparator = uriSuffix.indexOf('/');
+          if (lastSeparator == UUID_LENGTH && uriSuffix.indexOf('/', lastSeparator + 1) < 0) {
+            id = uriSuffix.substring(0, lastSeparator);
+            fileName = uriSuffix.substring(lastSeparator + 1);
+          } else {
+            filePath = uriSuffix;
+            fileName = FilenameUtils.getName(filePath);
+          }
+        } else {
+          filePath = uriSuffix; 
+          fileName = FilenameUtils.getName(filePath);
+        }
       } else {
-        fileURI = new FileResourceURIImpl(site, path);
+        filePath = path;
+        fileName = FilenameUtils.getName(filePath);
       }
+
+      // Try to load the resource
+      fileURI = new FileResourceURIImpl(site, filePath, id);
       fileResource = (FileResource) contentRepository.get(fileURI);
       if (fileResource == null) {
         logger.debug("No file found at {}", fileURI);
@@ -115,7 +143,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       DispatchUtils.sendInternalError(request, response);
       return true;
     }
-
+ 
     // Try to serve the file
     logger.debug("File handler agrees to handle {}", path);
 
@@ -139,7 +167,22 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     }
 
     // Determine the response language
-    Language language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
+    Language language = null;
+    if (StringUtils.isNotBlank(fileName)) {
+      for (ResourceContent c : fileResource.contents()) {
+        if (c.getFilename().equals(fileName)) {
+          if (language != null) {
+            logger.debug("Unable to determine language from ambiguous filename");
+            language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
+            break;
+          }
+          language = c.getLanguage();
+        }
+      }
+    } else {
+      language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
+    }
+
     if (language == null) {
       logger.warn("File {} does not exist in any supported language", fileURI);
       DispatchUtils.sendNotFound(request, response);

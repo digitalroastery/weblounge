@@ -62,10 +62,13 @@ import javax.ws.rs.core.MediaType;
 public final class ImageRequestHandlerImpl implements RequestHandler {
 
   /** Alternate uri prefix */
-  protected static final String ALT_URI_PREFIX = "/images";
+  protected static final String URI_PREFIX = "/images/";
 
   /** Name of the image style parameter */
   protected static final String OPT_IMAGE_STYLE = "style";
+  
+  /** Length of a UUID */
+  protected static final int UUID_LENGTH = 36;
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(ImageRequestHandlerImpl.class);
@@ -88,6 +91,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     WebUrl url = request.getUrl();
     Site site = request.getSite();
     String path = url.getPath();
+    String fileName = null;
 
     // Check the request method. Only GET is supported right now.
     String requestMethod = request.getMethod();
@@ -109,12 +113,35 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     ResourceURI imageURI = null;
     ImageResource imageResource = null;
     try {
-      if (path.startsWith(ALT_URI_PREFIX)) {
-        String id = FilenameUtils.getBaseName(StringUtils.chomp(path, "/"));
-        imageURI = new ImageResourceURIImpl(site, null, id);
+      String id = null;
+      String imagePath = null;
+
+      if (path.startsWith(URI_PREFIX)) {
+        String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
+  
+        // Check whether we are looking at a uuid or a url path
+        if (uriSuffix.length() == UUID_LENGTH) {
+          id = uriSuffix;
+        } else if (uriSuffix.length() >= UUID_LENGTH) {
+          int lastSeparator = uriSuffix.indexOf('/');
+          if (lastSeparator == UUID_LENGTH && uriSuffix.indexOf('/', lastSeparator + 1) < 0) {
+            id = uriSuffix.substring(0, lastSeparator);
+            fileName = uriSuffix.substring(lastSeparator + 1);
+          } else {
+            imagePath = uriSuffix;
+            fileName = FilenameUtils.getName(imagePath);
+          }
+        } else {
+          imagePath = uriSuffix; 
+          fileName = FilenameUtils.getName(imagePath);
+        }
       } else {
-        imageURI = new ImageResourceURIImpl(site, path);
+        imagePath = path;
+        fileName = FilenameUtils.getName(imagePath);
       }
+
+      // Try to load the resource
+      imageURI = new ImageResourceURIImpl(site, imagePath, id);
       imageResource = (ImageResource) contentRepository.get(imageURI);
       if (imageResource == null) {
         logger.debug("No image found at {}", imageURI);
@@ -156,7 +183,22 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     }
 
     // Determine the response language
-    Language language = LanguageUtils.getPreferredLanguage(imageResource, request, site);
+    Language language = null;
+    if (StringUtils.isNotBlank(fileName)) {
+      for (ImageContent c : imageResource.contents()) {
+        if (c.getFilename().equals(fileName)) {
+          if (language != null) {
+            logger.debug("Unable to determine language from ambiguous filename");
+            language = LanguageUtils.getPreferredLanguage(imageResource, request, site);
+            break;
+          }
+          language = c.getLanguage();
+        }
+      }
+    } else {
+      language = LanguageUtils.getPreferredLanguage(imageResource, request, site);
+    }
+    
     if (language == null) {
       logger.warn("Image {} does not exist in any supported language", imageURI);
       DispatchUtils.sendNotFound(request, response);
