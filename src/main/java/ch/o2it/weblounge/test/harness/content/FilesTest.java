@@ -102,6 +102,7 @@ public class FilesTest extends IntegrationTestBase {
     try {
       testGetDocument(serverUrl);
       testGetDocumentById(serverUrl);
+      testGetDocumentByIdAndName(serverUrl);
       testGetDocumentByPathLanguage(serverUrl);
       testGetDocumentByHeaderLanguage(serverUrl);
     } catch (Throwable t) {
@@ -217,6 +218,44 @@ public class FilesTest extends IntegrationTestBase {
       httpClient.getConnectionManager().shutdown();
     }
 
+  }
+
+  /**
+   * Tests for the special <code>/files</code> uri prefix that is provided by
+   * the file request handler. The handler should be able to respond to these
+   * requests:
+   * <ul>
+   *  <li>/files/&lt;id&gt;</li>
+   *  <li>/files/&lt;id&gt;/</li>
+   *  <li>/files/&lt;id&gt;/&lt;filename&gt;</li>
+   * </ul>
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetDocumentByIdAndName(String serverUrl) throws Exception {
+    HttpClient httpClient = null;
+    String url = UrlUtils.concat(serverUrl, "files", resourceId, filenameGerman);
+    HttpGet request = new HttpGet(url);
+    request.setHeader("Accept-Language", "de");
+    httpClient = new DefaultHttpClient();
+    try {
+      logger.info("Requesting German document version from {}", request.getURI());
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      assertTrue("No content received", response.getEntity().getContentLength() > 0);
+
+      // Test general headers
+      assertEquals(1, response.getHeaders("Content-Type").length);
+      assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
+      assertEquals(sizeGerman, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("Content-Disposition").length);
+      assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
   }
 
   /**

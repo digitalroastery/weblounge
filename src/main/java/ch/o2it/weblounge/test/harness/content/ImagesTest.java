@@ -146,6 +146,7 @@ public class ImagesTest extends IntegrationTestBase {
     try {
       testGetOriginalImage(requestUrl);
       testGetOriginalImageById(requestUrl);
+      testGetOriginalImageByIdAndName(requestUrl);
       testGetOriginalImageByPathLanguage(requestUrl);
       testGetOriginalImageByHeaderLanguage(requestUrl);
       testGetStyledImageById(requestUrl);
@@ -193,6 +194,32 @@ public class ImagesTest extends IntegrationTestBase {
     logger.info("");
 
     String url = UrlUtils.concat(serverUrl, "images", imageId);
+    HttpGet request = new HttpGet(url);
+    request.setHeader("Accept-Language", "de");
+    testGermanOriginal(request);
+  }
+
+  /**
+   * Tests for the special <code>/files</code> uri prefix that is provided by
+   * the file request handler. The handler should be able to respond to these
+   * requests:
+   * <ul>
+   *  <li>/files/&lt;id&gt;</li>
+   *  <li>/files/&lt;id&gt;/</li>
+   *  <li>/files/&lt;id&gt;/&lt;filename&gt;</li>
+   * </ul>
+   * 
+   * @param serverUrl
+   *          the base url
+   * @throws Exception
+   *           if an exception occurs
+   */
+  private void testGetOriginalImageByIdAndName(String serverUrl) throws Exception {
+    logger.info("");
+    logger.info("Testing original, (header-based) localized image by id and name");
+    logger.info("");
+
+    String url = UrlUtils.concat(serverUrl, "images", imageId, filenameGerman);
     HttpGet request = new HttpGet(url);
     request.setHeader("Accept-Language", "de");
     testGermanOriginal(request);
