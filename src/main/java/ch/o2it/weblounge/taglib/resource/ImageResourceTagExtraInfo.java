@@ -22,6 +22,7 @@ package ch.o2it.weblounge.taglib.resource;
 
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
+import ch.o2it.weblounge.common.content.image.ImageStyle;
 
 import javax.servlet.jsp.tagext.TagData;
 import javax.servlet.jsp.tagext.TagExtraInfo;
@@ -39,6 +40,9 @@ public class ImageResourceTagExtraInfo extends TagExtraInfo {
   /** Variable that will hold the image resource content */
   public static final String IMAGE_CONTENT = "imagecontent";
 
+  /** Variable that will hold the image style */
+  public static final String STYLE = "style";
+
   /**
    * Returns the information on the exported tag variables.
    * 
@@ -47,7 +51,8 @@ public class ImageResourceTagExtraInfo extends TagExtraInfo {
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
         new VariableInfo(IMAGE, ImageResource.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(IMAGE_CONTENT, ImageContent.class.getName(), true, VariableInfo.NESTED)
+        new VariableInfo(IMAGE_CONTENT, ImageContent.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(STYLE, ImageStyle.class.getName(), true, VariableInfo.NESTED)
     };
   }
 

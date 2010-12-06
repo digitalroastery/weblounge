@@ -23,7 +23,9 @@ package ch.o2it.weblounge.taglib.resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
+import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
+import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
@@ -59,6 +61,9 @@ public class ImageResourceTag extends WebloungeTag {
   /** The image path */
   private String imagePath = null;
 
+  /** The image style */
+  private String imageStyle = null;
+
   /**
    * Sets the image identifier.
    * 
@@ -78,6 +83,16 @@ public class ImageResourceTag extends WebloungeTag {
    */
   public void setPath(String path) {
     imagePath = path;
+  }
+
+  /**
+   * Sets the image style.
+   * 
+   * @param style
+   *          image style
+   */
+  public void setImagestyle(String style) {
+    imageStyle = style;
   }
 
   /**
@@ -119,8 +134,9 @@ public class ImageResourceTag extends WebloungeTag {
 
     ImageResource image = null;
     ImageContent imageContent = null;
+    ImageStyle style = null;
 
-    // Store the result in the jsp page context
+    // Load the content
     try {
       image = (ImageResource) repository.get(uri);
       language = LanguageUtils.getPreferredLanguage(image, request, site);
@@ -129,6 +145,12 @@ public class ImageResourceTag extends WebloungeTag {
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load image " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;
+    }
+    
+    // Find the image style
+    if (StringUtils.isNotBlank(imageStyle)) {
+      style = ImageStyleUtils.findStyle(imageStyle, site);
+      pageContext.setAttribute(ImageResourceTagExtraInfo.STYLE, style);
     }
 
     // TODO: Check the permissions
@@ -148,6 +170,7 @@ public class ImageResourceTag extends WebloungeTag {
   public int doEndTag() throws JspException {
     pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE);
     pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_CONTENT);
+    pageContext.removeAttribute(ImageResourceTagExtraInfo.STYLE);
     return super.doEndTag();
   }
 
@@ -160,6 +183,7 @@ public class ImageResourceTag extends WebloungeTag {
     super.reset();
     imageId = null;
     imagePath = null;
+    imageStyle = null;
   }
 
 }

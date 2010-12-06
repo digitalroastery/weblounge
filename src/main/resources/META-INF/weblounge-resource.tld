@@ -41,6 +41,7 @@
     <body-content>JSP</body-content>
     <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>imagestyle</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
   </tag>
 	
 </taglib>
