@@ -52,6 +52,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 import javax.ws.rs.core.MediaType;
 
@@ -118,6 +120,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
 
       if (path.startsWith(URI_PREFIX)) {
         String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
+        uriSuffix = URLDecoder.decode(uriSuffix, "UTF-8");
   
         // Check whether we are looking at a uuid or a url path
         if (uriSuffix.length() == UUID_LENGTH) {
@@ -148,7 +151,11 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         return false;
       }
     } catch (ContentRepositoryException e) {
-      logger.error("Error loading image from {}: {}", contentRepository, e);
+      logger.error("Error loading image from {}: {}", contentRepository, e.getMessage());
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (UnsupportedEncodingException e) {
+      logger.error("Error decoding image url {} using UTF-8: {}", path, e.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;
     }
@@ -186,7 +193,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     Language language = null;
     if (StringUtils.isNotBlank(fileName)) {
       for (ImageContent c : imageResource.contents()) {
-        if (c.getFilename().equals(fileName)) {
+        if (c.getFilename().equalsIgnoreCase(fileName)) {
           if (language != null) {
             logger.debug("Unable to determine language from ambiguous filename");
             language = LanguageUtils.getPreferredLanguage(imageResource, request, site);

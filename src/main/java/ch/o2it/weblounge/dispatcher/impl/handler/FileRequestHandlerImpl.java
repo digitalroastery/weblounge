@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 import javax.ws.rs.core.MediaType;
 
@@ -109,6 +111,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       
       if (path.startsWith(URI_PREFIX)) {
         String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
+        uriSuffix = URLDecoder.decode(uriSuffix, "UTF-8");
 
         // Check whether we are looking at a uuid or a url path
         if (uriSuffix.length() == UUID_LENGTH) {
@@ -142,6 +145,10 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       logger.error("Error loading file from {}: {}", contentRepository, e);
       DispatchUtils.sendInternalError(request, response);
       return true;
+    } catch (UnsupportedEncodingException e) {
+      logger.error("Error decoding file url {} using UTF-8: {}", path, e.getMessage());
+      DispatchUtils.sendInternalError(request, response);
+      return true;
     }
  
     // Try to serve the file
@@ -170,7 +177,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
     Language language = null;
     if (StringUtils.isNotBlank(fileName)) {
       for (ResourceContent c : fileResource.contents()) {
-        if (c.getFilename().equals(fileName)) {
+        if (c.getFilename().equalsIgnoreCase(fileName)) {
           if (language != null) {
             logger.debug("Unable to determine language from ambiguous filename");
             language = LanguageUtils.getPreferredLanguage(fileResource, request, site);
