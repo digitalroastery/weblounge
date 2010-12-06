@@ -30,6 +30,7 @@ SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%FELIX_HOME%\conf -Dweblou
 SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
 SET GRAPHICS_OPTS=-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit
 SET TEMPDIR_OPTS=-Djava.io.tmpdir=$FELIX_TEMPDIR
+SET MEMORY_OPTS=-Xmx2048m
 
 REM # Create the debug config
 SET DEBUG_OPTS=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=%DEBUG_PORT%,server=y,suspend=%DEBUG_SUSPEND%
@@ -37,5 +38,5 @@ SET DEBUG_OPTS=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=%DEBUG_PO
 REM # Remove the weblounge bundles from felix cache
 
 REM # Finally start felix
-java %DEBUG_OPTS% %TEMPDIR_OPTS% %MAVEN_OPTS% %GRAPHICS_OPTS% %FELIX_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %PAX_LOGGING_OPTS% -jar %FELIX_HOME%\bin\felix.jar %FELIX_CACHEDIR%
+java %MEMORY_OPTS% %DEBUG_OPTS% %TEMPDIR_OPTS% %MAVEN_OPTS% %GRAPHICS_OPTS% %FELIX_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %PAX_LOGGING_OPTS% -jar %FELIX_HOME%\bin\felix.jar %FELIX_CACHEDIR%
 ENDLOCAL
