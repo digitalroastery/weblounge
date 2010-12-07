@@ -58,7 +58,7 @@ import javax.ws.rs.core.MediaType;
 public final class FileRequestHandlerImpl implements RequestHandler {
 
   /** Alternate uri prefix */
-  protected static final String URI_PREFIX = "/files/";
+  protected static final String URI_PREFIX = "/weblounge-files/";
 
   /** Length of a UUID */
   protected static final int UUID_LENGTH = 36;
@@ -126,7 +126,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
             fileName = FilenameUtils.getName(filePath);
           }
         } else {
-          filePath = uriSuffix; 
+          filePath = "/" + uriSuffix; 
           fileName = FilenameUtils.getName(filePath);
         }
       } else {

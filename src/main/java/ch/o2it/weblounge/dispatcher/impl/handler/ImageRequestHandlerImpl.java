@@ -64,7 +64,7 @@ import javax.ws.rs.core.MediaType;
 public final class ImageRequestHandlerImpl implements RequestHandler {
 
   /** Alternate uri prefix */
-  protected static final String URI_PREFIX = "/images/";
+  protected static final String URI_PREFIX = "/weblounge-images/";
 
   /** Name of the image style parameter */
   protected static final String OPT_IMAGE_STYLE = "style";
@@ -135,7 +135,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
             fileName = FilenameUtils.getName(imagePath);
           }
         } else {
-          imagePath = uriSuffix; 
+          imagePath = "/" + uriSuffix; 
           fileName = FilenameUtils.getName(imagePath);
         }
       } else {
