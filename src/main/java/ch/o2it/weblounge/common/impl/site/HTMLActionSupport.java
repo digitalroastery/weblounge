@@ -44,6 +44,7 @@ import ch.o2it.weblounge.common.site.I18nDictionary;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +101,27 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * of <code>HTML</code> pages.
    */
   public HTMLActionSupport() {
+    this(null);
+  }
+
+  /**
+   * Creates a new action implementation that directly supports the generation
+   * of <code>HTML</code> pages.
+   * <p>
+   * When passing in <code>renderer</code>, the action's default behavior will
+   * be to write the renderer to the stage.
+   * 
+   * @param renderer
+   *          the renderer identifier
+   */
+  public HTMLActionSupport(String renderer) {
     flavors.add(RequestFlavor.HTML);
+    if (StringUtils.isNotBlank(renderer)) {
+      this.renderer = getModule().getRenderer(renderer);
+      if (this.renderer == null) {
+        logger.warn("Default renderer '{}' for action {} not found", renderer, this);
+      }
+    }
   }
 
   /**
@@ -289,7 +310,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public int startHeader(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
-    
+
     // The headers returned by getHTMLHeaders() may contain configured as well
     // as unconfigured (containing ${module.root} in their paths) elements. This
     // is why we need to make sure that we are not writing duplicates to the
@@ -334,6 +355,10 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws IOException, ActionException {
+    if (renderer != null) {
+      include(request, response, renderer);
+      return SKIP_COMPOSER;
+    }
     return EVAL_COMPOSER;
   }
 
