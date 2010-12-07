@@ -41,7 +41,7 @@ public class ImageResourceTagExtraInfo extends TagExtraInfo {
   public static final String IMAGE_CONTENT = "imagecontent";
 
   /** Variable that will hold the image style */
-  public static final String STYLE = "style";
+  public static final String STYLE = "imagestyle";
 
   /**
    * Returns the information on the exported tag variables.

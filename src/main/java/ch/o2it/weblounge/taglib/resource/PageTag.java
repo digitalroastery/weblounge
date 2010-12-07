@@ -94,13 +94,14 @@ public class PageTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // Create the page uri
+    // Create the page uri, either from the id or the path. If none is
+    // specified, and we are not in jsp compilation mode, issue a warning
     ResourceURI uri = null;
     if (StringUtils.isNotBlank(pageId)) {
       uri = new PageURIImpl(site, null, pageId);
     } else if (StringUtils.isNotBlank(pagePath)) {
       uri = new PageURIImpl(site, pagePath, null);
-    } else {
+    } else if (!request.getRequestURI().endsWith(".jsp")) {
       logger.warn("Neither uuid nor path were specified for image");
       return SKIP_BODY;
     }

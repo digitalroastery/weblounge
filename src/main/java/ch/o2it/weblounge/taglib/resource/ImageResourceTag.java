@@ -110,13 +110,14 @@ public class ImageResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // Create the image uri
+    // Create the image uri, either from the id or the path. If none is
+    // specified, and we are not in jsp compilation mode, issue a warning
     ResourceURI uri = null;    
     if (StringUtils.isNotBlank(imageId)) {
       uri = new ImageResourceURIImpl(site, null, imageId);
     } else if (StringUtils.isNotBlank(imagePath)) {
       uri = new ImageResourceURIImpl(site, imagePath, null);
-    } else {
+    } else if (!request.getRequestURI().endsWith(".jsp")) {
       logger.warn("Neither uuid nor path were specified for image");
       return SKIP_BODY;
     }

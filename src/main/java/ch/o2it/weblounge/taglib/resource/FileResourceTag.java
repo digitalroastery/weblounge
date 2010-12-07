@@ -95,14 +95,15 @@ public class FileResourceTag extends WebloungeTag {
       return SKIP_BODY;
     }
 
-    // Create the file uri
+    // Create the file uri, either from the id or the path. If none is
+    // specified, and we are not in jsp compilation mode, issue a warning
     ResourceURI uri = null;
     if (StringUtils.isNotBlank(fileId)) {
       uri = new FileResourceURIImpl(site, null, fileId);
     } else if (StringUtils.isNotBlank(filePath)) {
       uri = new FileResourceURIImpl(site, filePath, null);
-    } else {
-      logger.warn("Neither uuid nor path were specified for file");
+    } else if (!request.getRequestURI().endsWith(".jsp")) {
+      logger.debug("Neither uuid nor path were specified for file");
       return SKIP_BODY;
     }
 
