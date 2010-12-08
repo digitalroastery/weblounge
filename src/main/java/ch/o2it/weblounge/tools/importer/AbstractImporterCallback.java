@@ -47,19 +47,6 @@ public abstract class AbstractImporterCallback implements ImporterCallback {
 
   public abstract boolean fileImported(File f) throws Exception;
 
-  /**
-   * This default implementation only creates the folder in the destination.
-   * 
-   * @see ch.o2it.weblounge.tools.importer.ImporterCallback#folderImported(java.io.File)
-   */
-  public boolean folderImported(File f) {
-    try {
-      return createDestination(f) != null;
-    } catch (IOException e) {
-      System.err.println("Error creating target directory for " + f + ": " + e.getMessage());
-      return false;
-    }
-  }
 
   /**
    * Takes the file argument, strips off the src directory prefix and creates
@@ -160,7 +147,7 @@ public abstract class AbstractImporterCallback implements ImporterCallback {
    */
   protected boolean storeFile(File file, File dest, String folder, String filename, UUID uuid,
       int version) {
-    String path = PathUtils.concat(dest.getAbsolutePath(), folder, uuidToPath(uuid), String.valueOf(version), filename);
+    String path = PathUtils.concat(dest.getAbsolutePath(), folder, uuidToPath(uuid.toString()), String.valueOf(version), filename);
     File newfile = new File(path);
     if (!newfile.getParentFile().exists()) {
       newfile.getParentFile().mkdirs();
@@ -183,10 +170,10 @@ public abstract class AbstractImporterCallback implements ImporterCallback {
    *          the universal unique identifier
    * @return the path
    */
-  private String uuidToPath(UUID uuid) {
+  protected String uuidToPath(String uuid) {
     if (uuid == null)
       throw new IllegalArgumentException("Identifier must not be null");
-    String[] elements = uuid.toString().split("-");
+    String[] elements = uuid.split("-");
     StringBuffer path = new StringBuffer();
 
     // convert first part of uuid to long and apply modulo 100

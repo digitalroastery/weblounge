@@ -49,4 +49,9 @@ public class ModuleImporterCallback extends AbstractImporterCallback {
 		}
 	}
 
+  public boolean folderImported(File f) throws Exception {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
 }

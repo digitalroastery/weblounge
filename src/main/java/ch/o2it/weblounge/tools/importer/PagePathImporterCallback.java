@@ -18,7 +18,6 @@ public class PagePathImporterCallback extends AbstractImporterCallback {
       this.rootPartition = "/" + this.rootPartition;
   }  
 
-  @Override
   public boolean folderImported(File f) {
     if (f.isDirectory() && !f.equals(srcDir)) {
       String path = f.getPath().replace(this.srcDir, "");

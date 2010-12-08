@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:importer="ch.o2it.weblounge.tools.importer.Importer" exclude-result-prefixes="uuid">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="uuid">
   <xsl:output method="xml" omit-xml-declaration="no" indent="true" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property" />
 
-  <xsl:include href="./utils.xsl" />
-
+  <xsl:param name="uuid" />
+  <xsl:param name="path" />
+  
   <xsl:variable name="adminuserid">
     <xsl:text>admin</xsl:text>
   </xsl:variable>
@@ -14,10 +15,10 @@
   <xsl:template match="/">
     <page xmlns="http://www.o2it.ch/weblounge/3.0/page" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/page http://www.o2it.ch/xsd/weblounge/3.0/page.xsd">
       <xsl:attribute name="id">
-        <xsl:value-of select="importer:getUUID(page/@partition, page/@path)" />
+        <xsl:value-of select="$uuid" />
       </xsl:attribute>
       <xsl:attribute name="path">
-        <xsl:value-of select="importer:getPath(page/@partition, page/@path)" />
+        <xsl:value-of select="$path" />
       </xsl:attribute>
       <xsl:attribute name="version"><xsl:value-of select="page/@version" /></xsl:attribute>
       <xsl:apply-templates select="page/header" />
@@ -190,12 +191,12 @@
     <properties>
       <xsl:if test="property[@id='partition'] and property[@id='path']">
         <property id="pageid">
-          <xsl:value-of select="importer:getUUID(property[@id='partition'], property[@id='path'])" />
+          <xsl:value-of select="$uuid" />
         </property>
       </xsl:if>
       <xsl:if test="property[@id!='partition'] and property[@id='path']">
         <property id="resourceid">
-          <xsl:value-of select="importer:getUUID(property[@id='path'])" />
+          <xsl:value-of select="$uuid" />
         </property>
       </xsl:if>
       <xsl:apply-templates select="./property" />
@@ -234,4 +235,73 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template name="capitalize">
+    <xsl:param name="data" />
+    <!-- generate first character -->
+    <xsl:value-of select="translate(substring($data,1,1),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" />
+    <!-- generate remaining string -->
+    <xsl:value-of select="substring($data,2,string-length($data)-1)" />
+  </xsl:template>
+
+  <xsl:template name="formatdate">
+    <xsl:param name="DateTime" />
+    <xsl:if test="string-length($DateTime) != 0">
+      <!-- expected date format 2006/01/17 19:05:41 GMT -->
+      <!-- new date format 2006-01-17T19:05:41+01:00 -->
+      <xsl:variable name="year">
+        <xsl:value-of select="substring-before($DateTime,'/')" />
+      </xsl:variable>
+      <xsl:variable name="month-temp">
+        <xsl:value-of select="substring-after($DateTime,'/')" />
+      </xsl:variable>
+      <xsl:variable name="month">
+        <xsl:value-of select="substring-before($month-temp,'/')" />
+      </xsl:variable>
+      <xsl:variable name="day-temp">
+        <xsl:value-of select="substring-after($month-temp,'/')" />
+      </xsl:variable>
+      <xsl:variable name="day">
+        <xsl:value-of select="substring-before($day-temp,' ')" />
+      </xsl:variable>
+
+      <xsl:variable name="time">
+        <xsl:value-of select="substring-after($DateTime,' ')" />
+      </xsl:variable>
+      <xsl:variable name="hh">
+        <xsl:value-of select="substring($time,1,2)" />
+      </xsl:variable>
+      <xsl:variable name="mm">
+        <xsl:value-of select="substring($time,4,2)" />
+      </xsl:variable>
+      <xsl:variable name="ss">
+        <xsl:value-of select="substring($time,7,2)" />
+      </xsl:variable>
+
+      <xsl:variable name="tz">
+        <xsl:value-of select="substring-after($time,' ')" />
+      </xsl:variable>
+
+      <xsl:value-of select="$year" />
+      <xsl:value-of select="'-'" />
+      <xsl:value-of select="$month" />
+      <xsl:value-of select="'-'" />
+      <xsl:value-of select="$day" />
+      <xsl:value-of select="'T'" />
+      <xsl:value-of select="$hh" />
+      <xsl:value-of select="':'" />
+      <xsl:value-of select="$mm" />
+      <xsl:value-of select="':'" />
+      <xsl:value-of select="$ss" />
+      <xsl:choose>
+        <xsl:when test="$tz = 'GMT'">
+          <xsl:text>+01:00</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:if>
+    <xsl:if test="string-length($DateTime) = 0">
+      <xsl:text>292278994-08-17T07:12:55+01:00</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
 </xsl:stylesheet>

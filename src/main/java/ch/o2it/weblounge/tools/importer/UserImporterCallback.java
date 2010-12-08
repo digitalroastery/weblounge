@@ -40,7 +40,6 @@ public class UserImporterCallback extends AbstractImporterCallback {
 		clipboard.put("users", users);
 	}
 
-	@Override
 	public boolean folderImported(File f) {
 		String path = f.getAbsolutePath();
 		path = path.substring(srcDir.length()).toLowerCase();

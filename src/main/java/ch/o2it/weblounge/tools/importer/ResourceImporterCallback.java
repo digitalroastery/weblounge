@@ -117,4 +117,9 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
 		return true;
 	}
 
+  public boolean folderImported(File f) throws Exception {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
 }
