@@ -610,7 +610,7 @@ public class SiteCommand {
    * @param site
    *          the site to add
    */
-  public void addSite(Site site) {
+  void addSite(Site site) {
     synchronized (sites) {
       sites.add(site);
     }
@@ -622,7 +622,7 @@ public class SiteCommand {
    * @param site
    *          the site to remove
    */
-  public void removeSite(Site site) {
+  void removeSite(Site site) {
     synchronized (sites) {
       sites.remove(site);
     }

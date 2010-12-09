@@ -8,6 +8,9 @@
   <implementation class="ch.o2it.weblounge.kernel.WebloungeSharedResources" />
   <property name="service.description" value="Weblounge Shared Resources" />
   <property name="service.pid" value="ch.o2it.weblounge.resources" />
+  <service>
+    <provide interface="ch.o2it.weblounge.kernel.WebloungeSharedResources" />
+  </service>
   <reference name="httpservice" interface="org.osgi.service.http.HttpService" cardinality="1..1" policy="static" bind="setHttpService" />
 
 </scr:component>

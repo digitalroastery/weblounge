@@ -54,6 +54,11 @@
     <!-- thirdparty -->
     
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    
+    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
@@ -66,6 +71,12 @@
     <dependency>
       <groupId>quartz</groupId>
       <artifactId>quartz</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.webconsole</artifactId>
+      <version>3.1.6</version>
     </dependency>
 
     <!-- testing -->
@@ -105,6 +116,8 @@
               ch.o2it.weblounge.dispatcher;version=${project.version},
               ch.o2it.weblounge.testing;version=${project.version},
               org.apache.commons.lang;version="2.4",
+              org.apache.commons.io;version="1.4",
+              org.apache.felix.webconsole;version="3.1.2",
               org.quartz;version="1.5.2",
               org.quartz.impl;version="1.5.2",
               org.osgi.framework;version="1.4.0",
@@ -112,10 +125,12 @@
               org.osgi.service.http;version="1.1.0",
               org.osgi.service.cm;version="1.1.0",
               org.osgi.util.tracker;version="1.4.0",
-              org.slf4j;version="1.5.6"
-            </Import-Package>
+              org.slf4j;version="1.5.6",
+              javax.servlet;version="2.5.0",
+              javax.servlet.http;version="2.5.0",
+             </Import-Package>
             <Export-Package>
-              ch.o2it.weblounge.kernel;version=${project.version}
+              ch.o2it.weblounge.kernel;version=${project.version},
             </Export-Package>
             <Service-Component>
               OSGI-INF/contentrepository-factory.xml,
@@ -123,7 +138,8 @@
               OSGI-INF/shared-resources.xml,
               OSGI-INF/site-command.xml,
               OSGI-INF/site-manager-service.xml,
-              OSGI-INF/test-command.xml
+              OSGI-INF/test-command.xml,
+              OSGI-INF/webconsole-plugin.xml
             </Service-Component>
           </instructions>
         </configuration>

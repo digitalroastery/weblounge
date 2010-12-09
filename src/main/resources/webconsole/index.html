@@ -1,0 +1,82 @@
+<script type="text/javascript" src="${shared-resources}/scripts/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="${shared-resources}/scripts/webconsole-plugin.js"></script>
+
+<script type="text/javascript">
+	// <![CDATA[
+	var scrData = {
+			"sites-count":${sites-count},
+			"sites-active":${sites-active},
+			"sites-inactive":${sites-inactive},
+			"sites-data":[${sites-data}]
+	};
+	var i18n = {
+			"Site"                   : 'Site',
+			stat_no_sites            : "No sites installed currently!",
+			stat_ok                  : "Number of installed sites: {0}"
+	};
+	// ]]>
+</script>
+
+<!-- status line -->
+<p class="statline"><span id="sites-active">0</span> sites active, <span id="sites-inactive">0</span> sites inactive</p>
+
+<div id="sites">
+
+	<!-- controls top -->
+	<form method="post" enctype="multipart/form-data" action="">
+		<div class="ui-widget-header ui-corner-top buttonGroup">
+			<label>Status:</label>
+			<select class="minLevel">
+				<option value="1" selected="true">ALL</option>
+				<option value="2">Active</option>
+				<option value="3">Inactive</option>
+			</select>
+			<button class="reloadButton">Reload</button>
+		</div>
+	</form>
+
+	<!-- sites -->
+	<table id="plugin_table" class="tablesorter nicetable noauto">
+		<thead>
+			<tr>
+				<th class="col_Id">Id</th>
+				<th class="col_Name">Name</th>
+				<th class="col_Version">Version</th>
+				<th class="col_Status">Status</th>
+				<th class="col_Actions">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr><!-- template -->
+				<td>&nbsp;</td><!-- ID -->
+				<td><!-- name -->
+					<div class="bIcon ui-icon ui-icon-triangle-1-e" title="Show Details">&nbsp;</div>
+					<div class="bName">&nbsp;</div> <!-- here goes site name/link -->
+				</td>
+				<td>&nbsp;</td><!-- version -->
+				<td>&nbsp;</td><!-- status -->
+				<td><!-- actions -->
+					<ul class="icons ui-widget">
+						<li class="dynhover" title="Start"><span class="ui-icon ui-icon-play">&nbsp;</span></li>
+						<li class="dynhover" title="Stop"><span class="ui-icon ui-icon-stop">&nbsp;</span></li>
+						<li class="dynhover" title="Index"><span class="ui-icon ui-icon-transferthick-e-w">&nbsp;</span></li>
+					</ul>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<!-- controls bottom -->
+	<form method="post" enctype="multipart/form-data" action="">
+		<div class="ui-widget-header ui-corner-bottom buttonGroup">
+			<label>Status:</label>
+			<select class="minLevel">
+				<option value="1" selected="true">ALL</option>
+				<option value="2">Active</option>
+				<option value="3">Inactive</option>
+			</select>
+			<button class="reloadButton">Reload</button>
+		</div>
+	</form>
+
+</div>

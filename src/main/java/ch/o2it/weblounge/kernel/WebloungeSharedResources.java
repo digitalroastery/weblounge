@@ -59,10 +59,10 @@ public class WebloungeSharedResources implements ManagedService {
 
   /** Actual mountpoint for the shared resources */
   private String resourcesMountpoint = null;
-  
+
   /** The http service */
   private HttpService httpService = null;
-  
+
   /** The http context */
   private HttpContext httpContext = null;
 
@@ -81,7 +81,7 @@ public class WebloungeSharedResources implements ManagedService {
     ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
     if (configAdminRef != null) {
       ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(configAdminRef);
-      Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();      
+      Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
       if (config != null) {
         updated(config);
       } else {
@@ -113,22 +113,22 @@ public class WebloungeSharedResources implements ManagedService {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
-    
+
     // Mountpoint
     String currentMountpoint = resourcesMountpoint;
-    String mountpoint = (String)properties.get(OPT_RESOURCES_MOUNTPOINT);
+    String mountpoint = (String) properties.get(OPT_RESOURCES_MOUNTPOINT);
     if (StringUtils.trimToNull(mountpoint) != null) {
       resourcesMountpoint = mountpoint;
       logger.debug("Configured value for the shared resource mountpoint is '{}'", mountpoint);
     }
-    
+
     // Update the registration
     if (currentMountpoint != null) {
       try {
@@ -139,6 +139,15 @@ public class WebloungeSharedResources implements ManagedService {
         logger.error("Error registering shared resources at " + resourcesMountpoint, e);
       }
     }
+  }
+
+  /**
+   * Returns the path to the root of the shared resources.
+   * 
+   * @return the shared resources mountpoint
+   */
+  public String getResourcesMountpoint() {
+    return resourcesMountpoint;
   }
 
   /**
