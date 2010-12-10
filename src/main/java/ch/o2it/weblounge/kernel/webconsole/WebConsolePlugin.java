@@ -153,13 +153,18 @@ public class WebConsolePlugin extends AbstractWebConsolePlugin {
       int i = 1;
       for (Site site : sites) {
         String state = site.isRunning() ? "active" : "inactive";
+        int stateRaw = site.isRunning() ? 1 : 0;
         activeSites += site.isRunning() ? 1 : 0;
         inactiveSites += !site.isRunning() ? 1 : 0;
+        if (i > 1)
+          sitesData.append(",");
         sitesData.append("{");
         sitesData.append("\"id\":").append(i).append(",");
         sitesData.append("\"name\":\"").append(site.getName()).append("\",");
         sitesData.append("\"version\":\"").append("-").append("\",");
-        sitesData.append("\"status\":\"").append(state).append("\"");
+        sitesData.append("\"state\":\"").append(state).append("\",");
+        sitesData.append("\"state\":\"").append(state).append("\",");
+        sitesData.append("\"stateRaw\":\"").append(stateRaw).append("\"");
         sitesData.append("}");
         i++;
       }

@@ -1,18 +1,18 @@
-<script type="text/javascript" src="${shared-resources}/scripts/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript" src="${shared-resources}/scripts/webconsole-plugin.js"></script>
 
 <script type="text/javascript">
 	// <![CDATA[
-	var scrData = {
-			"sites-count":${sites-count},
-			"sites-active":${sites-active},
-			"sites-inactive":${sites-inactive},
-			"sites-data":[${sites-data}]
+	var showSiteDetails = false;
+	var pluginData = {
+			sites_count							: ${sites-count},
+			sites_active            : ${sites-active},
+			sites_inactive          : ${sites-inactive},
+			sites_data              : [${sites-data}]
 	};
 	var i18n = {
 			"Site"                   : 'Site',
-			stat_no_sites            : "No sites installed currently!",
-			stat_ok                  : "Number of installed sites: {0}"
+			stat_no_sites            : "No sites installed.",
+			stat_ok                  : "Sites information: {0} sites in total, {1} active, {2} inactive"
 	};
 	// ]]>
 </script>
@@ -27,7 +27,7 @@
 		<div class="ui-widget-header ui-corner-top buttonGroup">
 			<label>Status:</label>
 			<select class="minLevel">
-				<option value="1" selected="true">ALL</option>
+				<option value="1" selected="true">-</option>
 				<option value="2">Active</option>
 				<option value="3">Inactive</option>
 			</select>
@@ -41,8 +41,7 @@
 			<tr>
 				<th class="col_Id">Id</th>
 				<th class="col_Name">Name</th>
-				<th class="col_Version">Version</th>
-				<th class="col_Status">Status</th>
+				<th class="col_State">Status</th>
 				<th class="col_Actions">Actions</th>
 			</tr>
 		</thead>
@@ -50,16 +49,14 @@
 			<tr><!-- template -->
 				<td>&nbsp;</td><!-- ID -->
 				<td><!-- name -->
-					<div class="bIcon ui-icon ui-icon-triangle-1-e" title="Show Details">&nbsp;</div>
-					<div class="bName">&nbsp;</div> <!-- here goes site name/link -->
+					<div class="bIcon ui-icon ui-icon-triangle-1-e" style="float:left" title="Show Details">&nbsp;</div>
 				</td>
-				<td>&nbsp;</td><!-- version -->
 				<td>&nbsp;</td><!-- status -->
 				<td><!-- actions -->
 					<ul class="icons ui-widget">
-						<li class="dynhover" title="Start"><span class="ui-icon ui-icon-play">&nbsp;</span></li>
-						<li class="dynhover" title="Stop"><span class="ui-icon ui-icon-stop">&nbsp;</span></li>
-						<li class="dynhover" title="Index"><span class="ui-icon ui-icon-transferthick-e-w">&nbsp;</span></li>
+						<li class="dynhover ui-helper-hidden" title="Start"><span class="ui-icon ui-icon-play">&nbsp;</span></li>
+						<li class="dynhover ui-helper-hidden" title="Stop"><span class="ui-icon ui-icon-stop">&nbsp;</span></li>
+						<li class="dynhover ui-helper-hidden" title="Index"><span class="ui-icon ui-icon-transferthick-e-w">&nbsp;</span></li>
 					</ul>
 				</td>
 			</tr>
@@ -71,7 +68,7 @@
 		<div class="ui-widget-header ui-corner-bottom buttonGroup">
 			<label>Status:</label>
 			<select class="minLevel">
-				<option value="1" selected="true">ALL</option>
+				<option value="1" selected="true">-</option>
 				<option value="2">Active</option>
 				<option value="3">Inactive</option>
 			</select>

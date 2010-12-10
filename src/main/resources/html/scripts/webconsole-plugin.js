@@ -21,66 +21,53 @@
 /**
  * Main rendering method that is called once the whole view has been loaded.
  */
-function renderData(eventData)  {
-	switch(eventData.status) {
+function renderData(e)  {
+	switch(e.status) {
 		case  0: // no sites
 			$(".statline").html(i18n.stat_no_sites);
 			$('#scr').addClass('ui-helper-hidden');
 			break;
 		default:
-			$(".statline").html(i18n.stat_ok.msgFormat(eventData.status));
+			$(".statline").html(i18n.stat_ok.msgFormat(e.sites_count, e.sites_active, e.sites_inactive));
 			$('#scr').removeClass('ui-helper-hidden');
 
 			tableBody.empty();
-			for (var idx in eventData.data) {
-				site(eventData.data[idx]);
+			for (var i in e.sites_data) {
+				site(e.sites_data[i]);
 			}
 			$("#plugin_table").trigger("update");
 			
-			if (drawDetails) renderDetails(eventData);
+			//if (showSiteDetails) renderDetails(e);
 			initStaticWidgets();
 	}
-}
-
-function getEntryId(/* Object */ dataEntry) {
-    var id = dataEntry.id;
-    if (id < 0) {
-        id = dataEntry.name;
-        if (dataEntry.pid) {
-            id += "/" + dataEntry.pid;
-        }
-    }
-    return id;
 }
 
 /**
  * Processes a single site from the data that was loaded and adds it to the site
  * table.
  */
-function site(/* Object */ dataEntry) {
-	var idPath = getEntryId(dataEntry);
-	var id = idPath.replace(/[./-]/g, "_");
-	var name = dataEntry.name;
+function site(/* Object */ site) {
+	var id = site.id;
+	var name = site.name;
 	var _ = tableEntryTemplate.clone().appendTo(tableBody).attr('id', 'entry' + id);
 
 	_.find('.bIcon').attr('id', 'img' + id).click(function() {
-		showDetails(idPath);
-	}).after(drawDetails ? name : ('<a href="' + pluginRoot + '/' + idPath + '">' + name + '</a>'));
+		showDetails(id);
+	}).after(showSiteDetails ? name : ('<a href="' + pluginRoot + '/' + id + '">' + name + '</a>'));
 
-	_.find('td:eq(0)').text(dataEntry.id);
-	_.find('td:eq(2)').text(dataEntry.state);
+	_.find('td:eq(0)').text(site.id);
+	_.find('td:eq(2)').text(site.state);
 
 	// setup buttons
-	if (dataEntry.stateRaw == 1 || dataEntry.stateRaw == 1024) { // disabled
-																	// or
-																	// disabling
-		_.find('li:eq(0)').removeClass('ui-helper-hidden').click(function() { changeDataEntryState(idPath, 'enable') });
+	if (site.stateRaw == 0) { // disabled or disabling
+		_.find('li:eq(0)').removeClass('ui-helper-hidden').click(function() {
+			changeDataEntryState(id, 'enable')
+		});
 	} else {
-		_.find('li:eq(1)').removeClass('ui-helper-hidden').click(function() { changeDataEntryState(idPath, 'disable') });
+		_.find('li:eq(1)').removeClass('ui-helper-hidden').click(function() {
+			changeDataEntryState(id, 'disable')
+		});
 	}
-	if (dataEntry.configurable) _.find('li:eq(2)').removeClass('ui-helper-hidden').click(function() { // configure
-		changeDataEntryState(dataEntry.pid, 'configure');
-	});	
 }
 
 function changeDataEntryState(/* long */ id, /* String */ action) {
@@ -131,33 +118,33 @@ function hideDetails(/* String */ id) {
 /**
  * Adds the site details.
  */
-function renderDetails(/* Object */ data) {
-	data = data.data[0];
-	var id = getEntryId(data).replace(/[./-]/g, "_");
+function renderDetails(/* Object */ site) {
+	site = site.site[0];
+	var id = site.id
 	$("#pluginInlineDetails").remove();
 	var __test__ = $("#entry" + id);
 	$("#entry" + id + " > td").eq(1).append("<div id='pluginInlineDetails'/>");
 	$("#img" + id).each(function() {
-		if (drawDetails) {
+		if (showSiteDetails) {
 			var ref = window.location.pathname;
 			ref = ref.substring(0, ref.lastIndexOf('/'));
 			$(this).
-				removeClass('ui-icon-triangle-1-e').// right
-				removeClass('ui-icon-triangle-1-s').// down
-				addClass('ui-icon-triangle-1-w').// left
+				removeClass('ui-icon-triangle-1-e'). // right
+				removeClass('ui-icon-triangle-1-s'). // down
+				addClass('ui-icon-triangle-1-w'). // left
 				attr("title", "Back").
 				unbind('click').click(function() {window.location = ref});
 		} else {
 			$(this).
-				removeClass('ui-icon-triangle-1-w').// left
-				removeClass('ui-icon-triangle-1-e').// right
-				addClass('ui-icon-triangle-1-s').// down
+				removeClass('ui-icon-triangle-1-w'). // left
+				removeClass('ui-icon-triangle-1-e'). // right
+				addClass('ui-icon-triangle-1-s'). // down
 				attr("title", "Hide Details").
 				unbind('click').click(function() {hideDetails(id)});
 		}
 	});
 	$("#pluginInlineDetails").append("<table border='0'><tbody></tbody></table>");
-	var details = data.props;
+	var details = site.props;
 	for (var idx in details) {
 		var prop = details[idx];
 		var key = i18n[prop.key] ? i18n[prop.key] : prop.key; // i18n
@@ -195,7 +182,7 @@ $(document).ready(function(){
 	tableBody = $('#plugin_table tbody');
 	tableEntryTemplate = tableBody.find('tr').clone();
 
-	renderData(scrData);
+	renderData(pluginData);
 
 	$(".reloadButton").click(loadData);
 
