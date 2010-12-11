@@ -62,7 +62,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private static final Logger logger = LoggerFactory.getLogger(WebloungeDispatcherServlet.class);
 
   /** Value of the X-Powered-By header */
-  private static final String poweredBy = "Weblounge Content Mangement System";
+  private static final String poweredBy = "Weblounge Content Management System";
 
   /** The response cache */
   private transient ResponseCache cache = null;
