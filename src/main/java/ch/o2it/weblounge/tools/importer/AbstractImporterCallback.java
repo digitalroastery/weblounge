@@ -37,10 +37,15 @@ import javax.xml.transform.stream.StreamSource;
 
 public abstract class AbstractImporterCallback implements ImporterCallback {
 
-  protected String srcDir = null;
-  protected String destDir = null;
+  /** site source directory */
+  protected File srcDir = null;
+  
+  /** destination directory */
+  protected File destDir = null;
+  
+  
 
-  AbstractImporterCallback(String src, String dest) {
+  AbstractImporterCallback(File src, File dest) {
     this.srcDir = src;
     this.destDir = dest;
   }
@@ -58,8 +63,8 @@ public abstract class AbstractImporterCallback implements ImporterCallback {
    */
   protected File createDestination(File f) throws IOException {
     String path = f.getAbsolutePath();
-    path = path.substring(srcDir.length());
-    File dest = new File(PathUtils.concat(destDir, path));
+    path = path.substring(srcDir.getAbsolutePath().length());
+    File dest = new File(destDir, path);
     if (f.isDirectory())
       return (dest.exists() || dest.mkdirs()) ? dest : null;
     else {

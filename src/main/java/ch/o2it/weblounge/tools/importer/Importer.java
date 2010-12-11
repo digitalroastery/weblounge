@@ -13,7 +13,6 @@
 
 package ch.o2it.weblounge.tools.importer;
 
-import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.tools.util.CommandLineParser;
 
 import java.io.File;
@@ -30,9 +29,6 @@ import java.util.Stack;
  * Tool to import data from earlier versions of weblounge.
  */
 public class Importer {
-
-  /** Command line parameter "site" */
-  private static final String[] OPT_SITE = { "s", "site" };
 
   /** Command line parameter "dir" */
   private static final String[] OPT_SRC_DIRECTORY = { "i", "in" };
@@ -64,15 +60,13 @@ public class Importer {
   static {
     cmd.defineRequiredOption(OPT_SRC_DIRECTORY);
     cmd.defineRequiredOption(OPT_DEST_DIRECTORY);
-    cmd.defineRequiredOption(OPT_SITE);
     cmd.defineCommand(CMD_FORCE);
     cmd.defineCommand(CMD_HELP);
     cmd.defineCommand(CMD_QUIET);
   }
 
-  private String srcDir;
-  private String destDir;
-  private String site;
+  private File srcDir;
+  private File destDir;
   private boolean quiet;
   long pageCount;
   long errorCount;
@@ -90,22 +84,17 @@ public class Importer {
    * @param quiet
    *          <code>true</code> to suppress output
    */
-  public Importer(String srcDir, String destDir, String site, boolean quiet) {
-    this.srcDir = srcDir;
-    this.destDir = destDir;
-    this.site = site;
+  public Importer(String srcDir, String destDir, boolean quiet) {
+    this.srcDir = new File(srcDir);
+    this.destDir = new File(destDir);
     this.quiet = quiet;
     pageCount = 0;
     errorCount = 0;
   }
-  
+
   public void importPagePaths() throws Exception {
-    File siteRoot = new File(PathUtils.concat(new String[] {
-        srcDir,
-        "/db/weblounge/sites",
-        site,
-        "site" }));
-    ImporterCallback callback = new PagePathImporterCallback(siteRoot.getAbsolutePath(), destDir, "/home");
+    File siteRoot = new File(srcDir, "site");
+    ImporterCallback callback = new PagePathImporterCallback(siteRoot, destDir, "/home");
     try {
       traverse(siteRoot, callback);
     } catch (Throwable t) {
@@ -129,11 +118,7 @@ public class Importer {
    * @throws Exception
    */
   public void importPages() throws Exception {
-    File siteRoot = new File(PathUtils.concat(new String[] {
-        srcDir,
-        "/db/weblounge/sites",
-        site,
-        "site" }));
+    File siteRoot = new File(srcDir, "site");
     ImporterCallback callback = new PageImporterCallback(srcDir, destDir, clipboard);
     try {
       traverse(siteRoot, callback);
@@ -158,16 +143,12 @@ public class Importer {
    * @throws Exception
    */
   public void importResources() throws Exception {
-    File siteRoot = new File(PathUtils.concat(new String[] {
-        srcDir,
-        "/db/weblounge/sites",
-        site,
-        "repository" }));
-    ImporterCallback callback = new ResourceImporterCallback(srcDir, destDir, clipboard);
+    File repositoryRoot = new File(srcDir, "repository");
+    ImporterCallback callback = new ResourceImporterCallback(repositoryRoot, destDir, clipboard);
     try {
-      traverse(siteRoot, callback);
+      traverse(repositoryRoot, callback);
     } catch (Throwable t) {
-      System.err.println("Error importing " + siteRoot + ": " + t.getMessage());
+      System.err.println("Error importing " + repositoryRoot + ": " + t.getMessage());
       return;
     }
     if (!quiet) {
@@ -187,18 +168,14 @@ public class Importer {
    * @throws Exception
    */
   public void importUsers() throws Exception {
-    File siteRoot = new File(PathUtils.concat(new String[] {
-        srcDir,
-        "/db/weblounge/sites",
-        site,
-        "user" }));
+    File usersRoot = new File(srcDir, "user");
     ImporterCallback callback = new UserImporterCallback(srcDir, destDir, clipboard);
     Collection<String> users = new ArrayList<String>();
     clipboard.put("users", users);
     try {
-      traverse(siteRoot, callback);
+      traverse(usersRoot, callback);
     } catch (Throwable t) {
-      System.err.println("Error importing " + siteRoot + ": " + t.getMessage());
+      System.err.println("Error importing " + usersRoot + ": " + t.getMessage());
       return;
     }
     if (!quiet) {
@@ -218,12 +195,12 @@ public class Importer {
    * @throws Exception
    */
   public void importModules() throws Exception {
-    File siteRoot = new File(PathUtils.concat(srcDir, "/db/weblounge/sites", site, "modules"));
+    File modulesRoot = new File(srcDir, "modules");
     ImporterCallback callback = new ModuleImporterCallback(srcDir, destDir, clipboard);
     try {
-      traverse(siteRoot, callback);
+      traverse(modulesRoot, callback);
     } catch (Throwable t) {
-      System.err.println("Error importing " + siteRoot + ": " + t.getMessage());
+      System.err.println("Error importing " + modulesRoot + ": " + t.getMessage());
       return;
     }
     if (!quiet) {
@@ -261,9 +238,6 @@ public class Importer {
     String dest = cmd.getOption(OPT_DEST_DIRECTORY);
     boolean quiet = cmd.providesCommand(CMD_QUIET);
 
-    // Check for site
-    String site = cmd.getOption(OPT_SITE);
-
     // Check for existing backup directory
     if (!cmd.providesCommand(CMD_FORCE)) {
       File f = new File(dest);
@@ -277,9 +251,9 @@ public class Importer {
     Date start = new Date();
 
     try {
-      Importer importer = new Importer(src, dest, site, quiet);
-      //importer.importUsers();
-      //importer.importModules();
+      Importer importer = new Importer(src, dest, quiet);
+      // importer.importUsers();
+      // importer.importModules();
       importer.importPagePaths();
       importer.importResources();
       importer.importPages();
@@ -302,6 +276,41 @@ public class Importer {
     }
 
     System.out.println("Import took " + minutes + ":" + seconds);
+  }
+
+  public static String getUUID(String partition, String path) {
+    return ImporterState.getInstance().getUUID(getPath(partition, path));
+  }
+
+  public static String getUUID(String path) {
+    return ImporterState.getInstance().getUUID(path);
+  }
+
+  public static String getOrigPath(String partition, String path) {
+    if (!partition.startsWith("/")) {
+      partition = "/".concat(partition);
+    }
+    if (path.length() == 1) {
+      path = "";
+    }
+    if (path.endsWith("/")) {
+      path = path.substring(0, path.length() - 1);
+    }
+    if (path.length() > 1 && !path.startsWith("/")) {
+      path = "/".concat(path);
+    }
+    return partition.concat(path).toLowerCase();
+  }
+
+  public static String getPath(String partition, String path) {
+    String path_ = getOrigPath(partition, path);
+    if (path_.startsWith(PageImporterCallback.ROOT_PARTITION)) {
+      path_ = path_.substring(PageImporterCallback.ROOT_PARTITION.length(), path_.length());
+    }
+    if ("".equals(path_)) {
+      path_ = "/";
+    }
+    return path_.toLowerCase();
   }
 
   /**
@@ -345,7 +354,7 @@ public class Importer {
    *          the shared memory
    * @throws XMLDBException
    */
-  public void traverse(File root, ImporterCallback callback) throws Exception {
+  private void traverse(File root, ImporterCallback callback) throws Exception {
     Stack<File> directories = new Stack<File>();
     directories.push(root);
     try {

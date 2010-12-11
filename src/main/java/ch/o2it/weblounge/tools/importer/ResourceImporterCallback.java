@@ -31,29 +31,32 @@ import javax.xml.transform.stream.StreamSource;
 
 public class ResourceImporterCallback extends AbstractImporterCallback {
 
-	/**
-	 * Creates a new callback for page imports.
-	 * 
-	 * @param src the source root directory
-	 * @param dest the destination root directory
-	 */
-	ResourceImporterCallback(String src, String dest, Map<String,Collection<?>> clipboard) {
-		super(src, dest);
-	}
+  /**
+   * Creates a new callback for page imports.
+   * 
+   * @param src
+   *          the source root directory
+   * @param dest
+   *          the destination root directory
+   */
+  ResourceImporterCallback(File src, File dest,
+      Map<String, Collection<?>> clipboard) {
+    super(src, dest);
+  }
 
-	/**
-	 * This method is called if a resource file has been found.
-	 * 
-	 * @see ch.o2it.weblounge.tools.importer.AbstractImporterCallback#fileImported(java.io.File)
-	 */
-	public boolean fileImported(File f) {
-	  // load collection information
-	  File collXml = new File(FilenameUtils.getFullPath(f.getPath()) + "repository.xml");
-	  
-	  // paht relative to the src directory
-	  String relpath = f.getPath().replaceAll(this.srcDir, "");
-	  	  
-	  UUID uuid = UUID.randomUUID();
+  /**
+   * This method is called if a resource file has been found.
+   * 
+   * @see ch.o2it.weblounge.tools.importer.AbstractImporterCallback#fileImported(java.io.File)
+   */
+  public boolean fileImported(File f) {
+    // load collection information
+    File collXml = new File(FilenameUtils.getFullPath(f.getPath()) + "repository.xml");
+
+    // path relative to the src directory
+    String relpath = f.getPath().replaceAll(this.srcDir.getAbsolutePath(), "");
+
+    UUID uuid = UUID.randomUUID();
     File resourceXml = null;
     BufferedImage img = null;
     try {
@@ -63,13 +66,12 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
       resourceXml = File.createTempFile(uuid.toString(), ".xml");
     } catch (IOException e) {
       System.err.println("Error processing file '" + relpath + "/" + f.getName() + "': " + e.getMessage());
-      return false;
+      return true;
     }
 
     // log_.info("Processing file " + file.getName());
-    String relfilepath = relpath.concat("/").concat(f.getName());
-    String path = ImporterUtils.normalizePath(relfilepath);
-    ImporterState.getInstance().putUUID(relfilepath, uuid);
+    String path = ImporterUtils.normalizePath(relpath);
+    ImporterState.getInstance().putUUID(relpath, uuid);
 
     // concat filename ('de' + original's file extension, ex 'de.pdf')
     String filename = "de.".concat(FilenameUtils.getExtension(f.getName()));
@@ -83,7 +85,7 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
       Transformer trans;
       try {
         trans = transFact.newTransformer(xsl);
-        trans.setParameter("fileid", relfilepath);
+        trans.setParameter("fileid", relpath);
         trans.setParameter("uuid", uuid.toString());
         trans.setParameter("path", path);
         trans.setParameter("imgwidth", img.getWidth());
@@ -100,7 +102,7 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
       Transformer trans;
       try {
         trans = transFact.newTransformer(xsl);
-        trans.setParameter("fileid", relfilepath);
+        trans.setParameter("fileid", relpath);
         trans.setParameter("uuid", uuid.toString());
         trans.setParameter("path", path);
         this.transformXml(collXml, resourceXml, trans);
@@ -110,16 +112,14 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
       }
     }
 
-    File destfolder = new File(this.destDir);
-    this.storeFile(f, destfolder, subfolder, filename, uuid, 0);
-    this.storeFile(resourceXml, destfolder, subfolder, "index.xml", uuid, 0);
+    this.storeFile(f, destDir, subfolder, filename, uuid, 0);
+    this.storeFile(resourceXml, destDir, subfolder, "index.xml", uuid, 0);
     System.out.println("Imported resource " + f.getName());
-		return true;
-	}
+    return true;
+  }
 
   public boolean folderImported(File f) throws Exception {
-    // TODO Auto-generated method stub
-    return false;
+    return true;
   }
 
 }

@@ -91,7 +91,7 @@ public class ImporterState {
     UUID uuid = uuidStore.get(path);
 
     if (uuid != null) {
-      log_.info("Returning UUID ".concat(uuidStore.get(path).toString().concat(" for path ").concat(path)));
+      // log_.info("Returning UUID ".concat(uuidStore.get(path).toString().concat(" for path ").concat(path)));
       return uuid.toString();
     } else {
       log_.warn("No UUID found for path ".concat(path));

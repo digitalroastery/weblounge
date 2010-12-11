@@ -10,7 +10,7 @@ public class PagePathImporterCallback extends AbstractImporterCallback {
   /** name of the root partition */
   String rootPartition = "/home";
 
-  PagePathImporterCallback(String src, String dest, String rootpartition) {
+  PagePathImporterCallback(File src, File dest, String rootpartition) {
     super(src, dest);
     if (StringUtils.isNotBlank(rootpartition))
       this.rootPartition = rootpartition;
@@ -20,7 +20,7 @@ public class PagePathImporterCallback extends AbstractImporterCallback {
 
   public boolean folderImported(File f) {
     if (f.isDirectory() && !f.equals(srcDir)) {
-      String path = f.getPath().replace(this.srcDir, "");
+      String path = f.getPath().replace(this.srcDir.getAbsolutePath(), "");
       if (path.startsWith(this.rootPartition)) {
         path = path.substring(this.rootPartition.length(), path.length());
       }

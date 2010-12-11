@@ -1,12 +1,13 @@
-Create two directories "import" and "export" anywhere in your filesystem.
+Preparation
+-----------
+1. Extract the desired site out of the Weblounge 2.0 XML dump. You only need the site folder 
+under <xmldump>/db/weblounge/sites.
 
-1. Extract the weblounge 2.0 XML dump to the <import> directory, so that it
-looks like <import>/db/weblounge etc.
-
-2. TODO: <Repository files> ?
+2. Get a copy of the Weblounge 2.0 repository and merge it with the XML repository information.
+cp -r <repository>/* <mysite>/repository/
 
 3. Run the importer:
 
-   java -jar weblounge-importer.jar -i <import> -o <export> -s <site>
+   java -jar weblounge-importer.jar -i <mysite> -o <export>
    
-4. Move <export>/<site> to your Weblounge 3 installation.
+4. Move <export> to your Weblounge 3 installation.

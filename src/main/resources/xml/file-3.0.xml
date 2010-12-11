@@ -6,6 +6,7 @@
     <index>true</index>
     <metadata>
       <title language="de"><![CDATA[Plakat Finaltag italienisch]]></title>
+      <subject>/foo/bar</subject>
     </metadata>
     <security>
       <owner>

@@ -38,7 +38,7 @@ public class PageImporterCallback extends AbstractImporterCallback {
    * defines root partition; content inside this partition will be put into the
    * root
    */
-  private static final String ROOT_PARTITION = "/home";
+  public static final String ROOT_PARTITION = "/home";
 
   /** The page id */
   static long pageId = 1L;
@@ -51,8 +51,7 @@ public class PageImporterCallback extends AbstractImporterCallback {
    * @param dest
    *          the destination root directory
    */
-  PageImporterCallback(String src, String dest,
-      Map<String, Collection<?>> clipboard) {
+  PageImporterCallback(File src, File dest, Map<String, Collection<?>> clipboard) {
     super(src, dest);
   }
 
@@ -70,7 +69,7 @@ public class PageImporterCallback extends AbstractImporterCallback {
         if (!"index.xml".equals(FilenameUtils.getName(f.getName()))) {
           version = FilenameUtils.getBaseName(f.getName());
         }
-        File dest = new File(PathUtils.concat(this.destDir, "pages", uuidToPath(ImporterState.getInstance().getUUID(path)), String.valueOf(version), "index.xml"));
+        File dest = new File(destDir, PathUtils.concat("pages", uuidToPath(ImporterState.getInstance().getUUID(path)), String.valueOf(version), "index.xml"));
         dest.getParentFile().mkdirs();
         dest.createNewFile();
         // File dest = createDestination(f);
@@ -127,8 +126,7 @@ public class PageImporterCallback extends AbstractImporterCallback {
   }
 
   public boolean folderImported(File f) throws Exception {
-    // TODO Auto-generated method stub
-    return false;
+    return true;
   }
 
 }
