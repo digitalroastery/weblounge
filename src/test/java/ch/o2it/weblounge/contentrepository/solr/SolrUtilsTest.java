@@ -34,7 +34,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Test case for {@link SolrUtilsTest}.
+ * Test case for {@link SolrUtils}.
  */
 public class SolrUtilsTest {
 
