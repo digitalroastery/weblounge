@@ -85,7 +85,7 @@ public final class PagesEndpointDocs {
     updatePageEndpoint.addFormat(Format.xml());
     updatePageEndpoint.addStatus(ok("the page was updated"));
     updatePageEndpoint.addStatus(badRequest("the page content was not specified"));
-    createPageEndpoint.addStatus(badRequest("the page content is malformed"));
+    updatePageEndpoint.addStatus(badRequest("the page content is malformed"));
     updatePageEndpoint.addStatus(notFound("the site or the page to update were not found"));
     updatePageEndpoint.addStatus(preconditionFailed("the page's etag does not match the value specified in the If-Match header"));
     updatePageEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
