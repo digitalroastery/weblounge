@@ -54,6 +54,11 @@
     <!-- thirdparty -->
     
     <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
+    
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
@@ -112,6 +117,7 @@
               ch.o2it.weblounge.common.impl.content.page;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.common.impl.util.config;version=${project.version},
+              ch.o2it.weblounge.common.impl.util.doc;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
               ch.o2it.weblounge.dispatcher;version=${project.version},
               ch.o2it.weblounge.testing;version=${project.version},
@@ -128,6 +134,8 @@
               org.slf4j;version="1.5.6",
               javax.servlet;version="2.5.0",
               javax.servlet.http;version="2.5.0",
+              javax.ws.rs,
+              javax.ws.rs.core,
              </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.kernel;version=${project.version},
@@ -138,6 +146,7 @@
               OSGI-INF/shared-resources.xml,
               OSGI-INF/site-command.xml,
               OSGI-INF/site-manager-service.xml,
+              OSGI-INF/site-rest-service.xml,
               OSGI-INF/test-command.xml,
               OSGI-INF/webconsole-plugin.xml
             </Service-Component>

@@ -30,7 +30,7 @@ function renderData(e)  {
 		default:
 			$(".statline").html(i18n.stat_ok.msgFormat(e.sites_count, e.sites_active, e.sites_inactive));
 			$('#scr').removeClass('ui-helper-hidden');
-
+	
 			tableBody.empty();
 			for (var i in e.sites_data) {
 				site(e.sites_data[i]);
@@ -49,35 +49,34 @@ function renderData(e)  {
 function site(/* Object */ site) {
 	var id = site.id;
 	var name = site.name;
-	var _ = tableEntryTemplate.clone().appendTo(tableBody).attr('id', 'entry' + id);
+	var tableEntry = tableEntryTemplate.clone().appendTo(tableBody).attr('id', 'entry' + id);
 
-	_.find('.bIcon').attr('id', 'img' + id).click(function() {
+	tableEntry.find('.bIcon').attr('id', 'img' + id).click(function() {
 		showDetails(id);
 	}).after(showSiteDetails ? name : ('<a href="' + pluginRoot + '/' + id + '">' + name + '</a>'));
 
-	_.find('td:eq(0)').text(site.id);
-	_.find('td:eq(2)').text(site.state);
+	tableEntry.find('td:eq(1)').text(site.state);
 
 	// setup buttons
-	if (site.stateRaw == 0) { // disabled or disabling
-		_.find('li:eq(0)').removeClass('ui-helper-hidden').click(function() {
-			changeDataEntryState(id, 'enable')
+	if (site.stateRaw == 0) {
+		tableEntry.find('li:eq(0)').removeClass('ui-helper-hidden').click(function() {
+			setSiteStatus(id, 'enable')
 		});
 	} else {
-		_.find('li:eq(1)').removeClass('ui-helper-hidden').click(function() {
-			changeDataEntryState(id, 'disable')
+		tableEntry.find('li:eq(1)').removeClass('ui-helper-hidden').click(function() {
+			setSiteStatus(id, 'disable')
 		});
 	}
 }
 
-function changeDataEntryState(/* long */ id, /* String */ action) {
-	if (action == "configure") {
-		window.location = appRoot + "/configMgr/" + id;
-		return;
-	}
-	$.post(pluginRoot + "/" + id, {"action":action}, function(data) {
-		renderData(data);
-	}, "json");	
+/**
+ * Sets the site status of the indicated site according to the given status and
+ * triggers a ui update.
+ */
+function setSiteStatus(/* long */ id, /* String */ status) {
+	$.put(siteServiceUri + "/" + id, {"status":status}, function(data) {
+		loadData();
+	}, "xml");	
 }
 
 /**
@@ -94,7 +93,7 @@ function showDetails(/* long */ id) {
  * Loads all data and triggers rendering.
  */
 function loadData() {
-	$.get(pluginRoot + "/.json", null, function(data) {
+	$.get(pluginRoot + "/index.json", null, function(data) {
 		renderData(data);
 	}, "json");	
 }
@@ -178,12 +177,17 @@ function renderDetails(/* Object */ site) {
 var tableBody = false;
 var tableEntryTemplate = false;
 
+/**
+ * The document has been fully loaded by the client. Time to add more content
+ * and register event handler.
+ */
 $(document).ready(function(){
 	tableBody = $('#plugin_table tbody');
 	tableEntryTemplate = tableBody.find('tr').clone();
 
 	renderData(pluginData);
 
+	$(".reloadButton").unbind('submit');
 	$(".reloadButton").click(loadData);
 
 	var extractMethod = function(node) {
@@ -197,9 +201,9 @@ $(document).ready(function(){
 	$("#plugin_table").tablesorter({
 		headers: {
 			0: { sorter:"digit"},
-			3: { sorter: false }
+			2: { sorter: false }
 		},
-		sortList: [[1,0]],
+		sortList: [[0,1]],
 		textExtraction:extractMethod
 	});
 });

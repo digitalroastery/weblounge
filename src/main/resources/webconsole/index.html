@@ -3,6 +3,7 @@
 <script type="text/javascript">
 	// <![CDATA[
 	var showSiteDetails = false;
+	var siteServiceUri = '${site-service-uri}';
 	var pluginData = {
 			sites_count							: ${sites-count},
 			sites_active            : ${sites-active},
@@ -39,7 +40,6 @@
 	<table id="plugin_table" class="tablesorter nicetable noauto">
 		<thead>
 			<tr>
-				<th class="col_Id">Id</th>
 				<th class="col_Name">Name</th>
 				<th class="col_State">Status</th>
 				<th class="col_Actions">Actions</th>
@@ -47,7 +47,6 @@
 		</thead>
 		<tbody>
 			<tr><!-- template -->
-				<td>&nbsp;</td><!-- ID -->
 				<td><!-- name -->
 					<div class="bIcon ui-icon ui-icon-triangle-1-e" style="float:left" title="Show Details">&nbsp;</div>
 				</td>

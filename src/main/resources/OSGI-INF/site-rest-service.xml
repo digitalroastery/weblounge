@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  name="Weblounge Site Endpoint">	
+  
+  <implementation class="ch.o2it.weblounge.kernel.endpoint.SitesEndpoint" />
+  <property name="service.description" value="Weblounge Site Endpoint" />
+  <property name="rest.path" value="sites" />
+  <service>
+    <provide interface="ch.o2it.weblounge.kernel.endpoint.SitesEndpoint" />
+  </service>
+
+  <reference name="sites" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+
+</scr:component>

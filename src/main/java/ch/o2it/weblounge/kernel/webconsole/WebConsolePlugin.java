@@ -65,6 +65,9 @@ public class WebConsolePlugin extends AbstractWebConsolePlugin {
   /** Template key for the number of inactive sites */
   private static final String SITES_INACTIVE_COUNT_KEY = "sites-inactive";
 
+  /** Template key for the path to the site service rest endpoint */
+  private static final String SITE_SERVICE_URI = "site-service-uri";
+
   /** Template key for the uri to the weblounge shared resources */
   private static final String SHARED_RESOURCES_KEY = "shared-resources";
 
@@ -73,6 +76,10 @@ public class WebConsolePlugin extends AbstractWebConsolePlugin {
 
   /** Reference to the shared resources */
   private WebloungeSharedResources sharedResources = null;
+
+  /** URI to the site rest service */
+  // TODO: Make this dynamic, read path property from service
+  private String siteServiceURI = "/system/weblounge/sites";
 
   /**
    * {@inheritDoc}
@@ -97,25 +104,63 @@ public class WebConsolePlugin extends AbstractWebConsolePlugin {
   /**
    * {@inheritDoc}
    * 
+   * @see org.apache.felix.webconsole.AbstractWebConsolePlugin#doGet(javax.servlet.http.HttpServletRequest,
+   *      javax.servlet.http.HttpServletResponse)
+   */
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+      throws ServletException, IOException {
+    if (request.getPathInfo().endsWith("/index.json")) {
+      response.setContentType("text/json");
+      String json = addSitesData("${" + SITES_DATA_KEY + "}");
+      response.getWriter().print(json);
+      return;
+    } else {
+      super.doGet(request, response);
+    }
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+   */
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    // TODO Auto-generated method stub
+    super.doPost(req, resp);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.apache.felix.webconsole.AbstractWebConsolePlugin#renderContent(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
   @Override
   protected void renderContent(HttpServletRequest req, HttpServletResponse res)
       throws ServletException, IOException {
-    InputStream is = null;
-    try {
-      is = getClass().getResourceAsStream(INDEX);
-      String template = IOUtils.toString(is);
+    if ("/index.json".equals(req.getRequestURI())) {
+      res.setContentType("text/json");
+      String json = addSitesData("${" + SITES_DATA_KEY + "}");
+      res.getWriter().print(json);
+    } else {
+      InputStream is = null;
+      try {
+        is = getClass().getResourceAsStream(INDEX);
+        String template = IOUtils.toString(is);
 
-      // Process the template
-      template = addSharedResourcesMountpoint(template);
-      template = addSitesData(template);
+        // Process the template
+        template = addSharedResourcesMountpoint(template);
+        template = addSitesData(template);
 
-      // Write the template to the output
-      res.getWriter().print(template);
-    } finally {
-      IOUtils.closeQuietly(is);
+        // Write the template to the output
+        res.setContentType("text/html");
+        res.getWriter().print(template);
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
     }
   }
 
@@ -159,7 +204,7 @@ public class WebConsolePlugin extends AbstractWebConsolePlugin {
         if (i > 1)
           sitesData.append(",");
         sitesData.append("{");
-        sitesData.append("\"id\":").append(i).append(",");
+        sitesData.append("\"id\":\"").append(site.getIdentifier()).append("\",");
         sitesData.append("\"name\":\"").append(site.getName()).append("\",");
         sitesData.append("\"version\":\"").append("-").append("\",");
         sitesData.append("\"state\":\"").append(state).append("\",");
@@ -170,6 +215,9 @@ public class WebConsolePlugin extends AbstractWebConsolePlugin {
       }
     }
     template = template.replace("${" + SITES_DATA_KEY + "}", sitesData.toString());
+
+    // Path to site manager REST endpoint
+    template = template.replace("${" + SITE_SERVICE_URI + "}", siteServiceURI);
 
     // Total number of sites
     template = template.replace("${" + SITES_COUNT_KEY + "}", Integer.toString(sites.size()));
