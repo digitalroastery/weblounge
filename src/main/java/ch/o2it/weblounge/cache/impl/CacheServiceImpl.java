@@ -28,6 +28,8 @@ import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
+import net.sf.ehcache.CacheManager;
+
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -52,17 +54,24 @@ import javax.servlet.http.HttpServletResponseWrapper;
  */
 public class CacheServiceImpl implements CacheService, ManagedService {
 
-  /** The configured cache size */
-  private long cacheSize_ = CacheManager.DEFAULT_CACHE_SIZE;
-
   /** Logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
+  /** The default cache size maximum */
+  public static final long DEFAULT_CACHE_SIZE = 10 * 1024 * 1024;
+
+  /** The configured cache size */
+  private long cacheSize_ = 0;
+
+  /** The terracotta cache manager */
+  private CacheManager cache = null;
+  
   /**
    * Creates a new cache service.
    */
   public CacheServiceImpl() {
-    cacheSize_ = CacheManager.DEFAULT_CACHE_SIZE;
+    cacheSize_ = DEFAULT_CACHE_SIZE;
+    cache = new CacheManager();
   }
 
   /**
@@ -74,7 +83,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *           if component activation fails
    */
   void activate(ComponentContext context) throws Exception {
-    CacheManager.setEnabled(true);
+    // TODO: Add cache configuration
   }
 
   /**
@@ -86,7 +95,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *           if component inactivation fails
    */
   void deactivate(ComponentContext context) throws Exception {
-    CacheManager.shutdown();
+    cache.shutdown();
   }
 
   /**
@@ -107,7 +116,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (cacheSize != null) {
       try {
         cacheSize_ = Long.parseLong(cacheSize);
-        CacheManager.setMaxCacheSize(cacheSize_);
+        // TODO: Configure max. cache size
       } catch (Exception e) {
         throw new ConfigurationException("Error configuring the cache size: " + e.getMessage(), e);
       }
@@ -117,7 +126,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     String filters = (String) properties.get("filters");
     try {
       if (filters != null) {
-        CacheManager.setFilters(filters);
+        // TODO: Configure cache filters
       }
     } catch (Exception e) {
       throw new ConfigurationException("Error configuring the cache filters: " + e.getMessage(), e);
@@ -131,7 +140,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.common.request.ResponseCache#setSize(long)
    */
   public void setSize(long size) {
-    CacheManager.setMaxCacheSize(size);
+    // TODO: Set cache size
   }
 
   /**
@@ -140,7 +149,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.common.request.ResponseCache#resetStatistics()
    */
   public void resetStatistics() {
-    CacheManager.resetStats();
+    // TODO: Reset statistics
   }
 
   /**
@@ -149,7 +158,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.common.request.ResponseCache#clear()
    */
   public void clear() {
-    CacheManager.emptyCache();
+    cache.clearAll();
   }
 
   /**
@@ -186,12 +195,15 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
 
     /* start the cache transaction */
-    HttpServletResponse resp = CacheManager.startCacheableResponse(handle, request, (HttpServletResponse) ((HttpServletResponseWrapper) response).getResponse());
-    if (resp == null)
-      return true;
+    // TODO: Do a lookup. If the cache entry is there, write the contents to the
+    // response and return true. If not, start the cacheable response
+    // TODO: Start the response
+    // HttpServletResponse resp = CacheManager.startCacheableResponse(handle, request, (HttpServletResponse) ((HttpServletResponseWrapper) response).getResponse());
+    // if (resp == null)
+    //  return true;
 
     /* wrap the response */
-    ((HttpServletResponseWrapper) response).setResponse(resp);
+    //((HttpServletResponseWrapper) response).setResponse(resp);
 
     return false;
   }
@@ -202,7 +214,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.common.request.ResponseCache#endResponse(ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public boolean endResponse(WebloungeResponse response) {
-    return CacheManager.endCacheableResponse(unwrapResponse(response));
+    // TODO: Start respone
+    // return CacheManager.endCacheableResponse(unwrapResponse(response));
+    return false;
   }
 
   /**
@@ -211,7 +225,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateResponse(ch.o2it.weblounge.common.request.WebloungeResponse)
    */
   public void invalidateResponse(WebloungeResponse response) {
-    CacheManager.invalidateCacheableResponse(unwrapResponse(response));
+    // TODO: Invalidate response
+    // CacheManager.invalidateCacheableResponse(unwrapResponse(response));
   }
 
   /**
@@ -234,8 +249,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public boolean startResponsePart(CacheHandle handle,
       HttpServletResponse response) {
-    boolean found = CacheManager.startHandle(handle, unwrapResponse(response));
-    return found;
+    //boolean found = CacheManager.startHandle(handle, unwrapResponse(response));
+    //return found;
+    return false;
   }
 
   /**
@@ -245,7 +261,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *      javax.servlet.http.HttpServletResponse)
    */
   public void endResponsePart(CacheHandle handle, HttpServletResponse response) {
-    CacheManager.endHandle(handle, unwrapResponse(response));
+    //CacheManager.endHandle(handle, unwrapResponse(response));
+    // TODO: Write the response part to the cache
   }
 
   /**
@@ -254,7 +271,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateEntry(java.lang.Iterable)
    */
   public Set<CacheHandle> invalidateEntry(Iterable<CacheTag> tags) {
-    return CacheManager.invalidate(tags);
+    // TODO: Invalidate the entry
+    //return CacheManager.invalidate(tags);
+    return null;
   }
 
   /**
@@ -263,7 +282,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateEntry(ch.o2it.weblounge.common.request.CacheHandle)
    */
   public Set<CacheHandle> invalidateEntry(CacheHandle handle) {
-    return CacheManager.invalidateEntry(handle);
+    // TODO: Invalidate the entry
+    //return CacheManager.invalidateEntry(handle);
+    return null;
   }
 
   /**

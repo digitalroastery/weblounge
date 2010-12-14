@@ -48,7 +48,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * LRU implementation of an http response cache.
  */
-public class CacheManager {
+public class OldCacheManager {
 
   /** the default character encoding */
   /* TODO: Is this hard coding correct? */
@@ -126,7 +126,7 @@ public class CacheManager {
   private static Map<String, Class<? extends StreamFilter>> allFilters = new HashMap<String, Class<? extends StreamFilter>>();
 
   /** the logging facility provided by log4j */
-  private static final Logger log = LoggerFactory.getLogger(CacheManager.class);
+  private static final Logger log = LoggerFactory.getLogger(OldCacheManager.class);
 
   // initialize the class
   static {
@@ -657,7 +657,7 @@ public class CacheManager {
    *          The enabled to set
    */
   static void setEnabled(boolean enabled) {
-    CacheManager.enabled = enabled;
+    OldCacheManager.enabled = enabled;
     log.debug("The cache is now " + (enabled ? "enabled" : "disabled"));
   }
 
@@ -677,7 +677,7 @@ public class CacheManager {
    *          The maxCacheSize to set
    */
   static void setMaxCacheSize(long maxCacheSize) {
-    CacheManager.maxCacheSize = maxCacheSize;
+    OldCacheManager.maxCacheSize = maxCacheSize;
     ensureFreeSpace(0);
     log.debug("New cache size is now {} bytes", maxCacheSize);
   }

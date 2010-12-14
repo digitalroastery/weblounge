@@ -203,7 +203,7 @@ final class CacheOutputStream extends ServletOutputStream {
 
     if (e.hit) {
       /* modify the existing cache element */
-      CacheManager.modify(e.hnd, e.parent);
+      OldCacheManager.modify(e.hnd, e.parent);
       log.debug("Modified element of type {}", e.hnd.getClass().getName());
     } else {
 
@@ -214,7 +214,7 @@ final class CacheOutputStream extends ServletOutputStream {
 
       /* insert the new cache buffer into the cache */
       log.debug("Trying to insert {} into cache", e.hnd.getClass().getName());
-      CacheManager.insert(e.hnd, buf, modified, e.parent, e.children, hierarchy.empty() ? meta : null);
+      OldCacheManager.insert(e.hnd, buf, modified, e.parent, e.children, hierarchy.empty() ? meta : null);
     }
   }
 

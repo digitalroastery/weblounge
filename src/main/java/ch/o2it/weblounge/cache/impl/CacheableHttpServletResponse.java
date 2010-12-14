@@ -90,7 +90,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * @throws IOException
    *           if the writer could not be allocated
    * @see javax.servlet.ServletResponse#getWriter()
-   * @see ch.o2it.weblounge.service.cache.CacheManager
+   * @see ch.o2it.weblounge.OldCacheManager.cache.CacheManager
    */
   @Override
   public PrintWriter getWriter() throws IOException {
@@ -105,7 +105,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
     /* get the character encoding */
     encoding = getCharacterEncoding();
     if (encoding == null)
-      encoding = CacheManager.DEFAULT_ENCODING;
+      encoding = OldCacheManager.DEFAULT_ENCODING;
 
     /* allocate a new writer */
     try {
