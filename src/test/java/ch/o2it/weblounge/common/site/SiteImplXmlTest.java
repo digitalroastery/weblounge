@@ -21,25 +21,17 @@
 package ch.o2it.weblounge.common.site;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
-import ch.o2it.weblounge.common.impl.util.xml.ValidationErrorHandler;
+import ch.o2it.weblounge.common.impl.site.SiteReader;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 /**
  * Test case for the xml capabilities of {@link SiteImpl}.
@@ -55,26 +47,11 @@ public class SiteImplXmlTest extends SiteImplTest {
   @Before
   public void setUp() throws Exception {
     setupPrerequisites();
-    
-    // Schema validator setup
-    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    URL schemaUrl = SiteImpl.class.getResource("/xsd/site.xsd");
-    Schema siteSchema = schemaFactory.newSchema(schemaUrl);
-    
-    // Site.xml document builder setup
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-    docBuilderFactory.setSchema(siteSchema);
-    docBuilderFactory.setNamespaceAware(true);
-    DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 
     // Validate and read the site descriptor
     URL testContext = this.getClass().getResource(testFile);
-    ValidationErrorHandler errorHandler = new ValidationErrorHandler(testContext);
-    docBuilder.setErrorHandler(errorHandler);
-    Document doc = docBuilder.parse(testContext.openStream());
-    assertFalse("Schema validation failed", errorHandler.hasErrors());
-
-    site = SiteImpl.fromXml(doc.getFirstChild());
+    SiteReader reader = new SiteReader();
+    site = reader.read(testContext.openStream());
   }
   
   /**

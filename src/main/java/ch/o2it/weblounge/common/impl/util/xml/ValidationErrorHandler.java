@@ -37,7 +37,7 @@ public class ValidationErrorHandler implements ErrorHandler {
   private static final Logger logger = LoggerFactory.getLogger(ValidationErrorHandler.class);
 
   /** The module descriptor */
-  private URL moduleXml = null;
+  private String name = null;
 
   /** Number of errors */
   private int errors = 0;
@@ -46,13 +46,25 @@ public class ValidationErrorHandler implements ErrorHandler {
   private int warnings = 0;
 
   /**
-   * Creates a new module descriptor validator.
+   * Creates a new validator which will handle errors that occur while reading
+   * the resource located at <code>resourceURL</code>.
    * 
-   * @param moduleXml
+   * @param resourceURL
    *          the module descriptor
    */
-  public ValidationErrorHandler(URL moduleXml) {
-    this.moduleXml = moduleXml;
+  public ValidationErrorHandler(URL resourceURL) {
+    this.name = resourceURL.toExternalForm();
+  }
+
+  /**
+   * Creates a new validator which will handle errors that occur while reading
+   * the resource identified by <code>name</code>.
+   * 
+   * @param name
+   *          the module descriptor
+   */
+  public ValidationErrorHandler(String name) {
+    this.name = name;
   }
 
   /**
@@ -87,8 +99,8 @@ public class ValidationErrorHandler implements ErrorHandler {
    * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
    */
   public void error(SAXParseException exception) throws SAXException {
-    errors ++;
-    logger.error("Error parsing " + moduleXml + ": " + exception.getMessage());
+    errors++;
+    logger.error("Error parsing " + name + ": " + exception.getMessage());
   }
 
   /**
@@ -97,8 +109,8 @@ public class ValidationErrorHandler implements ErrorHandler {
    * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
    */
   public void fatalError(SAXParseException exception) throws SAXException {
-    errors ++;
-    logger.error("Fatal error parsing " + moduleXml + ": " + exception.getMessage());
+    errors++;
+    logger.error("Fatal error parsing " + name + ": " + exception.getMessage());
   }
 
   /**
@@ -107,8 +119,8 @@ public class ValidationErrorHandler implements ErrorHandler {
    * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
    */
   public void warning(SAXParseException exception) throws SAXException {
-    warnings ++;
-    logger.error("Problem found while parsing " + moduleXml + ": " + exception.getMessage());
+    warnings++;
+    logger.error("Problem found while parsing " + name + ": " + exception.getMessage());
   }
 
 }

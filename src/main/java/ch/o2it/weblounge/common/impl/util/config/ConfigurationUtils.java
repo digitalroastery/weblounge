@@ -93,7 +93,7 @@ public final class ConfigurationUtils {
   }
 
   /**
-   * Returns <code>true</code> if the lowercased and trimmed value is not
+   * Returns <code>true</code> if the lowercase and trimmed value is not
    * <code>null</code> and corresponds to any of:
    * <ul>
    * <li>true</li>
@@ -113,7 +113,7 @@ public final class ConfigurationUtils {
   }
 
   /**
-   * Returns <code>true</code> if the lowercased and trimmed value is not
+   * Returns <code>true</code> if the lowercase and trimmed value is not
    * <code>null</code> and corresponds to any of:
    * <ul>
    * <li>true</li>
@@ -134,7 +134,7 @@ public final class ConfigurationUtils {
   }
 
   /**
-   * Returns <code>true</code> if the lowercased and trimmed value is not
+   * Returns <code>true</code> if the lowercase and trimmed value is not
    * <code>null<code> and corresponds to any of:
    * <ul>
    * <li>true</li>
@@ -152,6 +152,48 @@ public final class ConfigurationUtils {
       return false;
     value = value.trim().toLowerCase();
     return "false".equals(value) || "off".equals(value) || "no".equals(value);
+  }
+
+  /**
+   * Returns <code>true</code> if the lowercase and trimmed value is not
+   * <code>null</code> and corresponds to any of:
+   * <ul>
+   * <li>active</li>
+   * <li>enabled</li>
+   * <li>on</li>
+   * </ul>
+   * 
+   * @param value
+   *          the value to test
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>enabled</code>
+   */
+  public static boolean isEnabled(String value) {
+    if (value == null)
+      return false;
+    value = value.trim().toLowerCase();
+    return "active".equals(value) || "enabled".equals(value) || "on".equals(value);
+  }
+
+  /**
+   * Returns <code>true</code> if the lowercase and trimmed value is not
+   * <code>null<code> and corresponds to any of:
+   * <ul>
+   * <li>inactive</li>
+   * <li>disabled</li>
+   * <li>off</li>
+   * </ul>
+   * 
+   * @param value
+   *          the value to test
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>true</code>
+   */
+  public static boolean isDisabled(String value) {
+    if (value == null)
+      return false;
+    value = value.trim().toLowerCase();
+    return "inactive".equals(value) || "disabled".equals(value) || "off".equals(value);
   }
 
   /**

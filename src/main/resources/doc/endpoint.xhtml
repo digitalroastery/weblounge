@@ -123,7 +123,7 @@
 		        <#if endpoint.form.html??><#-- just dump the html value -->
 		        ${endpoint.form.html}
 		        <#elseif (endpoint.form.basic)><#-- link to the basic endpoint path -->
-		        <a href="${endpoint.path}${endpoint.queryString!}">${endpoint.path}${endpoint.queryString!}</a>
+		        <a href="${metadata.url}${endpoint.path}${endpoint.queryString!}">${endpoint.form.title!"Test link"}</a>
 		        <#elseif endpoint.form.url??><#-- just create a link to the form -->
 		        <a href="${endpoint.form.url}" target="_new">${endpoint.form.title!"Go to Testing form"}</a>
 		        <#else>
