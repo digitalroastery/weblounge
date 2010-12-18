@@ -292,7 +292,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * 
    * @see javax.servlet.ServletRequest#getAttributeNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getAttributeNames() {
     checkActive();
     return this.attributes.keys();
@@ -494,7 +494,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * 
    * @see javax.servlet.ServletRequest#getParameterNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getParameterNames() {
     return Collections.enumeration(this.parameters.keySet());
   }
@@ -515,7 +515,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * 
    * @see javax.servlet.ServletRequest#getParameterMap()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Map getParameterMap() {
     return Collections.unmodifiableMap(this.parameters);
   }
@@ -651,7 +651,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * 
    * @see javax.servlet.ServletRequest#getLocales()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getLocales() {
     return this.locales.elements();
   }
@@ -883,7 +883,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * 
    * @see javax.servlet.http.HttpServletRequest#getHeaders(java.lang.String)
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Enumeration getHeaders(String name) {
     HeaderValueCollection header = HeaderValueCollection.getByName(this.headers, name);
     return Collections.enumeration(header != null ? header.getValues() : Collections.EMPTY_LIST);
@@ -894,7 +894,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
    * 
    * @see javax.servlet.http.HttpServletRequest#getHeaderNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getHeaderNames() {
     return this.headers.keys();
   }

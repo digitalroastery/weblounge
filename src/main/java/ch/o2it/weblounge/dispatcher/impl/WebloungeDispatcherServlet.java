@@ -78,6 +78,14 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
   /** List of dispatcher listeners */
   private List<RequestHandler> requestHandler = null;
+  
+  /** List with well known urls and files */
+  private static List<String> wellknownFiles = new ArrayList<String>();
+  
+  static {
+    wellknownFiles.add("/favicon.ico");
+    wellknownFiles.add("/robots.txt");
+  }
 
   /**
    * Creates a new instance of the weblounge dispatcher servlet.
@@ -229,7 +237,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     // See if a site dispatcher was found, and if so, if it's enabled
     if (site == null) {
-      logger.warn("No dispatcher found for {}", request);
+      if (!wellknownFiles.contains(request.getRequestURI()))
+        logger.warn("No dispatcher found for {}", request);
       DispatchUtils.sendNotFound("Not found", request, response);
       return;
     } else if (!site.isRunning()) {

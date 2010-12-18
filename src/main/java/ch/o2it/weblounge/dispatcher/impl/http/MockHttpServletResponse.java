@@ -106,6 +106,14 @@ public class MockHttpServletResponse implements HttpServletResponse {
   private String includedUrl = null;
 
   /**
+   * Creates a new mock servlet response with a default character encoding of
+   * <code>UTF-8</code>.
+   */
+  public MockHttpServletResponse() {
+    characterEncoding = "utf-8";
+  }
+
+  /**
    * Set whether {@link #getOutputStream()} access is allowed.
    * <p>
    * Default is true.
@@ -291,7 +299,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
    * Switches the implementation to committing the response once the buffer size
    * has been exceeded.
    */
-  private void setCommittedIfBufferSizeExceeded() {
+  void setCommittedIfBufferSizeExceeded() {
     int bufSize = getBufferSize();
     if (bufSize > 0 && this.response.size() > bufSize) {
       setCommitted(true);

@@ -198,7 +198,7 @@ public class MockHttpSession implements HttpSession {
    * 
    * @see javax.servlet.http.HttpSession#getAttributeNames()
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Enumeration getAttributeNames() {
     return this.attributes.keys();
   }

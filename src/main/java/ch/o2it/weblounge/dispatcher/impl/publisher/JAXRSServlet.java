@@ -24,13 +24,19 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * This custom implementation of the <code>CXFNonSpringJaxrsServlet</code> was
@@ -40,11 +46,16 @@ import javax.servlet.ServletException;
  */
 public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(JAXRSServlet.class);
+  
   /** The serial version uid */
   private static final long serialVersionUID = 7336130764437993613L;
 
+  /** The servlet address */
   private String address = null;
 
+  /** The wrapped endpoint */
   private Object service = null;
 
   /**
@@ -59,9 +70,33 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
     if (address == null)
       throw new IllegalArgumentException("Address can't be null");
     if (service == null)
-      throw new IllegalArgumentException("Service impleemntation can't be null");
+      throw new IllegalArgumentException("Service implementation can't be null");
     this.address = address;
     this.service = service;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.apache.cxf.transport.servlet.AbstractHTTPServlet#service(javax.servlet.ServletRequest,
+   *      javax.servlet.ServletResponse)
+   */
+  @Override
+  public void service(HttpServletRequest request, HttpServletResponse res)
+      throws ServletException, IOException {
+    String uri = request.getRequestURI();
+    if (uri.endsWith(".json") || uri.endsWith("/json")) {
+      JSONResponseWrapper wrappedResponse = new JSONResponseWrapper(res);
+      super.service(request, wrappedResponse);
+      try {
+        wrappedResponse.finishResponse();
+      } catch (JSONException e) {
+        logger.error("Conversion to json failed: " + e.getMessage());
+        throw new ServletException(e);
+      }
+    } else {
+      super.service(request, res);
+    }
   }
 
   /**

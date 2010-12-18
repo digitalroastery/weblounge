@@ -1,0 +1,13 @@
+{
+  "o": {
+    "content":"first",
+    "string":"json",
+    "number":1,
+    "array": {
+      "e": [
+	      1,
+	      true
+      ]
+    }
+  }
+}
