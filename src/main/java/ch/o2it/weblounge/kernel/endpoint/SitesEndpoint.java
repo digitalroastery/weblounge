@@ -68,7 +68,9 @@ public class SitesEndpoint {
     buf.append("<sites>");
     Iterator<Site> si = sites.sites();
     while (si.hasNext()) {
-      buf.append(si.next().toXml());
+      String siteXml = si.next().toXml();
+      siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
+      buf.append(siteXml);
     }
     buf.append("</sites>");
     ResponseBuilder response = Response.ok(buf.toString());
@@ -98,7 +100,9 @@ public class SitesEndpoint {
     }
 
     // Create the response
-    ResponseBuilder response = Response.ok(site.toXml());
+    String siteXml = site.toXml();
+    siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
+    ResponseBuilder response = Response.ok(siteXml);
     return response.build();
   }
 
