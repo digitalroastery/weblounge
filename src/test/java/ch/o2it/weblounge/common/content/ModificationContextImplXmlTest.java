@@ -24,8 +24,8 @@ import static org.junit.Assert.fail;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.content.ModificationContext;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 
 import org.junit.Before;

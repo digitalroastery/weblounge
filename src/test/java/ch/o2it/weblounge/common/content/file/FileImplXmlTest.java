@@ -24,9 +24,9 @@ import static org.junit.Assert.fail;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 
 import org.junit.Before;
 import org.junit.Test;

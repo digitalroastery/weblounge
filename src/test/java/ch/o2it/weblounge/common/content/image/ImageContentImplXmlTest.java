@@ -23,9 +23,9 @@ package ch.o2it.weblounge.common.content.image;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.content.image.ImageContentImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageContentReader;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 
 import org.junit.Before;
 import org.junit.Test;

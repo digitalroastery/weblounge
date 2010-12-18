@@ -22,12 +22,12 @@ package ch.o2it.weblounge.common.content.page;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;

@@ -22,11 +22,11 @@ package ch.o2it.weblounge.common.content.file;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;

@@ -23,9 +23,9 @@ package ch.o2it.weblounge.common.content.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileContentReader;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common;
+package ch.o2it.weblounge.common.impl.util;
 
 import org.junit.Ignore;
 
@@ -31,20 +31,21 @@ import java.io.IOException;
  */
 @Ignore
 public class TestUtils {
-  
+
   /**
-   * Loads the <code>XML</code> data from the specified file on the class
-   * path and returns it after having stripped off any newlines, line breaks
-   * and otherwise disturbing spaces and characters.
+   * Loads the <code>XML</code> data from the specified file on the class path
+   * and returns it after having stripped off any newlines, line breaks and
+   * otherwise disturbing spaces and characters.
    * 
-   * @param path the resource path
+   * @param path
+   *          the resource path
    * @return the contents of the resource
    */
   public static String loadXmlFromResource(String path) {
     File templateFile = new File(TestUtils.class.getResource(path).getPath());
     String template = null;
     try {
-      byte[] buffer = new byte[(int)templateFile.length()];
+      byte[] buffer = new byte[(int) templateFile.length()];
       FileInputStream f = new FileInputStream(templateFile);
       f.read(buffer);
       f.close();
@@ -54,6 +55,34 @@ public class TestUtils {
       throw new RuntimeException("Error reading test resource at " + path);
     }
     return template;
-  }  
+  }
+
+  /**
+   * Loads the <code>JSON</code> data from the specified file on the class path
+   * and returns it after having stripped off any newlines, line breaks and
+   * otherwise disturbing spaces and characters.
+   * 
+   * @param path
+   *          the resource path
+   * @return the contents of the resource
+   */
+  public static String loadJsonFromResource(String path) {
+    File templateFile = new File(TestUtils.class.getResource(path).getPath());
+    String template = null;
+    try {
+      byte[] buffer = new byte[(int) templateFile.length()];
+      FileInputStream f = new FileInputStream(templateFile);
+      f.read(buffer);
+      f.close();
+      template = new String(buffer);
+      template = template.replaceAll("(\"\\s*)", "\"").replaceAll("(\\s*\")+", "\"");
+      template = template.replaceAll("(\\s*\\{\\s*)", "{").replaceAll("(\\s*\\}\\s*)", "}");
+      template = template.replaceAll("(\\s*\\[\\s*)", "[").replaceAll("(\\s*\\]\\s*)", "]");
+      template = template.replaceAll("(\\s*,\\s*)", ",");
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading test resource at " + path);
+    }
+    return template;
+  }
 
 }

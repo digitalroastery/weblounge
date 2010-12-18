@@ -23,9 +23,9 @@ package ch.o2it.weblounge.common.content.page;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.TestUtils;
 import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletReader;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 
 import org.junit.Before;
 import org.junit.Test;
