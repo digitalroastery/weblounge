@@ -62,14 +62,10 @@ public class PageImporterCallback extends AbstractImporterCallback {
    */
   public boolean fileImported(File f) {
     try {
-      if (!"workflow.xml".equals(f.getName()) && !"history.xml".equals(f.getName())) {
+      if ("index.xml".equals(f.getName())) {
         Node root = getXmlRoot(f);
         String path = getPath(XPathHelper.valueOf(root, "/page/@partition"), XPathHelper.valueOf(root, "/page/@path"));
-        String version = "0";
-        if (!"index.xml".equals(FilenameUtils.getName(f.getName()))) {
-          version = FilenameUtils.getBaseName(f.getName());
-        }
-        File dest = new File(destDir, PathUtils.concat("pages", uuidToPath(ImporterState.getInstance().getUUID(path)), String.valueOf(version), "index.xml"));
+        File dest = new File(destDir, PathUtils.concat("pages", uuidToPath(ImporterState.getInstance().getUUID(path)), "0", "index.xml"));
         dest.getParentFile().mkdirs();
         dest.createNewFile();
         // File dest = createDestination(f);
@@ -81,8 +77,9 @@ public class PageImporterCallback extends AbstractImporterCallback {
         this.transformXml(f, dest, trans);
 
         System.out.println("Imported page " + path);
+        return true;
       }
-      return true;
+      return false;
     } catch (IOException e) {
       System.err.println("Error creating target file for " + f + ": " + e.getMessage());
       return false;

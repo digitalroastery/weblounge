@@ -93,6 +93,8 @@ public class Importer {
   }
 
   public void importPagePaths() throws Exception {
+    pageCount = 0;
+    errorCount = 0;
     File siteRoot = new File(srcDir, "site");
     ImporterCallback callback = new PagePathImporterCallback(siteRoot, destDir, "/home");
     try {
@@ -118,6 +120,8 @@ public class Importer {
    * @throws Exception
    */
   public void importPages() throws Exception {
+    pageCount = 0;
+    errorCount = 0;
     File siteRoot = new File(srcDir, "site");
     ImporterCallback callback = new PageImporterCallback(srcDir, destDir, clipboard);
     try {
@@ -143,6 +147,8 @@ public class Importer {
    * @throws Exception
    */
   public void importResources() throws Exception {
+    pageCount = 0;
+    errorCount = 0;
     File repositoryRoot = new File(srcDir, "repository");
     ImporterCallback callback = new ResourceImporterCallback(repositoryRoot, destDir, clipboard);
     try {
@@ -168,6 +174,8 @@ public class Importer {
    * @throws Exception
    */
   public void importUsers() throws Exception {
+    pageCount = 0;
+    errorCount = 0;
     File usersRoot = new File(srcDir, "user");
     ImporterCallback callback = new UserImporterCallback(srcDir, destDir, clipboard);
     Collection<String> users = new ArrayList<String>();
@@ -374,8 +382,10 @@ public class Importer {
               directories.push(files[i]);
             } else if (!"__contents__.xml".equals(files[i].getName()) && !".DS_Store".equals(files[i].getName()) && !"repository.xml".equals(files[i].getName())) {
               if (!callback.fileImported(files[i])) {
-                System.err.println("Error importing file " + current);
-                return;
+                // System.err.println("Error importing file " + current);
+                errorCount++;
+              } else {
+                pageCount++;
               }
             }
           } catch (Exception e) {

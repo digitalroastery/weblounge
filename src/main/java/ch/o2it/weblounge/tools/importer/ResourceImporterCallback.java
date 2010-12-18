@@ -14,15 +14,16 @@
 package ch.o2it.weblounge.tools.importer;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.sanselan.ImageInfo;
+import org.apache.sanselan.ImageReadException;
+import org.apache.sanselan.Sanselan;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.imageio.ImageIO;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -52,33 +53,38 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
   public boolean fileImported(File f) {
     // load collection information
     File collXml = new File(FilenameUtils.getFullPath(f.getPath()) + "repository.xml");
+    if (!collXml.exists()) {
+      System.err.println("No repository information (repository.xml) found for file: " + f.getName());
+      return false;
+    }
 
     // path relative to the src directory
     String relpath = f.getPath().replaceAll(this.srcDir.getAbsolutePath(), "");
 
     UUID uuid = UUID.randomUUID();
     File resourceXml = null;
-    BufferedImage img = null;
+    ImageInfo imageInfo = null;
     try {
-      // try loading file as image
-      img = ImageIO.read(f);
       // create temporary resource descriptor file
       resourceXml = File.createTempFile(uuid.toString(), ".xml");
+      
+      // try loading file as image
+      imageInfo = Sanselan.getImageInfo(f);
     } catch (IOException e) {
-      System.err.println("Error processing file '" + relpath + "/" + f.getName() + "': " + e.getMessage());
-      return true;
+      System.err.println("Error processing file '" + relpath + "': " + e.getMessage());
+      return false;
+    } catch (ImageReadException e) {
+      // file is not an image
     }
 
-    // log_.info("Processing file " + file.getName());
     String path = ImporterUtils.normalizePath(relpath);
     ImporterState.getInstance().putUUID(relpath, uuid);
 
-    // concat filename ('de' + original's file extension, ex 'de.pdf')
     String filename = "de.".concat(FilenameUtils.getExtension(f.getName()));
 
     // check, if file is an image resource
     String subfolder = null;
-    if (img != null) {
+    if (imageInfo != null) {
       subfolder = "images";
       Source xsl = new StreamSource(this.getClass().getResourceAsStream("/xsl/convert-image.xsl"));
       TransformerFactory transFact = TransformerFactory.newInstance();
@@ -88,8 +94,8 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
         trans.setParameter("fileid", relpath);
         trans.setParameter("uuid", uuid.toString());
         trans.setParameter("path", path);
-        trans.setParameter("imgwidth", img.getWidth());
-        trans.setParameter("imgheight", img.getHeight());
+        trans.setParameter("imgwidth", imageInfo.getWidth());
+        trans.setParameter("imgheight", imageInfo.getHeight());
         this.transformXml(collXml, resourceXml, trans);
       } catch (TransformerConfigurationException e) {
         System.err.println(e.getMessage());

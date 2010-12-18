@@ -194,7 +194,7 @@
           <xsl:value-of select="importer:getUUID(property[@id='partition'], property[@id='path'])" />
         </property>
       </xsl:if>
-      <xsl:if test="property[@id!='partition'] and property[@id='path']">
+      <xsl:if test="not(property[@id='partition']) and property[@id='path']">
         <property id="resourceid">
           <xsl:value-of select="importer:getUUID(property[@id='path'])" />
         </property>
