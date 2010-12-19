@@ -48,7 +48,7 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(JAXRSServlet.class);
-  
+
   /** The serial version uid */
   private static final long serialVersionUID = 7336130764437993613L;
 
@@ -75,6 +75,47 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
     this.service = service;
   }
 
+  @Override
+  protected void handleRequest(HttpServletRequest request,
+      HttpServletResponse response) throws ServletException {
+    if (requiresJson(request)) {
+      JSONResponseWrapper wrappedResponse = new JSONResponseWrapper(response);
+      super.handleRequest(request, wrappedResponse);
+      try {
+        wrappedResponse.finishResponse();
+      } catch (IOException e) {
+        logger.error("Writing json to response failed: " + e.getMessage());
+        throw new ServletException(e);
+      } catch (JSONException e) {
+        logger.error("Conversion to json failed: " + e.getMessage());
+        throw new ServletException(e);
+      }
+    } else {
+      super.handleRequest(request, response);
+    }
+  }
+
+  /**
+   * Returns <code>true</code> if the request is asking for a <code>json</code>
+   * response.
+   * 
+   * @param request
+   *          the request
+   * @return <code>true</code> if a json response is requested
+   */
+  private boolean requiresJson(HttpServletRequest request) {
+    String uri = request.getRequestURI();
+    String parameter = request.getParameter("json");
+    String accepts = request.getHeader("Accept");
+    if (uri.endsWith(".json") || uri.endsWith("/json"))
+        return true;
+    if (parameter != null)
+      return true;
+    if (accepts != null && ("application/json".equals(accepts) || "text/json".equals(accepts)))
+      return true;
+    return false;
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -84,19 +125,6 @@ public class JAXRSServlet extends CXFNonSpringJaxrsServlet {
   @Override
   public void service(HttpServletRequest request, HttpServletResponse res)
       throws ServletException, IOException {
-    String uri = request.getRequestURI();
-    if (uri.endsWith(".json") || uri.endsWith("/json")) {
-      JSONResponseWrapper wrappedResponse = new JSONResponseWrapper(res);
-      super.service(request, wrappedResponse);
-      try {
-        wrappedResponse.finishResponse();
-      } catch (JSONException e) {
-        logger.error("Conversion to json failed: " + e.getMessage());
-        throw new ServletException(e);
-      }
-    } else {
-      super.service(request, res);
-    }
   }
 
   /**

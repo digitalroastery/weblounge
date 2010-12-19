@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl.publisher;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -57,7 +58,7 @@ public class JSONResponseWrapper extends HttpServletResponseWrapper {
    */
   public JSONResponseWrapper(HttpServletResponse response) {
     super(response);
-    response.setContentType("text/x-json");
+    response.setContentType("application/json");
   }
 
   /**
@@ -130,9 +131,18 @@ public class JSONResponseWrapper extends HttpServletResponseWrapper {
         printWriter.flush();
       }
 
+      // Make sure there is a default encoding
+      if (encoding == null)
+        encoding = "utf-8";
+
       // Convert the current xml content to json
       Writer responseWriter = getResponse().getWriter();
-      String xml = new String(servletOutputStream.getBytes(), encoding);
+      String xml = null;
+      if (StringUtils.isNotBlank(encoding)) {
+        xml = new String(servletOutputStream.getBytes(), encoding);
+      } else {
+        xml = new String(servletOutputStream.getBytes());
+      }
       JSONObject json = XML.toJSONObject(xml);
 
       // Write json back to the response
