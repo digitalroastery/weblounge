@@ -8,6 +8,6 @@ cp -r <repository>/* <mysite>/repository/
 
 3. Run the importer:
 
-   java -jar weblounge-importer.jar -i <mysite> -o <export>
+   java -jar weblounge-importer-3.0-SNAPSHOT-jar-with-dependencies.jar -i /home/db/weblounge/sites/<mysite> -o /targe/directory
    
 4. Move <export> to your Weblounge 3 installation.

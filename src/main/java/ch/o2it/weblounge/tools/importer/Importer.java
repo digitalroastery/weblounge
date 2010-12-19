@@ -92,6 +92,12 @@ public class Importer {
     errorCount = 0;
   }
 
+  /**
+   * Imports the pages.
+   * 
+   * @throws Exception
+   *           if there is an error during import
+   */
   public void importPagePaths() throws Exception {
     pageCount = 0;
     errorCount = 0;
@@ -104,7 +110,7 @@ public class Importer {
       return;
     }
     if (!quiet) {
-      System.out.println("\n" + pageCount + " page pahts imported.");
+      System.out.println("\n" + pageCount + " pages imported.");
     }
     if (errorCount > 0) {
       System.out.println("\n" + errorCount + " errors occured:\n");
@@ -250,7 +256,7 @@ public class Importer {
     if (!cmd.providesCommand(CMD_FORCE)) {
       File f = new File(dest);
       if (f.exists()) {
-        System.err.println("The destination directory " + src + " already exists. Use --force to overwrite.");
+        System.err.println("The destination directory " + dest + " already exists. Use --force to overwrite.");
         return;
       }
       f.delete();
@@ -360,7 +366,8 @@ public class Importer {
    *          the callback
    * @param clipboard
    *          the shared memory
-   * @throws XMLDBException
+   * @throws Exception
+   *           if the operation fails
    */
   private void traverse(File root, ImporterCallback callback) throws Exception {
     Stack<File> directories = new Stack<File>();
