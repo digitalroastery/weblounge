@@ -23,19 +23,35 @@ package ch.o2it.weblounge.cache.impl;
 import ch.o2it.weblounge.cache.CacheService;
 import ch.o2it.weblounge.cache.impl.handle.TaggedCacheHandle;
 import ch.o2it.weblounge.common.ConfigurationException;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
+import ch.o2it.weblounge.common.impl.user.Guest;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
+import org.apache.commons.io.FileUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletResponse;
@@ -57,21 +73,14 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
-  /** The default cache size maximum */
-  public static final long DEFAULT_CACHE_SIZE = 10 * 1024 * 1024;
+  /** The ehache cache manager */
+  private CacheManager cacheManager = null;
 
-  /** The configured cache size */
-  private long cacheSize_ = 0;
-
-  /** The terracotta cache manager */
-  private CacheManager cache = null;
-  
   /**
    * Creates a new cache service.
    */
   public CacheServiceImpl() {
-    cacheSize_ = DEFAULT_CACHE_SIZE;
-    cache = new CacheManager();
+    cacheManager = new CacheManager();
   }
 
   /**
@@ -95,7 +104,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *           if component inactivation fails
    */
   void deactivate(ComponentContext context) throws Exception {
-    cache.shutdown();
+    for (String cacheName : cacheManager.getCacheNames()) {
+      Cache cache = cacheManager.getCache(cacheName);
+      cache.dispose();
+    }
+    cacheManager.shutdown();
   }
 
   /**
@@ -112,15 +125,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       throws org.osgi.service.cm.ConfigurationException {
     if (properties == null)
       return;
-    String cacheSize = (String) properties.get("size");
-    if (cacheSize != null) {
-      try {
-        cacheSize_ = Long.parseLong(cacheSize);
-        // TODO: Configure max. cache size
-      } catch (Exception e) {
-        throw new ConfigurationException("Error configuring the cache size: " + e.getMessage(), e);
-      }
-    }
 
     // Filter options
     String filters = (String) properties.get("filters");
@@ -137,19 +141,14 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#setSize(long)
-   */
-  public void setSize(long size) {
-    // TODO: Set cache size
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.request.ResponseCache#resetStatistics()
    */
   public void resetStatistics() {
-    // TODO: Reset statistics
+    for (String cacheId : cacheManager.getCacheNames()) {
+      Cache cache = cacheManager.getCache(cacheId);
+      cache.setStatisticsEnabled(false);
+      cache.setStatisticsEnabled(true);
+    }
   }
 
   /**
@@ -158,7 +157,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.common.request.ResponseCache#clear()
    */
   public void clear() {
-    cache.clearAll();
+    cacheManager.clearAll();
   }
 
   /**
@@ -194,16 +193,44 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       return false;
     }
 
+    Site site = request.getSite();
+    String cacheId = site.getIdentifier();
+    Cache cache = cacheManager.getCache(cacheId);
+    if (cache == null)
+      throw new IllegalStateException("No cache found for site '" + site + "'");
+
+    // Try to load the content from the cache
+    String cacheKey = createKey(request);
+    Element element = cache.get(cacheKey);
+
+    // If it exists, write the contents back to the response
+    if (element != null && element.getValue() != null) {
+      // TODO: Object should be an object with entries for headers and content
+      CacheHandle content = (CacheHandle)element.getValue();
+      long contentLength = element.getSerializedSize();
+      response.setContentLength((int) contentLength);
+      try {
+        // TODO: Write headers to response first
+        response.getWriter().write(content.toString());
+        return true;
+      } catch (IOException e) {
+        logger.warn("Error writing cached response to client");
+        return true; // If we can't others can't either
+      }
+    }
+
     /* start the cache transaction */
     // TODO: Do a lookup. If the cache entry is there, write the contents to the
     // response and return true. If not, start the cacheable response
     // TODO: Start the response
-    // HttpServletResponse resp = CacheManager.startCacheableResponse(handle, request, (HttpServletResponse) ((HttpServletResponseWrapper) response).getResponse());
+    // HttpServletResponse resp = CacheManager.startCacheableResponse(handle,
+    // request, (HttpServletResponse) ((HttpServletResponseWrapper)
+    // response).getResponse());
     // if (resp == null)
-    //  return true;
+    // return true;
 
     /* wrap the response */
-    //((HttpServletResponseWrapper) response).setResponse(resp);
+    // ((HttpServletResponseWrapper) response).setResponse(resp);
 
     return false;
   }
@@ -249,8 +276,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public boolean startResponsePart(CacheHandle handle,
       HttpServletResponse response) {
-    //boolean found = CacheManager.startHandle(handle, unwrapResponse(response));
-    //return found;
+    // boolean found = CacheManager.startHandle(handle,
+    // unwrapResponse(response));
+    // return found;
     return false;
   }
 
@@ -261,7 +289,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *      javax.servlet.http.HttpServletResponse)
    */
   public void endResponsePart(CacheHandle handle, HttpServletResponse response) {
-    //CacheManager.endHandle(handle, unwrapResponse(response));
+    // CacheManager.endHandle(handle, unwrapResponse(response));
     // TODO: Write the response part to the cache
   }
 
@@ -272,7 +300,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public Set<CacheHandle> invalidateEntry(Iterable<CacheTag> tags) {
     // TODO: Invalidate the entry
-    //return CacheManager.invalidate(tags);
+    // return CacheManager.invalidate(tags);
     return null;
   }
 
@@ -283,7 +311,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public Set<CacheHandle> invalidateEntry(CacheHandle handle) {
     // TODO: Invalidate the entry
-    //return CacheManager.invalidateEntry(handle);
+    // return CacheManager.invalidateEntry(handle);
     return null;
   }
 
@@ -305,6 +333,117 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       response = ((ServletResponseWrapper) response).getResponse();
     }
     return null;
+  }
+
+  /**
+   * Callback for OSGi that is called when a new site is registered. Upon
+   * registration, a new cache will be created for this site.
+   * 
+   * @param site
+   *          the site
+   */
+  void addSite(Site site) {
+    String siteId = site.getIdentifier();
+    cacheManager.addCache(siteId);
+    Cache cache = cacheManager.getCache(siteId);
+    if (cache == null)
+      throw new IllegalStateException("Unable to create cache for site '" + siteId + "'");
+
+    // Specify where to put the file
+    String cacheFile = PathUtils.concat(System.getProperty("java.io.tmpdir"), "weblounge", "sites", site.getIdentifier(), "caches");
+    try {
+      FileUtils.forceMkdir(new File(cacheFile));
+      cache.setDiskStorePath(cacheFile);
+      logger.info("Created new cache file at {}", cacheFile);
+    } catch (IOException e) {
+      logger.error("Failed to create cache file at {}", cacheFile);
+    }
+
+    // Enable cache statistics
+    cache.setStatisticsEnabled(true);
+
+    // Warm the cache by loading the home uri in all languages
+    User guest = new Guest();
+    for (Language language : site.getLanguages()) {
+      String cacheKey = createKey(cacheFile, guest, language, null);
+      cache.load(cacheKey);
+    }
+  }
+
+  void removeSite(Site site) {
+    String siteId = site.getIdentifier();
+    Cache cache = cacheManager.getCache(siteId);
+    if (cache == null) {
+      logger.warn("No cache found to disable for site '{}'", siteId);
+      return;
+    }
+    cache.flush();
+    cacheManager.removeCache(siteId);
+    logger.info("Cache for site '{}' removed", siteId);
+  }
+
+  /**
+   * Returns the cache key for the given request.
+   * 
+   * @param request
+   *          the request
+   * @return the cache key
+   */
+  protected String createKey(WebloungeRequest request) {
+    String uri = request.getPathInfo();
+    User user = request.getUser();
+    Language language = request.getLanguage();
+    Map<String, String> params = new HashMap<String, String>();
+    Enumeration<?> ne = request.getParameterNames();
+    while (ne.hasMoreElements()) {
+      String name = (String) ne.nextElement();
+      String[] values = request.getParameterValues(name);
+      if (values.length == 1) {
+        params.put(name, values[0]);
+      } else {
+        int i = 0;
+        for (String value : values) {
+          params.put(name + "-" + i, value);
+        }
+      }
+    }
+    return createKey(uri, user, language, params);
+  }
+
+  /**
+   * Returns the cache key for the given url, user, language and request
+   * parameters.
+   * 
+   * @param uri
+   *          the request uri
+   * @param user
+   *          the requesting user
+   * @param language
+   *          the request language
+   * @param params
+   *          the request parameters
+   * @return the cache key
+   */
+  protected String createKey(String uri, User user, Language language,
+      Map<String, String> params) {
+    StringBuffer buf = new StringBuffer(uri);
+    buf.append("?user=").append(user.getLogin());
+    buf.append("&language=").append(language.getIdentifier());
+
+    // Parameters need to be sorted by key, otherwise we'll get a cache miss
+    // simply because the arguments were specified in a different order
+    if (params != null) {
+      List<String> parameterNames = new ArrayList<String>();
+      parameterNames.addAll(params.keySet());
+      Collections.sort(parameterNames);    
+      for (String parameterName : parameterNames) {
+        buf.append("&").append(parameterName).append("=").append(params.get(parameterName));
+      }
+    }
+    
+    // TODO: Consider headers as well. Think "Accepts"
+
+    return buf.toString();
   }
 
 }

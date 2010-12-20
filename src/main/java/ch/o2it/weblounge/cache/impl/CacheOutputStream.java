@@ -224,7 +224,6 @@ final class CacheOutputStream extends ServletOutputStream {
    * @param meta
    *          the response meta information
    */
-  @SuppressWarnings("fallthrough")
   synchronized void endOutput(CachedResponseMetaInfo meta) {
     switch (hierarchy.size()) {
       case 0:
