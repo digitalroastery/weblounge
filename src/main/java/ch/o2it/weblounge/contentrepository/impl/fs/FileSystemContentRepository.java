@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
@@ -227,7 +228,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         });
         if (files == null || files.length == 0)
           continue;
-        boolean foundResource = false;
         for (File f : files) {
           if (f.isDirectory()) {
             uris.push(f);
@@ -237,6 +237,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               ResourceURI uri = null;
               ResourceReader<?, ?> reader = serializer.getReader();
               InputStream is = null;
+              boolean foundResource = false;
+
+              // Read the resource
               try {
                 is = new FileInputStream(f);
                 resource = reader.read(is, site);
@@ -254,22 +257,34 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
               index.add(resource);
               resourceVersionCount++;
-              if (!foundResource) {
-                String resourceName = uri.toString();
-                if (resource.contents().size() > 0)
-                  resourceName += resource.contents().iterator().next();
-                logger.info("Adding {} {} to site index", resourceType, resourceName);
-                resourceCount++;
-                foundResource = true;
-              }
 
               // Make sure the resource is in the correct place
               File expectedFile = uriToFile(uri);
               String tempPath = expectedFile.getAbsolutePath().substring(homePath.length());
-              FileUtils.copyFile(f, new File(restructuredResources, tempPath));
+              File indexedFile = new File(restructuredResources, tempPath);
+              FileUtils.copyFile(f, indexedFile);
               if (!f.equals(expectedFile)) {
                 restructured = true;
               }
+              
+              // See if there are files that need to be copied as well. We add
+              // the "found" flag in case that there are multiple versions of
+              // this resource (we don't want to copy the files more than once).
+              if (!foundResource) {
+                for (ResourceContent c : resource.contents()) {
+                  if (c.getFilename() == null)
+                    throw new IllegalStateException("Found content without filename in " + resource);
+                  Language l = c.getLanguage();
+                  String filename = l.getIdentifier() + "." + FilenameUtils.getExtension(c.getFilename());
+                  String srcFile = PathUtils.concat(f.getParentFile().getAbsolutePath(), filename);
+                  String destFile = PathUtils.concat(indexedFile.getParentFile().getAbsolutePath(), filename);
+                  FileUtils.copyFile(new File(srcFile), new File(destFile));
+                }
+                logger.info("Adding {} {} to site index", resourceType, uri.toString());
+                resourceCount++;
+                foundResource = true;
+              }
+
             } catch (Throwable t) {
               logger.error("Error indexing {} {}: {}", new Object[] {
                   resourceType,
