@@ -30,14 +30,6 @@ import ch.o2it.weblounge.common.request.ResponseCache;
 public interface CacheService extends ResponseCache {
 
   /**
-   * Sets the maximum cache size to the given number of bytes.
-   * 
-   * @param size
-   *          The maximum cache size
-   */
-  void setSize(long size);
-
-  /**
    * Resets the cache statistics.
    */
   void resetStatistics();
