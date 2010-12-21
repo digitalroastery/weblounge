@@ -250,7 +250,7 @@ public class ContentRepositoryIndex {
     String path = uri.getPath();
     String type = uri.getType();
     long version = uri.getVersion();
-    
+
     // Make sure we are not asked to add a resource to the index that has the
     // same id as an existing one
     if (id != null) {
@@ -316,7 +316,7 @@ public class ContentRepositoryIndex {
     // Otherwise, it's just a new version
     else if (!versionIdx.hasVersion(address, version)) {
       versionIdx.addVersion(address, version);
-    
+
       // Handle live indices
       if (version == Resource.LIVE) {
         languageIdx.set(address, resource.languages());
@@ -402,7 +402,7 @@ public class ContentRepositoryIndex {
     } else {
       versionIdx.delete(address, version);
     }
-    
+
     return true;
   }
 
@@ -742,11 +742,15 @@ public class ContentRepositoryIndex {
    *          the uri
    * @return the id
    * @throws IllegalArgumentException
-   *           if the uri contains neither an id nor a path
+   *           if the uri contains neither an id nor a path of if the uri is
+   *           <code>null</code>
    * @throws IOException
    *           if accessing the index fails
    */
   protected long toURIEntry(ResourceURI uri) throws IOException {
+    if (uri == null) 
+      throw new IllegalArgumentException("Uri must not be null");
+    
     String id = uri.getId();
     String path = uri.getPath();
 
