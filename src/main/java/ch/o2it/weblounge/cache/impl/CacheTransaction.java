@@ -36,9 +36,6 @@ final class CacheTransaction {
   /** The main cache handle for this transaction */
   CacheHandle hnd = null;
 
-  /** The request that initiated this transaction */
-  HttpServletRequest req = null;
-
   /** The response that accepts the result of this transaction */
   HttpServletResponse resp = null;
 
@@ -76,7 +73,6 @@ final class CacheTransaction {
    */
   CacheTransaction(CacheHandle hnd, HttpServletRequest req,
       HttpServletResponse resp, StreamFilter filter) {
-    this.req = req;
     this.hnd = hnd;
     this.resp = resp;
     this.filter = filter;

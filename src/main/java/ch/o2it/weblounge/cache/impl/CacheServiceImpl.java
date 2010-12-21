@@ -307,19 +307,19 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Is the response ready to be cached?
     if (transaction == null || transaction.invalidated || !response.isValid()) {
-      logger.debug("Response to {} was invalid and is not cached", transaction.req);
+      logger.debug("Response to {} was invalid and is not cached", response);
       return false;
     }
 
     // Make sure the cache is still available
     Cache cache = cacheManager.getCache(transaction.cache);
     if (cache == null) {
-      logger.debug("Cache for {} disappeared, response is not cached", transaction.req);
+      logger.debug("Cache for {} disappeared, response is not cached", response);
       return false;
     }
 
     // Write the entry to the cache
-    logger.trace("Writing response for {} to the cache", transaction.req);
+    logger.trace("Writing response for {} to the cache", response);
     CacheEntry entry = new CacheEntry(transaction.os.getBuffer(), transaction.headers);
     Element element = new Element(transaction.cacheKey, entry);
     cache.put(element);
