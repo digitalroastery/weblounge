@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.request;
 
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -55,6 +56,18 @@ import javax.servlet.http.HttpServletResponse;
 public interface ResponseCache {
 
   /**
+   * Wraps the given response into a cacheable http servlet response.
+   * 
+   * @param request
+   *          the servlet request
+   * @param response
+   *          the servlet response
+   * @return the wrapped response
+   */
+  HttpServletResponse createCacheableResponse(HttpServletRequest request,
+      HttpServletResponse response);
+
+  /**
    * Starts a cacheable response. By calling this method, a new response wrapper
    * is generated which will write the response output to the cache as well as
    * to the client.
@@ -74,29 +87,29 @@ public interface ResponseCache {
    *          the valid time in milliseconds
    * @param recheckTime
    *          the recheck time in milliseconds
-   * @return the <code>CacheHandle</code> of the response or <code>null</code>
-   *         if the response was found in the cache
+   * @return <code>null</code> if the content was found in the cache
    */
-  CacheHandle startResponse(Iterable<CacheTag> uniqueTags, WebloungeRequest request,
-      WebloungeResponse response, long validTime, long recheckTime);
+  CacheHandle startResponse(Iterable<CacheTag> uniqueTags,
+      WebloungeRequest request, WebloungeResponse response, long validTime,
+      long recheckTime);
 
   /**
    * Starts a cacheable response. By calling this method, a new response wrapper
    * is generated which will write the response output to the cache as well as
    * to the client.
    * <p>
-   * If the method returns <code>true</code>, then the response part was found
+   * If the method returns <code>null</code>, then the response part was found
    * in the cache and has been directly written to the response from the cache.
-   * If it returns <code>false</code>, the data was not found but will be put
-   * into the cache when {@link #endResponse(WebloungeResponse)} is called.
+   * Otherwise, the data was not found but will be put into the cache when
+   * {@link #endResponse(WebloungeResponse)} is called.
    * 
    * @param request
    *          the request
    * @param response
    *          the response
-   * @return boolean <code>true</code> if the response was found in the cache
+   * @return <code>null</code> if the response was found in the cache
    */
-  boolean startResponse(CacheHandle handle, WebloungeRequest request,
+  CacheHandle startResponse(CacheHandle handle, WebloungeRequest request,
       WebloungeResponse response);
 
   /**

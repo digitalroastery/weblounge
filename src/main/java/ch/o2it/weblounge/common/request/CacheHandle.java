@@ -22,6 +22,8 @@ package ch.o2it.weblounge.common.request;
 
 import ch.o2it.weblounge.common.content.Taggable;
 
+import java.io.Serializable;
+
 /**
  * Identifies a cached object with a recheck and expiration time. Clients may
  * locally cache objects and use them without checking with the object's
@@ -35,7 +37,7 @@ import ch.o2it.weblounge.common.content.Taggable;
  * 
  * @see ch.o2it.weblounge.common.Times
  */
-public interface CacheHandle extends Taggable<CacheTag> {
+public interface CacheHandle extends Serializable, Taggable<CacheTag> {
 
   /**
    * Returns the time the cached object expires in milliseconds. When that time
