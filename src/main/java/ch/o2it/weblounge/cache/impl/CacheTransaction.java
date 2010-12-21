@@ -46,13 +46,19 @@ final class CacheTransaction {
   CacheOutputStream os = new CacheOutputStream();
 
   /** The cached response meta info */
-  CachedResponseMetaInfo meta = new CachedResponseMetaInfo();
+  CachedHttpResponseHeaders headers = new CachedHttpResponseHeaders();
 
   /** The output filter */
   StreamFilter filter = null;
 
   /** True if the transaction has been invalidated */
   boolean invalidated = false;
+
+  /** The cache identifier */
+  String cache = null;
+
+  /** Key into the cache */
+  String cacheKey = null;
 
   /**
    * Creates a new transaction for the given handle, request and response. Any

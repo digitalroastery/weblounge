@@ -20,11 +20,15 @@
 
 package ch.o2it.weblounge.cache.impl;
 
+import ch.o2it.weblounge.cache.StreamFilter;
 import ch.o2it.weblounge.cache.impl.filter.FilterWriter;
 import ch.o2it.weblounge.common.request.CacheHandle;
 
+import org.apache.commons.io.output.TeeOutputStream;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -35,11 +39,13 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 /**
  * Implementation of a <code>HttpServletResponseWrapper</code> that allows for
- * response caching by installing a custom version off an output stream which
+ * response caching by installing a custom version of an output stream which
  * works like the <code>tee</code> command in un*x systems. Like this, the
  * output can be written to the response cache <i>and</i> to the client at the
  * same time.
@@ -47,44 +53,64 @@ import javax.servlet.http.HttpServletResponseWrapper;
 class CacheableHttpServletResponse extends HttpServletResponseWrapper {
 
   /**
-   * holds the special tee writer that copies the output to the network and to
+   * Holds the special tee writer that copies the output to the network and to
    * the cache.
    */
   private PrintWriter out = null;
 
-  /** the character encoding of this reply. */
+  /** The character encoding of this reply. */
   private String encoding = null;
 
-  /** the cached transaction for this page */
+  /** The cache transaction for this response */
   CacheTransaction tx = null;
 
-  /** the format used for date headers */
+  /** The format used for date headers */
   private DateFormat format = null;
 
-  /** the content type */
+  /** The content type */
   private String contentType = null;
 
-  /** whether the getOuputStream has already been called */
+  /** Whether the getOuputStream has already been called */
   private boolean osCalled = false;
 
+  /** Default encoding */
+  private static final String DEFAULT_ENCODING = "utf-8";
+
   /**
-   * Creates a <code>CacheableHttpServletResponse</code> using the given
-   * cacheWriter stream to write the output to the cache.
+   * Creates a <code>CacheableHttpServletResponse</code> that is writing any
+   * content to the wrapped response as well as to the cached output stream,
+   * given a preceding call to {@link #startTransaction(CacheTransaction)}.
    * 
    * @param tx
    *          the cached transaction represented by this cacheable response
    */
-  CacheableHttpServletResponse(CacheTransaction tx) {
-    super(tx.resp);
+  CacheableHttpServletResponse(HttpServletResponse response) {
+    super(response);
+  }
 
-    /* the cached transaction for this page */
-    this.tx = tx;
-    cacheMiss(tx.hnd);
+  /**
+   * Starts a cache transaction.
+   * 
+   * @param handle
+   *          the cache handle
+   * @param request
+   *          the http request
+   * @param response
+   *          the http response
+   * @param filter
+   *          the stream filter
+   * @return the transaction
+   */
+  public CacheTransaction startTransaction(CacheHandle handle,
+      HttpServletRequest request, HttpServletResponse response,
+      StreamFilter filter) {
+    tx = new CacheTransaction(null, request, response, null);
+    return tx;
   }
 
   /**
    * Returns the modified writer that enables the <code>CacheManager</cache>
-	 * to copy the response to the cache.
+   * to copy the response to the cache.
    * 
    * @return a PrintWriter object that can return character data to the client
    * @throws IOException
@@ -94,34 +120,42 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    */
   @Override
   public PrintWriter getWriter() throws IOException {
-    /* check whether there's already a writer allocated */
+    // Check whether there's already a writer allocated
     if (out != null)
       return out;
 
-    /* check whether getOutputStream() has already been called */
+    // Check whether getOutputStream() has already been called
     if (osCalled)
-      throw new IllegalStateException("getOutputStream() has already been called");
+      throw new IllegalStateException("An output stream has already been allocated");
 
-    /* get the character encoding */
+    // Get the character encoding
     encoding = getCharacterEncoding();
     if (encoding == null)
-      encoding = OldCacheManager.DEFAULT_ENCODING;
+      encoding = DEFAULT_ENCODING;
 
-    /* allocate a new writer */
+    // Allocate a new writer. If there is a transaction, the output is written
+    // to both the original response and the cache output stream.
+    OutputStream os = null;
+    if (tx != null)
+      os = new TeeOutputStream(getResponse().getOutputStream(), tx.os);
+    else
+      os = getResponse().getOutputStream();
+
+    // Install the writer
     try {
-      if (tx.filter == null)
-        out = new PrintWriter(new OutputStreamWriter(tx.os, encoding));
+      if (tx == null || tx.filter == null)
+        out = new PrintWriter(new OutputStreamWriter(os, encoding));
       else
-        out = new PrintWriter(new BufferedWriter(new FilterWriter(new OutputStreamWriter(tx.os, encoding), tx.filter, contentType)));
+        out = new PrintWriter(new BufferedWriter(new FilterWriter(new OutputStreamWriter(os, encoding), tx.filter, contentType)));
     } catch (UnsupportedEncodingException e) {
       throw new IOException(e.getMessage());
     }
 
-    /* check whether the new writer is usable */
+    // Check whether the new writer is usable
     if (out == null)
-      throw new IOException("unable to allocate writer");
+      throw new IOException("Unable to allocate writer");
 
-    /* return the new writer */
+    // Return the new writer
     return out;
   }
 
@@ -129,43 +163,11 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * @see javax.servlet.ServletResponseWrapper#getOutputStream()
    */
   @Override
-  public ServletOutputStream getOutputStream() {
+  public ServletOutputStream getOutputStream() throws IOException {
     if (out != null)
-      throw new IllegalStateException("getWriter() has already been called");
+      throw new IllegalStateException("A writer has already been allocated");
     osCalled = true;
-    return tx.os;
-  }
-
-  /**
-   * Signals a cache hit for the given handle.
-   * 
-   * @param hnd
-   *          the handle that produced the cache hit
-   * @param buf
-   *          the content from the cache
-   */
-  void cacheHit(CacheHandle hnd, byte buf[]) {
-    if (out != null)
-      out.flush();
-    tx.os.newEntry(hnd, true);
-    try {
-      tx.os.write(buf);
-    } catch (IOException e) {
-      /* this will never happen! */
-    }
-    tx.os.endEntry(hnd);
-  }
-
-  /**
-   * Signals a cache miss for the given handle.
-   * 
-   * @param hnd
-   *          the handle that produced a cache miss
-   */
-  void cacheMiss(CacheHandle hnd) {
-    if (out != null)
-      out.flush();
-    tx.os.newEntry(hnd, false);
+    return tx != null ? tx.os : getResponse().getOutputStream();
   }
 
   /**
@@ -177,7 +179,6 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   void endEntry(CacheHandle hnd) {
     if (out != null)
       out.flush();
-    tx.os.endEntry(hnd);
 
   }
 
@@ -192,7 +193,6 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
       out.close();
       out = null;
     }
-    tx.os.endOutput(tx.meta);
     return tx;
   }
 
@@ -201,8 +201,8 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * cache.
    */
   void invalidateOutput() {
-    tx.os.invalidateOutput();
-    tx.invalidated = true;
+    if (tx != null)
+      tx.invalidated = true;
   }
 
   /**
@@ -211,7 +211,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * @return <code>true</code> if the response has been invalidated
    */
   public boolean isInvalidated() {
-    return tx.invalidated;
+    return tx != null ? tx.invalidated : false;
   }
 
   /**
@@ -221,7 +221,8 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   public void setContentType(String type) {
     super.setContentType(type);
     contentType = type;
-    tx.meta.contentType = type;
+    if (tx != null)
+      tx.headers.setContentType(type);
 
     /* check whether the encoding has changed */
     if (encoding == null || !encoding.equals(getCharacterEncoding())) {
@@ -239,7 +240,8 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   @Override
   public void addHeader(String name, String value) {
     super.addHeader(name, value);
-    tx.meta.addHeader(name, value);
+    if (tx != null)
+      tx.headers.addHeader(name, value);
   }
 
   /**
@@ -249,7 +251,8 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   @Override
   public void setHeader(String name, String value) {
     super.setHeader(name, value);
-    tx.meta.setHeader(name, value);
+    if (tx != null)
+      tx.headers.setHeader(name, value);
   }
 
   /**
@@ -259,7 +262,8 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   @Override
   public void addDateHeader(String name, long date) {
     super.addDateHeader(name, date);
-    tx.meta.addHeader(name, formatDate(date));
+    if (tx != null)
+      tx.headers.addHeader(name, formatDate(date));
   }
 
   /**
@@ -269,7 +273,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   @Override
   public void addIntHeader(String name, int value) {
     super.addIntHeader(name, value);
-    tx.meta.addHeader(name, "" + value);
+    tx.headers.addHeader(name, Integer.toString(value));
   }
 
   /**
@@ -279,7 +283,8 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   @Override
   public void setDateHeader(String name, long date) {
     super.setDateHeader(name, date);
-    tx.meta.setHeader(name, formatDate(date));
+    if (tx != null)
+      tx.headers.setHeader(name, formatDate(date));
   }
 
   /**
@@ -289,7 +294,8 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   @Override
   public void setIntHeader(String name, int value) {
     super.setIntHeader(name, value);
-    tx.meta.setHeader(name, "" + value);
+    if (tx != null)
+      tx.headers.setHeader(name, Integer.toString(value));
   }
 
   /**

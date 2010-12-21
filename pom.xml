@@ -49,27 +49,14 @@
 
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>2.3.0</version>
-      <type>pom</type>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
       <version>2.3.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>3.5.1-Final</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-terracotta</artifactId>
-      <version>2.1.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -115,38 +102,43 @@
               ch.o2it.weblounge.common;version=${project.version},
               ch.o2it.weblounge.common.content;version=${project.version},
               ch.o2it.weblounge.common.impl.request;version=${project.version},
+              ch.o2it.weblounge.common.impl.url;version=${project.version},
+              ch.o2it.weblounge.common.impl.user;version=${project.version},
               ch.o2it.weblounge.common.impl.util.datatype;version=${project.version},
+              ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.request;version=${project.version},
+              ch.o2it.weblounge.common.site;version=${project.version},
+              ch.o2it.weblounge.common.user;version=${project.version},
+              org.apache.commons.io;version="1.4",
+              org.apache.commons.io.output;version="1.4",
               org.apache.commons.lang;version="2.4",
               org.slf4j;version="1.5.6",
               javax.servlet;version="2.5",
               javax.servlet.http;version="2.5",
+              net.sf.ehcache;version="2.3.0",
+              net.sf.ehcache.config;version="2.3.0",
               javax.management,
               javax.management.openmbean,
               javax.naming,
-              javax.transaction,
-              javax.transaction.xa, 
+              javax.transaction;resolution:=optional,
+              javax.transaction.xa;resolution:=optional, 
               javax.xml.parsers,
               org.xml.sax.helpers,
               org.osgi.service.cm;version="1.3.0",
-              org.osgi.service.component;version="1.1.0",
+              org.osgi.service.component;version="1.1.0"
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.cache.impl;version=${project.version}
             </Export-Package>
             <Private-Package>
               ch.o2it.weblounge.cache.impl.filter,
-              ch.o2it.weblounge.cache.impl.handle,
-              ch.o2it.weblounge.cache.impl.index,
-              net.sf.ehcache
+              ch.o2it.weblounge.cache.impl.handle
             </Private-Package>
             <Service-Component>
               OSGI-INF/cache-service.xml
             </Service-Component>
             <Embed-Dependency>
-              jtidy,
-              ehcache-core,
-              hibernate-core
+              jtidy
             </Embed-Dependency>
           </instructions>
         </configuration>
