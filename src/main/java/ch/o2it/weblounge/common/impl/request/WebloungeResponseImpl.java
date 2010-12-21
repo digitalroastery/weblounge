@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 public class WebloungeResponseImpl extends HttpServletResponseWrapper implements WebloungeResponse {
 
   /** Flag for invalidated responses that should not be cached */
-  private boolean isValid = false;
+  private boolean isValid = true;
 
   /** True if an error has been reported */
   private boolean hasError = false;
