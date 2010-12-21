@@ -230,6 +230,11 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     // Get the site dispatcher
     Site site = getSiteByRequest(httpRequest);
     Servlet siteServlet = sites.getSiteServlet(site);
+    
+    // Wrap for caching
+    if (cache != null) {
+      httpResponse = cache.createCacheableResponse(httpRequest, httpResponse);
+    }
 
     // Wrap request and response
     WebloungeRequestImpl request = new WebloungeRequestImpl(httpRequest, siteServlet);

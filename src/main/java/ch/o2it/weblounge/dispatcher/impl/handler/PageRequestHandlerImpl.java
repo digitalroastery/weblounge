@@ -227,6 +227,9 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, request, response);
         return true;
       }
+      
+      // Set the content type
+      response.setContentType("text/html");
 
       // Add additional cache tags
       response.addTag("webl:template", template.getIdentifier());
@@ -265,7 +268,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       if (action == null) {
         switch (processingMode) {
           case Cached:
-            response.endResponsePart();
+            response.endResponse();
             break;
           case Head:
             Http11Utils.endHeadResponse(response);
