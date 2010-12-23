@@ -71,7 +71,7 @@ public final class CacheEntry implements Serializable {
     this.handle = handle;
     this.content = content;
     this.headers = headers;
-    this.eTag = "\"WL-" + Long.toHexString(handle.getKey().hashCode() | entryCreationDate) + "\"";
+    this.eTag = "\"WL-" + Long.toHexString(entryCreationDate) + "\"";
   }
 
   /**
