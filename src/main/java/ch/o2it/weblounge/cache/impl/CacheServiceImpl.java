@@ -423,20 +423,38 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // If it exists, write the contents back to the response
     if (element != null && element.getValue() != null) {
       CacheEntry entry = (CacheEntry) element.getValue();
+      
+      long clientCacheDate = request.getDateHeader("If-Modified-Since");
+      long validTimeInSeconds = (element.getExpirationTime() - System.currentTimeMillis()) / 1000;
+      String eTag = request.getHeader("If-Match");
+      
       try {
 
         // Write the response headers
         response.setContentType(entry.getHeaders().getContentType());
         response.setContentLength(entry.getContent().length);
+        
         entry.getHeaders().apply(response);
+        
+        // Add cache control headers
+        response.setDateHeader("Date", System.currentTimeMillis());
+        response.setDateHeader("Expires", element.getExpirationTime());
+        response.setHeader("Cache-Control", "max-age=" + validTimeInSeconds + ", must-revalidate");
+        response.setHeader("Etag", entry.getETag());
         
         // Add the X-Cache-Key header
         StringBuffer cacheKeyHeader = new StringBuffer(site.getName());
         cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
         response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
 
-        // Write the response body
-        response.getOutputStream().write(entry.getContent());
+        // Check the headers first. Maybe we don't need to send anything but
+        // a not-modified back
+        if (entry.notModified(clientCacheDate) && entry.matches(eTag)) {
+          response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        } else {
+          response.getOutputStream().write(entry.getContent());
+        }
+
         response.flushBuffer();
 
         return null;

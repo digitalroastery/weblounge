@@ -23,6 +23,8 @@ package ch.o2it.weblounge.cache.impl;
 import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTag;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
 
 /**
@@ -41,6 +43,12 @@ public final class CacheEntry implements Serializable {
 
   /** The response metadata */
   private CachedHttpResponseHeaders headers = null;
+
+  /** Date where the entry was added to the cache */
+  private long entryCreationDate = System.currentTimeMillis();
+
+  /** The etag */
+  private String eTag = null;
 
   /**
    * Creates a new cache entry for the given handle, content and metadata.
@@ -63,6 +71,7 @@ public final class CacheEntry implements Serializable {
     this.handle = handle;
     this.content = content;
     this.headers = headers;
+    this.eTag = "\"WL-" + Long.toHexString(handle.getKey().hashCode() | entryCreationDate) + "\"";
   }
 
   /**
@@ -81,6 +90,24 @@ public final class CacheEntry implements Serializable {
    */
   public CacheTag[] getTags() {
     return handle.getTags();
+  }
+
+  /**
+   * Returns this entry's etag value.
+   * 
+   * @return the etag
+   */
+  public String getETag() {
+    return eTag;
+  }
+
+  /**
+   * Returns the date where this entry was created.
+   * 
+   * @return the creation date
+   */
+  public long getCreationDate() {
+    return entryCreationDate;
   }
 
   /**
@@ -125,6 +152,30 @@ public final class CacheEntry implements Serializable {
    */
   public byte[] getContent() {
     return content;
+  }
+
+  /**
+   * Returns <code>true</code> if date is not older than the creation date of
+   * this cache entry.
+   * 
+   * @param date
+   *          the date
+   * @return <code>true</code> if this entry is older or equally old
+   */
+  public boolean notModified(long date) {
+    return date >= entryCreationDate;
+  }
+
+  /**
+   * Returns <code>true</code> if <code>eTag</code> is either blank (not
+   * specified) or if it matches this entry's etag.
+   * 
+   * @param eTag
+   *          the etag
+   * @return <code>true</code> if the etag is either empty or matches
+   */
+  public boolean matches(String eTag) {
+    return StringUtils.isBlank(eTag) || this.eTag.equals(eTag);
   }
 
 }
