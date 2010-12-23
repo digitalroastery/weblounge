@@ -38,6 +38,6 @@ public interface Tag {
    * 
    * @return the value
    */
-  Object getValue();
+  String getValue();
 
 }

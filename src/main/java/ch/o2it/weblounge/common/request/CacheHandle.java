@@ -23,6 +23,7 @@ package ch.o2it.weblounge.common.request;
 import ch.o2it.weblounge.common.content.Taggable;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Identifies a cached object with a recheck and expiration time. Clients may
@@ -38,6 +39,13 @@ import java.io.Serializable;
  * @see ch.o2it.weblounge.common.Times
  */
 public interface CacheHandle extends Serializable, Taggable<CacheTag> {
+
+  /**
+   * Returns the key that is used to reference the entry in the cache.
+   * 
+   * @return the key
+   */
+  String getKey();
 
   /**
    * Returns the time the cached object expires in milliseconds. When that time
@@ -73,5 +81,12 @@ public interface CacheHandle extends Serializable, Taggable<CacheTag> {
    * @see ch.o2it.weblounge.common.Times
    */
   void setRecheck(long recheck);
+
+  /**
+   * Returns the tags in a set.
+   * 
+   * @return the set
+   */
+  Set<CacheTag> getTagSet();
 
 }

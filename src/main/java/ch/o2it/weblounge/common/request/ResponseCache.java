@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.request;
 
-import java.util.Set;
+import ch.o2it.weblounge.common.site.Site;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,18 +40,16 @@ import javax.servlet.http.HttpServletResponse;
  * (template) from scratch but could choose to reuse the cached pieces.
  * <p>
  * The two methods
- * {@link #startResponse(Iterable, WebloungeRequest, WebloungeResponse, long, long)}
- * and {@link #startResponsePart(Iterable, HttpServletResponse, long, long)} are
- * used to create an entry in the cache. They will return <code>null</code> if
- * the entry is already present, meaning that the cached version will be sent to
- * the client. If a <code>CacheHandle</code> is returned, then a new cache
+ * {@link #startResponse(CacheTag[], WebloungeRequest, WebloungeResponse, long, long)}
+ * and {@link #startResponsePart(CacheTag[], HttpServletResponse, long, long)}
+ * are used to create an entry in the cache. They will return <code>null</code>
+ * if the entry is already present, meaning that the cached version will be sent
+ * to the client. If a <code>CacheHandle</code> is returned, then a new cache
  * entry, identified by the handle, was created and the output written to the
  * response will be sent to both the cache and the client.
  * <p>
- * Note that the <code>Iterable&lt;Tag&gt;</code> is used to determine if an
- * entry is part of the cache or not, so in order to take advantage of the
- * cache, it is crucial that you tag your responses and their parts in a useful
- * manner.
+ * Note that in order to take advantage of the cache, it is crucial that you tag
+ * your responses and their parts in a useful manner.
  */
 public interface ResponseCache {
 
@@ -89,9 +87,8 @@ public interface ResponseCache {
    *          the recheck time in milliseconds
    * @return <code>null</code> if the content was found in the cache
    */
-  CacheHandle startResponse(Iterable<CacheTag> uniqueTags,
-      WebloungeRequest request, WebloungeResponse response, long validTime,
-      long recheckTime);
+  CacheHandle startResponse(CacheTag[] uniqueTags, WebloungeRequest request,
+      WebloungeResponse response, long validTime, long recheckTime);
 
   /**
    * Starts a cacheable response. By calling this method, a new response wrapper
@@ -134,7 +131,7 @@ public interface ResponseCache {
    * @param response
    *          the servlet response
    */
-  void invalidateResponse(WebloungeResponse response);
+  void invalidate(WebloungeResponse response);
 
   /**
    * Starts caching a sub portion of the current response, identified by a set
@@ -151,6 +148,8 @@ public interface ResponseCache {
    * 
    * @param uniqueTags
    *          the tag set identifying the response part
+   * @param request
+   *          the servlet requests
    * @param response
    *          the servlet response
    * @param validTime
@@ -160,8 +159,9 @@ public interface ResponseCache {
    * @return the <code>CacheHandle</code> of the response part or
    *         <code>null</code> if the response part was found in the cache
    */
-  CacheHandle startResponsePart(Iterable<CacheTag> uniqueTags,
-      HttpServletResponse response, long validTime, long recheckTime);
+  CacheHandle startResponsePart(CacheTag[] uniqueTags,
+      HttpServletRequest request, HttpServletResponse response, long validTime,
+      long recheckTime);
 
   /**
    * Starts caching a sub portion of the current response, identified by
@@ -198,19 +198,38 @@ public interface ResponseCache {
   void endResponsePart(CacheHandle handle, HttpServletResponse response);
 
   /**
-   * Tells the cache to throw away the data identified by the given set of tags.
-   * 
+   * Tells the cache of the given site to throw away the data identified by the
+   * given set of tags.
    * @param tags
    *          the set of tags
+   * @param site
+   *          the site
+   * 
+   * @return the handles of the removed elements
    */
-  Set<CacheHandle> invalidateEntry(Iterable<CacheTag> tags);
+  void invalidate(CacheTag[] tags, Site site);
 
   /**
-   * Tells the cache to throw away the data identified by <code>handle</code>.
-   * 
+   * Tells the cache of the given site to throw away the data identified by
+   * <code>handle</code>.
    * @param handle
    *          the cache data identifier
+   * @param site
+   *          the site
+   * 
+   * @return the handle or <code>null</code>
    */
-  Set<CacheHandle> invalidateEntry(CacheHandle handle);
+  void invalidate(CacheHandle handle, Site site);
+
+  /**
+   * Asks the cache to load those elements into memory that match at least the
+   * given set of tags.
+   * 
+   * @param site
+   *          the site
+   * @param tags
+   *          the tags to match
+   */
+  void preload(Site site, CacheTag[] tags);
 
 }

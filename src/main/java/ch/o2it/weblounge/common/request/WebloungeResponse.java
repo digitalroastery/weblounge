@@ -56,8 +56,8 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
    * @throws IllegalStateException
    *           if the response has already been started
    */
-  boolean startResponse(Iterable<CacheTag> uniqueTags, long validTime,
-      long recheckTime) throws IllegalStateException;
+  boolean startResponse(CacheTag[] uniqueTags, long validTime, long recheckTime)
+      throws IllegalStateException;
 
   /**
    * Tell the cache service that writing the response to the client is now
@@ -96,7 +96,7 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
    * @return <code>true</code> if the response part was found in the cache,
    *         false otherwise
    */
-  boolean startResponsePart(Iterable<CacheTag> uniqueTags, long validTime,
+  boolean startResponsePart(CacheTag[] uniqueTags, long validTime,
       long recheckTime);
 
   /**
@@ -145,7 +145,7 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
    * <p>
    * <b>Note:</b> Call <code>super.sendError(error, msg)<code> when
    * overwriting this method. Otherwise the system will not be able to
-	 * handle the notification of request listeners.
+   * handle the notification of request listeners.
    * 
    * @param error
    *          the HTTP error code
@@ -161,7 +161,7 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
    * <p>
    * <b>Note:</b> Call <code>super.sendError(error, msg)<code> when
    * overwriting this method. Otherwise the system will not be able to
-	 * handle the notification of request listeners.
+   * handle the notification of request listeners.
    * 
    * @param error
    *          the HTTP error code

@@ -49,7 +49,7 @@ public interface Taggable<T extends Tag> {
    *          the tag value
    * @return <code>true</code> if the tag could be inserted
    */
-  boolean addTag(String name, Object value);
+  boolean addTag(String name, String value);
 
   /**
    * Adds those tags from <code>tags</code> to the tag set that are not already

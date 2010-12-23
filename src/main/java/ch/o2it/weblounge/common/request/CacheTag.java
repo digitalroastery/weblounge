@@ -29,16 +29,17 @@ import ch.o2it.weblounge.common.content.Tag;
 public interface CacheTag extends Tag {
 
   /** Special object representing the "any" value */
-  Object ANY = new Object();
+  String ANY = "*";
 
-  String Url = "webl:url";
-  String Language = "webl:language";
-  String User = "webl:user";
-  String Module = "webl:module";
-  String Action = "webl:action";
-  String Site = "webl:site";
-  String Parameters = "webl:parameters";
-  String Position = "webl:position";
-  String Renderer = "webl:renderer";
+  String Url = "url";
+  String Language = "language";
+  String User = "user";
+  String Module = "module";
+  String Action = "action";
+  String Site = "site";
+  String Parameters = "parameters";
+  String Composer = "composer";
+  String Position = "position";
+  String Renderer = "renderer";
 
 }
