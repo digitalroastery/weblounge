@@ -37,7 +37,7 @@ final class CacheOutputStream extends ServletOutputStream {
 
   /** Write position in the output buffer */
   private int pos = 0;
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -80,12 +80,14 @@ final class CacheOutputStream extends ServletOutputStream {
   }
 
   /**
-   * Returns the raw output buffer.
+   * Returns the content of this stream as a byte array.
    * 
-   * @return the output buffer
+   * @return the content
    */
-  byte[] getBuffer() {
-    return buf;
+  byte[] getContent() {
+    byte newbuf[] = new byte[pos];
+    System.arraycopy(buf, 0, newbuf, 0, pos);
+    return newbuf;
   }
 
 }

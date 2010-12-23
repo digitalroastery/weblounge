@@ -98,7 +98,7 @@ final class CacheTransaction {
    * @return the content
    */
   byte[] getContent() {
-    return os.getBuffer();
+    return os.getContent();
   }
 
   /**

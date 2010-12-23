@@ -163,4 +163,13 @@ final class CachedHttpResponseHeaders implements Serializable {
     return original;
   }
 
+  /**
+   * Returns the number of headers.
+   * 
+   * @return the number of headers
+   */
+  public int size() {
+    return headers.size();
+  }
+
 }
