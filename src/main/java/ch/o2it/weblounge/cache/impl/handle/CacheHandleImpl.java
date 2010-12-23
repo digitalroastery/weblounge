@@ -22,13 +22,15 @@ package ch.o2it.weblounge.cache.impl.handle;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
+import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTag;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -39,26 +41,69 @@ import java.util.Set;
  */
 public abstract class CacheHandleImpl implements CacheHandle {
 
+  /** The serial version uid */
+  private static final long serialVersionUID = 924532419150524805L;
+
+  /** The key */
+  protected String key = null;
+
   /** The expiration time of the cached object. */
-  private long expires;
+  protected long expires;
 
   /** The recheck time of the cached object */
-  private long recheck;
+  protected long recheck;
 
   /** the set of cache tags */
-  private Set<CacheTag> tags = new HashSet<CacheTag>();
+  protected CacheTagSet tags = new CacheTagSet();
 
   /**
    * Creates a new CacheHandle that expires at the given time.
+   * 
+   * @param key
+   *          the key into the cache
+   * @param expires
+   *          the relative expiration time of the cached object
+   * @param recheck
+   *          the time the cached element has to be checked for modifications.
+   */
+  public CacheHandleImpl(String key, long expires, long recheck) {
+    this(expires, recheck);
+    if (StringUtils.isBlank(key))
+      throw new IllegalArgumentException("Key cannot be null");
+    this.key = key;
+  }
+
+  /**
+   * Creates a new CacheHandle that expires at the given time. Make sure to set
+   * the key as soon as possible.
    * 
    * @param expires
    *          the relative expiration time of the cached object
    * @param recheck
    *          the time the cached element has to be checked for modifications.
    */
-  public CacheHandleImpl(long expires, long recheck) {
+  protected CacheHandleImpl(long expires, long recheck) {
     setRecheck(recheck);
     setExpires(expires);
+  }
+
+  /**
+   * Sets the key.
+   * 
+   * @param key
+   *          the key
+   */
+  protected void setKey(String key) {
+    this.key = key;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.request.CacheHandle#getKey()
+   */
+  public String getKey() {
+    return key;
   }
 
   /**
@@ -100,6 +145,15 @@ public abstract class CacheHandleImpl implements CacheHandle {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.CacheHandle#getTagSet()
+   */
+  public Set<CacheTag> getTagSet() {
+    return tags;
+  }
+  
+  /**
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -113,9 +167,9 @@ public abstract class CacheHandleImpl implements CacheHandle {
 
   /**
    * @see ch.o2it.weblounge.api.util.Taggable#addTag(java.lang.String,
-   *      java.lang.Object)
+   *      ava.lang.String)
    */
-  public boolean addTag(String key, Object value) {
+  public boolean addTag(String key, String value) {
     return tags.add(new CacheTagImpl(key, value));
   }
 

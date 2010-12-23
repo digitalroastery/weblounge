@@ -20,6 +20,9 @@
 
 package ch.o2it.weblounge.cache.impl;
 
+import ch.o2it.weblounge.common.request.CacheHandle;
+import ch.o2it.weblounge.common.request.CacheTag;
+
 import java.io.Serializable;
 
 /**
@@ -30,6 +33,9 @@ public final class CacheEntry implements Serializable {
   /** Serial version uid */
   private static final long serialVersionUID = 5694887351734158681L;
 
+  /** The cache handle */
+  private CacheHandle handle = null;
+
   /** The content buffer */
   private byte[] content;
 
@@ -37,21 +43,70 @@ public final class CacheEntry implements Serializable {
   private CachedHttpResponseHeaders headers = null;
 
   /**
-   * Creates a new cache handle with the given expiration and recheck time, the
-   * content and the metadata.
+   * Creates a new cache entry for the given handle, content and metadata.
    * 
    * @param content
    *          the content
    * @param headers
    *          the metadata
+   * @throws IllegalArgumentException
+   *           if the content or the headers collection is <code>null</code>
    */
-  protected CacheEntry(byte[] content, CachedHttpResponseHeaders headers) {
+  protected CacheEntry(CacheHandle handle, byte[] content,
+      CachedHttpResponseHeaders headers) {
+    if (handle == null)
+      throw new IllegalArgumentException("Handle cannot be null");
     if (content == null)
       throw new IllegalArgumentException("Content cannot be null");
     if (headers == null)
       throw new IllegalArgumentException("Headers cannot be null");
+    this.handle = handle;
     this.content = content;
     this.headers = headers;
+  }
+
+  /**
+   * Returns the key for this entry.
+   * 
+   * @return the key
+   */
+  public String getKey() {
+    return handle.getKey();
+  }
+
+  /**
+   * Returns the tags for this entry.
+   * 
+   * @return the tags
+   */
+  public CacheTag[] getTags() {
+    return handle.getTags();
+  }
+
+  /**
+   * Returns <code>true</code> if the entry is tagged with <code>tag</code>.
+   * 
+   * @param tag
+   *          the tag
+   * @return <code>true</code> if the entry is tagged
+   */
+  public boolean containsTag(CacheTag tag) {
+    if (handle.getTags() == null)
+      return false;
+    for (CacheTag t : handle.getTags()) {
+      if (t.equals(tag))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns the entry's handle.
+   * 
+   * @return the handle
+   */
+  public CacheHandle getHandle() {
+    return handle;
   }
 
   /**

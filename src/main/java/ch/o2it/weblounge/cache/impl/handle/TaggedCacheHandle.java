@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTag;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,16 +39,19 @@ import java.util.TreeSet;
  */
 public class TaggedCacheHandle extends CacheHandleImpl {
 
-  /** the default expiration time for a page */
+  /** Serial version uid */
+  private static final long serialVersionUID = 8931343734889324271L;
+
+  /** The default expiration time for a page */
   protected static final long DEFAULT_EXPIRES = Times.MS_PER_DAY;
 
-  /** the default recheck time for a page */
+  /** The default recheck time for a page */
   protected static final long DEFAULT_RECHECK = Times.MS_PER_HOUR;
 
-  /** the hash code */
+  /** The hash code */
   private int hashCode;
 
-  /** the unique tag set of this cache handle */
+  /** The unique tag set of this cache handle */
   private Tag[] primaryTags;
 
   /**
@@ -61,8 +65,9 @@ public class TaggedCacheHandle extends CacheHandleImpl {
    *          number of milliseconds that this handle is likely to need to be
    *          rechecked
    */
-  public TaggedCacheHandle(Iterable<CacheTag> primary, long expires, long recheck) {
+  public TaggedCacheHandle(CacheTag[] primary, long expires, long recheck) {
     super(expires, recheck);
+    setKey(createKey(primary));
     Set<Tag> s = new TreeSet<Tag>(new TagComparator());
     hashCode = 0;
     for (CacheTag t : primary) {
@@ -127,6 +132,35 @@ public class TaggedCacheHandle extends CacheHandleImpl {
   }
 
   /**
+   * Creates the key out of the set of tags. Note that the <code>site</code> tag
+   * is skipped since this cache implementation uses a separate cache per site
+   * anyway.
+   * 
+   * @param tags
+   *          the tags
+   * @return the key
+   */
+  protected String createKey(CacheTag[] tags) {
+    if (tags == null || tags.length == 0)
+      throw new IllegalArgumentException("Tags must not be null or empty");
+
+    StringBuffer key = new StringBuffer();
+
+    // Build the key
+    Set<CacheTag> s = new TreeSet<CacheTag>(new TagComparator());
+    s.addAll(Arrays.asList(tags));
+    for (CacheTag tag : s) {
+      if (CacheTag.Site.equals(tag.getName()))
+        continue;
+      if (key.length() > 0)
+        key.append("; ");
+      key.append(tag.getName()).append("=").append(tag.getValue());
+    }
+
+    return key.toString();
+  }
+
+  /**
    * @see ch.o2it.weblounge.cache.CacheHandle.cache.CacheHandle#hashCode()
    */
   @Override
@@ -173,4 +207,5 @@ public class TaggedCacheHandle extends CacheHandleImpl {
     }
 
   }
+
 }

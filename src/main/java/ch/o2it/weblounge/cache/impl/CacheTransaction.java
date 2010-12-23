@@ -22,9 +22,7 @@ package ch.o2it.weblounge.cache.impl;
 
 import ch.o2it.weblounge.cache.StreamFilter;
 import ch.o2it.weblounge.common.request.CacheHandle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import ch.o2it.weblounge.common.request.CacheTag;
 
 /**
  * Represents a transaction in the response cache. A transaction keeps track of
@@ -34,28 +32,22 @@ import javax.servlet.http.HttpServletResponse;
 final class CacheTransaction {
 
   /** The main cache handle for this transaction */
-  CacheHandle hnd = null;
-
-  /** The response that accepts the result of this transaction */
-  HttpServletResponse resp = null;
+  private CacheHandle hnd = null;
 
   /** The associated cache output stream */
-  CacheOutputStream os = new CacheOutputStream();
+  private CacheOutputStream os = new CacheOutputStream();
 
   /** The cached response meta info */
-  CachedHttpResponseHeaders headers = new CachedHttpResponseHeaders();
+  private CachedHttpResponseHeaders headers = new CachedHttpResponseHeaders();
 
   /** The output filter */
-  StreamFilter filter = null;
+  private StreamFilter filter = null;
 
   /** True if the transaction has been invalidated */
-  boolean invalidated = false;
+  private boolean valid = true;
 
   /** The cache identifier */
-  String cache = null;
-
-  /** Key into the cache */
-  String cacheKey = null;
+  private String cache = null;
 
   /**
    * Creates a new transaction for the given handle, request and response. Any
@@ -64,18 +56,94 @@ final class CacheTransaction {
    * 
    * @param hnd
    *          the cache handle
-   * @param req
-   *          the servlet request
-   * @param resp
-   *          the servlet response
    * @param filter
    *          the filter
    */
-  CacheTransaction(CacheHandle hnd, HttpServletRequest req,
-      HttpServletResponse resp, StreamFilter filter) {
+  CacheTransaction(CacheHandle hnd, String cache, StreamFilter filter) {
     this.hnd = hnd;
-    this.resp = resp;
+    this.cache = cache;
     this.filter = filter;
+  }
+
+  /**
+   * Returns the cache handle.
+   * 
+   * @return the handle
+   */
+  CacheHandle getHandle() {
+    return hnd;
+  }
+
+  /**
+   * Returns the cache identifier.
+   * 
+   * @return the cache
+   */
+  String getCache() {
+    return cache;
+  }
+
+  /**
+   * Returns the transaction's output stream.
+   * 
+   * @return the output stream
+   */
+  CacheOutputStream getOutputStream() {
+    return os;
+  }
+
+  /**
+   * Returns the content that was written to the output stream.
+   * 
+   * @return the content
+   */
+  byte[] getContent() {
+    return os.getBuffer();
+  }
+
+  /**
+   * Returns the headers that were written to the response.
+   * 
+   * @return the response headers
+   */
+  CachedHttpResponseHeaders getHeaders() {
+    return headers;
+  }
+
+  /**
+   * Returns the transaction's tags.
+   * 
+   * @return the tags
+   */
+  CacheTag[] getTags() {
+    return hnd.getTags();
+  }
+
+  /**
+   * Returns the installed stream filter.
+   * 
+   * @return the filter
+   */
+  StreamFilter getFilter() {
+    return filter;
+  }
+
+  /**
+   * Marks this transaction as invalidated, which means that it's content will
+   * not be stored in the cache.
+   */
+  void invalidate() {
+    valid = false;
+  }
+
+  /**
+   * Returns <code>true</code> if this transaction is valid and it's content
+   * should be added to the cache.
+   * 
+   * @return <code>true</code> if this transaction is valid
+   */
+  boolean isValid() {
+    return valid;
   }
 
 }

@@ -21,18 +21,16 @@
 package ch.o2it.weblounge.cache.impl;
 
 import ch.o2it.weblounge.cache.CacheService;
+import ch.o2it.weblounge.cache.StreamFilter;
 import ch.o2it.weblounge.cache.impl.handle.TaggedCacheHandle;
-import ch.o2it.weblounge.common.ConfigurationException;
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.url.PathUtils;
-import ch.o2it.weblounge.common.impl.user.Guest;
-import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -40,6 +38,10 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
 import org.apache.commons.io.IOUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -48,13 +50,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
@@ -78,26 +76,56 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Path to cache configuration */
   private static final String CACHE_MANAGER_CONFIG = "/ehcache/config.xml";
 
+  /** Name of the weblounge cache header */
+  private static final String CACHE_KEY_HEADER = "X-Cache-Key";
+
+  /** Service pid, used to look up the service configuration */
+  public static final String SERVICE_PID = "ch.o2it.weblounge.cache";
+
+  /** Configuration key prefix for content repository configuration */
+  public static final String OPT_PREFIX = "cache";
+
+  /** Configuration key for the persistence of the cache */
+  public static final String OPT_DISK_PERSISTENT = OPT_PREFIX + ".diskPersistent";
+
   /** The default value for "disk persistent" configuration property */
-  private static final boolean DEFAULT_DISK_PERSISTENT = true;
+  private static final boolean DEFAULT_DISK_PERSISTENT = false;
+
+  /** Configuration key for the overflow to disk setting */
+  public static final String OPT_OVERFLOW_TO_DISK = OPT_PREFIX + ".overflowToDisk";
 
   /** The default value for "overflow to disk" configuration property */
   private static final boolean DEFAULT_OVERFLOW_TO_DISK = true;
 
+  /** Configuration key for the statistics setting */
+  public static final String OPT_ENABLE_STATISTICS = OPT_PREFIX + ".statistics";
+
   /** The default value for "statistics enabled" configuration property */
   private static final boolean DEFAULT_STATISTICS_ENABLED = true;
+
+  /** Configuration key for the maximum number of elements in memory */
+  public static final String OPT_MAX_ELEMENTS_IN_MEMORY = OPT_PREFIX + ".maxElementsInMemory";
 
   /** The default value for "max elements in memory" configuration property */
   private static final int DEFAULT_MAX_ELEMENTS_IN_MEMORY = 1000;
 
+  /** Configuration key for the maximum number of elements on disk */
+  public static final String OPT_MAX_ELEMENTS_ON_DISK = OPT_PREFIX + ".maxElementsOnDisk";
+
   /** The default value for "max elements on disk" configuration property */
-  private static final int DEFAULT_MAX_ELEMENTS_ON_DISK = 10000;
+  private static final int DEFAULT_MAX_ELEMENTS_ON_DISK = 0;
+
+  /** Configuration key for the time to idle setting */
+  public static final String OPT_TIME_TO_IDLE = OPT_PREFIX + ".timeToIdle";
 
   /** The default value for "seconds to idle" configuration property */
-  private static final int DEFAULT_TIME_TO_IDLE = (int) (Times.MS_PER_HOUR * 1000);
+  private static final int DEFAULT_TIME_TO_IDLE = 0;
+
+  /** Configuration key for the time to live setting */
+  public static final String OPT_TIME_TO_LIVE = OPT_PREFIX + ".timeToLive";
 
   /** The default value for "seconds to live" configuration property */
-  private static final int DEFAULT_TIME_TO_LIVE = (int) (Times.MS_PER_DAY * 1000);
+  private static final int DEFAULT_TIME_TO_LIVE = (int) (Times.MS_PER_DAY / 1000);
 
   /** Make the cache persistent between reboots? */
   protected boolean diskPersistent = DEFAULT_DISK_PERSISTENT;
@@ -123,6 +151,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** The ehache cache manager */
   private CacheManager cacheManager = null;
 
+  /** The stream filter */
+  private StreamFilter filter = null;
+
   /**
    * Creates a new cache service.
    */
@@ -145,7 +176,23 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *           if component activation fails
    */
   void activate(ComponentContext context) throws Exception {
-    // TODO: Get and apply cache configuration
+    BundleContext bundleContext = context.getBundleContext();
+
+    logger.info("Starting cache service");
+
+    // Try to get hold of the service configuration
+    ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
+    if (configAdminRef != null) {
+      ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(configAdminRef);
+      Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
+      if (config != null) {
+        updated(config);
+      } else {
+        logger.debug("No customized configuration found for cache");
+      }
+    } else {
+      logger.debug("No configuration admin service found while looking for cache configuration");
+    }
   }
 
   /**
@@ -174,21 +221,74 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @SuppressWarnings("rawtypes")
-  public void updated(Dictionary properties)
-      throws org.osgi.service.cm.ConfigurationException {
+  public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
 
-    // Filter options
-    String filters = (String) properties.get("filters");
+    // Disk persistence
+    diskPersistent = ConfigurationUtils.isTrue((String) properties.get(OPT_DISK_PERSISTENT), DEFAULT_DISK_PERSISTENT);
+    logger.debug("Cache persistance between reboots is {}", diskPersistent ? "on" : "off");
+
+    // Statistics
+    statisticsEnabled = ConfigurationUtils.isTrue((String) properties.get(OPT_ENABLE_STATISTICS), DEFAULT_STATISTICS_ENABLED);
+    logger.debug("Cache statistics are {}", statisticsEnabled ? "enabled" : "disabled");
+
+    // Max elements in memory
     try {
-      if (filters != null) {
-        // TODO: Configure cache filters
-      }
-    } catch (Exception e) {
-      throw new ConfigurationException("Error configuring the cache filters: " + e.getMessage(), e);
+      maxElementsInMemory = ConfigurationUtils.getValue((String) properties.get(OPT_MAX_ELEMENTS_IN_MEMORY), DEFAULT_MAX_ELEMENTS_IN_MEMORY);
+      logger.debug("Cache will keep {} elements in memory", maxElementsInMemory > 0 ? "up to " + maxElementsInMemory : "all");
+    } catch (NumberFormatException e) {
+      logger.warn("Value for cache setting '" + OPT_MAX_ELEMENTS_IN_MEMORY + "' is malformed: " + (String) properties.get(OPT_MAX_ELEMENTS_IN_MEMORY));
+      logger.warn("Cache setting '" + OPT_MAX_ELEMENTS_IN_MEMORY + "' set to default value of " + DEFAULT_MAX_ELEMENTS_IN_MEMORY);
+      maxElementsInMemory = DEFAULT_MAX_ELEMENTS_IN_MEMORY;
     }
 
+    // Max elements on disk
+    try {
+      maxElementsOnDisk = ConfigurationUtils.getValue((String) properties.get(OPT_MAX_ELEMENTS_ON_DISK), DEFAULT_MAX_ELEMENTS_ON_DISK);
+      logger.debug("Cache will keep {} elements on disk", maxElementsOnDisk > 0 ? "up to " + maxElementsOnDisk : "all");
+    } catch (NumberFormatException e) {
+      logger.warn("Value for cache setting '" + OPT_MAX_ELEMENTS_ON_DISK + "' is malformed: " + (String) properties.get(OPT_MAX_ELEMENTS_ON_DISK));
+      logger.warn("Cache setting '" + OPT_MAX_ELEMENTS_ON_DISK + "' set to default value of " + DEFAULT_MAX_ELEMENTS_ON_DISK);
+      maxElementsOnDisk = DEFAULT_MAX_ELEMENTS_ON_DISK;
+    }
+
+    // Overflow to disk
+    overflowToDisk = ConfigurationUtils.isTrue((String) properties.get(OPT_OVERFLOW_TO_DISK), DEFAULT_OVERFLOW_TO_DISK);
+
+    // Time to idle
+    try {
+      timeToIdle = ConfigurationUtils.getValue((String) properties.get(OPT_TIME_TO_IDLE), DEFAULT_TIME_TO_IDLE);
+      logger.debug("Cache time to idle is set to ", timeToIdle > 0 ? timeToIdle + "s" : "unlimited");
+    } catch (NumberFormatException e) {
+      logger.warn("Value for cache setting '" + OPT_TIME_TO_IDLE + "' is malformed: " + (String) properties.get(OPT_TIME_TO_IDLE));
+      logger.warn("Cache setting '" + OPT_TIME_TO_IDLE + "' set to default value of " + DEFAULT_TIME_TO_IDLE);
+      timeToIdle = DEFAULT_TIME_TO_IDLE;
+    }
+
+    // Time to live
+    try {
+      timeToLive = ConfigurationUtils.getValue((String) properties.get(OPT_TIME_TO_LIVE), DEFAULT_TIME_TO_LIVE);
+      logger.debug("Cache time to live is set to ", timeToIdle > 0 ? timeToLive + "s" : "unlimited");
+    } catch (NumberFormatException e) {
+      logger.warn("Value for cache setting '" + OPT_TIME_TO_LIVE + "' is malformed: " + (String) properties.get(OPT_TIME_TO_LIVE));
+      logger.warn("Cache setting '" + OPT_TIME_TO_LIVE + "' set to default value of " + DEFAULT_TIME_TO_LIVE);
+      timeToLive = DEFAULT_TIME_TO_LIVE;
+    }
+
+    for (String cacheId : cacheManager.getCacheNames()) {
+      Cache cache = cacheManager.getCache(cacheId);
+      if (cache == null)
+        continue;
+      CacheConfiguration config = cache.getCacheConfiguration();
+      config.setDiskPersistent(diskPersistent);
+      config.setStatistics(statisticsEnabled);
+      config.setMaxElementsInMemory(maxElementsInMemory);
+      config.setMaxElementsOnDisk(maxElementsOnDisk);
+      config.setOverflowToDisk(overflowToDisk);
+      config.setTimeToIdleSeconds(timeToIdle);
+      config.setTimeToLiveSeconds(timeToLive);
+    }
   }
 
   /**
@@ -216,6 +316,63 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.request.ResponseCache#preload(ch.o2it.weblounge.common.site.Site,
+   *      ch.o2it.weblounge.common.request.CacheTag[])
+   */
+  public void preload(Site site, CacheTag[] tags) {
+    if (site == null)
+      throw new IllegalArgumentException("Site cannot be null");
+    if (tags == null || tags.length == 0)
+      throw new IllegalArgumentException("Tags cannot be null or empty");
+
+    String cacheId = site.getIdentifier();
+    Cache cache = cacheManager.getCache(cacheId);
+    if (cache == null)
+      throw new IllegalStateException("Cache '" + cacheId + "' is not online");
+
+    // Get the matching keys and load the elements into the cache
+    Collection<Object> keys = getKeys(cache, tags);
+    for (Object key : keys) {
+      cache.load(key);
+    }
+    logger.info("Loaded first {} elements of cache '{}' into memory", keys.size(), cacheId);
+  }
+
+  /**
+   * Returns those keys from the given cache that contain at least all the tags
+   * as defined in the <code>tags</code> array.
+   * 
+   * @param cache
+   *          the cache
+   * @param tags
+   *          the set of tags
+   * @return the collection of matching keys
+   */
+  private Collection<Object> getKeys(Cache cache, CacheTag[] tags) {
+    // Create the parts of the key to look for
+    List<String> keyParts = new ArrayList<String>(tags.length);
+    for (CacheTag tag : tags) {
+      StringBuffer b = new StringBuffer(tag.getName()).append(":").append(tag.getValue());
+      keyParts.add(b.toString());
+    }
+
+    // Collect those keys that contain all relevant parts
+    Collection<Object> keys = new ArrayList<Object>();
+    key: for (Object k : cache.getKeys()) {
+      String key = k.toString();
+      for (String keyPart : keyParts) {
+        if (!key.contains(keyPart))
+          continue key;
+      }
+      keys.add(k);
+    }
+
+    return keys;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.request.ResponseCache#createCacheableResponse(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
@@ -227,11 +384,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponse(java.lang.Iterable,
+   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponse(ch.o2it.weblounge.common.request.CacheTag[],
    *      ch.o2it.weblounge.common.request.WebloungeRequest,
    *      ch.o2it.weblounge.common.request.WebloungeResponse, long, long)
    */
-  public CacheHandle startResponse(Iterable<CacheTag> uniqueTags,
+  public CacheHandle startResponse(CacheTag[] uniqueTags,
       WebloungeRequest request, WebloungeResponse response, long validTime,
       long recheckTime) {
     CacheHandle hdl = new TaggedCacheHandle(uniqueTags, validTime, recheckTime);
@@ -261,8 +418,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       throw new IllegalStateException("No cache found for site '" + site + "'");
 
     // Try to load the content from the cache
-    String cacheKey = createKey(request);
-    Element element = cache.get(cacheKey);
+    Element element = cache.get(handle.getKey());
 
     // If it exists, write the contents back to the response
     if (element != null && element.getValue() != null) {
@@ -274,6 +430,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         response.setContentLength(entry.getContent().length);
         entry.getHeaders().apply(response);
         
+        // Add the X-Cache-Key header
+        StringBuffer cacheKeyHeader = new StringBuffer(site.getName());
+        cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
+        response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
+
         // Write the response body
         response.getOutputStream().write(entry.getContent());
         response.flushBuffer();
@@ -285,10 +446,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       }
     }
 
-    cacheableResponse.startTransaction(handle, request, response, null);
-    cacheableResponse.tx.hnd = handle;
-    cacheableResponse.tx.cache = cacheId;
-    cacheableResponse.tx.cacheKey = cacheKey;
+    cacheableResponse.startTransaction(handle, cacheId, filter);
     return handle;
   }
 
@@ -306,13 +464,13 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     CacheTransaction transaction = cacheableResponse.endOutput();
 
     // Is the response ready to be cached?
-    if (transaction == null || transaction.invalidated || !response.isValid()) {
+    if (transaction == null || !transaction.isValid() || !response.isValid()) {
       logger.debug("Response to {} was invalid and is not cached", response);
       return false;
     }
 
     // Make sure the cache is still available
-    Cache cache = cacheManager.getCache(transaction.cache);
+    Cache cache = cacheManager.getCache(transaction.getCache());
     if (cache == null) {
       logger.debug("Cache for {} disappeared, response is not cached", response);
       return false;
@@ -320,8 +478,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Write the entry to the cache
     logger.trace("Writing response for {} to the cache", response);
-    CacheEntry entry = new CacheEntry(transaction.os.getBuffer(), transaction.headers);
-    Element element = new Element(transaction.cacheKey, entry);
+    CacheEntry entry = new CacheEntry(transaction.getHandle(), transaction.getContent(), transaction.getHeaders());
+    Element element = new Element(entry.getKey(), entry);
     cache.put(element);
 
     return true;
@@ -330,26 +488,33 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateResponse(ch.o2it.weblounge.common.request.WebloungeResponse)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidate(ch.o2it.weblounge.common.request.WebloungeResponse)
    */
-  public void invalidateResponse(WebloungeResponse response) {
+  public void invalidate(WebloungeResponse response) {
     CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
     if (cacheableResponse == null)
       return;
-    cacheableResponse.tx.invalidated = true;
+    cacheableResponse.invalidate();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponsePart(java.lang.Iterable,
+   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponsePart(ch.o2it.weblounge.common.request.CacheTag[],
+   *      javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse, long, long)
    */
-  public CacheHandle startResponsePart(Iterable<CacheTag> uniqueTags,
-      HttpServletResponse response, long validTime, long recheckTime) {
-     CacheHandle hdl = new TaggedCacheHandle(uniqueTags, validTime,
-     recheckTime);
-     return startResponsePart(hdl, response) ? null : hdl;
+  public CacheHandle startResponsePart(CacheTag[] uniqueTags,
+      HttpServletRequest request, HttpServletResponse response, long validTime,
+      long recheckTime) {
+
+    // Is this a valid response?
+    CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
+    if (cacheableResponse == null)
+      return null;
+
+    CacheHandle hdl = new TaggedCacheHandle(uniqueTags, validTime, recheckTime);
+    return startResponsePart(hdl, response) ? null : hdl;
   }
 
   /**
@@ -360,14 +525,14 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public boolean startResponsePart(CacheHandle handle,
       HttpServletResponse response) {
-    
+
     // Is this a valid response?
     CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
     if (cacheableResponse == null)
       return false;
 
-    // Adjust the transaction handle's recheck and valid time 
-    CacheHandle responseHnd = cacheableResponse.tx.hnd;
+    // Adjust the transaction handle's recheck and valid time
+    CacheHandle responseHnd = cacheableResponse.tx.getHandle();
     if (handle.getExpires() < responseHnd.getExpires())
       responseHnd.setExpires(handle.getExpires());
     if (handle.getRecheck() < responseHnd.getRecheck())
@@ -389,21 +554,51 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateEntry(java.lang.Iterable)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidate(ch.o2it.weblounge.common.request.CacheTag[],
+   *      ch.o2it.weblounge.common.site.Site)
    */
-  public Set<CacheHandle> invalidateEntry(Iterable<CacheTag> tags) {
-    // TODO: Invalidate the entry
-    return null;
+  public void invalidate(CacheTag[] tags, Site site) {
+    if (tags == null || tags.length == 0)
+      throw new IllegalArgumentException("Tags cannot be null or empty");
+    if (site == null)
+      throw new IllegalArgumentException("Site cannot be null");
+
+    // Load the cache
+    String cacheId = site.getIdentifier();
+    Cache cache = cacheManager.getCache(cacheId);
+    if (cache == null)
+      throw new IllegalStateException("Cache '" + cacheId + "' is not online");
+
+    // Remove the objects matched by the tags
+    long removed = 0;
+    for (Object key : getKeys(cache, tags)) {
+      if (cache.remove(key))
+        removed++;
+    }
+
+    logger.debug("Removed {} elements from cache '{}'", removed, cacheId);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidateEntry(ch.o2it.weblounge.common.request.CacheHandle)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidate(ch.o2it.weblounge.common.request.CacheHandle,
+   *      ch.o2it.weblounge.common.site.Site)
    */
-  public Set<CacheHandle> invalidateEntry(CacheHandle handle) {
-    // TODO: Invalidate the entry
-    return null;
+  public void invalidate(CacheHandle handle, Site site) {
+    if (handle == null)
+      throw new IllegalArgumentException("Handle cannot be null");
+    if (site == null)
+      throw new IllegalArgumentException("Site cannot be null");
+
+    // Load the cache
+    String cacheId = site.getIdentifier();
+    Cache cache = cacheManager.getCache(cacheId);
+    if (cache == null)
+      throw new IllegalStateException("Cache '" + cacheId + "' is not online");
+
+    cache.remove(handle.getKey());
+    logger.debug("Removed {} from cache '{}'", handle.getKey(), cacheId);
   }
 
   /**
@@ -451,18 +646,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     cacheConfig.setTimeToLiveSeconds(timeToLive);
 
     Cache cache = new Cache(cacheConfig);
-    cacheManager.addCache(siteId);
+    cacheManager.addCache(cache);
     if (overflowToDisk)
       logger.info("Cache for site '{}' created at {}", siteId, cacheManager.getDiskStorePath());
     else
       logger.info("In-memory cache for site '{}' created");
-
-    // Warm the cache by loading the home uri in all languages
-    User guest = new Guest();
-    for (Language language : site.getLanguages()) {
-      String cacheKey = createKey(cacheFile, guest, language, null);
-      cache.load(cacheKey);
-    }
   }
 
   /**
@@ -483,72 +671,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     cache.dispose();
     cacheManager.removeCache(siteId);
     logger.info("Cache for site '{}' removed", siteId);
-  }
-
-  /**
-   * Returns the cache key for the given request.
-   * 
-   * @param request
-   *          the request
-   * @return the cache key
-   */
-  protected String createKey(WebloungeRequest request) {
-    String uri = request.getPathInfo();
-    if (uri == null)
-      uri = "/";
-    User user = request.getUser();
-    Language language = request.getLanguage();
-    Map<String, String> params = new HashMap<String, String>();
-    Enumeration<?> ne = request.getParameterNames();
-    while (ne.hasMoreElements()) {
-      String name = (String) ne.nextElement();
-      String[] values = request.getParameterValues(name);
-      if (values.length == 1) {
-        params.put(name, values[0]);
-      } else {
-        int i = 0;
-        for (String value : values) {
-          params.put(name + "-" + i, value);
-        }
-      }
-    }
-    return createKey(uri, user, language, params);
-  }
-
-  /**
-   * Returns the cache key for the given url, user, language and request
-   * parameters.
-   * 
-   * @param uri
-   *          the request uri
-   * @param user
-   *          the requesting user
-   * @param language
-   *          the request language
-   * @param params
-   *          the request parameters
-   * @return the cache key
-   */
-  protected String createKey(String uri, User user, Language language,
-      Map<String, String> params) {
-    StringBuffer buf = new StringBuffer(uri);
-    buf.append("?user=").append(user.getLogin());
-    buf.append("&language=").append(language.getIdentifier());
-
-    // Parameters need to be sorted by key, otherwise we'll get a cache miss
-    // simply because the arguments were specified in a different order
-    if (params != null) {
-      List<String> parameterNames = new ArrayList<String>();
-      parameterNames.addAll(params.keySet());
-      Collections.sort(parameterNames);
-      for (String parameterName : parameterNames) {
-        buf.append("&").append(parameterName).append("=").append(params.get(parameterName));
-      }
-    }
-
-    // TODO: Consider headers as well. Think "Accepts"
-
-    return buf.toString();
   }
 
 }

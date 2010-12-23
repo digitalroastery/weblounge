@@ -39,7 +39,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -93,18 +92,15 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * 
    * @param handle
    *          the cache handle
-   * @param request
-   *          the http request
-   * @param response
-   *          the http response
+   * @param cache
+   *          the cache identifier
    * @param filter
    *          the stream filter
    * @return the transaction
    */
-  public CacheTransaction startTransaction(CacheHandle handle,
-      HttpServletRequest request, HttpServletResponse response,
+  public CacheTransaction startTransaction(CacheHandle handle, String cache,
       StreamFilter filter) {
-    tx = new CacheTransaction(null, request, response, null);
+    tx = new CacheTransaction(handle, cache, filter);
     return tx;
   }
 
@@ -137,16 +133,16 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
     // to both the original response and the cache output stream.
     OutputStream os = null;
     if (tx != null)
-      os = new TeeOutputStream(getResponse().getOutputStream(), tx.os);
+      os = new TeeOutputStream(getResponse().getOutputStream(), tx.getOutputStream());
     else
       os = getResponse().getOutputStream();
 
     // Install the writer
     try {
-      if (tx == null || tx.filter == null)
+      if (tx == null || tx.getFilter() == null)
         out = new PrintWriter(new OutputStreamWriter(os, encoding));
       else
-        out = new PrintWriter(new BufferedWriter(new FilterWriter(new OutputStreamWriter(os, encoding), tx.filter, contentType)));
+        out = new PrintWriter(new BufferedWriter(new FilterWriter(new OutputStreamWriter(os, encoding), tx.getFilter(), contentType)));
     } catch (UnsupportedEncodingException e) {
       throw new IOException(e.getMessage());
     }
@@ -167,7 +163,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
     if (out != null)
       throw new IllegalStateException("A writer has already been allocated");
     osCalled = true;
-    return tx != null ? tx.os : getResponse().getOutputStream();
+    return tx != null ? tx.getOutputStream() : getResponse().getOutputStream();
   }
 
   /**
@@ -200,9 +196,9 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * Invalidate the output. Tells the cache writer to stop adding output to the
    * cache.
    */
-  void invalidateOutput() {
+  void invalidate() {
     if (tx != null)
-      tx.invalidated = true;
+      tx.invalidate();
   }
 
   /**
@@ -210,8 +206,8 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * 
    * @return <code>true</code> if the response has been invalidated
    */
-  public boolean isInvalidated() {
-    return tx != null ? tx.invalidated : false;
+  public boolean isValid() {
+    return tx != null ? tx.isValid() : false;
   }
 
   /**
@@ -222,7 +218,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
     super.setContentType(type);
     contentType = type;
     if (tx != null)
-      tx.headers.setContentType(type);
+      tx.getHeaders().setContentType(type);
 
     /* check whether the encoding has changed */
     if (encoding == null || !encoding.equals(getCharacterEncoding())) {
@@ -241,7 +237,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   public void addHeader(String name, String value) {
     super.addHeader(name, value);
     if (tx != null)
-      tx.headers.addHeader(name, value);
+      tx.getHeaders().addHeader(name, value);
   }
 
   /**
@@ -252,7 +248,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   public void setHeader(String name, String value) {
     super.setHeader(name, value);
     if (tx != null)
-      tx.headers.setHeader(name, value);
+      tx.getHeaders().setHeader(name, value);
   }
 
   /**
@@ -263,7 +259,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   public void addDateHeader(String name, long date) {
     super.addDateHeader(name, date);
     if (tx != null)
-      tx.headers.addHeader(name, formatDate(date));
+      tx.getHeaders().addHeader(name, formatDate(date));
   }
 
   /**
@@ -273,7 +269,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   @Override
   public void addIntHeader(String name, int value) {
     super.addIntHeader(name, value);
-    tx.headers.addHeader(name, Integer.toString(value));
+    tx.getHeaders().addHeader(name, Integer.toString(value));
   }
 
   /**
@@ -284,7 +280,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   public void setDateHeader(String name, long date) {
     super.setDateHeader(name, date);
     if (tx != null)
-      tx.headers.setHeader(name, formatDate(date));
+      tx.getHeaders().setHeader(name, formatDate(date));
   }
 
   /**
@@ -295,7 +291,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   public void setIntHeader(String name, int value) {
     super.setIntHeader(name, value);
     if (tx != null)
-      tx.headers.setHeader(name, Integer.toString(value));
+      tx.getHeaders().setHeader(name, Integer.toString(value));
   }
 
   /**
