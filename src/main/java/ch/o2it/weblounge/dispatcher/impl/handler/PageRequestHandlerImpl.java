@@ -125,7 +125,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       CacheTagSet cacheTags = createCacheTags(request);
 
       // Check if the page is already part of the cache
-      if (response.startResponse(cacheTags, validTime, recheckTime)) {
+      if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
         logger.debug("Page handler answered request for {} from cache", request.getUrl());
         return true;
       }

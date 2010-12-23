@@ -215,7 +215,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         CacheTagSet cacheTags = createCacheTags(request, action);
 
         // Check if the page is already part of the cache
-        if (response.startResponse(cacheTags, validTime, recheckTime)) {
+        if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
           logger.debug("Action answered request for {} from cache", request.getUrl());
           return true;
         }
