@@ -28,7 +28,7 @@ import javax.servlet.jsp.tagext.Tag;
 /**
  * Tag used to tag the current response part.
  */
-public class CacheTag extends WebloungeTag {
+public class CacheTaggingTag extends WebloungeTag {
 
   /** The serial version id */
   private static final long serialVersionUID = 6518301782108444957L;

@@ -238,7 +238,7 @@ public class PagePreviewTag extends WebloungeTag {
     pageContext.setAttribute(PagePreviewTagVariables.PREVIEW, pagePreview);
 
     // Add included page url to tags
-    response.addTag("webl:url", pageUrl);
+    response.addTag(ch.o2it.weblounge.common.request.CacheTag.Url, pageUrl.getLink());
 
     pageletIndex = 0;
     handlePagelet(pageletIndex);

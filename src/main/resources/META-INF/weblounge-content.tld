@@ -12,9 +12,9 @@
   
   	<tag>
 		<description>Adds a tag to the cache</description>
-		<display-name>Weblounge Cache Tag</display-name>
+		<display-name>Weblounge Cache Tagging Tag</display-name>
 		<name>cachetag</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.CacheTag</tag-class>
+		<tag-class>ch.o2it.weblounge.taglib.content.CacheTaggingTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>value</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>

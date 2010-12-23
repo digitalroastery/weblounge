@@ -31,6 +31,7 @@ import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.HTMLAction;
@@ -523,12 +524,12 @@ public class ComposerTagSupport extends WebloungeTag {
           long recheckTime = Times.MS_PER_HOUR;
 
           // Create tagset
-          composerCacheTags.add("webl:url", url.getPath());
-          composerCacheTags.add("webl:url", request.getRequestedUrl().getPath());
-          composerCacheTags.add("webl:composer", name);
-          composerCacheTags.add("webl:site", url.getSite().getIdentifier());
-          composerCacheTags.add("webl:language", request.getLanguage().getIdentifier());
-          composerCacheTags.add("webl:user", request.getUser().getLogin());
+          composerCacheTags.add(CacheTag.Url, url.getPath());
+          composerCacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
+          composerCacheTags.add(CacheTag.Composer, name);
+          composerCacheTags.add(CacheTag.Site, url.getSite().getIdentifier());
+          composerCacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
+          composerCacheTags.add(CacheTag.User, request.getUser().getLogin());
           Enumeration<?> pe = request.getParameterNames();
           int parameterCount = 0;
           while (pe.hasMoreElements()) {
@@ -539,19 +540,19 @@ public class ComposerTagSupport extends WebloungeTag {
               composerCacheTags.add(key, value);
             }
           }
-          composerCacheTags.add("webl:parameters", Integer.toString(parameterCount));
+          composerCacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
 
           // Add action specific tags and adjust valid and recheck time
           if (action != null) {
-            composerCacheTags.add("webl:module", action.getModule().getIdentifier());
-            composerCacheTags.add("webl:action", action.getIdentifier());
+            composerCacheTags.add(CacheTag.Module, action.getModule().getIdentifier());
+            composerCacheTags.add(CacheTag.Action, action.getIdentifier());
             validTime = action.getValidTime();
             recheckTime = action.getRecheckTime();
           }
 
           // See if the composer is already in the cache. If not, a new response
           // part is started, that we can now add content for
-          if (response.startResponsePart(composerCacheTags, validTime, recheckTime)) {
+          if (response.startResponsePart(composerCacheTags.getTags(), validTime, recheckTime)) {
             return EVAL_PAGE;
           }
 
@@ -594,7 +595,7 @@ public class ComposerTagSupport extends WebloungeTag {
 
         // Add cache tag for content provider (in case of inheritance)
         if (composerCacheTags != null && contentProvider != null && !contentProvider.equals(targetPage)) {
-          response.addTag("webl:url", contentProvider.getURI().getPath());
+          response.addTag(CacheTag.Url, contentProvider.getURI().getPath());
         }
 
         // Render the pagelets
@@ -726,15 +727,15 @@ public class ComposerTagSupport extends WebloungeTag {
       if (request.getVersion() == Resource.LIVE) {
 
         // Create tagset
-        pageletCacheTags.add("webl:url", url.getPath());
-        pageletCacheTags.add("webl:url", request.getRequestedUrl().getPath());
-        pageletCacheTags.add("webl:composer", name);
-        pageletCacheTags.add("webl:renderer-position", position);
-        pageletCacheTags.add("webl:module", pagelet.getModule());
-        pageletCacheTags.add("webl:renderer", pagelet.getIdentifier());
-        pageletCacheTags.add("webl:language", request.getLanguage().getIdentifier());
-        pageletCacheTags.add("webl:user", request.getUser().getLogin());
-        pageletCacheTags.add("webl:site", url.getSite().getIdentifier());
+        pageletCacheTags.add(CacheTag.Url, url.getPath());
+        pageletCacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
+        pageletCacheTags.add(CacheTag.Composer, name);
+        pageletCacheTags.add(CacheTag.Position, Integer.toString(position));
+        pageletCacheTags.add(CacheTag.Module, pagelet.getModule());
+        pageletCacheTags.add(CacheTag.Renderer, pagelet.getIdentifier());
+        pageletCacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
+        pageletCacheTags.add(CacheTag.User, request.getUser().getLogin());
+        pageletCacheTags.add(CacheTag.Site, url.getSite().getIdentifier());
         Enumeration<?> pe = request.getParameterNames();
         int parameterCount = 0;
         while (pe.hasMoreElements()) {
@@ -745,21 +746,21 @@ public class ComposerTagSupport extends WebloungeTag {
             pageletCacheTags.add(key, value);
           }
         }
-        pageletCacheTags.add("webl:parameters", Integer.toString(parameterCount));
+        pageletCacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
 
         // Add action specific tags
         if (action != null) {
-          pageletCacheTags.add("webl:module", action.getModule().getIdentifier());
-          pageletCacheTags.add("webl:action", action.getIdentifier());
+          pageletCacheTags.add(CacheTag.Module, action.getModule().getIdentifier());
+          pageletCacheTags.add(CacheTag.Action, action.getIdentifier());
         }
 
-        if (response.startResponsePart(pageletCacheTags, validTime, recheckTime)) {
+        if (response.startResponsePart(pageletCacheTags.getTags(), validTime, recheckTime)) {
           return;
         }
 
         // Add cache tag for content provider (in case of inheritance)
         if (contentProvider != null && !contentProvider.equals(targetPage)) {
-          response.addTag("webl:url", contentProvider.getURI().getPath());
+          response.addTag(CacheTag.Url, contentProvider.getURI().getPath());
         }
 
         if (debug)
