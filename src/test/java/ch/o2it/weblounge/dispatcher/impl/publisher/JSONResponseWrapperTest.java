@@ -23,8 +23,8 @@ package ch.o2it.weblounge.dispatcher.impl.publisher;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
-import ch.o2it.weblounge.dispatcher.impl.http.MockHttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;

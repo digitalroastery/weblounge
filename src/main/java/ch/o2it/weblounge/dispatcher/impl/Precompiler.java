@@ -20,10 +20,10 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.impl.testing.MockHttpServletRequest;
+import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.dispatcher.impl.http.MockHttpServletRequest;
-import ch.o2it.weblounge.dispatcher.impl.http.MockHttpServletResponse;
 
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
