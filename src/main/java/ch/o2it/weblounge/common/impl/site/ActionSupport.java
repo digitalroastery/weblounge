@@ -418,7 +418,6 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     rendererTagSet.add(CacheTag.User, user.getLogin());
     rendererTagSet.add(CacheTag.Module, getModule().getIdentifier());
     rendererTagSet.add(CacheTag.Action, getIdentifier());
-    rendererTagSet.add(CacheTag.Position, headers);
     Enumeration<?> pe = request.getParameterNames();
     int parameterCount = 0;
     while (pe.hasMoreElements()) {
@@ -430,14 +429,14 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       }
     }
     rendererTagSet.add(CacheTag.Parameters, Integer.toString(parameterCount));
-    if (response.startResponsePart(rendererTagSet, validTime, recheckTime)) {
+    if (response.startResponsePart(rendererTagSet.getTags(), validTime, recheckTime)) {
       logger.debug("Action handler {} answered request for {} from cache", this, renderer);
       return;
     }
 
     // Add additional cache tags
     if (renderer.getModule() != null)
-      response.addTag(CacheTag.Module, renderer.getModule());
+      response.addTag(CacheTag.Module, renderer.getModule().getIdentifier());
 
     // Include renderer in response
     try {

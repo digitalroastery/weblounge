@@ -25,6 +25,7 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
@@ -40,12 +41,50 @@ import java.util.regex.Pattern;
  * Utility class used to handle parameters from configuration files.
  */
 public final class ConfigurationUtils {
-  
+
   /**
    * This class is not intended to be instantiated.
    */
   private ConfigurationUtils() {
     // Nothing to be done here
+  }
+
+  /**
+   * Returns the <code>int</code> value or <code>defaultValue</code> if
+   * <code>value</code> is either <code>null</code> or blank.
+   * 
+   * @param value
+   *          the value as a string
+   * @param defaultValue
+   *          the default value
+   * @return the value
+   * @throws NumberFormatException
+   *           if <code>value</code> can't be parsed into an <code>int</code>
+   */
+  public static int getValue(String value, int defaultValue)
+      throws NumberFormatException {
+    if (StringUtils.isBlank(value))
+      return defaultValue;
+    return Integer.parseInt(value);
+  }
+
+  /**
+   * Returns the <code>long</code> value or <code>defaultValue</code> if
+   * <code>value</code> is either <code>null</code> or blank.
+   * 
+   * @param value
+   *          the value as a string
+   * @param defaultValue
+   *          the default value
+   * @return the value
+   * @throws NumberFormatException
+   *           if <code>value</code> can't be parsed into a <code>long</code>
+   */
+  public static long getValue(String value, long defaultValue)
+      throws NumberFormatException {
+    if (StringUtils.isBlank(value))
+      return defaultValue;
+    return Long.parseLong(value);
   }
 
   /**
@@ -127,8 +166,30 @@ public final class ConfigurationUtils {
    *         <code>true</code>
    */
   public static boolean isTrue(String value) {
-    if (value == null)
-      return false;
+    return isTrue(value, false);
+  }
+
+  /**
+   * Returns <code>true</code> if the lowercase and trimmed value is not
+   * <code>null</code> and corresponds to any of:
+   * <ul>
+   * <li>true</li>
+   * <li>on</li>
+   * <li>yes</li>
+   * </ul>
+   * If <code>value</code> is either <code>null</code> or blank,
+   * <code>defaultValue</code> is returned.
+   * 
+   * @param value
+   *          the value to test
+   * @param defaultValue
+   *          the default value if <code>value</code> is blank
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>true</code>
+   */
+  public static boolean isTrue(String value, boolean defaultValue) {
+    if (StringUtils.isBlank(value))
+      return defaultValue;
     value = value.trim().toLowerCase();
     return "true".equals(value) || "on".equals(value) || "yes".equals(value);
   }
@@ -148,8 +209,30 @@ public final class ConfigurationUtils {
    *         <code>true</code>
    */
   public static boolean isFalse(String value) {
+    return isFalse(value, false);
+  }
+
+  /**
+   * Returns <code>true</code> if the lowercase and trimmed value is not
+   * <code>null<code> and corresponds to any of:
+   * <ul>
+   * <li>true</li>
+   * <li>on</li>
+   * <li>yes</li>
+   * </ul>
+   * If <code>value</code> is either <code>null</code> or blank,
+   * <code>defaultValue</code> is returned.
+   * 
+   * @param value
+   *          the value to test
+   * @param defaultValue
+   *          the default value if <code>value</code> is blank
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>true</code>
+   */
+  public static boolean isFalse(String value, boolean defaultValue) {
     if (value == null)
-      return false;
+      return defaultValue;
     value = value.trim().toLowerCase();
     return "false".equals(value) || "off".equals(value) || "no".equals(value);
   }
@@ -169,8 +252,30 @@ public final class ConfigurationUtils {
    *         <code>enabled</code>
    */
   public static boolean isEnabled(String value) {
+    return isEnabled(value, false);
+  }
+
+  /**
+   * Returns <code>true</code> if the lowercase and trimmed value is not
+   * <code>null</code> and corresponds to any of:
+   * <ul>
+   * <li>active</li>
+   * <li>enabled</li>
+   * <li>on</li>
+   * </ul>
+   * If <code>value</code> is either <code>null</code> or blank,
+   * <code>defaultValue</code> is returned.
+   * 
+   * @param value
+   *          the value to test
+   * @param defaultValue
+   *          the default value if <code>value</code> is blank
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>enabled</code>
+   */
+  public static boolean isEnabled(String value, boolean defaultValue) {
     if (value == null)
-      return false;
+      return defaultValue;
     value = value.trim().toLowerCase();
     return "active".equals(value) || "enabled".equals(value) || "on".equals(value);
   }
@@ -190,8 +295,30 @@ public final class ConfigurationUtils {
    *         <code>true</code>
    */
   public static boolean isDisabled(String value) {
+    return isDisabled(value, false);
+  }
+
+  /**
+   * Returns <code>true</code> if the lowercase and trimmed value is not
+   * <code>null<code> and corresponds to any of:
+   * <ul>
+   * <li>inactive</li>
+   * <li>disabled</li>
+   * <li>off</li>
+   * </ul>
+   * If <code>value</code> is either <code>null</code> or blank,
+   * <code>defaultValue</code> is returned.
+   * 
+   * @param value
+   *          the value to test
+   * @param defaultValue
+   *          the default value if <code>value</code> is blank
+   * @return <code>true</code> if the value can be interpreted as
+   *         <code>true</code>
+   */
+  public static boolean isDisabled(String value, boolean defaultValue) {
     if (value == null)
-      return false;
+      return defaultValue;
     value = value.trim().toLowerCase();
     return "inactive".equals(value) || "disabled".equals(value) || "off".equals(value);
   }
@@ -403,13 +530,13 @@ public final class ConfigurationUtils {
   public static String processTemplate(String text) {
     if (text.indexOf("${") >= 0 && text.indexOf("}") > 2) {
       for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
-        String variable = "\\$\\{" + (String)entry.getKey() + "\\}";
-        String replacement = (String)entry.getValue(); 
+        String variable = "\\$\\{" + (String) entry.getKey() + "\\}";
+        String replacement = (String) entry.getValue();
         text = text.replaceAll(variable, replacement);
       }
       for (Entry<String, String> entry : System.getenv().entrySet()) {
         String variable = "\\$\\{" + entry.getKey() + "\\}";
-        String replacement = entry.getValue(); 
+        String replacement = entry.getValue();
         text = text.replaceAll(variable, replacement);
       }
     }
@@ -420,7 +547,8 @@ public final class ConfigurationUtils {
    * Processes the given text by replacing these placeholders with their actual
    * values:
    * <ul>
-   * <li><code>file://${site.root}</code> with <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;</li>
+   * <li><code>file://${site.root}</code> with
+   * <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;</li>
    * </ul>
    * 
    * @param text
@@ -436,7 +564,7 @@ public final class ConfigurationUtils {
     Site site = request.getSite();
     String hostname = site.getHostName();
     String port = request.getLocalPort() != 80 ? ":" + request.getLocalPort() : "";
-    
+
     StringBuffer siteRootReplacement = new StringBuffer();
     siteRootReplacement.append("http://").append(hostname).append(port);
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
@@ -452,8 +580,11 @@ public final class ConfigurationUtils {
    * Processes the given text by replacing these placeholders with their actual
    * values:
    * <ul>
-   * <li><code>file://${site.root}</code> with <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;</li>
-   * <li><code>file://${module.root}</code> with <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;/modules/&lt;module&gt;</code></li>
+   * <li><code>file://${site.root}</code> with
+   * <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;</li>
+   * <li><code>file://${module.root}</code> with
+   * <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;/modules/&lt;module&gt;</code>
+   * </li>
    * </ul>
    * 
    * @param text
@@ -464,14 +595,15 @@ public final class ConfigurationUtils {
    *          the module
    * @return the processed text
    */
-  public static String processTemplate(String text, WebloungeRequest request, Module module) {
+  public static String processTemplate(String text, WebloungeRequest request,
+      Module module) {
     text = processTemplate(text);
-    
+
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
     String hostname = site.getHostName();
     String port = request.getLocalPort() != 80 ? ":" + request.getLocalPort() : "";
-    
+
     StringBuffer siteRootReplacement = new StringBuffer();
     siteRootReplacement.append("http://").append(hostname).append(port);
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());

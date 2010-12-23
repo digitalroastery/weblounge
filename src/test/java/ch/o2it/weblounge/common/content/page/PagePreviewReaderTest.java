@@ -107,7 +107,6 @@ public class PagePreviewReaderTest {
    * .
    */
   @Test
-  @SuppressWarnings("null")
   public void testRead() {
     InputStream is = getClass().getResourceAsStream(previewFile);
     Composer preview = null;

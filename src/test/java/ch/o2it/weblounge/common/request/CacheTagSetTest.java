@@ -45,13 +45,13 @@ public class CacheTagSetTest {
   protected CacheTagSet set = null;
   
   /** Value for tag "a" */
-  protected Object aValue = new Object();
+  protected String aValue = "a";
 
   /** Value for tag "b" */
-  protected Object bValue = new Object();
+  protected String bValue = "b";
 
   /** Value for tag "c" */
-  protected Object cValue = new Object();
+  protected String cValue = "c";
 
   /** Sample tag "a" */
   protected CacheTagImpl a = new CacheTagImpl("a", aValue);

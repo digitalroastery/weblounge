@@ -22,16 +22,21 @@ package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.request.CacheTag;
 
+import java.io.Serializable;
+
 /**
  * Tag used to identify entries in the caching service.
  */
-public final class CacheTagImpl implements CacheTag {
+public final class CacheTagImpl implements CacheTag, Serializable {
+
+  /** The serial version uid */
+  private static final long serialVersionUID = -1445545271162573855L;
 
   /** Tag key */
   protected String key = null;
 
   /** Tag value */
-  protected Object value = null;
+  protected String value = null;
 
   /**
    * Creates a cache tag with an empty value. This kind of tag can be used to
@@ -55,7 +60,7 @@ public final class CacheTagImpl implements CacheTag {
    * @param value
    *          the tag value
    */
-  public CacheTagImpl(String key, Object value) {
+  public CacheTagImpl(String key, String value) {
     if (key == null)
       throw new IllegalArgumentException("Tag key must not be null!");
     if (value == null)
@@ -78,7 +83,7 @@ public final class CacheTagImpl implements CacheTag {
    * 
    * @see ch.o2it.weblounge.common.request.CacheTag#getValue()
    */
-  public Object getValue() {
+  public String getValue() {
     return value;
   }
 
@@ -125,7 +130,7 @@ public final class CacheTagImpl implements CacheTag {
    * @return <code>true</code> if this tag matches all values
    */
   public boolean matchesAny() {
-    return value == ANY;
+    return ANY.equals(this.value);
   }
 
 }

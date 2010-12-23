@@ -134,9 +134,9 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.Taggable#addTag(java.lang.String,
-   *      java.lang.Object)
+   *      java.lang.String)
    */
-  public boolean addTag(String name, Object value) {
+  public boolean addTag(String name, String value) {
     boolean result = false;
     if (cacheHandles != null && cacheHandles.size() > 0) {
       result |= cacheHandles.firstElement().addTag(name, value);
@@ -297,11 +297,11 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponse(java.lang.Iterable,
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponse(ch.o2it.weblounge.common.request.CacheTag[],
    *      long, long)
    */
-  public boolean startResponse(Iterable<CacheTag> tags, long validTime,
-      long recheckTime) throws IllegalStateException {
+  public boolean startResponse(CacheTag[] tags, long validTime, long recheckTime)
+      throws IllegalStateException {
     if (!isValid || cache == null)
       return false;
     if (cacheHandles != null)
@@ -321,11 +321,11 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponsePart(java.lang.Iterable,
+   * @see ch.o2it.weblounge.common.request.WebloungeResponse#startResponsePart(ch.o2it.weblounge.common.request.CacheTag[],
    *      long, long)
    */
-  public boolean startResponsePart(Iterable<CacheTag> uniqueTags,
-      long validTime, long recheckTime) {
+  public boolean startResponsePart(CacheTag[] uniqueTags, long validTime,
+      long recheckTime) {
     if (!isValid || cache == null)
       return false;
     if (cacheHandles == null)
@@ -333,7 +333,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
 
     // Do a cache lookup
     CacheHandle handle = null;
-    handle = cache.startResponsePart(uniqueTags, this, validTime, recheckTime);
+    handle = cache.startResponsePart(uniqueTags, request, this, validTime, recheckTime);
 
     // Is the response part in the cache?
     if (handle == null)

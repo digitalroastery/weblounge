@@ -22,7 +22,9 @@ package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.request.CacheTag;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -36,16 +38,40 @@ import java.util.Set;
  * The set allows multiple tags with the same key, but only one tag with a
  * key-value pair.
  */
-public final class CacheTagSet implements Set<CacheTag> {
+public final class CacheTagSet implements Set<CacheTag>, Serializable {
+
+  /** Serial version uid */
+  private static final long serialVersionUID = 8603326280663738089L;
 
   /** The tags */
-  private List<CacheTag> tags = null;
+  private List<CacheTag> tags = new ArrayList<CacheTag>();
 
   /**
    * Creates a new set of cache tags.
    */
-  public CacheTagSet() {
-    tags = new ArrayList<CacheTag>();
+  public CacheTagSet() { 
+    this(null);
+  }
+
+  /**
+   * Creates a new set of cache tags.
+   * 
+   * @param tags
+   *          an initial set of tags
+   */
+  public CacheTagSet(CacheTag[] tags) {
+    if (tags != null) {
+      this.tags.addAll(Arrays.asList(tags));
+    }
+  }
+
+  /**
+   * Returns the tags as an array.
+   * 
+   * @return the tags
+   */
+  public CacheTag[] getTags() {
+    return tags.toArray(new CacheTag[tags.size()]);
   }
 
   /**
@@ -58,7 +84,7 @@ public final class CacheTagSet implements Set<CacheTag> {
    *          the tag value
    * @return <code>true</code> if the tag could be inserted
    */
-  public boolean add(String key, Object value) {
+  public boolean add(String key, String value) {
     return add(new CacheTagImpl(key, value));
   }
 
@@ -168,7 +194,7 @@ public final class CacheTagSet implements Set<CacheTag> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.util.Set#remove(java.lang.Object)
    */
   public boolean remove(Object o) {
@@ -223,7 +249,7 @@ public final class CacheTagSet implements Set<CacheTag> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.util.Set#retainAll(java.util.Collection)
    */
   public boolean retainAll(Collection<?> c) {

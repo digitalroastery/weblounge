@@ -42,7 +42,7 @@ public class CacheTagTest {
   protected String name = "key";
   
   /** The default value */
-  protected Object value = new Object();
+  protected String value = "o";
 
   /**
    * @throws java.lang.Exception
