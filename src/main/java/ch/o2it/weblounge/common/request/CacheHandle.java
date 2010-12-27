@@ -48,6 +48,13 @@ public interface CacheHandle extends Serializable, Taggable<CacheTag> {
   String getKey();
 
   /**
+   * Returns the date where this handle was created.
+   * 
+   * @return the creation date
+   */
+  long getCreationDate();
+
+  /**
    * Returns the time the cached object expires in milliseconds. When that time
    * is reached, the object will be invalidated and removed from the cache.
    * 
