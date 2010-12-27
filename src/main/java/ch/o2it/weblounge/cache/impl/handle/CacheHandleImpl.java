@@ -45,6 +45,9 @@ public class CacheHandleImpl implements CacheHandle {
   /** The key */
   protected String key = null;
 
+  /** Date where the handle was created */
+  private long creationDate = System.currentTimeMillis();
+
   /** The expiration time of the cached object. */
   protected long expires;
 
@@ -102,6 +105,15 @@ public class CacheHandleImpl implements CacheHandle {
    */
   public String getKey() {
     return key;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.request.CacheHandle#getCreationDate()
+   */
+  public long getCreationDate() {
+    return creationDate;
   }
 
   /**

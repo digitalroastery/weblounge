@@ -46,6 +46,8 @@ final class CacheableHttpServletResponseHeaders implements Serializable {
 
   static {
     ignoredHeaders.add("content-length");
+    ignoredHeaders.add("etag");
+    ignoredHeaders.add("expires");
   }
 
   /**

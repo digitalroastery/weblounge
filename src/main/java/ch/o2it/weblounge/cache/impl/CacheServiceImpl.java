@@ -465,6 +465,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
 
     cacheableResponse.startTransaction(handle, cacheId, filter);
+    response.setHeader("Etag", CacheEntry.createETag(handle.getCreationDate()));
+    response.setDateHeader("Expires", handle.getCreationDate() + Times.MS_PER_MIN);
     return handle;
   }
 

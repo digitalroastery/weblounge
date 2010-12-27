@@ -45,7 +45,7 @@ public final class CacheEntry implements Serializable {
   private CacheableHttpServletResponseHeaders headers = null;
 
   /** Date where the entry was added to the cache */
-  private long entryCreationDate = System.currentTimeMillis();
+  private long entryCreationDate = 0L;
 
   /** The etag */
   private String eTag = null;
@@ -71,7 +71,8 @@ public final class CacheEntry implements Serializable {
     this.handle = handle;
     this.content = content;
     this.headers = headers;
-    this.eTag = "\"WL-" + Long.toHexString(entryCreationDate) + "\"";
+    this.entryCreationDate = handle.getCreationDate();
+    this.eTag = createETag(entryCreationDate);
   }
 
   /**
@@ -98,6 +99,8 @@ public final class CacheEntry implements Serializable {
    * @return the etag
    */
   public String getETag() {
+    if (headers.containsHeader("ETag"))
+      return (String)headers.getHeaders().get("ETag");
     return eTag;
   }
 
@@ -164,7 +167,7 @@ public final class CacheEntry implements Serializable {
     if (contentType == null)
       return null;
     if (contentType instanceof String)
-      return (String)contentType;
+      return (String) contentType;
     throw new IllegalStateException("Response contained more than one 'Content-type' header");
   }
 
@@ -191,10 +194,22 @@ public final class CacheEntry implements Serializable {
   public boolean matches(String eTag) {
     return StringUtils.isBlank(eTag) || this.eTag.equals(eTag);
   }
-  
+
+  /**
+   * Returns the etag (including the extra pair of quotes) for the given value,
+   * which will usually be the creation time of the cached entry.
+   * 
+   * @param value
+   *          the value
+   * @return the etag
+   */
+  public static String createETag(long value) {
+    return "\"WL-" + Long.toHexString(value) + "\"";
+  }
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

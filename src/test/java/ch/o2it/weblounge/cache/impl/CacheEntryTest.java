@@ -125,7 +125,8 @@ public class CacheEntryTest {
     String eTag = entry.getETag();
     assertNotNull(eTag);
     Thread.sleep(100);
-    String newETag = new CacheEntry(handle, content.getBytes(), headers).getETag();
+    CacheHandle newHandle = new TaggedCacheHandle(tags.getTags(), expirationTime, recheckTime);
+    String newETag = new CacheEntry(newHandle, content.getBytes(), headers).getETag();
     assertFalse(eTag.equals(newETag));
   }
 
