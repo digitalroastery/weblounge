@@ -60,9 +60,6 @@ public class CacheTest extends IntegrationTestBase {
   /** The request language */
   private static final Language language = LanguageUtils.getLanguage(Locale.GERMAN);
 
-  /** The page's content length */
-  private long contentLength = 567L;
-  
   /**
    * Creates a new instance of the <code>HTML</code> page test.
    */
@@ -124,17 +121,12 @@ public class CacheTest extends IntegrationTestBase {
       assertEquals(1, response.getHeaders("Expires").length);
       Date expires = df.parse(response.getHeaders("Expires")[0].getValue());
 
-      // Get the Cache header
-      assertNotNull(response.getHeaders("X-Cache-Key"));
-      assertEquals(1, response.getHeaders("X-Cache-Key").length);
-      String cacheKey = response.getHeaders("X-Cache-Key")[0].getValue();
-
-      // Get the content size
-      assertEquals(contentLength, response.getEntity().getContentLength());
-      
       // Prepare the second request
-      request.setHeader("If-Match", eTag);
-      request.setHeader("If-Not-Modified", df.format(System.currentTimeMillis()));
+      httpClient.getConnectionManager().shutdown();
+      httpClient = new DefaultHttpClient();
+      
+      request.setHeader("If-None-Match", eTag);
+      request.setHeader("If-Modified-Since", df.format(System.currentTimeMillis()));
       
       response = TestSiteUtils.request(httpClient, request, params);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
@@ -150,13 +142,11 @@ public class CacheTest extends IntegrationTestBase {
       assertEquals(1, response.getHeaders("Etag").length);
       assertEquals(eTag, response.getHeaders("Etag")[0].getValue());
 
-      // Test cache key
+      // Test the Cache header
       assertNotNull(response.getHeaders("X-Cache-Key"));
-      assertEquals(1, response.getHeaders("X-Cache-Key").length);
-      assertEquals(cacheKey, response.getHeaders("X-Cache-Key")[0].getValue());
-
-      // Test the content length
-      assertEquals(contentLength, response.getEntity().getContentLength());
+      assertEquals(1, response.getHeaders("X-Cache-Key").length);       
+      String cacheKey = response.getHeaders("X-Cache-Key")[0].getValue();
+      assertNotNull(cacheKey);
 
       // Test the expires header
       Date newExpires = df.parse(response.getHeaders("Expires")[0].getValue());

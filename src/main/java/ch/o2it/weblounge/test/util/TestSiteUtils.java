@@ -23,6 +23,7 @@ package ch.o2it.weblounge.test.util;
 import ch.o2it.weblounge.test.site.GreeterHTMLAction;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.http.HeaderIterator;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -124,9 +125,12 @@ public final class TestSiteUtils {
         for (String[] param : params)
           qparams.add(new BasicNameValuePair(param[0], param[1]));
         URI requestURI = request.getURI();
-        ((HttpGet) request).setURI(null);
         URI uri = URIUtils.createURI(requestURI.getScheme(), requestURI.getHost(), requestURI.getPort(), requestURI.getPath(), URLEncodedUtils.format(qparams, "UTF-8"), null);
+        HeaderIterator headerIterator = request.headerIterator();
         request = new HttpGet(uri);
+        while (headerIterator.hasNext()) {
+          request.addHeader(headerIterator.nextHeader());
+        }
       } else if (request instanceof HttpPost) {
         List<NameValuePair> formparams = new ArrayList<NameValuePair>();
         for (String[] param : params)
