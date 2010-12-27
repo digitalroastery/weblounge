@@ -135,14 +135,16 @@ final class CacheableHttpServletResponseHeaders implements Serializable {
       String key = entry.getKey();
       int hashIndex = key.indexOf('#');
       if (hashIndex > 0)
-        key = key.substring(hashIndex);
+        key = key.substring(0, hashIndex);
       if (original.containsKey(key)) {
         Object value = original.get(key);
         if (value instanceof List) {
           ((List<String>) value).add(entry.getValue());
         } else {
-          value = new ArrayList<String>();
-          ((List<String>) value).add(entry.getValue());
+          List<String> values = new ArrayList<String>();
+          values.add((String)value);
+          values.add(entry.getValue());
+          value = values;
         }
         original.put(key, value);
       } else {

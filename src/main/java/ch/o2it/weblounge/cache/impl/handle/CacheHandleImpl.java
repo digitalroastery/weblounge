@@ -39,7 +39,7 @@ import java.util.Set;
  * Identifies a cached object. Implementing classes must provide meaningful
  * <code>hashCode()</code> and </code>equals()</code> methods.
  */
-public abstract class CacheHandleImpl implements CacheHandle {
+public class CacheHandleImpl implements CacheHandle {
 
   /** The serial version uid */
   private static final long serialVersionUID = 924532419150524805L;
@@ -146,24 +146,39 @@ public abstract class CacheHandleImpl implements CacheHandle {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.CacheHandle#getTagSet()
    */
   public Set<CacheTag> getTagSet() {
     return tags;
   }
-  
+
   /**
+   * {@inheritDoc}
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
-  public abstract int hashCode();
+  public int hashCode() {
+    if (key == null)
+      throw new IllegalStateException("Key has not been set");
+    return key.hashCode();
+  }
 
   /**
-   * @see java.lang.Object#equals(Object)
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public abstract boolean equals(Object o);
+  public boolean equals(Object o) {
+    if (key == null)
+      throw new IllegalStateException("Key has not been set");
+    if (o instanceof CacheHandle) {
+      return key.equals(((CacheHandle)o).getKey());
+    }
+    return false;
+  }
 
   /**
    * @see ch.o2it.weblounge.api.util.Taggable#addTag(java.lang.String,

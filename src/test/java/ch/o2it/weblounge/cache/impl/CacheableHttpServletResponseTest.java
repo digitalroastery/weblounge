@@ -21,29 +21,47 @@
 package ch.o2it.weblounge.cache.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.cache.impl.handle.TaggedCacheHandle;
+import ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl;
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
-import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.o2it.weblounge.common.request.CacheHandle;
-import ch.o2it.weblounge.common.request.CacheTag;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import javax.servlet.ServletOutputStream;
 
 /**
  * Test case for the implementation at {@link CacheableHttpServletResponse}.
  */
-@Ignore
 public class CacheableHttpServletResponseTest {
 
   /** The response under test */
   protected CacheableHttpServletResponse response = null;
+  
+  /** The current time */
+  protected long time = System.currentTimeMillis();
+
+  /** The expiration time */
+  protected long expirationTime = time + Times.MS_PER_DAY;
+
+  /** The recheck time */
+  protected long recheckTime = time + Times.MS_PER_HOUR;
+
+  /** The cache handle */
+  protected CacheHandle handle = new CacheHandleImpl("/a/b/c", expirationTime, recheckTime);
   
   /**
    * @throws java.lang.Exception
@@ -60,10 +78,8 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testStartTransaction() {
-    long time = System.currentTimeMillis();
     String cache = "cache";
-    CacheTagSet tags = new CacheTagSet(new CacheTag[] { new CacheTagImpl("a", "b") });
-    CacheHandle hdl = new TaggedCacheHandle(tags.getTags(), time + Times.MS_PER_DAY, time + Times.MS_PER_HOUR);
+    CacheHandle hdl = new CacheHandleImpl("/a/b/c", expirationTime, recheckTime);
     CacheTransaction tx = response.startTransaction(hdl, cache, null);
     assertNotNull(tx);
     assertEquals(hdl, tx.getHandle());
@@ -78,8 +94,12 @@ public class CacheableHttpServletResponseTest {
   @Test
   public void testGetWriter() throws Exception {
     assertNotNull(response.getWriter());
-    response.getOutputStream();
-    fail();
+    try {
+      response.getOutputStream();
+      fail();
+    } catch (IllegalStateException e) {
+      // This is expected
+    }
   }
 
   /**
@@ -88,8 +108,14 @@ public class CacheableHttpServletResponseTest {
    * .
    */
   @Test
-  public void testGetOutputStream() {
-    fail("Not yet implemented"); // TODO
+  public void testGetOutputStream() throws Exception {
+    assertNotNull(response.getOutputStream());
+    try {
+      response.getWriter();
+      fail();
+    } catch (IllegalStateException e) {
+      // This is expected
+    }
   }
 
   /**
@@ -98,8 +124,11 @@ public class CacheableHttpServletResponseTest {
    * .
    */
   @Test
-  public void testEndEntry() {
-    fail("Not yet implemented"); // TODO
+  public void testEndEntry() throws Exception {
+    response.endEntry(handle);
+    ServletOutputStream os = response.getOutputStream();
+    assertNotNull(os);
+    os.write("Write test".getBytes());
   }
 
   /**
@@ -108,8 +137,10 @@ public class CacheableHttpServletResponseTest {
    * .
    */
   @Test
-  public void testEndOutput() {
-    fail("Not yet implemented"); // TODO
+  public void testEndOutput() throws Exception {
+    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    CacheTransaction txEnd = response.endOutput();
+    assertEquals(tx, txEnd);
   }
 
   /**
@@ -119,7 +150,10 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testInvalidate() {
-    fail("Not yet implemented"); // TODO
+    response.startTransaction(handle, "cache", null);
+    assertTrue(response.isValid());
+    response.invalidate();
+    assertFalse(response.isValid());
   }
 
   /**
@@ -129,7 +163,9 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testIsValid() {
-    fail("Not yet implemented"); // TODO
+    assertFalse(response.isValid());
+    response.startTransaction(handle, "cache", null);
+    assertTrue(response.isValid());
   }
 
   /**
@@ -139,7 +175,9 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testSetContentTypeString() {
-    fail("Not yet implemented"); // TODO
+    response.startTransaction(handle, "cache", null);
+    assertTrue(response.isValid());
+
   }
 
   /**
@@ -149,7 +187,15 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testAddHeaderStringString() {
-    fail("Not yet implemented"); // TODO
+    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    String headerName = "Test-Header";
+    response.addHeader(headerName, "testvalue");
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof String);
+    response.addHeader(headerName, "othertestvalue");
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof List);
+    assertEquals(2, ((List<?>)tx.getHeaders().getHeaders().get(headerName)).size());
   }
 
   /**
@@ -159,7 +205,20 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testSetHeaderStringString() {
-    fail("Not yet implemented"); // TODO
+    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    String headerName = "Test-Header";
+    String headerValue = "testvalue";
+    String otherHeaderValue = "testvalue";
+
+    response.setHeader(headerName, headerValue);
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof String);
+    assertEquals(headerValue, tx.getHeaders().getHeaders().get(headerName));
+
+    response.setHeader(headerName, otherHeaderValue);
+    assertTrue(response.containsHeader(headerName));
+    assertFalse(tx.getHeaders().getHeaders().get(headerName) instanceof List);
+    assertEquals(otherHeaderValue, tx.getHeaders().getHeaders().get(headerName));
   }
 
   /**
@@ -167,9 +226,27 @@ public class CacheableHttpServletResponseTest {
    * {@link ch.o2it.weblounge.cache.impl.CacheableHttpServletResponse#addDateHeader(java.lang.String, long)}
    * .
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void testAddDateHeaderStringLong() {
-    fail("Not yet implemented"); // TODO
+    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    String headerName = "Test-Date-Header";
+    Date headerValue = new Date();
+    Date otherHeaderValue = new Date(123456789);
+    DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+    df.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+    response.addDateHeader(headerName, headerValue.getTime());
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof String);
+
+    response.addDateHeader(headerName, otherHeaderValue.getTime());
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof List);
+    List<String> headers = (List<String>)tx.getHeaders().getHeaders().get(headerName);
+    assertEquals(2, headers.size());
+    assertTrue(headers.contains(df.format(headerValue)));
+    assertTrue(headers.contains(df.format(otherHeaderValue)));
   }
 
   /**
@@ -177,9 +254,25 @@ public class CacheableHttpServletResponseTest {
    * {@link ch.o2it.weblounge.cache.impl.CacheableHttpServletResponse#addIntHeader(java.lang.String, int)}
    * .
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void testAddIntHeaderStringInt() {
-    fail("Not yet implemented"); // TODO
+    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    String headerName = "Test-Header";
+    int headerValue = 12345;
+    int otherHeaderValue = 6789;
+
+    response.addIntHeader(headerName, headerValue);
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof String);
+
+    response.addIntHeader(headerName, otherHeaderValue);
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof List);
+    List<String> headers = (List<String>)tx.getHeaders().getHeaders().get(headerName);
+    assertEquals(2, headers.size());
+    assertTrue(headers.contains(Integer.toString(headerValue)));
+    assertTrue(headers.contains(Integer.toString(otherHeaderValue)));
   }
 
   /**
@@ -189,7 +282,25 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testSetDateHeaderStringLong() {
-    fail("Not yet implemented"); // TODO
+    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    String headerName = "Test-Date-Header";
+    Date headerValue = new Date();
+    Date otherHeaderValue = new Date(123456789);
+    DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+    df.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+    response.setDateHeader(headerName, headerValue.getTime());
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof String);
+    String cachedDate = (String)tx.getHeaders().getHeaders().get(headerName);
+    assertNotNull(cachedDate);
+    assertEquals(df.format(headerValue), cachedDate);
+
+    response.setDateHeader(headerName, otherHeaderValue.getTime());
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof String);
+    cachedDate = (String)tx.getHeaders().getHeaders().get(headerName);
+    assertEquals(df.format(otherHeaderValue), cachedDate);
   }
 
   /**
@@ -199,7 +310,20 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testSetIntHeaderStringInt() {
-    fail("Not yet implemented"); // TODO
+    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    String headerName = "Test-Header";
+    int headerValue = 12345;
+    int otherHeaderValue = 6789;
+
+    response.setIntHeader(headerName, headerValue);
+    assertTrue(response.containsHeader(headerName));
+    assertTrue(tx.getHeaders().getHeaders().get(headerName) instanceof String);
+    assertEquals(Integer.toString(headerValue), tx.getHeaders().getHeaders().get(headerName));
+
+    response.setIntHeader(headerName, otherHeaderValue);
+    assertTrue(response.containsHeader(headerName));
+    assertFalse(tx.getHeaders().getHeaders().get(headerName) instanceof List);
+    assertEquals(Integer.toString(otherHeaderValue), tx.getHeaders().getHeaders().get(headerName));
   }
 
 }

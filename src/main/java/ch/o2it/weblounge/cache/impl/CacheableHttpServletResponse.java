@@ -103,7 +103,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
     tx = new CacheTransaction(handle, cache, filter);
     return tx;
   }
-
+  
   /**
    * Returns the modified writer that enables the <code>CacheManager</cache>
    * to copy the response to the cache.
@@ -175,7 +175,6 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   void endEntry(CacheHandle hnd) {
     if (out != null)
       out.flush();
-
   }
 
   /**
