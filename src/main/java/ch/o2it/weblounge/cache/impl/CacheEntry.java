@@ -161,6 +161,8 @@ public final class CacheEntry implements Serializable {
    */
   public String getContentType() {
     Object contentType = headers.getHeaders().get("Content-Type");
+    if (contentType == null)
+      return null;
     if (contentType instanceof String)
       return (String)contentType;
     throw new IllegalStateException("Response contained more than one 'Content-type' header");
@@ -188,6 +190,16 @@ public final class CacheEntry implements Serializable {
    */
   public boolean matches(String eTag) {
     return StringUtils.isBlank(eTag) || this.eTag.equals(eTag);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return handle.getKey();
   }
 
 }
