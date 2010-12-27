@@ -166,7 +166,7 @@ public class FilesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests for the special <code>/files</code> uri prefix that is provided by
+   * Tests for the special <code>/weblounge-files</code> uri prefix that is provided by
    * the file request handler.
    * 
    * @param serverUrl
@@ -176,7 +176,7 @@ public class FilesTest extends IntegrationTestBase {
    */
   private void testGetDocumentById(String serverUrl) throws Exception {
     HttpClient httpClient = null;
-    String url = UrlUtils.concat(serverUrl, "files", resourceId);
+    String url = UrlUtils.concat(serverUrl, "weblounge-files", resourceId);
     HttpGet request = new HttpGet(url);
     request.setHeader("Accept-Language", "de");
     httpClient = new DefaultHttpClient();
@@ -221,13 +221,13 @@ public class FilesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests for the special <code>/files</code> uri prefix that is provided by
+   * Tests for the special <code>/weblounge-files</code> uri prefix that is provided by
    * the file request handler. The handler should be able to respond to these
    * requests:
    * <ul>
-   *  <li>/files/&lt;id&gt;</li>
-   *  <li>/files/&lt;id&gt;/</li>
-   *  <li>/files/&lt;id&gt;/&lt;filename&gt;</li>
+   *  <li>/weblounge-files/&lt;id&gt;</li>
+   *  <li>/weblounge-files/&lt;id&gt;/</li>
+   *  <li>/weblounge-files/&lt;id&gt;/&lt;filename&gt;</li>
    * </ul>
    * 
    * @param serverUrl
@@ -237,7 +237,7 @@ public class FilesTest extends IntegrationTestBase {
    */
   private void testGetDocumentByIdAndName(String serverUrl) throws Exception {
     HttpClient httpClient = null;
-    String url = UrlUtils.concat(serverUrl, "files", resourceId, filenameGerman);
+    String url = UrlUtils.concat(serverUrl, "weblounge-files", resourceId, filenameGerman);
     HttpGet request = new HttpGet(url);
     request.setHeader("Accept-Language", "de");
     httpClient = new DefaultHttpClient();

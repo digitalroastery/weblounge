@@ -179,7 +179,7 @@ public class ImagesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests for the special <code>/images</code> uri prefix that is provided by
+   * Tests for the special <code>/weblounge-images</code> uri prefix that is provided by
    * the file request handler.
    * 
    * @param serverUrl
@@ -193,7 +193,7 @@ public class ImagesTest extends IntegrationTestBase {
     logger.info("Testing original, (header-based) localized image by id");
     logger.info("");
 
-    String url = UrlUtils.concat(serverUrl, "images", imageId);
+    String url = UrlUtils.concat(serverUrl, "weblounge-images", imageId);
     HttpGet request = new HttpGet(url);
     request.setHeader("Accept-Language", "de");
     testGermanOriginal(request);
@@ -219,7 +219,7 @@ public class ImagesTest extends IntegrationTestBase {
     logger.info("Testing original, (header-based) localized image by id and name");
     logger.info("");
 
-    String url = UrlUtils.concat(serverUrl, "images", imageId, filenameGerman);
+    String url = UrlUtils.concat(serverUrl, "weblounge-images", imageId, filenameGerman);
     HttpGet request = new HttpGet(url);
     request.setHeader("Accept-Language", "de");
     testGermanOriginal(request);
@@ -281,7 +281,7 @@ public class ImagesTest extends IntegrationTestBase {
   }
 
   /**
-   * Tests for the special <code>/images</code> uri prefix that is provided by
+   * Tests for the special <code>/weblounge-images</code> uri prefix that is provided by
    * the file request handler.
    * 
    * @param serverUrl
@@ -297,7 +297,7 @@ public class ImagesTest extends IntegrationTestBase {
 
     List<String> eTags = new ArrayList<String>();
     for (ImageStyle style : styles) {
-      String url = UrlUtils.concat(serverUrl, "images", imageId);
+      String url = UrlUtils.concat(serverUrl, "weblounge-images", imageId);
       HttpGet request = new HttpGet(url + "?style=" + style.getIdentifier());
 
       // English
