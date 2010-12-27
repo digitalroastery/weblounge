@@ -48,11 +48,8 @@ public class TaggedCacheHandle extends CacheHandleImpl {
   /** The default recheck time for a page */
   protected static final long DEFAULT_RECHECK = Times.MS_PER_HOUR;
 
-  /** The hash code */
-  private int hashCode;
-
   /** The unique tag set of this cache handle */
-  private Tag[] primaryTags;
+  private CacheTag[] primaryTags;
 
   /**
    * Creates a new <code>TaggedCacheHandle</code>.
@@ -69,7 +66,6 @@ public class TaggedCacheHandle extends CacheHandleImpl {
     super(expires, recheck);
     setKey(createKey(primary));
     Set<Tag> s = new TreeSet<Tag>(new TagComparator());
-    hashCode = 0;
     for (CacheTag t : primary) {
       if (t == null)
         throw new NullPointerException("Tag must no be null");
@@ -81,54 +77,19 @@ public class TaggedCacheHandle extends CacheHandleImpl {
         throw new IllegalArgumentException("No wildcard tags allowed as primary tag");
       if (!s.add(t))
         throw new IllegalArgumentException("No duplicate unique tags allowed");
-      hashCode += t.hashCode();
       addTag(t);
     }
-    primaryTags = s.toArray(new Tag[s.size()]);
+    primaryTags = primary;
   }
 
   /**
-   * @see ch.o2it.weblounge.cache.CacheHandle.cache.CacheHandle#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object o) {
-    if (o == this)
-      return true;
-    if (o instanceof TaggedCacheHandle) {
-      TaggedCacheHandle h = (TaggedCacheHandle) o;
-      if (hashCode != h.hashCode)
-        return false;
-      if (primaryTags.length != h.primaryTags.length)
-        return false;
-      for (Tag tag : primaryTags) {
-        boolean found = false;
-        for (Tag otherTag : h.primaryTags) {
-          if (tag.equals(otherTag)) {
-            found = true;
-            break;
-          }
-        }
-        if (!found)
-          return false;
-      }
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Returns the tag with the specified name.
+   * Returns the tags that were specified when this cache handle was created and
+   * excludes those tags that were added later on during processing.
    * 
-   * @param name
-   *          the tag name
-   * @return the tag
+   * @return the primary tags
    */
-  protected Tag getTag(String name) {
-    for (Tag t : primaryTags) {
-      if (t.getName().equals(name))
-        return t;
-    }
-    return null;
+  public CacheTag[] getPrimaryTags() {
+    return primaryTags;
   }
 
   /**
@@ -158,22 +119,6 @@ public class TaggedCacheHandle extends CacheHandleImpl {
     }
 
     return key.toString();
-  }
-
-  /**
-   * @see ch.o2it.weblounge.cache.CacheHandle.cache.CacheHandle#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    return hashCode;
-  }
-
-  /**
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
-    return "TaggedCacheHandle";
   }
 
   /**

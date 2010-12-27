@@ -28,11 +28,9 @@ import ch.o2it.weblounge.common.request.CacheTag;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -219,7 +217,6 @@ public class CacheHandleImpl implements CacheHandle {
     if (name == null)
       throw new IllegalArgumentException("Cannot remove tag without a name");
     Object tag = null;
-    List<CacheTag> tags = new ArrayList<CacheTag>();
     for (CacheTag t : tags) {
       if (t.getName().equals(name) && t.getValue().equals(value)) {
         tag = t;

@@ -62,7 +62,7 @@ final class CacheableHttpServletResponseHeaders implements Serializable {
       int hashIndex = key.indexOf('#');
       if (hashIndex > 0)
         key = key.substring(hashIndex);
-      if (ignoredHeaders.contains(key.toLowerCase()))
+      if (!ignoredHeaders.contains(key.toLowerCase()))
         response.addHeader(key, e.getValue());
     }
   }
