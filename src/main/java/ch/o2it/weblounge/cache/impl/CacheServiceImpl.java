@@ -426,7 +426,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       
       long clientCacheDate = request.getDateHeader("If-Modified-Since");
       long validTimeInSeconds = (element.getExpirationTime() - System.currentTimeMillis()) / 1000;
-      String eTag = request.getHeader("If-Match");
+      String eTag = request.getHeader("If-None-Match");
       
       try {
 
