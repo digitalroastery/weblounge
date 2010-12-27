@@ -431,7 +431,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       try {
 
         // Write the response headers
-        response.setContentType(entry.getHeaders().getContentType());
+        response.setContentType(entry.getContentType());
         response.setContentLength(entry.getContent().length);
         
         entry.getHeaders().apply(response);

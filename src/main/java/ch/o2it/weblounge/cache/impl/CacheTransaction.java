@@ -38,7 +38,7 @@ final class CacheTransaction {
   private CacheOutputStream os = new CacheOutputStream();
 
   /** The cached response meta info */
-  private CachedHttpResponseHeaders headers = new CachedHttpResponseHeaders();
+  private CacheableHttpServletResponseHeaders headers = new CacheableHttpServletResponseHeaders();
 
   /** The output filter */
   private StreamFilter filter = null;
@@ -106,7 +106,7 @@ final class CacheTransaction {
    * 
    * @return the response headers
    */
-  CachedHttpResponseHeaders getHeaders() {
+  CacheableHttpServletResponseHeaders getHeaders() {
     return headers;
   }
 

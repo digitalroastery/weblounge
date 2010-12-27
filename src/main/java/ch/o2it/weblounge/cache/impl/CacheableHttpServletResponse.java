@@ -218,7 +218,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
     super.setContentType(type);
     contentType = type;
     if (tx != null)
-      tx.getHeaders().setContentType(type);
+      tx.getHeaders().setHeader("Content-Type", type);
 
     /* check whether the encoding has changed */
     if (encoding == null || !encoding.equals(getCharacterEncoding())) {

@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletResponse;
  * <code>HTTP</code> headers that have been set in the associated
  * <code>HttpServletResponse</code>.
  */
-final class CachedHttpResponseHeaders implements Serializable {
+final class CacheableHttpServletResponseHeaders implements Serializable {
 
   /** The serial version uid */
   private static final long serialVersionUID = 8273352269230366714L;
@@ -41,15 +41,11 @@ final class CachedHttpResponseHeaders implements Serializable {
   /** List of custom headers */
   private Map<String, String> headers = new HashMap<String, String>(5);
 
-  /** Content type of the message */
-  private String contentType = null;
-
   /** List with headers to ignore */
   private static final List<String> ignoredHeaders = new ArrayList<String>();
 
   static {
     ignoredHeaders.add("content-length");
-    ignoredHeaders.add("content-type");
   }
 
   /**
@@ -72,22 +68,15 @@ final class CachedHttpResponseHeaders implements Serializable {
   }
 
   /**
-   * Sets the content type.
+   * Returns <code>true</code> if the response headers contain the header with
+   * name <code>header</code>.
    * 
-   * @param contentType
-   *          the content type
+   * @param header
+   *          the header name
+   * @return <code>true</code> if the header was set
    */
-  public void setContentType(String contentType) {
-    this.contentType = contentType;
-  }
-
-  /**
-   * Returns the content type.
-   * 
-   * @return the content type
-   */
-  public String getContentType() {
-    return contentType;
+  boolean containsHeader(String header) {
+    return headers.containsKey(header);
   }
 
   /**

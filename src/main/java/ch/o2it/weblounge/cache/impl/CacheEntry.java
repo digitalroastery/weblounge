@@ -42,7 +42,7 @@ public final class CacheEntry implements Serializable {
   private byte[] content;
 
   /** The response metadata */
-  private CachedHttpResponseHeaders headers = null;
+  private CacheableHttpServletResponseHeaders headers = null;
 
   /** Date where the entry was added to the cache */
   private long entryCreationDate = System.currentTimeMillis();
@@ -61,7 +61,7 @@ public final class CacheEntry implements Serializable {
    *           if the content or the headers collection is <code>null</code>
    */
   protected CacheEntry(CacheHandle handle, byte[] content,
-      CachedHttpResponseHeaders headers) {
+      CacheableHttpServletResponseHeaders headers) {
     if (handle == null)
       throw new IllegalArgumentException("Handle cannot be null");
     if (content == null)
@@ -141,7 +141,7 @@ public final class CacheEntry implements Serializable {
    * 
    * @return the headers
    */
-  public CachedHttpResponseHeaders getHeaders() {
+  public CacheableHttpServletResponseHeaders getHeaders() {
     return headers;
   }
 
@@ -152,6 +152,18 @@ public final class CacheEntry implements Serializable {
    */
   public byte[] getContent() {
     return content;
+  }
+
+  /**
+   * Returns the content type.
+   * 
+   * @return the content type
+   */
+  public String getContentType() {
+    Object contentType = headers.getHeaders().get("Content-Type");
+    if (contentType instanceof String)
+      return (String)contentType;
+    throw new IllegalStateException("Response contained more than one 'Content-type' header");
   }
 
   /**
