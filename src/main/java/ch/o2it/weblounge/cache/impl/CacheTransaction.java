@@ -56,6 +56,8 @@ final class CacheTransaction {
    * 
    * @param hnd
    *          the cache handle
+   * @param cache
+   *          the cache identifier
    * @param filter
    *          the filter
    */

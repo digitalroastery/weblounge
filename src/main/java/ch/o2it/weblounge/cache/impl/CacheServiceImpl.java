@@ -423,25 +423,25 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // If it exists, write the contents back to the response
     if (element != null && element.getValue() != null) {
       CacheEntry entry = (CacheEntry) element.getValue();
-      
+
       long clientCacheDate = request.getDateHeader("If-Modified-Since");
       long validTimeInSeconds = (element.getExpirationTime() - System.currentTimeMillis()) / 1000;
       String eTag = request.getHeader("If-None-Match");
-      
+
       try {
 
         // Write the response headers
         response.setContentType(entry.getContentType());
         response.setContentLength(entry.getContent().length);
-        
+
         entry.getHeaders().apply(response);
-        
+
         // Add cache control headers
         response.setDateHeader("Date", System.currentTimeMillis());
         response.setDateHeader("Expires", element.getExpirationTime());
         response.setHeader("Cache-Control", "max-age=" + validTimeInSeconds + ", must-revalidate");
         response.setHeader("Etag", entry.getETag());
-        
+
         // Add the X-Cache-Key header
         StringBuffer cacheKeyHeader = new StringBuffer(site.getName());
         cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
@@ -485,14 +485,14 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // Is the response ready to be cached?
     if (transaction == null || !transaction.isValid() || !response.isValid()) {
-      logger.debug("Response to {} was invalid and is not cached", response);
+      logger.debug("Response to {} was invalid and is not being cached", response);
       return false;
     }
 
     // Make sure the cache is still available
     Cache cache = cacheManager.getCache(transaction.getCache());
     if (cache == null) {
-      logger.debug("Cache for {} disappeared, response is not cached", response);
+      logger.debug("Cache for {} disappeared, response is not being cached", response);
       return false;
     }
 
@@ -515,6 +515,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (cacheableResponse == null)
       return;
     cacheableResponse.invalidate();
+    CacheHandle handle = cacheableResponse.tx.getHandle();
+    String cache = cacheableResponse.tx.getCache();
+    invalidate(handle, cache);
   }
 
   /**
@@ -610,9 +613,24 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       throw new IllegalArgumentException("Handle cannot be null");
     if (site == null)
       throw new IllegalArgumentException("Site cannot be null");
+    invalidate(handle, site.getIdentifier());
+  }
+
+  /**
+   * Removes the entry identified by <code>handle</code> from the given cache.
+   * 
+   * @param handle
+   *          the cache handle
+   * @param cacheId
+   *          the cache identifier
+   */
+  void invalidate(CacheHandle handle, String cacheId) {
+    if (handle == null)
+      throw new IllegalArgumentException("Handle cannot be null");
+    if (cacheId == null)
+      throw new IllegalArgumentException("Site cannot be null");
 
     // Load the cache
-    String cacheId = site.getIdentifier();
     Cache cache = cacheManager.getCache(cacheId);
     if (cache == null)
       throw new IllegalStateException("Cache '" + cacheId + "' is not online");
