@@ -292,13 +292,17 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         logger.error(t.getMessage(), t);
         DispatchUtils.sendInternalError(t.getMessage(), request, response);
       } finally {
+        if (!response.isValid() && cache != null)
+          cache.invalidate(response);
         logger.debug("Finished processing of {}", httpRequest.getRequestURI());
       }
     }
     
     // Apparently, nobody felt responsible for this request
-    logger.debug("No handler found to handle {}", request);
+    logger.debug("No handler found for {}", request);
     DispatchUtils.sendNotFound(request, response);
+    if (cache != null)
+      cache.invalidate(response);
     fireRequestFailed(request, response, site);
   }
 
