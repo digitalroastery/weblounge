@@ -209,16 +209,17 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
         len = 0;
         if (value instanceof String[]) {
           String[] s1 = (String[]) value;
-          for (int i = 0; i < s1.length;)
+          for (int i = 0; i < s1.length; i++)
             s[len++] = s1[i];
-        } else
+        } else {
           s[len++] = (String) value;
-        for (int i = 0; i < s2.length;)
+        }
+        for (int i = 0; i < s2.length; i++)
           s[len++] = s2[i];
         m.put(name, s);
-      } else if (value instanceof String[])
+      } else if (value instanceof String[]) {
         m.put(name, value);
-      else {
+      } else {
         String[] s = new String[1];
         s[0] = (String) value;
         m.put(name, s);
@@ -260,9 +261,9 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
           return s1;
         String[] s = new String[s1.length + s2.length];
         int len = 0;
-        for (int i = 0; i < s1.length;)
+        for (int i = 0; i < s1.length; i++)
           s[len++] = s1[i];
-        for (int i = 0; i < s2.length;)
+        for (int i = 0; i < s2.length; i++)
           s[len++] = s2[i];
         return s;
       }
