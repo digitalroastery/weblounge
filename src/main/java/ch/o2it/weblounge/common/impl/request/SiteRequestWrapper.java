@@ -38,7 +38,6 @@ import java.util.Set;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpUtils;
 
 /**
  * DispatcherRequest
@@ -120,21 +119,10 @@ public class SiteRequestWrapper extends HttpServletRequestWrapper implements Web
     this.site = request.getSite();
     this.include = include;
     
-    // Take target url apart into url and query string. All of the url's query
-    // parameters are then added to the original request's parameters.
-    String queryString = request.getQueryString();
     int index = url.indexOf('?');
-    if (index != -1) {
-      if (index < url.length() - 1) {
-        String query = url.substring(index + 1);
-        if (queryString == null || queryString.length() == 0)
-          queryString = query;
-        else
-          queryString += "&" + query;
-        params = HttpUtils.parseQueryString(query);
-      }
-      if (index > 0)
-        url = url.substring(0, index);
+    params = request.getParameterMap();
+    if (index > -1) {
+      url = url.substring(0, index);
     }
 
     // Set the context path, servlet path and request uri
