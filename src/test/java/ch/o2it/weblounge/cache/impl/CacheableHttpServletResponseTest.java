@@ -137,7 +137,7 @@ public class CacheableHttpServletResponseTest {
    * .
    */
   @Test
-  public void testEndOutput() throws Exception {
+  public void testEndOutput() {
     CacheTransaction tx = response.startTransaction(handle, "cache", null);
     CacheTransaction txEnd = response.endOutput();
     assertEquals(tx, txEnd);
