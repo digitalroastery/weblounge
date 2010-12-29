@@ -512,7 +512,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public void invalidate(WebloungeResponse response) {
     CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
-    if (cacheableResponse == null)
+    if (cacheableResponse == null || cacheableResponse.tx == null)
       return;
     cacheableResponse.invalidate();
     CacheHandle handle = cacheableResponse.tx.getHandle();
