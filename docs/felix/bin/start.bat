@@ -1,4 +1,5 @@
 SETLOCAL
+ECHO OFF
 REM ##
 REM # Configure these variables to match your environment
 REM # If you have system-wide variables for FELIX_HOME and M2_REPO then you
@@ -6,14 +7,20 @@ REM # should not have to make any changes to this file.
 REM ##
 
 REM # Make sure the following two path entries do *not* contain spaces
+REM # or are escaped by double quotes.
+REM # Also, make sure that the user executing Weblounge has write access
+REM # to FELIX_WORKDIR.
 
 REM # Felix home
-SET FELIX_HOME=C:\Libraries\felix-framework-2.0.0
-SET FELIX_LOGDIR=%FELIX_HOME%\logs
-SET FELIX_CACHEDIR=%FELIX_HOME%\cache
-SET FELIX_TEMPDIR=%FELIX_HOME%\work
+SET FELIX_HOME="C:\Program Files\Weblounge"
+SET FELIX_WORKDIR="C:\Users\johndoe\AppData\Local\Weblounge"
+SET FELIX_LOGDIR=%FELIX_WORKDIR%\logs
+SET FELIX_CACHEDIR=%FELIX_WORKDIR%\cache
+SET FELIX_TEMPDIR=%FELIX_WORKDIR%\work
 
-REM # Maven home
+REM # Maven home. This variable needs to be set if certain bundles are
+REM # being referenced from the local maven repository in FELIX_HOME/conf
+REM # 
 SET M2_REPO=C:\Users\johndoe\.m2\repository
 
 REM # Felix debug options
