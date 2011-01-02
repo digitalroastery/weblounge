@@ -120,6 +120,7 @@ public class ActionSupportTest {
 
     // module
     module = new ModuleImpl();
+    module.setIdentifier(identifier);
 
     actionUrl = new WebUrlImpl(site, UrlUtils.concat(siteUrl, mountpoint));
   }
