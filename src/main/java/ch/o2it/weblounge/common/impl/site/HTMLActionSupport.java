@@ -78,6 +78,9 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   /** The page template id */
   protected String templateId = null;
 
+  /** The stage renderer id */
+  protected String stageRendererId = null;
+
   /** The page template */
   protected PageTemplate template = null;
 
@@ -85,7 +88,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
   protected Page page = null;
 
   /** The renderer used for this request */
-  protected Renderer renderer = null;
+  protected PageletRenderer renderer = null;
 
   /** The information messages */
   protected List<String> infoMessages = null;
@@ -116,12 +119,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public HTMLActionSupport(String renderer) {
     flavors.add(RequestFlavor.HTML);
-    if (StringUtils.isNotBlank(renderer)) {
-      this.renderer = getModule().getRenderer(renderer);
-      if (this.renderer == null) {
-        logger.warn("Default renderer '{}' for action {} not found", renderer, this);
-      }
-    }
+    stageRendererId = renderer;
   }
 
   /**
@@ -153,6 +151,22 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
       this.pageURI = new PageURIImpl(site, targetPath);
     if (templateId != null)
       this.template = site.getTemplate(templateId);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.impl.site.ActionSupport#setModule(ch.o2it.weblounge.common.site.Module)
+   */
+  @Override
+  public void setModule(Module module) {
+    super.setModule(module);
+    if (StringUtils.isNotBlank(stageRendererId)) {
+      this.renderer = getModule().getRenderer(stageRendererId);
+      if (this.renderer == null) {
+        logger.warn("Stage renderer '{}' for action {} not found", renderer, this);
+      }
+    }
   }
 
   /**
@@ -250,6 +264,43 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    */
   public PageTemplate getTemplate() {
     return template;
+  }
+
+  /**
+   * Sets the renderer that is used to renderer the <code>stage</code> composer
+   * when implementers don't overwrite
+   * {@link #startStage(WebloungeRequest, WebloungeResponse, Composer)} and
+   * {@link #startComposer(WebloungeRequest, WebloungeResponse, Composer)}.
+   * 
+   * @param renderer
+   *          the stage renderer
+   */
+  public void setStageRenderer(PageletRenderer renderer) {
+    this.stageRendererId = (renderer != null) ? renderer.getIdentifier() : null;
+    this.renderer = renderer;
+  }
+
+  /**
+   * Returns the renderer that is used to renderer the <code>stage</code>
+   * composer when implementers don't overwrite
+   * {@link #startStage(WebloungeRequest, WebloungeResponse, Composer)} and
+   * {@link #startComposer(WebloungeRequest, WebloungeResponse, Composer)}.
+   * 
+   * @return the renderer
+   */
+  public PageletRenderer getStageRenderer() {
+    if (renderer == null) {
+      if (StringUtils.isNotBlank(stageRendererId)) {
+        if (module == null) {
+          throw new IllegalStateException("Module was not set");
+        }
+        renderer = getModule().getRenderer(stageRendererId);
+        if (renderer != null) {
+          logger.warn("Stage renderer '{}' not found in module '{}'", stageRendererId, module.getIdentifier());
+        }
+      }
+    }
+    return renderer;
   }
 
   /**

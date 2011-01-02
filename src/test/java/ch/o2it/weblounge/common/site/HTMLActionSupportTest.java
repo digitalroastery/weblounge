@@ -27,9 +27,11 @@ import static org.junit.Assert.assertNull;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.site.ActionSupport;
 import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
@@ -63,6 +65,9 @@ public class HTMLActionSupportTest extends ActionSupportTest {
 
   /** The page template */
   protected PageTemplate pageTemplate = null;
+  
+  /** A renderer */
+  protected PageletRenderer renderer = null;
 
   /**
    * @throws java.lang.Exception
@@ -70,10 +75,11 @@ public class HTMLActionSupportTest extends ActionSupportTest {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    htmlAction = (HTMLActionSupport)action;
+    htmlAction = (HTMLActionSupport) action;
     htmlAction.setPageURI(pageURI);
     htmlAction.setTemplate(site.getTemplate(template));
     htmlAction.setPage(page);
+    htmlAction.setModule(module);
   }
 
   /**
@@ -83,6 +89,8 @@ public class HTMLActionSupportTest extends ActionSupportTest {
    *           if setting up the preliminaries fails
    */
   protected void setUpPreliminaries() throws Exception {
+    super.setUpPreliminaries();
+    
     pageTemplate = new PageTemplateImpl(template, new URL("file:///template.jsp"));
 
     // site
@@ -91,13 +99,27 @@ public class HTMLActionSupportTest extends ActionSupportTest {
     EasyMock.expect(site.getUrl()).andReturn(new WebUrlImpl(site, siteUrl));
     EasyMock.replay(site);
 
+    // Renderer 
+    renderer = new PageletRendererImpl("renderer");
+    
     // module
-    module = EasyMock.createNiceMock(Module.class);
-    EasyMock.replay(module);
+    module.addRenderer(renderer);
 
     pageURI = new PageURIImpl(site, pageURIPath);
     page = new PageImpl(pageURI);
     actionUrl = new WebUrlImpl(site, UrlUtils.concat(siteUrl, mountpoint));
+  }
+
+  /**
+   * Test method for {@link
+   * ch.o2it.weblounge.common.impl.site.HTMLActionSupport(String)}.
+   */
+  @Test
+  public void testConstructWithRenderer() {
+    HTMLActionSupport myAction = new HTMLActionSupport(renderer.getIdentifier());
+    myAction.setModule(module);
+    assertNotNull(myAction.getModule());
+    assertNotNull(myAction.getStageRenderer());
   }
 
   /**
@@ -137,7 +159,7 @@ public class HTMLActionSupportTest extends ActionSupportTest {
   @Test
   public void testPassivate() {
     super.testPassivate();
-    
+
     assertEquals(pageURI, htmlAction.getPageURI());
     assertNotNull(template, htmlAction.getTemplate());
 
