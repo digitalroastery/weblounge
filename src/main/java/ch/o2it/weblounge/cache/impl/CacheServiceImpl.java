@@ -149,17 +149,22 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   protected boolean statisticsEnabled = DEFAULT_STATISTICS_ENABLED;
 
   /** The ehache cache manager */
-  private CacheManager cacheManager = null;
+  protected CacheManager cacheManager = null;
 
   /** The stream filter */
-  private StreamFilter filter = null;
+  protected StreamFilter filter = null;
+
+  /** The site */
+  protected Site site = null;
 
   /**
    * Creates a new cache service.
    */
-  public CacheServiceImpl() {
+  public CacheServiceImpl(Site site) {
+    this.site = site;
     InputStream configInputStream = null;
     try {
+      // TODO: Adjust path
       configInputStream = getClass().getClassLoader().getResourceAsStream(CACHE_MANAGER_CONFIG);
       cacheManager = new CacheManager(configInputStream);
     } finally {
@@ -316,12 +321,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#preload(ch.o2it.weblounge.common.site.Site,
-   *      ch.o2it.weblounge.common.request.CacheTag[])
+   * @see ch.o2it.weblounge.common.request.ResponseCache#preload(ch.o2it.weblounge.common.request.CacheTag[])
    */
-  public void preload(Site site, CacheTag[] tags) {
-    if (site == null)
-      throw new IllegalArgumentException("Site cannot be null");
+  public void preload(CacheTag[] tags) {
     if (tags == null || tags.length == 0)
       throw new IllegalArgumentException("Tags cannot be null or empty");
 
@@ -411,7 +413,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       throw new IllegalStateException("Cached response is not properly wrapped");
     }
 
-    Site site = request.getSite();
     String cacheId = site.getIdentifier();
     Cache cache = cacheManager.getCache(cacheId);
     if (cache == null)
@@ -577,10 +578,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidate(ch.o2it.weblounge.common.request.CacheTag[],
-   *      ch.o2it.weblounge.common.site.Site)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidate(ch.o2it.weblounge.common.request.CacheTag[])
    */
-  public void invalidate(CacheTag[] tags, Site site) {
+  public void invalidate(CacheTag[] tags) {
     if (tags == null || tags.length == 0)
       throw new IllegalArgumentException("Tags cannot be null or empty");
     if (site == null)
@@ -605,14 +605,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidate(ch.o2it.weblounge.common.request.CacheHandle,
-   *      ch.o2it.weblounge.common.site.Site)
+   * @see ch.o2it.weblounge.common.request.ResponseCache#invalidate(ch.o2it.weblounge.common.request.CacheHandle)
    */
-  public void invalidate(CacheHandle handle, Site site) {
+  public void invalidate(CacheHandle handle) {
     if (handle == null)
       throw new IllegalArgumentException("Handle cannot be null");
-    if (site == null)
-      throw new IllegalArgumentException("Site cannot be null");
     invalidate(handle, site.getIdentifier());
   }
 
@@ -628,7 +625,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (handle == null)
       throw new IllegalArgumentException("Handle cannot be null");
     if (cacheId == null)
-      throw new IllegalArgumentException("Site cannot be null");
+      throw new IllegalArgumentException("Cache id cannot be null");
 
     // Load the cache
     Cache cache = cacheManager.getCache(cacheId);
