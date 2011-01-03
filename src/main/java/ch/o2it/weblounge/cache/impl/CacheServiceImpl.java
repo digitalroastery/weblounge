@@ -24,26 +24,22 @@ import ch.o2it.weblounge.cache.CacheService;
 import ch.o2it.weblounge.cache.StreamFilter;
 import ch.o2it.weblounge.cache.impl.handle.TaggedCacheHandle;
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Site;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.ConfigurationFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,6 +143,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /** Whether cache statistics are enabled */
   protected boolean statisticsEnabled = DEFAULT_STATISTICS_ENABLED;
+  
+  /** Identifier for the default cache */
+  private static final String DEFAULT_CACHE = "site";
 
   /** The ehache cache manager */
   protected CacheManager cacheManager = null;
@@ -154,71 +153,52 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** The stream filter */
   protected StreamFilter filter = null;
 
-  /** The site */
-  protected Site site = null;
+  /** Cache identifier */
+  protected String id = null;
 
-  /**
-   * Creates a new cache service.
-   */
-  public CacheServiceImpl(Site site) {
-    this.site = site;
-    InputStream configInputStream = null;
-    try {
-      // TODO: Adjust path
-      configInputStream = getClass().getClassLoader().getResourceAsStream(CACHE_MANAGER_CONFIG);
-      cacheManager = new CacheManager(configInputStream);
-    } finally {
-      IOUtils.closeQuietly(configInputStream);
-    }
-  }
-
-  /**
-   * Callback for OSGi's declarative services component activation.
-   * 
-   * @param context
-   *          the component context
-   * @throws Exception
-   *           if component activation fails
-   */
-  void activate(ComponentContext context) throws Exception {
-    BundleContext bundleContext = context.getBundleContext();
-
-    logger.info("Starting cache service");
-
-    // Try to get hold of the service configuration
-    ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
-    if (configAdminRef != null) {
-      ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(configAdminRef);
-      Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
-      if (config != null) {
-        updated(config);
-      } else {
-        logger.debug("No customized configuration found for cache");
-      }
-    } else {
-      logger.debug("No configuration admin service found while looking for cache configuration");
-    }
-  }
-
-  /**
-   * Callback for OSGi's declarative services component dactivation.
-   * 
-   * @param context
-   *          the component context
-   * @throws Exception
-   *           if component inactivation fails
-   */
-  void deactivate(ComponentContext context) throws Exception {
-    shutdown();
-  }
+  /** Cache name */
+  protected String name = null;
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.cache.CacheService#getSite()
+   * @see ch.o2it.weblounge.cache.CacheService#init(java.lang.String,
+   *      java.lang.String, java.lang.String)
    */
-  public Site getSite() {
-    return site;
+  public void init(String id, String name, String diskStorePath) {
+    this.id = id;
+    this.name = name;
+
+    InputStream configInputStream = null;
+    try {
+      configInputStream = getClass().getClassLoader().getResourceAsStream(CACHE_MANAGER_CONFIG);
+      Configuration cacheManagerConfig = ConfigurationFactory.parseConfiguration(configInputStream);
+      cacheManagerConfig.getDiskStoreConfiguration().setPath(diskStorePath);
+      cacheManager = new CacheManager(cacheManagerConfig);
+    } finally {
+      IOUtils.closeQuietly(configInputStream);
+    }
+
+    // Configure the cache
+    CacheConfiguration cacheConfig = new CacheConfiguration();
+    cacheConfig.setName(DEFAULT_CACHE);
+    cacheConfig.setDiskStorePath(diskStorePath);
+    cacheConfig.setEternal(false);
+    cacheConfig.setDiskPersistent(diskPersistent);
+    cacheConfig.setMaxElementsInMemory(maxElementsInMemory);
+    cacheConfig.setMaxElementsOnDisk(maxElementsOnDisk);
+    cacheConfig.setOverflowToDisk(overflowToDisk);
+    cacheConfig.setStatistics(statisticsEnabled);
+    cacheConfig.setTimeToIdleSeconds(timeToIdle);
+    cacheConfig.setTimeToLiveSeconds(timeToLive);
+
+    Cache cache = new Cache(cacheConfig);
+    cacheManager.addCache(cache);
+    if (overflowToDisk)
+      logger.info("Cache for site '{}' created at {}", id, cacheManager.getDiskStorePath());
+    else
+      logger.info("In-memory cache for site '{}' created");
+
   }
 
   /**
@@ -227,6 +207,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    * @see ch.o2it.weblounge.cache.CacheService#shutdown()
    */
   public void shutdown() {
+    if (cacheManager == null)
+      return;
     for (String cacheName : cacheManager.getCacheNames()) {
       Cache cache = cacheManager.getCache(cacheName);
       cache.dispose();
@@ -234,6 +216,15 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     cacheManager.shutdown();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.cache.CacheService#getIdentifier()
+   */
+  public String getIdentifier() {
+    return id;
+  }
+  
   /**
    * Configures the caching service. Available options are:
    * <ul>
@@ -345,17 +336,14 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (tags == null || tags.length == 0)
       throw new IllegalArgumentException("Tags cannot be null or empty");
 
-    String cacheId = site.getIdentifier();
-    Cache cache = cacheManager.getCache(cacheId);
-    if (cache == null)
-      throw new IllegalStateException("Cache '" + cacheId + "' is not online");
+    Cache cache = cacheManager.getCache(DEFAULT_CACHE);
 
     // Get the matching keys and load the elements into the cache
     Collection<Object> keys = getKeys(cache, tags);
     for (Object key : keys) {
       cache.load(key);
     }
-    logger.info("Loaded first {} elements of cache '{}' into memory", keys.size(), cacheId);
+    logger.info("Loaded first {} elements of cache '{}' into memory", keys.size(), id);
   }
 
   /**
@@ -431,10 +419,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       throw new IllegalStateException("Cached response is not properly wrapped");
     }
 
-    String cacheId = site.getIdentifier();
-    Cache cache = cacheManager.getCache(cacheId);
+    Cache cache = cacheManager.getCache(DEFAULT_CACHE);
     if (cache == null)
-      throw new IllegalStateException("No cache found for site '" + site + "'");
+      throw new IllegalStateException("No cache found for site '" + id + "'");
 
     // Try to load the content from the cache
     Element element = cache.get(handle.getKey());
@@ -462,7 +449,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         response.setHeader("Etag", entry.getETag());
 
         // Add the X-Cache-Key header
-        StringBuffer cacheKeyHeader = new StringBuffer(site.getName());
+        StringBuffer cacheKeyHeader = new StringBuffer(name);
         cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
         response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
 
@@ -483,7 +470,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       }
     }
 
-    cacheableResponse.startTransaction(handle, cacheId, filter);
+    cacheableResponse.startTransaction(handle, filter);
     response.setHeader("Etag", CacheEntry.createETag(handle.getCreationDate()));
     response.setDateHeader("Expires", handle.getCreationDate() + Times.MS_PER_MIN);
     return handle;
@@ -509,7 +496,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
 
     // Make sure the cache is still available
-    Cache cache = cacheManager.getCache(transaction.getCache());
+    Cache cache = cacheManager.getCache(DEFAULT_CACHE);
     if (cache == null) {
       logger.debug("Cache for {} disappeared, response is not being cached", response);
       return false;
@@ -535,8 +522,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       return;
     cacheableResponse.invalidate();
     CacheHandle handle = cacheableResponse.tx.getHandle();
-    String cache = cacheableResponse.tx.getCache();
-    invalidate(handle, cache);
+    invalidate(handle);
   }
 
   /**
@@ -601,14 +587,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   public void invalidate(CacheTag[] tags) {
     if (tags == null || tags.length == 0)
       throw new IllegalArgumentException("Tags cannot be null or empty");
-    if (site == null)
-      throw new IllegalArgumentException("Site cannot be null");
 
     // Load the cache
-    String cacheId = site.getIdentifier();
-    Cache cache = cacheManager.getCache(cacheId);
-    if (cache == null)
-      throw new IllegalStateException("Cache '" + cacheId + "' is not online");
+    Cache cache = cacheManager.getCache(DEFAULT_CACHE);
 
     // Remove the objects matched by the tags
     long removed = 0;
@@ -617,7 +598,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
         removed++;
     }
 
-    logger.debug("Removed {} elements from cache '{}'", removed, cacheId);
+    logger.debug("Removed {} elements from cache '{}'", removed, id);
   }
 
   /**
@@ -628,30 +609,11 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   public void invalidate(CacheHandle handle) {
     if (handle == null)
       throw new IllegalArgumentException("Handle cannot be null");
-    invalidate(handle, site.getIdentifier());
-  }
-
-  /**
-   * Removes the entry identified by <code>handle</code> from the given cache.
-   * 
-   * @param handle
-   *          the cache handle
-   * @param cacheId
-   *          the cache identifier
-   */
-  void invalidate(CacheHandle handle, String cacheId) {
-    if (handle == null)
-      throw new IllegalArgumentException("Handle cannot be null");
-    if (cacheId == null)
-      throw new IllegalArgumentException("Cache id cannot be null");
 
     // Load the cache
-    Cache cache = cacheManager.getCache(cacheId);
-    if (cache == null)
-      throw new IllegalStateException("Cache '" + cacheId + "' is not online");
-
+    Cache cache = cacheManager.getCache(DEFAULT_CACHE);
     cache.remove(handle.getKey());
-    logger.debug("Removed {} from cache '{}'", handle.getKey(), cacheId);
+    logger.debug("Removed {} from cache '{}'", handle.getKey(), id);
   }
 
   /**
@@ -672,58 +634,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       response = ((ServletResponseWrapper) response).getResponse();
     }
     return null;
-  }
-
-  /**
-   * Callback for OSGi that is called when a new site is registered. Upon
-   * registration, a new cache will be created for this site.
-   * 
-   * @param site
-   *          the site
-   */
-  void addSite(Site site) {
-    String siteId = site.getIdentifier();
-    String cacheFile = PathUtils.concat(System.getProperty("java.io.tmpdir"), "weblounge", "sites", siteId, "cache");
-
-    // Configure the cache
-    CacheConfiguration cacheConfig = new CacheConfiguration();
-    cacheConfig.setName(siteId);
-    cacheConfig.setDiskStorePath(cacheFile);
-    cacheConfig.setEternal(false);
-    cacheConfig.setDiskPersistent(diskPersistent);
-    cacheConfig.setMaxElementsInMemory(maxElementsInMemory);
-    cacheConfig.setMaxElementsOnDisk(maxElementsOnDisk);
-    cacheConfig.setOverflowToDisk(overflowToDisk);
-    cacheConfig.setStatistics(statisticsEnabled);
-    cacheConfig.setTimeToIdleSeconds(timeToIdle);
-    cacheConfig.setTimeToLiveSeconds(timeToLive);
-
-    Cache cache = new Cache(cacheConfig);
-    cacheManager.addCache(cache);
-    if (overflowToDisk)
-      logger.info("Cache for site '{}' created at {}", siteId, cacheManager.getDiskStorePath());
-    else
-      logger.info("In-memory cache for site '{}' created");
-  }
-
-  /**
-   * Callback for OSGi that is called if a site is unregistered from the service
-   * registry. This method makes sure that the associated cache is properly shut
-   * down and disposed.
-   * 
-   * @param site
-   *          the site
-   */
-  void removeSite(Site site) {
-    String siteId = site.getIdentifier();
-    Cache cache = cacheManager.getCache(siteId);
-    if (cache == null) {
-      logger.warn("No cache found to disable for site '{}'", siteId);
-      return;
-    }
-    cache.dispose();
-    cacheManager.removeCache(siteId);
-    logger.info("Cache for site '{}' removed", siteId);
   }
 
 }

@@ -78,12 +78,10 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testStartTransaction() {
-    String cache = "cache";
     CacheHandle hdl = new CacheHandleImpl("/a/b/c", expirationTime, recheckTime);
-    CacheTransaction tx = response.startTransaction(hdl, cache, null);
+    CacheTransaction tx = response.startTransaction(hdl, null);
     assertNotNull(tx);
     assertEquals(hdl, tx.getHandle());
-    assertEquals(cache, tx.getCache());
   }
 
   /**
@@ -138,7 +136,7 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testEndOutput() {
-    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    CacheTransaction tx = response.startTransaction(handle, null);
     CacheTransaction txEnd = response.endOutput();
     assertEquals(tx, txEnd);
   }
@@ -150,7 +148,7 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testInvalidate() {
-    response.startTransaction(handle, "cache", null);
+    response.startTransaction(handle, null);
     assertTrue(response.isValid());
     response.invalidate();
     assertFalse(response.isValid());
@@ -164,7 +162,7 @@ public class CacheableHttpServletResponseTest {
   @Test
   public void testIsValid() {
     assertFalse(response.isValid());
-    response.startTransaction(handle, "cache", null);
+    response.startTransaction(handle, null);
     assertTrue(response.isValid());
   }
 
@@ -175,7 +173,7 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testSetContentTypeString() {
-    response.startTransaction(handle, "cache", null);
+    response.startTransaction(handle, null);
     assertTrue(response.isValid());
 
   }
@@ -187,7 +185,7 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testAddHeaderStringString() {
-    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    CacheTransaction tx = response.startTransaction(handle, null);
     String headerName = "Test-Header";
     response.addHeader(headerName, "testvalue");
     assertTrue(response.containsHeader(headerName));
@@ -205,7 +203,7 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testSetHeaderStringString() {
-    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    CacheTransaction tx = response.startTransaction(handle, null);
     String headerName = "Test-Header";
     String headerValue = "testvalue";
     String otherHeaderValue = "testvalue";
@@ -229,7 +227,7 @@ public class CacheableHttpServletResponseTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testAddDateHeaderStringLong() {
-    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    CacheTransaction tx = response.startTransaction(handle, null);
     String headerName = "Test-Date-Header";
     Date headerValue = new Date();
     Date otherHeaderValue = new Date(123456789);
@@ -257,7 +255,7 @@ public class CacheableHttpServletResponseTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testAddIntHeaderStringInt() {
-    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    CacheTransaction tx = response.startTransaction(handle, null);
     String headerName = "Test-Header";
     int headerValue = 12345;
     int otherHeaderValue = 6789;
@@ -282,7 +280,7 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testSetDateHeaderStringLong() {
-    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    CacheTransaction tx = response.startTransaction(handle, null);
     String headerName = "Test-Date-Header";
     Date headerValue = new Date();
     Date otherHeaderValue = new Date(123456789);
@@ -310,7 +308,7 @@ public class CacheableHttpServletResponseTest {
    */
   @Test
   public void testSetIntHeaderStringInt() {
-    CacheTransaction tx = response.startTransaction(handle, "cache", null);
+    CacheTransaction tx = response.startTransaction(handle, null);
     String headerName = "Test-Header";
     int headerValue = 12345;
     int otherHeaderValue = 6789;

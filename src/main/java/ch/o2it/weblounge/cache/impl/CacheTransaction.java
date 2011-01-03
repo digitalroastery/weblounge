@@ -46,9 +46,6 @@ final class CacheTransaction {
   /** True if the transaction has been invalidated */
   private boolean valid = true;
 
-  /** The cache identifier */
-  private String cache = null;
-
   /**
    * Creates a new transaction for the given handle, request and response. Any
    * output that is written to the response will be processed by the filter
@@ -61,9 +58,8 @@ final class CacheTransaction {
    * @param filter
    *          the filter
    */
-  CacheTransaction(CacheHandle hnd, String cache, StreamFilter filter) {
+  CacheTransaction(CacheHandle hnd, StreamFilter filter) {
     this.hnd = hnd;
-    this.cache = cache;
     this.filter = filter;
   }
 
@@ -74,15 +70,6 @@ final class CacheTransaction {
    */
   CacheHandle getHandle() {
     return hnd;
-  }
-
-  /**
-   * Returns the cache identifier.
-   * 
-   * @return the cache
-   */
-  String getCache() {
-    return cache;
   }
 
   /**

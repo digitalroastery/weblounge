@@ -92,18 +92,16 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    * 
    * @param handle
    *          the cache handle
-   * @param cache
-   *          the cache identifier
    * @param filter
    *          the stream filter
    * @return the transaction
    */
-  public CacheTransaction startTransaction(CacheHandle handle, String cache,
+  public CacheTransaction startTransaction(CacheHandle handle,
       StreamFilter filter) {
-    tx = new CacheTransaction(handle, cache, filter);
+    tx = new CacheTransaction(handle, filter);
     return tx;
   }
-  
+
   /**
    * Returns the modified writer that enables the <code>CacheManager</cache>
    * to copy the response to the cache.

@@ -21,13 +21,20 @@
 package ch.o2it.weblounge.cache.impl;
 
 import ch.o2it.weblounge.cache.CacheService;
-import ch.o2it.weblounge.common.site.Site;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Dictionary;
 
 /**
  * Service factory that will return a cache for each (site) bundle.
@@ -44,12 +51,32 @@ public class CacheServiceFactory implements ServiceFactory {
    *      org.osgi.framework.ServiceRegistration)
    */
   public Object getService(Bundle bundle, ServiceRegistration registration) {
-    Site site = (Site)registration.getReference().getProperty("site");
-    if (site == null) {
-      logger.warn("No site was passed with the service creation request");
-      return null;
+    // Create a new cache service instance
+    CacheServiceImpl cache = new CacheServiceImpl();
+
+    // Try to get hold of the service configuration
+    BundleContext bundleContext = bundle.getBundleContext();
+    ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
+    if (configAdminRef != null) {
+      try {
+        ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(configAdminRef);
+        Configuration serviceConfig = configAdmin.getConfiguration(CacheServiceImpl.SERVICE_PID);
+        if (serviceConfig != null) {
+          Dictionary<?, ?> serviceProperties = serviceConfig.getProperties();
+          cache.updated(serviceProperties);
+        } else {
+          logger.debug("No customized configuration found for cache");
+        }
+      } catch (IOException e) {
+        logger.error("Error reading cache configuration from configuraiton admin service: " + e.getMessage());
+      } catch (ConfigurationException e) {
+        logger.error("Error configuring cache service: " + e.getMessage());
+      }
+    } else {
+      logger.debug("No configuration admin service found while looking for cache configuration");
     }
-    return new CacheServiceImpl(site);
+
+    return cache;
   }
 
   /**

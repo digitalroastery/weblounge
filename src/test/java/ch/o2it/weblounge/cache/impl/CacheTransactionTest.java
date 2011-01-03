@@ -52,9 +52,6 @@ public class CacheTransactionTest {
   /** The cache handle */
   protected CacheHandle handle = null;
   
-  /** The cache identifier */
-  protected String cache = "cache";
-  
   /** The stream filter */
   protected StreamFilter filter = new NullFilter();
   
@@ -95,7 +92,7 @@ public class CacheTransactionTest {
     handle = new TaggedCacheHandle(tags.getTags(), expirationTime, recheckTime);
     
     response = new CacheableHttpServletResponse(new MockHttpServletResponse());
-    transaction = response.startTransaction(handle, cache, filter);
+    transaction = response.startTransaction(handle, filter);
   }
 
   /**
@@ -105,15 +102,6 @@ public class CacheTransactionTest {
   public void testGetHandle() {
     assertNotNull(transaction.getHandle());
     assertEquals(handle, transaction.getHandle());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.cache.impl.CacheTransaction#getCache()}.
-   */
-  @Test
-  public void testGetCache() {
-    assertNotNull(cache);
-    assertEquals(cache, transaction.getCache());
   }
 
   /**
