@@ -59,6 +59,33 @@ public class SiteManager {
   /** Maps sites to osgi bundles */
   private Map<Site, Bundle> siteBundles = new HashMap<Site, Bundle>();
 
+  /** Registered site listeners */
+  private List<SiteServiceListener> listeners = new ArrayList<SiteServiceListener>();
+
+  /**
+   * Adds <code>listener</code> to the list of site listeners.
+   * 
+   * @param listener
+   *          the site listener
+   */
+  public void addSiteListener(SiteServiceListener listener) {
+    synchronized (listeners) {
+      listeners.add(listener);
+    }
+  }
+
+  /**
+   * Removes <code>listener</code> from the list of site listeners.
+   * 
+   * @param listener
+   *          the site listener
+   */
+  public void removeSiteListener(SiteServiceListener listener) {
+    synchronized (listeners) {
+      listeners.remove(listener);
+    }
+  }
+
   /**
    * Callback for OSGi's declarative services component activation.
    * 
@@ -198,6 +225,13 @@ public class SiteManager {
 
     logger.debug("Site '{}' registered", site);
 
+    // Inform site listeners
+    synchronized (listeners) {
+      for (SiteServiceListener listener : listeners) {
+        listener.siteAppeared(site, reference);
+      }
+    }
+
     // Start the site
     if (site.isStartedAutomatically()) {
       try {
@@ -210,6 +244,7 @@ public class SiteManager {
         logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
       }
     }
+
   }
 
   /**
@@ -218,6 +253,13 @@ public class SiteManager {
    * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#removeSite(ch.o2it.weblounge.common.site.Site)
    */
   void removeSite(Site site) {
+
+    // Inform site listeners
+    synchronized (listeners) {
+      for (SiteServiceListener listener : listeners) {
+        listener.siteDisappeared(site);
+      }
+    }
 
     // Stop the site if it's running
     try {
@@ -241,6 +283,7 @@ public class SiteManager {
         sitesByServerName.remove(serverName);
       }
     }
+
     logger.debug("Site {} unregistered", site);
   }
 
