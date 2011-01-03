@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.request;
 
-import ch.o2it.weblounge.common.site.Site;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -202,34 +200,28 @@ public interface ResponseCache {
    * given set of tags.
    * @param tags
    *          the set of tags
-   * @param site
-   *          the site
    * 
    * @return the handles of the removed elements
    */
-  void invalidate(CacheTag[] tags, Site site);
+  void invalidate(CacheTag[] tags);
 
   /**
    * Tells the cache of the given site to throw away the data identified by
    * <code>handle</code>.
    * @param handle
    *          the cache data identifier
-   * @param site
-   *          the site
    * 
    * @return the handle or <code>null</code>
    */
-  void invalidate(CacheHandle handle, Site site);
+  void invalidate(CacheHandle handle);
 
   /**
    * Asks the cache to load those elements into memory that match at least the
    * given set of tags.
    * 
-   * @param site
-   *          the site
    * @param tags
    *          the tags to match
    */
-  void preload(Site site, CacheTag[] tags);
+  void preload(CacheTag[] tags);
 
 }
