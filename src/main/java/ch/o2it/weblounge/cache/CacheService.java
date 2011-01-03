@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.cache;
 
 import ch.o2it.weblounge.common.request.ResponseCache;
-import ch.o2it.weblounge.common.site.Site;
 
 /**
  * The <code>ResponseCacheService</code> is a service providing an
@@ -41,11 +40,24 @@ public interface CacheService extends ResponseCache {
   void clear();
 
   /**
-   * Returns the site that this cache is associated with.
+   * Initializes the cache service with an identifier, a name and a path to the
+   * local disk store (if applicable).
    * 
-   * @return the site
+   * @param id
+   *          the cache identifier
+   * @param name
+   *          the cache name
+   * @param diskStorePath
+   *          path to the local disk store
    */
-  Site getSite();
+  void init(String id, String name, String diskStorePath);
+
+  /**
+   * Returns the cache identifier.
+   * 
+   * @return the identifier
+   */
+  String getIdentifier();
 
   /**
    * Tells the cache implementation to stop caching and do cleanup work.
