@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.cache;
 
 import ch.o2it.weblounge.common.request.ResponseCache;
+import ch.o2it.weblounge.common.site.Site;
 
 /**
  * The <code>ResponseCacheService</code> is a service providing an
@@ -38,5 +39,17 @@ public interface CacheService extends ResponseCache {
    * Clears the cache.
    */
   void clear();
+
+  /**
+   * Returns the site that this cache is associated with.
+   * 
+   * @return the site
+   */
+  Site getSite();
+
+  /**
+   * Tells the cache implementation to stop caching and do cleanup work.
+   */
+  void shutdown();
 
 }

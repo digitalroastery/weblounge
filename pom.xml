@@ -45,7 +45,8 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.cache-api</Bundle-SymbolicName>
             <Import-Package>
-              ch.o2it.weblounge.common.request;version=${project.version}
+              ch.o2it.weblounge.common.request;version=${project.version},
+              ch.o2it.weblounge.common.site;version=${project.version}
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.cache;version=${project.version}
