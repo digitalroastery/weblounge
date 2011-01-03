@@ -36,7 +36,7 @@ SET FELIX_FILEINSTALL_OPTS=-Dfelix.fileinstall.dir=%FELIX_HOME%\load
 SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%FELIX_HOME%\conf -Dweblounge.logdir=%FELIX_LOGDIR%
 SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
 SET GRAPHICS_OPTS=-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit
-SET TEMPDIR_OPTS=-Djava.io.tmpdir=$FELIX_TEMPDIR
+SET TEMPDIR_OPTS=-Djava.io.tmpdir=%FELIX_TEMPDIR%
 SET MEMORY_OPTS=-Xmx2048m
 
 REM # Create the debug config
