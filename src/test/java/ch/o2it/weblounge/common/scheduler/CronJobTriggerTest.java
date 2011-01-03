@@ -154,7 +154,6 @@ public class CronJobTriggerTest {
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.DAY_OF_MONTH, 1);
-    rollUp(c, Calendar.MONTH, new int[] {1});
     expectedFireDate = rollUp(c, Calendar.DAY_OF_WEEK, daysOfWeek);
     assertEquals(expectedFireDate, dayOfWeekTrigger.getNextExecutionAfter(now));
   }
@@ -173,17 +172,16 @@ public class CronJobTriggerTest {
    */
   private Date rollUp(Calendar c, int field, int[] fieldValues) {
     boolean matches = false;
-    
-    c.setFirstDayOfWeek(Calendar.SUNDAY);
+
+    // Align milliseconds and seconds
     c.setFirstDayOfWeek(Calendar.SUNDAY);
     c.set(Calendar.MILLISECOND, 0);
     c.set(Calendar.SECOND, 0);
     
-    int offset = 0;
+    // Make sure we move past the current time
     Calendar now = Calendar.getInstance();
-    now.set(Calendar.MILLISECOND, 0);
-    now.set(Calendar.SECOND, 0);
-    
+
+    int offset = 0;
     switch (field) {
       case Calendar.MONTH:
         offset = 1;
@@ -194,17 +192,54 @@ public class CronJobTriggerTest {
       default:
         offset = 0;
     }
+
     while (!matches) {
-      for (int i : fieldValues) {
-        int calendarValue = c.get(field) + offset;
-        if (i == calendarValue) {
-          matches = c.after(now);
+      c.add(field, 1);
+      if (!c.after(now))
+        continue;
+      int calendarValue = c.get(field) + offset;
+      for (int v : fieldValues) {
+        if (calendarValue == v) {
+          matches = true;
+          break;
         }
       }
-      if (!matches)
-        c.add(field, 1);
     }
+    
     return c.getTime();
+
+    // c.setFirstDayOfWeek(Calendar.SUNDAY);
+    // c.set(Calendar.MILLISECOND, 0);
+    // c.set(Calendar.SECOND, 0);
+
+    // int offset = 0;
+    // Calendar now = Calendar.getInstance();
+    // now.set(Calendar.MILLISECOND, 0);
+    // now.set(Calendar.SECOND, 0);
+    //
+    // switch (field) {
+    // case Calendar.MONTH:
+    // offset = 1;
+    // break;
+    // case Calendar.DAY_OF_WEEK:
+    // offset = -1;
+    // break;
+    // default:
+    // offset = 0;
+    // }
+    // while (!matches) {
+    // for (int i : fieldValues) {
+    // int calendarValue = c.get(field) + offset;
+    // if (i == calendarValue) {
+    // matches = c.after(now);
+    // }
+    // }
+    // if (!matches) {
+    // c.add(field, 1);
+    // matches = true;
+    // }
+    // }
+
   }
 
   /**
