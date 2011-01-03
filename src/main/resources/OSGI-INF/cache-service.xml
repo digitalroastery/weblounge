@@ -5,13 +5,12 @@
   immediate="true"
   name="Weblounge Cache Service">
 
-  <implementation class="ch.o2it.weblounge.cache.impl.CacheServiceImpl" />
+  <implementation class="ch.o2it.weblounge.cache.impl.CacheServiceFactory" />
   <property name="service.description" value="Cache Service" />
   <service>
     <provide interface="ch.o2it.weblounge.cache.CacheService" />
     <provide interface="ch.o2it.weblounge.common.request.ResponseCache" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-  <reference name="site" interface="ch.o2it.weblounge.common.site.Site" cardinality="0..n" policy="dynamic" bind="addSite" unbind="removeSite" />
 
 </scr:component>

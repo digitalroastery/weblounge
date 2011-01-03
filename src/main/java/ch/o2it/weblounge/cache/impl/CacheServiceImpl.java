@@ -209,6 +209,24 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    *           if component inactivation fails
    */
   void deactivate(ComponentContext context) throws Exception {
+    shutdown();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.cache.CacheService#getSite()
+   */
+  public Site getSite() {
+    return site;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.cache.CacheService#shutdown()
+   */
+  public void shutdown() {
     for (String cacheName : cacheManager.getCacheNames()) {
       Cache cache = cacheManager.getCache(cacheName);
       cache.dispose();
