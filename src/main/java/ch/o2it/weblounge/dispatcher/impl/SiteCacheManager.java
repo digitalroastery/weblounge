@@ -20,6 +20,7 @@
 package ch.o2it.weblounge.dispatcher.impl;
 
 import ch.o2it.weblounge.cache.CacheService;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.kernel.SiteManager;
 import ch.o2it.weblounge.kernel.SiteServiceListener;
@@ -41,10 +42,10 @@ import java.util.Iterator;
  * unregisters the weblounge dispatcher with the first service implementation to
  * come.
  */
-public class CacheServiceTracker implements SiteServiceListener {
+public class SiteCacheManager implements SiteServiceListener {
 
   /** Logger */
-  private static final Logger logger = LoggerFactory.getLogger(CacheServiceTracker.class);
+  private static final Logger logger = LoggerFactory.getLogger(SiteCacheManager.class);
 
   /** The site manager */
   protected SiteManager siteManager = null;
@@ -61,14 +62,32 @@ public class CacheServiceTracker implements SiteServiceListener {
     BundleContext ctx = bundle.getBundleContext();
     String filter = "(site=" + site.getIdentifier() + ")";
     try {
-      ServiceReference[] serviceReferences = ctx.getServiceReferences(CacheService.class.getName(), filter);
-      if (serviceReferences != null && serviceReferences.length > 0) {
-        CacheService cache = (CacheService) ctx.getService(serviceReferences[0]);
-        Dictionary<String, String> serviceProps = new Hashtable<String, String>();
-        serviceProps.put("site", site.getIdentifier());
-        ctx.registerService(CacheService.class.getName(), cache, serviceProps);
-        logger.debug("Registered cache service for site '{}'", site);
+      if (ctx.getServiceReferences(CacheService.class.getName(), filter) != null) {
+        logger.warn("Found existing cache service for site '{}'", site);
+        return;
       }
+
+      // Have the service factory create a new reference
+      ServiceReference serviceReference = ctx.getServiceReference(CacheService.class.getName());
+      if (serviceReference == null) {
+        logger.warn("Unable to create a response cache for site '{}'. Is the cache service running?", site);
+        return;
+      }
+
+      String siteId = site.getIdentifier();
+      String siteName = site.getName();
+      String diskStorePath = PathUtils.concat(System.getProperty("java.io.tmpdir"), "weblounge", "sites", siteId, "cache");
+
+      // Initialize the cache
+      CacheService cache = (CacheService) ctx.getService(serviceReference);
+      cache.init(siteId, siteName, diskStorePath);
+
+      // Register the cache
+      Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
+      serviceProps.put("site", site);
+      ctx.registerService(CacheService.class.getName(), cache, serviceProps);
+      logger.info("Registered cache service for site '{}'", site);
+
     } catch (InvalidSyntaxException e) {
       logger.error("Error looking up cache service for site '" + site.getIdentifier() + "'", e);
     }
@@ -92,7 +111,7 @@ public class CacheServiceTracker implements SiteServiceListener {
         for (ServiceReference ref : serviceReferences) {
           ctx.ungetService(ref);
         }
-        logger.debug("Unregistered cache service for site '{}'", site);
+        logger.info("Unregistered cache service for site '{}'", site);
       }
     } catch (InvalidSyntaxException e) {
       logger.error("Error looking up cache service for site '" + site.getIdentifier() + "'", e);
@@ -151,34 +170,6 @@ public class CacheServiceTracker implements SiteServiceListener {
     siteManager.removeSiteListener(this);
 
     // Unregister caches for all current sites
-    Iterator<Site> sites = siteManager.sites();
-    while (sites.hasNext()) {
-      Site site = sites.next();
-      unregisterCache(site, siteManager.getSiteBundle(site));
-    }
-  }
-
-  /**
-   * OSGi callback that sets a reference to the cache service.
-   * 
-   * @param cacheService
-   *          the cache service
-   */
-  void setCacheService(CacheService cacheService) {
-    Iterator<Site> sites = siteManager.sites();
-    while (sites.hasNext()) {
-      Site site = sites.next();
-      registerCache(site, siteManager.getSiteBundle(site));
-    }
-  }
-
-  /**
-   * OSGi callback that removes the reference to the cache service.
-   * 
-   * @param cacheService
-   *          the cache service
-   */
-  void removeCacheService(CacheService cacheService) {
     Iterator<Site> sites = siteManager.sites();
     while (sites.hasNext()) {
       Site site = sites.next();

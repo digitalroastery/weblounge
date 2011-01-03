@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.cache.CacheService;
 import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -57,7 +56,6 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -480,18 +478,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
         Precompiler precompiler = new Precompiler(siteServlet, logCompileErrors);
         precompilers.put(site, precompiler);
         precompiler.precompile();
-      }
-
-      // Set up a response cache for this site
-      ServiceReference cacheServiceReference = siteBundle.getBundleContext().getServiceReference(CacheService.class.getName());
-      if (cacheServiceReference != null) {
-        CacheService cache = (CacheService) siteBundle.getBundleContext().getService(cacheServiceReference);
-        if (cache != null) {
-          Dictionary<String, String> props = new Hashtable<String, String>();
-          props.put("site", site.getIdentifier());
-          logger.info("Creating response cache for site '{}'", site.getIdentifier());
-          siteBundle.getBundleContext().registerService(CacheService.class.getName(), cache, props);
-        }
       }
 
       logger.debug("Site '{}' registered under site://{}", site, siteRoot);

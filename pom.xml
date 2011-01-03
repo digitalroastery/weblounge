@@ -329,13 +329,13 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/action-requesthandler.xml,
-              OSGI-INF/cacheservice-tracker.xml,
               OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/dispatcher-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,
               OSGI-INF/file-requesthandler.xml,
               OSGI-INF/image-requesthandler.xml,
               OSGI-INF/page-requesthandler.xml,
+              OSGI-INF/site-cache-manager.xml,
               OSGI-INF/site-dispatcher-service.xml
             </Service-Component>
             <Private-Package>

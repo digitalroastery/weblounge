@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -83,7 +84,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   private static List<String> wellknownFiles = new ArrayList<String>();
   
   /** The response caches */
-  private Map<Site, ResponseCache> caches = null;
+  private Map<String, ResponseCache> caches = null;
   
   static {
     wellknownFiles.add("/favicon.ico");
@@ -94,10 +95,10 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * Creates a new instance of the weblounge dispatcher servlet.
    */
   WebloungeDispatcherServlet() {
-    requestListeners = new ArrayList<RequestListener>();
-    dispatcher = new ArrayList<DispatchListener>();
-    requestHandler = new ArrayList<RequestHandler>();
-    caches = new HashMap<Site, ResponseCache>();
+    requestListeners = new CopyOnWriteArrayList<RequestListener>();
+    dispatcher = new CopyOnWriteArrayList<DispatchListener>();
+    requestHandler = new CopyOnWriteArrayList<RequestHandler>();
+    caches = new HashMap<String, ResponseCache>();
   }
   
   /**
@@ -233,10 +234,18 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     // Get the site dispatcher
     Site site = getSiteByRequest(httpRequest);
+    if (site == null) {
+      if (!wellknownFiles.contains(httpRequest.getRequestURI()))
+        logger.warn("No dispatcher found for {}", httpRequest);
+      httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+
+    // Get the servlet that is responsible for the site's content
     Servlet siteServlet = sites.getSiteServlet(site);
     
     // Get the response cache, if available
-    ResponseCache cache = caches.get(site);
+    ResponseCache cache = caches.get(site.getIdentifier());
     
     // Wrap for caching
     if (cache != null) {
@@ -248,12 +257,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
 
     // See if a site dispatcher was found, and if so, if it's enabled
-    if (site == null) {
-      if (!wellknownFiles.contains(request.getRequestURI()))
-        logger.warn("No dispatcher found for {}", request);
-      DispatchUtils.sendNotFound("Not found", request, response);
-      return;
-    } else if (!site.isRunning()) {
+    if (!site.isRunning()) {
       logger.warn("Dispatcher for site {} is temporarily not available", site);
       DispatchUtils.sendServiceUnavailable("Site is temporarily unavailable", request, response);
       return;
@@ -270,7 +274,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
     // Ask the registered request handler if they are willing to handle
     // the request.
-    // TODO: Synchronize
     for (RequestHandler handler : requestHandler) {
       try {
         logger.trace("Asking {} to serve {}", handler, request);
@@ -342,7 +345,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the lister
    */
   void addRequestListener(RequestListener listener) {
-    // TODO: Synchronize
     if (!requestListeners.contains(listener)) {
       requestListeners.add(listener);
     }
@@ -355,7 +357,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the listener to remove
    */
   void removeRequestListener(RequestListener listener) {
-    // TODO: Synchronize
     requestListeners.remove(listener);
   }
 
@@ -369,7 +370,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the lister
    */
   void addDispatchListener(DispatchListener listener) {
-    // TODO: Synchronize
     if (!dispatcher.contains(listener)) {
       dispatcher.add(listener);
     }
@@ -382,7 +382,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the listener to remove
    */
   void removeDispatchListener(DispatchListener listener) {
-    // TODO: Synchronize
     dispatcher.remove(listener);
   }
 
@@ -395,7 +394,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the request handler
    */
   void addRequestHandler(RequestHandler handler) {
-    // TODO: Synchronize
     if (!requestHandler.contains(handler)) {
       requestHandler.add(handler);
     }
@@ -408,7 +406,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the request handler to remove
    */
   void removeRequestHandler(RequestHandler handler) {
-    // TODO: Synchronize
     requestHandler.remove(handler);
   }
 
@@ -419,7 +416,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the response cache
    */
   void addResponseCache(CacheService cache) {
-    caches.put(cache.getSite(), cache);
+    caches.put(cache.getIdentifier(), cache);
+    logger.info("Response caching activated for site '{}'", cache.getIdentifier());
   }
 
   /**
@@ -429,7 +427,8 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    *          the response cache
    */
   void removeResponseCache(CacheService cache) {
-    caches.remove(cache.getSite());
+    caches.remove(cache.getIdentifier());
+    logger.info("Response caching deactivated for site '{}'", cache.getIdentifier());
   }
 
   /**
@@ -445,7 +444,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    */
   protected void fireRequestStarted(WebloungeRequest request,
       WebloungeResponse response, Site site) {
-    // TODO: Synchronize
     for (int i = 0; i < requestListeners.size(); i++) {
       RequestListener listener = requestListeners.get(i);
       listener.requestStarted(request, response);
@@ -465,7 +463,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    */
   protected void fireRequestDelivered(WebloungeRequest request,
       WebloungeResponse response, Site site) {
-    // TODO: Synchronize
     for (int i = 0; i < requestListeners.size(); i++) {
       RequestListener listener = requestListeners.get(i);
       listener.requestDelivered(request, response);
@@ -486,12 +483,10 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   protected void fireRequestFailed(WebloungeRequest request,
       WebloungeResponse response, Site site) {
     WebloungeResponseImpl resp = ((WebloungeResponseImpl) response);
-    // TODO: Synchronize
     for (int i = 0; i < requestListeners.size(); i++) {
       RequestListener listener = requestListeners.get(i);
       listener.requestFailed(request, response, resp.getResponseStatus());
     }
-    // TODO: Move to where the event is fired
     if (site != null)
       site.requestFailed(request, response, resp.getResponseStatus());
   }
