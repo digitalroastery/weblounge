@@ -14,5 +14,6 @@
   </service>
   <reference name="httpservice" interface="org.ops4j.pax.web.service.WebContainer" cardinality="1..1" policy="static" bind="setHttpService" unbind="removeHttpService" />
   <reference name="actionrequesthandler" interface="ch.o2it.weblounge.dispatcher.ActionRequestHandler" cardinality="0..1" policy="dynamic" bind="setActionRequestHandler" unbind="removeActionRequestHandler" />
+  <reference name="sitemanager" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" unbind="removeSiteManager" />
 
 </scr:component>

@@ -19,6 +19,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.cache.CacheService;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
 import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
@@ -36,7 +37,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -64,9 +67,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   /** Value of the X-Powered-By header */
   private static final String poweredBy = "Weblounge Content Management System";
 
-  /** The response cache */
-  private transient ResponseCache cache = null;
-
   /** The sites that are online */
   private transient SiteDispatcherService sites = null;
 
@@ -82,6 +82,9 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   /** List with well known urls and files */
   private static List<String> wellknownFiles = new ArrayList<String>();
   
+  /** The response caches */
+  private Map<Site, ResponseCache> caches = null;
+  
   static {
     wellknownFiles.add("/favicon.ico");
     wellknownFiles.add("/robots.txt");
@@ -94,6 +97,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     requestListeners = new ArrayList<RequestListener>();
     dispatcher = new ArrayList<DispatchListener>();
     requestHandler = new ArrayList<RequestHandler>();
+    caches = new HashMap<Site, ResponseCache>();
   }
   
   /**
@@ -102,7 +106,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param siteDispatcher
    *          the site locator
    */
-  public void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
+  void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
     this.sites = siteDispatcher;
   }
   
@@ -112,7 +116,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param siteDispatcher
    *          the site locator
    */
-  public void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
+  void removeSiteDispatcher(SiteDispatcherService siteDispatcher) {
     this.sites = null;
   }
 
@@ -231,6 +235,9 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     Site site = getSiteByRequest(httpRequest);
     Servlet siteServlet = sites.getSiteServlet(site);
     
+    // Get the response cache, if available
+    ResponseCache cache = caches.get(site);
+    
     // Wrap for caching
     if (cache != null) {
       httpResponse = cache.createCacheableResponse(httpRequest, httpResponse);
@@ -307,18 +314,6 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   }
 
   /**
-   * Enables and disables caching by telling the dispatcher to use
-   * <code>cache</code> for response caching. Pass <code>null</code> to disable
-   * response caching.
-   * 
-   * @param cache
-   *          the response cache implementation
-   */
-  public void setResponseCache(ResponseCache cache) {
-    this.cache = cache;
-  }
-
-  /**
    * Returns the site that is being targeted by <code>request</code> or
    * <code>null</code> if either no site was found or the site is disabled right
    * now.
@@ -346,7 +341,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param listener
    *          the lister
    */
-  public void addRequestListener(RequestListener listener) {
+  void addRequestListener(RequestListener listener) {
     // TODO: Synchronize
     if (!requestListeners.contains(listener)) {
       requestListeners.add(listener);
@@ -359,7 +354,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param listener
    *          the listener to remove
    */
-  public void removeRequestListener(RequestListener listener) {
+  void removeRequestListener(RequestListener listener) {
     // TODO: Synchronize
     requestListeners.remove(listener);
   }
@@ -373,7 +368,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param listener
    *          the lister
    */
-  public void addDispatchListener(DispatchListener listener) {
+  void addDispatchListener(DispatchListener listener) {
     // TODO: Synchronize
     if (!dispatcher.contains(listener)) {
       dispatcher.add(listener);
@@ -386,7 +381,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param listener
    *          the listener to remove
    */
-  public void removeDispatchListener(DispatchListener listener) {
+  void removeDispatchListener(DispatchListener listener) {
     // TODO: Synchronize
     dispatcher.remove(listener);
   }
@@ -399,7 +394,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param handler
    *          the request handler
    */
-  public void addRequestHandler(RequestHandler handler) {
+  void addRequestHandler(RequestHandler handler) {
     // TODO: Synchronize
     if (!requestHandler.contains(handler)) {
       requestHandler.add(handler);
@@ -412,9 +407,29 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
    * @param handler
    *          the request handler to remove
    */
-  public void removeRequestHandler(RequestHandler handler) {
+  void removeRequestHandler(RequestHandler handler) {
     // TODO: Synchronize
     requestHandler.remove(handler);
+  }
+
+  /**
+   * Registers the response cache with the main dispatcher servlet.
+   * 
+   * @param cache
+   *          the response cache
+   */
+  void addResponseCache(CacheService cache) {
+    caches.put(cache.getSite(), cache);
+  }
+
+  /**
+   * Removes the response cache from the main dispatcher servlet.
+   * 
+   * @param cache
+   *          the response cache
+   */
+  void removeResponseCache(CacheService cache) {
+    caches.remove(cache.getSite());
   }
 
   /**

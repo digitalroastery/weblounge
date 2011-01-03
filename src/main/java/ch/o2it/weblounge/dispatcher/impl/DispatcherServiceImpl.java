@@ -19,6 +19,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.cache.CacheService;
 import ch.o2it.weblounge.dispatcher.DispatcherService;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.SiteDispatcherService;
@@ -48,12 +49,9 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
 
   /** The main dispatcher servlet */
   private WebloungeDispatcherServlet dispatcher = null;
-  
+
   /** Tracker for the http service */
   private HttpServiceTracker httpTracker = null;
-
-  /** Tracker for the cache service */
-  private CacheServiceTracker cacheTracker = null;
 
   /**
    * Creates a new instance of the dispatcher service.
@@ -61,7 +59,7 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   public DispatcherServiceImpl() {
     dispatcher = new WebloungeDispatcherServlet();
   }
-  
+
   /**
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
@@ -89,11 +87,6 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     httpTracker = new HttpServiceTracker(bundleContext, dispatcher);
     httpTracker.open();
 
-    // Start looking for a cache service
-    logger.trace("Start looking for response cache service implementations");
-    cacheTracker = new CacheServiceTracker(bundleContext, dispatcher);
-    cacheTracker.open();
-
     logger.debug("Weblounge dispatcher activated");
   }
 
@@ -111,10 +104,6 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
     // Get rid of the http tracker
     httpTracker.close();
     httpTracker = null;
-
-    // Get rid of the http tracker
-    cacheTracker.close();
-    cacheTracker = null;
 
     logger.debug("Weblounge dispatcher deactivated");
   }
@@ -159,6 +148,26 @@ public class DispatcherServiceImpl implements DispatcherService, ManagedService 
   void removeRequestHandler(RequestHandler handler) {
     logger.info("Unregistering {}", handler);
     dispatcher.removeRequestHandler(handler);
+  }
+
+  /**
+   * Registers the response cache with the main dispatcher servlet.
+   * 
+   * @param cache
+   *          the response cache
+   */
+  void addCacheService(CacheService cache) {
+    dispatcher.addResponseCache(cache);
+  }
+
+  /**
+   * Removes the response cache from the main dispatcher servlet.
+   * 
+   * @param cache
+   *          the response cache
+   */
+  void removeCacheService(CacheService cache) {
+    dispatcher.removeResponseCache(cache);
   }
 
 }

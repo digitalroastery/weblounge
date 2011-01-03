@@ -45,6 +45,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>ch.o2it.weblounge</groupId>
+      <artifactId>weblounge-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- osgi support -->
 
     <dependency>
@@ -143,6 +149,7 @@
             <Bundle-SymbolicName>${project.groupId}.dispatcher</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common;version=${project.version},
+              ch.o2it.weblounge.cache;version=${project.version},
               ch.o2it.weblounge.common.content;version=${project.version},
               ch.o2it.weblounge.common.content.file;version=${project.version},
               ch.o2it.weblounge.common.content.image;version=${project.version},
@@ -166,6 +173,7 @@
               ch.o2it.weblounge.common.user;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
               ch.o2it.weblounge.dispatcher;version=${project.version},
+              ch.o2it.weblounge.kernel;version=${project.version},
               javax.el;version="2.0.0",
               javax.servlet;version="2.5.0",
               javax.servlet.http;version="2.5.0",
@@ -321,6 +329,7 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/action-requesthandler.xml,
+              OSGI-INF/cacheservice-tracker.xml,
               OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/dispatcher-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,

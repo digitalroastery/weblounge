@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.cache.CacheService;
 import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -33,6 +34,8 @@ import ch.o2it.weblounge.dispatcher.SiteDispatcherService;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXml;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlFilter;
 import ch.o2it.weblounge.dispatcher.impl.http.WebXmlServlet;
+import ch.o2it.weblounge.kernel.SiteManager;
+import ch.o2it.weblounge.kernel.SiteServiceListener;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +48,6 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.NamespaceException;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -70,7 +73,7 @@ import javax.servlet.http.HttpServletRequest;
  * The site dispatcher watches sites coming and going and registers them with
  * the weblounge dispatcher.
  */
-public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteListener, ManagedService {
+public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteListener, SiteServiceListener, ManagedService {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SiteDispatcherServiceImpl.class);
@@ -110,9 +113,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
   /** Init parameters for jetty */
   private TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
-
-  /** The site tracker */
-  private SiteTracker siteTracker = null;
 
   /** The sites */
   private List<Site> sites = new ArrayList<Site>();
@@ -177,8 +177,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     }
 
     httpRegistrations = new HashMap<Site, WebXml>();
-    siteTracker = new SiteTracker(this, bundleContext);
-    siteTracker.open();
 
     logger.debug("Site dispatcher activated");
   }
@@ -193,9 +191,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   void deactivate(ComponentContext context) {
     logger.debug("Deactivating site dispatcher");
-
-    siteTracker.close();
-    siteTracker = null;
 
     // Stop precompilers
     for (Precompiler compiler : precompilers.values()) {
@@ -487,6 +482,18 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
         precompiler.precompile();
       }
 
+      // Set up a response cache for this site
+      ServiceReference cacheServiceReference = siteBundle.getBundleContext().getServiceReference(CacheService.class.getName());
+      if (cacheServiceReference != null) {
+        CacheService cache = (CacheService) siteBundle.getBundleContext().getService(cacheServiceReference);
+        if (cache != null) {
+          Dictionary<String, String> props = new Hashtable<String, String>();
+          props.put("site", site.getIdentifier());
+          logger.info("Creating response cache for site '{}'", site.getIdentifier());
+          siteBundle.getBundleContext().registerService(CacheService.class.getName(), cache, props);
+        }
+      }
+
       logger.debug("Site '{}' registered under site://{}", site, siteRoot);
 
     } catch (Throwable t) {
@@ -563,6 +570,25 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
         }
       }
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.kernel.SiteServiceListener#siteAppeared(ch.o2it.weblounge.common.site.Site,
+   *      org.osgi.framework.ServiceReference)
+   */
+  public void siteAppeared(Site site, ServiceReference reference) {
+    addSite(site, reference);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.kernel.SiteServiceListener#siteDisappeared(ch.o2it.weblounge.common.site.Site)
+   */
+  public void siteDisappeared(Site site) {
+    removeSite(site);
   }
 
   /**
@@ -673,52 +699,23 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   }
 
   /**
-   * This tracker is used to track <code>Site</code> services. Once a site is
-   * detected, it registers that site with the
-   * <code>SiteDispatcherService</code>.
+   * OSGi callback that will set the site manager.
+   * 
+   * @param siteManager
+   *          the site manager
    */
-  private final class SiteTracker extends ServiceTracker {
+  void setSiteManager(SiteManager siteManager) {
+    siteManager.addSiteListener(this);
+  }
 
-    /** The site dispatcher */
-    private SiteDispatcherServiceImpl dispatcher = null;
-
-    /**
-     * Creates a new <code>SiteTracker</code>.
-     * 
-     * @param dispatcher
-     *          the site dispatcher
-     * @param context
-     *          the site dispatcher's bundle context
-     */
-    public SiteTracker(SiteDispatcherServiceImpl dispatcher,
-        BundleContext context) {
-      super(context, Site.class.getName(), null);
-      this.dispatcher = dispatcher;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
-     */
-    public Object addingService(ServiceReference reference) {
-      Site site = (Site) super.addingService(reference);
-      dispatcher.addSite(site, reference);
-      return site;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference,
-     *      java.lang.Object)
-     */
-    public void removedService(ServiceReference reference, Object service) {
-      Site site = (Site) service;
-      dispatcher.removeSite(site);
-      super.removedService(reference, service);
-    }
-
+  /**
+   * OSGi callback that will unset the site manager.
+   * 
+   * @param siteManager
+   *          the site manager
+   */
+  void removeSiteManager(SiteManager siteManager) {
+    siteManager.removeSiteListener(this);
   }
 
 }
