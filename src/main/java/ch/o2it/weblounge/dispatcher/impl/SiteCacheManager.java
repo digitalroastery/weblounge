@@ -80,6 +80,10 @@ public class SiteCacheManager implements SiteServiceListener {
 
       // Initialize the cache
       CacheService cache = (CacheService) ctx.getService(serviceReference);
+      if (cache == null) {
+        logger.error("Unable to locate cache service for service reference");
+        return;
+      }
       cache.init(siteId, siteName, diskStorePath);
 
       // Register the cache

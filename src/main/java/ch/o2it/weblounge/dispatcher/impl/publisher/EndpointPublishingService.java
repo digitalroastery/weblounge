@@ -78,6 +78,9 @@ public class EndpointPublishingService implements ManagedService {
 
   /** Context of this component */
   protected ComponentContext componentContext = null;
+  
+  /** The bundle context */
+  protected BundleContext bundleContext = null;
 
   /** The JSR 311 service listener */
   protected ServiceListener jsr311ServiceListener = null;
@@ -106,7 +109,7 @@ public class EndpointPublishingService implements ManagedService {
    */
   void activate(ComponentContext componentContext) throws Exception {
     this.componentContext = componentContext;
-    BundleContext bundleContext = componentContext.getBundleContext();
+    this.bundleContext = componentContext.getBundleContext();
 
     logger.info("Starting rest publishing service");
 
@@ -293,8 +296,12 @@ public class EndpointPublishingService implements ManagedService {
      */
     public void serviceChanged(ServiceEvent event) {
       ServiceReference ref = event.getServiceReference();
-      Object service = ref.getBundle().getBundleContext().getService(ref);
+      Object service = bundleContext.getService(ref);
 
+      // Sometimes, there is a service reference without a service
+      if (service == null)
+        return;
+      
       // Is this a JSR 311 annotated class?
       Path pathAnnotation = service.getClass().getAnnotation(Path.class);
       if (pathAnnotation == null)
