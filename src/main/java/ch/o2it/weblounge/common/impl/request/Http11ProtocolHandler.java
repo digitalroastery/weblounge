@@ -468,8 +468,13 @@ public final class Http11ProtocolHandler implements Times, Http11Constants {
         break;
 
       case RESPONSE_OK:
-        if (type.expires > type.time)
+        if (type.expires > type.time) {
           resp.setDateHeader(HEADER_EXPIRES, type.expires);
+        } else if (type.expires == 0) {
+          resp.setHeader(HEADER_CACHE_CONTROL, "no-cache");
+          resp.setHeader(HEADER_PRAGMA, "no-cache");
+          resp.setDateHeader(HEADER_EXPIRES, 0);
+        }
         if (type.modified > 0) {
           resp.setHeader(HEADER_ETAG, Http11Utils.calcETag(type.modified));
           resp.setDateHeader(HEADER_LAST_MODIFIED, type.modified);

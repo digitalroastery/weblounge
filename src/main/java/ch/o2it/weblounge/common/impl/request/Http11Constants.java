@@ -52,6 +52,8 @@ public interface Http11Constants {
   String HEADER_ETAG = "ETag";
   String HEADER_LAST_MODIFIED = "Last-Modified";
   String HEADER_CONTENT_RANGE = "Content-Range";
+  String HEADER_CACHE_CONTROL = "Cache-Control";
+  String HEADER_PRAGMA = "Pragma";
 
   /* some basic request headers */
   String HEADER_IF_MODIFIED_SINCE = "If-Modified-Since";
