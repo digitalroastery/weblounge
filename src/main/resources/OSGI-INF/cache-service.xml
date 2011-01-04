@@ -8,7 +8,6 @@
   <service>
     <provide interface="ch.o2it.weblounge.cache.CacheService" />
     <provide interface="ch.o2it.weblounge.common.request.ResponseCache" />
-    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
 
 </scr:component>
