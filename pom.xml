@@ -64,6 +64,11 @@
     </dependency>
     
     <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+    </dependency>
+    
+    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
@@ -115,6 +120,8 @@
               ch.o2it.weblounge.common.user;version=${project.version},
               ch.o2it.weblounge.common.impl.content;version=${project.version},
               ch.o2it.weblounge.common.impl.content.page;version=${project.version},
+              ch.o2it.weblounge.common.impl.request;version=${project.version},
+              ch.o2it.weblounge.common.impl.url;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.common.impl.util.config;version=${project.version},
               ch.o2it.weblounge.common.impl.util.doc;version=${project.version},
@@ -132,6 +139,7 @@
               org.osgi.service.cm;version="1.1.0",
               org.osgi.util.tracker;version="1.4.0",
               org.slf4j;version="1.5.6",
+              javax.activation,
               javax.servlet;version="2.5.0",
               javax.servlet.http;version="2.5.0",
               javax.ws.rs,

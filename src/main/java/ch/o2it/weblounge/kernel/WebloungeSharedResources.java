@@ -33,7 +33,11 @@ import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.Dictionary;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 
 /**
  * This component registers this bundle's <code>/html</code> resource directory
@@ -57,6 +61,12 @@ public class WebloungeSharedResources implements ManagedService {
   /** Option name for the shared resources mountpoint */
   public static final String OPT_RESOURCES_MOUNTPOINT = "resources.path";
 
+  /** Option name for the external location of shared resources */
+  public static final String OPT_EXT_RESOURCES = "resources.external.dir";
+
+  /** Directory with external resources */
+  private File externalResourcesDir = null;
+  
   /** Actual mountpoint for the shared resources */
   private String resourcesMountpoint = null;
 
@@ -65,6 +75,12 @@ public class WebloungeSharedResources implements ManagedService {
 
   /** The http context */
   private HttpContext httpContext = null;
+  
+  /** The servlet used to serve both bundle and external resources */
+  private HttpServlet servlet = null;
+  
+  /** Bundle context */
+  private BundleContext bundleContext = null;
 
   /**
    * Callback for OSGi's declarative services component dactivation.
@@ -75,7 +91,7 @@ public class WebloungeSharedResources implements ManagedService {
    *           if component inactivation fails
    */
   void activate(ComponentContext context) throws Exception {
-    BundleContext bundleContext = context.getBundleContext();
+    bundleContext = context.getBundleContext();
 
     // Try to get hold of the service configuration
     ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
@@ -93,8 +109,18 @@ public class WebloungeSharedResources implements ManagedService {
     }
 
     logger.info("Starting to serve shared weblounge resources at {}", resourcesMountpoint);
-    httpContext = httpService.createDefaultHttpContext();
-    httpService.registerResources(resourcesMountpoint, RESOURCES_BUNDLE_DIR, httpContext);
+    
+    try {
+      httpContext = httpService.createDefaultHttpContext();
+      if (servlet != null) {
+        httpService.registerServlet(resourcesMountpoint, servlet, null, httpContext);
+        logger.info("Added {} to shared weblounge resources", externalResourcesDir);
+      } else {
+        httpService.registerResources(resourcesMountpoint, RESOURCES_BUNDLE_DIR, httpContext);
+      }
+    } catch (ServletException e) {
+      logger.error("Error registering shared resources servlet at " + resourcesMountpoint, e);
+    }
   }
 
   /**
@@ -129,14 +155,31 @@ public class WebloungeSharedResources implements ManagedService {
       logger.debug("Configured value for the shared resource mountpoint is '{}'", mountpoint);
     }
 
+    // Mountpoint
+    String externalResources = (String) properties.get(OPT_EXT_RESOURCES);
+    if (StringUtils.trimToNull(externalResources) != null) {
+      externalResourcesDir = new File(externalResources);
+      servlet = new WebloungeSharedResourcesServlet(externalResourcesDir, bundleContext.getBundle());
+      logger.debug("Configured external shared resources directory at '{}'", externalResources);
+    } else {
+      servlet = null;
+    }
+
     // Update the registration
     if (currentMountpoint != null) {
       try {
         httpService.unregister(currentMountpoint);
-        logger.info("No serving shared weblounge resources at {}", resourcesMountpoint);
-        httpService.registerResources(resourcesMountpoint, RESOURCES_BUNDLE_DIR, httpContext);
+        logger.info("Serving shared weblounge resources at {}", resourcesMountpoint);
+        if (servlet != null) {
+          httpService.registerServlet(resourcesMountpoint, servlet, null, httpContext);
+          logger.info("Added {} to shared weblounge resources", externalResourcesDir);
+        } else {
+          httpService.registerResources(resourcesMountpoint, RESOURCES_BUNDLE_DIR, httpContext);
+        }
       } catch (NamespaceException e) {
         logger.error("Error registering shared resources at " + resourcesMountpoint, e);
+      } catch (ServletException e) {
+        logger.error("Error registering shared resources servlet at " + resourcesMountpoint, e);
       }
     }
   }
