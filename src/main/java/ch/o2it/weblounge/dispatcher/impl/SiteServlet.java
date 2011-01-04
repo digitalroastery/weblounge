@@ -31,6 +31,7 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.util.resource.Resource;
 import org.ops4j.pax.web.jsp.JspServletWrapper;
 import org.osgi.framework.Bundle;
@@ -286,7 +287,7 @@ public class SiteServlet extends HttpServlet {
         logger.warn("I/O error while generating content from {}", url);
       }
     } finally {
-      is.close();
+      IOUtils.closeQuietly(is);
     }
 
   }

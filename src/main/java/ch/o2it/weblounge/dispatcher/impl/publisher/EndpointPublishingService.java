@@ -127,7 +127,7 @@ public class EndpointPublishingService implements ManagedService {
     // Make sure we are notified in case of new services
     bundleContext.addServiceListener(jsr311ServiceListener);
 
-    // Register any existing JAX-RS services that have already been loaded
+    // Register JAX-RS services that have already been loaded
     for (Bundle bundle : bundleContext.getBundles()) {
       ServiceReference[] refs = bundle.getRegisteredServices();
       if (refs == null)
@@ -300,7 +300,7 @@ public class EndpointPublishingService implements ManagedService {
       if (pathAnnotation == null)
         return;
 
-      // Is there a context path
+      // Is there a context path?
       Object contextPathProperty = ref.getProperty(OPT_CONTEXTPATH);
       if (contextPathProperty == null)
         return;
