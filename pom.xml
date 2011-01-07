@@ -106,6 +106,7 @@
         <module>modules/weblounge-system</module>
         <module>modules/weblounge-taglib</module>
         <module>modules/weblounge-test</module>
+        <module>modules/weblounge-workbench</module>
       </modules>
     </profile>
 
