@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  start="activate" 
+  stop="deactivate"
+  name="Weblounge Workbench Service">	
+  
+  <implementation class="ch.o2it.weblounge.workbench.WorkbenchService" />
+  <property name="service.description" value="Weblounge Workbench Service" />
+  <property name="service.pid" value="ch.o2it.weblounge.workbench" />
+  <service>
+    <provide interface="ch.o2it.weblounge.workbench.WorkbenchService" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+
+</scr:component>

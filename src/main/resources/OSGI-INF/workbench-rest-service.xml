@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true" 
+  name="Weblounge Workbench Endpoint">	
+  
+  <implementation class="ch.o2it.weblounge.workbench.endpoint.WorkbenchEndpoint" />
+  <property name="service.description" value="Weblounge Workbench Endpoint" />
+  <property name="rest.path" value="workbench" />
+  <service>
+    <provide interface="ch.o2it.weblounge.workbench.endpoint.WorkbenchEndpoint" />
+  </service>
+
+  <reference name="sites" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+  <reference name="workbench" interface="ch.o2it.weblounge.workbench.WorkbenchService" cardinality="1..1" policy="static" bind="setWorkbench" />
+
+</scr:component>
