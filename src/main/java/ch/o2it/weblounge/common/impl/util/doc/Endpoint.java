@@ -194,8 +194,6 @@ public class Endpoint {
   public void addRequiredParameter(Parameter parameter) {
     if (parameter == null)
       throw new IllegalArgumentException("Parameter must not be null");
-    if (isGetMethod())
-      throw new IllegalStateException("Cannot add required parameter to GET endpoints");
 
     parameter.setRequired(true);
     parameter.setIsPathParameter(false);
