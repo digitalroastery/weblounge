@@ -106,6 +106,7 @@ public class PagePreviewReaderTest {
    * {@link ch.o2it.weblounge.common.impl.content.page.PagePreviewReader#read(ch.o2it.weblounge.common.content.PageURI, java.io.InputStream)}
    * .
    */
+  @SuppressWarnings("null")
   @Test
   public void testRead() {
     InputStream is = getClass().getResourceAsStream(previewFile);
