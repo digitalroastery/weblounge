@@ -129,13 +129,28 @@ public class PagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+    
+    // See if we can get the new page by path
+    HttpGet getPageByPathRequest = new HttpGet(requestUrl);
+    params = new String[][] {{"path", testPath}};
+    httpClient = new DefaultHttpClient();
+    Document pageByPathXml = null;
+    logger.info("Requesting page by path at {}", requestUrl);
+    try {
+      HttpResponse response = TestSiteUtils.request(httpClient, getPageByPathRequest, params);
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      pageByPathXml = TestSiteUtils.parseXMLResponse(response);
+      assertEquals(pageId, XPathHelper.valueOf(pageByPathXml, "/page/@id"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
 
     // Update the page
     HttpPut updatePageRequest = new HttpPut(UrlUtils.concat(requestUrl, pageId));
     String updatedCreator = creator + " (updated)";
-    NodeList creatorElements = pageXml.getElementsByTagName("created");
+    NodeList creatorElements = pageByPathXml.getElementsByTagName("created");
     creatorElements.item(0).getFirstChild().setTextContent(updatedCreator);
-    params = new String[][] { { "content", serializeDoc(pageXml) } };
+    params = new String[][] { { "content", serializeDoc(pageByPathXml) } };
     httpClient = new DefaultHttpClient();
     logger.info("Updating page at {}", requestUrl);
     try {
@@ -152,10 +167,10 @@ public class PagesEndpointTest extends IntegrationTestBase {
     try {
       HttpResponse response = TestSiteUtils.request(httpClient, getUpdatedPageRequest, null);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      pageXml = TestSiteUtils.parseXMLResponse(response);
-      assertEquals(pageId, XPathHelper.valueOf(pageXml, "/page/@id"));
-      assertEquals(testPath, XPathHelper.valueOf(pageXml, "/page/@path"));
-      assertEquals(updatedCreator, XPathHelper.valueOf(pageXml, "/page/head/created/user"));
+      pageByPathXml = TestSiteUtils.parseXMLResponse(response);
+      assertEquals(pageId, XPathHelper.valueOf(pageByPathXml, "/page/@id"));
+      assertEquals(testPath, XPathHelper.valueOf(pageByPathXml, "/page/@path"));
+      assertEquals(updatedCreator, XPathHelper.valueOf(pageByPathXml, "/page/head/created/user"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
