@@ -62,6 +62,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
@@ -85,6 +86,50 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   private String docs = null;
 
   /**
+   * Returns the resource with the given path or a <code>404</code> if the
+   * resource could not be found.
+   * 
+   * @param request
+   *          the request
+   * @param path
+   *          the resource path
+   * @return the resource
+   */
+  @GET
+  @Produces("text/xml")
+  @Path("/")
+  public Response getFileByPath(@Context HttpServletRequest request,
+      @QueryParam("path") String path) {
+
+    // Check the parameters
+    if (path == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Get the resource
+    Resource<?> resource = loadResourceByPath(request, path, null);
+    if (resource == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    // Is there an up-to-date, cached version on the client side?
+    if (!ResourceUtils.isModified(resource, request)) {
+      return Response.notModified().build();
+    }
+
+    // Check the ETag
+    String eTagValue = ResourceUtils.getETagValue(resource, null);
+    if (!ResourceUtils.isMismatch(resource, null, request)) {
+      return Response.notModified(new EntityTag(eTagValue)).build();
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.ok(resource.toXml());
+    response.tag(new EntityTag(eTagValue));
+    response.lastModified(resource.getModificationDate());
+    return response.build();
+  }
+
+  /**
    * Returns the resource with the given identifier or a <code>404</code> if the
    * resource could not be found.
    * 
@@ -97,7 +142,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   @GET
   @Produces("text/xml")
   @Path("/{resource}")
-  public Response getFile(@Context HttpServletRequest request,
+  public Response getFileByURI(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId) {
 
     // Check the parameters
@@ -501,13 +546,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Tried to create a resource without a type");
       throw new WebApplicationException(Status.BAD_REQUEST);
     }
-    
+
     URI uri = null;
     if (!StringUtils.isBlank(resourceXml)) {
       logger.debug("Adding resource to {}", resourceURI);
       try {
-        ResourceSerializer<?,?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
-        ResourceReader<?,?> resourceReader = serializer.getReader();
+        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+        ResourceReader<?, ?> resourceReader = serializer.getReader();
         resource = resourceReader.read(IOUtils.toInputStream(resourceXml), site);
       } catch (IOException e) {
         logger.warn("Error reading resource {} from request", resourceURI);

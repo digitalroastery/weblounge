@@ -202,6 +202,54 @@ public class ContentRepositoryEndpoint {
   }
 
   /**
+   * Returns the resource identified by the given request and resource path or
+   * <code>null</code> if either one of the site, the site's content repository
+   * or the resource itself is not available.
+   * <p>
+   * If <code>resourceType</code> is not <code>null</code>, the loaded resource
+   * is only returned if the resource type matches.
+   * 
+   * @param request
+   *          the servlet request
+   * @param resourcePath
+   *          the resource path
+   * @param resourceType
+   *          the resource type
+   * @return the resource
+   */
+  protected Resource<?> loadResourceByPath(HttpServletRequest request,
+      String resourcePath, String resourceType) {
+    if (sites == null) {
+      logger.debug("Unable to load resource '{}': no sites registered", resourcePath);
+      return null;
+    }
+
+    // Extract the site
+    Site site = getSite(request);
+
+    // Look for the content repository
+    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+    if (contentRepository == null) {
+      logger.warn("No content repository found for site '{}'", site);
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+    }
+
+    // Load the resource and return it
+    try {
+      ResourceURI resourceURI = new ResourceURIImpl(resourceType, site, resourcePath);
+      Resource<?> resource = contentRepository.get(resourceURI);
+      if (resource == null)
+        return null;
+      if (resourceType != null && !resourceType.equals(resource.getURI().getType())) {
+        return null;
+      }
+      return resource;
+    } catch (ContentRepositoryException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
    * Tries to locate the content repository for the given site. If
    * <code>writable</code> is <code>true</code>, the method tries to cast the
    * repository to a <code>WritableContentRepository</code>.

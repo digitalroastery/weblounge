@@ -52,17 +52,29 @@ public final class PagesEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "pages");
     docs.setTitle("Weblounge Pages");
 
+    // GET /?path=
+    Endpoint getPageByPathEndpoint = new Endpoint("/", Method.GET, "getpagebypath");
+    getPageByPathEndpoint.setDescription("Returns the page that is located at the given path");
+    getPageByPathEndpoint.addFormat(Format.xml());
+    getPageByPathEndpoint.addStatus(ok("the page was found and is returned as part of the response"));
+    getPageByPathEndpoint.addStatus(notFound("the page was not found or could not be loaded"));
+    getPageByPathEndpoint.addStatus(badRequest("an invalid path was received"));
+    getPageByPathEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getPageByPathEndpoint.addRequiredParameter(new Parameter("path", Parameter.Type.String, "The page path"));
+    getPageByPathEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getPageByPathEndpoint);
+
     // GET /{page}
-    Endpoint pageEndpoint = new Endpoint("/{page}", Method.GET, "getpage");
-    pageEndpoint.setDescription("Returns the page with the given id");
-    pageEndpoint.addFormat(Format.xml());
-    pageEndpoint.addStatus(ok("the page was found and is returned as part of the response"));
-    pageEndpoint.addStatus(notFound("the page was not found or could not be loaded"));
-    pageEndpoint.addStatus(badRequest("an invalid page identifier was received"));
-    pageEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    pageEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
-    pageEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, pageEndpoint);
+    Endpoint getPageByURIEndpoint = new Endpoint("/{page}", Method.GET, "getpagebyuri");
+    getPageByURIEndpoint.setDescription("Returns the page with the given id");
+    getPageByURIEndpoint.addFormat(Format.xml());
+    getPageByURIEndpoint.addStatus(ok("the page was found and is returned as part of the response"));
+    getPageByURIEndpoint.addStatus(notFound("the page was not found or could not be loaded"));
+    getPageByURIEndpoint.addStatus(badRequest("an invalid page identifier was received"));
+    getPageByURIEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getPageByURIEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    getPageByURIEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getPageByURIEndpoint);
 
     // POST /{page}
     Endpoint createPageEndpoint = new Endpoint("/", Method.POST, "createpage");

@@ -59,6 +59,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
@@ -92,8 +93,45 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    * @return the page
    */
   @GET
+  @Path("/")
+  public Response getPageURI(@Context HttpServletRequest request,
+      @QueryParam("path") String path) {
+
+    // Check the parameters
+    if (path == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    // Load the page
+    Page page = (Page)loadResourceByPath(request, path, Page.TYPE);
+    if (page == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+
+    // Is there an up-to-date, cached version on the client side?
+    if (!ResourceUtils.isModified(page, request)) {
+      return Response.notModified().build();
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.ok(page.toXml());
+    response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
+    response.lastModified(page.getModificationDate());
+    return response.build();
+  }
+  
+  /**
+   * Returns the page with the given identifier or a <code>404</code> if the
+   * page could not be found.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @return the page
+   */
+  @GET
   @Path("/{page}")
-  public Response getPage(@Context HttpServletRequest request,
+  public Response getPageByURI(@Context HttpServletRequest request,
       @PathParam("page") String pageId) {
 
     // Check the parameters

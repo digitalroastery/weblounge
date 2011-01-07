@@ -53,17 +53,29 @@ public final class FilesEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "files");
     docs.setTitle("Weblounge Files");
 
+    // GET /?path=
+    Endpoint getFileByPathEndpoint = new Endpoint("/{resource}", Method.GET, "getfile");
+    getFileByPathEndpoint.setDescription("Returns the file that is located at the given path");
+    getFileByPathEndpoint.addFormat(Format.xml());
+    getFileByPathEndpoint.addStatus(ok("the file was found and is returned as part of the response"));
+    getFileByPathEndpoint.addStatus(notFound("the file was not found or could not be loaded"));
+    getFileByPathEndpoint.addStatus(badRequest("an invalid path was received"));
+    getFileByPathEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getFileByPathEndpoint.addRequiredParameter(new Parameter("path", Parameter.Type.String, "The resource path"));
+    getFileByPathEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getFileByPathEndpoint);
+
     // GET /{resource}
-    Endpoint getFileEndpoint = new Endpoint("/{resource}", Method.GET, "getfile");
-    getFileEndpoint.setDescription("Returns the file with the given id");
-    getFileEndpoint.addFormat(Format.xml());
-    getFileEndpoint.addStatus(ok("the file was found and is returned as part of the response"));
-    getFileEndpoint.addStatus(notFound("the file was not found or could not be loaded"));
-    getFileEndpoint.addStatus(badRequest("an invalid file identifier was received"));
-    getFileEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getFileEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
-    getFileEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getFileEndpoint);
+    Endpoint getFileByURIEndpoint = new Endpoint("/{resource}", Method.GET, "getfile");
+    getFileByURIEndpoint.setDescription("Returns the file with the given id");
+    getFileByURIEndpoint.addFormat(Format.xml());
+    getFileByURIEndpoint.addStatus(ok("the file was found and is returned as part of the response"));
+    getFileByURIEndpoint.addStatus(notFound("the file was not found or could not be loaded"));
+    getFileByURIEndpoint.addStatus(badRequest("an invalid file identifier was received"));
+    getFileByURIEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getFileByURIEndpoint.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
+    getFileByURIEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getFileByURIEndpoint);
 
     // GET /{resource}/content/{language}
     Endpoint getFileContentEndpoint = new Endpoint("/{resource}/content/{language}", Method.GET, "getfilecontent");
