@@ -353,6 +353,12 @@ public class LazyPageImplTest extends PageImplTest {
     assertTrue(((LazyPageImpl)page).isBodyLoaded());
     assertFalse(((LazyPageImpl)page).isHeaderLoaded());
   }
+  
+  @Override
+  public void testGetPreview() {
+    super.testGetPreview();
+    // FIXME implement test case
+  }
 
   /**
    * {@inheritDoc}

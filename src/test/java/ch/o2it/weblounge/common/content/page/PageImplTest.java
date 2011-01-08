@@ -27,8 +27,6 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
@@ -218,6 +216,14 @@ public class PageImplTest {
   @Test
   public void testGetURI() {
     assertEquals(pageURI, page.getURI());
+  }
+
+  /**
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.page.PageImpl#getPreview()}.
+   */
+  @Test
+  public void testGetPreview() {
+    // FIXME Implement test case
   }
 
   /**

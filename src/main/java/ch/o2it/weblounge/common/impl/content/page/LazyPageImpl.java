@@ -95,6 +95,7 @@ public class LazyPageImpl implements Page {
     this.pageXml = pageXml;
     this.headerXml = headerXml;
     this.previewXml = previewXml;
+    this.page = new PageImpl(uri);
   }
 
   /**
