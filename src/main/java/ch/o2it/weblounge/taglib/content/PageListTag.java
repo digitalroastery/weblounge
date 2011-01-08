@@ -235,6 +235,7 @@ public class PageListTag extends WebloungeTag {
       SearchQuery query = new SearchQueryImpl(site);
       for (String subject : subjects)
         query.withSubject(subject);
+      query.withLimit(count);
       pages = repository.find(query);
     }
 
@@ -248,8 +249,8 @@ public class PageListTag extends WebloungeTag {
       SearchResultItem candidateItem = pages.getItems()[index];
       if (!(candidateItem instanceof SearchResultPageItem))
         continue;
-      item = (SearchResultPageItem)candidateItem;
-      
+      item = (SearchResultPageItem) candidateItem;
+
       // Store the important properties
       url = item.getUrl();
       page = item.getPage();
@@ -258,6 +259,10 @@ public class PageListTag extends WebloungeTag {
       found = true;
       for (Map.Entry<String, String> h : requireHeadlines.entrySet()) {
         boolean headlineFound = false;
+        // FIXME page.getPreview() always returns an empty pagelet array,
+        // therefore this condition will never be met
+        // The problem probably doesn't exist exactly at this place (somewhere
+        // at the SearchResultPageItem?)
         for (Pagelet p : page.getPreview()) {
           if (h.getKey().equals(p.getModule()) && h.getValue().equals(p.getIdentifier())) {
             headlineFound = true;
