@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.SearchResultPageItem;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.page.LazyPageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
@@ -31,7 +32,7 @@ import ch.o2it.weblounge.common.url.WebUrl;
  * Default implementation of a
  * {@link ch.o2it.weblounge.common.content.SearchResultItem}.
  */
-public class SearchResultPageItemImpl extends SearchResultItemImpl {
+public class SearchResultPageItemImpl extends SearchResultItemImpl implements SearchResultPageItem {
 
   /** The page xml */
   protected String pageXml = null;
