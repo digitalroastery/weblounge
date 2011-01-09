@@ -34,10 +34,10 @@ import javax.servlet.jsp.tagext.VariableInfo;
 public class PageListTagExtraInfo extends TagExtraInfo {
 
   /** Script variable representing the preview composer */
-  public static final String PREVIEW = "previewComposer";
+  public static final String PREVIEW = "preview";
 
   /** Script variable representing the previewed page */
-  public static final String PREVIEW_PAGE = "previewPage";
+  public static final String PREVIEW_PAGE = "page";
 
   /**
    * Returns the information on the exported tag variables.
