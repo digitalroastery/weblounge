@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import javax.servlet.jsp.JspException;
@@ -65,7 +66,7 @@ public class PageListTag extends WebloungeTag {
   private List<String> subjects = null;
 
   /** The number of page headers to return */
-  private int count = 0;
+  private int count = 10;
 
   /** The page headers */
   private SearchResult pages = null;
@@ -235,6 +236,8 @@ public class PageListTag extends WebloungeTag {
       SearchQuery query = new SearchQueryImpl(site);
       for (String subject : subjects)
         query.withSubject(subject);
+      for (Entry<String, String> headline : requireHeadlines.entrySet())
+        query.withPagelet(headline.getKey(), headline.getValue()).inComposer("main");
       query.withLimit(count);
       pages = repository.find(query);
     }
@@ -254,37 +257,19 @@ public class PageListTag extends WebloungeTag {
       // Store the important properties
       url = item.getUrl();
       page = item.getPage();
+      
+      // TODO security check
 
-      // Make sure all the required headlines are available
       found = true;
-      for (Map.Entry<String, String> h : requireHeadlines.entrySet()) {
-        boolean headlineFound = false;
-        // FIXME page.getPreview() always returns an empty pagelet array,
-        // therefore this condition will never be met
-        // The problem probably doesn't exist exactly at this place (somewhere
-        // at the SearchResultPageItem?)
-        for (Pagelet p : page.getPreview()) {
-          if (h.getKey().equals(p.getModule()) && h.getValue().equals(p.getIdentifier())) {
-            headlineFound = true;
-            break;
-          }
-        }
-        if (!headlineFound) {
-          found = false;
-          break;
-        }
-      }
-
-      index++;
     }
 
     // Set the headline in the request
     if (found && page != null) {
-      pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
-      pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
       this.page = page;
       this.preview = new ComposerImpl("stage", page.getPreview());
       this.url = url;
+      pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
+      pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
     }
 
     return found;
