@@ -105,10 +105,10 @@ public interface SolrFields {
   /** Pagelet xml field name (located) */
   public static final String PAGELET_XML_LOCATED = "pagelet-xml-{0}";
 
-  /** Pagelet xml field name */
+  /** Pagelet type field name */
   public static final String PAGELET_TYPE = "pagelet-type";
 
-  /** Pagelet xml field name (located) */
+  /** Pagelet type field name (located) */
   public static final String PAGELET_TYPE_LOCATED = "pagelet-type-{0}";
 
   /** Resource content filename field name */
