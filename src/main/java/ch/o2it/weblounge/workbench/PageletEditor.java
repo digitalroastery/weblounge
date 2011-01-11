@@ -20,7 +20,20 @@
 
 package ch.o2it.weblounge.workbench;
 
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.site.Module;
+import ch.o2it.weblounge.common.site.Site;
+
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.XML;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Class containing all the information that is needed to edit a certain
@@ -30,8 +43,31 @@ import ch.o2it.weblounge.common.content.page.Pagelet;
  */
 public class PageletEditor {
 
+  /** Possible flavors for the pagelet editor's data part */
+  public enum DataFlavor {
+    Xml, Json
+  };
+
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(PageletEditor.class);
+  
   /** The pagelet */
   protected Pagelet pagelet = null;
+
+  /** The page's resource uri */
+  protected ResourceURI uri = null;
+
+  /** The pagelet's composer identifier */
+  protected String composerId = null;
+
+  /** The pagelet's position within the composer */
+  protected int pageletIndex = -1;
+
+  /** The data flavor */
+  protected DataFlavor dataFlavor = DataFlavor.Json;
+
+  /** The pagelet's renderer */
+  protected PageletRenderer renderer = null;
 
   /**
    * Creates a new pagelet editor for the given pagelet.
@@ -39,8 +75,27 @@ public class PageletEditor {
    * @param pagelet
    *          the pagelet
    */
-  public PageletEditor(Pagelet pagelet) {
+  public PageletEditor(Pagelet pagelet, ResourceURI uri, String composer,
+      int pageletIndex) {
+    if (pagelet == null)
+      throw new IllegalArgumentException("Pagelet cannot be null");
+    if (uri == null)
+      throw new IllegalArgumentException("Page uri cannot be null");
+    if (composer == null)
+      throw new IllegalArgumentException("Composer cannot be null");
+    if (pageletIndex < 0)
+      throw new IllegalArgumentException("Pagelet index must be a positive integer");
+
     this.pagelet = pagelet;
+    this.uri = uri;
+    this.composerId = composer;
+    this.pageletIndex = pageletIndex;
+
+    Site site = uri.getSite();
+    Module module = site.getModule(pagelet.getModule());
+    if (module != null) {
+      renderer = module.getRenderer(pagelet.getIdentifier());
+    }
   }
 
   /**
@@ -53,14 +108,138 @@ public class PageletEditor {
   }
 
   /**
+   * Returns the resource uri.
+   * 
+   * @return the uri
+   */
+  public ResourceURI getURI() {
+    return uri;
+  }
+
+  /**
+   * Returns the composer identifier.
+   * 
+   * @return the composer
+   */
+  public String getComposer() {
+    return composerId;
+  }
+
+  /**
+   * Returns the (zero-based) pagelet's index inside the composer.
+   * 
+   * @return the pagelet's position
+   */
+  public int getPageletIndex() {
+    return pageletIndex;
+  }
+
+  /**
+   * Sets the flavor that the pagelet data is returned in.
+   * 
+   * @param flavor
+   *          the flavor
+   */
+  public void setDataFlavor(DataFlavor flavor) {
+    this.dataFlavor = flavor;
+  }
+
+  /**
+   * Returns the flavor that the pagelet data is returned in. By default,
+   * {@link DataFlavor#Json} is used.
+   * 
+   * @return the pagelet data flavor
+   */
+  public DataFlavor getDataFlavor() {
+    return dataFlavor;
+  }
+
+  /**
+   * Returns <code>true</code> if the pagelet has an renderer associated.
+   * 
+   * @return <code>true</code> if there is a renderer
+   */
+  public boolean hasRenderer() {
+    return renderer != null && renderer.getRenderer() != null;
+  }
+
+  /**
+   * Returns <code>true</code> if the pagelet has an editor associated.
+   * 
+   * @return <code>true</code> if there is an editor
+   */
+  public boolean hasEditor() {
+    return renderer != null && renderer.getEditor() != null;
+  }
+
+  /**
    * Returns the <code>XML</code> representation of this pagelet.
    * 
    * @return the pagelet
    */
   public String toXml() {
     StringBuffer buf = new StringBuffer();
-    buf.append(pagelet.toXml());
+
+    // head
+    buf.append("<pageleteditor ");
+    buf.append("uri=\"").append(uri.getId()).append("\" ");
+    buf.append("composer=\"").append(composerId).append("\" ");
+    buf.append("index=\"").append(pageletIndex).append("\">");
+
+    // the pagelet
+    buf.append("<data flavor=\"json\">");
+    String data = null;
+    switch (dataFlavor) {
+      case Json:
+        try {
+          data = XML.toJSONObject(pagelet.toXml()).toString();
+        } catch (JSONException e) {
+          throw new IllegalStateException("Pagelet xml can't be converted to json: " + e.getMessage(), e);
+        }
+        break;
+      case Xml:
+        data = pagelet.toXml();
+        break;
+      default:
+        throw new IllegalStateException("An unhandled flavor was found: " + dataFlavor);
+    }
+    buf.append(data);
+    buf.append("</data>");
+
+    // the renderer
+    if (renderer != null && renderer.getRenderer() != null) {
+      InputStream is = null;
+      try {
+        buf.append("<renderer type=\"xhtml\">");
+        is = renderer.getRenderer().openStream();
+        buf.append(IOUtils.toString(is));
+        buf.append("<renderer>");
+      } catch (IOException e) {
+        logger.warn("Error reading renderer from {}", renderer.getRenderer());
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+      buf.append("</renderer>");
+    }
+
+    // the editor
+    if (renderer != null && renderer.getEditor() != null) {
+      InputStream is = null;
+      try {
+        buf.append("<editor type=\"xhtml\">");
+        is = renderer.getEditor().openStream();
+        buf.append(IOUtils.toString(is));
+        buf.append("<editor>");
+      } catch (IOException e) {
+        logger.warn("Error reading editor from {}", renderer.getEditor());
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+      buf.append("</editor>");
+    }
+
+    buf.append("</pageleteditor>");
+
     return buf.toString();
   }
-
 }

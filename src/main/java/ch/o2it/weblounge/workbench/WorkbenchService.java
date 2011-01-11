@@ -115,7 +115,7 @@ public class WorkbenchService implements ManagedService {
     }
     Pagelet pagelet = composer.getPagelet(pageletIndex);
 
-    return new PageletEditor(pagelet);
+    return new PageletEditor(pagelet, pageURI, composerId, pageletIndex);
   }
 
 }
