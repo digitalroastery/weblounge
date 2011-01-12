@@ -255,7 +255,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     Cache cache = new Cache(cacheConfig);
     cacheManager.addCache(cache);
     if (overflowToDisk)
-      logger.info("Cache for site '{}' created at {}", id, cacheManager.getDiskStorePath());
+      logger.info("Cache extension for site '{}' created at {}", id, cacheManager.getDiskStorePath());
     else
       logger.info("In-memory cache for site '{}' created");
 

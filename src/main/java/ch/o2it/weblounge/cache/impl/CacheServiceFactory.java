@@ -113,7 +113,9 @@ public class CacheServiceFactory implements ManagedServiceFactory {
    */
   public void deleted(String pid) {
     ServiceRegistration registration = services.remove(pid);
+    CacheService cache = (CacheService)bundleCtx.getService(registration.getReference());
     registration.unregister();
+    cache.shutdown();
   }
 
 }
