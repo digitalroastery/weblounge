@@ -110,10 +110,10 @@ public class BundleContentRepository extends AbstractContentRepository {
     // Make sure we can create a temporary index
     idxRootDir = new File(PathUtils.concat(new String[] {
         System.getProperty("java.io.tmpdir"),
-        "weblounge",
-        "tmp",
+        "repository",
+        getSite().getIdentifier(),
         "index",
-        getSite().getIdentifier() }));
+    }));
     try {
       FileUtils.forceMkdir(idxRootDir);
     } catch (IOException e) {
@@ -343,7 +343,8 @@ public class BundleContentRepository extends AbstractContentRepository {
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#loadPage()
    */
   @Override
-  protected InputStream openStreamToResource(ResourceURI uri) throws IOException {
+  protected InputStream openStreamToResource(ResourceURI uri)
+      throws IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path
@@ -374,8 +375,8 @@ public class BundleContentRepository extends AbstractContentRepository {
    *      ch.o2it.weblounge.common.language.Language)
    */
   @Override
-  protected InputStream openStreamToResourceContent(ResourceURI uri, Language language)
-      throws IOException {
+  protected InputStream openStreamToResourceContent(ResourceURI uri,
+      Language language) throws IOException {
     String uriPath = uri.getPath();
 
     // This repository is path based, so let's make sure we have a path
