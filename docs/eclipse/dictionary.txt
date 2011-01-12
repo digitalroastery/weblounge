@@ -73,3 +73,5 @@ serializer
 deserializing
 versioned
 serializers
+registry
+admin
