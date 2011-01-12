@@ -432,7 +432,6 @@ public final class ImageStyleUtils {
     // If needed, create the scaled file's parent directory
     File dir = new File(PathUtils.concat(
         System.getProperty("java.io.tmpdir"),
-        "weblounge",
         "sites",
         site.getIdentifier(),
         "images",
