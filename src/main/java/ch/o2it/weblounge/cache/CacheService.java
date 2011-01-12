@@ -40,19 +40,6 @@ public interface CacheService extends ResponseCache {
   void clear();
 
   /**
-   * Initializes the cache service with an identifier, a name and a path to the
-   * local disk store (if applicable).
-   * 
-   * @param id
-   *          the cache identifier
-   * @param name
-   *          the cache name
-   * @param diskStorePath
-   *          path to the local disk store
-   */
-  void init(String id, String name, String diskStorePath);
-
-  /**
    * Returns the cache identifier.
    * 
    * @return the identifier
