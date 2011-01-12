@@ -335,7 +335,6 @@
               OSGI-INF/file-requesthandler.xml,
               OSGI-INF/image-requesthandler.xml,
               OSGI-INF/page-requesthandler.xml,
-              OSGI-INF/site-cache-manager.xml,
               OSGI-INF/site-dispatcher-service.xml
             </Service-Component>
             <Private-Package>

@@ -405,12 +405,14 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   }
 
   /**
-   * {@inheritDoc}
+   * Adds a new site.
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#addSite(ch.o2it.weblounge.common.site.Site,
-   *      org.osgi.framework.ServiceReference)
+   * @param site
+   *          the site
+   * @param reference
+   *          the site's service reference
    */
-  public void addSite(Site site, ServiceReference reference) {
+  void addSite(Site site, ServiceReference reference) {
     WebXml webXml = createWebXml(site, reference);
     Bundle siteBundle = reference.getBundle();
     Properties initParameters = new Properties();
