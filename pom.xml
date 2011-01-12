@@ -137,7 +137,8 @@
               ch.o2it.weblounge.cache.impl.handle
             </Private-Package>
             <Service-Component>
-              OSGI-INF/cache-service.xml
+              OSGI-INF/configuration-factory.xml,
+              OSGI-INF/service-factory.xml
             </Service-Component>
             <Embed-Dependency>
               jtidy

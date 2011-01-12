@@ -22,73 +22,98 @@ package ch.o2it.weblounge.cache.impl;
 
 import ch.o2it.weblounge.cache.CacheService;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceFactory;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.component.ComponentContext;
 
-import java.io.IOException;
 import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Service factory that will return a cache for each (site) bundle.
+ * Service factory that will return a cache for each configuration that is
+ * published to the {@link ConfigurationAdmin}.
+ * <p>
+ * The following properties need to be present in order for a cache instance to
+ * be started.
+ * <ul>
+ * <li><code>cache.id</code> - identifier that needs to match the site
+ * identifier</li>
+ * <li><code>cache.name</code> - a human readable name for this cache</li>
+ * <li><code>cache.diskStorePath</code> - path to the cache extension on disk</li>
+ * </ul>
+ * <p>
+ * For additional configuration, take a look at the sample configuration that
+ * comes with Weblounge. When registered with the system using the pid
+ * <code>ch.o2it.weblounge.cache</code>, it will be used as the basis for
+ * configuration objects.
  */
-public class CacheServiceFactory implements ServiceFactory {
+public class CacheServiceFactory implements ManagedServiceFactory {
 
-  /** Logger */
-  private static final Logger logger = LoggerFactory.getLogger(CacheServiceFactory.class);
+  /** The factory's service pid */
+  static final String SERVICE_PID = "ch.o2it.weblounge.cache.factory";
+  
+  /** Service registrations per configuration pid */
+  private Map<String, ServiceRegistration> services = new HashMap<String, ServiceRegistration>();
+
+  /** This service factory's bundle context */
+  private BundleContext bundleCtx = null;
 
   /**
-   * {@inheritDoc}
+   * Sets a reference to the service factory's component context.
+   * <p>
+   * This method is called from the OSGi context upon service creation.
    * 
-   * @see org.osgi.framework.ServiceFactory#getService(org.osgi.framework.Bundle,
-   *      org.osgi.framework.ServiceRegistration)
+   * @param ctx
+   *          the component context
    */
-  public Object getService(Bundle bundle, ServiceRegistration registration) {
-    // Create a new cache service instance
-    CacheServiceImpl cache = new CacheServiceImpl();
-
-    // Try to get hold of the service configuration
-    BundleContext bundleContext = bundle.getBundleContext();
-    ServiceReference configAdminRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
-    if (configAdminRef != null) {
-      try {
-        ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(configAdminRef);
-        Configuration serviceConfig = configAdmin.getConfiguration(CacheServiceImpl.SERVICE_PID);
-        if (serviceConfig != null) {
-          Dictionary<?, ?> serviceProperties = serviceConfig.getProperties();
-          cache.updated(serviceProperties);
-        } else {
-          logger.debug("No customized configuration found for cache");
-        }
-      } catch (IOException e) {
-        logger.error("Error reading cache configuration from configuraiton admin service: " + e.getMessage());
-      } catch (ConfigurationException e) {
-        logger.error("Error configuring cache service: " + e.getMessage());
-      }
-    } else {
-      logger.debug("No configuration admin service found while looking for cache configuration");
-    }
-
-    return cache;
+  protected void activate(ComponentContext ctx) {
+    this.bundleCtx = ctx.getBundleContext();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.osgi.framework.ServiceFactory#ungetService(org.osgi.framework.Bundle,
-   *      org.osgi.framework.ServiceRegistration, java.lang.Object)
+   * @see org.osgi.service.cm.ManagedServiceFactory#getName()
    */
-  public void ungetService(Bundle bundle, ServiceRegistration registration,
-      Object service) {
-    CacheService cacheService = (CacheService) service;
-    cacheService.shutdown();
+  public String getName() {
+    return "Cache service factory";
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String,
+   *      java.util.Dictionary)
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public void updated(String pid, Dictionary properties)
+      throws ConfigurationException {
+
+    // Create a new cache service instance
+    String id = (String) properties.get(CacheServiceImpl.OPT_ID);
+    String name = (String) properties.get(CacheServiceImpl.OPT_NAME);
+    String diskStorePath = (String) properties.get(CacheServiceImpl.OPT_DISKSTORE_PATH);
+    CacheServiceImpl cache = new CacheServiceImpl(id, name, diskStorePath);
+    cache.updated(properties);
+
+    // Register the service
+    String serviceType = CacheService.class.getName();
+    properties.put("service.pid", pid);
+    services.put(pid, bundleCtx.registerService(serviceType, cache, properties));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.osgi.service.cm.ManagedServiceFactory#deleted(java.lang.String)
+   */
+  public void deleted(String pid) {
+    ServiceRegistration registration = services.remove(pid);
+    registration.unregister();
   }
 
 }

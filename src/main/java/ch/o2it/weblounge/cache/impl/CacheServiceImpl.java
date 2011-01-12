@@ -37,12 +37,15 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -75,11 +78,17 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Name of the weblounge cache header */
   private static final String CACHE_KEY_HEADER = "X-Cache-Key";
 
-  /** Service pid, used to look up the service configuration */
-  public static final String SERVICE_PID = "ch.o2it.weblounge.cache";
-
   /** Configuration key prefix for content repository configuration */
   public static final String OPT_PREFIX = "cache";
+
+  /** Configuration key for the cache identifier */
+  public static final String OPT_ID = OPT_PREFIX + ".id";
+
+  /** Configuration key for the cache name */
+  public static final String OPT_NAME = OPT_PREFIX + ".name";
+
+  /** Configuration key for the path to the cache's disk store */
+  public static final String OPT_DISKSTORE_PATH = OPT_PREFIX + ".diskStorePath";
 
   /** Configuration key for the persistence of the cache */
   public static final String OPT_DISK_PERSISTENT = OPT_PREFIX + ".diskPersistent";
@@ -143,7 +152,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /** Whether cache statistics are enabled */
   protected boolean statisticsEnabled = DEFAULT_STATISTICS_ENABLED;
-  
+
   /** Identifier for the default cache */
   private static final String DEFAULT_CACHE = "site";
 
@@ -158,17 +167,46 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /** Cache name */
   protected String name = null;
+  
+  /** Path to the local disk store */
+  protected String diskStorePath = null;
+  
+  /** True to indicate that everything went fine with the setup of the disk store */
+  protected boolean diskStoreEnabled = true;
 
   /**
-   * {@inheritDoc}
+   * Creates a new cache with the given identifier and name.
    * 
-   * @see ch.o2it.weblounge.cache.CacheService#init(java.lang.String,
-   *      java.lang.String, java.lang.String)
+   * @param id
+   *          the cache identifier
+   * @param name
+   *          the cache name
+   * @param diskStorePath
+   *          the cache's disk store
    */
-  public void init(String id, String name, String diskStorePath) {
+  public CacheServiceImpl(String id, String name, String diskStorePath) {
+    if (StringUtils.isBlank(id))
+      throw new IllegalArgumentException("Cache id cannot be blank");
+    if (StringUtils.isBlank(name))
+      throw new IllegalArgumentException("Cache name cannot be blank");
     this.id = id;
     this.name = name;
+    this.diskStorePath = diskStorePath;
+    init(id, name, diskStorePath);
+  }
 
+  /**
+   * Initializes the cache service with an identifier, a name and a path to the
+   * local disk store (if applicable).
+   * 
+   * @param id
+   *          the cache identifier
+   * @param name
+   *          the cache name
+   * @param diskStorePath
+   *          path to the local disk store
+   */
+  private void init(String id, String name, String diskStorePath) {
     InputStream configInputStream = null;
     try {
       configInputStream = getClass().getClassLoader().getResourceAsStream(CACHE_MANAGER_CONFIG);
@@ -178,16 +216,38 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     } finally {
       IOUtils.closeQuietly(configInputStream);
     }
+    
+    // Check the path to the cache
+    if (StringUtils.isNotBlank(diskStorePath)) {
+      File file = new File(diskStorePath);
+      try {
+        if (!file.exists())
+          FileUtils.forceMkdir(file);
+        if (!file.isDirectory())
+          throw new IOException();
+        if (!file.canWrite())
+          throw new IOException();
+      } catch (IOException e) {
+        logger.warn("Unable to create disk store for cache '{}' at {}", id, diskStorePath);
+        logger.warn("Persistent cache will be disabled for '{}'", id);
+        diskPersistent = false;
+        diskStoreEnabled = false;
+      }
+    } else {
+      diskStoreEnabled = false;
+    }
 
     // Configure the cache
     CacheConfiguration cacheConfig = new CacheConfiguration();
     cacheConfig.setName(DEFAULT_CACHE);
-    cacheConfig.setDiskStorePath(diskStorePath);
+    cacheConfig.setDiskPersistent(diskPersistent && diskStoreEnabled);
+    cacheConfig.setOverflowToDisk(overflowToDisk && diskStoreEnabled);
+    if (overflowToDisk && diskStoreEnabled) {
+      cacheConfig.setDiskStorePath(diskStorePath);
+      cacheConfig.setMaxElementsOnDisk(maxElementsOnDisk);
+    }
     cacheConfig.setEternal(false);
-    cacheConfig.setDiskPersistent(diskPersistent);
     cacheConfig.setMaxElementsInMemory(maxElementsInMemory);
-    cacheConfig.setMaxElementsOnDisk(maxElementsOnDisk);
-    cacheConfig.setOverflowToDisk(overflowToDisk);
     cacheConfig.setStatistics(statisticsEnabled);
     cacheConfig.setTimeToIdleSeconds(timeToIdle);
     cacheConfig.setTimeToLiveSeconds(timeToLive);
@@ -218,13 +278,13 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.cache.CacheService#getIdentifier()
    */
   public String getIdentifier() {
     return id;
   }
-  
+
   /**
    * Configures the caching service. Available options are:
    * <ul>
@@ -295,11 +355,13 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       if (cache == null)
         continue;
       CacheConfiguration config = cache.getCacheConfiguration();
-      config.setDiskPersistent(diskPersistent);
+      config.setOverflowToDisk(overflowToDisk && diskStoreEnabled);
+      if (overflowToDisk && diskStoreEnabled) {
+        config.setMaxElementsOnDisk(maxElementsOnDisk);
+        config.setDiskPersistent(diskPersistent);
+      }
       config.setStatistics(statisticsEnabled);
       config.setMaxElementsInMemory(maxElementsInMemory);
-      config.setMaxElementsOnDisk(maxElementsOnDisk);
-      config.setOverflowToDisk(overflowToDisk);
       config.setTimeToIdleSeconds(timeToIdle);
       config.setTimeToLiveSeconds(timeToLive);
     }
@@ -634,6 +696,16 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       response = ((ServletResponseWrapper) response).getResponse();
     }
     return null;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return name;
   }
 
 }
