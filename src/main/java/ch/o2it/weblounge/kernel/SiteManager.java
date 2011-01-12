@@ -237,6 +237,9 @@ public class SiteManager {
       try {
         logger.debug("Starting site '{}'", site);
         // TODO: Make sure there is a *running* content repository for this site
+        // Alternatively, have the site implementation use a reference to the
+        // repository and start itself once the repository switches to "running"
+        // state (requires a repository listener)
         site.start();
       } catch (IllegalStateException e) {
         logger.error("Site '{}' could not be started: {}", e.getMessage(), e);
