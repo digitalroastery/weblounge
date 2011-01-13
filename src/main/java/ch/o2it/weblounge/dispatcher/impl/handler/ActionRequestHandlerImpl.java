@@ -121,11 +121,11 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         if (flavors.length() > 0)
           flavors.append(",");
         flavors.append(flavor.toString().toLowerCase());
-        logger.debug("Caching action '{}' for url {}", action, normalizedUrl);
+        logger.trace("Caching action '{}' for url {}", action, normalizedUrl);
       }
     }
 
-    logger.info("Action '{}' ({}) registered for site://{}", new Object[] {
+    logger.debug("Action '{}' ({}) registered for site://{}", new Object[] {
         action,
         flavors.toString(),
         registration.toString() });
@@ -155,13 +155,13 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       while (cacheIterator.hasNext()) {
         ActionPool candidate = cacheIterator.next().getValue();
         if (candidate.equals(pool)) {
-          logger.debug("Removing '{}' from action url cache", action);
+          logger.trace("Removing '{}' from action url cache", action);
           cacheIterator.remove();
         }
       }
     }
 
-    logger.info("Unregistering action '{}' from {}", action, new WebUrlImpl(action.getSite(), action.getPath()).normalize());
+    logger.debug("Unregistering action '{}' from {}", action, new WebUrlImpl(action.getSite(), action.getPath()).normalize());
     return true;
   }
 
