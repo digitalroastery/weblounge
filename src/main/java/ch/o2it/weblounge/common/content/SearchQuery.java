@@ -504,6 +504,16 @@ public interface SearchQuery {
   SearchQuery inComposer(String composer) throws IllegalStateException;
 
   /**
+   * This method may be called after a call to {@link #withPagelet(Pagelet)} in
+   * order to specify that the pagelet needs to be in the stage composer.
+   * 
+   * @return the query extended by this criterion
+   * @throws IllegalStateException
+   *           if no pagelet has been specified before
+   */
+  SearchQuery inStage() throws IllegalStateException;
+
+  /**
    * This method may be called after a call to {@link #inComposer(String)} in
    * order to specify the pagelet's position within that composer.
    * 
