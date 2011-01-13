@@ -20,10 +20,36 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_BOOST;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.FULLTEXT;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED_BY;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SCORE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils.clean;
 
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.SearchResultImpl;
 import ch.o2it.weblounge.common.impl.content.SearchResultPageItemImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
@@ -38,6 +64,7 @@ import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -84,57 +111,58 @@ public class SolrRequester {
 
     // Id
     if (query.getIdentifier() != null) {
-      and(solrQuery, SolrFields.ID, query.getIdentifier(), true, true);
+      and(solrQuery, ID, query.getIdentifier(), true, true);
     }
 
     // Path
     if (query.getPath() != null) {
-      and(solrQuery, SolrFields.PATH, query.getPath(), true, true);
+      and(solrQuery, PATH, query.getPath(), true, true);
     }
 
     // Subjects
     if (query.getSubjects().length > 0) {
-      and(solrQuery, SolrFields.SUBJECT, query.getSubjects(), true, true);
+      and(solrQuery, SUBJECT, query.getSubjects(), true, true);
     }
 
     // Template
     if (query.getTemplate() != null) {
-      and(solrQuery, SolrFields.TEMPLATE, query.getTemplate(), true, true);
+      and(solrQuery, TEMPLATE, query.getTemplate(), true, true);
     }
 
     // Creator
     if (query.getCreator() != null) {
-      and(solrQuery, SolrFields.CREATED_BY, SolrUtils.serializeUser(query.getCreator()), true, true);
+      and(solrQuery, CREATED_BY, SolrUtils.serializeUser(query.getCreator()), true, true);
     }
 
     // Creation date
     if (query.getCreationDate() != null) {
-      and(solrQuery, SolrFields.CREATED, SolrUtils.selectDay(query.getCreationDate()), false, false);
+      and(solrQuery, CREATED, SolrUtils.selectDay(query.getCreationDate()), false, false);
     }
 
     // Modifier
     if (query.getModifier() != null) {
-      and(solrQuery, SolrFields.MODIFIED_BY, SolrUtils.serializeUser(query.getModifier()), true, true);
+      and(solrQuery, MODIFIED_BY, SolrUtils.serializeUser(query.getModifier()), true, true);
     }
 
     // Modification date
     if (query.getModificationDate() != null) {
-      and(solrQuery, SolrFields.MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, false);
+      and(solrQuery, MODIFIED, SolrUtils.selectDay(query.getModificationDate()), false, false);
     }
 
     // Publisher
     if (query.getPublisher() != null) {
-      and(solrQuery, SolrFields.PUBLISHED_BY, SolrUtils.serializeUser(query.getPublisher()), true, true);
+      and(solrQuery, PUBLISHED_BY, SolrUtils.serializeUser(query.getPublisher()), true, true);
     }
 
     // Publication date
     if (query.getPublishingDate() != null) {
-      and(solrQuery, SolrFields.PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
+      and(solrQuery, PUBLISHED_FROM, SolrUtils.selectDay(query.getPublishingDate()), false, false);
     }
 
     // Pagelet elements
     for (Map.Entry<String, String> entry : query.getElements().entrySet()) {
-      solrQuery.append(" ").append(SolrFields.PAGELET_CONTENTS).append(":");
+      // TODO: Language?
+      solrQuery.append(" ").append(PAGELET_CONTENTS).append(":");
       solrQuery.append("\"").append(entry.getKey()).append(":=\"");
       int i = 0;
       for (String contentValue : StringUtils.split(entry.getValue())) {
@@ -148,22 +176,43 @@ public class SolrRequester {
       StringBuffer searchTerm = new StringBuffer();
       searchTerm.append(entry.getKey());
       searchTerm.append(":=").append(entry.getValue());
-      and(solrQuery, SolrFields.PAGELET_PROPERTIES, searchTerm.toString(), true, true);
+      and(solrQuery, PAGELET_PROPERTIES, searchTerm.toString(), true, true);
     }
 
+    // Pagelet types
+    for (Pagelet pagelet : query.getPagelets()) {
+      StringBuffer searchTerm = new StringBuffer();
+      searchTerm.append(pagelet.getModule()).append("/").append(pagelet.getIdentifier());
+
+      // Are we looking for the pagelet in a certain composer or position?
+      PageletURI uri = pagelet.getURI();
+      if (StringUtils.isNotBlank(uri.getComposer()) || uri.getPosition() >= 0) {
+        if (StringUtils.isNotBlank(uri.getComposer())) {
+          String field = MessageFormat.format(PAGELET_TYPE_COMPOSER, uri.getComposer());
+          and(solrQuery, field, searchTerm.toString(), true, true);
+        }
+        if (uri.getPosition() >= 0) {
+          String field = MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, uri.getPosition());
+          and(solrQuery, field, searchTerm.toString(), true, true);
+        }
+      } else {
+        and(solrQuery, PAGELET_TYPE, searchTerm.toString(), true, true);
+      }
+    }
+    
     // Content filenames
     if (query.getFilename() != null) {
-      and(solrQuery, SolrFields.CONTENT_FILENAME, query.getFilename(), true, true);
+      and(solrQuery, CONTENT_FILENAME, query.getFilename(), true, true);
     }
 
     // Content mimetypes
     if (query.getMimetype() != null) {
-      and(solrQuery, SolrFields.CONTENT_MIMETYPE, query.getMimetype(), true, true);
+      and(solrQuery, CONTENT_MIMETYPE, query.getMimetype(), true, true);
     }
 
     // Fulltext
     if (query.getText() != null) {
-      and(solrQuery, SolrFields.FULLTEXT, query.getText(), true, true);
+      and(solrQuery, FULLTEXT, query.getText(), true, true);
     }
 
     if (solrQuery.length() == 0)
@@ -175,7 +224,7 @@ public class SolrRequester {
     SolrQuery q = new SolrQuery(solrQuery.toString());
     q.setStart(query.getOffset() > 0 ? query.getOffset() : 0);
     q.setRows(query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE);
-    q.setSortField(SolrFields.SCORE, SolrQuery.ORDER.desc);
+    q.setSortField(SCORE, SolrQuery.ORDER.desc);
     q.setIncludeScore(true);
     q.setFields("* score");
 
@@ -196,17 +245,17 @@ public class SolrRequester {
 
     // Walk through response and create new items with title, creator, etc:
     for (SolrDocument doc : solrResponse.getResults()) {
-      float score = (Float) doc.getFieldValue(SolrFields.SCORE);
+      float score = (Float) doc.getFieldValue(SCORE);
 
-      String id = (String) doc.getFieldValue(SolrFields.ID);
-      String path = (String) doc.getFieldValue(SolrFields.PATH);
+      String id = (String) doc.getFieldValue(ID);
+      String path = (String) doc.getFieldValue(PATH);
       WebUrl url = new WebUrlImpl(site, path);
 
       SearchResultPageItemImpl item = new SearchResultPageItemImpl(site, id, url, score, site);
-      item.setPageXml((String) doc.getFieldValue(SolrFields.XML));
-      item.setPageHeaderXml((String) doc.getFieldValue(SolrFields.HEADER_XML));
-      item.setPagePreviewXml((String) doc.getFieldValue(SolrFields.PREVIEW_XML));
-      item.setTitle((String) doc.getFieldValue(SolrFields.TITLE_LOCALIZED));
+      item.setPageXml((String) doc.getFieldValue(XML));
+      item.setPageHeaderXml((String) doc.getFieldValue(HEADER_XML));
+      item.setPagePreviewXml((String) doc.getFieldValue(PREVIEW_XML));
+      item.setTitle((String) doc.getFieldValue(TITLE_LOCALIZED));
 
       // Add the item to the result set
       result.addResultItem(item);
@@ -304,14 +353,14 @@ public class SolrRequester {
 
     sb.append("(");
 
-    sb.append(SolrFields.TITLE_LOCALIZED);
+    sb.append(TITLE_LOCALIZED);
     sb.append(":(");
     sb.append(uq);
     sb.append(")^");
-    sb.append(SolrFields.TITLE_BOOST);
+    sb.append(TITLE_BOOST);
     sb.append(" ");
 
-    sb.append(SolrFields.FULLTEXT);
+    sb.append(FULLTEXT);
     sb.append(":(");
     sb.append(uq);
     sb.append(") ");

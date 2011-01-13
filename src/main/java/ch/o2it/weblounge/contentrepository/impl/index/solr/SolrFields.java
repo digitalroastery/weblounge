@@ -97,19 +97,25 @@ public interface SolrFields {
   public static final String PAGELET_CONTENTS = "pagelet-contents";
 
   /** Pagelet text and properties values (localized) */
-  public static final String PAGELET_CONTENTS_LOCALIZED = "pagelet-contents-{0}";
+  public static final String PAGELET_CONTENTS_LOCALIZED = "pagelet-contents-language-{0}";
 
   /** Pagelet properties field name */
   public static final String PAGELET_PROPERTIES = "pagelet-properties";
 
-  /** Pagelet xml field name (located) */
-  public static final String PAGELET_XML_LOCATED = "pagelet-xml-{0}";
+  /** Pagelet xml field name (composer) */
+  public static final String PAGELET_XML_COMPOSER = "pagelet-xml-composer-{0}";
+
+  /** Pagelet xml field name (position within composer) */
+  public static final String PAGELET_XML_COMPOSER_POSITION = "pagelet-xml-position-{0}";
 
   /** Pagelet type field name */
   public static final String PAGELET_TYPE = "pagelet-type";
 
-  /** Pagelet type field name (located) */
-  public static final String PAGELET_TYPE_LOCATED = "pagelet-type-{0}";
+  /** Pagelet type field name (composer) */
+  public static final String PAGELET_TYPE_COMPOSER = "pagelet-type-composer-{0}";
+
+  /** Pagelet type field name (position within composer) */
+  public static final String PAGELET_TYPE_COMPOSER_POSITION = "pagelet-type-position-{0}";
 
   /** Resource content filename field name */
   public static final String CONTENT_FILENAME = "content-filename";

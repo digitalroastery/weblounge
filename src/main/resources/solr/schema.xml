@@ -265,9 +265,12 @@
    
     <!-- Dynamic fields for pagelet texts and properties -->
     <field name="pagelet-type" type="text" indexed="true" stored="false" multiValued="true"/>
-    <dynamicField name="pagelet-type-*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet-type-composer-*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet-type-position-*" type="text" indexed="true" stored="true" multiValued="true"/>
     <field name="pagelet-contents" type="text" indexed="true" stored="false" multiValued="true"/>
-    <dynamicField name="pagelet-contents-*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet-contents-language-*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet-contents-composer-*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet-contents-position-*" type="text" indexed="true" stored="true" multiValued="true"/>
     <field name="pagelet-properties" type="text" indexed="true" stored="false" multiValued="true"/>
     <dynamicField name="pagelet-xml-*" type="text" indexed="false" stored="true" multiValued="true"/>
 

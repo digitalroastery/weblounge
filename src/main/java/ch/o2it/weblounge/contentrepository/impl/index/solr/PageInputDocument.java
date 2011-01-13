@@ -23,13 +23,16 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_CONTENTS_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_PROPERTIES;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_LOCATED;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML_LOCATED;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML_COMPOSER;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_XML_COMPOSER_POSITION;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
 
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.language.Language;
 
@@ -59,38 +62,65 @@ public class PageInputDocument extends ResourceInputDocument {
    * 
    * @param page
    *          the page
+   * @param the
+   *          stage composer
    */
   protected void init(Page page) {
     super.init(page);
 
     // Page-level
     addField(TEMPLATE, page.getTemplate(), false);
+    
+    // Determine the stage composer
+    String stage = null;
+    PageTemplate template = page.getURI().getSite().getTemplate(page.getTemplate());
+    if (template != null) {
+      stage = template.getStage();
+    }
 
     // Pagelet elements and properties
     for (Composer composer : page.getComposers()) {
-      int i = 0;
-      for (Pagelet p : composer.getPagelets()) {
-        String location = composer.getIdentifier() + "-" + i;
-        for (Language l : p.languages()) {
-          addField(PAGELET_CONTENTS, serializeContent(p, l), true);
-          addField(getLocalizedFieldName(PAGELET_CONTENTS_LOCALIZED, l), serializeContent(p, l), l, true);
-        }
-        addField(PAGELET_PROPERTIES, serializeProperties(p), false);
-        addField(MessageFormat.format(PAGELET_XML_LOCATED, location), p.toXml(), false);
-        addField(MessageFormat.format(PAGELET_TYPE_LOCATED, location), p.getModule() + "/" + p.getIdentifier(), false);
-        i++;
+      String composerId = composer.getIdentifier();
+      addComposerFields(composer, composerId);
+      if (composerId.equals(stage)) {
+        addComposerFields(composer, "stage");
       }
     }
 
     // Preview information
     StringBuffer preview = new StringBuffer();
-    preview.append("<composer id=\"stage\">");
+    preview.append("<composer id=\"preview\">");
     for (Pagelet p : page.getPreview()) {
       preview.append(p.toXml());
     }
     preview.append("</composer>");
     addField(PREVIEW_XML, preview.toString(), false);
 
+  }
+
+  /**
+   * Depending on the composer content and the provided target id, adds the
+   * necessary fields to the input document.
+   * 
+   * @param composer
+   *          the composer
+   * @param composerId
+   *          the composer identifier
+   */
+  protected void addComposerFields(Composer composer, String composerId) {
+    int i = 0;
+    for (Pagelet p : composer.getPagelets()) {
+      for (Language l : p.languages()) {
+        addField(PAGELET_CONTENTS, serializeContent(p, l), true);
+        addField(getLocalizedFieldName(PAGELET_CONTENTS_LOCALIZED, l), serializeContent(p, l), l, true);
+      }
+      addField(PAGELET_PROPERTIES, serializeProperties(p), false);
+      addField(MessageFormat.format(PAGELET_XML_COMPOSER, composerId), p.toXml(), false);
+      addField(MessageFormat.format(PAGELET_XML_COMPOSER_POSITION, i), p.toXml(), false);
+      addField(MessageFormat.format(PAGELET_TYPE_COMPOSER, composerId), p.getModule() + "/" + p.getIdentifier(), false);
+      addField(MessageFormat.format(PAGELET_TYPE_COMPOSER_POSITION, i), p.getModule() + "/" + p.getIdentifier(), false);
+      i++;
+    }
   }
 
 }
