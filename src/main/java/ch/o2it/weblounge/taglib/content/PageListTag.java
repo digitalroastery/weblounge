@@ -136,6 +136,8 @@ public class PageListTag extends WebloungeTag {
    *          the number of page headers
    */
   public void setCount(String count) {
+    if (count == null)
+      throw new IllegalArgumentException("Count must be a positive integer");
     try {
       this.count = Integer.parseInt(count);
     } catch (NumberFormatException e) {
@@ -151,6 +153,8 @@ public class PageListTag extends WebloungeTag {
    *          the keywords
    */
   public void setKeywords(String value) {
+    if (value == null)
+      throw new IllegalArgumentException("Keywords cannot be null");
     StringTokenizer tok = new StringTokenizer(value, ",;");
     while (tok.hasMoreTokens()) {
       subjects.add(tok.nextToken().trim());
@@ -237,7 +241,7 @@ public class PageListTag extends WebloungeTag {
       for (String subject : subjects)
         query.withSubject(subject);
       for (Entry<String, String> headline : requireHeadlines.entrySet())
-        query.withPagelet(headline.getKey(), headline.getValue()).inComposer("main");
+        query.withPagelet(headline.getKey(), headline.getValue()).inStage();
       query.withLimit(count);
       pages = repository.find(query);
     }

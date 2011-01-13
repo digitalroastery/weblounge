@@ -40,6 +40,15 @@ public class ImageResourceTagExtraInfo extends TagExtraInfo {
   /** Variable that will hold the image resource content */
   public static final String IMAGE_CONTENT = "imagecontent";
 
+  /** Variable that will hold the image width */
+  public static final String IMAGE_WIDTH = "imageWidth";
+
+  /** Variable that will hold the image height */
+  public static final String IMAGE_HEIGHT = "imageHeight";
+
+  /** Variable that will hold the url to the image */
+  public static final String IMAGE_SRC = "imageUrl";
+
   /** Variable that will hold the image style */
   public static final String STYLE = "imagestyle";
 
@@ -52,7 +61,10 @@ public class ImageResourceTagExtraInfo extends TagExtraInfo {
     return new VariableInfo[] {
         new VariableInfo(IMAGE, ImageResource.class.getName(), true, VariableInfo.NESTED),
         new VariableInfo(IMAGE_CONTENT, ImageContent.class.getName(), true, VariableInfo.NESTED),
-        new VariableInfo(STYLE, ImageStyle.class.getName(), true, VariableInfo.NESTED)
+        new VariableInfo(STYLE, ImageStyle.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(IMAGE_WIDTH, Integer.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(IMAGE_HEIGHT, Integer.class.getName(), true, VariableInfo.NESTED),
+        new VariableInfo(IMAGE_SRC, String.class.getName(), true, VariableInfo.NESTED),
     };
   }
 

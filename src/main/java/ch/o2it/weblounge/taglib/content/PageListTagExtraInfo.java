@@ -37,7 +37,7 @@ public class PageListTagExtraInfo extends TagExtraInfo {
   public static final String PREVIEW = "preview";
 
   /** Script variable representing the previewed page */
-  public static final String PREVIEW_PAGE = "page";
+  public static final String PREVIEW_PAGE = "previewPage";
 
   /**
    * Returns the information on the exported tag variables.
@@ -46,8 +46,8 @@ public class PageListTagExtraInfo extends TagExtraInfo {
    */
   public VariableInfo[] getVariableInfo(TagData tagData) {
     return new VariableInfo[] {
-      new VariableInfo(PageListTagExtraInfo.PREVIEW, Composer.class.getName(), true, VariableInfo.NESTED),
-      new VariableInfo(PageListTagExtraInfo.PREVIEW_PAGE, Page.class.getName(), true, VariableInfo.NESTED)
+      new VariableInfo(PREVIEW, Composer.class.getName(), true, VariableInfo.NESTED),
+      new VariableInfo(PREVIEW_PAGE, Page.class.getName(), true, VariableInfo.NESTED)
     };
   }
 

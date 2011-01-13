@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -136,6 +137,9 @@ public class ImageResourceTag extends WebloungeTag {
     ImageResource image = null;
     ImageContent imageContent = null;
     ImageStyle style = null;
+    String linkToImage = null;
+    int imageWidth = 0;
+    int imageHeight = 0;
 
     // Load the content
     try {
@@ -143,6 +147,10 @@ public class ImageResourceTag extends WebloungeTag {
       language = LanguageUtils.getPreferredLanguage(image, request, site);
       image.switchTo(language);
       imageContent = image.getContent(language);
+      imageWidth = imageContent.getWidth();
+      imageHeight = imageContent.getHeight();
+      // TODO: Make this a reference rather than a hard coded string
+      linkToImage = UrlUtils.concat("/weblounge-images", image.getIdentifier(), imageContent.getFilename());
     } catch (ContentRepositoryException e) {
       logger.warn("Error trying to load image " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;
@@ -151,6 +159,9 @@ public class ImageResourceTag extends WebloungeTag {
     // Find the image style
     if (StringUtils.isNotBlank(imageStyle)) {
       style = ImageStyleUtils.findStyle(imageStyle, site);
+      linkToImage += "?style=" + style.getIdentifier();
+      imageWidth = ImageStyleUtils.getWidth(imageContent, style);
+      imageHeight = ImageStyleUtils.getHeight(imageContent, style);
       pageContext.setAttribute(ImageResourceTagExtraInfo.STYLE, style);
     }
 
@@ -159,6 +170,9 @@ public class ImageResourceTag extends WebloungeTag {
     // Store the image and the image content in the request
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE, image);
     pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_CONTENT, imageContent);
+    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_WIDTH, imageWidth);
+    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_HEIGHT, imageHeight);
+    pageContext.setAttribute(ImageResourceTagExtraInfo.IMAGE_SRC, linkToImage);
 
     return EVAL_BODY_INCLUDE;
   }
@@ -171,6 +185,9 @@ public class ImageResourceTag extends WebloungeTag {
   public int doEndTag() throws JspException {
     pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE);
     pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_CONTENT);
+    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_WIDTH);
+    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_HEIGHT);
+    pageContext.removeAttribute(ImageResourceTagExtraInfo.IMAGE_SRC);
     pageContext.removeAttribute(ImageResourceTagExtraInfo.STYLE);
     return super.doEndTag();
   }
