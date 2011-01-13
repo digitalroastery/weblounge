@@ -446,7 +446,7 @@ public class ModuleImpl implements Module {
 
     // Finally, mark this module as running
     running = true;
-    logger.info("Module '{}' started", this);
+    logger.debug("Module '{}' started", this);
 
     // Tell listeners
     fireModuleStarted();
@@ -464,7 +464,7 @@ public class ModuleImpl implements Module {
 
     // Finally, mark this module as stopped
     running = false;
-    logger.info("Module '{}' stopped", this);
+    logger.debug("Module '{}' stopped", this);
 
     // Tell listeners
     fireModuleStopped();

@@ -34,6 +34,7 @@ import ch.o2it.weblounge.common.impl.content.ResourceImpl;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,6 +131,27 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
     return composer;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.page.Page#getStage()
+   */
+  public Composer getStage() {
+    PageTemplate t = null;
+    if (StringUtils.isNotBlank(template)) {
+      t = uri.getSite().getTemplate(template);
+    } else {
+      t = uri.getSite().getDefaultTemplate();
+      logger.warn("Page {} has no template associated", uri);
+    }
+    if (t == null)
+      throw new IllegalStateException("Page template '" + template + "' not found");
+    String stage = t.getStage();
+    if (StringUtils.isNotBlank(stage))
+      return getComposer(stage);
+    return null;
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -288,10 +310,10 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
     Site site = getURI().getSite();
     PageTemplate t = site.getTemplate(template);
     if (preview == null && t == null) {
-      logger.warn("Can't calculate the page preview due to missing template");
+      logger.warn("Can't calculate the page preview due to missing page template '{}'", template);
       return new Pagelet[] {};
     } else if (preview == null && t.getStage() == null) {
-      logger.warn("Can't calculate the page preview due to missing stage definition");
+      logger.warn("Can't calculate the page preview due to missing stage definition in page template '{}'", template);
       return new Pagelet[] {};
     } else if (preview == null) {
       this.preview = new ArrayList<Pagelet>();

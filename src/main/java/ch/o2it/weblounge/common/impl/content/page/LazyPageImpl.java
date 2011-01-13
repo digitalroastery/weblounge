@@ -118,7 +118,7 @@ public class LazyPageImpl implements Page {
       cleanupAfterLoading();
     } catch (Throwable e) {
       logger.error("Failed to lazy-load body of {}", uri);
-      throw new IllegalStateException(e);
+      throw new IllegalStateException("Failed to lazy-load body of " + uri, e);
     }
   }
 
@@ -293,7 +293,20 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.o2it.weblounge.common.content.page.Page#getStage()
+   */
+  public Composer getStage() {
+    if (!isHeaderLoaded && isBodyLoaded)
+      loadPageHeader();
+    else
+      loadPage();
+    return page.getStage();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.page.Page#getComposer(java.lang.String)
    */
   public Composer getComposer(String composerId) {
@@ -301,7 +314,7 @@ public class LazyPageImpl implements Page {
       loadPageBody();
     return page.getComposer(composerId);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -372,13 +385,13 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#getIdentifier()
    */
   public String getIdentifier() {
     return uri.getId();
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -434,10 +447,10 @@ public class LazyPageImpl implements Page {
       loadPageBody();
     return page.getPagelets(composer, module, id);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#getPath()
    */
   public String getPath() {
@@ -569,13 +582,13 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#getVersion()
    */
   public long getVersion() {
     return uri.getVersion();
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -678,10 +691,10 @@ public class LazyPageImpl implements Page {
       loadPageHeader();
     page.setDescription(description, language);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#setIdentifier(java.lang.String)
    */
   public void setIdentifier(String identifier) {
@@ -723,8 +736,9 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.content.Resource#setCreated(ch.o2it.weblounge.common.user.User, java.util.Date)
+   * 
+   * @see ch.o2it.weblounge.common.content.Resource#setCreated(ch.o2it.weblounge.common.user.User,
+   *      java.util.Date)
    */
   public void setCreated(User user, Date date) {
     if (!isHeaderLoaded)
@@ -826,13 +840,13 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#setVersion(long)
    */
   public void setVersion(long version) {
     uri.setVersion(version);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -914,7 +928,7 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
    */
   public void setCreationDate(Date date) {
@@ -922,7 +936,7 @@ public class LazyPageImpl implements Page {
       loadPageHeader();
     page.setCreationDate(date);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -947,7 +961,7 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
    */
   public void setCreator(User user) {
@@ -955,7 +969,7 @@ public class LazyPageImpl implements Page {
       loadPageHeader();
     page.setCreator(user);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -1170,10 +1184,10 @@ public class LazyPageImpl implements Page {
       loadPageHeader();
     page.setOwner(owner);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#setPath(java.lang.String)
    */
   public void setPath(String path) {
@@ -1182,7 +1196,7 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#getContent(ch.o2it.weblounge.common.language.Language)
    */
   public ResourceContent getContent(Language language) {
@@ -1191,16 +1205,16 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#getOriginalContent()
    */
   public ResourceContent getOriginalContent() {
     return null;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#removeContent(ch.o2it.weblounge.common.language.Language)
    */
   public ResourceContent removeContent(Language language) {
@@ -1209,7 +1223,7 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#contents()
    */
   public Set<ResourceContent> contents() {
@@ -1218,7 +1232,7 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -1231,7 +1245,7 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -1241,11 +1255,11 @@ public class LazyPageImpl implements Page {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Resource#addContent(ch.o2it.weblounge.common.content.ResourceContent)
    */
   public void addContent(ResourceContent content) {
     return;
   }
-  
+
 }

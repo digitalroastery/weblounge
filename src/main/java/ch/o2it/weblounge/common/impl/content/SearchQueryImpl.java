@@ -395,6 +395,15 @@ public class SearchQueryImpl implements SearchQuery {
 
   /**
    * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#inStage()
+   */
+  public SearchQuery inStage() throws IllegalStateException {
+    return inComposer("stage");
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.o2it.weblounge.common.content.SearchQuery#withAuthor(ch.o2it.weblounge.common.user.User)
    */

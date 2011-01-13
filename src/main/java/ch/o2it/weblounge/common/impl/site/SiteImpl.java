@@ -1052,11 +1052,11 @@ public class SiteImpl implements Site {
         }
         
         Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());
-        logger.info("Module '{}' loaded for site '{}'", m, this);
+        logger.debug("Module '{}' loaded for site '{}'", m, this);
         addModule(m);
       }
     } else {
-      logger.info("Site '{}' has no modules", this);
+      logger.debug("Site '{}' has no modules", this);
     }
 
     // Look for a job scheduler
