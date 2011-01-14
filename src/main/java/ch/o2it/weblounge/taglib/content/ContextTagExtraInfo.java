@@ -82,7 +82,7 @@ public class ContextTagExtraInfo extends TagExtraInfo {
           varinfo[i++] = new VariableInfo(name, Site.class.getName(), true, VariableInfo.NESTED);
         // Uri
         if ((name = variables.getUri()) != null)
-          varinfo[i++] = new VariableInfo(name, java.lang.String.class.getName(), true, VariableInfo.NESTED);
+          varinfo[i++] = new VariableInfo(name, String.class.getName(), true, VariableInfo.NESTED);
         // Url
         if ((name = variables.getUrl()) != null)
           varinfo[i++] = new VariableInfo(name, WebUrl.class.getName(), true, VariableInfo.NESTED);

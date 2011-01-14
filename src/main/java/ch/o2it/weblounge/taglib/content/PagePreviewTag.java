@@ -321,7 +321,7 @@ public class PagePreviewTag extends WebloungeTag {
       try {
         request.setAttribute(WebloungeRequest.PAGE, page);
         request.setAttribute(WebloungeRequest.PAGELET, pagelet);
-        request.setAttribute(WebloungeRequest.COMPOSER, pagePreview.getIdentifier());
+        request.setAttribute(WebloungeRequest.COMPOSER, pagePreview);
 
         pageContext.setAttribute(PagePreviewTagVariables.PAGELET, pagelet);
 

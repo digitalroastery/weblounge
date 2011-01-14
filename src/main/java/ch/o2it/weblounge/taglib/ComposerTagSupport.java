@@ -513,9 +513,6 @@ public class ComposerTagSupport extends WebloungeTag {
 
       try {
 
-        // Set composer id
-        request.setAttribute(WebloungeRequest.COMPOSER, name);
-
         // Check if this composer is already in the cache
         if (request.getVersion() == Resource.LIVE) {
 
@@ -574,6 +571,9 @@ public class ComposerTagSupport extends WebloungeTag {
         // Load the pagelets
         composer.setPagelets(getContent());
 
+        // Set composer
+        request.setAttribute(WebloungeRequest.COMPOSER, composer);
+
         // Check for action handler
         if (action != null && action instanceof HTMLAction) {
           HTMLAction htmlAction = (HTMLAction) action;
@@ -601,6 +601,11 @@ public class ComposerTagSupport extends WebloungeTag {
         // Render the pagelets
         for (int i = 0; i < pagelets.length; i++) {
           Pagelet pagelet = pagelets[i];
+
+          // Add pagelet and composer to the request
+          request.setAttribute(WebloungeRequest.PAGELET, pagelet);
+          request.setAttribute(WebloungeRequest.COMPOSER, composer);
+          
           doPagelet(pagelet, i, writer);
         }
 
@@ -671,12 +676,6 @@ public class ComposerTagSupport extends WebloungeTag {
 
     try {
       CacheTagSet pageletCacheTags = new CacheTagSet();
-
-      // Add the pagelet to the request. Like this, actions may have
-      // access to the
-      // pagelet data as well.
-      request.setAttribute(WebloungeRequest.PAGELET, pagelet);
-      request.setAttribute(WebloungeRequest.COMPOSER, name);
 
       String moduleId = pagelet.getModule();
       String rendererId = pagelet.getIdentifier();

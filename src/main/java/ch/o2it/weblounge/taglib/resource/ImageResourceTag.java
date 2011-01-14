@@ -159,10 +159,14 @@ public class ImageResourceTag extends WebloungeTag {
     // Find the image style
     if (StringUtils.isNotBlank(imageStyle)) {
       style = ImageStyleUtils.findStyle(imageStyle, site);
-      linkToImage += "?style=" + style.getIdentifier();
-      imageWidth = ImageStyleUtils.getWidth(imageContent, style);
-      imageHeight = ImageStyleUtils.getHeight(imageContent, style);
-      pageContext.setAttribute(ImageResourceTagExtraInfo.STYLE, style);
+      if (style != null) {
+        linkToImage += "?style=" + style.getIdentifier();
+        imageWidth = ImageStyleUtils.getWidth(imageContent, style);
+        imageHeight = ImageStyleUtils.getHeight(imageContent, style);
+        pageContext.setAttribute(ImageResourceTagExtraInfo.STYLE, style);
+      } else {
+        logger.warn("Image style '{}' not found", imageStyle);
+      }
     }
 
     // TODO: Check the permissions
