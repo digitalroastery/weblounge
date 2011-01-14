@@ -308,7 +308,13 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
    */
   public Pagelet[] getPreview() {
     Site site = getURI().getSite();
-    PageTemplate t = site.getTemplate(template);
+    PageTemplate t = null;
+    if (StringUtils.isNotBlank(template)) {
+      t = site.getTemplate(template);
+    } else {
+      t = site.getDefaultTemplate();
+      logger.warn("Page {} has no template associated", uri);
+    }
     if (preview == null && t == null) {
       logger.warn("Can't calculate the page preview due to missing page template '{}'", template);
       return new Pagelet[] {};

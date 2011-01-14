@@ -112,7 +112,7 @@ public class LazyPageImpl implements Page {
       }
 
       // Load the page
-      page = reader.read(IOUtils.toInputStream(pageXml), uri.getSite());
+      page = reader.read(IOUtils.toInputStream(pageXml, "UTF-8"), uri.getSite());
       isHeaderLoaded = true;
       isBodyLoaded = true;
       cleanupAfterLoading();
@@ -212,7 +212,8 @@ public class LazyPageImpl implements Page {
     pageXml = null;
     previewXml = null;
     previewComposer = null;
-    readerRef.clear();
+    if (readerRef != null)
+      readerRef.clear();
   }
 
   /**
@@ -299,7 +300,7 @@ public class LazyPageImpl implements Page {
   public Composer getStage() {
     if (!isHeaderLoaded && isBodyLoaded)
       loadPageHeader();
-    else
+    else if (!isBodyLoaded)
       loadPage();
     return page.getStage();
   }
