@@ -536,7 +536,7 @@
 		<tag-class>ch.o2it.weblounge.taglib.content.PagePreviewTag</tag-class>
         <tei-class>ch.o2it.weblounge.taglib.content.PagePreviewTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
-		<attribute><name>pageId</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+		<attribute><name>pageid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>end</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
         <attribute><name>lead</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
         <attribute><name>render</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>

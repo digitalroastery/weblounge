@@ -107,7 +107,7 @@ public class PagePreviewTag extends WebloungeTag {
    * @param value
    *          the page identifier
    */
-  public void setPageId(String value) {
+  public void setPageid(String value) {
     pageId = value;
   }
 
