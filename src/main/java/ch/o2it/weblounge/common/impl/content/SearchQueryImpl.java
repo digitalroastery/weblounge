@@ -133,6 +133,15 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The query limit */
   protected int limit = -1;
+  
+  /** Creation date order relation */
+  protected Order creationDateSearchOrder = Order.None;
+
+  /** Modification date order relation */
+  protected Order modificationDateSearchOrder = Order.None;
+
+  /** Publication date order relation */
+  protected Order publicationDateSearchOrder = Order.None;
 
   /**
    * Creates a new search query that is operating on the given site.
@@ -793,6 +802,72 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public String getMimetype() {
     return mimetype;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#sortByCreationDate(ch.o2it.weblounge.common.content.SearchQuery.Order)
+   */
+  public SearchQuery sortByCreationDate(Order order) {
+    if (order == null)
+      creationDateSearchOrder = Order.None;
+    else
+      creationDateSearchOrder = order;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getCreationDateSortOrder()
+   */
+  public Order getCreationDateSortOrder() {
+    return creationDateSearchOrder;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#sortByModificationDate(ch.o2it.weblounge.common.content.SearchQuery.Order)
+   */
+  public SearchQuery sortByModificationDate(Order order) {
+    if (order == null)
+      modificationDateSearchOrder = Order.None;
+    else
+      modificationDateSearchOrder = order;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getModificationDateSortOrder()
+   */
+  public Order getModificationDateSortOrder() {
+    return modificationDateSearchOrder;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#sortByPublishingDate(ch.o2it.weblounge.common.content.SearchQuery.Order)
+   */
+  public SearchQuery sortByPublishingDate(Order order) {
+    if (order == null)
+      publicationDateSearchOrder = Order.None;
+    else
+      publicationDateSearchOrder = order;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#getPublishingDateSortOrder()
+   */
+  public Order getPublishingDateSortOrder() {
+    return publicationDateSearchOrder;
   }
   
   /**
