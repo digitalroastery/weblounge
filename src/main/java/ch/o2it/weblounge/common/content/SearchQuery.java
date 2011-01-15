@@ -35,6 +35,13 @@ import java.util.Map;
 public interface SearchQuery {
 
   /**
+   * Sort order definitions.
+   */
+  public enum Order {
+    None, Ascending, Descending
+  }
+
+  /**
    * Returns the contextual site for this query.
    * 
    * @return the site
@@ -606,5 +613,59 @@ public interface SearchQuery {
    * @return the mime type
    */
   String getMimetype();
+
+  /**
+   * Asks the search index to order the results by creation date rather than by
+   * relevance.
+   * 
+   * @param order
+   *          the sort order
+   * @return the search query
+   */
+  SearchQuery sortByCreationDate(Order order);
+
+  /**
+   * Returns the sort order for the date if specified. If this field is not to
+   * be sorted by creation date, {@link Order#None} is returned.
+   * 
+   * @return the sort order
+   */
+  Order getCreationDateSortOrder();
+
+  /**
+   * Asks the search index to order the results by modification date rather than
+   * by relevance.
+   * 
+   * @param order
+   *          the sort order
+   * @return the search query
+   */
+  SearchQuery sortByModificationDate(Order order);
+
+  /**
+   * Returns the sort order for the date if specified. If this field is not to
+   * be sorted by modification date, {@link Order#None} is returned.
+   * 
+   * @return the sort order
+   */
+  Order getModificationDateSortOrder();
+
+  /**
+   * Asks the search index to order the results by publishing date rather than
+   * by relevance.
+   * 
+   * @param order
+   *          the sort order
+   * @return the search query
+   */
+  SearchQuery sortByPublishingDate(Order order);
+
+  /**
+   * Returns the sort order for the date if specified. If this field is not to
+   * be sorted by publishing date, {@link Order#None} is returned.
+   * 
+   * @return the sort order
+   */
+  Order getPublishingDateSortOrder();
 
 }
