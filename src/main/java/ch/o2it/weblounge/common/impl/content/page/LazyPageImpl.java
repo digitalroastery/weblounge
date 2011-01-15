@@ -95,7 +95,6 @@ public class LazyPageImpl implements Page {
     this.pageXml = pageXml;
     this.headerXml = headerXml;
     this.previewXml = previewXml;
-    this.page = new PageImpl(uri);
   }
 
   /**
@@ -464,11 +463,9 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.page.Page#getPreview()
    */
   public Pagelet[] getPreview() {
-    if (previewComposer != null)
-      return previewComposer.getPagelets();
-    if (!isBodyLoaded)
+    if (previewComposer == null)
       loadPagePreview();
-    return page.getPreview();
+    return previewComposer.getPagelets();
   }
 
   /**
