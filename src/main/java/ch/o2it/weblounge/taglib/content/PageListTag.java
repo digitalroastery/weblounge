@@ -236,13 +236,18 @@ public class PageListTag extends WebloungeTag {
         return false;
       }
 
-      // Load the pages
+      // Specify which pages to load
       SearchQuery query = new SearchQueryImpl(site);
       for (String subject : subjects)
         query.withSubject(subject);
       for (Entry<String, String> headline : requireHeadlines.entrySet())
         query.withPagelet(headline.getKey(), headline.getValue()).inStage();
+
+      // Order by date and limit the result set
+      query.sortByPublishingDate(SearchQuery.Order.Descending);
       query.withLimit(count);
+
+      // Finally Load the pages
       pages = repository.find(query);
     }
 
