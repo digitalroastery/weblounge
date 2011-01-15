@@ -58,6 +58,7 @@ import ch.o2it.weblounge.common.url.WebUrl;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -199,7 +200,7 @@ public class SolrRequester {
         and(solrQuery, PAGELET_TYPE, searchTerm.toString(), true, true);
       }
     }
-    
+
     // Content filenames
     if (query.getFilename() != null) {
       and(solrQuery, CONTENT_FILENAME, query.getFilename(), true, true);
@@ -228,6 +229,51 @@ public class SolrRequester {
     q.setIncludeScore(true);
     q.setFields("* score");
 
+    // Order by publishing date
+    if (!SearchQuery.Order.None.equals(query.getPublishingDateSortOrder())) {
+      switch (query.getPublishingDateSortOrder()) {
+        case Ascending:
+          q.addSortField(SolrFields.PUBLISHED_FROM, ORDER.asc);
+          break;
+        case Descending:
+          q.addSortField(SolrFields.PUBLISHED_FROM, ORDER.desc);
+          break;
+        case None:
+        default:
+          break;
+      }
+    } 
+    
+    // Order by modification date
+    else if (!SearchQuery.Order.None.equals(query.getModificationDateSortOrder())) {
+      switch (query.getModificationDateSortOrder()) {
+        case Ascending:
+          q.addSortField(SolrFields.MODIFIED, ORDER.asc);
+          break;
+        case Descending:
+          q.addSortField(SolrFields.MODIFIED, ORDER.desc);
+          break;
+        case None:
+        default:
+          break;
+      }
+    }
+
+    // Order by creation date
+    else if (!SearchQuery.Order.None.equals(query.getCreationDateSortOrder())) {
+      switch (query.getCreationDateSortOrder()) {
+        case Ascending:
+          q.addSortField(SolrFields.MODIFIED, ORDER.asc);
+          break;
+        case Descending:
+          q.addSortField(SolrFields.MODIFIED, ORDER.desc);
+          break;
+        case None:
+        default:
+          break;
+      }
+    }
+    
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
     try {
