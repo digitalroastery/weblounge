@@ -41,6 +41,7 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -247,26 +248,28 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     // Add ETag header
     response.setHeader("ETag", "\"" + eTag + "\"");
 
-    // Load the input stream from the repository
-    try {
-      imageInputStream = contentRepository.getContent(imageURI, language);
-    } catch (Throwable t) {
-      logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
-          language,
-          imageResource,
-          contentRepository,
-          t.getMessage() });
-      logger.error(t.getMessage(), t);
-      IOUtils.closeQuietly(imageInputStream);
-      return false;
-    }
-
     // Get the mime type
     final String mimetype = imageContents.getMimetype();
     final String format = mimetype.substring(mimetype.indexOf("/") + 1);
 
     // When there is no scaling required, just return the original
     if (style == null || ImageScalingMode.None.equals(style.getScalingMode())) {
+      
+      // Load the input stream from the repository
+      try {
+        imageInputStream = contentRepository.getContent(imageURI, language);
+      } catch (Throwable t) {
+        logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
+            language,
+            imageResource,
+            contentRepository,
+            t.getMessage() });
+        logger.error(t.getMessage(), t);
+        IOUtils.closeQuietly(imageInputStream);
+        return false;
+      }
+
+      // Write the image back to the client
       try {
         response.setHeader("Content-Length", Long.toString(imageContents.getSize()));
         response.setHeader("Content-Disposition", "inline; filename=" + imageContents.getFilename());
@@ -284,10 +287,11 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     }
 
     // Write the scaled file back to the response
+    File scaledImageFile = null;
     try {
 
       // If the scaled version is not there yet, create it
-      File scaledImageFile = ImageStyleUtils.getScaledImageFile(imageResource, imageContents, site, style);
+      scaledImageFile = ImageStyleUtils.getScaledImageFile(imageResource, imageContents, site, style);
       long lastModified = imageResource.getModificationDate().getTime();
       if (!scaledImageFile.isFile() || scaledImageFile.lastModified() < lastModified) {
         InputStream is = contentRepository.getContent(imageURI, language);
@@ -314,6 +318,11 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     } catch (IOException e) {
       logger.error("Error sending image {} to the client: {}", imageURI, e.getMessage());
+      DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (Throwable t) {
+      FileUtils.deleteQuietly(scaledImageFile);
+      logger.error("Error creating scaled image {}: {}", imageURI, t.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;
     } finally {
