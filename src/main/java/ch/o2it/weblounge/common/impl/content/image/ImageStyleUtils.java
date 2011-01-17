@@ -322,7 +322,7 @@ public final class ImageStyleUtils {
       int imageHeight = image.getHeight();
 
       // Resizing
-      double scale = getScale(imageWidth, imageHeight, style);
+      float scale = getScale(imageWidth, imageHeight, style);
 
       ParameterBlock scaleParams = new ParameterBlock();
       scaleParams.addSource(image);
