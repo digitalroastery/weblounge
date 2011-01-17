@@ -49,6 +49,7 @@ import ch.o2it.weblounge.dispatcher.PageRequestHandler;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,9 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(PageRequestHandlerImpl.class);
+
+  /** Alternate uri prefix */
+  protected static final String URI_PREFIX = "/weblounge-pages/";
 
   /** The singleton handler instance */
   private static final PageRequestHandlerImpl handler = new PageRequestHandlerImpl();
@@ -165,10 +169,15 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
         // Load the page
         try {
-          if (action != null)
+          if (action != null) {
             pageURI = getPageURIForAction(action, request);
-          else
+          } else if (path.startsWith(URI_PREFIX)) {
+            String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
+            uriSuffix = URLDecoder.decode(uriSuffix, "UTF-8");
+            pageURI = new PageURIImpl(site, null, uriSuffix);
+          } else {
             pageURI = new PageURIImpl(request);
+          }
 
           if (contentRepository.exists(pageURI)) {
             page = (Page) contentRepository.get(pageURI);
@@ -227,7 +236,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         DispatchUtils.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, request, response);
         return true;
       }
-      
+
       // Set the content type
       response.setContentType("text/html");
 
