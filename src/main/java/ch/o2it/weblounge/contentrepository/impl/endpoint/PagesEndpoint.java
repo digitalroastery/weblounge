@@ -216,7 +216,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     Page page = null;
     try {
       PageReader pageReader = new PageReader();
-      page = pageReader.read(IOUtils.toInputStream(pageXml), site);
+      page = pageReader.read(IOUtils.toInputStream(pageXml, "UTF-8"), site);
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
       User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
