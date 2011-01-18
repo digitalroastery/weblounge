@@ -56,7 +56,7 @@ public class WebloungeSharedResources implements ManagedService {
   public static final String RESOURCES_BUNDLE_DIR = "/html";
 
   /** Mountpoint to use when registering the shared resources */
-  public static final String DEFAULT_RESOURCES_MOUNTPOINT = "/system/weblounge/shared";
+  public static final String DEFAULT_RESOURCES_MOUNTPOINT = "/weblounge-shared";
 
   /** Option name for the shared resources mountpoint */
   public static final String OPT_RESOURCES_MOUNTPOINT = "resources.path";
