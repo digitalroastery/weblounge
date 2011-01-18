@@ -324,20 +324,22 @@ public final class ImageStyleUtils {
       // Resizing
       float scale = getScale(imageWidth, imageHeight, style);
 
-      ParameterBlock scaleParams = new ParameterBlock();
-      scaleParams.addSource(image);
-      scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
-      scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
-
       RenderingHints scaleHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       scaleHints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
       scaleHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
       scaleHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
       if (scale > 1.0) {
+        ParameterBlock scaleParams = new ParameterBlock();
+        scaleParams.addSource(image);
+        scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
+        scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
         image = JAI.create("scale", scaleParams, scaleHints);
-      }
-      if (scale < 1.0) {
+      } else if (scale < 1.0) {
+        ParameterBlock scaleParams = new ParameterBlock();
+        scaleParams.addSource(image);
+        scaleParams.add(Double.valueOf(scale)).add(Double.valueOf(scale)).add(0.0f).add(0.0f);
+        scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
         image = JAI.create("SubsampleAverage", scaleParams, scaleHints);
       }
 
