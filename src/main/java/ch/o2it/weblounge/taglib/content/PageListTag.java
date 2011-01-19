@@ -238,10 +238,16 @@ public class PageListTag extends WebloungeTag {
 
       // Specify which pages to load
       SearchQuery query = new SearchQueryImpl(site);
-      for (String subject : subjects)
+      
+      // Add the keywords
+      for (String subject : subjects) {
         query.withSubject(subject);
-      for (Entry<String, String> headline : requireHeadlines.entrySet())
+      }
+      
+      // Add the pagelets required on state
+      for (Entry<String, String> headline : requireHeadlines.entrySet()) {
         query.withPagelet(headline.getKey(), headline.getValue()).inStage();
+      }
 
       // Order by date and limit the result set
       query.sortByPublishingDate(SearchQuery.Order.Descending);
