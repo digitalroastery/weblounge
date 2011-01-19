@@ -180,6 +180,7 @@ public interface ResponseCache {
    * @return boolean <code>true</code> if the response part was found in the
    *         cache
    */
+  @Deprecated
   boolean startResponsePart(CacheHandle handle, HttpServletResponse response);
 
   /**
@@ -193,6 +194,7 @@ public interface ResponseCache {
    * @param response
    *          the servlet response
    */
+  @Deprecated
   void endResponsePart(CacheHandle handle, HttpServletResponse response);
 
   /**
