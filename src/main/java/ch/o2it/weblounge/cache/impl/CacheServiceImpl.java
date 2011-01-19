@@ -81,6 +81,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Configuration key prefix for content repository configuration */
   public static final String OPT_PREFIX = "cache";
 
+  /** Configuration key for the enabled state of the cache */
+  public static final String OPT_ENABLE = OPT_PREFIX + ".enable";
+
+  /** The default value for "enable" configuration property */
+  private static final boolean DEFAULT_ENABLE = true;
+  
   /** Configuration key for the cache identifier */
   public static final String OPT_ID = OPT_PREFIX + ".id";
 
@@ -159,6 +165,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** The ehache cache manager */
   protected CacheManager cacheManager = null;
 
+  /** True if the cache is enabled */
+  protected boolean enabled = true;
+  
   /** The stream filter */
   protected StreamFilter filter = null;
 
@@ -298,6 +307,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
+
+    // Disk persistence
+    enabled = ConfigurationUtils.isTrue((String) properties.get(OPT_ENABLE), DEFAULT_ENABLE);
+    logger.debug("Cache is {}", diskPersistent ? "enabled" : "disabled");
 
     // Disk persistence
     diskPersistent = ConfigurationUtils.isTrue((String) properties.get(OPT_DISK_PERSISTENT), DEFAULT_DISK_PERSISTENT);
@@ -475,10 +488,16 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   public CacheHandle startResponse(CacheHandle handle,
       WebloungeRequest request, WebloungeResponse response) {
 
-    // check whether the response has been properly wrapped
+    // Check whether the response has been properly wrapped
     CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
     if (cacheableResponse == null) {
       throw new IllegalStateException("Cached response is not properly wrapped");
+    }
+    
+    // While disabled, don't do lookups but return immediately
+    if (!enabled) {
+      cacheableResponse.startTransaction(handle, filter);
+      return handle;
     }
 
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
@@ -547,6 +566,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
     if (cacheableResponse == null)
       return false;
+
+    // Discard any cached content while disabled
+    if (!enabled)
+      return true;
 
     // Finish writing the element
     CacheTransaction transaction = cacheableResponse.endOutput();

@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.cache.impl;
 
 import ch.o2it.weblounge.common.impl.url.PathUtils;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.osgi.service.cm.Configuration;
@@ -74,9 +75,16 @@ public class CacheConfigurationFactory implements ManagedService {
 
     // Loop over all configurations and update them accordingly
     for (Map.Entry<Site, Configuration> entry : configurations.entrySet()) {
+      Configuration currentConfig = entry.getValue();
+      boolean previouslyEnabled = !ConfigurationUtils.isFalse((String) currentConfig.getProperties().get(CacheServiceImpl.OPT_ENABLE));
+      boolean nowEnabled = !ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE));
       try {
         Dictionary configuration = createConfiguration(entry.getKey());
-        entry.getValue().update(configuration);
+        if (nowEnabled) {
+          currentConfig.update(configuration);
+        } else if (previouslyEnabled) {
+          currentConfig.delete();
+        }
       } catch (IOException e) {
         logger.error("Error updating cache configuration in persistent store", e);
       }
@@ -129,7 +137,13 @@ public class CacheConfigurationFactory implements ManagedService {
   void addSite(Site site) throws IOException {
     Configuration configuration = configurationAdmin.createFactoryConfiguration(CacheServiceFactory.SERVICE_PID, null);
     Dictionary<?, ?> properties = createConfiguration(site);
-    configuration.update(properties);
+
+    // Is the cache enabled?
+    if (!ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE))) {
+      configuration.update(properties);
+    }
+
+    // Store the configuration for later reference
     configurations.put(site, configuration);
   }
 
@@ -148,7 +162,11 @@ public class CacheConfigurationFactory implements ManagedService {
    */
   void removeSite(Site site) throws IOException {
     Configuration config = configurations.remove(site);
-    config.delete();
+
+    // Was the cache enabled?
+    if (!ConfigurationUtils.isFalse((String) config.getProperties().get(CacheServiceImpl.OPT_ENABLE))) {
+      config.delete();
+    }
   }
 
   /**
