@@ -44,6 +44,9 @@ import java.util.Stack;
  */
 public class SearchQueryImpl implements SearchQuery {
 
+  /** Name of the stage composer */
+  public static final String STAGE_COMPOSER = "#stage#";
+  
   /** The site */
   protected Site site = null;
 
@@ -408,7 +411,7 @@ public class SearchQueryImpl implements SearchQuery {
    * @see ch.o2it.weblounge.common.content.SearchQuery#inStage()
    */
   public SearchQuery inStage() throws IllegalStateException {
-    return inComposer("stage");
+    return inComposer(STAGE_COMPOSER);
   }
   
   /**
