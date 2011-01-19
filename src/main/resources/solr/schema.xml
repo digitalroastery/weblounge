@@ -211,7 +211,7 @@
              string matched by the pattern.
              
              See the Java Regular Expression documentation for more
-             infomation on pattern and replacement string syntax.
+             information on pattern and replacement string syntax.
              
              http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/package-summary.html
           -->
@@ -234,6 +234,7 @@
     <field name="id" type="string" indexed="true" stored="true" required="true" />
     <field name="path" type="string" indexed="true" stored="true" required="false" />
     <field name="type" type="string" indexed="true" stored="true" required="true" />
+    <field name="version" type="long" indexed="true" stored="true" required="true" />
 
     <!-- Page-level metadata -->
     <field name="subjects" type="string" multiValued="true" indexed="true" stored="true" required="false" /> 
