@@ -34,6 +34,7 @@ import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.language.Language;
 
 import java.text.MessageFormat;
@@ -83,7 +84,7 @@ public class PageInputDocument extends ResourceInputDocument {
       String composerId = composer.getIdentifier();
       addComposerFields(composer, composerId);
       if (composerId.equals(stage)) {
-        addComposerFields(composer, "stage");
+        addComposerFields(composer, SearchQueryImpl.STAGE_COMPOSER);
       }
     }
 

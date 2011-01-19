@@ -85,10 +85,10 @@ public class ResourceInputDocument extends AbstractInputDocument {
     //setField(CREATED, SolrUtils.serializeDate(resource.getCreationDate()), false);
     addField(CREATED, resource.getCreationDate(), false);
     addField(CREATED_BY, SolrUtils.serializeUser(resource.getCreator()), false);
-    addField(MODIFIED, SolrUtils.serializeDate(resource.getModificationDate()), false);
+    addField(MODIFIED, resource.getModificationDate(), false);
     addField(MODIFIED_BY, SolrUtils.serializeUser(resource.getModifier()), false);
-    addField(PUBLISHED_FROM, SolrUtils.serializeDate(resource.getPublishFrom()), false);
-    addField(PUBLISHED_TO, SolrUtils.serializeDate(resource.getPublishTo()), false);
+    addField(PUBLISHED_FROM, resource.getPublishFrom(), false);
+    addField(PUBLISHED_TO, resource.getPublishTo(), false);
     addField(PUBLISHED_BY, SolrUtils.serializeUser(resource.getPublisher()), false);
 
     // Language dependent header fields

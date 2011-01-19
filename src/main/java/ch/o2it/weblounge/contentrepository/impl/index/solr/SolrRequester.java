@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_BOOST;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
@@ -42,6 +41,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUB
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SCORE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_BOOST;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils.clean;
@@ -66,6 +66,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -206,7 +208,7 @@ public class SolrRequester {
       and(solrQuery, CONTENT_FILENAME, query.getFilename(), true, true);
     }
 
-    // Content mimetypes
+    // Content mime types
     if (query.getMimetype() != null) {
       and(solrQuery, CONTENT_MIMETYPE, query.getMimetype(), true, true);
     }
@@ -225,9 +227,10 @@ public class SolrRequester {
     SolrQuery q = new SolrQuery(solrQuery.toString());
     q.setStart(query.getOffset() > 0 ? query.getOffset() : 0);
     q.setRows(query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE);
-    q.setSortField(SCORE, SolrQuery.ORDER.desc);
-    q.setIncludeScore(true);
-    q.setFields("* score");
+    
+    // Define the fields that should be returned by the query
+    List<String> fields = new ArrayList<String>();
+    fields.add("*");
 
     // Order by publishing date
     if (!SearchQuery.Order.None.equals(query.getPublishingDateSortOrder())) {
@@ -273,6 +276,16 @@ public class SolrRequester {
           break;
       }
     }
+
+    // Order by score
+    else {
+      q.setSortField(SCORE, SolrQuery.ORDER.desc);
+      q.setIncludeScore(true);
+      fields.add("score");
+    }
+    
+    // Add the fields to return
+    q.setFields(StringUtils.join(fields, " "));
     
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
@@ -291,7 +304,7 @@ public class SolrRequester {
 
     // Walk through response and create new items with title, creator, etc:
     for (SolrDocument doc : solrResponse.getResults()) {
-      float score = (Float) doc.getFieldValue(SCORE);
+      float score = fields.contains("score") ? (Float) doc.getFieldValue(SCORE) : 0.0f;
 
       String id = (String) doc.getFieldValue(ID);
       String path = (String) doc.getFieldValue(PATH);
