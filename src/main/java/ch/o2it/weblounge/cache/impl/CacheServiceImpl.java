@@ -93,6 +93,9 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /** Configuration key for the cache name */
   public static final String OPT_NAME = OPT_PREFIX + ".name";
 
+  /** Configuration key indicating that a clear() operation is required */
+  public static final String OPT_CLEAR = OPT_PREFIX + ".clear";
+
   /** Configuration key for the path to the cache's disk store */
   public static final String OPT_DISKSTORE_PATH = OPT_PREFIX + ".diskStorePath";
 
@@ -308,6 +311,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (properties == null)
       return;
 
+    // Do we need to clear the cache?
+    boolean clear = ConfigurationUtils.isTrue((String) properties.get(OPT_CLEAR), false);
+    if (clear) {
+      clear();
+    }
+    
     // Disk persistence
     enabled = ConfigurationUtils.isTrue((String) properties.get(OPT_ENABLE), DEFAULT_ENABLE);
     logger.debug("Cache is {}", diskPersistent ? "enabled" : "disabled");
@@ -400,6 +409,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public void clear() {
     cacheManager.clearAll();
+    logger.info("Cache '{}' cleared", id);
   }
 
   /**

@@ -130,13 +130,15 @@
               org.osgi.service.component;version="1.1.0"
             </Import-Package>
             <Export-Package>
-              ch.o2it.weblounge.cache.impl;version=${project.version}
+              ch.o2it.weblounge.cache.impl;version=${project.version},
+              ch.o2it.weblounge.cache.impl.command;version=${project.version}
             </Export-Package>
             <Private-Package>
               ch.o2it.weblounge.cache.impl.filter,
               ch.o2it.weblounge.cache.impl.handle
             </Private-Package>
             <Service-Component>
+              OSGI-INF/cache-command.xml,
               OSGI-INF/configuration-factory.xml,
               OSGI-INF/service-factory.xml
             </Service-Component>

@@ -123,6 +123,32 @@ public class CacheConfigurationFactory implements ManagedService {
   }
 
   /**
+   * Returns the configuration for the cache with the given identifier or
+   * <code>null</code> if no such cache was registered.
+   * 
+   * @param id
+   *          the cache identifier
+   * @return the cache configuration
+   */
+  public Configuration getConfiguration(String id) {
+    for (Configuration config : configurations.values()) {
+      Dictionary<?, ?> properties = config.getProperties();
+      if (properties != null && id.equals(properties.get(CacheServiceImpl.OPT_ID)))
+        return config;
+    }
+    return null;
+  }
+
+  /**
+   * Returns an array of all registered cache configurations.
+   * 
+   * @return the cache configurations
+   */
+  public Configuration[] getConfigurations() {
+    return configurations.values().toArray(new Configuration[configurations.size()]);
+  }
+
+  /**
    * Creates and publishes configurations for this site using the
    * {@link ConfigurationAdmin}.
    * <p>
