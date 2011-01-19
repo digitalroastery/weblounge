@@ -31,6 +31,9 @@ import ch.o2it.weblounge.taglib.WebloungeTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 
@@ -65,6 +68,9 @@ public class ContextTag extends WebloungeTag {
 
   /** The parsed variable definitions */
   private ContextTagVariables variables = null;
+  
+  /** Map of existing key-value pairs that are replaced */
+  private Map<String, Object> existingVariables = new HashMap<String, Object>();
 
   /** The application uri */
   // TODO: Implement a better way
@@ -171,6 +177,12 @@ public class ContextTag extends WebloungeTag {
       pageContext.removeAttribute(ContextTagVariables.URL);
       pageContext.removeAttribute(ContextTagVariables.USER);
     }
+    
+    // Restore former values
+    for (Map.Entry<String, Object> entry : existingVariables.entrySet()) {
+      pageContext.setAttribute(entry.getKey(), entry.getValue());
+    }
+
     return EVAL_PAGE;
   }
 
@@ -204,11 +216,30 @@ public class ContextTag extends WebloungeTag {
     if (key == null)
       return;
     Object existingValue = pageContext.getAttribute(key);
-    String existingType = (existingValue != null) ? existingValue.getClass().getName() : "null";
-    if (existingValue == null && value == null || existingValue != null && !existingValue.equals(value))
-      throw new IllegalStateException("Context item '" + key + "' is already defined as " + existingType);
+    
+    // If there is a value already, keep it for later reference
+    if (existingValue != null) {
+      existingVariables.put(key, existingValue);
+      String existingType = existingValue.getClass().getName();
+      logger.debug("Temporarily replacing context item '" + key + "' of type " + existingType + " with new value");
+    }
+
+    // Store the new value
     pageContext.setAttribute(key, value);
     logger.debug("Defining context item '{}': {}", key, value != null ? value : "null");
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#release()
+   */
+  @Override
+  public void release() {
+    super.release();
+    definitions = null;
+    variables = null;
+    existingVariables.clear();
+  }
+  
 }
