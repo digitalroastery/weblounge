@@ -22,17 +22,17 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_CREATED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_CREATED_BY;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME_LOCALIZED;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_FILENAME_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_MIMETYPE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CONTENT_XML;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.COVERAGE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.CREATED_BY;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.DESCRIPTION_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.DESCRIPTION;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.DESCRIPTION_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.HEADER_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.MODIFIED;
@@ -41,12 +41,13 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAT
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_FROM;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_TO;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.RIGHTS_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUBJECT;
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.VERSION;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 
 import ch.o2it.weblounge.common.content.Resource;
@@ -74,6 +75,7 @@ public class ResourceInputDocument extends AbstractInputDocument {
     addField(ID, resource.getURI().getId(), true);
     addField(PATH, resource.getURI().getPath(), true);
     addField(TYPE, resource.getURI().getType(), true);
+    addField(VERSION, resource.getURI().getVersion(), false);
 
     // Resource-level
     for (String subject : resource.getSubjects())

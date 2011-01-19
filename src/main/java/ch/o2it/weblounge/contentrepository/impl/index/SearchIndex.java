@@ -158,7 +158,9 @@ public class SearchIndex {
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
     logger.debug("Removing element with id '{}' from searching index", uri.getId());
     UpdateRequest solrRequest = new UpdateRequest();
-    solrRequest.deleteById(uri.getId());
+    StringBuilder query = new StringBuilder();
+    query.append("id:").append(uri.getId()).append(" AND version:").append(uri.getVersion());
+    solrRequest.deleteByQuery(query.toString());
     solrRequest.setAction(ACTION.COMMIT, true, true);
     try {
       solrConnection.update(solrRequest);
@@ -262,7 +264,7 @@ public class SearchIndex {
       throws ContentRepositoryException {
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
     try {
-      ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getId());
+      ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getId(), uri.getVersion());
       update(new ResourceURIInputDocument(newURI));
       return true;
     } catch (Exception e) {
@@ -272,8 +274,8 @@ public class SearchIndex {
 
   /**
    * Tries to load solr from the specified directory. If that directory is not
-   * there, or in the case where either one of solr config or data directory is
-   * missing, a preceding call to <code>initSolr()</code> is made.
+   * there, or in the case where either one of solr configuration or data
+   * directory is missing, a preceding call to <code>initSolr()</code> is made.
    * 
    * @param solrRoot
    *          the solr root directory

@@ -23,6 +23,7 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.ID;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.VERSION;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
 
@@ -37,7 +38,8 @@ public class ResourceURIInputDocument extends AbstractInputDocument {
 
   /**
    * Creates an input document for the given uri. On update, only the uri will
-   * change (namely the path), and the rest of the resource will remain unchanged.
+   * change (namely the path), and the rest of the resource will remain
+   * unchanged.
    * 
    * @param uri
    *          the resource uri
@@ -56,6 +58,7 @@ public class ResourceURIInputDocument extends AbstractInputDocument {
     setField(ID, uri.getId());
     setField(PATH, uri.getPath());
     setField(TYPE, uri.getType());
+    setField(VERSION, uri.getVersion());
   }
 
 }

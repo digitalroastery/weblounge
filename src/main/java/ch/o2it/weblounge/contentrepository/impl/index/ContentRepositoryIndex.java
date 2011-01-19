@@ -600,12 +600,9 @@ public class ContentRepositoryIndex {
   public synchronized void move(ResourceURI uri, String path)
       throws IOException, ContentRepositoryException, IllegalStateException {
 
-    // We are only interested in live versions
-    if (uri.getVersion() != Resource.LIVE)
-      return;
-
     // Locate the entry in question
     long address = toURIEntry(uri);
+    long[] versions = getRevisions(uri);
 
     // Everything ok?
     if (address == -1)
@@ -625,7 +622,11 @@ public class ContentRepositoryIndex {
     uriIdx.update(address, uri.getType(), uri.getPath());
     pathIdx.delete(oldPath, address);
     pathIdx.set(address, uri.getPath());
-    searchIdx.move(uri, path);
+    
+    for (long version : versions) {
+      uri.setVersion(version);
+      searchIdx.move(uri, path);
+    }
   }
 
   /**

@@ -33,6 +33,9 @@ public interface SolrFields {
   /** Type field name */
   public static final String TYPE = "type";
 
+  /** Version field name */
+  public static final String VERSION = "version";
+
   /** Subjects field name */
   public static final String SUBJECT = "subjects";
 
