@@ -37,10 +37,10 @@ public class CommentRemover implements StreamFilter {
 	private boolean inComment = false;
 
 	/** Comment start sequence */
-	private static char commentStart[] = {'<', '!', '-', '-'};
+	private static char[] commentStart = {'<', '!', '-', '-'};
 	
 	/** Comment end sequence */
-	private static char commentEnd[] = {'-', '-', '>'};
+	private static char[] commentEnd = {'-', '-', '>'};
 	
 	/**
 	 * @see ch.o2it.weblounge.api.request.StreamFilter#filter(java.lang.StringBuffer, java.lang.String)

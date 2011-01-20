@@ -30,7 +30,7 @@ import ch.o2it.weblounge.cache.StreamFilter;
 public class FilterChain implements StreamFilter {
 
   /** the wrapped filters */
-  private StreamFilter filters[] = null;
+  private StreamFilter[] filters = null;
 
   /**
    * Creates a new <code>FilterChain</code>.
@@ -38,7 +38,7 @@ public class FilterChain implements StreamFilter {
    * @param filters
    *          the wrapped filters.
    */
-  public FilterChain(StreamFilter filters[]) {
+  public FilterChain(StreamFilter[] filters) {
     if (filters == null)
       throw new NullPointerException("filters must not be null");
     this.filters = filters;

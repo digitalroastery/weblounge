@@ -74,7 +74,7 @@ final class CacheOutputStream extends ServletOutputStream {
    */
   private void extendBuffer(int size) {
     int goal = buf.length << 1;
-    byte newbuf[] = new byte[goal > size ? goal : size];
+    byte[] newbuf = new byte[goal > size ? goal : size];
     System.arraycopy(buf, 0, newbuf, 0, pos);
     buf = newbuf;
   }
@@ -85,7 +85,7 @@ final class CacheOutputStream extends ServletOutputStream {
    * @return the content
    */
   byte[] getContent() {
-    byte newbuf[] = new byte[pos];
+    byte[] newbuf = new byte[pos];
     System.arraycopy(buf, 0, newbuf, 0, pos);
     return newbuf;
   }

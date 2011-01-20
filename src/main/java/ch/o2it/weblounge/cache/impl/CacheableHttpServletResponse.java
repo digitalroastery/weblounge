@@ -61,7 +61,7 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
   private String encoding = null;
 
   /** The cache transaction for this response */
-  CacheTransaction tx = null;
+  private CacheTransaction tx = null;
 
   /** The format used for date headers */
   private DateFormat format = null;
@@ -205,6 +205,15 @@ class CacheableHttpServletResponse extends HttpServletResponseWrapper {
    */
   public boolean isValid() {
     return tx != null ? tx.isValid() : false;
+  }
+
+  /**
+   * Returns the active cache transaction.
+   * 
+   * @return the transaction
+   */
+  public CacheTransaction getTransaction() {
+    return tx;
   }
 
   /**

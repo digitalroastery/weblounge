@@ -20,12 +20,11 @@
 
 package ch.o2it.weblounge.cache.impl.command;
 
+import ch.o2it.weblounge.cache.impl.CacheConfiguration;
 import ch.o2it.weblounge.cache.impl.CacheConfigurationFactory;
 import ch.o2it.weblounge.cache.impl.CacheServiceImpl;
-import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.cm.Configuration;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +82,7 @@ public class CacheCommand {
       String id = args[0];
 
       // Look up the cache
-      Configuration config = getCache(id);
+      CacheConfiguration config = getCache(id);
       if (config == null) {
         try {
           config = getCache(Integer.parseInt(id));
@@ -123,7 +122,7 @@ public class CacheCommand {
    * Prints a list of currently registered cache configurations.
    */
   private void list() {
-    Configuration[] configurations = configFactory.getConfigurations();
+    CacheConfiguration[] configurations = configFactory.getConfigurations();
 
     // Are there any cache configurations?
     if (configurations.length == 0) {
@@ -140,12 +139,11 @@ public class CacheCommand {
 
     // Display the cache list
     for (int i = 0; i < configurations.length; i++) {
-      Configuration configuration = configurations[i];
-      Dictionary<Object, Object> properties = getProperties(configuration);
+      CacheConfiguration configuration = configurations[i];
 
-      String id = (String) properties.get(CacheServiceImpl.OPT_ID);
-      String name = (String) properties.get(CacheServiceImpl.OPT_NAME);
-      boolean enabled = !ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE));
+      String id = configuration.getIdentifier();
+      String name = configuration.getName();
+      boolean enabled = configuration.isEnabled();
 
       StringBuffer buf = new StringBuffer();
       buf.append("[ ").append(formatter.format(i + 1)).append(" ] ");
@@ -169,12 +167,21 @@ public class CacheCommand {
    * @param cache
    *          the cache
    */
-  private void status(Configuration cache) {
+  private void status(CacheConfiguration cache) {
     Dictionary<?, ?> properties = cache.getProperties();
     for (Enumeration<?> keyEnum = properties.keys(); keyEnum.hasMoreElements();) {
       String key = keyEnum.nextElement().toString();
+      String keyPresentation = key;
+      if ("service.pid".equals(key))
+        continue;
+      else if (CacheServiceImpl.OPT_ID.equals(key))
+        continue;
+      else if (CacheServiceImpl.OPT_NAME.equals(key))
+        continue;
+      else if (key.startsWith(CacheServiceImpl.OPT_PREFIX))
+        keyPresentation = key.substring(CacheServiceImpl.OPT_PREFIX.length() + 1);
       String object = cache.getProperties().get(key).toString();
-      pad(key, object);
+      pad(keyPresentation, object);
     }
   }
 
@@ -187,18 +194,18 @@ public class CacheCommand {
    * @param args
    *          the arguments
    */
-  private void get(Configuration configuration, String[] args) {
+  private void get(CacheConfiguration configuration, String[] args) {
     if (args.length != 1) {
       System.out.println("Please specify a configuration tkey");
       System.err.println("Usage: cache <id> get <key>");
       return;
     }
 
-    Dictionary<Object, Object> properties = getProperties(configuration);
-    String key = args[0];
-    String value = (String) properties.get(key);
-
-    pad(key, value != null ? value : "-");
+    String key = CacheServiceImpl.OPT_PREFIX + "." + args[0];
+    String value = (String) configuration.getProperties().get(key);
+    if (value != null) {
+      System.out.println(value);
+    }
   }
 
   /**
@@ -210,22 +217,28 @@ public class CacheCommand {
    * @param args
    *          the arguments
    */
-  private void set(Configuration configuration, String[] args) {
-    if (args.length != 2) {
-      System.out.println("Please specify a configuration tkey");
+  private void set(CacheConfiguration configuration, String[] args) {
+    if (args.length < 1) {
+      System.out.println("Please specify a configuration key");
       System.err.println("Usage: cache <id> set <key> <value>");
+      return;
+    } else if (!configuration.isEnabled()) {
+      System.out.println("This cache is not enabled");
       return;
     }
 
-    Dictionary<Object, Object> properties = getProperties(configuration);
-    String id = (String) properties.get(CacheServiceImpl.OPT_ID);
-    String key = args[0];
-    String value = args[1];
-    properties.put(key, value);
+    String id = configuration.getIdentifier();
+    String key = CacheServiceImpl.OPT_PREFIX + "." + args[0];
+
+    if (args.length > 1) {
+      configuration.getProperties().put(key, args[1]);
+    } else {
+      configuration.getProperties().remove(key);
+    }
 
     // Tell the configuration admin service to update the service
     try {
-      configuration.update(properties);
+      configuration.getConfiguration().update(configuration.getProperties());
     } catch (IOException e) {
       System.out.println("Error updating cache '" + id + "': " + e.getMessage());
     }
@@ -237,16 +250,21 @@ public class CacheCommand {
    * @param configuration
    *          the cache configuration
    */
-  private void clear(Configuration configuration) {
-    Dictionary<Object, Object> properties = getProperties(configuration);
+  private void clear(CacheConfiguration configuration) {
+    if (!configuration.isEnabled()) {
+      System.out.println("This cache is not enabled");
+      return;
+    }
+
+    Dictionary<Object, Object> properties = configuration.getProperties();
     String id = (String) properties.get(CacheServiceImpl.OPT_ID);
     properties.put(CacheServiceImpl.OPT_CLEAR, "true");
 
     // Tell the configuration admin service to update the service
     try {
-      configuration.update(properties);
+      configuration.getConfiguration().update(properties);
       properties.remove(CacheServiceImpl.OPT_CLEAR);
-      configuration.update(properties);
+      configuration.getConfiguration().update(properties);
       System.out.println("Cache '" + id + "' cleared");
     } catch (IOException e) {
       System.out.println("Error updating cache '" + id + "': " + e.getMessage());
@@ -264,7 +282,7 @@ public class CacheCommand {
   private void pad(String caption, String info) {
     if (caption == null)
       caption = "";
-    for (int i = 0; i < (15 - caption.length()); i++)
+    for (int i = 0; i < (20 - caption.length()); i++)
       System.out.print(" ");
     if (!"".equals(caption)) {
       System.out.print(caption);
@@ -282,18 +300,13 @@ public class CacheCommand {
    * @param configuration
    *          the cache to enable
    */
-  private void enable(Configuration configuration) {
-    Dictionary<Object, Object> properties = getProperties(configuration);
-
-    if (!ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE))) {
+  private void enable(CacheConfiguration configuration) {
+    if (configuration.isEnabled()) {
       System.out.println("Cache " + configuration + " is already enabled");
       return;
     }
-
-    System.out.println("Enabling cache " + configuration);
     try {
-      properties.put(CacheServiceImpl.OPT_ENABLE, "true");
-      configuration.update(properties);
+      configFactory.enable(configuration);
     } catch (Throwable t) {
       t.printStackTrace();
     }
@@ -305,16 +318,13 @@ public class CacheCommand {
    * @param configuration
    *          the cache to disable
    */
-  private void disable(Configuration configuration) {
-    Dictionary<Object, Object> properties = getProperties(configuration);
-
-    if (ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE))) {
+  private void disable(CacheConfiguration configuration) {
+    if (!configuration.isEnabled()) {
       System.out.println("Cache " + configuration + " is already disbled");
       return;
     }
-
     try {
-      configuration.delete();
+      configFactory.disable(configuration);
     } catch (Throwable t) {
       t.printStackTrace();
     }
@@ -341,7 +351,7 @@ public class CacheCommand {
    *          the cache identifier
    * @return the cache configuration
    */
-  private Configuration getCache(String id) {
+  private CacheConfiguration getCache(String id) {
     return configFactory.getConfiguration(id);
   }
 
@@ -353,25 +363,10 @@ public class CacheCommand {
    *          the cache configuration number
    * @return the cache configuration
    */
-  private Configuration getCache(int index) {
+  private CacheConfiguration getCache(int index) {
     index--;
-    Configuration[] configurations = configFactory.getConfigurations();
+    CacheConfiguration[] configurations = configFactory.getConfigurations();
     return (index < configurations.length) ? configurations[index] : null;
-  }
-
-  /**
-   * Returns the configuration properties.
-   * 
-   * @param config
-   *          the cache configuration
-   * @return the properties
-   */
-  @SuppressWarnings("unchecked")
-  private Dictionary<Object, Object> getProperties(Configuration config) {
-    Dictionary<Object, Object> properties = config.getProperties();
-    if (properties == null)
-      properties = new Hashtable<Object, Object>();
-    return properties;
   }
 
   /**

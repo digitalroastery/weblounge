@@ -24,8 +24,8 @@ import ch.o2it.weblounge.cache.CacheService;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
 
@@ -35,7 +35,7 @@ import java.util.Map;
 
 /**
  * Service factory that will return a cache for each configuration that is
- * published to the {@link ConfigurationAdmin}.
+ * published to the {@link org.osgi.service.cm.ConfigurationAdmin}.
  * <p>
  * The following properties need to be present in order for a cache instance to
  * be started.
@@ -93,17 +93,26 @@ public class CacheServiceFactory implements ManagedServiceFactory {
   public void updated(String pid, Dictionary properties)
       throws ConfigurationException {
 
+    // is this an update to an existing service?
+    if (services.containsKey(pid)) {
+      ServiceRegistration registration = services.get(pid);
+      ManagedService service = (ManagedService)bundleCtx.getService(registration.getReference());
+      service.updated(properties);
+    } 
+    
     // Create a new cache service instance
-    String id = (String) properties.get(CacheServiceImpl.OPT_ID);
-    String name = (String) properties.get(CacheServiceImpl.OPT_NAME);
-    String diskStorePath = (String) properties.get(CacheServiceImpl.OPT_DISKSTORE_PATH);
-    CacheServiceImpl cache = new CacheServiceImpl(id, name, diskStorePath);
-    cache.updated(properties);
-
-    // Register the service
-    String serviceType = CacheService.class.getName();
-    properties.put("service.pid", pid);
-    services.put(pid, bundleCtx.registerService(serviceType, cache, properties));
+    else {
+      String id = (String) properties.get(CacheServiceImpl.OPT_ID);
+      String name = (String) properties.get(CacheServiceImpl.OPT_NAME);
+      String diskStorePath = (String) properties.get(CacheServiceImpl.OPT_DISKSTORE_PATH);
+      CacheServiceImpl cache = new CacheServiceImpl(id, name, diskStorePath);
+      cache.updated(properties);
+  
+      // Register the service
+      String serviceType = CacheService.class.getName();
+      properties.put("service.pid", pid);
+      services.put(pid, bundleCtx.registerService(serviceType, cache, properties));
+    }
   }
 
   /**

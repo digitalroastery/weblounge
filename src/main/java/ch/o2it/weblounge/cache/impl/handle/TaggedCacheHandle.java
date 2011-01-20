@@ -22,8 +22,6 @@ package ch.o2it.weblounge.cache.impl.handle;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Tag;
-import ch.o2it.weblounge.common.content.Taggable;
-import ch.o2it.weblounge.common.request.CacheHandle;
 import ch.o2it.weblounge.common.request.CacheTag;
 
 import java.io.Serializable;
@@ -33,9 +31,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * This is an implementation of a {@link CacheHandle} that is identified by
- * tags. By implementing the {@link Taggable} interface, the handle can be
- * qualified
+ * This is an implementation of a {@link import
+ * ch.o2it.weblounge.common.request.CacheHandle} that is identified by tags. By
+ * implementing the {@link ch.o2it.weblounge.common.content.Taggable} interface,
+ * the handle can be qualified
  */
 public class TaggedCacheHandle extends CacheHandleImpl {
 

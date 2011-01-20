@@ -11,6 +11,12 @@
     <version>3.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
+  
+  <properties>
+    <weblounge.basedir>${project.parent.basedir}</weblounge.basedir>
+    <checkstyle.skip>false</checkstyle.skip>
+  </properties>
+  
   <dependencies>
 
     <!-- weblounge -->

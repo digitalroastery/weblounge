@@ -28,7 +28,6 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.cm.ManagedServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,10 @@ public class CacheConfigurationFactory implements ManagedService {
   public static final String SERVICE_PID = "ch.o2it.weblounge.cache";
 
   /** Service configurations per site */
-  private Map<Site, Configuration> configurations = new HashMap<Site, Configuration>();
+  private Map<String, CacheConfiguration> configurations = new HashMap<String, CacheConfiguration>();
+
+  /** The sites */
+  private Map<String, Site> sites = new HashMap<String, Site>();
 
   /** Reference to the configuration admin service */
   private ConfigurationAdmin configurationAdmin = null;
@@ -74,16 +76,30 @@ public class CacheConfigurationFactory implements ManagedService {
     cacheConfiguration = properties;
 
     // Loop over all configurations and update them accordingly
-    for (Map.Entry<Site, Configuration> entry : configurations.entrySet()) {
-      Configuration currentConfig = entry.getValue();
-      boolean previouslyEnabled = !ConfigurationUtils.isFalse((String) currentConfig.getProperties().get(CacheServiceImpl.OPT_ENABLE));
+    for (Map.Entry<String, CacheConfiguration> entry : configurations.entrySet()) {
+      CacheConfiguration configHolder = entry.getValue();
+      Configuration config = entry.getValue().getConfiguration();
+
+      // If there is no configuration, then there is no configuration admin.
+      // Highly unlikely, since we are inside the updated() method, but you
+      // never know :-)
+      if (config == null)
+        continue;
+
+      boolean previouslyEnabled = configHolder.isEnabled();
       boolean nowEnabled = !ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE));
+
       try {
-        Dictionary configuration = createConfiguration(entry.getKey());
-        if (nowEnabled) {
-          currentConfig.update(configuration);
+        Dictionary configuration = createConfiguration(configHolder.getIdentifier(), configHolder.getName());
+        if (nowEnabled && !previouslyEnabled) {
+          config = configurationAdmin.createFactoryConfiguration(CacheServiceFactory.SERVICE_PID);
+          config.update(properties);
+          configHolder.setConfiguration(config);
+        } else if (nowEnabled) {
+          config.update(configuration);
         } else if (previouslyEnabled) {
-          currentConfig.delete();
+          config.delete();
+          configHolder.setConfiguration(null);
         }
       } catch (IOException e) {
         logger.error("Error updating cache configuration in persistent store", e);
@@ -99,11 +115,13 @@ public class CacheConfigurationFactory implements ManagedService {
    * earlier obtained using the configuration admin service and adding the site
    * specific properties to it.
    * 
-   * @param site
-   *          the associated site
+   * @param id
+   *          the site identifier
+   * @param name
+   *          the site name
    * @return the configuration
    */
-  private Dictionary<?, ?> createConfiguration(Site site) {
+  private Dictionary<Object, Object> createConfiguration(String id, String name) {
     Hashtable<Object, Object> configuration = new Hashtable<Object, Object>();
 
     // Add the default properties
@@ -115,9 +133,9 @@ public class CacheConfigurationFactory implements ManagedService {
     }
 
     // Add everything that's site specific
-    configuration.put(CacheServiceImpl.OPT_ID, site.getIdentifier());
-    configuration.put(CacheServiceImpl.OPT_NAME, site.getName());
-    configuration.put(CacheServiceImpl.OPT_DISKSTORE_PATH, PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "cache"));
+    configuration.put(CacheServiceImpl.OPT_ID, id);
+    configuration.put(CacheServiceImpl.OPT_NAME, name);
+    configuration.put(CacheServiceImpl.OPT_DISKSTORE_PATH, PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", id, "cache"));
 
     return configuration;
   }
@@ -130,10 +148,9 @@ public class CacheConfigurationFactory implements ManagedService {
    *          the cache identifier
    * @return the cache configuration
    */
-  public Configuration getConfiguration(String id) {
-    for (Configuration config : configurations.values()) {
-      Dictionary<?, ?> properties = config.getProperties();
-      if (properties != null && id.equals(properties.get(CacheServiceImpl.OPT_ID)))
+  public CacheConfiguration getConfiguration(String id) {
+    for (CacheConfiguration config : configurations.values()) {
+      if (id.equals(config.getIdentifier()))
         return config;
     }
     return null;
@@ -144,8 +161,47 @@ public class CacheConfigurationFactory implements ManagedService {
    * 
    * @return the cache configurations
    */
-  public Configuration[] getConfigurations() {
-    return configurations.values().toArray(new Configuration[configurations.size()]);
+  public CacheConfiguration[] getConfigurations() {
+    return configurations.values().toArray(new CacheConfiguration[configurations.size()]);
+  }
+
+  /**
+   * Asks the factory to register the given configuration with the configuration
+   * admin service.
+   * 
+   * @param configuration
+   *          the cache configuration
+   * @throws IOException
+   *           if registering the configuration failed
+   */
+  public void enable(CacheConfiguration configuration) throws IOException {
+    if (!configurations.containsValue(configuration))
+      return;
+    
+    if (!configuration.isEnabled()) {
+      Configuration c = configurationAdmin.createFactoryConfiguration(CacheServiceFactory.SERVICE_PID);
+      c.update(configuration.getProperties());
+      configuration.setConfiguration(c);
+    }
+  }
+
+  /**
+   * Asks the factory to withdraw the given configuration from the configuration
+   * admin service.
+   * 
+   * @param configuration
+   *          the cache configuration
+   * @throws IOException
+   *           if withdrawing the configuration failed
+   */
+  public void disable(CacheConfiguration configuration) throws IOException {
+    if (!configurations.containsValue(configuration))
+      return;
+
+    if (configuration.isEnabled()) {
+      configuration.getConfiguration().delete();
+      configuration.setConfiguration(null);
+    }
   }
 
   /**
@@ -161,22 +217,27 @@ public class CacheConfigurationFactory implements ManagedService {
    *           if access to the persistent store fails
    */
   void addSite(Site site) throws IOException {
+    sites.put(site.getIdentifier(), site);
+
+    if (configurationAdmin == null)
+      return;
+    
+    CacheConfiguration configHolder = new CacheConfiguration(site.getIdentifier(), site.getName());
+    configHolder.setProperties(createConfiguration(site.getIdentifier(), site.getName()));
+
+    // Create the initial properties
     Configuration configuration = configurationAdmin.createFactoryConfiguration(CacheServiceFactory.SERVICE_PID, null);
-    Dictionary<?, ?> properties = createConfiguration(site);
+    configuration.update(configHolder.getProperties());
+    configHolder.setConfiguration(configuration);
 
-    // Is the cache enabled?
-    if (!ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE))) {
-      configuration.update(properties);
-    }
-
-    // Store the configuration for later reference
-    configurations.put(site, configuration);
+    configurations.put(site.getIdentifier(), configHolder);
   }
 
   /**
    * Removes the associated service configuration from
    * {@link ConfigurationAdmin}, so the cache service's
-   * {@link ManagedServiceFactory#deleted(String)} gets called.
+   * {@link org.osgi.service.cm.ManagedServiceFactory#deleted(String)} gets
+   * called.
    * <p>
    * This method is called by the OSGi framework for every site that disappears
    * from the service registry.
@@ -187,17 +248,16 @@ public class CacheConfigurationFactory implements ManagedService {
    *           if access to the persistent store fails
    */
   void removeSite(Site site) throws IOException {
-    Configuration config = configurations.remove(site);
-    if (config == null)
-      return;
-    Dictionary<?,?> properties = config.getProperties();
-    if (properties == null)
-      return;
+    sites.remove(site.getIdentifier());
 
-    // Was the cache enabled?
-    if (!ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE))) {
-      config.delete();
-    }
+    // Delete the configuration
+    CacheConfiguration configHolder = configurations.remove(site);
+    if (configHolder == null)
+      return;
+    
+    Configuration config = configHolder.getConfiguration();
+    config.delete();
+    configurations.remove(configHolder.getIdentifier());
   }
 
   /**
@@ -222,7 +282,19 @@ public class CacheConfigurationFactory implements ManagedService {
         cacheConfiguration = new Hashtable();
       }
     } catch (IOException e) {
-      logger.error("Error reading cache configuration from configuraiton admin service: " + e.getMessage());
+      logger.error("Error reading cache configuration from configuration admin service: " + e.getMessage());
+    }
+
+    // Process sites that appeared while there was no configuration admin
+    // service around
+    for (Site site : sites.values()) {
+      if (!configurations.containsKey(site.getIdentifier())) {
+        try {
+          addSite(site);
+        } catch (IOException e) {
+          logger.error("Error adding cache configuration to the configuration admin service: " + e.getMessage());
+        }
+      }
     }
 
   }

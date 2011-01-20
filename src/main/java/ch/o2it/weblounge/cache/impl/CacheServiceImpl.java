@@ -613,10 +613,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
    */
   public void invalidate(WebloungeResponse response) {
     CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
-    if (cacheableResponse == null || cacheableResponse.tx == null)
+    if (cacheableResponse == null || cacheableResponse.getTransaction() == null)
       return;
     cacheableResponse.invalidate();
-    CacheHandle handle = cacheableResponse.tx.getHandle();
+    CacheHandle handle = cacheableResponse.getTransaction().getHandle();
     invalidate(handle);
   }
 
@@ -655,7 +655,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       return false;
 
     // Adjust the transaction handle's recheck and valid time
-    CacheHandle responseHnd = cacheableResponse.tx.getHandle();
+    CacheHandle responseHnd = cacheableResponse.getTransaction().getHandle();
     if (handle.getExpires() < responseHnd.getExpires())
       responseHnd.setExpires(handle.getExpires());
     if (handle.getRecheck() < responseHnd.getRecheck())
