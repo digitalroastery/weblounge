@@ -350,6 +350,10 @@ public class ComposerTagSupport extends WebloungeTag {
       WebUrl url = getRequest().getUrl();
       Site site = request.getSite();
       ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+      if (contentRepository == null) {
+        logger.warn("Content repository unavailable for site '{}'", site.getIdentifier());
+        return;
+      }
 
       targetPage = (Page) getRequest().getAttribute(WebloungeRequest.PAGE);
 

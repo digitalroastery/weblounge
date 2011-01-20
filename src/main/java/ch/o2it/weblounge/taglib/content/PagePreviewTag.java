@@ -178,7 +178,7 @@ public class PagePreviewTag extends WebloungeTag {
       try {
         page = (Page)contentRepository.get(pageURI);
         if (page == null) {
-          logger.error("No data available for page '" + pageURI + "'");
+          logger.error("No data available for page {}", pageURI);
           return EVAL_PAGE;
         }
       } catch (SecurityException e) {
@@ -190,13 +190,13 @@ public class PagePreviewTag extends WebloungeTag {
       pageUrl = new WebUrlImpl(site, page.getURI().getPath());
       PageTemplate template = site.getTemplate(page.getTemplate());
       if (template == null) {
-        logger.error("No template found for page '" + pageURI + "'");
+        logger.error("No page template found for {}", pageURI);
         return EVAL_PAGE;
       }
 
       String stage = template.getStage();
       if (stage == null) {
-        logger.error("No stage defined for template '" + template + "'");
+        logger.error("No stage defined for page template '{}'", template);
         return EVAL_PAGE;
       }
 
