@@ -44,7 +44,7 @@ import java.util.Map;
  * for each site that is targeted at the {@link CacheConfigurationFactory}.
  * <p>
  * When registered with the system using the pid
- * <code>ch.o2it.weblounge.cache</code>, th will be used as the basis for
+ * <code>ch.o2it.weblounge.cache</code>, it will be used as the basis for
  * configuration objects.
  */
 public class CacheConfigurationFactory implements ManagedService {
@@ -188,9 +188,14 @@ public class CacheConfigurationFactory implements ManagedService {
    */
   void removeSite(Site site) throws IOException {
     Configuration config = configurations.remove(site);
+    if (config == null)
+      return;
+    Dictionary<?,?> properties = config.getProperties();
+    if (properties == null)
+      return;
 
     // Was the cache enabled?
-    if (!ConfigurationUtils.isFalse((String) config.getProperties().get(CacheServiceImpl.OPT_ENABLE))) {
+    if (!ConfigurationUtils.isFalse((String) properties.get(CacheServiceImpl.OPT_ENABLE))) {
       config.delete();
     }
   }
