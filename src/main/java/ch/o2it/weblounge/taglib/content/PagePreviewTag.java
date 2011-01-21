@@ -30,6 +30,7 @@ import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
@@ -43,6 +44,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -83,8 +88,8 @@ public class PagePreviewTag extends WebloungeTag {
   /** The stop marker */
   private Marker stopMarker = Marker.None;
 
-  /** The lead element */
-  private String leadElement = "text/title";
+  /** The lead elements */
+  private List<String> leadElements = null;
 
   /** True to have the tag render the contents */
   private boolean render = true;
@@ -102,6 +107,13 @@ public class PagePreviewTag extends WebloungeTag {
   private Object oldPagelet = null;
 
   /**
+   * Creates a new page preview tag.
+   */
+  public PagePreviewTag() {
+    leadElements = new ArrayList<String>();
+  }
+
+  /**
    * Sets the page identifier.
    * 
    * @param value
@@ -112,17 +124,26 @@ public class PagePreviewTag extends WebloungeTag {
   }
 
   /**
-   * Defines the lead element. The input needs to be formatted as
-   * <code>&lt;module&gt;/&lt;pagelet&gt;</code> and defaults to
-   * <code>text/title</code>.
+   * Defines the lead elements. The elements need to be passed in as comma
+   * separated strings, e. g.
    * 
-   * @param element
-   *          the lead element
+   * <pre>
+   * text/title, repository/image
+   * </pre>
+   * 
+   * 
+   * @param value
+   *          the lead elements
    */
-  public void setLead(String element) {
-    if (element.split("/").length != 2)
-      throw new IllegalArgumentException("The lead element definition must be formatted as '<module>/<pagelet>'");
-    leadElement = element;
+  public void setLead(String value) {
+    StringTokenizer tok = new StringTokenizer(value, ",;");
+    while (tok.hasMoreTokens()) {
+      String element = tok.nextToken().trim();
+      String[] parts = element.split("/");
+      if (parts.length != 2)
+        throw new IllegalArgumentException("Lead elements '" + value + "' are malformed. Required is 'module1/pagelet1, module2/pagelet2, ...");
+      leadElements.add(element);
+    }
   }
 
   /**
@@ -176,7 +197,7 @@ public class PagePreviewTag extends WebloungeTag {
       ResourceURI pageURI = new PageURIImpl(site, null, pageId);
 
       try {
-        page = (Page)contentRepository.get(pageURI);
+        page = (Page) contentRepository.get(pageURI);
         if (page == null) {
           logger.error("No data available for page {}", pageURI);
           return EVAL_PAGE;
@@ -201,27 +222,23 @@ public class PagePreviewTag extends WebloungeTag {
       }
 
       // Read pagelets
-      Pagelet[] pagelets = null;
+      List<Pagelet> pagelets = new ArrayList<Pagelet>();
       switch (stopMarker) {
         case Lead:
-          for (Pagelet p : page.getPreview()) {
-            String[] s = leadElement.split("/");
-            if (p.getModule().equals(s[0]) && p.getIdentifier().equals(s[1])) {
-              pagelets = new Pagelet[] { p };
-              break;
+          for (Pagelet p : page.getPagelets(stage)) {
+            if (leadElements.contains(p.toString())) {
+              pagelets.add(p);
             }
           }
-          if (pagelets == null)
-            pagelets = new Pagelet[] {};
           break;
         case Marker:
-          pagelets = page.getPreview();
+          pagelets.addAll(Arrays.asList(page.getPreview()));
           break;
         default:
-          pagelets = page.getPagelets(stage);
+          pagelets.addAll(Arrays.asList(page.getPagelets(stage)));
       }
 
-      pagePreview = new ComposerImpl("stage", pagelets);
+      pagePreview = new ComposerImpl("preview", pagelets);
     }
 
     // Store old page, composer and pagelet for later reference
@@ -238,8 +255,11 @@ public class PagePreviewTag extends WebloungeTag {
     pageContext.setAttribute(PagePreviewTagVariables.PREVIEW, pagePreview);
 
     // Add included page url to tags
-    response.addTag(ch.o2it.weblounge.common.request.CacheTag.Url, pageUrl.getLink());
+    response.addTag(CacheTag.Url, pageUrl.getLink());
 
+    if (pagePreview.size() == 0)
+      return SKIP_BODY;
+    
     pageletIndex = 0;
     handlePagelet(pageletIndex);
 
@@ -251,12 +271,12 @@ public class PagePreviewTag extends WebloungeTag {
    */
   public int doAfterBody() throws JspException {
     pageletIndex++;
-    
+
     // Look for the next pagelet (some might be skipped)
     while (pageletIndex < pagePreview.getPagelets().length && !handlePagelet(pageletIndex)) {
       pageletIndex++;
     }
-    
+
     // If we found one, let's execute the body. Otherwise, we skip
     if (pageletIndex <= pagePreview.getPagelets().length) {
       return EVAL_BODY_AGAIN;
@@ -278,7 +298,7 @@ public class PagePreviewTag extends WebloungeTag {
     request.setAttribute(WebloungeRequest.PAGE, oldPage);
     request.setAttribute(WebloungeRequest.COMPOSER, oldComposer);
     request.setAttribute(WebloungeRequest.PAGELET, oldPagelet);
-    
+
     return EVAL_PAGE;
   }
 
@@ -293,7 +313,7 @@ public class PagePreviewTag extends WebloungeTag {
     pageId = null;
     stopMarker = Marker.None;
     pageletIndex = 0;
-    leadElement = "text/title";
+    leadElements.clear();
     render = true;
   }
 
@@ -335,7 +355,8 @@ public class PagePreviewTag extends WebloungeTag {
           // Permission p = SystemPermission.READ;
           // if (!pagelet.checkOne(p, user.getRoleClosure()) &&
           // !pagelet.check(p, user)) {
-          // logger.debug("Skipping pagelet " + i + " in composer " + composer_ +
+          // logger.debug("Skipping pagelet " + i + " in composer " + composer_
+          // +
           // " due to insufficient rights");
           // continue p;
           // }

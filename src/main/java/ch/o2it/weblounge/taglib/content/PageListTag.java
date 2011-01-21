@@ -41,10 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import javax.servlet.jsp.JspException;
@@ -87,13 +84,13 @@ public class PageListTag extends WebloungeTag {
   private WebUrl url = null;
 
   /** List of required headlines */
-  private Map<String, String> requireHeadlines = null;
+  private List<String> requireHeadlines = null;
 
   /**
    * Creates a new page header list tag.
    */
   public PageListTag() {
-    requireHeadlines = new HashMap<String, String>();
+    requireHeadlines = new ArrayList<String>();
     subjects = new ArrayList<String>();
     reset();
   }
@@ -162,7 +159,11 @@ public class PageListTag extends WebloungeTag {
   }
 
   /**
-   * Indicates the required headlines.
+   * Indicates the required headlines. The headline element types need to be
+   * passed in as comma separated strings, e. g.
+   * <pre>
+   * text/title, repository/image
+   * </pre>
    * 
    * @param value
    *          the headlines
@@ -174,7 +175,7 @@ public class PageListTag extends WebloungeTag {
       String[] parts = headline.split("/");
       if (parts.length != 2)
         throw new IllegalArgumentException("Required headlines '" + value + "' are malformed. Required is 'module1/pagelet1, module2/pagelet2, ...");
-      requireHeadlines.put(parts[0], parts[1]);
+      requireHeadlines.add(headline);
     }
   }
 
@@ -245,8 +246,9 @@ public class PageListTag extends WebloungeTag {
       }
       
       // Add the pagelets required on state
-      for (Entry<String, String> headline : requireHeadlines.entrySet()) {
-        query.withPagelet(headline.getKey(), headline.getValue()).inStage();
+      for (String headline : requireHeadlines) {
+        String[] parts = headline.split("/");
+        query.withPagelet(parts[0], parts[1]).inStage();
       }
 
       // Order by date and limit the result set
