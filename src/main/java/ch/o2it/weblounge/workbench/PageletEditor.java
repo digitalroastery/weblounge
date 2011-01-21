@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Class containing all the information that is needed to edit a certain
@@ -187,7 +188,7 @@ public class PageletEditor {
     buf.append("index=\"").append(pageletIndex).append("\">");
 
     // the pagelet
-    buf.append("<data flavor=\"json\">");
+    buf.append("<data flavor=\"json\"><![CDATA[");
     String data = null;
     switch (dataFlavor) {
       case Json:
@@ -204,38 +205,40 @@ public class PageletEditor {
         throw new IllegalStateException("An unhandled flavor was found: " + dataFlavor);
     }
     buf.append(data);
-    buf.append("</data>");
+    buf.append("]]></data>");
 
     // the renderer
     if (renderer != null && renderer.getRenderer() != null) {
       InputStream is = null;
       try {
-        buf.append("<renderer type=\"xhtml\">");
-        is = renderer.getRenderer().openStream();
-        buf.append(IOUtils.toString(is));
+        URL rendererUrl = new URL(renderer.getRenderer().toExternalForm() + "?format=raw");
+        buf.append("<renderer type=\"xhtml\"><![CDATA[");
+        is = rendererUrl.openStream();
+        buf.append(IOUtils.toString(is, "utf-8"));
         buf.append("<renderer>");
       } catch (IOException e) {
         logger.warn("Error reading renderer from {}", renderer.getRenderer());
       } finally {
         IOUtils.closeQuietly(is);
       }
-      buf.append("</renderer>");
+      buf.append("]]></renderer>");
     }
 
     // the editor
     if (renderer != null && renderer.getEditor() != null) {
       InputStream is = null;
       try {
-        buf.append("<editor type=\"xhtml\">");
-        is = renderer.getEditor().openStream();
-        buf.append(IOUtils.toString(is));
+        URL editorUrl = new URL(renderer.getEditor().toExternalForm() + "?format=raw");
+        buf.append("<editor type=\"xhtml\"><![CDATA[");
+        is = editorUrl.openStream();
+        buf.append(IOUtils.toString(is, "utf-8"));
         buf.append("<editor>");
       } catch (IOException e) {
         logger.warn("Error reading editor from {}", renderer.getEditor());
       } finally {
         IOUtils.closeQuietly(is);
       }
-      buf.append("</editor>");
+      buf.append("]]></editor>");
     }
 
     buf.append("</pageleteditor>");
