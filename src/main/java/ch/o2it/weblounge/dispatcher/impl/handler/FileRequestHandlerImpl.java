@@ -111,7 +111,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       
       if (path.startsWith(URI_PREFIX)) {
         String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
-        uriSuffix = URLDecoder.decode(uriSuffix, "UTF-8");
+        uriSuffix = URLDecoder.decode(uriSuffix, "utf-8");
 
         // Check whether we are looking at a uuid or a url path
         if (uriSuffix.length() == UUID_LENGTH) {
@@ -146,7 +146,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
       DispatchUtils.sendInternalError(request, response);
       return true;
     } catch (UnsupportedEncodingException e) {
-      logger.error("Error decoding file url {} using UTF-8: {}", path, e.getMessage());
+      logger.error("Error decoding file url {} using utf-8: {}", path, e.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;
     }

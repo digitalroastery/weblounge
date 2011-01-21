@@ -173,7 +173,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
             pageURI = getPageURIForAction(action, request);
           } else if (path.startsWith(URI_PREFIX)) {
             String uriSuffix = StringUtils.chomp(path.substring(URI_PREFIX.length()), "/");
-            uriSuffix = URLDecoder.decode(uriSuffix, "UTF-8");
+            uriSuffix = URLDecoder.decode(uriSuffix, "utf-8");
             pageURI = new PageURIImpl(site, null, uriSuffix);
           } else {
             pageURI = new PageURIImpl(request);
