@@ -116,7 +116,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
     // Check for search terms that should yield a result
     searchTerms = "Friedrich Nietzsche Suchresultat";
     httpClient = new DefaultHttpClient();
-    searchRequest = new HttpGet(UrlUtils.concat(requestUrl, URLEncoder.encode(searchTerms, "UTF-8")));
+    searchRequest = new HttpGet(UrlUtils.concat(requestUrl, URLEncoder.encode(searchTerms, "utf-8")));
     String[][] params = new String[][] {{"limit", "5"}};
     logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
     try {

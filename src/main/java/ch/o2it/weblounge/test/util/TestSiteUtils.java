@@ -79,7 +79,7 @@ public final class TestSiteUtils {
    * <p>
    * Note that we need to do a conversion from the <code>ISO-LATIN-1</code>
    * (which is assumed by the <code>Properties</code> implementation) to
-   * <code>UTF-8</code>.
+   * <code>utf-8</code>.
    * 
    * @return the greetings
    * @throws Exception
@@ -93,7 +93,7 @@ public final class TestSiteUtils {
       for (Entry<Object, Object> entry : props.entrySet()) {
         try {
           String isoLatin1Value = entry.getValue().toString();
-          String utf8Value = new String(isoLatin1Value.getBytes("ISO-8859-1"), "UTF-8");
+          String utf8Value = new String(isoLatin1Value.getBytes("ISO-8859-1"), "utf-8");
           greetings.put((String) entry.getKey(), utf8Value);
         } catch (UnsupportedEncodingException e) {
           logger.error("I can't believe the platform does not support encoding {}", e.getMessage());
@@ -125,7 +125,7 @@ public final class TestSiteUtils {
         for (String[] param : params)
           qparams.add(new BasicNameValuePair(param[0], param[1]));
         URI requestURI = request.getURI();
-        URI uri = URIUtils.createURI(requestURI.getScheme(), requestURI.getHost(), requestURI.getPort(), requestURI.getPath(), URLEncodedUtils.format(qparams, "UTF-8"), null);
+        URI uri = URIUtils.createURI(requestURI.getScheme(), requestURI.getHost(), requestURI.getPort(), requestURI.getPath(), URLEncodedUtils.format(qparams, "utf-8"), null);
         HeaderIterator headerIterator = request.headerIterator();
         request = new HttpGet(uri);
         while (headerIterator.hasNext()) {
@@ -135,13 +135,13 @@ public final class TestSiteUtils {
         List<NameValuePair> formparams = new ArrayList<NameValuePair>();
         for (String[] param : params)
           formparams.add(new BasicNameValuePair(param[0], param[1]));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "utf-8");
         ((HttpPost) request).setEntity(entity);
       } else if (request instanceof HttpPut) {
         List<NameValuePair> formparams = new ArrayList<NameValuePair>();
         for (String[] param : params)
           formparams.add(new BasicNameValuePair(param[0], param[1]));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, "utf-8");
         ((HttpPut) request).setEntity(entity);
       }
     }
@@ -160,12 +160,12 @@ public final class TestSiteUtils {
    */
   public static Document parseXMLResponse(HttpResponse response)
       throws Exception {
-    String responseXml = EntityUtils.toString(response.getEntity(), "UTF-8");
+    String responseXml = EntityUtils.toString(response.getEntity(), "utf-8");
     responseXml = StringEscapeUtils.unescapeHtml(responseXml);
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
     DocumentBuilder builder = factory.newDocumentBuilder();
-    return builder.parse(new ByteArrayInputStream(responseXml.getBytes("UTF-8")));
+    return builder.parse(new ByteArrayInputStream(responseXml.getBytes("utf-8")));
   }
 
   /**
@@ -180,7 +180,7 @@ public final class TestSiteUtils {
    */
   public static String parseTextResponse(HttpResponse response)
       throws Exception {
-    String responseText = EntityUtils.toString(response.getEntity(), "UTF-8");
+    String responseText = EntityUtils.toString(response.getEntity(), "utf-8");
     return responseText;
   }
 
@@ -195,7 +195,7 @@ public final class TestSiteUtils {
    */
   public static JSONObject parseJSONResponse(HttpResponse response)
       throws Exception {
-    String responseJson = EntityUtils.toString(response.getEntity(), "UTF-8");
+    String responseJson = EntityUtils.toString(response.getEntity(), "utf-8");
     JSONObject json = new JSONObject(responseJson);
     return json;
   }
