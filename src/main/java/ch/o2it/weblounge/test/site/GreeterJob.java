@@ -60,7 +60,7 @@ public class GreeterJob implements JobWorker {
     int index = (int) ((greetings.length - 1) * Math.random());
     Map.Entry<String, String> entry = greetings[index];
     try {
-      logger.info(new String(entry.getValue().getBytes("utf-8")) + " (" + entry.getKey() + ")");
+      logger.info(new String(entry.getValue().getBytes("utf-8"), "utf-8") + " (" + entry.getKey() + ")");
     } catch (UnsupportedEncodingException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
