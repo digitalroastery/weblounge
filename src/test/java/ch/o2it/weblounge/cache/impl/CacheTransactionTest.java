@@ -122,7 +122,7 @@ public class CacheTransactionTest {
 
     // Write something to the response
     response.getOutputStream().write(content.getBytes());
-    assertEquals(content, new String(transaction.getContent()));
+    assertEquals(content, new String(transaction.getContent(), "utf-8"));
   }
 
   /**

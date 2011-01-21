@@ -176,9 +176,9 @@ public class CacheEntryTest {
    * Test method for {@link ch.o2it.weblounge.cache.impl.CacheEntry#getContent()}.
    */
   @Test
-  public void testGetContent() {
+  public void testGetContent() throws Exception {
     assertNotNull(entry.getContent());
-    assertEquals(content, new String(entry.getContent()));
+    assertEquals(content, new String(entry.getContent(), "utf-8"));
   }
 
   /**

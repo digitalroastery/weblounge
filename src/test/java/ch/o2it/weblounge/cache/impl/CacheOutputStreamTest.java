@@ -78,7 +78,7 @@ public class CacheOutputStreamTest {
     assertNotNull(outputStream.getContent());
     outputStream.write(content.getBytes());
     assertEquals(content.length(), outputStream.getContent().length);
-    assertEquals(content, new String(outputStream.getContent()));
+    assertEquals(content, new String(outputStream.getContent(), "utf-8"));
   }
 
 }
