@@ -69,7 +69,7 @@ public class PagePreviewReaderTest {
   protected ComposerImpl stage = null;
 
   /** Name of the composer */
-  protected String composerName = "stage";
+  protected String composerName = "preview";
 
   /** Pagelet module */
   protected String titleModule = "text";

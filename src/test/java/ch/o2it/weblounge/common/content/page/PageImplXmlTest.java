@@ -60,7 +60,7 @@ public class PageImplXmlTest extends PageImplTest {
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(page.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(page.toXml().getBytes("utf-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

@@ -86,7 +86,7 @@ public class LocalizedModificationContextImplXmlTest extends LocalizedModificati
     }
     content.append("</content>");
     try {
-      assertEquals(testXml, new String(content.toString().getBytes("UTF-8")));
+      assertEquals(testXml, new String(content.toString().getBytes("utf-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

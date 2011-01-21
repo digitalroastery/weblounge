@@ -110,7 +110,7 @@ public class MockHttpServletResponse implements HttpServletResponse {
 
   /**
    * Creates a new mock servlet response with a default character encoding of
-   * <code>UTF-8</code>.
+   * <code>utf-8</code>.
    */
   public MockHttpServletResponse() {
     characterEncoding = "utf-8";

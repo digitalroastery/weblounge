@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<composer id="stage">
+<composer id="preview">
   <pagelet module="text" id="title">
     <security>
       <owner>

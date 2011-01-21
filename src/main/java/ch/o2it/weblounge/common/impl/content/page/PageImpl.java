@@ -313,7 +313,7 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
       t = site.getTemplate(template);
     } else {
       t = site.getDefaultTemplate();
-      logger.warn("Page {} has no template associated", uri);
+      logger.warn("Page {} has no template associated, using site default '{}'", uri, t.getIdentifier());
     }
     if (preview == null && t == null) {
       logger.warn("Can't calculate the page preview due to missing page template '{}'", template);

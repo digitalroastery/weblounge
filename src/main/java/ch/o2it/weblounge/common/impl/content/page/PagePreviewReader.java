@@ -55,6 +55,9 @@ public final class PagePreviewReader extends WebloungeContentReader {
   /** Parser factory */
   private static final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 
+  /** Name of the preview composer */
+  public static final String PREVIEW_COMPOSER_NAME = "preview";
+  
   /** The SAX parser */
   private WeakReference<SAXParser> parserRef = null;
 
@@ -104,7 +107,7 @@ public final class PagePreviewReader extends WebloungeContentReader {
       IOException, ParserConfigurationException {
     reset();
     this.pageURI = uri;
-    this.composer = new ComposerImpl("stage");
+    this.composer = new ComposerImpl(PREVIEW_COMPOSER_NAME);
     SAXParser parser = parserRef.get();
     if (parser == null) {
       parser = parserFactory.newSAXParser();

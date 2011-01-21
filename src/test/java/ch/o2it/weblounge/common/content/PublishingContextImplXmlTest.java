@@ -72,7 +72,7 @@ public class PublishingContextImplXmlTest extends PublishingContextImplTest {
   public void testFromXmlNode() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(ctx.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(ctx.toXml().getBytes("utf-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

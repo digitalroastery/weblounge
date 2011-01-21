@@ -70,7 +70,7 @@ public class LinkImplXmlTest extends LinkImplTest {
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(link.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(link.toXml().getBytes("utf-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

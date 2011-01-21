@@ -250,7 +250,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
   public String getLink() {
     if (link == null) {
       try {
-        link = URLEncoder.encode(getLink(-1, null, null), "UTF-8");
+        link = URLEncoder.encode(getLink(-1, null, null), "utf-8");
       } catch (UnsupportedEncodingException e) {
         logger.error("Unexpected error while urlencoding link {}", link, e);
       }

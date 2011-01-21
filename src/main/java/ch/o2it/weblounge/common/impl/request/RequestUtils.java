@@ -209,7 +209,7 @@ public final class RequestUtils {
     String p = request.getParameter(parameter);
     if (p != null) {
       try {
-        p = URLDecoder.decode(p.trim(), "UTF-8");
+        p = URLDecoder.decode(p.trim(), "utf-8");
       } catch (UnsupportedEncodingException e) {
       }
     }
@@ -239,9 +239,9 @@ public final class RequestUtils {
 
     String p = urlparams.get(index);
     try {
-      p = URLDecoder.decode(p.trim(), "UTF-8");
+      p = URLDecoder.decode(p.trim(), "utf-8");
     } catch (UnsupportedEncodingException e) {
-      logger.error("Encoding 'UTF-8' is not supported on this platform");
+      logger.error("Encoding 'utf-8' is not supported on this platform");
     }
     return StringUtils.trimToNull(p);
   }

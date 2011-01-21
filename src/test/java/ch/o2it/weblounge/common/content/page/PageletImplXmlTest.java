@@ -61,7 +61,7 @@ public class PageletImplXmlTest extends PageletImplTest {
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(pagelet.toXml().getBytes("UTF-8")));
+      assertEquals(testXml, new String(pagelet.toXml().getBytes("utf-8")));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

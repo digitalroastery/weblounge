@@ -111,7 +111,7 @@ public class LazyPageImpl implements Page {
       }
 
       // Load the page
-      page = reader.read(IOUtils.toInputStream(pageXml, "UTF-8"), uri.getSite());
+      page = reader.read(IOUtils.toInputStream(pageXml, "utf-8"), uri.getSite());
       isHeaderLoaded = true;
       isBodyLoaded = true;
       cleanupAfterLoading();
@@ -142,7 +142,7 @@ public class LazyPageImpl implements Page {
       }
 
       // Load the page header
-      page = reader.readHeader(IOUtils.toInputStream(headerXml), uri.getSite());
+      page = reader.readHeader(IOUtils.toInputStream(headerXml, "utf-8"), uri.getSite());
       isHeaderLoaded = true;
       if (isHeaderLoaded && isBodyLoaded)
         cleanupAfterLoading();
@@ -169,7 +169,7 @@ public class LazyPageImpl implements Page {
       }
 
       // Load the page body
-      page = reader.readBody(IOUtils.toInputStream(pageXml), uri.getSite());
+      page = reader.readBody(IOUtils.toInputStream(pageXml, "utf-8"), uri.getSite());
       isBodyLoaded = true;
       if (isHeaderLoaded && isBodyLoaded)
         cleanupAfterLoading();
@@ -177,7 +177,7 @@ public class LazyPageImpl implements Page {
         pageXml = null;
 
     } catch (Throwable e) {
-      logger.error("Failed to lazy-load body of {}", uri);
+      logger.error("Failed to lazy-load body of {}: {}", uri, e.getMessage());
       throw new IllegalStateException(e);
     }
   }
@@ -190,12 +190,13 @@ public class LazyPageImpl implements Page {
     // thing instead.
     if (previewXml == null) {
       loadPageBody();
+      previewComposer = new ComposerImpl(PagePreviewReader.PREVIEW_COMPOSER_NAME, page.getPreview());
       return;
     }
 
     try {
       PagePreviewReader reader = new PagePreviewReader();
-      previewComposer = reader.read(IOUtils.toInputStream(previewXml, "UTF-8"), uri);
+      previewComposer = reader.read(IOUtils.toInputStream(previewXml, "utf-8"), uri);
       previewXml = null;
     } catch (Throwable e) {
       logger.error("Failed to lazy-load preview of {}", uri);
