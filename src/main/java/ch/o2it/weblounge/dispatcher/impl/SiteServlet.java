@@ -66,6 +66,12 @@ public class SiteServlet extends HttpServlet {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SiteServlet.class);
 
+  /** The supported formats */
+  public enum Format { Processed, Raw };
+  
+  /** Parameter name for the output format */
+  public static final String PARAM_FORMAT = "format";
+  
   /** The site */
   private final Site site;
 
@@ -174,8 +180,22 @@ public class SiteServlet extends HttpServlet {
       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
+
+    // Check the requested format. In case of a JSP, this can either be
+    // processed (default) or raw, in which case the file contents are
+    // returned rather than Jaspers output of it.
+    Format format = Format.Processed;
+    String f = request.getParameter(PARAM_FORMAT);
+    if (StringUtils.isNotBlank(f)) {
+      try {
+        format = Format.valueOf(StringUtils.capitalize(f.toLowerCase()));
+      } catch (Exception e) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        return;
+      }
+    }
     
-    if (filename.endsWith(".jsp")) {
+    if (Format.Processed.equals(format) && filename.endsWith(".jsp")) {
       serviceJavaServerPage(request, response);
     } else {
       serviceResource(request, response);
