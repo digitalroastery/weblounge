@@ -111,38 +111,38 @@ public class AuthenticatedUserImplTest {
    * Test method for {@link ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#setPassword(byte[], ch.o2it.weblounge.common.security.DigestType)}.
    */
   @Test
-  public void testSetPasswordByteArrayDigestType() {
+  public void testSetPasswordByteArrayDigestType() throws Exception {
     String pass = "pass";
     user.setPassword(pass.getBytes(), DigestType.plain);
     assertEquals(DigestType.plain, user.getPasswordDigestType());
-    assertEquals(new String(pass.getBytes()), new String(user.getPassword()));
+    assertEquals(new String(pass.getBytes(), "utf-8"), new String(user.getPassword(), "utf-8"));
   }
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#setPassword(byte[])}.
    */
   @Test
-  public void testSetPasswordByteArray() {
-    user.setPassword("pass".getBytes());
+  public void testSetPasswordByteArray() throws Exception {
+    user.setPassword("pass".getBytes("utf-8"));
     assertEquals(DigestType.md5, user.getPasswordDigestType());
-    assertEquals(new String(DigestUtils.md5("pass".getBytes())), new String(user.getPassword()));
+    assertEquals(new String(DigestUtils.md5("pass".getBytes("utf-8")), "utf-8"), new String(user.getPassword(), "utf-8"));
   }
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#getPassword()}.
    */
   @Test
-  public void testGetPassword() {
+  public void testGetPassword() throws Exception {
     assertEquals(DigestType.plain, user.getPasswordDigestType());
-    assertEquals(new String(password), new String(user.getPassword()));
+    assertEquals(new String(password, "utf-8"), new String(user.getPassword(), "utf-8"));
   }
 
   /**
    * Test method for {@link ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#checkPassword(java.lang.String)}.
    */
   @Test
-  public void testCheckPassword() {
-    assertTrue(user.checkPassword(new String(password)));
+  public void testCheckPassword() throws Exception {
+    assertTrue(user.checkPassword(new String(password, "utf-8")));
   }
 
   /**

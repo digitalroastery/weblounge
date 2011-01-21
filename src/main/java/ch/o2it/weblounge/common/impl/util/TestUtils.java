@@ -46,7 +46,7 @@ public class TestUtils {
       FileInputStream f = new FileInputStream(templateFile);
       f.read(buffer);
       f.close();
-      template = new String(buffer).replaceFirst("<\\?.*?>", "");
+      template = new String(buffer, "utf-8").replaceFirst("<\\?.*?>", "");
       template = template.replaceAll("(>\\s*)+", ">").replaceAll("(\\s*<)+", "<");
     } catch (IOException e) {
       throw new RuntimeException("Error reading test resource at " + path);
@@ -71,7 +71,7 @@ public class TestUtils {
       FileInputStream f = new FileInputStream(templateFile);
       f.read(buffer);
       f.close();
-      template = new String(buffer);
+      template = new String(buffer, "utf-8");
       template = template.replaceAll("(\"\\s*)", "\"").replaceAll("(\\s*\")+", "\"");
       template = template.replaceAll("(\\s*\\{\\s*)", "{").replaceAll("(\\s*\\}\\s*)", "}");
       template = template.replaceAll("(\\s*\\[\\s*)", "[").replaceAll("(\\s*\\]\\s*)", "]");

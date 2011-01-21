@@ -30,6 +30,7 @@ import ch.o2it.weblounge.common.user.User;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -170,14 +171,19 @@ public class AuthenticatedUserImpl extends UserImpl implements AuthenticatedUser
     if (password == null) {
       return true;
     }
-    String passwordString = new String(this.password);
-    switch (passwordDigestType) {
-      case plain:
-        return passwordString.equals(password);
-      case md5:
-        return passwordString.equals(new String(DigestUtils.md5(password)));
-      default:
-        throw new IllegalStateException("Unsupported digest type '" + passwordDigestType + "'");
+    try {
+      String passwordString = new String(this.password, "utf-8");
+      switch (passwordDigestType) {
+        case plain:
+          return passwordString.equals(password);
+        case md5:
+          return passwordString.equals(new String(DigestUtils.md5(password), "utf-8"));
+        default:
+          throw new IllegalStateException("Unsupported digest type '" + passwordDigestType + "'");
+      }
+    } catch (UnsupportedEncodingException e) {
+      // Can't happen, utf-8 support is mandatory
+      throw new IllegalStateException("This platform is missing utf-8 encoding support");
     }
   }
 

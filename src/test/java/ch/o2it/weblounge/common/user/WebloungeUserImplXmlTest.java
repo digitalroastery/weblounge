@@ -71,7 +71,7 @@ public class WebloungeUserImplXmlTest extends WebloungeUserImplTest {
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(user.toXml().getBytes("utf-8")));
+      assertEquals(testXml, new String(user.toXml().getBytes("utf-8"), "utf-8"));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

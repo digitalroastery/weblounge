@@ -60,7 +60,7 @@ public class FileImplXmlTest extends FileImplTest {
   public void testToXml() {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     try {
-      assertEquals(testXml, new String(file.toXml().getBytes("utf-8")));
+      assertEquals(testXml, new String(file.toXml().getBytes("utf-8"), "utf-8"));
     } catch (UnsupportedEncodingException e) {
       fail("Encoding to utf-8 failed");
     }

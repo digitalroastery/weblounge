@@ -84,15 +84,15 @@ public class FileReaderTest {
 
     // Read test file
     file = reader.read(testContext.openStream(), site);
-    assertEquals(testXml, new String(file.toXml().getBytes("utf-8")));
+    assertEquals(testXml, new String(file.toXml().getBytes("utf-8"), "utf-8"));
 
     // Read other test file
     file = reader.read(otherTestContext.openStream(), site);
-    assertEquals(otherTestXml, new String(file.toXml().getBytes("utf-8")));
+    assertEquals(otherTestXml, new String(file.toXml().getBytes("utf-8"), "utf-8"));
 
     // Read test file again
     file = reader.read(testContext.openStream(), site);
-    assertEquals(testXml, new String(file.toXml().getBytes("utf-8")));
+    assertEquals(testXml, new String(file.toXml().getBytes("utf-8"), "utf-8"));
   }
 
 }

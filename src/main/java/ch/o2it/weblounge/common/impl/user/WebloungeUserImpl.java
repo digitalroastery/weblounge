@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -569,11 +570,16 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     b.append("<security>");
 
     // Password
-    b.append("<password type=\"");
-    b.append(passwordDigestType.toString());
-    b.append("\">");
-    b.append(new String(password));
-    b.append("</password>");
+    try {
+      b.append("<password type=\"");
+      b.append(passwordDigestType.toString());
+      b.append("\">");
+      b.append(new String(password, "utf-8"));
+      b.append("</password>");
+    } catch (UnsupportedEncodingException e) {
+      // Can't happen, utf-8 support is mandatory
+      throw new IllegalStateException("This platform is missing utf-8 encoding support");
+    }
 
     // challenge - response
     if (challenge != null && response != null) {

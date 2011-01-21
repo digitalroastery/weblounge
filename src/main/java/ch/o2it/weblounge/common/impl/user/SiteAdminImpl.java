@@ -32,6 +32,7 @@ import ch.o2it.weblounge.common.site.Site;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -202,11 +203,16 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
     b.append("<login>").append(login).append("</login>");
 
     // Password
-    b.append("<password type=\"");
-    b.append(passwordDigestType.toString());
-    b.append("\">");
-    b.append(new String(password));
-    b.append("</password>");
+    try {
+      b.append("<password type=\"");
+      b.append(passwordDigestType.toString());
+      b.append("\">");
+      b.append(new String(password, "utf-8"));
+      b.append("</password>");
+    } catch (UnsupportedEncodingException e) {
+      // Can't happen, utf-8 support is mandatory
+      throw new IllegalStateException("This platform is missing utf-8 encoding support");
+    }
 
     // First name
     if (firstName != null) {

@@ -175,7 +175,7 @@ public final class EndpointDocumentationGenerator {
       if (in == null) {
         throw new IllegalStateException("No template file could be found at: " + path);
       }
-      textTemplate = new String(IOUtils.toByteArray(in));
+      textTemplate = new String(IOUtils.toByteArray(in), "utf-8");
     } catch (IOException e) {
       logger.error("failed to load template file from path (" + path + "): " + e, e);
       textTemplate = null;

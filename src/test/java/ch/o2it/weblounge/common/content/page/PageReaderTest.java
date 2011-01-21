@@ -83,15 +83,15 @@ public class PageReaderTest {
 
     // Read test page
     page = reader.read(testContext.openStream(), site);
-    assertEquals(testXml, new String(page.toXml().getBytes("utf-8")));
+    assertEquals(testXml, new String(page.toXml().getBytes("utf-8"), "utf-8"));
 
     // Read other test page
     page = reader.read(otherTestContext.openStream(), site);
-    assertEquals(otherTestXml, new String(page.toXml().getBytes("utf-8")));
+    assertEquals(otherTestXml, new String(page.toXml().getBytes("utf-8"), "utf-8"));
 
     // Read test page again
     page = reader.read(testContext.openStream(), site);
-    assertEquals(testXml, new String(page.toXml().getBytes("utf-8")));
+    assertEquals(testXml, new String(page.toXml().getBytes("utf-8"), "utf-8"));
 }
 
 }
