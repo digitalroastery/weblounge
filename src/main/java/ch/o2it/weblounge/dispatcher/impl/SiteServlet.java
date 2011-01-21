@@ -32,6 +32,7 @@ import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.util.resource.Resource;
 import org.ops4j.pax.web.jsp.JspServletWrapper;
 import org.osgi.framework.Bundle;
@@ -167,6 +168,13 @@ public class SiteServlet extends HttpServlet {
   public void service(final HttpServletRequest request,
       final HttpServletResponse response) throws ServletException, IOException {
     String filename = FilenameUtils.getName(request.getPathInfo());
+    
+    // Don't allow listing the root directory?
+    if (StringUtils.isBlank(filename)) {
+      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
+    
     if (filename.endsWith(".jsp")) {
       serviceJavaServerPage(request, response);
     } else {
