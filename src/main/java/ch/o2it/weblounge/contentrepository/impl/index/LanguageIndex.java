@@ -513,7 +513,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
     for (int i = 0; i < existingLanguages; i++) {
       byte[] l = new byte[bytesPerLanguage];
       idx.read(l);
-      languages[i] = new String(l);
+      languages[i] = new String(l, "utf-8");
       if (languages[i].equals(language.getIdentifier())) {
         deleteEntry = i;
       }
@@ -571,7 +571,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
     for (int i = 0; i < v; i++) {
       byte[] language = new byte[bytesPerLanguage];
       idx.read(language);
-      languages[i] = LanguageUtils.getLanguage(new String(language));
+      languages[i] = LanguageUtils.getLanguage(new String(language, "utf-8"));
     }
     return languages;
   }
@@ -599,7 +599,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
     for (int i = 0; i < v; i++) {
       byte[] l = new byte[bytesPerLanguage];
       idx.read(l);
-      if (language.getIdentifier().equals(new String(l)))
+      if (language.getIdentifier().equals(new String(l, "utf-8")))
         return true;
     }
     return false;

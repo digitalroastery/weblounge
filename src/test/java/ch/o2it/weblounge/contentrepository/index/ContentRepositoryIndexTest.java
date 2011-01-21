@@ -122,6 +122,7 @@ public class ContentRepositoryIndexTest {
 
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getTemplate((String)EasyMock.anyObject())).andReturn(t).anyTimes();
+    EasyMock.expect(site.getDefaultTemplate()).andReturn(t).anyTimes();
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
     EasyMock.replay(site);
 

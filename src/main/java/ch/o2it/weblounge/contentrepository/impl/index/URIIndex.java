@@ -514,7 +514,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
     int bytesRead = idx.read(bytes);
     if (bytesRead < bytesPerId || bytes[1] == '\n')
       throw new IllegalStateException("No data at address " + entry);
-    return new String(bytes);
+    return new String(bytes, "utf-8");
   }
 
   /**
