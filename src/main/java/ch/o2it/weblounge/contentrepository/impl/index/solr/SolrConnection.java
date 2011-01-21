@@ -221,7 +221,7 @@ public class SolrConnection {
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
       writer.write(bos, req, rsp);
       BinaryResponseParser parser = new BinaryResponseParser();
-      return parser.processResponse(new ByteArrayInputStream(bos.toByteArray()), "UTF-8");
+      return parser.processResponse(new ByteArrayInputStream(bos.toByteArray()), "utf-8");
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }

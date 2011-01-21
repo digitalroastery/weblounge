@@ -117,7 +117,7 @@ public class SearchEndpoint {
     // Create the search expression and the query
     SearchQuery query = new SearchQueryImpl(site);
     try {
-      query.withText(URLDecoder.decode(terms, "UTF-8"));
+      query.withText(URLDecoder.decode(terms, "utf-8"));
       query.withOffset(offset);
       query.withLimit(limit);
     } catch (UnsupportedEncodingException e) {

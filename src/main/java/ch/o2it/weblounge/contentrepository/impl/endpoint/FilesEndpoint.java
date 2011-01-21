@@ -464,7 +464,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     try {
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
       ResourceReader<?, ?> resourceReader = (ResourceReader<?, ?>) serializer.getContentReader();
-      resource = resourceReader.read(IOUtils.toInputStream(resourceXml), site);
+      resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       // TODO: Replace this with current user
       User admin = site.getAdministrator();
       user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
@@ -553,7 +553,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       try {
         ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
         ResourceReader<?, ?> resourceReader = serializer.getReader();
-        resource = resourceReader.read(IOUtils.toInputStream(resourceXml), site);
+        resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       } catch (IOException e) {
         logger.warn("Error reading resource {} from request", resourceURI);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

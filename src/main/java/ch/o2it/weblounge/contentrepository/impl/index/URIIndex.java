@@ -567,7 +567,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
 
     byte[] bytes = new byte[bytesPerPath];
     idx.read(bytes);
-    String line = new String(bytes, "UTF-8");
+    String line = new String(bytes, "utf-8");
     int delimiter = line.indexOf('\n');
     if (delimiter < 1)
       throw new IllegalStateException("Found path without delimiter");
