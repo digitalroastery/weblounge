@@ -304,5 +304,15 @@ public class CacheHandleImpl implements CacheHandle {
   public Iterator<CacheTag> tags() {
     return Collections.unmodifiableSet(tags).iterator();
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return getKey();
+  }
 
 }
