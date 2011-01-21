@@ -141,7 +141,7 @@ public class JSONResponseWrapper extends HttpServletResponseWrapper {
       if (StringUtils.isNotBlank(encoding)) {
         xml = new String(servletOutputStream.getBytes(), encoding);
       } else {
-        xml = new String(servletOutputStream.getBytes());
+        xml = new String(servletOutputStream.getBytes(), "utf-8");
       }
       JSONObject json = XML.toJSONObject(xml);
 
