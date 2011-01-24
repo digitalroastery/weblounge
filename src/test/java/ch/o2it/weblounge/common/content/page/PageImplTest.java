@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content.page;
 
+import static org.junit.Assert.assertNotNull;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -223,7 +225,7 @@ public class PageImplTest {
    */
   @Test
   public void testGetPreview() {
-    // FIXME Implement test case
+    assertNotNull(page.getPreview());
   }
 
   /**
