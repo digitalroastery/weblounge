@@ -1251,6 +1251,16 @@ public class LazyPageImpl implements Page {
   public int hashCode() {
     return uri.hashCode();
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return uri.toString();
+  }
 
   /**
    * {@inheritDoc}
