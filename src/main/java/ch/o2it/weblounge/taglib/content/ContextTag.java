@@ -68,7 +68,7 @@ public class ContextTag extends WebloungeTag {
 
   /** The parsed variable definitions */
   private ContextTagVariables variables = null;
-  
+
   /** Map of existing key-value pairs that are replaced */
   private Map<String, Object> existingVariables = new HashMap<String, Object>();
 
@@ -177,13 +177,13 @@ public class ContextTag extends WebloungeTag {
       pageContext.removeAttribute(ContextTagVariables.URL);
       pageContext.removeAttribute(ContextTagVariables.USER);
     }
-    
+
     // Restore former values
     for (Map.Entry<String, Object> entry : existingVariables.entrySet()) {
       pageContext.setAttribute(entry.getKey(), entry.getValue());
     }
 
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
   /**
@@ -216,7 +216,7 @@ public class ContextTag extends WebloungeTag {
     if (key == null)
       return;
     Object existingValue = pageContext.getAttribute(key);
-    
+
     // If there is a value already, keep it for later reference
     if (existingValue != null) {
       existingVariables.put(key, existingValue);
@@ -231,15 +231,16 @@ public class ContextTag extends WebloungeTag {
 
   /**
    * {@inheritDoc}
-   *
-   * @see javax.servlet.jsp.tagext.BodyTagSupport#release()
+   * 
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
    */
   @Override
-  public void release() {
-    super.release();
+  protected void reset() {
+    super.reset();
     definitions = null;
-    variables = null;
     existingVariables.clear();
+    uri = null;
+    variables = null;
   }
-  
+
 }

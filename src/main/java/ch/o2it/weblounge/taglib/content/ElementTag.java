@@ -207,9 +207,8 @@ public class ElementTag extends WebloungeTag {
     }
     if (name != null)
       pageContext.removeAttribute(name);
-    super.doEndTag();
-    reset();
-    return EVAL_PAGE;
+
+    return super.doEndTag();
   }
 
   /**

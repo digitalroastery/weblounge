@@ -111,6 +111,7 @@ public class PageHeaderTag extends WebloungeTag {
    * 
    * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
    */
+  @Override
   protected void reset() {
     super.reset();
     pageId = null;

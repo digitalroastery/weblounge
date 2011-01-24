@@ -36,6 +36,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
@@ -536,7 +537,7 @@ public class WebloungeTag extends BodyTagSupport {
 
   /**
    * Extract the wrapped <code>WebloungeResponse</code> from a <code>
-	 * ServletResponse</code>.
+   * ServletResponse</code>.
    * 
    * @param response
    *          the wrapping response
@@ -561,8 +562,7 @@ public class WebloungeTag extends BodyTagSupport {
 
   /**
    * Extract the wrapped <code>WebloungeRequest</code> from a <code>
-	 * ServletRequest</code>
-   * .
+   * ServletRequest</code> .
    * 
    * @param request
    *          the wrapping request
@@ -580,9 +580,20 @@ public class WebloungeTag extends BodyTagSupport {
 
     // Last resort
     if (request instanceof HttpServletRequest)
-      return new WebloungeRequestImpl((HttpServletRequest)request);
+      return new WebloungeRequestImpl((HttpServletRequest) request);
 
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doEndTag()
+   */
+  @Override
+  public int doEndTag() throws JspException {
+    reset();
+    return super.doEndTag();
   }
 
 }

@@ -57,7 +57,7 @@ public abstract class ActionRefreshTag extends WebloungeTag {
         }
       }
     }
-    return EVAL_BODY_INCLUDE;
+    return super.doEndTag();
   }
 
   /**

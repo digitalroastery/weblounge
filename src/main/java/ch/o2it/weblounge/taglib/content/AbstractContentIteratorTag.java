@@ -56,7 +56,7 @@ public abstract class AbstractContentIteratorTag extends WebloungeTag {
   protected int maxOccurs = -1;
 
   /** The pagelet from the request */
-  private Pagelet pagelet = null;
+  protected Pagelet pagelet = null;
 
   /**
    * Creates a new content iterator tag.
@@ -164,33 +164,19 @@ public abstract class AbstractContentIteratorTag extends WebloungeTag {
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
    */
-  public int doEndTag() throws JspException {
-    reset();
-    return super.doEndTag();
-  }
-
-  /**
-   * Method called when the tag is released to the pool.
-   * 
-   * @see javax.servlet.jsp.tagext.Tag#release()
-   */
-  public void release() {
-    reset();
-    super.release();
-  }
-
-  /**
-   * Initializes and resets this tag instance.
-   */
+  @Override
   protected void reset() {
     super.reset();
     elements.clear();
-    properties.clear();
     index = 0;
-    minOccurs = -1;
     maxOccurs = -1;
+    minOccurs = -1;
+    pagelet = null;
+    properties.clear();
   }
 
 }

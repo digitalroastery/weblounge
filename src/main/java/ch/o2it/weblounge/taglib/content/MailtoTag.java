@@ -104,14 +104,16 @@ public class MailtoTag extends WebloungeTag {
     } catch (IOException e) {
       logger.warn("Error when writing mailto tag: " + e.getMessage());
     }
-    super.doEndTag();
-    clear();
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
   /**
-	 */
-  public void clear() {
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
+   */
+  @Override
+  public void reset() {
     login = null;
   }
 

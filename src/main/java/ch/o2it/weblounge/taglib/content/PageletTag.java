@@ -130,8 +130,7 @@ public class PageletTag extends WebloungeTag {
         request.removeAttribute(WebloungeRequest.PAGELET);
       }
     }
-    reset();
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
   /**
@@ -170,14 +169,17 @@ public class PageletTag extends WebloungeTag {
   }
 
   /**
-   * Resets the state of this tag instance.
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
    */
+  @Override
   protected void reset() {
     super.reset();
-    module = null;
-    rendererId = null;
-    properties = null;
     elements = null;
+    module = null;
+    properties = null;
+    rendererId = null;
   }
 
 }

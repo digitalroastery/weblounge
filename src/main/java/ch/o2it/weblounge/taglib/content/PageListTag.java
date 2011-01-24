@@ -83,13 +83,13 @@ public class PageListTag extends WebloungeTag {
   private WebUrl url = null;
 
   /** List of required headlines */
-  private List<String> requireHeadlines = null;
+  private List<String> requiredPagelets = null;
 
   /**
    * Creates a new page header list tag.
    */
   public PageListTag() {
-    requireHeadlines = new ArrayList<String>();
+    requiredPagelets = new ArrayList<String>();
     subjects = new ArrayList<String>();
     reset();
   }
@@ -174,7 +174,7 @@ public class PageListTag extends WebloungeTag {
       String[] parts = headline.split("/");
       if (parts.length != 2)
         throw new IllegalArgumentException("Required headlines '" + value + "' are malformed. Required is 'module1/pagelet1, module2/pagelet2, ...");
-      requireHeadlines.add(headline);
+      requiredPagelets.add(headline);
     }
   }
 
@@ -213,7 +213,6 @@ public class PageListTag extends WebloungeTag {
     pageContext.removeAttribute(PageListTagExtraInfo.PREVIEW);
     pageContext.removeAttribute(PageListTagExtraInfo.PREVIEW_PAGE);
     request.setAttribute(WebloungeRequest.PAGELET, pagelet);
-    reset();
     return super.doEndTag();
   }
 
@@ -245,7 +244,7 @@ public class PageListTag extends WebloungeTag {
       }
       
       // Add the pagelets required on state
-      for (String headline : requireHeadlines) {
+      for (String headline : requiredPagelets) {
         String[] parts = headline.split("/");
         query.withPagelet(parts[0], parts[1]).inStage();
       }
@@ -292,25 +291,22 @@ public class PageListTag extends WebloungeTag {
   }
 
   /**
-   * Method called when the tag is released to the pool.
-   * 
-   * @see javax.servlet.jsp.tagext.Tag#release()
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
    */
-  public void release() {
-    reset();
-    super.release();
-  }
-
-  /**
-   * Initializes and resets this tag instance.
-   */
+  @Override
   protected void reset() {
     super.reset();
-    pages = null;
-    subjects.clear();
-    requireHeadlines.clear();
-    index = 0;
     count = 10;
+    index = 0;
+    page = null;
+    pagelet = null;
+    pages = null;
+    preview = null;
+    requiredPagelets.clear();
+    subjects.clear();
+    url = null;
   }
 
 }

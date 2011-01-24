@@ -34,7 +34,7 @@ public abstract class UserCheckTag extends WebloungeTag {
 
   /** Serial version uid */
   private static final long serialVersionUID = 6402453515629077507L;
-  
+
   /** The user identifier */
   private String user = null;
 
@@ -70,16 +70,9 @@ public abstract class UserCheckTag extends WebloungeTag {
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.Tag#doEndTag()
-   */
-  public int doEndTag() throws JspException {
-    reset();
-    return super.doEndTag();
-  }
-
-  /**
-   * Does the cleanup by resetting the instance variables to their initial
-   * values.
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
    */
   public void reset() {
     user = null;

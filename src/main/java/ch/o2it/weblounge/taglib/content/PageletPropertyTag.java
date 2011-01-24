@@ -73,7 +73,7 @@ public class PageletPropertyTag extends WebloungeTag {
         ((PageletTag) getParent()).setProperty(name, value);
       }
     }
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
 }

@@ -121,7 +121,7 @@ public class HTMLHeaderTag extends WebloungeTag {
       throw new JspException();
     }
 
-    return EVAL_BODY_INCLUDE;
+    return super.doEndTag();
   }
 
 }

@@ -159,9 +159,7 @@ public abstract class PropertyCheckTag extends WebloungeTag {
     if (name != null) {
       pageContext.removeAttribute(name);
     }
-    reset();
-    super.doEndTag();
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
   /**

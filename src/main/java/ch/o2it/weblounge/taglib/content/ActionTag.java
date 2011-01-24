@@ -196,13 +196,11 @@ public class ActionTag extends WebloungeTag {
       JspWriter out = pageContext.getOut();
       out.print(a.toString());
 
-      super.doEndTag();
     } catch (IOException e) {
       logger.warn("Error when writing action tag: " + e.getMessage());
-    } finally {
-      reset();
     }
-    return EVAL_PAGE;
+
+    return super.doEndTag();
   }
 
   /**

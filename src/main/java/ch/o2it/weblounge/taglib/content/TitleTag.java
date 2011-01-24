@@ -25,6 +25,9 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 
 import javax.servlet.jsp.JspException;
@@ -38,6 +41,9 @@ public class TitleTag extends WebloungeTag {
   /** Serial version uid */
   private static final long serialVersionUID = -2728129601060527783L;
 
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(TitleTag.class);
+
   /**
    * Writes the title tag to the output.
    * 
@@ -49,9 +55,9 @@ public class TitleTag extends WebloungeTag {
     try {
       pageContext.getOut().write(p.getTitle(l));
     } catch (IOException e) {
+      logger.warn("Error writing title element to page");
     }
-    super.doEndTag();
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
 }

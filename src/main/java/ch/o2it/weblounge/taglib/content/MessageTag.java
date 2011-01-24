@@ -125,7 +125,7 @@ public class MessageTag extends WebloungeTag {
       }
     }
 
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
 }

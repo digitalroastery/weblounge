@@ -38,38 +38,32 @@ import javax.servlet.jsp.JspWriter;
 /**
  * This tag provides an implementation for a link into the weblounge system. The
  * link consists mainly of the target site, and the target url.
- * 
- * @author Tobias Wunden <tobias.wunden@o2it.ch>
- * @version 1.0
  */
-
 public class LinkTag extends WebloungeTag {
 
   /** serial version id */
   private static final long serialVersionUID = 4109014697686228019L;
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(LinkTag.class);
+
   /** id of page to link */
-  private String resourceid_;
+  private String resourceid;
 
   /** link anchor */
-  private String anchor_;
+  private String anchor;
 
   /** link target */
-  private String target_;
-
-  // Logging
-
-  /** the logging facility provided by log4j */
-  private static final Logger log = LoggerFactory.getLogger(LinkTag.class);
+  private String target;
 
   /**
    * Sets the id of the page to link.
    * 
-   * @param page
-   *          id
+   * @param resourceid
+   *          the page identifier
    */
   public final void setResourceid(String resourceid) {
-    resourceid_ = resourceid;
+    this.resourceid = resourceid;
   }
 
   /**
@@ -79,7 +73,7 @@ public class LinkTag extends WebloungeTag {
    *          anchor on the target page
    */
   public final void setAnchor(String anchor) {
-    anchor_ = anchor;
+    this.anchor = anchor;
   }
 
   /**
@@ -95,7 +89,7 @@ public class LinkTag extends WebloungeTag {
    *          the target
    */
   public final void setTarget(String target) {
-    target_ = target;
+    this.target = target;
   }
 
   /**
@@ -106,17 +100,17 @@ public class LinkTag extends WebloungeTag {
 
     try {
       ContentRepository repo = ContentRepositoryFactory.getRepository(request.getSite());
-      Page page = (Page) repo.get(new PageURIImpl(request.getSite(), null, resourceid_));
+      Page page = (Page) repo.get(new PageURIImpl(request.getSite(), null, resourceid));
       String link = page.getURI().getPath();
 
       // anchor
-      if (anchor_ != null && anchor_.length() > 0)
-        link += "#" + anchor_;
+      if (anchor != null && anchor.length() > 0)
+        link += "#" + anchor;
 
       StringBuffer attributes = new StringBuffer();
 
       // target
-      attributes.append((target_ != null) ? "target=\"" + target_ + "\"" : "");
+      attributes.append((target != null) ? "target=\"" + target + "\"" : "");
 
       // Add tag attributes
       for (Map.Entry<String, String> attribute : getStandardAttributes().entrySet()) {
@@ -129,7 +123,7 @@ public class LinkTag extends WebloungeTag {
       return EVAL_BODY_INCLUDE;
 
     } catch (Throwable t) {
-      log.error("Error when evaluating starting tag: " + t.getMessage());
+      logger.error("Error when evaluating starting tag: " + t.getMessage(), t);
       return SKIP_BODY;
     }
   }
@@ -145,19 +139,18 @@ public class LinkTag extends WebloungeTag {
       writer.write("</a>");
       writer.flush();
     } catch (IOException e) {
+      logger.warn("Error writing link tag to page ", e);
     }
-    reset();
-    super.doEndTag();
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
   /**
    * @see javax.servlet.jsp.tagext.Tag#release()
    */
   public void reset() {
-    resourceid_ = null;
-    anchor_ = null;
-    target_ = null;
+    resourceid = null;
+    anchor = null;
+    target = null;
   }
 
 }

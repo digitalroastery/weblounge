@@ -25,6 +25,9 @@ import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -38,6 +41,9 @@ public class FormTag extends WebloungeTag {
 
   /** The serial version id */
   private static final long serialVersionUID = 5004974746165447409L;
+  
+  /** The logger */
+  private static Logger logger = LoggerFactory.getLogger(FormTag.class);
 
   /** Form method, POST, PUT etc */
   private String method = "post";
@@ -189,6 +195,7 @@ public class FormTag extends WebloungeTag {
       pageContext.getOut().write("</form>");
       reset();
     } catch (IOException e) {
+      logger.warn("Error writing form tag to page", e);
     }
     return super.doEndTag();
   }

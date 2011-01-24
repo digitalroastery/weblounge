@@ -337,6 +337,15 @@ public class PagePreviewTag extends WebloungeTag {
    * @return either EVAL_PAGE or SKIP_PAGE
    */
   public int doEndTag() throws JspException {
+
+    // If there is no page body, the doAfterBody() method will not be executed.
+    // Therefore, make sure we do it here.
+    if (pageletIndex < pagePreview.size()) {
+      while (doAfterBody() == EVAL_BODY_AGAIN) {
+        ;
+      }
+    }
+
     pageContext.removeAttribute(PagePreviewTagVariables.URL);
     pageContext.removeAttribute(PagePreviewTagVariables.PREVIEW);
     pageContext.removeAttribute(PagePreviewTagVariables.PAGELET);
@@ -345,22 +354,7 @@ public class PagePreviewTag extends WebloungeTag {
     request.setAttribute(WebloungeRequest.COMPOSER, oldComposer);
     request.setAttribute(WebloungeRequest.PAGELET, oldPagelet);
 
-    return EVAL_PAGE;
-  }
-
-  /**
-   * This method is called when this tag instance is released and put back into
-   * the pool.
-   * 
-   * @see javax.servlet.jsp.tagext.Tag#release()
-   */
-  public void release() {
-    super.release();
-    pageId = null;
-    stopMarker = Marker.None;
-    pageletIndex = 0;
-    previewElements.clear();
-    render = true;
+    return super.doEndTag();
   }
 
   /**
@@ -467,6 +461,28 @@ public class PagePreviewTag extends WebloungeTag {
     }
 
     return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+    page = null;
+    pageId = null;
+    pageletIndex = 0;
+    pagePreview = null;
+    pageUrl = null;
+    previewElements.clear();
+    stopMarker = Marker.None;
+    render = true;
+    endOfPreviewElement = null;
+    oldPage = null;
+    oldComposer = null;
+    oldPagelet = null;
   }
 
 }

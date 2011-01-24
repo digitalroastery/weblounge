@@ -61,8 +61,7 @@ public class I18nTag extends WebloungeTag {
     } catch (IOException e) {
       throw new JspException(e);
     }
-    super.doEndTag();
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
 }

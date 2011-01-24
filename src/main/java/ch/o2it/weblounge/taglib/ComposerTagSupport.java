@@ -222,7 +222,7 @@ public class ComposerTagSupport extends WebloungeTag {
     if (request.getVersion() == Resource.WORK && targetPage.isLocked()) {
       addCssClass(CLASS_LOCKED);
     }
-    
+
     // Add tag attributes
     for (Map.Entry<String, String> attribute : getStandardAttributes().entrySet()) {
       buf.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
@@ -609,7 +609,7 @@ public class ComposerTagSupport extends WebloungeTag {
           // Add pagelet and composer to the request
           request.setAttribute(WebloungeRequest.PAGELET, pagelet);
           request.setAttribute(WebloungeRequest.COMPOSER, composer);
-          
+
           doPagelet(pagelet, i, writer);
         }
 
@@ -649,10 +649,9 @@ public class ComposerTagSupport extends WebloungeTag {
         msg += " for action '" + action + "'";
       logger.error(msg, t);
       return EVAL_PAGE;
-    } finally {
-      reset();
     }
-    return EVAL_PAGE;
+
+    return super.doEndTag();
   }
 
   /**
@@ -857,19 +856,23 @@ public class ComposerTagSupport extends WebloungeTag {
   }
 
   /**
-   * Resets the properties of this tag to default values.
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
    */
+  @Override
   protected void reset() {
     super.reset();
     attributes.clear();
-    targetPage = null;
-    contentProvider = null;
-    pagelets = null;
-    description = null;
     contentInheritanceEnabled = false;
-    orientation = Orientation.Vertical;
-    renderingState = RenderingState.Outside;
+    contentProvider = null;
+    debug = false;
+    description = null;
     initialized = false;
+    orientation = Orientation.Vertical;
+    pagelets = null;
+    renderingState = RenderingState.Outside;
+    targetPage = null;
   }
 
 }

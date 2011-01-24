@@ -67,7 +67,7 @@ public class CacheTaggingTag extends WebloungeTag {
    */
   public int doEndTag() throws JspException {
     response.addTag(name, value);
-    return EVAL_PAGE;
+    return super.doEndTag();
   }
 
 }
