@@ -216,6 +216,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
         return null;
       }
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      if (serializer == null) {
+        logger.warn("No resource serializer for type '{}' found", uri.getType());
+        throw new ContentRepositoryException("No resource serializer for type '" + uri.getType() + "' found");
+      }
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
     } catch (Exception e) {
