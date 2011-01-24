@@ -269,6 +269,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         }
         DispatchUtils.sendInternalError(request, response);
       }
+
       return true;
     } catch (IOException e) {
       logger.error("I/O exception while sending error status: {}", e.getMessage(), e);

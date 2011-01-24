@@ -279,7 +279,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
       // Return the action
     } finally {
       try {
-        // action.passivate();
         pool.returnObject(action);
       } catch (Throwable t) {
         logger.error("Error returning action {} to pool: {}", new Object[] {
@@ -360,7 +359,6 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
             ((HTMLAction) action).startStage(request, response, c);
           }
           response.getWriter().print("\n\t</body>\n</html>");
-          response.flushBuffer();
         }
       }
     } catch (IOException e) {
