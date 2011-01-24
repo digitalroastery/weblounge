@@ -30,7 +30,6 @@ import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -187,7 +186,7 @@ public class HTMLActionTest extends IntegrationTestBase {
 
       // Make sure it is rendered on the home page
       String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
-      assertNull("Action is not rendered on configured page", StringUtils.isBlank(testSuiteTitle));
+      assertNull("Action is not rendered on configured page", testSuiteTitle);
 
     } catch (Exception e) {
       fail("Request to " + request.getURI() + " failed" + e.getMessage());
