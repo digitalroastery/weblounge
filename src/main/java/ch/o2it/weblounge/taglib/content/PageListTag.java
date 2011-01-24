@@ -50,7 +50,6 @@ import javax.servlet.jsp.JspException;
  * This tag is used to gather a list of pages satisfying certain criteria such
  * as the page type, search keywords etc.
  */
-
 public class PageListTag extends WebloungeTag {
 
   /** Serial version UID */

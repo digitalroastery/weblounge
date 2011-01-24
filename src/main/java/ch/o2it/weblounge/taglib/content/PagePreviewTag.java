@@ -40,6 +40,7 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,7 @@ public class PagePreviewTag extends WebloungeTag {
 
   /** Preview stop */
   private static enum Marker {
-    None, Lead, Marker
+    None, Elements, Endmarker, Pagepreview
   };
 
   /** The page */
@@ -86,10 +87,13 @@ public class PagePreviewTag extends WebloungeTag {
   private WebUrl pageUrl = null;
 
   /** The stop marker */
-  private Marker stopMarker = Marker.None;
+  private Marker stopMarker = Marker.Pagepreview;
 
   /** The lead elements */
-  private List<String> leadElements = null;
+  private List<String> previewElements = null;
+
+  /** The marker element */
+  private String endOfPreviewElement = null;
 
   /** True to have the tag render the contents */
   private boolean render = true;
@@ -110,7 +114,7 @@ public class PagePreviewTag extends WebloungeTag {
    * Creates a new page preview tag.
    */
   public PagePreviewTag() {
-    leadElements = new ArrayList<String>();
+    previewElements = new ArrayList<String>();
   }
 
   /**
@@ -120,6 +124,8 @@ public class PagePreviewTag extends WebloungeTag {
    *          the page identifier
    */
   public void setPageid(String value) {
+    if (StringUtils.isBlank(value))
+      return;
     pageId = value;
   }
 
@@ -131,34 +137,55 @@ public class PagePreviewTag extends WebloungeTag {
    * text/title, repository/image
    * </pre>
    * 
-   * 
    * @param value
    *          the lead elements
    */
-  public void setLead(String value) {
+  public void setElements(String value) {
+    if (StringUtils.isBlank(value))
+      return;
     StringTokenizer tok = new StringTokenizer(value, ",;");
     while (tok.hasMoreTokens()) {
       String element = tok.nextToken().trim();
       String[] parts = element.split("/");
       if (parts.length != 2)
-        throw new IllegalArgumentException("Lead elements '" + value + "' are malformed. Required is 'module1/pagelet1, module2/pagelet2, ...");
-      leadElements.add(element);
+        throw new IllegalArgumentException("Preview elements '" + value + "' are malformed. Required is 'module1/pagelet1, module2/pagelet2, ...");
+      previewElements.add(element);
     }
   }
 
   /**
-   * Sets the end method.
+   * Sets the preview type. The value needs to be one of
+   * <ul>
+   * <li><code>None</code> - All elements of the page's stage composer are
+   * included</li>
+   * <li><code>Elements</code> - Only elements of the given types are included</li>
+   * <li><code>End</code> - All elements up until the appearance of the stop
+   * marker are included</li>
+   * <li><code>PagePreview - The page preview elements are included</code></li>
+   * </ul>
+   */
+  public void setType(String value) {
+    stopMarker = Marker.valueOf(StringUtils.capitalize(value.toLowerCase()));
+  }
+
+  /**
+   * Defines the element that marks the end of the page preview. The element
+   * needs to be passed in as comma separated strings, e. g.
+   * 
+   * <pre>
+   * text / title
+   * </pre>
    * 
    * @param value
-   *          the stop value
+   *          the end element
    */
   public void setEnd(String value) {
-    if ("lead".equalsIgnoreCase(value))
-      stopMarker = Marker.Lead;
-    else if ("marker".equalsIgnoreCase(value))
-      stopMarker = Marker.Marker;
-    else
-      stopMarker = Marker.None;
+    if (StringUtils.isBlank(value))
+      return;
+    String[] parts = value.split("/");
+    if (parts.length != 2)
+      throw new IllegalArgumentException("Preview end element '" + value + "' is malformed. Expecting '<module>/<pagelet>'");
+    endOfPreviewElement = value;
   }
 
   /**
@@ -170,6 +197,8 @@ public class PagePreviewTag extends WebloungeTag {
    *          <code>true</code> to have the tag render the content
    */
   public void setRender(String render) {
+    if (StringUtils.isBlank(render))
+      return;
     this.render = Boolean.parseBoolean(render);
   }
 
@@ -209,37 +238,56 @@ public class PagePreviewTag extends WebloungeTag {
       }
 
       pageUrl = new WebUrlImpl(site, page.getURI().getPath());
-      PageTemplate template = site.getTemplate(page.getTemplate());
-      if (template == null) {
-        logger.error("No page template found for {}", pageURI);
-        return EVAL_PAGE;
-      }
-
-      String stage = template.getStage();
-      if (stage == null) {
-        logger.error("No stage defined for page template '{}'", template);
-        return EVAL_PAGE;
-      }
-
-      // Read pagelets
-      List<Pagelet> pagelets = new ArrayList<Pagelet>();
-      switch (stopMarker) {
-        case Lead:
-          for (Pagelet p : page.getPagelets(stage)) {
-            if (leadElements.contains(p.toString())) {
-              pagelets.add(p);
-            }
-          }
-          break;
-        case Marker:
-          pagelets.addAll(Arrays.asList(page.getPreview()));
-          break;
-        default:
-          pagelets.addAll(Arrays.asList(page.getPagelets(stage)));
-      }
-
-      pagePreview = new ComposerImpl("preview", pagelets);
     }
+
+    PageTemplate template = site.getTemplate(page.getTemplate());
+    if (template == null) {
+      logger.error("No page template found for {}", page);
+      return EVAL_PAGE;
+    }
+
+    String stage = template.getStage();
+    if (stage == null) {
+      logger.error("No stage defined for page template '{}'", template);
+      return EVAL_PAGE;
+    }
+
+    // Read pagelets
+    List<Pagelet> pagelets = new ArrayList<Pagelet>();
+    switch (stopMarker) {
+      case None:
+        pagelets.addAll(Arrays.asList(page.getPagelets(stage)));
+        break;
+      case Elements:
+        if (previewElements == null || previewElements.size() == 0)
+          throw new IllegalStateException("No preview elements set");
+        for (Pagelet p : page.getPagelets(stage)) {
+          if (previewElements.contains(p.toString())) {
+            pagelets.add(p);
+          }
+        }
+        break;
+      case Endmarker:
+        if (StringUtils.isBlank(endOfPreviewElement))
+          throw new IllegalStateException("No stop marker element set");
+        for (Pagelet p : page.getPagelets(stage)) {
+          if (endOfPreviewElement.equals(p.toString())) {
+            break;
+          }
+          pagelets.add(p);
+        }
+        break;
+      case Pagepreview:
+        pagelets.addAll(Arrays.asList(page.getPreview()));
+        break;
+      default:
+        throw new IllegalStateException("Don't know how to handle stop marker '" + stopMarker + "'");
+    }
+
+    if (pagelets.size() == 0)
+      return SKIP_BODY;
+
+    pagePreview = new ComposerImpl("preview", pagelets);
 
     // Store old page, composer and pagelet for later reference
     oldPage = request.getAttribute(WebloungeRequest.PAGE);
@@ -257,9 +305,7 @@ public class PagePreviewTag extends WebloungeTag {
     // Add included page url to tags
     response.addTag(CacheTag.Url, pageUrl.getLink());
 
-    if (pagePreview.size() == 0)
-      return SKIP_BODY;
-    
+    // Handle the first pagelet, we'll do the others
     pageletIndex = 0;
     handlePagelet(pageletIndex);
 
@@ -313,7 +359,7 @@ public class PagePreviewTag extends WebloungeTag {
     pageId = null;
     stopMarker = Marker.None;
     pageletIndex = 0;
-    leadElements.clear();
+    previewElements.clear();
     render = true;
   }
 
