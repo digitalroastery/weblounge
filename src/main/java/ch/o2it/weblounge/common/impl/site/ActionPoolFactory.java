@@ -68,6 +68,12 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
     
     Action action = blueprint.getClass().newInstance();
     
+    // Module
+    action.setModule(blueprint.getModule());
+    
+    // Site
+    action.setSite(blueprint.getSite());
+
     // Identifier
     action.setIdentifier(blueprint.getIdentifier());
 
@@ -93,7 +99,7 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
 
     // Are we looking at an html action?
     if (blueprint instanceof HTMLAction) {
-      HTMLAction htmlBlueprint = (HTMLAction)action;
+      HTMLAction htmlBlueprint = (HTMLAction)blueprint;
       HTMLAction htmlAction = (HTMLAction)action;
 
       // Page URI
@@ -110,12 +116,6 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
     for (Language l : blueprint.languages()) {
       action.setName(blueprint.getName(l), l);
     }
-    
-    // Module
-    action.setModule(blueprint.getModule());
-    
-    // Site
-    action.setSite(blueprint.getSite());
 
     return action;
   }

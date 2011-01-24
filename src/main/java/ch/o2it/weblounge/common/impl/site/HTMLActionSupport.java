@@ -232,6 +232,9 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
    * @see ch.o2it.weblounge.common.site.Action#getPageURI()
    */
   public ResourceURI getPageURI() {
+    if (pageURI == null && site != null && StringUtils.isNotBlank(targetPath)) {
+      pageURI = new PageURIImpl(site, targetPath);
+    }
     return pageURI;
   }
 
