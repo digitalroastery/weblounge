@@ -23,12 +23,14 @@ package ch.o2it.weblounge.test.harness.content;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -56,6 +58,9 @@ public class HTMLActionTest extends IntegrationTestBase {
       "/greeting/",
       "/greeting/html" };
 
+  /** The path to targeted action */
+  private static final String targetedActionPath = "/greeting-targeted/";
+
   /**
    * Creates a new instance of the <code>HTML</code> action test.
    */
@@ -81,6 +86,17 @@ public class HTMLActionTest extends IntegrationTestBase {
    * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
+    testParametersAndLanguage(serverUrl);
+    testConfiguredTargetPage(serverUrl);
+    testOverridenTargetPage(serverUrl);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
+   */
+  private void testParametersAndLanguage(String serverUrl) throws Exception {
     logger.info("Preparing test of greeter action");
 
     // Load the test data
@@ -112,6 +128,10 @@ public class HTMLActionTest extends IntegrationTestBase {
           assertNotNull("General template output does not work", templateOutput);
           assertEquals("Template title is not as expected", "Welcome to Weblounge", templateOutput);
 
+          // Make sure it is rendered on the home page
+          String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
+          assertEquals("Action is not rendered on start page", "Welcome to the Weblounge 3.0 testpage!", testSuiteTitle);
+
           // Look for action parameter handling and direct output of
           // startState()
           String actualGreeting = XPathHelper.valueOf(xml, "/html/body/div[@id='main']/h1");
@@ -138,6 +158,79 @@ public class HTMLActionTest extends IntegrationTestBase {
           httpClient.getConnectionManager().shutdown();
         }
       }
+    }
+  }
+
+  /**
+   * Tests whether actions are rendered on pages as configured in module.xml
+   * 
+   * @param serverUrl
+   *          the server url
+   */
+  private void testConfiguredTargetPage(String serverUrl) {
+    logger.info("Preparing test of greeter action");
+
+    // Prepare the request
+    logger.info("Testing action target page configuration");
+
+    HttpGet request = new HttpGet(UrlUtils.concat(serverUrl, targetedActionPath));
+
+    // Send the request and make sure it ends up on the expected page
+    logger.info("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Get the document contents
+      Document xml = TestSiteUtils.parseXMLResponse(response);
+
+      // Make sure it is rendered on the home page
+      String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
+      assertNull("Action is not rendered on configured page", StringUtils.isBlank(testSuiteTitle));
+
+    } catch (Exception e) {
+      fail("Request to " + request.getURI() + " failed" + e.getMessage());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+
+  /**
+   * Tests whether action output can be redirected to certain pages by providing
+   * a target url.
+   * 
+   * @param serverUrl
+   *          the server url
+   */
+  private void testOverridenTargetPage(String serverUrl) {
+    logger.info("Preparing test of greeter action");
+
+    // Prepare the request
+    logger.info("Testing action target page overriding");
+
+    StringBuffer requestUrl = new StringBuffer(targetedActionPath);
+    requestUrl.append("?target-url=/");
+    HttpGet request = new HttpGet(UrlUtils.concat(serverUrl, requestUrl.toString()));
+
+    // Send the request and make sure it ends up on the expected page
+    logger.info("Sending request to {}", request.getURI());
+    HttpClient httpClient = new DefaultHttpClient();
+    try {
+      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+
+      // Get the document contents
+      Document xml = TestSiteUtils.parseXMLResponse(response);
+
+      // Make sure it is rendered on the home page
+      String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
+      assertEquals("Action is not rendered on start page", "Welcome to the Weblounge 3.0 testpage!", testSuiteTitle);
+
+    } catch (Exception e) {
+      fail("Request to " + request.getURI() + " failed" + e.getMessage());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
     }
   }
 
