@@ -23,6 +23,7 @@ package ch.o2it.weblounge.workbench.endpoint;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.kernel.SiteManager;
 import ch.o2it.weblounge.workbench.PageletEditor;
@@ -115,7 +116,7 @@ public class WorkbenchEndpoint {
    */
   protected Site getSite(HttpServletRequest request)
       throws WebApplicationException {
-    Site site = sites.findSiteByName(request.getServerName());
+    Site site = sites.findSiteByURL(UrlUtils.toURL(request, false, false));
     if (site == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
     } else if (!site.isRunning()) {

@@ -98,6 +98,7 @@
               ch.o2it.weblounge.common.content;version="${project.version}",
               ch.o2it.weblounge.common.content.page;version="${project.version}",
               ch.o2it.weblounge.common.impl.content.page;version="${project.version}",
+              ch.o2it.weblounge.common.impl.url;version="${project.version}",
               ch.o2it.weblounge.common.impl.util.doc;version="${project.version}",
               ch.o2it.weblounge.common.site;version="${project.version}",
               ch.o2it.weblounge.contentrepository;version="${project.version}",
