@@ -31,6 +31,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -145,29 +146,31 @@ public class SiteManager {
    * please pass in <code>www.o2it.ch</code> instead of
    * <code>www.o2it.ch/</code>.
    * 
-   * @param serverName
-   *          the server name, e.g. <code>www.o2it.ch</code>
+   * @param url
+   *          the site url, e.g. <code>http://www.o2it.ch</code>
    * @return the site
    */
-  public Site findSiteByName(String serverName) {
-    Site site = sitesByServerName.get(serverName);
+  public Site findSiteByURL(URL url) {
+    Site site = sitesByServerName.get(url);
     if (site != null)
       return site;
+    
+    String hostName = url.getHost();
 
     // There is obviously no direct match. Therefore, try to find a
     // wildcard match
     for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
-      String alias = e.getKey();
+      String siteUrl = e.getKey();
 
       try {
         // convert the host wildcard (ex. *.domain.tld) to a valid regex (ex.
         // .*\.domain\.tld)
-        alias = alias.replace(".", "\\.");
+        String alias = siteUrl.replace(".", "\\.");
         alias = alias.replace("*", ".*");
-        if (serverName.matches(alias)) {
+        if (hostName.matches(alias)) {
           site = e.getValue();
-          logger.info("Registering {} for site ", serverName, site);
-          sitesByServerName.put(serverName, site);
+          logger.info("Registering {} for site ", url, site);
+          sitesByServerName.put(hostName, site);
           return site;
         }
       } catch (PatternSyntaxException ex) {
@@ -175,7 +178,7 @@ public class SiteManager {
       }
     }
 
-    logger.debug("Lookup for {} did not match any site", serverName);
+    logger.debug("Lookup for {} did not match any site", url);
     return null;
   }
 
@@ -214,12 +217,14 @@ public class SiteManager {
     synchronized (sites) {
       sites.add(site);
       siteBundles.put(site, reference.getBundle());
-      for (String name : site.getHostNames()) {
-        if (site.equals(sitesByServerName.get(name))) {
-          logger.error("Another site is already registered to " + name);
+      for (URL url : site.getURLs()) {
+        String hostName = url.getHost();
+        Site registeredFirst = sitesByServerName.get(hostName);
+        if (registeredFirst != null && !site.equals(registeredFirst)) {
+          logger.error("Another site is already registered to " + url);
           continue;
         }
-        sitesByServerName.put(name, site);
+        sitesByServerName.put(hostName, site);
       }
     }
 
@@ -276,14 +281,12 @@ public class SiteManager {
     synchronized (sites) {
       sites.remove(site);
       siteBundles.remove(site);
-      List<String> namesToRemove = new ArrayList<String>();
-      for (Map.Entry<String, Site> entry : sitesByServerName.entrySet()) {
-        if (site.equals(entry.getValue())) {
-          namesToRemove.add(entry.getKey());
+      Iterator<Site> si = sitesByServerName.values().iterator();
+      while (si.hasNext()) {
+        Site s = si.next();
+        if (site.equals(s)) {
+          si.remove();
         }
-      }
-      for (String serverName : namesToRemove) {
-        sitesByServerName.remove(serverName);
       }
     }
 
