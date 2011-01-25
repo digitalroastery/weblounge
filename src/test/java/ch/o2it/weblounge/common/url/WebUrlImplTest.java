@@ -35,6 +35,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URL;
+
 /**
  * Test cases for the web url implementation.
  */
@@ -74,7 +76,7 @@ public class WebUrlImplTest {
   protected WebUrlImpl flavoredLocalizedVersionedUrl = null;
 
   /** Site hostname */
-  protected String hostname = "www.test.com";
+  protected URL siteUrl = null;
 
   /** Default url path */
   protected String livePath = "/test/";
@@ -132,10 +134,12 @@ public class WebUrlImplTest {
    */
   @Before
   public void setUp() throws Exception {
+    siteUrl = new URL("http://www.test.com");
+    
     siteMock = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(siteMock.getLanguage("de")).andReturn(german).anyTimes();
     EasyMock.expect(siteMock.getDefaultLanguage()).andReturn(english);
-    EasyMock.expect(siteMock.getHostName()).andReturn(hostname).anyTimes();
+    EasyMock.expect(siteMock.getURL()).andReturn(siteUrl).anyTimes();
     EasyMock.replay(siteMock);
     otherSiteMock = EasyMock.createNiceMock(Site.class);
 
@@ -323,10 +327,10 @@ public class WebUrlImplTest {
    */
   @Test
   public void testNormalize() {
-    assertEquals(UrlUtils.concat(hostname, segmentedPath), liveUrl.normalize());
-    assertEquals(UrlUtils.concat(hostname, flavoredSegmentedPath), flavoredSegmentedLiveUrl.normalize());
-    assertEquals(UrlUtils.concat(hostname, localizedSegmentedPath), localizedSegmentedLiveUrl.normalize());
-    assertEquals(UrlUtils.concat(hostname, flavoredLocalizedSegmentedPath), flavoredLocalizedSegmentedLiveUrl.normalize());
+    assertEquals(UrlUtils.concat(siteUrl.toExternalForm(), segmentedPath), liveUrl.normalize());
+    assertEquals(UrlUtils.concat(siteUrl.toExternalForm(), flavoredSegmentedPath), flavoredSegmentedLiveUrl.normalize());
+    assertEquals(UrlUtils.concat(siteUrl.toExternalForm(), localizedSegmentedPath), localizedSegmentedLiveUrl.normalize());
+    assertEquals(UrlUtils.concat(siteUrl.toExternalForm(), flavoredLocalizedSegmentedPath), flavoredLocalizedSegmentedLiveUrl.normalize());
   }
 
   /**
@@ -337,7 +341,7 @@ public class WebUrlImplTest {
   @Test
   public void testNormalizeBooleanBooleanBoolean() {
     WebUrl url = flavoredLocalizedVersionedUrl;
-    String fullUrl = UrlUtils.concat(hostname, flavoredLocalizedVersionedPath);
+    String fullUrl = UrlUtils.concat(siteUrl.toExternalForm(), flavoredLocalizedVersionedPath);
     assertEquals(fullUrl, url.normalize(true, true, true, true));
 
     // Everything

@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.site;
 
+import static org.junit.Assert.assertNull;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -128,13 +130,13 @@ public class SiteImplTest {
   protected List<String> hostnames = new ArrayList<String>();
 
   /** Default hostname */
-  protected String defaultHostname = "www.weblounge.org";
+  protected URL defaultURL = null;
 
   /** Default hostname */
-  protected String fallbackHostname = "*.nowhere.com";
+  protected URL fallbackURL = null;
 
   /** Default hostname */
-  protected String localhost = "localhost:8080";
+  protected URL localhost = null;
 
   /** Portrait image style */
   protected ImageStyle portraitImageStyle = null;
@@ -172,9 +174,9 @@ public class SiteImplTest {
     site.addTemplate(mobileTemplate);
     site.setDefaultLanguage(German);
     site.addLanguage(English);
-    site.setDefaultHostname(defaultHostname);
-    site.addHostName(fallbackHostname);
-    site.addHostName(localhost);
+    site.setDefaultURL(defaultURL);
+    site.addURL(fallbackURL);
+    site.addURL(localhost);
     site.addAuthenticationModule(adminAuthenticationModule);
   }
 
@@ -184,6 +186,11 @@ public class SiteImplTest {
    * @throws Exception
    */
   protected void setupPrerequisites() throws Exception {
+    // Urls
+    defaultURL = new URL("http://www.weblounge.org");
+    fallbackURL = new URL("http://*.nowhere.com");
+    localhost = new URL("http://localhost:8080");
+    
     // Administrator
     administrator = new WebloungeAdminImpl(administratorLogin);
     administrator.setName(administratorName);
@@ -421,39 +428,39 @@ public class SiteImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeHostname(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#removeURL(URL)}
    * .
    */
   @Test
-  public void testRemoveHostname() {
-    site.removeHostname("test");
-    assertEquals(3, site.getHostNames().length);
-    site.removeHostname(defaultHostname);
-    assertEquals(2, site.getHostNames().length);
+  public void testRemoveURL() throws Exception {
+    site.removeURL(new URL("http://test"));
+    assertEquals(3, site.getURLs().length);
+    site.removeURL(defaultURL);
+    assertEquals(2, site.getURLs().length);
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getHostNames()}.
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getURLs()}.
    */
   @Test
-  public void testGetHostNames() {
-    assertEquals(3, site.getHostNames().length);
-    assertEquals(defaultHostname, site.getHostNames()[0]);
-    assertEquals(fallbackHostname, site.getHostNames()[1]);
-    assertEquals(localhost, site.getHostNames()[2]);
+  public void testGetURLs() {
+    assertEquals(3, site.getURLs().length);
+    assertEquals(defaultURL, site.getURLs()[0]);
+    assertEquals(fallbackURL, site.getURLs()[1]);
+    assertEquals(localhost, site.getURLs()[2]);
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getHostName()}.
+   * {@link ch.o2it.weblounge.common.impl.site.SiteImpl#getURL()}.
    */
   @Test
-  public void testGetHostName() {
-    assertEquals(defaultHostname, site.getHostName());
-    site.removeHostname(defaultHostname);
-    assertEquals(2, site.getHostNames().length);
-    assertTrue(site.getHostName() == null);
+  public void testGetURL() {
+    assertEquals(defaultURL, site.getURL());
+    site.removeURL(defaultURL);
+    assertEquals(2, site.getURLs().length);
+    assertTrue(site.getURL() == null);
   }
 
   /**
@@ -462,11 +469,11 @@ public class SiteImplTest {
    */
   @Test
   public void testGetUrl() {
-    assertEquals(defaultHostname, site.getUrl().getPath());
-    site.removeHostname(defaultHostname);
-    site.removeHostname(fallbackHostname);
-    site.removeHostname(localhost);
-    assertTrue(site.getUrl() == null);
+    assertEquals(defaultURL, site.getURL());
+    site.removeURL(defaultURL);
+    site.removeURL(fallbackURL);
+    site.removeURL(localhost);
+    assertNull(site.getURL());
   }
 
   /**

@@ -154,7 +154,7 @@ public class ModuleImpl implements Module {
       return url;
     if (site == null)
       throw new IllegalStateException("Site has not yet been set");
-    url = new WebUrlImpl(site, UrlUtils.concat(site.getUrl().getPath(), "module", identifier));
+    url = new WebUrlImpl(site, UrlUtils.concat(site.getURL().toExternalForm(), "module", identifier));
     return url;
   }
 

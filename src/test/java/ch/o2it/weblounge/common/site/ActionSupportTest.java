@@ -38,6 +38,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URL;
+
 /**
  * Test case for {@link ActionSupport}.
  */
@@ -115,7 +117,7 @@ public class ActionSupportTest {
   protected void setUpPreliminaries() throws Exception {
     // site
     site = EasyMock.createNiceMock(Site.class);
-    EasyMock.expect(site.getUrl()).andReturn(new WebUrlImpl(site, siteUrl));
+    EasyMock.expect(site.getURL()).andReturn(new URL(siteUrl));
     EasyMock.replay(site);
 
     // module

@@ -74,6 +74,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -151,10 +152,10 @@ public class SiteImpl implements Site {
   protected Map<String, Module> modules = null;
 
   /** The default hostname */
-  protected String defaultHostname = "localhost";
+  protected URL defaultURL = null;
 
   /** Ordered list of site urls */
-  protected List<String> hostnames = null;
+  protected List<URL> urls = null;
 
   /** Jobs */
   protected Map<String, QuartzJob> jobs = null;
@@ -198,7 +199,7 @@ public class SiteImpl implements Site {
     templates = new HashMap<String, PageTemplate>();
     layouts = new HashMap<String, PageLayout>();
     modules = new HashMap<String, Module>();
-    hostnames = new ArrayList<String>();
+    urls = new ArrayList<URL>();
     jobs = new HashMap<String, QuartzJob>();
     authenticationModules = new ArrayList<AuthenticationModule>();
     i18n = new I18nDictionaryImpl();
@@ -474,56 +475,58 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#setDefaultHostname(java.lang.String)
+   * @see ch.o2it.weblounge.common.site.Site#setDefaultURL(URL)
    */
-  public void setDefaultHostname(String hostname) {
-    defaultHostname = hostname;
-    url = null;
-    if (hostname != null)
-      addHostName(hostname);
+  public void setDefaultURL(URL url) {
+    defaultURL = url;
+    if (url != null)
+      addURL(url);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#addHostName(java.lang.String)
+   * @see ch.o2it.weblounge.common.site.Site#addURL(URL)
    */
-  public void addHostName(String hostname) {
-    if (hostname == null)
+  public void addURL(URL url) {
+    if (url == null)
+      throw new IllegalArgumentException("Url must not be null");
+    urls.add(url);
+
+    // Make sure we have a default URL
+    if (defaultURL == null)
+      defaultURL = url;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Site#removeURL(URL)
+   */
+  public boolean removeURL(URL url) {
+    if (url == null)
       throw new IllegalArgumentException("Hostname must not be null");
-    hostnames.add(hostname);
+    if (url.equals(defaultURL))
+      defaultURL = null;
+    return urls.remove(url);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#removeHostname(java.lang.String)
+   * @see ch.o2it.weblounge.common.site.Site#getURLs()
    */
-  public boolean removeHostname(String hostname) {
-    if (hostname == null)
-      throw new IllegalArgumentException("Hostname must not be null");
-    if (hostname.equals(defaultHostname))
-      defaultHostname = null;
-    url = null;
-    return hostnames.remove(hostname);
+  public URL[] getURLs() {
+    return urls.toArray(new URL[urls.size()]);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#getHostNames()
+   * @see ch.o2it.weblounge.common.site.Site#getURL()
    */
-  public String[] getHostNames() {
-    return hostnames.toArray(new String[hostnames.size()]);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#getHostName()
-   */
-  public String getHostName() {
-    return defaultHostname;
+  public URL getURL() {
+    return defaultURL;
   }
 
   /**
@@ -562,9 +565,9 @@ public class SiteImpl implements Site {
   public WebUrl getUrl() {
     if (url != null)
       return url;
-    if (defaultHostname == null)
+    if (defaultURL == null)
       return null;
-    url = new WebUrlImpl(this, defaultHostname);
+    url = new WebUrlImpl(this, defaultURL.getPath());
     return url;
   }
 
@@ -1337,12 +1340,17 @@ public class SiteImpl implements Site {
     NodeList urlNodes = XPathHelper.selectList(config, "ns:domains/ns:url", xpathProcessor);
     if (urlNodes.getLength() == 0)
       throw new IllegalStateException("Site '" + identifier + " has no hostname");
-    for (int i = 0; i < urlNodes.getLength(); i++) {
-      String url = urlNodes.item(i).getFirstChild().getNodeValue();
-      if (ConfigurationUtils.isDefault(urlNodes.item(i)))
-        site.setDefaultHostname(url);
-      else
-        site.addHostName(url);
+    String url = null;
+    try {
+      for (int i = 0; i < urlNodes.getLength(); i++) {
+        url = urlNodes.item(i).getFirstChild().getNodeValue();
+        if (ConfigurationUtils.isDefault(urlNodes.item(i)))
+          site.setDefaultURL(new URL(url));
+        else
+          site.addURL(new URL(url));
+      }
+    } catch (MalformedURLException e) {
+      throw new IllegalStateException("Site '" + identifier + "' defines malformed url: " + url);
     }
 
     // languages
@@ -1435,14 +1443,14 @@ public class SiteImpl implements Site {
     }
 
     // hostnames
-    if (hostnames.size() > 0) {
+    if (urls.size() > 0) {
       b.append("<domains>");
-      for (String hostname : hostnames) {
+      for (URL url : urls) {
         b.append("<url");
-        if (hostname.equals(defaultHostname))
+        if (url.equals(defaultURL))
           b.append(" default=\"true\"");
         b.append(">");
-        b.append(hostname);
+        b.append(url.toExternalForm());
         b.append("</url>");
       }
       b.append("</domains>");

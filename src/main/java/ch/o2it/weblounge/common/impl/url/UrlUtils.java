@@ -25,8 +25,12 @@ import ch.o2it.weblounge.common.site.Site;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.TreeSet;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <code>UrlUtils</code> is a helper class to deal with urls.
@@ -62,8 +66,8 @@ public final class UrlUtils {
   }
 
   /**
-   * Concatenates the url elements with respect to leading and trailing slashes. The
-   * path will always end with a trailing slash.
+   * Concatenates the url elements with respect to leading and trailing slashes.
+   * The path will always end with a trailing slash.
    * 
    * @param urlElements
    *          the path elements
@@ -340,6 +344,35 @@ public final class UrlUtils {
       return original.charAt(i);
     }
     return null;
+  }
+
+  /**
+   * Returns the request url as a string.
+   * 
+   * @param request
+   *          the request
+   * @param includePath
+   *          <code>true</code> to also include the request uri
+   * @param includeQuery
+   *          <code>true</code> to include the query string
+   * @return the url as a string
+   */
+  public static URL toURL(HttpServletRequest request, boolean includePath,
+      boolean includeQuery) {
+    try {
+      StringBuffer buf = new StringBuffer(request.getScheme());
+      buf.append("://");
+      buf.append(request.getServerName());
+      if (request.getServerPort() != 80)
+        buf.append(":").append(request.getServerPort());
+      if (includePath && request.getRequestURI() != null)
+        buf.append(request.getRequestURI());
+      if (includeQuery && StringUtils.isNotBlank(request.getQueryString()))
+        buf.append(request.getQueryString());
+      return new URL(buf.toString());
+    } catch (MalformedURLException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
 }

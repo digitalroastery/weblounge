@@ -7,9 +7,9 @@
     <language>en</language>
   </languages>
   <domains>
-  	<url default="true">www.weblounge.org</url>
-  	<url>*.nowhere.com</url>
-    <url>localhost:8080</url>
+  	<url default="true">http://www.weblounge.org</url>
+  	<url>http://*.nowhere.com</url>
+    <url>http://localhost:8080</url>
   </domains>
   <security>
     <administrator>

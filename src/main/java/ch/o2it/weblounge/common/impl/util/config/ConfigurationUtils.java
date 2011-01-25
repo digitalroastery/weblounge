@@ -28,12 +28,13 @@ import ch.o2it.weblounge.common.site.Site;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -562,11 +563,10 @@ public final class ConfigurationUtils {
 
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
-    String hostname = site.getHostName();
-    String port = request.getLocalPort() != 80 ? ":" + request.getLocalPort() : "";
+    URL url = site.getURL();
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append("http://").append(hostname).append(port);
+    siteRootReplacement.append(url.toExternalForm());
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
 
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
@@ -601,11 +601,10 @@ public final class ConfigurationUtils {
 
     Map<String, String> replacements = new HashMap<String, String>();
     Site site = request.getSite();
-    String hostname = site.getHostName();
-    String port = request.getLocalPort() != 80 ? ":" + request.getLocalPort() : "";
+    URL url = site.getURL();
 
     StringBuffer siteRootReplacement = new StringBuffer();
-    siteRootReplacement.append("http://").append(hostname).append(port);
+    siteRootReplacement.append(url);
     siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
     replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
 
