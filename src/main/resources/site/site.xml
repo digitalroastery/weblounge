@@ -9,9 +9,9 @@
     <language>en</language>
   </languages>
   <domains>
-    <url>127.0.0.1</url>
-    <url>test</url>
-    <url>localhost</url>
+    <url>http://127.0.0.1:8080</url>
+    <url>http://test:8080</url>
+    <url>http://localhost:8080</url>
   </domains>
   <security>
     <administrator>
