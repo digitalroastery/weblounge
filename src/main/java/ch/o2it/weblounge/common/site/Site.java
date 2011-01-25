@@ -29,10 +29,10 @@ import ch.o2it.weblounge.common.security.AuthenticationModule;
 import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
-import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import java.io.Serializable;
+import java.net.URL;
 
 /**
  * The site interface defines the method that may be called on weblounge site
@@ -306,62 +306,46 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * Sets a default hostname for the site. This hostname is used when links are
    * being generated for the site.
    * 
-   * @param hostname
+   * @param url
    *          the default hostname
    */
-  void setDefaultHostname(String hostname);
+  void setDefaultURL(URL url);
 
   /**
    * Adds <code>hostname</code> to the list of hostnames. Note that the hostname
    * that is added first will be considered the default hostname for this site.
    * 
-   * @param hostname
+   * @param url
    *          the hostname to add
    */
-  void addHostName(String hostname);
+  void addURL(URL url);
 
   /**
    * Removes <code>hostname</code> from the list of hostnames. The method
    * returns <code>true</code> if the hostname was found and removed,
    * <code>false</code> otherwise.
    * 
-   * @param hostname
+   * @param url
    *          the hostname to remove
    * @return <code>true</code> if the hostname was removed
    */
-  boolean removeHostname(String hostname);
+  boolean removeURL(URL url);
 
   /**
-   * Returns the default hostname used to reach this site. This method will
-   * return the complete hostname as found in the <code>&lt;name&gt;</code>
-   * section of <code>site.xml</code>.
+   * Returns the primary url used to reach this site. This method will return
+   * the default url as found in the <code>&lt;url&gt;</code> section of
+   * <code>site.xml</code>.
    * 
-   * @return the site's server name
+   * @return the site's primary url
    */
-  String getHostName();
+  URL getURL();
 
   /**
-   * Returns the server names that will lead to this site. A server name is the
-   * first part of a url. For example, in <tt>http://www.o2it.ch/weblounge</tt>,
-   * <tt>www.o2it.ch</code> is the server name.
+   * Returns the urls that will lead to this site.
    * 
-   * @return the registered server names
+   * @return the registered site urls
    */
-  String[] getHostNames();
-
-  /**
-   * Returns the absolute link which can be used to reach this site. This method
-   * will return the complete hostname as found in the <code>&lt;name&gt;</code>
-   * section of <code>site.xml</code>
-   * <p>
-   * If the site is mounted to the server's root, then the output is equivalent
-   * to {@link #getHostName()}. If no hostnames have been configured, this
-   * method returns <code>/</code> to indicate the root url of the current
-   * server.
-   * 
-   * @return the absolute link to this site
-   */
-  WebUrl getUrl();
+  URL[] getURLs();
 
   /**
    * Adds <code>language</code> to the site languages.

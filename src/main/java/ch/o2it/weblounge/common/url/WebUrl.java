@@ -135,7 +135,7 @@ public interface WebUrl extends Url {
    * <ul>
    * <li>It does not contain a protocol</li>
    * <li>It starts with the site's main hostname as returned by
-   * {@link ch.o2it.weblounge.common.site.Site#getHostName()}</li>
+   * {@link ch.o2it.weblounge.common.site.Site#getURL()}</li>
    * <li>It contains the requested version as a url extension</li>
    * <li>It contains the request flavor as a url extension</li>
    * </ul>
