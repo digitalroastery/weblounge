@@ -22,6 +22,8 @@ package ch.o2it.weblounge.dispatcher;
 
 import ch.o2it.weblounge.common.site.Site;
 
+import java.net.URL;
+
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 
@@ -36,13 +38,13 @@ public interface SiteDispatcherService {
    * <p>
    * Note that the server name is expected to not end with a trailing slash, so
    * please pass in <code>www.o2it.ch</code> instead of
-   * <code>www.o2it.ch/</code>.
+   * <code>http://www.o2it.ch/</code>.
    * 
-   * @param serverName
-   *          the server name, e.g. <code>www.o2it.ch</code>
+   * @param url
+   *          the server url, e.g. <code>http://www.o2it.ch</code>
    * @return the site
    */
-  Site findSiteByName(String serverName);
+  Site findSiteByURL(URL url);
 
   /**
    * Returns the site with the given site identifier or <code>null</code> if no
