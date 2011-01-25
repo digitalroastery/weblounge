@@ -26,6 +26,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -298,7 +300,8 @@ public class ContentRepositoryEndpoint {
    */
   protected Site getSite(HttpServletRequest request)
       throws WebApplicationException {
-    Site site = sites.findSiteByName(request.getServerName());
+    URL url = UrlUtils.toURL(request, false, false);
+    Site site = sites.findSiteByURL(url);
     if (site == null) {
       throw new WebApplicationException(Status.NOT_FOUND);
     } else if (!site.isRunning()) {

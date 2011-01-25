@@ -28,6 +28,7 @@ import static ch.o2it.weblounge.common.impl.util.doc.Status.serviceUnavailable;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
 import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentation;
@@ -46,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLDecoder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -101,7 +103,8 @@ public class SearchEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Find the site
-    Site site = sites.findSiteByName(request.getServerName());
+    URL url = UrlUtils.toURL(request, false, false);
+    Site site = sites.findSiteByURL(url);
     if (site == null) {
       return Response.status(Status.NOT_FOUND).build();
     } else if (!site.isRunning()) {
