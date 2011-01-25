@@ -189,7 +189,7 @@ public class SiteServlet extends HttpServlet {
     if (StringUtils.isNotBlank(f)) {
       try {
         format = Format.valueOf(StringUtils.capitalize(f.toLowerCase()));
-      } catch (Exception e) {
+      } catch (IllegalArgumentException e) {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         return;
       }

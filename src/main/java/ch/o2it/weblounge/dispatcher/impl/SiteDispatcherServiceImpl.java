@@ -52,16 +52,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
-import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
@@ -109,14 +109,11 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /** The action request handler */
   private ActionRequestHandler actionRequestHandler = null;
 
+  /** The site manager */
+  private SiteManager siteManager = null;
+
   /** Init parameters for jetty */
   private TreeMap<String, String> jasperConfig = new TreeMap<String, String>();
-
-  /** The sites */
-  private List<Site> sites = new ArrayList<Site>();
-
-  /** Maps server names to sites */
-  private Map<String, Site> sitesByServerName = new HashMap<String, Site>();
 
   /** Maps sites to site servlets */
   private Map<Site, SiteServlet> siteServlets = new HashMap<Site, SiteServlet>();
@@ -177,6 +174,15 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     httpRegistrations = new HashMap<Site, WebXml>();
 
     logger.debug("Site dispatcher activated");
+
+    // Register for changing sites
+    siteManager.addSiteListener(this);
+    
+    // Process sites that have already been registered
+    for (Iterator<Site> si = siteManager.sites(); si.hasNext();) {
+      addSite(si.next());
+    }
+
   }
 
   /**
@@ -190,6 +196,9 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   void deactivate(ComponentContext context) {
     logger.debug("Deactivating site dispatcher");
 
+    // Don't listen to new sites anymore
+    siteManager.removeSiteListener(this);
+    
     // Stop precompilers
     for (Precompiler compiler : precompilers.values()) {
       if (compiler != null)
@@ -303,12 +312,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   void setActionRequestHandler(ActionRequestHandler handler) {
     logger.debug("Registering {}", handler);
     this.actionRequestHandler = handler;
-    synchronized (sites) {
-      for (Site site : sites) {
-        for (Module module : site.getModules()) {
-          for (Action action : module.getActions()) {
-            actionRequestHandler.register(action);
-          }
+    if (siteManager == null)
+      return;
+    for (Iterator<Site> si = siteManager.sites(); si.hasNext();) {
+      for (Module module : si.next().getModules()) {
+        for (Action action : module.getActions()) {
+          actionRequestHandler.register(action);
         }
       }
     }
@@ -323,12 +332,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   void removeActionRequestHandler(ActionRequestHandler handler) {
     logger.debug("Unregistering {}", handler);
-    synchronized (sites) {
-      for (Site site : sites) {
-        for (Module module : site.getModules()) {
-          for (Action action : module.getActions()) {
-            actionRequestHandler.unregister(action);
-          }
+    if (siteManager == null)
+      return;
+    for (Iterator<Site> si = siteManager.sites(); si.hasNext();) {
+      for (Module module : si.next().getModules()) {
+        for (Action action : module.getActions()) {
+          actionRequestHandler.unregister(action);
         }
       }
     }
@@ -350,47 +359,16 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByIdentifier(java.lang.String)
    */
   public Site findSiteByIdentifier(String identifier) {
-    for (Site site : sites) {
-      if (site.getIdentifier().equals(identifier)) {
-        return site;
-      }
-    }
-    return null;
+    return siteManager.findSiteByIdentifier(identifier);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByName(java.lang.String)
+   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByURL(java.lang.String)
    */
-  public Site findSiteByName(String serverName) {
-    Site site = sitesByServerName.get(serverName);
-    if (site != null)
-      return site;
-
-    // There is obviously no direct match. Therefore, try to find a
-    // wildcard match
-    for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
-      String alias = e.getKey();
-
-      try {
-        // convert the host wildcard (ex. *.domain.tld) to a valid regex (ex.
-        // .*\.domain\.tld)
-        alias = alias.replace(".", "\\.");
-        alias = alias.replace("*", ".*");
-        if (serverName.matches(alias)) {
-          site = e.getValue();
-          logger.info("Registering {} for site {}", serverName, site);
-          sitesByServerName.put(serverName, site);
-          return site;
-        }
-      } catch (PatternSyntaxException ex) {
-        logger.warn("Error while trying to find a host wildcard match: ".concat(ex.getMessage()));
-      }
-    }
-
-    logger.debug("Lookup for {} did not match any site", serverName);
-    return null;
+  public Site findSiteByURL(URL siteURL) {
+    return siteManager.findSiteByURL(siteURL);
   }
 
   /**
@@ -401,7 +379,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   public Site findSiteByRequest(HttpServletRequest request) {
     if (request == null)
       throw new IllegalArgumentException("Request must not be null");
-    return findSiteByName(request.getServerName());
+    return findSiteByURL(UrlUtils.toURL(request, false, false));
   }
 
   /**
@@ -409,12 +387,10 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    * 
    * @param site
    *          the site
-   * @param reference
-   *          the site's service reference
    */
-  void addSite(Site site, ServiceReference reference) {
-    WebXml webXml = createWebXml(site, reference);
-    Bundle siteBundle = reference.getBundle();
+  private void addSite(Site site) {
+    Bundle siteBundle = siteManager.getSiteBundle(site);
+    WebXml webXml = createWebXml(site, siteBundle);
     Properties initParameters = new Properties();
 
     // Prepare the init parameters
@@ -463,18 +439,6 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
         siteStarted(site);
       }
 
-      // Register this site for the findByXYZ() methods
-      synchronized (sites) {
-        sites.add(site);
-        for (String name : site.getHostNames()) {
-          if (site.equals(sitesByServerName.get(name))) {
-            logger.error("Another site is already registered to " + name);
-            continue;
-          }
-          sitesByServerName.put(name, site);
-        }
-      }
-
       // Start the precompiler if requested
       if (precompile) {
         Precompiler precompiler = new Precompiler(siteServlet, logCompileErrors);
@@ -494,11 +458,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   }
 
   /**
-   * {@inheritDoc}
+   * Removes a site from the dispatcher.
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#removeSite(ch.o2it.weblounge.common.site.Site)
+   * @param site
+   *          the site to remove
    */
-  public void removeSite(Site site) {
+  private void removeSite(Site site) {
     // Remove site dispatcher servlet
     WebXml webXml = httpRegistrations.get(site);
     String siteRoot = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ROOT);
@@ -510,20 +475,8 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       }
     }
 
-    // Remove site registration
-    synchronized (sites) {
-      site.removeSiteListener(this);
-      sites.remove(site);
-      List<String> namesToRemove = new ArrayList<String>();
-      for (Map.Entry<String, Site> entry : sitesByServerName.entrySet()) {
-        if (site.equals(entry.getValue())) {
-          namesToRemove.add(entry.getKey());
-        }
-      }
-      for (String serverName : namesToRemove) {
-        sitesByServerName.remove(serverName);
-      }
-    }
+    // We are no longer interested in site events
+    site.removeSiteListener(this);
 
     // TODO: unregister site dispatcher
 
@@ -567,7 +520,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    *      org.osgi.framework.ServiceReference)
    */
   public void siteAppeared(Site site, ServiceReference reference) {
-    addSite(site, reference);
+    addSite(site);
   }
 
   /**
@@ -627,15 +580,23 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    * <b>Note:</b> almost all of these properties can be overwritten using either
    * the system properties or the service properties.
    */
-  public WebXml createWebXml(Site site, ServiceReference reference) {
-    Bundle siteBundle = reference.getBundle();
+  public WebXml createWebXml(Site site, Bundle siteBundle) {
+    ServiceReference reference = null;
+    ServiceReference[] references = siteBundle.getRegisteredServices();
+    for (ServiceReference ref : references) {
+      if (site.equals(siteBundle.getBundleContext().getService(ref))) {
+        reference = ref;
+        break;
+      }
+    }
+
     WebXml webXml = new WebXml();
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_NAME, siteBundle.getSymbolicName());
     webXml.addContextParam(DispatcherConfiguration.BUNDLE_ENTRY, DEFAULT_BUNDLE_ENTRY);
 
     // Webapp context root
     String webappRoot = null;
-    if (reference.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT) != null)
+    if (reference != null && reference.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT) != null)
       webappRoot = (String) reference.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
     else if (System.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT) != null)
       webappRoot = System.getProperty(DispatcherConfiguration.WEBAPP_CONTEXT_ROOT);
@@ -650,7 +611,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // Bundle context root uri
     String sitesRoot = null;
-    if (reference.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI) != null)
+    if (reference != null && reference.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI) != null)
       sitesRoot = (String) reference.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
     else if (System.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI) != null)
       sitesRoot = System.getProperty(DispatcherConfiguration.BUNDLE_CONTEXT_ROOT_URI);
@@ -673,7 +634,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // Bundle entry
     String bundleEntry = null;
-    if (reference.getProperty(DispatcherConfiguration.BUNDLE_ENTRY) != null)
+    if (reference != null && reference.getProperty(DispatcherConfiguration.BUNDLE_ENTRY) != null)
       bundleEntry = (String) reference.getProperty(DispatcherConfiguration.BUNDLE_ENTRY);
     else if (System.getProperty(DispatcherConfiguration.BUNDLE_ENTRY) != null)
       bundleEntry = System.getProperty(DispatcherConfiguration.BUNDLE_ENTRY);
@@ -693,7 +654,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    *          the site manager
    */
   void setSiteManager(SiteManager siteManager) {
-    siteManager.addSiteListener(this);
+    this.siteManager = siteManager;
   }
 
   /**
@@ -703,7 +664,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    *          the site manager
    */
   void removeSiteManager(SiteManager siteManager) {
-    siteManager.removeSiteListener(this);
+    this.siteManager = null;
   }
 
 }
