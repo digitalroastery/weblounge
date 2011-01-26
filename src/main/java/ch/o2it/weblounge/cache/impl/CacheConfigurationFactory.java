@@ -251,13 +251,12 @@ public class CacheConfigurationFactory implements ManagedService {
     sites.remove(site.getIdentifier());
 
     // Delete the configuration
-    CacheConfiguration configHolder = configurations.remove(site);
+    CacheConfiguration configHolder = configurations.remove(site.getIdentifier());
     if (configHolder == null)
       return;
     
     Configuration config = configHolder.getConfiguration();
     config.delete();
-    configurations.remove(configHolder.getIdentifier());
   }
 
   /**
