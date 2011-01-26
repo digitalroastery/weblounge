@@ -151,12 +151,11 @@ public class SiteManager {
    * @return the site
    */
   public Site findSiteByURL(URL url) {
-    Site site = sitesByServerName.get(url);
+    String hostName = url.getHost();
+    Site site = sitesByServerName.get(hostName);
     if (site != null)
       return site;
     
-    String hostName = url.getHost();
-
     // There is obviously no direct match. Therefore, try to find a
     // wildcard match
     for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
