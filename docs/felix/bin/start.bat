@@ -1,5 +1,5 @@
+@ECHO OFF
 SETLOCAL
-ECHO OFF
 REM ##
 REM # Configure these variables to match your environment
 REM # If you have system-wide variables for FELIX_HOME and M2_REPO then you
@@ -19,7 +19,7 @@ SET FELIX_CACHEDIR=%FELIX_WORKDIR%\cache
 SET FELIX_TEMPDIR=%FELIX_WORKDIR%\work
 
 REM # Maven home. This variable needs to be set if certain bundles are
-REM # being referenced from the local maven repository in FELIX_HOME/conf
+REM # being referenced from the local maven repository in FELIX_HOME/conf.
 REM # 
 SET M2_REPO=C:\Users\johndoe\.m2\repository
 
@@ -37,7 +37,7 @@ SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location=%FELIX_HOME%\conf -Dweblou
 SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN
 SET GRAPHICS_OPTS=-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit
 SET TEMPDIR_OPTS=-Djava.io.tmpdir=%FELIX_TEMPDIR%
-SET MEMORY_OPTS=-Xmx2048m
+SET MEMORY_OPTS=-Xmx1024m
 
 REM # Create the debug config
 SET DEBUG_OPTS=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=%DEBUG_PORT%,server=y,suspend=%DEBUG_SUSPEND%
