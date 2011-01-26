@@ -51,7 +51,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
@@ -86,7 +88,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /** The default value for "enable" configuration property */
   private static final boolean DEFAULT_ENABLE = true;
-  
+
   /** Configuration key for the cache identifier */
   public static final String OPT_ID = OPT_PREFIX + ".id";
 
@@ -170,7 +172,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /** True if the cache is enabled */
   protected boolean enabled = true;
-  
+
   /** The stream filter */
   protected StreamFilter filter = null;
 
@@ -179,12 +181,17 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
   /** Cache name */
   protected String name = null;
-  
+
   /** Path to the local disk store */
   protected String diskStorePath = null;
-  
-  /** True to indicate that everything went fine with the setup of the disk store */
+
+  /**
+   * True to indicate that everything went fine with the setup of the disk store
+   */
   protected boolean diskStoreEnabled = true;
+
+  /** Transactions that are currently being processed */
+  protected Map<String, CacheTransaction> transactions = null;
 
   /**
    * Creates a new cache with the given identifier and name.
@@ -204,6 +211,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     this.id = id;
     this.name = name;
     this.diskStorePath = diskStorePath;
+    this.transactions = new HashMap<String, CacheTransaction>();
     init(id, name, diskStorePath);
   }
 
@@ -228,7 +236,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     } finally {
       IOUtils.closeQuietly(configInputStream);
     }
-    
+
     // Check the path to the cache
     if (StringUtils.isNotBlank(diskStorePath)) {
       File file = new File(diskStorePath);
@@ -316,7 +324,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (clear) {
       clear();
     }
-    
+
     // Disk persistence
     enabled = ConfigurationUtils.isTrue((String) properties.get(OPT_ENABLE), DEFAULT_ENABLE);
     logger.debug("Cache is {}", diskPersistent ? "enabled" : "disabled");
@@ -503,7 +511,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (cacheableResponse == null) {
       throw new IllegalStateException("Cached response is not properly wrapped");
     }
-    
+
     // While disabled, don't do lookups but return immediately
     if (!enabled) {
       cacheableResponse.startTransaction(handle, filter);
@@ -519,52 +527,100 @@ public class CacheServiceImpl implements CacheService, ManagedService {
 
     // If it exists, write the contents back to the response
     if (element != null && element.getValue() != null) {
-      CacheEntry entry = (CacheEntry) element.getValue();
-
-      long clientCacheDate = request.getDateHeader("If-Modified-Since");
-      long validTimeInSeconds = (element.getExpirationTime() - System.currentTimeMillis()) / 1000;
-      String eTag = request.getHeader("If-None-Match");
-
       try {
-
-        // Write the response headers
-        response.setContentType(entry.getContentType());
-        response.setContentLength(entry.getContent().length);
-
-        entry.getHeaders().apply(response);
-
-        // Add cache control headers
-        response.setDateHeader("Date", System.currentTimeMillis());
-        response.setDateHeader("Expires", element.getExpirationTime());
-        response.setHeader("Cache-Control", "max-age=" + validTimeInSeconds + ", must-revalidate");
-        response.setHeader("Etag", entry.getETag());
-
-        // Add the X-Cache-Key header
-        StringBuffer cacheKeyHeader = new StringBuffer(name);
-        cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
-        response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
-
-        // Check the headers first. Maybe we don't need to send anything but
-        // a not-modified back
-        if (entry.notModified(clientCacheDate) && entry.matches(eTag)) {
-          response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-        } else {
-          response.getOutputStream().write(entry.getContent());
-        }
-
-        response.flushBuffer();
-
+        writeCacheEntry(element, handle, request, response);
         return null;
       } catch (IOException e) {
         logger.warn("Error writing cached response to client");
-        return null; // If we can't, others can't either
       }
     }
 
-    cacheableResponse.startTransaction(handle, filter);
+    // Make sure that there are no two transactions producing the same content.
+    // If there is a transaction already working on a specific content, have
+    // this transaction sit and wait.
+    synchronized (transactions) {
+      CacheTransaction tx = transactions.get(handle.getKey());
+      if (tx == null) {
+        tx = cacheableResponse.startTransaction(handle, filter);
+        transactions.put(handle.getKey(), tx);
+      } else {
+        try {
+          logger.debug("Waiting for cache transaction {} to be finished", tx);
+          synchronized (tx) {
+            tx.wait();
+          }
+          element = cache.get(handle.getKey());        
+        } catch (InterruptedException e) {
+          // Done sleeping!
+        }
+      }
+    }
+
+    // If we were waiting for an active cache transaction, let's try again
+    if (element != null && element.getValue() != null) {
+      try {
+        writeCacheEntry(element, handle, request, response);
+        return null;
+      } catch (IOException e) {
+        logger.warn("Error writing cached response to client");
+      }
+    }
+
+    // Apparently, we need to get it done ourselves
     response.setHeader("Etag", CacheEntry.createETag(handle.getCreationDate()));
     response.setDateHeader("Expires", handle.getCreationDate() + Times.MS_PER_MIN);
     return handle;
+  }
+
+  /**
+   * Writes the cache element to the response, setting the cache headers
+   * according to the settings found on the element.
+   * 
+   * @param element
+   *          the cache contents
+   * @param handle
+   *          the cache handle
+   * @param request
+   *          the request
+   * @param response
+   *          the response
+   * @throws IOException
+   *           if writing the cache contents to the response fails
+   */
+  private void writeCacheEntry(Element element, CacheHandle handle,
+      WebloungeRequest request, WebloungeResponse response) throws IOException {
+    CacheEntry entry = (CacheEntry) element.getValue();
+
+    long clientCacheDate = request.getDateHeader("If-Modified-Since");
+    long validTimeInSeconds = (element.getExpirationTime() - System.currentTimeMillis()) / 1000;
+    String eTag = request.getHeader("If-None-Match");
+
+    // Write the response headers
+    response.setContentType(entry.getContentType());
+    response.setContentLength(entry.getContent().length);
+
+    entry.getHeaders().apply(response);
+
+    // Add cache control headers
+    response.setDateHeader("Date", System.currentTimeMillis());
+    response.setDateHeader("Expires", element.getExpirationTime());
+    response.setHeader("Cache-Control", "max-age=" + validTimeInSeconds + ", must-revalidate");
+    response.setHeader("Etag", entry.getETag());
+
+    // Add the X-Cache-Key header
+    StringBuffer cacheKeyHeader = new StringBuffer(name);
+    cacheKeyHeader.append(" (").append(handle.getKey()).append(")");
+    response.addHeader(CACHE_KEY_HEADER, cacheKeyHeader.toString());
+
+    // Check the headers first. Maybe we don't need to send anything but
+    // a not-modified back
+    if (entry.notModified(clientCacheDate) && entry.matches(eTag)) {
+      response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    } else {
+      response.getOutputStream().write(entry.getContent());
+    }
+
+    response.flushBuffer();
   }
 
   /**
@@ -603,6 +659,19 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     Element element = new Element(entry.getKey(), entry);
     cache.put(element);
 
+    // Mark the current transaction as finished and notify anybody that was
+    // waiting for it to be finished
+    synchronized (transactions) {
+      CacheTransaction tx = transactions.remove(transaction.getHandle().getKey());
+      if (tx != null) {
+        synchronized (tx) {
+          tx.notifyAll();
+        }
+      } else {
+        logger.warn("Active cache transaction was lost on finish", tx);
+      }
+    }
+
     return true;
   }
 
@@ -616,8 +685,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (cacheableResponse == null || cacheableResponse.getTransaction() == null)
       return;
     cacheableResponse.invalidate();
-    CacheHandle handle = cacheableResponse.getTransaction().getHandle();
-    invalidate(handle);
+    invalidate(cacheableResponse.getTransaction().getHandle());
   }
 
   /**
@@ -708,6 +776,18 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // Load the cache
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
     cache.remove(handle.getKey());
+
+    // Mark the current transaction as finished and notify anybody that was
+    // waiting for it to be finished
+    synchronized (transactions) {
+      CacheTransaction tx = transactions.remove(handle.getKey());
+      if (tx != null) {
+        synchronized (tx) {
+          tx.notifyAll();
+        }
+      }
+    }
+    
     logger.debug("Removed {} from cache '{}'", handle.getKey(), id);
   }
 
@@ -730,10 +810,10 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
     return null;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
