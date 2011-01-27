@@ -20,7 +20,6 @@
 
 package ch.o2it.weblounge.taglib;
 
-import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
@@ -29,7 +28,6 @@ import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -504,7 +502,6 @@ public class ComposerTagSupport extends WebloungeTag {
     JspWriter writer = pageContext.getOut();
 
     Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
-    CacheTagSet composerCacheTags = null;
 
     try {
 
@@ -517,51 +514,29 @@ public class ComposerTagSupport extends WebloungeTag {
 
       try {
 
-        // Check if this composer is already in the cache
-        if (request.getVersion() == Resource.LIVE) {
-
-          composerCacheTags = new CacheTagSet();
-          long validTime = Times.MS_PER_DAY;
-          long recheckTime = Times.MS_PER_HOUR;
-
-          // Create tagset
-          composerCacheTags.add(CacheTag.Url, url.getPath());
-          composerCacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
-          composerCacheTags.add(CacheTag.Composer, name);
-          composerCacheTags.add(CacheTag.Site, url.getSite().getIdentifier());
-          composerCacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
-          composerCacheTags.add(CacheTag.User, request.getUser().getLogin());
-          Enumeration<?> pe = request.getParameterNames();
-          int parameterCount = 0;
-          while (pe.hasMoreElements()) {
-            parameterCount++;
-            String key = pe.nextElement().toString();
-            String[] values = request.getParameterValues(key);
-            for (String value : values) {
-              composerCacheTags.add(key, value);
-            }
+        // Add tags for this composer
+        response.addTag(CacheTag.Url, url.getPath());
+        response.addTag(CacheTag.Url, request.getRequestedUrl().getPath());
+        response.addTag(CacheTag.Composer, name);
+        response.addTag(CacheTag.Site, url.getSite().getIdentifier());
+        response.addTag(CacheTag.Language, request.getLanguage().getIdentifier());
+        response.addTag(CacheTag.User, request.getUser().getLogin());
+        Enumeration<?> pe = request.getParameterNames();
+        int parameterCount = 0;
+        while (pe.hasMoreElements()) {
+          parameterCount++;
+          String key = pe.nextElement().toString();
+          String[] values = request.getParameterValues(key);
+          for (String value : values) {
+            response.addTag(key, value);
           }
-          composerCacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
+        }
+        response.addTag(CacheTag.Parameters, Integer.toString(parameterCount));
 
-          // Add action specific tags and adjust valid and recheck time
-          if (action != null) {
-            composerCacheTags.add(CacheTag.Module, action.getModule().getIdentifier());
-            composerCacheTags.add(CacheTag.Action, action.getIdentifier());
-            validTime = action.getValidTime();
-            recheckTime = action.getRecheckTime();
-          }
-
-          // See if the composer is already in the cache. If not, a new response
-          // part is started, that we can now add content for
-          if (response.startResponsePart(composerCacheTags.getTags(), validTime, recheckTime)) {
-            return EVAL_PAGE;
-          }
-
-          if (debug)
-            writer.println("<!-- start content of composer '" + name + "' (cached) -->");
-        } else {
-          if (debug)
-            writer.println("<!-- start content of composer '" + name + "' (generated) -->");
+        // Add action specific tags and adjust valid and recheck time
+        if (action != null) {
+          response.addTag(CacheTag.Module, action.getModule().getIdentifier());
+          response.addTag(CacheTag.Action, action.getIdentifier());
         }
 
         // Flush all output so far
@@ -598,7 +573,7 @@ public class ComposerTagSupport extends WebloungeTag {
         }
 
         // Add cache tag for content provider (in case of inheritance)
-        if (composerCacheTags != null && contentProvider != null && !contentProvider.equals(targetPage)) {
+        if (contentProvider != null && !contentProvider.equals(targetPage)) {
           response.addTag(CacheTag.Url, contentProvider.getURI().getPath());
         }
 
@@ -626,15 +601,6 @@ public class ComposerTagSupport extends WebloungeTag {
         request.removeAttribute(WebloungeRequest.PAGELET);
         request.removeAttribute(WebloungeRequest.COMPOSER);
 
-        // Close composer cache handle
-        if (request.getVersion() == Resource.LIVE) {
-          if (debug)
-            writer.println("<!-- end generated content of composer '" + name + "' -->");
-          response.endResponsePart();
-        } else {
-          if (debug)
-            writer.println("<!-- end cached content of composer '" + name + "' -->");
-        }
         writer.flush();
       }
 
@@ -678,7 +644,6 @@ public class ComposerTagSupport extends WebloungeTag {
     PageletRenderer renderer = null;
 
     try {
-      CacheTagSet pageletCacheTags = new CacheTagSet();
 
       String moduleId = pagelet.getModule();
       String rendererId = pagelet.getIdentifier();
@@ -699,7 +664,7 @@ public class ComposerTagSupport extends WebloungeTag {
       }
 
       // Select the actual renderer by method and have it render the
-      // request. Since renderers are beeing pooled by the bundle, we
+      // request. Since renderers are being pooled by the bundle, we
       // have to return it after the request has finished.
 
       Module m = site.getModule(moduleId);
@@ -719,25 +684,19 @@ public class ComposerTagSupport extends WebloungeTag {
         return;
       }
 
-      // Check to see if the pagelet is already part of the cache. If it
-      // is, we may already
-      // move to the next pagelet!
-
-      // Create a new cache handle with the configured times
-      long validTime = renderer.getValidTime();
-      long recheckTime = renderer.getRecheckTime();
+      // Adjust the cache settings
       if (request.getVersion() == Resource.LIVE) {
 
-        // Create tagset
-        pageletCacheTags.add(CacheTag.Url, url.getPath());
-        pageletCacheTags.add(CacheTag.Url, request.getRequestedUrl().getPath());
-        pageletCacheTags.add(CacheTag.Composer, name);
-        pageletCacheTags.add(CacheTag.Position, Integer.toString(position));
-        pageletCacheTags.add(CacheTag.Module, pagelet.getModule());
-        pageletCacheTags.add(CacheTag.Renderer, pagelet.getIdentifier());
-        pageletCacheTags.add(CacheTag.Language, request.getLanguage().getIdentifier());
-        pageletCacheTags.add(CacheTag.User, request.getUser().getLogin());
-        pageletCacheTags.add(CacheTag.Site, url.getSite().getIdentifier());
+        // Add tags for this pagelet
+        response.addTag(CacheTag.Url, url.getPath());
+        response.addTag(CacheTag.Url, request.getRequestedUrl().getPath());
+        response.addTag(CacheTag.Composer, name);
+        response.addTag(CacheTag.Position, Integer.toString(position));
+        response.addTag(CacheTag.Module, pagelet.getModule());
+        response.addTag(CacheTag.Renderer, pagelet.getIdentifier());
+        response.addTag(CacheTag.Language, request.getLanguage().getIdentifier());
+        response.addTag(CacheTag.User, request.getUser().getLogin());
+        response.addTag(CacheTag.Site, url.getSite().getIdentifier());
         Enumeration<?> pe = request.getParameterNames();
         int parameterCount = 0;
         while (pe.hasMoreElements()) {
@@ -745,28 +704,19 @@ public class ComposerTagSupport extends WebloungeTag {
           String key = pe.nextElement().toString();
           String[] values = request.getParameterValues(key);
           for (String value : values) {
-            pageletCacheTags.add(key, value);
+            response.addTag(key, value);
           }
         }
-        pageletCacheTags.add(CacheTag.Parameters, Integer.toString(parameterCount));
+        response.addTag(CacheTag.Parameters, Integer.toString(parameterCount));
 
-        // Add action specific tags
-        if (action != null) {
-          pageletCacheTags.add(CacheTag.Module, action.getModule().getIdentifier());
-          pageletCacheTags.add(CacheTag.Action, action.getIdentifier());
-        }
-
-        if (response.startResponsePart(pageletCacheTags.getTags(), validTime, recheckTime)) {
-          return;
-        }
+        response.setMaximumRecheckTime(renderer.getRecheckTime());
+        response.setMaximumValidTime(renderer.getValidTime());
 
         // Add cache tag for content provider (in case of inheritance)
         if (contentProvider != null && !contentProvider.equals(targetPage)) {
           response.addTag(CacheTag.Url, contentProvider.getURI().getPath());
         }
 
-        if (debug)
-          writer.println("<!-- start cache content of pagelet " + position + " -->");
         writer.flush();
       }
 
@@ -838,14 +788,6 @@ public class ComposerTagSupport extends WebloungeTag {
 
       // Flush everything to the response
       writer.flush();
-
-      // Finish cache response
-      if (request.getVersion() == Resource.LIVE) {
-        if (debug)
-          writer.println("<!-- end cache content of pagelet " + position + " -->");
-        writer.flush();
-        response.endResponsePart();
-      }
 
       // Restore action attributes that may have been overwritten by
       // pagelets
