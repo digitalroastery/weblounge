@@ -104,44 +104,44 @@ public class CacheHandleImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl#getExpires()}.
+   * {@link ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl#getExpireTime()}.
    */
   @Test
   public void testGetExpires() {
-    assertEquals(expirationTime, handle.getExpires());
+    assertEquals(expirationTime, handle.getExpireTime());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl#setExpires(long)}
+   * {@link ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl#setExpireTime(long)}
    * .
    */
   @Test
   public void testSetExpires() {
     long t = System.currentTimeMillis();
-    handle.setExpires(t);
-    assertEquals(t, handle.getExpires());
+    handle.setExpireTime(t);
+    assertEquals(t, handle.getExpireTime());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl#getRecheck()}.
+   * {@link ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl#getRecheckTime()}.
    */
   @Test
   public void testGetRecheck() {
-    assertEquals(recheckTime, handle.getRecheck());
+    assertEquals(recheckTime, handle.getRecheckTime());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl#setRecheck(long)}
+   * {@link ch.o2it.weblounge.cache.impl.handle.CacheHandleImpl#setRecheckTime(long)}
    * .
    */
   @Test
   public void testSetRecheck() {
     long t = System.currentTimeMillis();
-    handle.setRecheck(t);
-    assertEquals(t, handle.getRecheck());
+    handle.setRecheckTime(t);
+    assertEquals(t, handle.getRecheckTime());
   }
 
   /**

@@ -691,60 +691,6 @@ public class CacheServiceImpl implements CacheService, ManagedService {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponsePart(ch.o2it.weblounge.common.request.CacheTag[],
-   *      javax.servlet.http.HttpServletRequest,
-   *      javax.servlet.http.HttpServletResponse, long, long)
-   */
-  public CacheHandle startResponsePart(CacheTag[] uniqueTags,
-      HttpServletRequest request, HttpServletResponse response, long validTime,
-      long recheckTime) {
-
-    // Is this a valid response?
-    CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
-    if (cacheableResponse == null)
-      return null;
-
-    CacheHandle hdl = new TaggedCacheHandle(uniqueTags, validTime, recheckTime);
-    return startResponsePart(hdl, response) ? null : hdl;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#startResponsePart(ch.o2it.weblounge.cache.CacheHandle,
-   *      javax.servlet.http.HttpServletResponse)
-   */
-  public boolean startResponsePart(CacheHandle handle,
-      HttpServletResponse response) {
-
-    // Is this a valid response?
-    CacheableHttpServletResponse cacheableResponse = unwrapResponse(response);
-    if (cacheableResponse == null)
-      return false;
-
-    // Adjust the transaction handle's recheck and valid time
-    CacheHandle responseHnd = cacheableResponse.getTransaction().getHandle();
-    if (handle.getExpires() < responseHnd.getExpires())
-      responseHnd.setExpires(handle.getExpires());
-    if (handle.getRecheck() < responseHnd.getRecheck())
-      responseHnd.setRecheck(handle.getRecheck());
-
-    return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.request.ResponseCache#endResponsePart(ch.o2it.weblounge.cache.CacheHandle,
-   *      javax.servlet.http.HttpServletResponse)
-   */
-  public void endResponsePart(CacheHandle handle, HttpServletResponse response) {
-    // Nothing to do
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.request.ResponseCache#invalidate(ch.o2it.weblounge.common.request.CacheTag[])
    */
   public void invalidate(CacheTag[] tags) {

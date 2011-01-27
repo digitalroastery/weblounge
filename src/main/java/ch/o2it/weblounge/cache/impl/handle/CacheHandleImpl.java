@@ -84,8 +84,8 @@ public class CacheHandleImpl implements CacheHandle {
    *          the time the cached element has to be checked for modifications.
    */
   protected CacheHandleImpl(long expires, long recheck) {
-    setRecheck(recheck);
-    setExpires(expires);
+    setRecheckTime(recheck);
+    setExpireTime(expires);
   }
 
   /**
@@ -121,7 +121,7 @@ public class CacheHandleImpl implements CacheHandle {
    * 
    * @return the expiration time
    */
-  public final long getExpires() {
+  public final long getExpireTime() {
     return expires;
   }
 
@@ -131,7 +131,7 @@ public class CacheHandleImpl implements CacheHandle {
    * @param expires
    *          the expiration time to set
    */
-  public final void setExpires(long expires) {
+  public final void setExpireTime(long expires) {
     this.expires = (expires > Times.MS_PER_SECOND) ? expires : Times.MS_PER_SECOND;
   }
 
@@ -140,7 +140,7 @@ public class CacheHandleImpl implements CacheHandle {
    * 
    * @return the recheck time
    */
-  public final long getRecheck() {
+  public final long getRecheckTime() {
     return recheck;
   }
 
@@ -150,7 +150,7 @@ public class CacheHandleImpl implements CacheHandle {
    * @param recheck
    *          the new recheck time
    */
-  public final void setRecheck(long recheck) {
+  public final void setRecheckTime(long recheck) {
     this.recheck = (recheck > Times.MS_PER_SECOND) ? recheck : Times.MS_PER_SECOND;
   }
 
