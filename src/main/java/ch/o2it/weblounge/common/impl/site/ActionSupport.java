@@ -44,7 +44,6 @@ import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.User;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -56,7 +55,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -403,34 +401,9 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       throw new ActionException(new IllegalArgumentException(msg));
     }
 
-    // Prepare caching
-    Language language = request.getLanguage();
-    User user = request.getUser();
-    long validTime = renderer.getValidTime();
-    long recheckTime = renderer.getRecheckTime();
-
-    response.addTag(CacheTag.Site, request.getSite().getIdentifier());
-    response.addTag(CacheTag.Url, request.getUrl().getPath());
-    response.addTag(CacheTag.Url, request.getRequestedUrl().getPath());
-    response.addTag(CacheTag.Language, language.getIdentifier());
-    response.addTag(CacheTag.User, user.getLogin());
-    response.addTag(CacheTag.Module, getModule().getIdentifier());
-    response.addTag(CacheTag.Action, getIdentifier());
-    Enumeration<?> pe = request.getParameterNames();
-    int parameterCount = 0;
-    while (pe.hasMoreElements()) {
-      parameterCount++;
-      String key = pe.nextElement().toString();
-      String[] values = request.getParameterValues(key);
-      for (String value : values) {
-        response.addTag(key, value);
-      }
-    }
-    response.addTag(CacheTag.Parameters, Integer.toString(parameterCount));
-    response.setMaximumValidTime(validTime);
-    response.setMaximumRecheckTime(recheckTime);
-
-    // Add additional cache tags
+    // Adjust the maximum valid and recheck time and add cache tags
+    response.setMaximumValidTime(renderer.getValidTime());
+    response.setMaximumRecheckTime(renderer.getRecheckTime());
     if (renderer.getModule() != null)
       response.addTag(CacheTag.Module, renderer.getModule().getIdentifier());
     response.addTag(CacheTag.Renderer, renderer.getIdentifier());
