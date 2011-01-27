@@ -22,19 +22,19 @@
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common-api</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>3.0.0-SNAPSHOTversion>
     </dependency>
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <versio3.0.0-SNAPSHOTSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-taglib</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <vers3.0.0-SNAPSHOTAPSHOT</version>
     </dependency>
 
     <!-- thirdparty -->
@@ -82,10 +82,10 @@
             <Bundle-Name>${project.name}</Bundle-Name>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              ch.o2it.weblounge.common.site;version=3.0-SNAPSHOT,
-              ch.o2it.weblounge.common.impl.site;version=3.0-SNAPSHOT,
-              ch.o2it.weblounge.taglib;version=3.0-SNAPSHOT,
-              ch.o2it.weblounge.taglib.content;version=3.0-SNAPSHOT,
+              ch.o2it.weblounge.common.site;ve3.0.0-SNAPSHOTSNAPSHOT,
+              ch.o2it.weblounge.common.impl.site;3.0.0-SNAPSHOT0-SNAPSHOT,
+              ch.o2it.weblounge.tagli3.0.0-SNAPSHOT0.0-SNAPSHOT,
+              ch.o2it.weblounge.taglib.cont3.0.0-SNAPSHOT3.0.0-SNAPSHOT,
               javax.servlet.jsp;version="2.1.0",
               javax.servlet.jsp.tagext;version="2.1.0",
               org.slf4j;version="1.5.6",
