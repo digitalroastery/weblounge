@@ -60,7 +60,7 @@ public interface CacheHandle extends Serializable, Taggable<CacheTag> {
    * 
    * @return the expiration time
    */
-  long getExpires();
+  long getExpireTime();
 
   /**
    * Sets the time the cached object expires in milliseconds.
@@ -69,7 +69,7 @@ public interface CacheHandle extends Serializable, Taggable<CacheTag> {
    *          the expiration time to set
    * @see ch.o2it.weblounge.common.Times
    */
-  void setExpires(long expires);
+  void setExpireTime(long expires);
 
   /**
    * Returns the recheck time of the cached objects in milliseconds. When the
@@ -78,7 +78,7 @@ public interface CacheHandle extends Serializable, Taggable<CacheTag> {
    * 
    * @return the recheck time
    */
-  long getRecheck();
+  long getRecheckTime();
 
   /**
    * Sets the recheck time of the cached object.
@@ -87,7 +87,7 @@ public interface CacheHandle extends Serializable, Taggable<CacheTag> {
    *          the new recheck time
    * @see ch.o2it.weblounge.common.Times
    */
-  void setRecheck(long recheck);
+  void setRecheckTime(long recheck);
 
   /**
    * Returns the tags in a set.

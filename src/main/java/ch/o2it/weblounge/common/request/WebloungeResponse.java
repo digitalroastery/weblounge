@@ -72,58 +72,26 @@ public interface WebloungeResponse extends HttpServletResponse, Taggable<CacheTa
   void endResponse() throws IllegalStateException;
 
   /**
-   * Starts caching a sub portion of the current response, identified by a set
-   * of cache tags.
-   * <p>
-   * Dividing the cached response into parts has the advantage, that, if for
-   * example on part of a page becomes invalid, the other parts remain in the
-   * cache and only the invalidated part and the page in whole have to be
-   * rebuilt.
-   * <p>
-   * If the method returns <code>true</code>, then the response part was found
-   * in the cache and has been directly written to the response from the cache.
-   * In this case, clients <b>must not</b> write data to the response.
-   * <p>
-   * If it returns <code>false</code>, the data was not found but will be put
-   * into the cache when {@link #endResponsePart()} is called.
-   * 
-   * @param uniqueTags
-   *          the tag set identifying the response part
-   * @param validTime
-   *          the valid time in milliseconds
-   * @param recheckTime
-   *          the recheck time in milliseconds
-   * @return <code>true</code> if the response part was found in the cache,
-   *         false otherwise
-   */
-  boolean startResponsePart(CacheTag[] uniqueTags, long validTime,
-      long recheckTime);
-
-  /**
-   * Tells the cache manager that the current response part is complete and may
-   * be written to the cache.
-   * 
-   * @throws IllegalStateException
-   *           if the response part was never started or if another response
-   *           part needs to be finished first
-   */
-  void endResponsePart() throws IllegalStateException;
-
-  /**
    * Sets the recheck time on the current response or response part.
+   * <p>
+   * The implementation will consider the minimum of any existing recheck time
+   * and <code>recheckTime</code> to be the new maximum recheck time.
    * 
    * @param recheckTime
    *          the recheck time in milliseconds
    */
-  void setRecheckTime(long recheckTime);
+  void setMaximumRecheckTime(long recheckTime);
 
   /**
-   * Sets the valid time on the current response or response part.
+   * Sets the maximum valid time on the current response or response part.
+   * <p>
+   * The implementation will consider the minimum of any existing valid time and
+   * <code>validTime</code> to be the new maximum valid time.
    * 
    * @param validTime
    *          the valid time in milliseconds
    */
-  void setValidTime(long validTime);
+  void setMaximumValidTime(long validTime);
 
   /**
    * Tells the cache to not cache this response. This method should be called in
