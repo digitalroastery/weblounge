@@ -116,6 +116,9 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       return true;
     }
 
+    // Create the set of tags that identify the page
+    CacheTagSet cacheTags = createCacheTags(request);
+
     // Check if the request is controlled by an action.
     Action action = (Action) request.getAttribute(WebloungeRequest.ACTION);
 
@@ -124,9 +127,6 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     if (request.getVersion() == Resource.LIVE && action == null) {
       long validTime = Renderer.DEFAULT_VALID_TIME;
       long recheckTime = Renderer.DEFAULT_RECHECK_TIME;
-
-      // Create the set of tags that identify the page
-      CacheTagSet cacheTags = createCacheTags(request);
 
       // Check if the page is already part of the cache
       if (response.startResponse(cacheTags.getTags(), validTime, recheckTime)) {
@@ -142,6 +142,14 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
     } else if (request.getVersion() == Resource.WORK) {
       response.setMaximumValidTime(0);
     }
+
+    // Add the cache tags (in addition to what the action handler might have
+    // set already)
+    response.addTags(cacheTags);
+
+    // Set the default maximum render and valid times for pages
+    response.setMaximumRecheckTime(Renderer.DEFAULT_RECHECK_TIME);
+    response.setMaximumValidTime(Renderer.DEFAULT_VALID_TIME);
 
     // Get the renderer id that has been registered with the url. For this, we
     // first have to load the page data, then get the associated renderer
@@ -239,11 +247,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       response.setContentType("text/html");
 
       // Add additional cache tags
-      response.addTag("webl:template", template.getIdentifier());
-      response.addTag("webl:pagetype", page.getType());
-      for (String keyword : page.getSubjects()) {
-        response.addTag("webl:keyword", keyword);
-      }
+      response.addTag(CacheTag.Renderer, template.getIdentifier());
 
       // Configure valid and recheck time according to the template
       response.setMaximumRecheckTime(template.getRecheckTime());
