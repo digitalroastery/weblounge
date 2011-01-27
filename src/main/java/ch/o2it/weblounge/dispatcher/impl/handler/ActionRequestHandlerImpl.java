@@ -34,7 +34,6 @@ import ch.o2it.weblounge.common.impl.request.Http11Utils;
 import ch.o2it.weblounge.common.impl.site.ActionPool;
 import ch.o2it.weblounge.common.impl.url.UrlMatcherImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
-import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -59,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -226,10 +224,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
         Http11Utils.startHeadResponse(response);
         processingMode = Mode.Head;
       } else if (request.getVersion() == Resource.WORK) {
-        response.setHeader("Expires", "0");
-        response.setHeader("Last-Modified", WebloungeDateFormat.formatStatic(new Date()));
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
-        response.setHeader("Pragma", "no-cache");
+        response.setMaximumValidTime(0);
       }
 
       logger.debug("Action {} will handle {}", action, url);

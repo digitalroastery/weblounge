@@ -140,9 +140,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       Http11Utils.startHeadResponse(response);
       processingMode = Mode.Head;
     } else if (request.getVersion() == Resource.WORK) {
-      response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0");
-      response.setHeader("Pragma", "no-cache");
-      response.setHeader("Expires", "0");
+      response.setMaximumValidTime(0);
     }
 
     // Get the renderer id that has been registered with the url. For this, we
@@ -248,8 +246,8 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
       }
 
       // Configure valid and recheck time according to the template
-      response.setRecheckTime(template.getRecheckTime());
-      response.setValidTime(template.getValidTime());
+      response.setMaximumRecheckTime(template.getRecheckTime());
+      response.setMaximumValidTime(template.getValidTime());
 
       // Select the actual renderer by method and have it render the
       // request. Since renderers are being pooled by the bundle, we
