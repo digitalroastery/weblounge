@@ -106,10 +106,10 @@ public class CacheHandleImpl implements CacheHandle {
   public String getKey() {
     return key;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.request.CacheHandle#getCreationDate()
    */
   public long getCreationDate() {
@@ -126,10 +126,9 @@ public class CacheHandleImpl implements CacheHandle {
   }
 
   /**
-   * Sets the time the cached object expires.
+   * {@inheritDoc}
    * 
-   * @param expires
-   *          the expiration time to set
+   * @see ch.o2it.weblounge.common.request.CacheHandle#setExpireTime(long)
    */
   public final void setExpireTime(long expires) {
     this.expires = (expires > Times.MS_PER_SECOND) ? expires : Times.MS_PER_SECOND;
@@ -145,10 +144,9 @@ public class CacheHandleImpl implements CacheHandle {
   }
 
   /**
-   * Sets the recheck time of the cached object.
+   * {@inheritDoc}
    * 
-   * @param recheck
-   *          the new recheck time
+   * @see ch.o2it.weblounge.common.request.CacheHandle#setRecheckTime(long)
    */
   public final void setRecheckTime(long recheck) {
     this.recheck = (recheck > Times.MS_PER_SECOND) ? recheck : Times.MS_PER_SECOND;
@@ -185,34 +183,42 @@ public class CacheHandleImpl implements CacheHandle {
     if (key == null)
       throw new IllegalStateException("Key has not been set");
     if (o instanceof CacheHandle) {
-      return key.equals(((CacheHandle)o).getKey());
+      return key.equals(((CacheHandle) o).getKey());
     }
     return false;
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#addTag(java.lang.String,
-   *      ava.lang.String)
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Taggable#addTag(java.lang.String,
+   *      java.lang.String)
    */
   public boolean addTag(String key, String value) {
     return tags.add(new CacheTagImpl(key, value));
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#addTag(ch.o2it.weblounge.api.util.Tag)
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Taggable#addTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean addTag(CacheTag tag) {
     return tags.add(tag);
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#addTags(java.util.Collection)
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Taggable#addTags(java.util.Collection)
    */
   public boolean addTags(Collection<CacheTag> t) {
     return tags.addAll(t);
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#removeTags(java.lang.String)
    */
   public boolean removeTags(String name) {
@@ -239,14 +245,18 @@ public class CacheHandleImpl implements CacheHandle {
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#clearTags()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Taggable#clearTags()
    */
   public void clearTags() {
     tags.clear();
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#containsTag(ch.o2it.weblounge.api.util.Tag)
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Taggable#containsTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean containsTag(CacheTag tag) {
     return tags.contains(tag);
@@ -278,20 +288,26 @@ public class CacheHandleImpl implements CacheHandle {
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#isTagged()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Taggable#isTagged()
    */
   public boolean isTagged() {
     return !tags.isEmpty();
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#removeTags(ch.o2it.weblounge.api.util.Tag)
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Taggable#removeTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean removeTag(CacheTag tag) {
     return tags.remove(tag);
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.Taggable#getTags()
    */
   public CacheTag[] getTags() {
@@ -299,15 +315,17 @@ public class CacheHandleImpl implements CacheHandle {
   }
 
   /**
-   * @see ch.o2it.weblounge.api.util.Taggable#tags()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Taggable#tags()
    */
   public Iterator<CacheTag> tags() {
     return Collections.unmodifiableSet(tags).iterator();
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
