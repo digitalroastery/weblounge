@@ -497,7 +497,6 @@ public class ComposerTagSupport extends WebloungeTag {
     logger.debug("Rendering composer " + name);
 
     Site site = request.getSite();
-    WebUrl url = request.getUrl();
     ComposerImpl composer = new ComposerImpl(name);
     JspWriter writer = pageContext.getOut();
 
@@ -507,37 +506,10 @@ public class ComposerTagSupport extends WebloungeTag {
 
       // Flush all input that has been written to the response so far.
       writer.flush();
-      if (debug) {
-        writer.println("<!-- start content of composer '" + name + "' -->");
-        writer.flush();
-      }
-
       try {
 
         // Add tags for this composer
-        response.addTag(CacheTag.Url, url.getPath());
-        response.addTag(CacheTag.Url, request.getRequestedUrl().getPath());
         response.addTag(CacheTag.Composer, name);
-        response.addTag(CacheTag.Site, url.getSite().getIdentifier());
-        response.addTag(CacheTag.Language, request.getLanguage().getIdentifier());
-        response.addTag(CacheTag.User, request.getUser().getLogin());
-        Enumeration<?> pe = request.getParameterNames();
-        int parameterCount = 0;
-        while (pe.hasMoreElements()) {
-          parameterCount++;
-          String key = pe.nextElement().toString();
-          String[] values = request.getParameterValues(key);
-          for (String value : values) {
-            response.addTag(key, value);
-          }
-        }
-        response.addTag(CacheTag.Parameters, Integer.toString(parameterCount));
-
-        // Add action specific tags and adjust valid and recheck time
-        if (action != null) {
-          response.addTag(CacheTag.Module, action.getModule().getIdentifier());
-          response.addTag(CacheTag.Action, action.getIdentifier());
-        }
 
         // Flush all output so far
         writer.flush();
@@ -684,41 +656,15 @@ public class ComposerTagSupport extends WebloungeTag {
         return;
       }
 
-      // Adjust the cache settings
-      if (request.getVersion() == Resource.LIVE) {
+      // Flush all data that has been created previously
+      writer.flush();
 
-        // Add tags for this pagelet
-        response.addTag(CacheTag.Url, url.getPath());
-        response.addTag(CacheTag.Url, request.getRequestedUrl().getPath());
-        response.addTag(CacheTag.Composer, name);
-        response.addTag(CacheTag.Position, Integer.toString(position));
-        response.addTag(CacheTag.Module, pagelet.getModule());
-        response.addTag(CacheTag.Renderer, pagelet.getIdentifier());
-        response.addTag(CacheTag.Language, request.getLanguage().getIdentifier());
-        response.addTag(CacheTag.User, request.getUser().getLogin());
-        response.addTag(CacheTag.Site, url.getSite().getIdentifier());
-        Enumeration<?> pe = request.getParameterNames();
-        int parameterCount = 0;
-        while (pe.hasMoreElements()) {
-          parameterCount++;
-          String key = pe.nextElement().toString();
-          String[] values = request.getParameterValues(key);
-          for (String value : values) {
-            response.addTag(key, value);
-          }
-        }
-        response.addTag(CacheTag.Parameters, Integer.toString(parameterCount));
+      response.addTag(CacheTag.Position, Integer.toString(position));
+      response.addTag(CacheTag.Module, pagelet.getModule());
+      response.addTag(CacheTag.Renderer, pagelet.getIdentifier());
 
-        response.setMaximumRecheckTime(renderer.getRecheckTime());
-        response.setMaximumValidTime(renderer.getValidTime());
-
-        // Add cache tag for content provider (in case of inheritance)
-        if (contentProvider != null && !contentProvider.equals(targetPage)) {
-          response.addTag(CacheTag.Url, contentProvider.getURI().getPath());
-        }
-
-        writer.flush();
-      }
+      response.setMaximumRecheckTime(renderer.getRecheckTime());
+      response.setMaximumValidTime(renderer.getValidTime());
 
       // Pass control to callback
       int beforePageletResult = beforePagelet(pagelet, position, writer);

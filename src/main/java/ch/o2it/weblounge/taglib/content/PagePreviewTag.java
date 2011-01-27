@@ -238,6 +238,7 @@ public class PagePreviewTag extends WebloungeTag {
       }
 
       pageUrl = new WebUrlImpl(site, page.getURI().getPath());
+      response.addTag(CacheTag.Url, pageUrl.getPath());
     }
 
     PageTemplate template = site.getTemplate(page.getTemplate());
@@ -440,6 +441,10 @@ public class PagePreviewTag extends WebloungeTag {
           }
 
         } // render?
+        
+        // Add cache tags
+        response.addTag(CacheTag.Module, pagelet.getModule());
+        response.addTag(CacheTag.Renderer, pagelet.getIdentifier());
 
       } catch (Throwable t) {
         String msg = "Exception when processing pagelet '" + pagelet.getURI() + "'";

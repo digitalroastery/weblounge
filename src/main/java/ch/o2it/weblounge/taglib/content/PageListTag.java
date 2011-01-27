@@ -29,6 +29,7 @@ import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -56,7 +57,7 @@ public class PageListTag extends WebloungeTag {
   private static final long serialVersionUID = -1825541321489778143L;
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(PageHeaderTag.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(PageListTag.class.getName());
 
   /** The list of keywords */
   private List<String> subjects = null;
@@ -160,6 +161,7 @@ public class PageListTag extends WebloungeTag {
   /**
    * Indicates the required headlines. The headline element types need to be
    * passed in as comma separated strings, e. g.
+   * 
    * <pre>
    * text/title, repository/image
    * </pre>
@@ -179,11 +181,16 @@ public class PageListTag extends WebloungeTag {
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
   public int doStartTag() throws JspException {
     index = 0;
+    
+    // Save the current pagelet so that we can restore it later
     pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
+    
     try {
       return (loadNextPage()) ? EVAL_BODY_INCLUDE : SKIP_BODY;
     } catch (ContentRepositoryException e) {
@@ -192,7 +199,9 @@ public class PageListTag extends WebloungeTag {
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.IterationTag#doAfterBody()
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doAfterBody()
    */
   public int doAfterBody() throws JspException {
     index++;
@@ -207,7 +216,9 @@ public class PageListTag extends WebloungeTag {
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.Tag#doEndTag()
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.taglib.WebloungeTag#doEndTag()
    */
   public int doEndTag() throws JspException {
     pageContext.removeAttribute(PageListTagExtraInfo.PREVIEW);
@@ -237,12 +248,12 @@ public class PageListTag extends WebloungeTag {
 
       // Specify which pages to load
       SearchQuery query = new SearchQueryImpl(site);
-      
+
       // Add the keywords
       for (String subject : subjects) {
         query.withSubject(subject);
       }
-      
+
       // Add the pagelets required on state
       for (String headline : requiredPagelets) {
         String[] parts = headline.split("/");
@@ -272,19 +283,20 @@ public class PageListTag extends WebloungeTag {
       // Store the important properties
       url = item.getUrl();
       page = item.getPage();
-      
+
       // TODO security check
 
       found = true;
     }
 
-    // Set the headline in the request
+    // Set the headline in the request and add caching information
     if (found && page != null) {
       this.page = page;
       this.preview = new ComposerImpl("stage", page.getPreview());
       this.url = url;
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
+      response.addTag(CacheTag.Url, url.getPath());
     }
 
     return found;
@@ -292,7 +304,7 @@ public class PageListTag extends WebloungeTag {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.taglib.WebloungeTag#reset()
    */
   @Override

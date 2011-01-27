@@ -20,8 +20,10 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.WebloungeTag;
@@ -93,14 +95,25 @@ public class LinkTag extends WebloungeTag {
   }
 
   /**
-   * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
    */
   public int doStartTag() throws JspException {
     super.doStartTag();
 
     try {
       ContentRepository repo = ContentRepositoryFactory.getRepository(request.getSite());
-      Page page = (Page) repo.get(new PageURIImpl(request.getSite(), null, resourceid));
+      ResourceURI pageURI = new PageURIImpl(request.getSite(), null, resourceid);
+      Page page = (Page) repo.get(pageURI);
+      if (page == null) {
+        logger.warn("Unable to link to non-existing page {}", pageURI);
+        return SKIP_BODY;
+      }
+
+      // Add cache tag
+      response.addTag(CacheTag.Url, page.getURI().getPath());
+
       String link = page.getURI().getPath();
 
       // anchor

@@ -509,15 +509,6 @@
 	</tag>
 
 	<tag>
-		<description>Extracts the page header from the database</description>
-		<display-name>Page Header</display-name>
-		<name>pageheader</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PageHeaderTag</tag-class>
-		<body-content>JSP</body-content>
-		<attribute><name>pageid</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
-	</tag>
-	
-	<tag>
 		<description>Extracts a number of pages from the database</description>
 		<display-name>List of pages</display-name>
 		<name>pagelist</name>

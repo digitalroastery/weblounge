@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
+import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
@@ -159,6 +160,10 @@ public class ActionTag extends WebloungeTag {
     try {
       if (action == null)
         return EVAL_PAGE;
+      
+      // Add cache tags
+      response.addTag(CacheTag.Module, action.getModule().getIdentifier());
+      response.addTag(CacheTag.Action, action.getIdentifier());
 
       StringBuffer a = new StringBuffer("<a ");
       if (getId() != null)
