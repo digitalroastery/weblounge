@@ -63,7 +63,7 @@ public class DynamicPolicy extends Policy {
   public PermissionCollection getPermissions(ProtectionDomain domain) {
     PermissionCollection permissions = deferredPolicy.getPermissions(domain);
     Principal[] principals = domain.getPrincipals();
-    for (Principal principal : principals) {
+    for (@SuppressWarnings("unused") Principal principal : principals) {
       // TODO: Translate custom/well-known principals into permissions
     }
     return permissions;

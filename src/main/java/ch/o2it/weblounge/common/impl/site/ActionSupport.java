@@ -29,7 +29,6 @@ import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
 import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.content.page.ScriptImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -409,15 +408,14 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     User user = request.getUser();
     long validTime = renderer.getValidTime();
     long recheckTime = renderer.getRecheckTime();
-    CacheTagSet rendererTagSet = new CacheTagSet();
 
-    rendererTagSet.add(CacheTag.Site, request.getSite().getIdentifier());
-    rendererTagSet.add(CacheTag.Url, request.getUrl().getPath());
-    rendererTagSet.add(CacheTag.Url, request.getRequestedUrl().getPath());
-    rendererTagSet.add(CacheTag.Language, language.getIdentifier());
-    rendererTagSet.add(CacheTag.User, user.getLogin());
-    rendererTagSet.add(CacheTag.Module, getModule().getIdentifier());
-    rendererTagSet.add(CacheTag.Action, getIdentifier());
+    response.addTag(CacheTag.Site, request.getSite().getIdentifier());
+    response.addTag(CacheTag.Url, request.getUrl().getPath());
+    response.addTag(CacheTag.Url, request.getRequestedUrl().getPath());
+    response.addTag(CacheTag.Language, language.getIdentifier());
+    response.addTag(CacheTag.User, user.getLogin());
+    response.addTag(CacheTag.Module, getModule().getIdentifier());
+    response.addTag(CacheTag.Action, getIdentifier());
     Enumeration<?> pe = request.getParameterNames();
     int parameterCount = 0;
     while (pe.hasMoreElements()) {
@@ -425,26 +423,20 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       String key = pe.nextElement().toString();
       String[] values = request.getParameterValues(key);
       for (String value : values) {
-        rendererTagSet.add(key, value);
+        response.addTag(key, value);
       }
     }
-    rendererTagSet.add(CacheTag.Parameters, Integer.toString(parameterCount));
-    if (response.startResponsePart(rendererTagSet.getTags(), validTime, recheckTime)) {
-      logger.debug("Action handler {} answered request for {} from cache", this, renderer);
-      return;
-    }
+    response.addTag(CacheTag.Parameters, Integer.toString(parameterCount));
+    response.setMaximumValidTime(validTime);
+    response.setMaximumRecheckTime(recheckTime);
 
     // Add additional cache tags
     if (renderer.getModule() != null)
       response.addTag(CacheTag.Module, renderer.getModule().getIdentifier());
+    response.addTag(CacheTag.Renderer, renderer.getIdentifier());
 
     // Include renderer in response
-    try {
-      response.addTag(CacheTag.Renderer, renderer.getIdentifier());
-      renderer.render(request, response);
-    } finally {
-      response.endResponsePart();
-    }
+    renderer.render(request, response);
     includeCount++;
   }
 
