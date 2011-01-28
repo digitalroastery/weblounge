@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
-import ch.o2it.weblounge.common.impl.url.PathUtils;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
@@ -245,7 +245,7 @@ public class SearchQueryImpl implements SearchQuery {
   public SearchQuery withPath(String path) {
     if (path == null)
       throw new IllegalArgumentException("Path cannot be null");
-    this.path = PathUtils.trim(path);
+    this.path = UrlUtils.trim(path);
     return this;
   }
 
