@@ -39,7 +39,7 @@ import ch.o2it.weblounge.common.site.Site;
  * <li><code>http://www.example.org/test/127.(html|json|xml)</code></li>
  * </ul>
  */
-public interface WebUrl extends Url {
+public interface WebUrl extends Path {
 
   /** The url separator character */
   char separatorChar = '/';

@@ -26,7 +26,7 @@ import java.io.Serializable;
  * A <code>Url</code> is what defines a path to a page, a binary resource or
  * an action in the system.
  */
-public interface Url extends Serializable {
+public interface Path extends Serializable {
 
   /**
    * Returns the url separator character, like '/' in web urls.
@@ -69,7 +69,7 @@ public interface Url extends Serializable {
    *          the url
    * @return <code>true</code> if this url is a prefix
    */
-  boolean isPrefixOf(Url url);
+  boolean isPrefixOf(Path url);
 
   /**
    * Returns <code>true</code> if this url is an extension of <code>url</code>
@@ -80,6 +80,6 @@ public interface Url extends Serializable {
    *          the url
    * @return <code>true</code> if this url is a prefix
    */
-  boolean isExtensionOf(Url url);
+  boolean isExtensionOf(Path url);
 
 }

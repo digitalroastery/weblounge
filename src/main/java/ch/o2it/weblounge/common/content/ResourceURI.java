@@ -21,13 +21,13 @@
 package ch.o2it.weblounge.common.content;
 
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.Url;
+import ch.o2it.weblounge.common.url.Path;
 
 /**
  * A page uri defines the location of a page within a <code>Site</code>. In
  * addition, it provides a unique identifier and a page version.
  */
-public interface ResourceURI extends Url {
+public interface ResourceURI extends Path {
 
   /**
    * Sets the resource identifier.
@@ -49,13 +49,6 @@ public interface ResourceURI extends Url {
    * @param path the path
    */
   void setPath(String path);
-
-  /**
-   * Returns the path of the page that this uri is pointing to.
-   * 
-   * @return the path
-   */
-  String getPath();
 
   /**
    * Sets the resource type.
