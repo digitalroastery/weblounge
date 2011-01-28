@@ -98,8 +98,7 @@ public class UrlImplTest {
     assertEquals(UrlUtils.trim(defaultUrlPath), defaultUrl.getPath());
     assertEquals(PathUtils.trim(defaultFilePath), defaultPath.getPath());
     assertEquals("/", new UrlImpl("/").getPath());
-    // TODO: Re-enable as soon as the trim() function is fixed in UrlImpl
-    //assertEquals("/", new UrlImpl("//").getPath());
+    assertEquals("/", new UrlImpl("//").getPath());
     assertFalse("/".equals(new UrlImpl("/test").getPath()));
   }
 

@@ -36,9 +36,15 @@ public class UrlImpl implements Path {
   /** The url that is represented */
   protected String path = null;
 
+  /** The path separator */
+  protected String pathElementSeparator = null;
+
   /** The path separator character */
   protected char pathElementSeparatorChar = 0;
 
+  /** Static constant used to filter out double path separators */
+  protected String doublePathElementSeparator = null;
+  
   /**
    * Creates a new url from a given path using the default path separator
    * <code>"/"</code>.
@@ -73,6 +79,15 @@ public class UrlImpl implements Path {
    */
   public UrlImpl(String path, char separator) {
     this.pathElementSeparatorChar = separator;
+    this.pathElementSeparator = Character.toString(separator);
+    
+    // Build the double path separator
+    StringBuffer buf = new StringBuffer();
+    buf.append(separator).append(separator);
+    if ('\\' == separator)
+      buf.append(separator).append(separator);
+    this.doublePathElementSeparator = buf.toString();
+
     if (path != null)
       setPath(path);
   }
@@ -84,7 +99,7 @@ public class UrlImpl implements Path {
    *          the path separator character
    */
   protected UrlImpl(char separator) {
-    this.pathElementSeparatorChar = separator;
+    this(null, separator);
     this.path = "/";
   }
 
@@ -213,15 +228,13 @@ public class UrlImpl implements Path {
     if (url == null)
       return null;
     url = url.trim().toLowerCase();
-    String separator = Character.toString(pathElementSeparatorChar);
-    // TODO: this fails if the separator is the windows file separator
-    //url = url.replaceAll(separator + separator, separator);
-    if (url.endsWith(separator) || url.equals(separator))
+    url = url.replace(doublePathElementSeparator, pathElementSeparator);
+    if (url.endsWith(pathElementSeparator) || url.equals(pathElementSeparator))
       return url;
-    int index = url.lastIndexOf(separator);
+    int index = url.lastIndexOf(pathElementSeparator);
     index = url.indexOf(".", index);
     if (index < 0)
-      url += separator;
+      url += pathElementSeparator;
     return url;
   }
 
