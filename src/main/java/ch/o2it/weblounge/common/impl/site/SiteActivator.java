@@ -122,7 +122,7 @@ public class SiteActivator {
       logger.debug("Registering site '{}' in the service registry", site);
       siteService = bundleContext.registerService(Site.class.getName(), site, context.getProperties());
 
-      logger.info("Site '{}' loaded", site);
+      logger.debug("Site '{}' loaded", site);
     } else {
       logger.warn("Site activator was unable to locate site.xml");
     }
