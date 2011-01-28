@@ -86,7 +86,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   public static final String DEFAULT_BUNDLE_ENTRY = "/site";
 
   /** Service pid, used to look up the service configuration */
-  public static final String SERVICE_PID = "ch.o2it.weblounge.siteregistration";
+  public static final String SERVICE_PID = "ch.o2it.weblounge.sitedispatcher";
 
   /** Configuration key prefix for jsp precompilation */
   public static final String OPT_PRECOMPILE = "precompile";
@@ -101,7 +101,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   public static final String OPT_JASPER_SCRATCHDIR = "scratchdir";
 
   /** Default value for jasper's <code>scratchDir</code> compiler context */
-  public static final String DEFAULT_JASPER_WORK_DIR = "/weblounge/tmp/jasper";
+  public static final String DEFAULT_JASPER_SCRATCH_DIR = "jasper";
 
   /** The http service */
   private WebContainer paxHttpService = null;
@@ -154,7 +154,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     // Configure the default jasper work directory where compiled java classes
     // go
     String tmpDir = System.getProperty("java.io.tmpdir");
-    String scratchDir = PathUtils.concat(tmpDir, DEFAULT_JASPER_WORK_DIR);
+    String scratchDir = PathUtils.concat(tmpDir, DEFAULT_JASPER_SCRATCH_DIR);
     jasperConfig.put(OPT_JASPER_SCRATCHDIR, scratchDir);
 
     // Try to get hold of the service configuration
@@ -275,7 +275,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
         FileUtils.forceMkdir(new File(scratchDir));
         logger.debug("Temporary jsp source files and classes go to {}", scratchDir);
       } catch (IOException e) {
-        throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper sratch directory at " + scratchDir + ": " + e.getMessage());
+        throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper scratch directory at " + scratchDir + ": " + e.getMessage());
       }
     }
 
