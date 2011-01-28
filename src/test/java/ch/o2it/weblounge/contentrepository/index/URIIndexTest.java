@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.index.URIIndex;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,7 +81,8 @@ public class URIIndexTest {
    */
   @After
   public void tearDown() throws Exception {
-    indexFile.delete();
+    idx.close();
+    FileUtils.deleteQuietly(indexFile);
   }
 
   /**
