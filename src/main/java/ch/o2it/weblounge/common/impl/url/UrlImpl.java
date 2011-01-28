@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.common.impl.url;
 
-import ch.o2it.weblounge.common.url.Url;
+import ch.o2it.weblounge.common.url.Path;
 
 /**
  * This class implements common url and path behavior.
  */
-public class UrlImpl implements Url {
+public class UrlImpl implements Path {
 
   /** Serial version uid */
   private static final long serialVersionUID = 3314907623908539157L;
@@ -59,7 +59,7 @@ public class UrlImpl implements Url {
    * @param path
    *          the url path
    */
-  public UrlImpl(Url url, String path) {
+  public UrlImpl(Path url, String path) {
     this(concat(url.getPath(), path, url.getPathSeparator()), url.getPathSeparator());
   }
 
@@ -91,7 +91,7 @@ public class UrlImpl implements Url {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.url.Url#getPathSeparator()
+   * @see ch.o2it.weblounge.common.url.Path#getPathSeparator()
    */
   public char getPathSeparator() {
     return pathElementSeparatorChar;
@@ -111,7 +111,7 @@ public class UrlImpl implements Url {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.url.Url#getPath()
+   * @see ch.o2it.weblounge.common.url.Path#getPath()
    */
   public String getPath() {
     return path;
@@ -137,7 +137,7 @@ public class UrlImpl implements Url {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.url.Url#startsWith(java.lang.String)
+   * @see ch.o2it.weblounge.common.url.Path#startsWith(java.lang.String)
    */
   public boolean startsWith(String path) {
     if (path == null)
@@ -149,7 +149,7 @@ public class UrlImpl implements Url {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.url.Url#endsWith(java.lang.String)
+   * @see ch.o2it.weblounge.common.url.Path#endsWith(java.lang.String)
    */
   public boolean endsWith(String path) {
     if (path == null)
@@ -161,9 +161,9 @@ public class UrlImpl implements Url {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.url.Url#isPrefixOf(ch.o2it.weblounge.common.url.Url)
+   * @see ch.o2it.weblounge.common.url.Path#isPrefixOf(ch.o2it.weblounge.common.url.Path)
    */
-  public boolean isPrefixOf(Url url) {
+  public boolean isPrefixOf(Path url) {
     if (url == null)
       throw new IllegalArgumentException("Cannot be prepended by null!");
     return url.getPath().indexOf(path) == 0;
@@ -172,9 +172,9 @@ public class UrlImpl implements Url {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.url.Url#isExtensionOf(ch.o2it.weblounge.common.url.Url)
+   * @see ch.o2it.weblounge.common.url.Path#isExtensionOf(ch.o2it.weblounge.common.url.Path)
    */
-  public boolean isExtensionOf(Url url) {
+  public boolean isExtensionOf(Path url) {
     return path.indexOf(url.getPath()) == 0;
   }
 
@@ -240,8 +240,8 @@ public class UrlImpl implements Url {
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Url) {
-      Url url = (Url) obj;
+    if (obj != null && obj instanceof Path) {
+      Path url = (Path) obj;
       return path.equals(url.getPath());
     }
     return super.equals(obj);

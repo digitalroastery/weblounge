@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.Url;
+import ch.o2it.weblounge.common.url.Path;
 import ch.o2it.weblounge.common.url.WebUrl;
 
 import org.slf4j.Logger;
@@ -120,7 +120,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @param url
    *          the url
    */
-  public WebUrlImpl(Site site, Url url) {
+  public WebUrlImpl(Site site, Path url) {
     this(site, url.getPath());
   }
 
@@ -143,7 +143,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
    * @param path
    *          the path to append
    */
-  public WebUrlImpl(Site site, Url url, String path) {
+  public WebUrlImpl(Site site, Path url, String path) {
     this(site, concat(url.getPath(), path, '/'));
   }
 
@@ -451,7 +451,7 @@ public class WebUrlImpl extends UrlImpl implements WebUrl {
       if (!site.equals(url.getSite()))
         return false;
       return true;
-    } else if (object instanceof Url) {
+    } else if (object instanceof Path) {
       return super.equals(object);
     }
     return false;

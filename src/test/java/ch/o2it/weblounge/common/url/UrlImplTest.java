@@ -76,7 +76,7 @@ public class UrlImplTest {
    */
   @Test
   public void testUrlImplUrlString() {
-    Url u = new UrlImpl(defaultUrl, "a/b");
+    Path u = new UrlImpl(defaultUrl, "a/b");
     String extendedPath = UrlUtils.concat(defaultUrlPath, "a/b/");
     assertEquals(u.getPath(), extendedPath);
   }
@@ -118,7 +118,7 @@ public class UrlImplTest {
    */
   @Test
   public void testStartsWith() {
-    Url u = new UrlImpl("/ab/c/d");
+    Path u = new UrlImpl("/ab/c/d");
     assertTrue(u.startsWith("/ab"));
     assertFalse(u.startsWith("ab"));
     assertFalse(u.startsWith("abc"));
@@ -130,7 +130,7 @@ public class UrlImplTest {
    */
   @Test
   public void testEndsWith() {
-    Url u = new UrlImpl("/ab/c/d");
+    Path u = new UrlImpl("/ab/c/d");
     assertTrue(u.endsWith("d"));
     assertTrue(u.endsWith("/d"));
     assertTrue(u.endsWith("/d/"));
@@ -139,24 +139,24 @@ public class UrlImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.UrlImpl#isPrefixOf(ch.o2it.weblounge.common.url.Url)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.url.UrlImpl#isPrefixOf(ch.o2it.weblounge.common.url.Path)}.
    */
   @Test
   public void testIsPrefixOf() {
-    Url u1 = new UrlImpl(defaultUrl, "/abc");
-    Url u2 = new UrlImpl("/abc");
+    Path u1 = new UrlImpl(defaultUrl, "/abc");
+    Path u2 = new UrlImpl("/abc");
     assertTrue(defaultUrl.isPrefixOf(u1));
     assertTrue(defaultUrl.isPrefixOf(defaultUrl));
     assertFalse(defaultUrl.isPrefixOf(u2));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.url.UrlImpl#isExtensionOf(ch.o2it.weblounge.common.url.Url)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.url.UrlImpl#isExtensionOf(ch.o2it.weblounge.common.url.Path)}.
    */
   @Test
   public void testIsExtensionOf() {
-    Url u1 = new UrlImpl(defaultUrl, "/abc");
-    Url u2 = new UrlImpl("/abc");
+    Path u1 = new UrlImpl(defaultUrl, "/abc");
+    Path u2 = new UrlImpl("/abc");
     assertTrue(u1.isExtensionOf(defaultUrl));
     assertTrue(defaultUrl.isExtensionOf(defaultUrl));
     assertFalse(u1.isExtensionOf(u2));
