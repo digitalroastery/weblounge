@@ -24,7 +24,6 @@ import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.url.WebUrl;
 
@@ -308,24 +307,19 @@ public interface Module extends Customizable {
   Job getJob(String id);
 
   /**
-   * Sets the module name in the given language.
+   * Sets the module name.
    * 
    * @param name
    *          the module name
-   * @param language
-   *          the language
    */
-  void setName(String name, Language language);
+  void setName(String name);
 
   /**
-   * Returns the module name in the given language or, if it doesn't exist, in
-   * the site default language.
+   * Returns the module name.
    * 
-   * @param language
-   *          the language
-   * @return the name in the given language
+   * @return the name
    */
-  String getName(Language language);
+  String getName();
 
   /**
    * Returns an <code>XML</code> representation of the module, which will look

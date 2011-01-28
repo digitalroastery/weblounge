@@ -20,8 +20,6 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
-import ch.o2it.weblounge.common.language.Language;
-
 import java.io.Serializable;
 import java.util.Dictionary;
 
@@ -49,14 +47,12 @@ public interface Job {
   String getIdentifier();
 
   /**
-   * Sets the name in the specified language.
+   * Sets the job name.
    * 
    * @param name
    *          the name
-   * @param language
-   *          the language
    */
-  void setName(String name, Language language);
+  void setName(String name);
 
   /**
    * Returns the job name.
@@ -64,30 +60,6 @@ public interface Job {
    * @return the job name
    */
   String getName();
-
-  /**
-   * Returns the job name in the required language. If not available,
-   * the name will be returned in the default language.
-   * 
-   * @param language
-   *          the required language
-   * @return the job name
-   */
-  String getName(Language language);
-
-  /**
-   * Returns the job name in the required language. If not available,
-   * either <code>null</code> or the name in a fallback language will be
-   * returned, depending on the value of <code>force</code>.
-   * 
-   * @param language
-   *          the required language
-   * @param force
-   *          <code>true</code> to force a <code>null</code> value rather then a
-   *          fallback language
-   * @return the job name
-   */
-  String getName(Language language, boolean force);
 
   /**
    * Sets the job implementation.

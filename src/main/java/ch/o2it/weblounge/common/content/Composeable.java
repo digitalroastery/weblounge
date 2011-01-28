@@ -21,8 +21,6 @@
 package ch.o2it.weblounge.common.content;
 
 import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
 
 /**
  * This interface defines common methods and fields for composeable objects like
@@ -40,7 +38,7 @@ import ch.o2it.weblounge.common.language.Localizable;
  * composeable can indicate this to the system by returning proper values in
  * {@link #getValidTime()} and {@link #getRecheckTime()}.
  */
-public interface Composeable extends Localizable {
+public interface Composeable {
 
   /**
    * Sets the composeable identifier.
@@ -74,14 +72,12 @@ public interface Composeable extends Localizable {
   boolean isComposeable();
 
   /**
-   * Sets the name in the specified language.
+   * Sets the name.
    * 
    * @param name
    *          the name
-   * @param language
-   *          the language
    */
-  void setName(String name, Language language);
+  void setName(String name);
 
   /**
    * Returns the composeable name.
@@ -89,30 +85,6 @@ public interface Composeable extends Localizable {
    * @return the composeable name
    */
   String getName();
-
-  /**
-   * Returns the composeable name in the required language. If not available,
-   * the name will be returned in the default language.
-   * 
-   * @param language
-   *          the required language
-   * @return the composeable name
-   */
-  String getName(Language language);
-
-  /**
-   * Returns the composeable name in the required language. If not available,
-   * either <code>null</code> or the name in a fallback language will be
-   * returned, depending on the value of <code>force</code>.
-   * 
-   * @param language
-   *          the required language
-   * @param force
-   *          <code>true</code> to force a <code>null</code> value rather then a
-   *          fallback language
-   * @return the composeable name
-   */
-  String getName(Language language, boolean force);
 
   /**
    * Sets the number of milliseconds that content represented by this
