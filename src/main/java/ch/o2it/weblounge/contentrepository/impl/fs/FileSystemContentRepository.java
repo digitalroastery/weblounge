@@ -41,6 +41,7 @@ import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +73,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
   /** Configuration key for the repository's root directory */
   public static final String OPT_ROOT_DIR = CONF_PREFIX + "root";
+  
+  /** Default directory root directory name */
+  public static final String ROOT_DIR_DEFAULT = "sites-data";
 
   /** Name of the index path element right below the repository root */
   public static final String INDEX_PATH = "index";
@@ -101,8 +105,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Detect the filesystem root directory
     String fsRootDir = (String) properties.get(OPT_ROOT_DIR);
-    if (fsRootDir == null) {
-      fsRootDir = UrlUtils.concat(System.getProperty("java.io.tmpdir"), "repository");
+    if (StringUtils.isBlank(fsRootDir)) {
+      fsRootDir = UrlUtils.concat(System.getProperty("java.io.tmpdir"), ROOT_DIR_DEFAULT);
     }
     repositoryRoot = new File(fsRootDir, site.getIdentifier());
     logger.debug("Content repository root is located at {}", repositoryRoot);
