@@ -242,7 +242,7 @@ public class SiteServlet extends HttpServlet {
       throw e;
     } catch (Throwable t) {
       // re-thrown
-      logger.error("Wow, certainly didn't expect this to happen!", t);
+      logger.error("Error while serving jsp {}: {}", request.getRequestURI(), t.getMessage());
       throw new ServletException(t);
     }
   }
