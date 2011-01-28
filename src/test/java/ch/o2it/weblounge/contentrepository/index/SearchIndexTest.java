@@ -52,7 +52,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -70,14 +72,14 @@ import java.util.UUID;
 public class SearchIndexTest {
 
   /** The search index */
-  protected SearchIndex idx = null;
+  protected static SearchIndex idx = null;
 
   /** The index root directory */
-  protected File idxRoot = null;
+  protected static File idxRoot = null;
 
   /** Flag to indicate read only index */
-  protected boolean isReadOnly = false;
-  
+  protected static boolean isReadOnly = false;
+
   /** Page template */
   protected PageTemplate template = null;
 
@@ -98,7 +100,7 @@ public class SearchIndexTest {
 
   /** UUID of page 2 */
   protected String uuid2 = "4bb19980-8f98-4873-a813-71b6dfab22ag";
-  
+
   /** UUID of the image resource */
   protected String imageid = "4bb19980-8f98-4873-a813-71b6dfab22as";
 
@@ -121,6 +123,32 @@ public class SearchIndexTest {
   protected String elementValue = "joyeux";
 
   /**
+   * Sets up the solr search index. Since solr sometimes has a hard time
+   * shutting down cleanly, it's done only once for all the tests.
+   * 
+   * @throws Exception
+   */
+  @BeforeClass
+  public static void setupClass() throws Exception {
+    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+    idxRoot = new File(rootPath);
+    idx = new SearchIndex(idxRoot, isReadOnly);
+  }
+
+  /**
+   * Does the cleanup after the test suite.
+   */
+  @AfterClass
+  public static void tearDownClass() {
+    try {
+      idx.close();
+      FileUtils.deleteQuietly(idxRoot);
+    } catch (IOException e) {
+      fail("Error closing search index: " + e.getMessage());
+    }
+  }
+
+  /**
    * Creates the test setup.
    * 
    * @throws java.lang.Exception
@@ -128,27 +156,23 @@ public class SearchIndexTest {
    */
   @Before
   public void setUp() throws Exception {
-    String rootPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-    idxRoot = new File(rootPath);
-    idx = new SearchIndex(idxRoot, isReadOnly);
-
     // Template
     template = EasyMock.createNiceMock(PageTemplate.class);
     EasyMock.expect(template.getIdentifier()).andReturn("templateid").anyTimes();
     EasyMock.expect(template.getStage()).andReturn("non-existing").anyTimes();
     EasyMock.replay(template);
-    
+
     Set<Language> languages = new HashSet<Language>();
     languages.add(LanguageUtils.getLanguage("en"));
     languages.add(LanguageUtils.getLanguage("de"));
-    
+
     // Site
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
-    EasyMock.expect(site.getTemplate((String)EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
     EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
     EasyMock.replay(site);
-    
+
     // Resource serializers
     ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
     ResourceSerializerFactory.setResourceSerializerService(serializerService);
@@ -160,7 +184,7 @@ public class SearchIndexTest {
     PageReader pageReader = new PageReader();
     pages = new Page[2];
     for (int i = 0; i < pages.length; i++) {
-      InputStream is = this.getClass().getResourceAsStream("/page" + (i+1) + ".xml");
+      InputStream is = this.getClass().getResourceAsStream("/page" + (i + 1) + ".xml");
       pages[i] = pageReader.read(is, site);
       IOUtils.closeQuietly(is);
     }
@@ -170,7 +194,7 @@ public class SearchIndexTest {
     InputStream fileIs = this.getClass().getResourceAsStream("/file.xml");
     file = fileReader.read(fileIs, site);
     IOUtils.closeQuietly(fileIs);
-    
+
     // Prepare the sample image
     ImageResourceReader imageReader = new ImageResourceReader();
     InputStream imageIs = this.getClass().getResourceAsStream("/image.xml");
@@ -183,12 +207,6 @@ public class SearchIndexTest {
    */
   @After
   public void tearDown() {
-    try {
-      idx.close();
-      FileUtils.deleteQuietly(idxRoot);
-    } catch (IOException e) {
-      fail("Error closing search index: " + e.getMessage());
-    }
   }
 
   /**
@@ -287,7 +305,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test 
+  @Test
   public void testGetWithCreationDate() {
     populateIndex();
     try {
@@ -330,7 +348,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test 
+  @Test
   public void testGetWithModificationDate() {
     populateIndex();
     try {
@@ -353,7 +371,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test 
+  @Test
   public void testGetWithPublisher() {
     populateIndex();
     try {
@@ -373,7 +391,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test 
+  @Test
   public void testGetWithPublishingDate() {
     populateIndex();
     try {
@@ -396,7 +414,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test 
+  @Test
   public void testGetWithSubjects() {
     populateIndex();
     try {
@@ -434,7 +452,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test 
+  @Test
   public void testGetWithProperty() {
     populateIndex();
     try {
@@ -452,7 +470,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test 
+  @Test
   public void testGetWithFilename() {
     populateIndex();
     try {
@@ -470,7 +488,7 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
    * .
    */
-  @Test 
+  @Test
   public void testGetWithMimetype() {
     populateIndex();
     try {
@@ -586,11 +604,11 @@ public class SearchIndexTest {
    * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#move(ch.o2it.weblounge.common.content.ResourceURI, java.lang.String)}
    * .
    */
-  @Test 
+  @Test
   public void testMove() {
     int resources = populateIndex();
     String newPath = "/new/path/test";
-    
+
     // Post the update
     try {
       idx.move(pages[0].getURI(), newPath);
@@ -603,7 +621,7 @@ public class SearchIndexTest {
     try {
       SearchQuery q = new SearchQueryImpl(site).withPath(newPath);
       assertEquals(1, idx.getByQuery(q).getItems().length);
-      
+
       // Make sure the number of pages remains the same
       q = new SearchQueryImpl(site);
       assertEquals(resources, idx.getByQuery(q).getItems().length);
@@ -621,31 +639,31 @@ public class SearchIndexTest {
    */
   protected int populateIndex() {
     int count = 0;
-    
+
     // Add the pages
     try {
       for (Page page : pages) {
         idx.add(page);
-        count ++;
+        count++;
       }
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample page to the index failed");
     }
-    
+
     // Add the file
     try {
       idx.add(file);
-      count ++;
+      count++;
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample file to the index failed");
     }
-    
+
     // Add the image
     try {
       idx.add(image);
-      count ++;
+      count++;
     } catch (Exception e) {
       e.printStackTrace();
       fail("Adding sample image to the index failed");
