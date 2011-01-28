@@ -171,6 +171,17 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       logger.debug("No configuration admin service found while looking for site dispatcher configuration");
     }
 
+    // Create the scratch directory if specified, otherwise jasper will complain
+    scratchDir = jasperConfig.get(OPT_JASPER_SCRATCHDIR);
+    if (scratchDir != null) {
+      try {
+        FileUtils.forceMkdir(new File(PathUtils.trim(scratchDir)));
+        logger.debug("Temporary jsp source files and classes go to {}", scratchDir);
+      } catch (IOException e) {
+        throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper scratch directory at " + scratchDir + ": " + e.getMessage());
+      }
+    }
+
     httpRegistrations = new HashMap<Site, WebXml>();
 
     logger.debug("Site dispatcher activated");
@@ -272,7 +283,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
     String scratchDir = jasperConfig.get(OPT_JASPER_SCRATCHDIR);
     if (scratchDir != null) {
       try {
-        FileUtils.forceMkdir(new File(scratchDir));
+        FileUtils.forceMkdir(new File(PathUtils.trim(scratchDir)));
         logger.debug("Temporary jsp source files and classes go to {}", scratchDir);
       } catch (IOException e) {
         throw new ConfigurationException(OPT_JASPER_SCRATCHDIR, "Unable to create jasper scratch directory at " + scratchDir + ": " + e.getMessage());
