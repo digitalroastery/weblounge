@@ -211,7 +211,7 @@ public class PageletEditor {
     if (renderer != null && renderer.getRenderer() != null) {
       InputStream is = null;
       try {
-        URL rendererUrl = new URL(renderer.getRenderer().toExternalForm() + "?format=raw");
+        URL rendererUrl = renderer.getRenderer();
         buf.append("<renderer type=\"xhtml\"><![CDATA[");
         is = rendererUrl.openStream();
         buf.append(IOUtils.toString(is, "utf-8"));
