@@ -9,7 +9,7 @@
       <xsd:sequence>
         <xsd:element name="autostart" type="xsd:boolean" />
         <xsd:element name="class" type="xsd:string" minOccurs="0" />
-        <xsd:element name="name" type="xsd:string" />
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
         <xsd:element ref="languages" />
         <xsd:element ref="domains" />
         <xsd:element ref="security" />
@@ -122,7 +122,7 @@
   <xsd:element name="template">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element ref="name" maxOccurs="unbounded" />
+        <xsd:element name="name" type="xsd:string" minOccurs="0" />
         <xsd:element name="renderer" type="xsd:anyURI" />
         <xsd:element name="stage" type="xsd:string" minOccurs="0" />
         <xsd:element name="recheck" type="durationType" />
@@ -131,16 +131,6 @@
       <xsd:attribute name="id" type="xsd:ID" />
       <xsd:attribute name="composeable" type="xsd:boolean" />
       <xsd:attribute name="default" type="xsd:boolean" />
-    </xsd:complexType>
-  </xsd:element>
-
-  <xsd:element name="name">
-    <xsd:complexType>
-      <xsd:simpleContent>
-        <xsd:extension base="xsd:string">
-          <xsd:attribute name="language" type="xsd:language" use="required" />
-        </xsd:extension>
-      </xsd:simpleContent>
     </xsd:complexType>
   </xsd:element>
 

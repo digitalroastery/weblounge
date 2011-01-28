@@ -62,10 +62,7 @@ public class ImageStyleImplTest {
   protected Language english = LanguageUtils.getLanguage("en");
   
   /** English image style name */
-  protected String englishName = "Default";
-
-  /** German image style name */
-  protected String germanName = "Standard";
+  protected String name = "Default";
 
   /**
    * @throws java.lang.Exception
@@ -73,8 +70,7 @@ public class ImageStyleImplTest {
   @Before
   public void setUp() throws Exception {
     imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable);
-    imageStyle.setName(germanName, german);
-    imageStyle.setName(englishName, english);
+    imageStyle.setName(name);
   }
 
   /**
@@ -107,15 +103,6 @@ public class ImageStyleImplTest {
   @Test
   public void testGetWidth() {
     assertEquals(width, imageStyle.getWidth());
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl#getName(ch.o2it.weblounge.common.language.Language)}.
-   */
-  @Test
-  public void testGetNameLanguage() {
-    assertEquals(germanName, imageStyle.getName(german));
-    assertEquals(englishName, imageStyle.getName(english));
   }
 
   /**

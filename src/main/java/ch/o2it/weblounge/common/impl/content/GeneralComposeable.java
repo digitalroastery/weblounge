@@ -24,9 +24,6 @@ import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.Composeable;
 import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
 import ch.o2it.weblounge.common.content.page.HTMLInclude;
-import ch.o2it.weblounge.common.impl.language.LocalizableContent;
-import ch.o2it.weblounge.common.impl.language.LocalizableObject;
-import ch.o2it.weblounge.common.language.Language;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +31,7 @@ import java.util.Set;
 /**
  * Base implementation for composeable objects like page templates or images.
  */
-public class GeneralComposeable extends LocalizableObject implements Composeable {
+public class GeneralComposeable implements Composeable {
 
   /** Object identifier */
   protected String identifier = null;
@@ -49,7 +46,7 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
   protected long validTime = Times.MS_PER_WEEK;
 
   /** Name of this composeable */
-  protected LocalizableContent<String> name = null;
+  protected String name = null;
   
   /** HTML head elements */
   protected Set<HTMLHeadElement> headers = null;
@@ -106,7 +103,6 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
     if (validTime < 0)
       throw new IllegalArgumentException("Valid time must be greater than or equal to zero");
     this.identifier = identifier;
-    this.name = new LocalizableContent<String>(this);
   }
 
   /**
@@ -131,12 +127,11 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Composeable#setName(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language)
+   *
+   * @see ch.o2it.weblounge.common.content.Composeable#setName(java.lang.String)
    */
-  public void setName(String name, Language language) {
-    this.name.put(name, language);
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**
@@ -145,26 +140,7 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
    * @see ch.o2it.weblounge.common.content.Composeable#getName()
    */
   public String getName() {
-    return name.get();
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Composeable#getName(ch.o2it.weblounge.common.language.Language)
-   */
-  public String getName(Language language) {
-    return name.get(language);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Composeable#getName(ch.o2it.weblounge.common.language.Language,
-   *      boolean)
-   */
-  public String getName(Language language, boolean force) {
-    return name.get(language, force);
+    return name;
   }
 
   /**
@@ -295,14 +271,4 @@ public class GeneralComposeable extends LocalizableObject implements Composeable
     return identifier;
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#toString(ch.o2it.weblounge.common.language.Language)
-   */
-  @Override
-  public String toString(Language language) {
-    return identifier;
-  }
-
 }

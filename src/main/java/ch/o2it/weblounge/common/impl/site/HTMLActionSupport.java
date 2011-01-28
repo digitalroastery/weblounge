@@ -34,7 +34,6 @@ import ch.o2it.weblounge.common.content.page.Script;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
@@ -653,9 +652,9 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
     b.append("\">");
 
     // Names
-    for (Language l : name.languages()) {
-      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
-      b.append(name.get(l));
+    if (StringUtils.isNotBlank(name)) {
+      b.append("<name>");
+      b.append(name);
       b.append("</name>");
     }
 

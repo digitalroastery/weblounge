@@ -73,10 +73,7 @@ public class PageletRendererImplTest {
   protected PagePreviewMode previewMode = PagePreviewMode.First;
   
   /** English pagelet name */
-  protected String englishName = "Pagelet renderer";
-
-  /** German pagelet name */
-  protected String germanName = "Darstellungselement";
+  protected String name = "Pagelet renderer";
 
   /** English */
   protected Language english = new LanguageImpl(new Locale("en"));
@@ -101,8 +98,7 @@ public class PageletRendererImplTest {
     renderer.setValidTime(validTime);
     renderer.setComposeable(composeable);
     renderer.setPreviewMode(previewMode);
-    renderer.setName(germanName, german);
-    renderer.setName(englishName, english);
+    renderer.setName(name);
     renderer.addHTMLHeader(css);
   }
 
@@ -133,18 +129,7 @@ public class PageletRendererImplTest {
    */
   @Test
   public void testGetName() {
-    assertEquals(germanName, renderer.getName());
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language)}
-   * .
-   */
-  @Test
-  public void testGetNameLanguage() {
-    assertEquals(germanName, renderer.getName(german));
-    assertEquals(englishName, renderer.getName(english));
+    assertEquals(name, renderer.getName());
   }
 
   /**

@@ -27,16 +27,14 @@
   </security>
   <templates>
     <template id="default" composeable="true" default="true">
-      <name language="de">Standard Vorlage</name>
-      <name language="en">Default template</name>
+      <name>Default template</name>
       <renderer>file://template/default.jsp</renderer>
       <stage>boxes</stage>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
     </template>
     <template id="mobile" composeable="true">
-      <name language="de">Mobile</name>
-      <name language="en">Mobile</name>
+      <name>Mobile</name>
     	<renderer>file://template/mobile.jsp</renderer>
       <recheck>1d</recheck>
       <valid>1w</valid>

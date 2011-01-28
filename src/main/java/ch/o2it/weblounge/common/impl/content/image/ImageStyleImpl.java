@@ -29,13 +29,11 @@ import static ch.o2it.weblounge.common.site.ImageScalingMode.Width;
 
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
-import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -330,17 +328,8 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     ImageStyleImpl imageStyle = new ImageStyleImpl(id, width, height, scalingMode, composeable);
 
     // Names
-    NodeList names = XPathHelper.selectList(node, "m:name", xpath);
-    for (int i = 0; i < names.getLength(); i++) {
-      Node localiziation = names.item(i);
-      String language = XPathHelper.valueOf(localiziation, "@language", xpath);
-      if (language == null)
-        throw new IllegalStateException("Found image style name without language");
-      String name = XPathHelper.valueOf(localiziation, "text()", xpath);
-      if (name == null)
-        throw new IllegalStateException("Found empty imagestyle name");
-      imageStyle.setName(name, LanguageUtils.getLanguage(language));
-    }
+    String name = XPathHelper.valueOf(node, "m:name", xpath);
+    imageStyle.setName(name);
 
     return imageStyle;
   }
@@ -363,11 +352,9 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
     buf.append(">");
 
     // name
-    for (Language l : name.languages()) {
-      buf.append("<name language=\"");
-      buf.append(l.getIdentifier());
-      buf.append("\">");
-      buf.append(name.get(l));
+    if (StringUtils.isNotBlank(name)) {
+      buf.append("<name>");
+      buf.append(name);
       buf.append("</name>");
     }
 

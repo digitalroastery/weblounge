@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module id="testmodule" xmlns="http://www.o2it.ch/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd">
   <enable>true</enable>
-  <name language="de">Testmodul</name>
-  <name language="en">Test module</name>
+  <name>Test module</name>
   <pagelets>
     <pagelet id="renderer" composeable="true">
-      <name language="de">Pagelet renderer</name>
-      <name language="en">Darstellungselement</name>
+      <name>Pagelet renderer</name>
       <renderer>file://renderer/renderer.jsp</renderer>
       <editor>file://renderer/editor.jsp</editor>
       <recheck>1d10M</recheck>
@@ -18,8 +16,7 @@
   </pagelets>
   <actions>
     <action id="myaction">
-      <name language="de">Test</name>
-      <name language="en">Test</name>
+      <name>Test</name>
       <class>ch.o2it.weblounge.common.site.TestAction</class>
       <mountpoint>/test/</mountpoint>
       <page>/testpage/</page>
@@ -40,7 +37,7 @@
   </actions>
   <jobs>
     <job id="testjob">
-      <name language="en">Job title</name>
+      <name>Job title</name>
       <class>ch.o2it.weblounge.common.scheduler.TestJob</class>
       <schedule>0 0 * * 1</schedule>
       <options>
@@ -53,8 +50,7 @@
   </jobs>
   <imagestyles>
     <imagestyle id="modulestyle" composeable="true">
-      <name language="de">Modulbild</name>
-      <name language="en">Module image</name>
+      <name>Module image</name>
       <scalingmode>box</scalingmode>
       <width>150</width>
       <height>200</height>

@@ -25,15 +25,12 @@ import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Module;
@@ -42,6 +39,7 @@ import ch.o2it.weblounge.common.site.ModuleListener;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -93,7 +91,7 @@ public class ModuleImpl implements Module {
   protected OptionsHelper options = null;
 
   /** Localized module title */
-  protected LocalizableContent<String> name = null;
+  protected String name = null;
 
   /** Module pagelet renderers */
   protected Map<String, PageletRenderer> renderers = null;
@@ -114,7 +112,6 @@ public class ModuleImpl implements Module {
    * Creates a new module.
    */
   public ModuleImpl() {
-    name = new LocalizableContent<String>();
     renderers = new HashMap<String, PageletRenderer>();
     actions = new HashMap<String, Action>();
     imagestyles = new HashMap<String, ImageStyle>();
@@ -367,20 +364,19 @@ public class ModuleImpl implements Module {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Module#setName(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language)
+   * @see ch.o2it.weblounge.common.site.Module#setName(java.lang.String)
    */
-  public void setName(String title, Language language) {
-    this.name.put(title, language);
+  public void setName(String title) {
+    this.name = title;
   }
-
+  
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Module#getName(ch.o2it.weblounge.common.language.Language)
+   *
+   * @see ch.o2it.weblounge.common.site.Module#getName()
    */
-  public String getName(Language language) {
-    return name.get(language);
+  public String getName() {
+    return name;
   }
 
   /**
@@ -628,17 +624,8 @@ public class ModuleImpl implements Module {
     }
 
     // name
-    NodeList names = XPathHelper.selectList(config, "m:name", xpathProcessor);
-    for (int i = 0; i < names.getLength(); i++) {
-      Node localiziation = names.item(i);
-      String language = XPathHelper.valueOf(localiziation, "@language", xpathProcessor);
-      if (language == null)
-        throw new IllegalStateException("Found module name without language");
-      String name = XPathHelper.valueOf(localiziation, "text()", xpathProcessor);
-      if (name == null)
-        throw new IllegalStateException("Found empty module name");
-      module.setName(name, LanguageUtils.getLanguage(language));
-    }
+    String name = XPathHelper.valueOf(config, "m:name", xpathProcessor);
+    module.setName(name);
 
     // pagelets
     NodeList pageletNodes = XPathHelper.selectList(config, "m:pagelets/m:pagelet", xpathProcessor);
@@ -692,9 +679,9 @@ public class ModuleImpl implements Module {
     b.append("<enable>").append(enabled).append("</enable>");
 
     // Names
-    for (Language l : name.languages()) {
-      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
-      b.append(name.get(l));
+    if (StringUtils.isNotBlank(name)) {
+      b.append("<name>");
+      b.append(name);
       b.append("</name>");
     }
 

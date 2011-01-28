@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.impl.site;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.HTMLHeadElement;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.HTMLAction;
 
@@ -112,10 +111,8 @@ public final class ActionPoolFactory extends BasePoolableObjectFactory {
       htmlAction.setTemplate(htmlBlueprint.getTemplate());
     }
     
-    // Names
-    for (Language l : blueprint.languages()) {
-      action.setName(blueprint.getName(l), l);
-    }
+    // Name
+    action.setName(blueprint.getName());
 
     return action;
   }

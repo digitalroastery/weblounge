@@ -22,7 +22,6 @@ package ch.o2it.weblounge.common.scheduler;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.scheduler.CronJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 
@@ -69,7 +68,7 @@ public class QuartzJobTest {
   public void setUp() throws Exception {
     setupPreliminaries();
     quartzJob = new QuartzJob(jobIdentifier, jobClass, jobContext, trigger);
-    quartzJob.setName(jobName, LanguageUtils.getLanguage("en"));
+    quartzJob.setName(jobName);
   }
   
   protected void setupPreliminaries() {

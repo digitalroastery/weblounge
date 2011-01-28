@@ -20,19 +20,16 @@
 
 package ch.o2it.weblounge.common.impl.scheduler;
 
-import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.scheduler.JobWorker;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.io.Serializable;
 import java.util.Dictionary;
@@ -51,12 +48,12 @@ public final class QuartzJob implements Job {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(QuartzJob.class);
-  
+
   /** The job identifier */
   protected String identifier = null;
 
   /** The job name */
-  protected LocalizableContent<String> name = null;
+  protected String name = null;
 
   /** The actual job implementation */
   protected Class<? extends JobWorker> worker = null;
@@ -104,7 +101,6 @@ public final class QuartzJob implements Job {
     if (trigger == null)
       throw new IllegalArgumentException("Trigger must not be null");
     this.identifier = identifier;
-    this.name = new LocalizableContent<String>();
     this.worker = worker;
     this.trigger = trigger;
     this.ctx = context;
@@ -128,7 +124,7 @@ public final class QuartzJob implements Job {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.scheduler.Job#getIdentifier()
    */
   public String getIdentifier() {
@@ -137,43 +133,25 @@ public final class QuartzJob implements Job {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.scheduler.Job#setName(java.lang.String)
    */
-  public void setName(String name, Language language) {
-    this.name.put(name, language);
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.scheduler.Job#getName()
    */
   public String getName() {
-    return name.get();
+    return name;
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.scheduler.Job#getName(ch.o2it.weblounge.common.language.Language)
-   */
-  public String getName(Language language) {
-    return name.get(language);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.common.scheduler.Job#getName(ch.o2it.weblounge.common.language.Language, boolean)
-   */
-  public String getName(Language language, boolean force) {
-    return name.get(language, force);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.scheduler.Job#setWorker(java.lang.Class)
    */
   public void setWorker(Class<JobWorker> job) {
@@ -184,7 +162,7 @@ public final class QuartzJob implements Job {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.scheduler.Job#getWorker()
    */
   public Class<? extends JobWorker> getWorker() {
@@ -202,7 +180,7 @@ public final class QuartzJob implements Job {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.scheduler.Job#setTrigger(ch.o2it.weblounge.common.scheduler.JobTrigger)
    */
   public void setTrigger(JobTrigger trigger) {
@@ -213,13 +191,13 @@ public final class QuartzJob implements Job {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.scheduler.Job#getTrigger()
    */
   public JobTrigger getTrigger() {
     return trigger;
   }
-  
+
   /**
    * Resets the job, which means that there will be no more evidence that the
    * job has been run already. This is especially useful in the case where a
@@ -284,7 +262,7 @@ public final class QuartzJob implements Job {
     CronJobTrigger jobTrigger = null;
     Dictionary<String, Serializable> ctx = new Hashtable<String, Serializable>();
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    
+
     // Main attributes
     String identifier = XPathHelper.valueOf(config, "@id", xPathProcessor);
 
@@ -319,26 +297,17 @@ public final class QuartzJob implements Job {
     // Did we find something?
 
     QuartzJob job = new QuartzJob(identifier, clazz, ctx, jobTrigger);
-    
+
     // name
-    NodeList names = XPathHelper.selectList(config, "m:name", xPathProcessor);
-    for (int i = 0; i < names.getLength(); i++) {
-      Node localiziation = names.item(i);
-      String language = XPathHelper.valueOf(localiziation, "@language", xPathProcessor);
-      if (language == null)
-        throw new IllegalStateException("Found job name without language");
-      String name = XPathHelper.valueOf(localiziation, "text()", xPathProcessor);
-      if (name == null)
-        throw new IllegalStateException("Found empty job name");
-      job.setName(name, LanguageUtils.getLanguage(language));
-    }
+    String name = XPathHelper.valueOf(config, "m:name", xPathProcessor);
+    job.setName(name);
 
     return job;
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.scheduler.Job#toXml()
    */
   public String toXml() {
@@ -348,9 +317,9 @@ public final class QuartzJob implements Job {
     b.append("\">");
 
     // Names
-    for (Language l : name.languages()) {
-      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
-      b.append(name.get(l));
+    if (StringUtils.isNotBlank(name)) {
+      b.append("<name>");
+      b.append(name);
       b.append("</name>");
     }
 
@@ -378,7 +347,7 @@ public final class QuartzJob implements Job {
         b.append("</name>");
         Object value = ctx.get(key);
         if (value instanceof String[]) {
-          String[] values = (String[])ctx.get(key);
+          String[] values = (String[]) ctx.get(key);
           for (String v : values) {
             b.append("<value>");
             b.append(v);

@@ -1,6 +1,5 @@
 <pagelet id="renderer" composeable="true">
-  <name language="de">Darstellungselement</name>
-  <name language="en">Pagelet renderer</name>
+  <name>Pagelet renderer</name>
   <renderer>file://renderer/renderer.jsp</renderer>
   <editor>file://renderer/editor.jsp</editor>
   <recheck>1d10M</recheck>

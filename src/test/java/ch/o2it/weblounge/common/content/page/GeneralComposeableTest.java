@@ -74,11 +74,8 @@ public class GeneralComposeableTest {
   /** French language */
   protected Language french = LanguageUtils.getLanguage("fr");
 
-  /** German name */
-  protected String germanName = "Standard Vorlage";
-
   /** English name */
-  protected String englishName = "Default template";
+  protected String name = "Default template";
   
   /** Cascading stylesheet include */
   protected Link css = new LinkImpl("http://localhost/css.css");
@@ -108,9 +105,7 @@ public class GeneralComposeableTest {
    *           if setup fails
    */
   protected void setUpComposeable() throws Exception {
-    composeable.setDefaultLanguage(german);
-    composeable.setName(germanName, german);
-    composeable.setName(englishName, english);
+    composeable.setName(name);
     composeable.setRecheckTime(recheckTime);
     composeable.setValidTime(validTime);
     composeable.setComposeable(isComposeable);
@@ -134,31 +129,7 @@ public class GeneralComposeableTest {
    */
   @Test
   public void testGetName() {
-    assertEquals(germanName, composeable.getName());
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language)}
-   * .
-   */
-  @Test
-  public void testGetNameLanguage() {
-    assertEquals(germanName, composeable.getName(german));
-    assertEquals(englishName, composeable.getName(english));
-    assertEquals(germanName, composeable.getName(french));
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.GeneralComposeable#getName(ch.o2it.weblounge.common.language.Language, boolean)}
-   * .
-   */
-  @Test
-  public void testGetNameLanguageBoolean() {
-    assertEquals(germanName, composeable.getName(german, true));
-    assertEquals(englishName, composeable.getName(english, true));
-    assertTrue(composeable.getName(french, true) == null);
+    assertEquals(name, composeable.getName());
   }
 
   /**

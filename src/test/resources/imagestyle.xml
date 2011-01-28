@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <imagestyle id="default" composeable="true">
-  <name language="de">Standard</name>
-  <name language="en">Default</name>
+  <name>Default</name>
   <scalingmode>cover</scalingmode>
   <width>250</width>
   <height>300</height>

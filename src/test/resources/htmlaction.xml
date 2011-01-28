@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <action id="myaction">
-  <name language="de">Test</name>
-  <name language="en">Test</name>
+  <name>Test</name>
   <class>ch.o2it.weblounge.common.site.TestAction</class>
   <mountpoint>/test/</mountpoint>
   <page>/testpage/</page>

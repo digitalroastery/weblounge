@@ -75,10 +75,7 @@ public class ModuleImplTest {
   protected String[] complexOptionValue = new String[] { "complex", "value" };
 
   /** English title */
-  protected String englishTitle = "Test module";
-
-  /** German title */
-  protected String germanTitle = "Testmodul";
+  protected String name = "Test module";
 
   /** The English language */
   protected final Language English = new LanguageImpl(new Locale("en"));
@@ -116,8 +113,7 @@ public class ModuleImplTest {
     setUpPreliminaries();
     module = new ModuleImpl();
     module.setIdentifier(identifier);
-    module.setName(germanTitle, German);
-    module.setName(englishTitle, English);
+    module.setName(name);
     module.setEnabled(enabled);
     module.setSearchable(searchable);
     module.setOption(simpleOptionName, simpleOptionValue);
@@ -267,18 +263,6 @@ public class ModuleImplTest {
   @Test
   public void testGetSite() {
     assertEquals(site, module.getSite());
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.common.impl.site.ModuleImpl#getName(ch.o2it.weblounge.common.language.Language)}
-   * .
-   */
-  @Test
-  public void testGetName() {
-    assertEquals(englishTitle, module.getName(English));
-    assertEquals(germanTitle, module.getName(German));
-    assertEquals(germanTitle, module.getName(Italian));
   }
 
   /**

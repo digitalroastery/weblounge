@@ -26,15 +26,14 @@ import ch.o2it.weblounge.common.content.page.Link;
 import ch.o2it.weblounge.common.content.page.PagePreviewMode;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.content.page.Script;
-import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.Module;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -334,17 +333,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     }
 
     // name
-    NodeList names = XPathHelper.selectList(node, "m:name", xpath);
-    for (int i = 0; i < names.getLength(); i++) {
-      Node localiziation = names.item(i);
-      String language = XPathHelper.valueOf(localiziation, "@language", xpath);
-      if (language == null)
-        throw new IllegalStateException("Found pagelet renderer name without language");
-      String name = XPathHelper.valueOf(localiziation, "text()", xpath);
-      if (name == null)
-        throw new IllegalStateException("Found empty pagelet name");
-      renderer.setName(name, LanguageUtils.getLanguage(language));
-    }
+    String name = XPathHelper.valueOf(node, "m:name", xpath);
+    renderer.setName(name);
 
     // scripts
     NodeList scripts = XPathHelper.selectList(node, "m:includes/m:script", xpath);
@@ -374,9 +364,9 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     buf.append(">");
 
     // Names
-    for (Language l : name.languages()) {
-      buf.append("<name language=\"").append(l.getIdentifier()).append("\">");
-      buf.append(name.get(l));
+    if (StringUtils.isNotBlank(name)) {
+      buf.append("<name>");
+      buf.append(name);
       buf.append("</name>");
     }
 

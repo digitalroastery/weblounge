@@ -28,13 +28,11 @@ import ch.o2it.weblounge.common.content.page.Script;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
 import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.content.page.ScriptImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
@@ -49,6 +47,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -686,17 +685,8 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // name
-    NodeList names = XPathHelper.selectList(config, "m:name", xpathProcessor);
-    for (int i = 0; i < names.getLength(); i++) {
-      Node localiziation = names.item(i);
-      String language = XPathHelper.valueOf(localiziation, "@language", xpathProcessor);
-      if (language == null)
-        throw new IllegalStateException("Found action name without language");
-      String name = XPathHelper.valueOf(localiziation, "text()", xpathProcessor);
-      if (name == null)
-        throw new IllegalStateException("Found empty action name");
-      action.setName(name, LanguageUtils.getLanguage(language));
-    }
+    String name = XPathHelper.valueOf(config, "m:name", xpathProcessor);
+    action.setName(name);
 
     // options
     Node optionsNode = XPathHelper.select(config, "m:options", xpathProcessor);
@@ -736,10 +726,10 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
       b.append("</valid>");
     }
 
-    // Names
-    for (Language l : name.languages()) {
-      b.append("<name language=\"").append(l.getIdentifier()).append("\">");
-      b.append(name.get(l));
+    // Name
+    if (StringUtils.isNotBlank(name)) {
+      b.append("<name>");
+      b.append(name);
       b.append("</name>");
     }
 

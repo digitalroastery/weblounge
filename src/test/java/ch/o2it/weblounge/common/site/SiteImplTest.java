@@ -102,11 +102,8 @@ public class SiteImplTest {
   /** Default template stage */
   protected final String defaultTemplateStage = "boxes";
 
-  /** Default template German name */
-  protected final String defaultTemplateNameGerman = "Standard Vorlage";
-
   /** Default template English name */
-  protected final String defaultTemplateNameEnglish = "Default template";
+  protected final String defaultTemplateName = "Default template";
 
   /** Mobile page template */
   protected PageTemplate mobileTemplate = null;
@@ -124,7 +121,7 @@ public class SiteImplTest {
   protected final String mobileTemplateNameGerman = "Mobile";
 
   /** Mobile template English name */
-  protected final String mobileTemplateNameEnglish = "Mobile";
+  protected final String mobileTemplateName = "Mobile";
 
   /** The site hostnames */
   protected List<String> hostnames = new ArrayList<String>();
@@ -202,13 +199,11 @@ public class SiteImplTest {
     defaultTemplate.setValidTime(defaultTemplateValidTime);
     defaultTemplate.setComposeable(true);
     defaultTemplate.setStage(defaultTemplateStage);
-    defaultTemplate.setName(defaultTemplateNameEnglish, English);
-    defaultTemplate.setName(defaultTemplateNameGerman, German);
+    defaultTemplate.setName(defaultTemplateName);
     // Mobile template
     mobileTemplate = new PageTemplateImpl(mobileTemplateId, new URL(mobileTemplateUrl));
     mobileTemplate.setComposeable(true);
-    mobileTemplate.setName(mobileTemplateNameEnglish, English);
-    mobileTemplate.setName(mobileTemplateNameGerman, German);
+    mobileTemplate.setName(mobileTemplateName);
     // Amin login module
     adminAuthenticationModule = new AuthenticationModuleImpl(adminLoginModuleClass, adminLoginModuleRelevance);
   }
@@ -325,8 +320,7 @@ public class SiteImplTest {
     assertEquals(defaultTemplateRecheckTime, d.getRecheckTime());
     assertEquals(defaultTemplateValidTime, d.getValidTime());
     assertEquals(defaultTemplateStage, d.getStage());
-    assertEquals(defaultTemplateNameEnglish, d.getName(English));
-    assertEquals(defaultTemplateNameGerman, d.getName(German));
+    assertEquals(defaultTemplateName, d.getName());
 
     PageTemplate m = site.getTemplate(mobileTemplateId);
     assertNotNull(m);
@@ -335,8 +329,7 @@ public class SiteImplTest {
     assertEquals(Renderer.DEFAULT_RECHECK_TIME, m.getRecheckTime());
     assertEquals(Renderer.DEFAULT_VALID_TIME, m.getValidTime());
     assertEquals(PageTemplate.DEFAULT_STAGE, m.getStage());
-    assertEquals(mobileTemplateNameEnglish, m.getName(English));
-    assertEquals(mobileTemplateNameGerman, m.getName(German));
+    assertEquals(mobileTemplateName, m.getName());
 
     assertTrue(site.getTemplate("test") == null);
   }

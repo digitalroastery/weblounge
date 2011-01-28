@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template id="default" composeable="true">
-  <name language="de">Standard Vorlage</name>
-  <name language="en">Default template</name>
+  <name>Default template</name>
   <renderer>file://template/default.jsp</renderer>
   <stage>boxes</stage>
   <layout>unrestricted</layout>
