@@ -23,16 +23,14 @@
   </security>
   <templates>
     <template id="default" composeable="true" default="true">
-      <name language="de">Standard Vorlage</name>
-      <name language="en">Default template</name>
+      <name>Default template</name>
       <renderer>file://${site.root}/templates/default.jsp</renderer>
       <stage>main</stage>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
     </template>
     <template id="welcome" composeable="false" default="true">
-      <name language="de">Startseite</name>
-      <name language="en">Welcome page</name>
+      <name>Welcome page</name>
       <renderer>file://${site.root}/templates/welcome.jsp</renderer>
       <stage>main</stage>
       <recheck>1d10M</recheck>
