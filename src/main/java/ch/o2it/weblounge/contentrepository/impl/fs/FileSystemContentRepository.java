@@ -73,7 +73,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
   /** Configuration key for the repository's root directory */
   public static final String OPT_ROOT_DIR = CONF_PREFIX + "root";
-  
+
   /** Default directory root directory name */
   public static final String ROOT_DIR_DEFAULT = "sites-data";
 
@@ -106,9 +106,9 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     // Detect the filesystem root directory
     String fsRootDir = (String) properties.get(OPT_ROOT_DIR);
     if (StringUtils.isBlank(fsRootDir)) {
-      fsRootDir = UrlUtils.concat(System.getProperty("java.io.tmpdir"), ROOT_DIR_DEFAULT);
+      fsRootDir = PathUtils.concat(System.getProperty("java.io.tmpdir"), ROOT_DIR_DEFAULT);
     }
-    repositoryRoot = new File(fsRootDir, site.getIdentifier());
+    repositoryRoot = new File(PathUtils.concat(fsRootDir, site.getIdentifier()));
     logger.debug("Content repository root is located at {}", repositoryRoot);
 
     // Make sure we can create a temporary index
@@ -270,7 +270,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
               if (!f.equals(expectedFile)) {
                 restructured = true;
               }
-              
+
               // See if there are files that need to be copied as well. We add
               // the "found" flag in case that there are multiple versions of
               // this resource (we don't want to copy the files more than once).

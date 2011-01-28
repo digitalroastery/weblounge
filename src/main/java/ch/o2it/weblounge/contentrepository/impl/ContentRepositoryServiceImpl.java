@@ -235,7 +235,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
       return false;
     }
 
-    // First, update the connection properties
+    // Update the connection properties
     extendedProperties.clear();
     for (Enumeration<?> keys = config.keys(); keys.hasMoreElements();) {
       String key = keys.nextElement().toString();
@@ -279,8 +279,19 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
     ContentRepository repository = null;
 
     // Add well-known properties
-    properties.put(Site.class.getName(), site);
-    properties.put(Bundle.class.getName(), bundle);
+    
+    // Create our own copy of the configuration properties and add a few that
+    // can't be added to the original one due to class incompatibility with
+    // the implementations used in the configuration admin service
+    Dictionary<String, Object> connectProperties = new Hashtable<String, Object>();
+    for (Enumeration<String> e = properties.keys(); e.hasMoreElements(); ) {
+      String key = e.nextElement();
+      connectProperties.put(key, properties.get(key));
+    }
+
+    // Send site and bundle as well
+    connectProperties.put(Site.class.getName(), site);
+    connectProperties.put(Bundle.class.getName(), bundle);
 
     // Determine the repository type, if configured
     String repositoryType = (String) properties.get(OPT_REPOSITORY_TYPE);
@@ -288,7 +299,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
     // Add the extended properties from either the bundle or the service
     // configuration
     for (Map.Entry<String, String> p : extendedProperties.entrySet()) {
-      properties.put(p.getKey(), p.getValue());
+      connectProperties.put(p.getKey(), p.getValue());
     }
 
     // Get the repository class
@@ -309,7 +320,7 @@ public class ContentRepositoryServiceImpl implements ContentRepositoryService, M
       repository = repositoryClass.newInstance();
       repositories.put(site, repository);
       bundles.put(site, bundle);
-      repository.connect(properties);
+      repository.connect(connectProperties);
     } catch (InstantiationException e) {
       logger.error("Unable to instantiate content repository " + repositoryClass + " for site '" + site + "'", e);
       return;
