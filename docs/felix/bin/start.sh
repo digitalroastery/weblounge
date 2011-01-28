@@ -41,10 +41,12 @@ DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,
 # Create the java runtime options
 RUNTIME_OPTS="$WEBLOUNGE_OPTS $TEMPDIR_OPTS $GRAPHICS_OPTS $WEBLOUNGE_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS"
 
-# Make sure weblounge bundles are reloaded
-for bundle in `find $WEBLOUNGE_CACHEDIR -type f -name bundle.location | xargs grep --files-with-match -e "file:" | sed -e s/bundle.location// `; do
-  rm -r $bundle
-done
+# Create the directories
+mkdir -p "$WEBLOUNGE_LOGDIR"
+mkdir -p "$WEBLOUNGE_CACHEDIR"
+mkdir -p "$WEBLOUNGE_TEMPDIR"
+mkdir -p "$WEBLOUNGE_SITESDIR"
+mkdir -p "$WEBLOUNGE_SITESDATADIR"
 
 # Finally start Weblounge
 java $MEMORY_OPTS $RUNTIME_OPTS $DEBUG_OPTS -jar $WEBLOUNGE_HOME/bin/felix.jar $WEBLOUNGE_CACHEDIR
