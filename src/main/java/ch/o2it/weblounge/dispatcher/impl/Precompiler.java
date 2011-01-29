@@ -20,9 +20,19 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.content.page.PageletURI;
+import ch.o2it.weblounge.common.impl.content.page.MockPageImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
+import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.o2it.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.osgi.framework.Bundle;
@@ -125,6 +135,18 @@ public class Precompiler {
       request.setServletPath(httpContextURI);
       MockHttpServletResponse response = new MockHttpServletResponse();
 
+      // Prepare a fake page in order to prevent erratic behavior during
+      // precompilation
+      Page page = new MockPageImpl(site);
+      Pagelet pagelet = null;
+      for (Module m : site.getModules()) {
+        if (m.getRenderers().length > 0) {
+          PageletRenderer r = m.getRenderers()[0];
+          PageletURI pageletURI = new PageletURIImpl(page.getURI(), PageTemplate.DEFAULT_STAGE, 0);
+          pagelet = new PageletImpl(pageletURI, m.getIdentifier(), r.getIdentifier());
+        }
+      }
+
       // Collect all jsp files and ask for precompilation
       Enumeration<URL> jspEntries = bundle.findEntries(bundlePath, "*.jsp", true);
       if (jspEntries == null) {
@@ -140,13 +162,19 @@ public class Precompiler {
         String pathInfo = path.substring(path.indexOf(bundlePath) + bundlePath.length());
         request.setPathInfo(pathInfo);
         request.setRequestURI(UrlUtils.concat(httpContextURI, pathInfo));
+
+        request.setAttribute(WebloungeRequest.PAGE, page);
+        request.setAttribute(WebloungeRequest.COMPOSER, page.getComposer(PageTemplate.DEFAULT_STAGE));
+        if (pagelet != null)
+          request.setAttribute(WebloungeRequest.PAGELET, pagelet);
+
         try {
           logger.debug("Precompiling {}:/{}", site, pathInfo);
           servlet.service(request, response);
         } catch (Throwable t) {
           if (logErrors)
             logger.warn("Error precompiling " + site + ":/" + pathInfo, t);
-          errorCount ++;
+          errorCount++;
         }
       }
 
