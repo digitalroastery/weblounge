@@ -183,7 +183,7 @@ public class PageletEditor {
 
     // head
     buf.append("<pageleteditor ");
-    buf.append("uri=\"").append(uri.getId()).append("\" ");
+    buf.append("uri=\"").append(uri.getIdentifier()).append("\" ");
     buf.append("composer=\"").append(composerId).append("\" ");
     buf.append("index=\"").append(pageletIndex).append("\">");
 
