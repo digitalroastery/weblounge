@@ -160,7 +160,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * @see ch.o2it.weblounge.common.content.Resource#getIdentifier()
    */
   public String getIdentifier() {
-    return uri.getId();
+    return uri.getIdentifier();
   }
   
   /**
@@ -859,7 +859,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
     b.append("<").append(rootTag);
     b.append(" id=\"");
-    b.append(uri.getId());
+    b.append(uri.getIdentifier());
     b.append("\" path=\"");
     b.append(uri.getPath());
     b.append("\" version=\"");

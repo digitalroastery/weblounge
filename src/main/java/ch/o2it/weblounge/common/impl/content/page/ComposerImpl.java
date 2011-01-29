@@ -91,6 +91,15 @@ public class ComposerImpl implements Composer {
   }
 
   /**
+   * Sets the composer identifier.
+   * 
+   * @param identifier the identifier
+   */
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
+  }
+
+  /**
    * Adds a pagelet to the list of pagelets.
    * 
    * @param pagelet

@@ -390,7 +390,7 @@ public class LazyPageImpl implements Page {
    * @see ch.o2it.weblounge.common.content.Resource#getIdentifier()
    */
   public String getIdentifier() {
-    return uri.getId();
+    return uri.getIdentifier();
   }
 
   /**

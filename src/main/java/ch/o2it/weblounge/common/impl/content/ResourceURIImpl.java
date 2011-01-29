@@ -59,7 +59,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
    *          the version
    */
   public ResourceURIImpl(ResourceURI uri, long version) {
-    this(uri.getType(), uri.getSite(), uri.getPath(), uri.getId(), version);
+    this(uri.getType(), uri.getSite(), uri.getPath(), uri.getIdentifier(), version);
   }
 
   /**
@@ -171,9 +171,9 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.ResourceURI#getId()
+   * @see ch.o2it.weblounge.common.content.ResourceURI#getIdentifier()
    */
-  public String getId() throws MalformedResourceURIException {
+  public String getIdentifier() throws MalformedResourceURIException {
     return id;
   }
 

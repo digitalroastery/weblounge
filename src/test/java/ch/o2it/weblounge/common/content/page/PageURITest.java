@@ -97,13 +97,13 @@ public class PageURITest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceURIImpl#getId()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.ResourceURIImpl#getIdentifier()}.
    */
   @Test
   public void testGetId() {
-    assertNull(simpleURI.getId());
-    assertNull(versionedURI.getId());
-    assertEquals(defaultId, identifyableVersionedURI.getId());
+    assertNull(simpleURI.getIdentifier());
+    assertNull(versionedURI.getIdentifier());
+    assertEquals(defaultId, identifyableVersionedURI.getIdentifier());
   }
 
   /**
