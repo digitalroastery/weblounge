@@ -252,7 +252,7 @@ public class SiteCommand {
         page = (Page)repository.get(new PageURIImpl(site, null, args[0]));
       if (page != null) {
         title("page");
-        pad("id", page.getURI().getId().toString());
+        pad("id", page.getURI().getIdentifier().toString());
         pad("path", page.getURI().getPath());
 
         section("lifecycle");
