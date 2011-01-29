@@ -41,7 +41,7 @@ public interface ResourceURI extends Path {
    * 
    * @return the page identifier
    */
-  String getId();
+  String getIdentifier();
 
   /**
    * Sets the uri path.
