@@ -265,7 +265,6 @@ public class CacheCommand {
       configuration.getConfiguration().update(properties);
       properties.remove(CacheServiceImpl.OPT_CLEAR);
       configuration.getConfiguration().update(properties);
-      System.out.println("Cache '" + id + "' cleared");
     } catch (IOException e) {
       System.out.println("Error updating cache '" + id + "': " + e.getMessage());
     }
