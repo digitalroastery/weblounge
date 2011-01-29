@@ -396,7 +396,7 @@ public class FileSystemContentRepositoryTest {
     int resources = populateRepository();
     String oldPath = page1URI.getPath();
     String newPath = "/new/path";
-    ResourceURI newURI = new PageURIImpl(site, newPath, page1URI.getId());
+    ResourceURI newURI = new PageURIImpl(site, newPath, page1URI.getIdentifier());
     try {
       repository.move(page1URI, newURI);
       assertEquals(resources, repository.getResourceCount());
@@ -610,7 +610,7 @@ public class FileSystemContentRepositoryTest {
     try {
       Resource<?> r = repository.get(page1URI);
       assertNotNull(r);
-      assertEquals(page1URI.getId(), r.getIdentifier());
+      assertEquals(page1URI.getIdentifier(), r.getIdentifier());
       assertNull(repository.get(new PageURIImpl(site, "/abc")));
       assertNull(repository.get(new PageURIImpl(site, null, "a-b-c-d")));
       assertNull(repository.get(new PageURIImpl(page1URI, Resource.WORK)));

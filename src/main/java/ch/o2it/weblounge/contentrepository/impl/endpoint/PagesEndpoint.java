@@ -324,7 +324,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Store the new page
     try {
       contentRepository.put(page);
-      uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), pageURI.getId()));
+      uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), pageURI.getIdentifier()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for page {}: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

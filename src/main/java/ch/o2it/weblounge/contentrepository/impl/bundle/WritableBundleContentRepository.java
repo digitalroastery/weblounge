@@ -137,7 +137,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
           // Make sure we are not updating existing resources, since this is the
           // first time import.
           if (exists(uri)) {
-            throw new ContentRepositoryException("Error adding resource " + uri + " to repository: a resource with id '" + uri.getId() + "' or path '" + uri.getPath() + "' already exists");
+            throw new ContentRepositoryException("Error adding resource " + uri + " to repository: a resource with id '" + uri.getIdentifier() + "' or path '" + uri.getPath() + "' already exists");
           }
 
           logger.info("Loading {} {}:{}", new Object[] {

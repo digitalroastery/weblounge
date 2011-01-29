@@ -156,10 +156,10 @@ public class SearchIndex {
    *           if removing the resource from solr fails
    */
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
-    logger.debug("Removing element with id '{}' from searching index", uri.getId());
+    logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
     UpdateRequest solrRequest = new UpdateRequest();
     StringBuilder query = new StringBuilder();
-    query.append("id:").append(uri.getId()).append(" AND version:").append(uri.getVersion());
+    query.append("id:").append(uri.getIdentifier()).append(" AND version:").append(uri.getVersion());
     solrRequest.deleteByQuery(query.toString());
     solrRequest.setAction(ACTION.COMMIT, true, true);
     try {
@@ -264,7 +264,7 @@ public class SearchIndex {
       throws ContentRepositoryException {
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
     try {
-      ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getId(), uri.getVersion());
+      ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getIdentifier(), uri.getVersion());
       update(new ResourceURIInputDocument(newURI));
       return true;
     } catch (Exception e) {

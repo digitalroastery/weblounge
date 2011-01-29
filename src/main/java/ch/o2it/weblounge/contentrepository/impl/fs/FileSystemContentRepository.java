@@ -358,8 +358,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throw new IllegalArgumentException("Resource uri has no type");
     path.append("/").append(uri.getType()).append("s");
     String id = null;
-    if (uri.getId() != null) {
-      id = uri.getId();
+    if (uri.getIdentifier() != null) {
+      id = uri.getIdentifier();
     } else {
       id = index.getIdentifier(uri);
       if (id == null) {
@@ -424,8 +424,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throw new IllegalArgumentException("Resource uri has no type");
     path.append("/").append(uri.getType()).append("s");
     String id = null;
-    if (uri.getId() != null) {
-      id = uri.getId();
+    if (uri.getIdentifier() != null) {
+      id = uri.getIdentifier();
     } else {
       id = index.getIdentifier(uri);
       if (id == null) {
@@ -433,7 +433,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
         return null;
       }
     }
-    path = appendIdToPath(uri.getId(), path);
+    path = appendIdToPath(uri.getIdentifier(), path);
     return new File(path.toString());
   }
 

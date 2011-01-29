@@ -178,7 +178,7 @@ public class ContentRepositoryIndexTest {
       fail(e.getMessage());
     }
     
-    String oldId = page.getURI().getId();
+    String oldId = page.getURI().getIdentifier();
     String oldPath = page.getURI().getPath();
 
     // Try to add a new resource with existing id
@@ -284,7 +284,7 @@ public class ContentRepositoryIndexTest {
   public void testMove() {
     String newPath = "/etc/weblounge";
     try {
-      String id = idx.add(page).getId();
+      String id = idx.add(page).getIdentifier();
       idx.move(page.getURI(), newPath);
       assertEquals(1, idx.size());
       assertEquals(id, idx.getIdentifier(new PageURIImpl(site, newPath)));
@@ -316,7 +316,7 @@ public class ContentRepositoryIndexTest {
   public void testExists() {
     try {
       assertFalse(idx.exists(page.getURI()));
-      String id = idx.add(page).getId();
+      String id = idx.add(page).getIdentifier();
       assertTrue(idx.exists(page.getURI()));
       assertTrue(idx.exists(new PageURIImpl(site, "/weblounge")));
       assertFalse(idx.exists(new PageURIImpl(site, "/xxx")));
@@ -395,7 +395,7 @@ public class ContentRepositoryIndexTest {
         p.setTitle("title", english);
         pages.add(p);
         ResourceURI uri = idx.add(p);
-        assertEquals(id, uri.getId());
+        assertEquals(id, uri.getIdentifier());
         assertEquals(path, uri.getPath());
         assertEquals(i + 1, idx.size());
       }
@@ -403,7 +403,7 @@ public class ContentRepositoryIndexTest {
       // Test if everything can be found
       for (Page p : pages) {
         assertTrue(idx.exists(p.getURI()));
-        assertEquals(p.getURI().getId(), idx.getIdentifier(p.getURI()));
+        assertEquals(p.getURI().getIdentifier(), idx.getIdentifier(p.getURI()));
         assertEquals(p.getURI().getPath(), idx.getPath(p.getURI()));
         assertEquals(1, idx.getLanguages(p.getURI()).length);
         assertEquals(1, idx.getRevisions(p.getURI()).length);

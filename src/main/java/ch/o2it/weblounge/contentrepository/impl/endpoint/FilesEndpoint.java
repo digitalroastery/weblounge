@@ -575,7 +575,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Store the new resource
     try {
       contentRepository.put(resource);
-      uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), resourceURI.getId()));
+      uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), resourceURI.getIdentifier()));
     } catch (URISyntaxException e) {
       logger.warn("Error creating a uri for resource {}: {}", resourceURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

@@ -55,7 +55,7 @@ public class ResourceURIInputDocument extends AbstractInputDocument {
    *          the resource uri
    */
   private void init(ResourceURI uri) {
-    setField(ID, uri.getId());
+    setField(ID, uri.getIdentifier());
     setField(PATH, uri.getPath());
     setField(TYPE, uri.getType());
     setField(VERSION, uri.getVersion());

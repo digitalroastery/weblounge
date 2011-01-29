@@ -246,7 +246,7 @@ public class ContentRepositoryIndex {
       ContentRepositoryException {
 
     ResourceURI uri = resource.getURI();
-    String id = uri.getId();
+    String id = uri.getIdentifier();
     String path = uri.getPath();
     String type = uri.getType();
     long version = uri.getVersion();
@@ -336,7 +336,7 @@ public class ContentRepositoryIndex {
     // Seems to be an existing resource, so it's an update rather than an
     // addition
     else {
-      logger.warn("Existing resource '{}' was passed to add(), redirecting to update()", uri.getId());
+      logger.warn("Existing resource '{}' was passed to add(), redirecting to update()", uri.getIdentifier());
       update(resource);
 
       if (resource.getIdentifier() == null)
@@ -363,7 +363,7 @@ public class ContentRepositoryIndex {
    */
   public synchronized boolean delete(ResourceURI uri) throws IOException,
       ContentRepositoryException, IllegalArgumentException {
-    String id = uri.getId();
+    String id = uri.getIdentifier();
     String path = uri.getPath();
     long version = uri.getVersion();
 
@@ -516,7 +516,7 @@ public class ContentRepositoryIndex {
     if (uri.getVersion() != Resource.LIVE)
       throw new IllegalArgumentException("The path index only works for live resources");
 
-    String id = uri.getId();
+    String id = uri.getIdentifier();
     if (id == null)
       throw new IllegalArgumentException("ResourceURI must contain an identifier");
 
@@ -617,7 +617,7 @@ public class ContentRepositoryIndex {
     }
 
     // Do it this way to make sure we have identical path trimming
-    uri = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getId(), uri.getVersion());
+    uri = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getIdentifier(), uri.getVersion());
 
     uriIdx.update(address, uri.getType(), uri.getPath());
     pathIdx.delete(oldPath, address);
@@ -752,7 +752,7 @@ public class ContentRepositoryIndex {
     if (uri == null) 
       throw new IllegalArgumentException("Uri must not be null");
     
-    String id = uri.getId();
+    String id = uri.getIdentifier();
     String path = uri.getPath();
 
     if (id == null && path == null)
