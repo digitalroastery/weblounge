@@ -43,6 +43,7 @@ import java.util.StringTokenizer;
  */
 public final class ImageMetadataUtils {
 
+  /** The logging facility */
   private static Logger logger = LoggerFactory.getLogger(ImageMetadataUtils.class);
 
   /**
@@ -87,12 +88,13 @@ public final class ImageMetadataUtils {
     }
 
     if (meta == null) {
-      logger.debug("Extracted metadata is null.");
+      logger.debug("Extracted metadata is null");
       return null;
     } else {
 
       ImageMetadata imgmeta = new ImageMetadata();
-      // extract IPTC information
+
+      // Extract IPTC information
       Directory iptc = meta.getDirectory(IptcDirectory.class);
       if (iptc.containsTag(IptcDirectory.TAG_HEADLINE))
         imgmeta.setCaption(iptc.getString(IptcDirectory.TAG_HEADLINE));
@@ -111,7 +113,7 @@ public final class ImageMetadataUtils {
         }
       }
 
-      // extract EXIF information
+      // Extract EXIF information
       Directory exif = meta.getDirectory(ExifDirectory.class);
       if (exif.containsTag(ExifDirectory.TAG_DATETIME)) {
         try {
@@ -146,7 +148,7 @@ public final class ImageMetadataUtils {
       if (StringUtils.isBlank(imgmeta.getCopyright()) && exif.containsTag(ExifDirectory.TAG_COPYRIGHT))
         imgmeta.setCopyright(exif.getString(ExifDirectory.TAG_COPYRIGHT));
 
-      // extract GPS information
+      // Extract GPS information
       Directory gps = meta.getDirectory(GpsDirectory.class);
       if (exif.containsTag(GpsDirectory.TAG_GPS_DEST_LATITUDE))
         imgmeta.setGpsLat(gps.getString(GpsDirectory.TAG_GPS_DEST_LATITUDE));
