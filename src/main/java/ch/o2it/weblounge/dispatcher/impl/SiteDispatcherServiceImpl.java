@@ -41,6 +41,7 @@ import org.apache.commons.lang.StringUtils;
 import org.ops4j.pax.web.service.WebContainer;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
@@ -57,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -127,6 +129,9 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
   private TreeMap<String, ArrayList<String>> filterNameMappings = new TreeMap<String, ArrayList<String>>();
 
+  /** The OSGi component context */
+  private ComponentContext componentContext = null;
+
   /** The precompiler for java server pages */
   private boolean precompile = true;
 
@@ -148,6 +153,8 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   void activate(ComponentContext context) throws IOException,
       ConfigurationException {
+
+    componentContext = context;
     BundleContext bundleContext = context.getBundleContext();
     logger.info("Starting site dispatcher");
 
@@ -188,7 +195,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // Register for changing sites
     siteManager.addSiteListener(this);
-    
+
     // Process sites that have already been registered
     for (Iterator<Site> si = siteManager.sites(); si.hasNext();) {
       addSite(si.next());
@@ -209,7 +216,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // Don't listen to new sites anymore
     siteManager.removeSiteListener(this);
-    
+
     // Stop precompilers
     for (Precompiler compiler : precompilers.values()) {
       if (compiler != null)
@@ -441,6 +448,12 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
       siteServlets.put(site, siteServlet);
       httpRegistrations.put(site, webXml);
+
+      // Register the site servlet as a service
+      Dictionary<String, String> registrationProperties = new Hashtable<String, String>();
+      registrationProperties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
+      componentContext.getBundleContext().registerService(Servlet.class.getName(), siteServlet, registrationProperties);
+
       logger.info("Site '{}' registered under site://{}", site, siteRoot);
 
       // Did we already miss the "siteStarted()" event? If so, we trigger it
@@ -476,7 +489,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
    */
   private void removeSite(Site site) {
     // Remove site dispatcher servlet
-    WebXml webXml = httpRegistrations.get(site);
+    WebXml webXml = httpRegistrations.remove(site);
     String siteRoot = webXml.getContextParam(DispatcherConfiguration.BUNDLE_ROOT);
     paxHttpService.unregister(siteRoot);
     Map<String, WebXmlServlet> webXmlServlets = webXml.getServlets();
@@ -488,6 +501,18 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
 
     // We are no longer interested in site events
     site.removeSiteListener(this);
+
+    siteServlets.remove(site);
+
+    // Remote the site servlet from the OSGi registry
+    String filterProperties = "(" + Servlet.class.getName().toLowerCase() + "=" + site.getIdentifier() + ")";
+    try {
+      ServiceReference[] refs = componentContext.getBundleContext().getServiceReferences(Servlet.class.getName(), filterProperties);
+      // TODO: Unregister the servlet
+    } catch (InvalidSyntaxException e) {
+      logger.error("Error in site servlet lookup: {}", e.getMessage());
+      // Should not happen, we created it ourselves
+    }
 
     // TODO: unregister site dispatcher
 
