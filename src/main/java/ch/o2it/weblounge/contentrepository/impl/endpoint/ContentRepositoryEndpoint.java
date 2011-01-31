@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
+import ch.o2it.weblounge.common.content.MalformedResourceURIException;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
@@ -246,6 +247,8 @@ public class ContentRepositoryEndpoint {
         return null;
       }
       return resource;
+    } catch (MalformedResourceURIException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST);
     } catch (ContentRepositoryException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }

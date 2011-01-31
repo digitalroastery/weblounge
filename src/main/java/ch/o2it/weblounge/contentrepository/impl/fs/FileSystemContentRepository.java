@@ -74,9 +74,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   /** Configuration key for the repository's root directory */
   public static final String OPT_ROOT_DIR = CONF_PREFIX + "root";
 
+  /** Name of the system property containing the root directory */
+  public static final String PROP_ROOT_DIR = "weblounge.sitesdatadir";
+
   /** Default directory root directory name */
   public static final String ROOT_DIR_DEFAULT = "sites-data";
-
+  
   /** Name of the index path element right below the repository root */
   public static final String INDEX_PATH = "index";
 
@@ -104,10 +107,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     super.connect(properties);
 
     // Detect the filesystem root directory
-    String fsRootDir = (String) properties.get(OPT_ROOT_DIR);
-    if (StringUtils.isBlank(fsRootDir) || (fsRootDir != null && fsRootDir.contains("$"))) {
+    String fsRootDir = null;
+    if (StringUtils.isNotBlank(System.getProperty(PROP_ROOT_DIR)))
+      fsRootDir = System.getProperty(PROP_ROOT_DIR);
+    else if (StringUtils.isNotBlank((String)properties.get(OPT_ROOT_DIR)))
+      fsRootDir = (String) properties.get(OPT_ROOT_DIR);
+    else
       fsRootDir = PathUtils.concat(System.getProperty("java.io.tmpdir"), ROOT_DIR_DEFAULT);
-    }
+      
     repositoryRoot = new File(PathUtils.concat(fsRootDir, site.getIdentifier()));
     logger.debug("Content repository root is located at {}", repositoryRoot);
 
