@@ -115,7 +115,7 @@ public class CacheUtils {
   }
 
   /**
-   * Adds the cache service instance to the list of cache services.
+   * Removes the cache service instance from the list of cache services.
    * 
    * @param cache
    *          the cache service
