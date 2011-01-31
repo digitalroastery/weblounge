@@ -49,7 +49,7 @@ public class UnknownLanguageException extends RuntimeException {
    *          the unsupported language identifier
    */
   public UnknownLanguageException(String language) {
-    super("Language " + language + " not supported!");
+    super("Language '" + language + "' not supported!");
     this.language = language;
   }
 
