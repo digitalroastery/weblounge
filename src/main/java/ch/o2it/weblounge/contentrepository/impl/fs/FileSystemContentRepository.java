@@ -105,7 +105,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     // Detect the filesystem root directory
     String fsRootDir = (String) properties.get(OPT_ROOT_DIR);
-    if (StringUtils.isBlank(fsRootDir)) {
+    if (StringUtils.isBlank(fsRootDir) || (fsRootDir != null && fsRootDir.contains("$"))) {
       fsRootDir = PathUtils.concat(System.getProperty("java.io.tmpdir"), ROOT_DIR_DEFAULT);
     }
     repositoryRoot = new File(PathUtils.concat(fsRootDir, site.getIdentifier()));
