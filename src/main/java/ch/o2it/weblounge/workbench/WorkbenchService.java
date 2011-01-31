@@ -24,36 +24,63 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.impl.testing.MockHttpServletRequest;
+import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
+import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.apache.commons.io.IOUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 
 /**
  * Implementation of a weblounge workbench. The workbench provides support for
  * management applications and the page editor.
  */
-public class WorkbenchService implements ManagedService {
+public class WorkbenchService {
 
   /** The logging facility */
   private static Logger logger = LoggerFactory.getLogger(WorkbenchService.class);
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   */
-  @SuppressWarnings("rawtypes")
-  public void updated(Dictionary properties) throws ConfigurationException {
-    // TODO Auto-generated method stub
+  /** The site servlets */
+  private static Map<String, Servlet> siteServlets = new HashMap<String, Servlet>();
 
+  /** The cache service tracker */
+  private ServiceTracker siteServletTracker = null;
+
+  /**
+   * Callback from OSGi declarative services on component startup.
+   * 
+   * @param ctx
+   *          the component context
+   */
+  void activate(ComponentContext ctx) {
+    siteServletTracker = new SiteServletTracker(ctx.getBundleContext());
+    siteServletTracker.open();
+  }
+
+  /**
+   * Callback from OSGi declarative services on component shutdown.
+   */
+  void deactivate() {
+    siteServletTracker.close();
   }
 
   /**
@@ -69,9 +96,11 @@ public class WorkbenchService implements ManagedService {
    * @param pageletIndex
    *          the pagelet index
    * @return the pagelet editor
+   * @throws IOException
+   *           if reading the pagelet fails
    */
   public PageletEditor getEditor(Site site, ResourceURI pageURI,
-      String composerId, int pageletIndex) {
+      String composerId, int pageletIndex) throws IOException {
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     if (composerId == null)
@@ -86,7 +115,7 @@ public class WorkbenchService implements ManagedService {
       return null;
     }
 
-    // Find the pagelet
+    // Load the page
     Page page = null;
 
     try {
@@ -111,11 +140,161 @@ public class WorkbenchService implements ManagedService {
     if (composer.getPagelets().length < pageletIndex || composer.size() < pageletIndex) {
       logger.warn("Client requested pagelet editor for non existing pagelet on page {}", pageURI);
       return null;
-
     }
-    Pagelet pagelet = composer.getPagelet(pageletIndex);
 
-    return new PageletEditor(pagelet, pageURI, composerId, pageletIndex);
+    Pagelet pagelet = composer.getPagelet(pageletIndex);
+    PageletEditor pageletEditor = new PageletEditor(pagelet, pageURI, composerId, pageletIndex);
+
+    // Load the contents of the renderer url
+    URL rendererURL = pageletEditor.getRenderer();
+    if (rendererURL != null) {
+      String rendererContent = null;
+      try {
+        rendererContent = loadContents(rendererURL, site, page, composer, pagelet);
+        pageletEditor.setRenderer(rendererContent);
+      } catch (ServletException e) {
+        logger.warn("Error processing the pagelet renderer at {}: {}", rendererURL, e.getMessage());
+      }
+    }
+
+    // Load the contents of the editor url
+    URL editorURL = pageletEditor.getEditorURL();
+    if (editorURL != null) {
+      String rendererContent = null;
+      try {
+        rendererContent = loadContents(editorURL, site, page, composer, pagelet);
+        pageletEditor.setEditor(rendererContent);
+      } catch (ServletException e) {
+        logger.warn("Error processing the pagelet renderer at {}: {}", editorURL, e.getMessage());
+      }
+    }
+
+    return pageletEditor;
+  }
+
+  /**
+   * Asks the site servlet to render the given url using the page, composer and
+   * pagelet as the rendering environment. If the no servlet is available for
+   * the given site, the contents are loaded from the url directly.
+   * 
+   * @param rendererURL
+   *          the renderer url
+   * @param site
+   *          the site
+   * @param page
+   *          the page
+   * @param composer
+   *          the composer
+   * @param pagelet
+   *          the pagelet
+   * @return the servlet response, serialized to a string
+   * @throws IOException
+   *           if the servlet fails to create the response
+   * @throws ServletException
+   *           if an exception occurs while processing
+   */
+  private String loadContents(URL rendererURL, Site site, Page page,
+      Composer composer, Pagelet pagelet) throws IOException, ServletException {
+
+    Servlet servlet = siteServlets.get(site.getIdentifier());
+
+    String httpContextURI = UrlUtils.concat("weblounge-sites", site.getIdentifier());
+    int httpContextURILength = httpContextURI.length();
+    String url = rendererURL.toExternalForm();
+    int uriInPath = url.indexOf(httpContextURI);
+
+    if (uriInPath > 0) {
+      String pathInfo = url.substring(uriInPath + httpContextURILength);
+
+      // Prepare the mock request
+      MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+      request.setLocalAddr(site.getURL().toExternalForm());
+      request.setAttribute(WebloungeRequest.PAGE, page);
+      request.setAttribute(WebloungeRequest.COMPOSER, composer);
+      request.setAttribute(WebloungeRequest.PAGELET, pagelet);
+      request.setPathInfo(pathInfo);
+      request.setRequestURI(UrlUtils.concat(httpContextURI, pathInfo));
+
+      MockHttpServletResponse response = new MockHttpServletResponse();
+      servlet.service(request, response);
+      return response.getContentAsString();
+    } else {
+      InputStream is = null;
+      try {
+        is = rendererURL.openStream();
+        return IOUtils.toString(is, "utf-8");
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+    }
+  }
+
+  /**
+   * Adds the site servlet to the list of servlets.
+   * 
+   * @param id
+   *          the site identifier
+   * @param servlet
+   *          the site servlet
+   */
+  void addSiteServlet(String id, Servlet servlet) {
+    logger.debug("Site servlet attached to {} workbench", id);
+    siteServlets.put(id, servlet);
+  }
+
+  /**
+   * Removes the site servlet from the list of servlets
+   * 
+   * @param site
+   *          the site identifier
+   */
+  void removeSiteServlet(String id) {
+    logger.debug("Site servlet detached from {} workbench", id);
+    siteServlets.remove(id);
+  }
+
+  /**
+   * Implementation of a <code>ServiceTracker</code> that is tracking instances
+   * of type {@link Servlet} with an associated <code>site</code> attribute.
+   */
+  private class SiteServletTracker extends ServiceTracker {
+
+    /**
+     * Creates a new servlet tracker that is using the given bundle context to
+     * look up service instances.
+     * 
+     * @param ctx
+     *          the bundle context
+     */
+    SiteServletTracker(BundleContext ctx) {
+      super(ctx, Servlet.class.getName() + "(" + Site.class.getName().toLowerCase() + "=*)", null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTracker#addingService(org.osgi.framework.ServiceReference)
+     */
+    @Override
+    public Object addingService(ServiceReference reference) {
+      Servlet servlet = (Servlet) super.addingService(reference);
+      String site = (String) reference.getProperty(Site.class.getName().toLowerCase());
+      addSiteServlet(site, servlet);
+      return servlet;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTracker#removedService(org.osgi.framework.ServiceReference,
+     *      java.lang.Object)
+     */
+    @Override
+    public void removedService(ServiceReference reference, Object service) {
+      String site = (String) reference.getProperty("site");
+      removeSiteServlet(site);
+    }
+
   }
 
 }

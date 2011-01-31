@@ -26,21 +26,14 @@ import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.XML;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 /**
  * Class containing all the information that is needed to edit a certain
  * pagelet.
- * 
- * TODO: Add tests
  */
 public class PageletEditor {
 
@@ -49,9 +42,6 @@ public class PageletEditor {
     Xml, Json
   };
 
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(PageletEditor.class);
-  
   /** The pagelet */
   protected Pagelet pagelet = null;
 
@@ -67,8 +57,14 @@ public class PageletEditor {
   /** The data flavor */
   protected DataFlavor dataFlavor = DataFlavor.Json;
 
-  /** The pagelet's renderer */
+  /** The pagelet renderer */
   protected PageletRenderer renderer = null;
+
+  /** The pagelet's renderer content */
+  protected String rendererContents = null;
+
+  /** The pagelet's editor content */
+  protected String editorContents = null;
 
   /**
    * Creates a new pagelet editor for the given pagelet.
@@ -165,12 +161,51 @@ public class PageletEditor {
   }
 
   /**
+   * Returns the URL to the pagelet's renderer.
+   * 
+   * @return the renderer URL
+   */
+  public URL getRenderer() {
+    return renderer != null ? renderer.getRenderer() : null;
+  }
+
+  /**
    * Returns <code>true</code> if the pagelet has an editor associated.
    * 
    * @return <code>true</code> if there is an editor
    */
   public boolean hasEditor() {
     return renderer != null && renderer.getEditor() != null;
+  }
+
+  /**
+   * Returns the URL to the editor or <code>null</code> if no editor is
+   * available.
+   * 
+   * @return the url to the editor
+   */
+  public URL getEditorURL() {
+    return renderer != null ? renderer.getEditor() : null;
+  }
+
+  /**
+   * Sets the renderer contents.
+   * 
+   * @param contents
+   *          the renderer contents
+   */
+  public void setRenderer(String contents) {
+    rendererContents = contents;
+  }
+
+  /**
+   * Sets the renderer contents.
+   * 
+   * @param contents
+   *          the renderer contents
+   */
+  public void setEditor(String contents) {
+    editorContents = contents;
   }
 
   /**
@@ -208,36 +243,18 @@ public class PageletEditor {
     buf.append("]]></data>");
 
     // the renderer
-    if (renderer != null && renderer.getRenderer() != null) {
-      InputStream is = null;
-      try {
-        URL rendererUrl = renderer.getRenderer();
-        buf.append("<renderer type=\"xhtml\"><![CDATA[");
-        is = rendererUrl.openStream();
-        buf.append(IOUtils.toString(is, "utf-8"));
-        buf.append("<renderer>");
-      } catch (IOException e) {
-        logger.warn("Error reading renderer from {}", renderer.getRenderer());
-      } finally {
-        IOUtils.closeQuietly(is);
-      }
+    if (rendererContents != null) {
+      buf.append("<renderer type=\"xhtml\"><![CDATA[");
+      buf.append(rendererContents);
+      buf.append("<renderer>");
       buf.append("]]></renderer>");
     }
 
     // the editor
-    if (renderer != null && renderer.getEditor() != null) {
-      InputStream is = null;
-      try {
-        URL editorUrl = new URL(renderer.getEditor().toExternalForm() + "?format=raw");
-        buf.append("<editor type=\"xhtml\"><![CDATA[");
-        is = editorUrl.openStream();
-        buf.append(IOUtils.toString(is, "utf-8"));
-        buf.append("<editor>");
-      } catch (IOException e) {
-        logger.warn("Error reading editor from {}", renderer.getEditor());
-      } finally {
-        IOUtils.closeQuietly(is);
-      }
+    if (editorContents != null) {
+      buf.append("<editor type=\"xhtml\"><![CDATA[");
+      buf.append(editorContents);
+      buf.append("<editor>");
       buf.append("]]></editor>");
     }
 
@@ -245,4 +262,5 @@ public class PageletEditor {
 
     return buf.toString();
   }
+
 }

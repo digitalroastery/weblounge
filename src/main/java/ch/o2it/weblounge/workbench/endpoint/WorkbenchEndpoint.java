@@ -29,6 +29,8 @@ import ch.o2it.weblounge.kernel.SiteManager;
 import ch.o2it.weblounge.workbench.PageletEditor;
 import ch.o2it.weblounge.workbench.WorkbenchService;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -78,7 +80,12 @@ public class WorkbenchEndpoint {
     // Return the editor
     // TODO: Work on work page instead of live
     ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.LIVE);
-    PageletEditor editor = workbench.getEditor(site, uri, composerId, pagelet);
+    PageletEditor editor;
+    try {
+      editor = workbench.getEditor(site, uri, composerId, pagelet);
+    } catch (IOException e) {
+      throw new WebApplicationException(e);
+    }
     if (editor == null)
       throw new WebApplicationException(Status.NOT_FOUND);
     
