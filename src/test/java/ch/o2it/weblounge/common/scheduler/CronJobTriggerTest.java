@@ -154,6 +154,7 @@ public class CronJobTriggerTest {
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.DAY_OF_MONTH, 1);
+    expectedFireDate = rollUp(c, Calendar.MONTH, new int[] { 1 });
     expectedFireDate = rollUp(c, Calendar.DAY_OF_WEEK, daysOfWeek);
     assertEquals(expectedFireDate, dayOfWeekTrigger.getNextExecutionAfter(now));
   }
