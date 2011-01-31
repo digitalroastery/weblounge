@@ -143,7 +143,9 @@ public class WebloungeRequestImpl extends HttpServletRequestWrapper implements W
 
     // Extract the language from the session (a.k.a an earlier request). Then
     // make sure the language was put there for the current site.
-    language = (Language) getSession(true).getAttribute(LANGUAGE);
+    if (language == null) {
+      language = (Language) getSession(true).getAttribute(LANGUAGE);
+    }
 
     // If no language has been found in the session, it's the visitor's first
     // access to this site. First thing we do is take a look at the url, where

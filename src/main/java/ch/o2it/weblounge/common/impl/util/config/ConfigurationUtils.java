@@ -589,18 +589,15 @@ public final class ConfigurationUtils {
    * 
    * @param text
    *          the text to process
-   * @param request
-   *          the request
    * @param module
    *          the module
    * @return the processed text
    */
-  public static String processTemplate(String text, WebloungeRequest request,
-      Module module) {
+  public static String processTemplate(String text, Module module) {
     text = processTemplate(text);
 
     Map<String, String> replacements = new HashMap<String, String>();
-    Site site = request.getSite();
+    Site site = module.getSite();
     URL url = site.getURL();
 
     StringBuffer siteRootReplacement = new StringBuffer();

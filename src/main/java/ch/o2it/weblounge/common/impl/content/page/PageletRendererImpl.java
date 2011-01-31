@@ -53,7 +53,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
   /** The logging facility */
   private Logger logger = LoggerFactory.getLogger(PageletRendererImpl.class);
-  
+
   /** The editor url */
   protected URL editor = null;
 
@@ -62,6 +62,9 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
   /** The preview mode */
   protected PagePreviewMode previewMode = PagePreviewMode.None;
+
+  /** Flag to indicate whether template processing in the urls has happened */
+  private boolean urlTemplatesProcessed = false;
 
   /**
    * Creates a new page template.
@@ -101,6 +104,47 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void setModule(Module module) {
     this.module = module;
+    processURLTemplates(module);
+  }
+
+  /**
+   * Processes both renderer and editor url by replacing templates in their
+   * paths with real values from the actual module.
+   * 
+   * @param module
+   *          the module
+   * @return <code>false</code> if the paths don't end up being real urls,
+   *         <code>true</code> otherwise
+   */
+  private boolean processURLTemplates(Module module) {
+    if (module == null || module.getSite() == null)
+      return false;
+    
+    urlTemplatesProcessed = true;
+
+    // Process the renderer URL
+    if (renderer != null) {
+      String rendererURL = ConfigurationUtils.processTemplate(renderer.toExternalForm(), module);
+      try {
+        renderer = new URL(rendererURL);
+      } catch (MalformedURLException e) {
+        logger.error("Renderer url {} of pagelet {} is malformed", rendererURL, this);
+        return false;
+      }
+    }
+
+    // Process the editor URL
+    if (editor != null) {
+      String editorURL = ConfigurationUtils.processTemplate(editor.toExternalForm(), module);
+      try {
+        editor = new URL(editorURL);
+      } catch (MalformedURLException e) {
+        logger.error("Editor url {} of pagelet {} is malformed", editorURL, this);
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -133,10 +177,34 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#setRenderer(java.net.URL)
+   */
+  @Override
+  public void setRenderer(URL renderer) {
+    super.setRenderer(renderer);
+    urlTemplatesProcessed = false;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#getRenderer()
+   */
+  @Override
+  public URL getRenderer() {
+    if (!urlTemplatesProcessed)
+      processURLTemplates(module);
+    return super.getRenderer();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.content.page.PageletRenderer#setEditor(java.net.URL)
    */
   public void setEditor(URL editor) {
     this.editor = editor;
+    urlTemplatesProcessed = false;
   }
 
   /**
@@ -145,6 +213,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * @see ch.o2it.weblounge.common.content.page.PageletRenderer#getEditor()
    */
   public URL getEditor() {
+    if (!urlTemplatesProcessed)
+      processURLTemplates(module);
     return editor;
   }
 
@@ -156,15 +226,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
-    String path = renderer.toExternalForm();
-    if (path.matches(".*\\$\\{.*\\}.*")) {
-      try {
-        renderer = new URL(ConfigurationUtils.processTemplate(path, request, module));
-      } catch (MalformedURLException e) {
-        logger.error("Error processing renderer url '" + renderer + "'", e);
-        throw new RenderException(this, e);
-      }
-    }
+    if (!urlTemplatesProcessed)
+      processURLTemplates(module);
     includeJSP(request, response, renderer);
   }
 
@@ -176,15 +239,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   public void renderAsEditor(WebloungeRequest request,
       WebloungeResponse response) throws RenderException {
-    String path = editor.toExternalForm();
-    if (path.matches(".*\\$\\{.*\\}.*")) {
-      try {
-        editor = new URL(ConfigurationUtils.processTemplate(path, request, module));
-      } catch (MalformedURLException e) {
-        logger.error("Error processing editor url '" + editor + "'", e);
-        throw new RenderException(this, e);
-      }
-    }
+    if (!urlTemplatesProcessed)
+      processURLTemplates(module);
     includeJSP(request, response, editor);
   }
 
@@ -223,8 +279,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    * @see #fromXml(Node, XPath)
    * @see #toXml()
    */
-  public static PageletRenderer fromXml(Node node)
-      throws IllegalStateException {
+  public static PageletRenderer fromXml(Node node) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
     return fromXml(node, xpath);
   }
@@ -272,7 +327,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     if (className != null) {
       Class<? extends PageletRenderer> c = null;
       try {
-        c = (Class<? extends PageletRenderer>)classLoader.loadClass(className);
+        c = (Class<? extends PageletRenderer>) classLoader.loadClass(className);
         renderer = c.newInstance();
         renderer.setIdentifier(id);
         renderer.setRenderer(rendererUrl);
@@ -288,7 +343,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       renderer.setIdentifier(id);
       renderer.setRenderer(rendererUrl);
     }
-    
+
     // Composeable
     renderer.setComposeable("true".equals(XPathHelper.valueOf(node, "@composeable", xpath)));
 
