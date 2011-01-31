@@ -246,7 +246,6 @@ public class PageletEditor {
     if (rendererContents != null) {
       buf.append("<renderer type=\"xhtml\"><![CDATA[");
       buf.append(rendererContents);
-      buf.append("<renderer>");
       buf.append("]]></renderer>");
     }
 
@@ -254,7 +253,6 @@ public class PageletEditor {
     if (editorContents != null) {
       buf.append("<editor type=\"xhtml\"><![CDATA[");
       buf.append(editorContents);
-      buf.append("<editor>");
       buf.append("]]></editor>");
     }
 

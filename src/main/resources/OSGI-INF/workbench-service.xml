@@ -10,7 +10,6 @@
   <property name="service.pid" value="ch.o2it.weblounge.workbench" />
   <service>
     <provide interface="ch.o2it.weblounge.workbench.WorkbenchService" />
-    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
 
 </scr:component>

@@ -35,6 +35,8 @@ import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
@@ -65,6 +67,9 @@ public class WorkbenchService {
   /** The cache service tracker */
   private ServiceTracker siteServletTracker = null;
 
+  /** Filter expression used to look up site servlets */
+  private static final String serviceFilter = "(&(objectclass=" + Servlet.class.getName() + ")(" + Site.class.getName().toLowerCase() + "=*))";
+
   /**
    * Callback from OSGi declarative services on component startup.
    * 
@@ -72,15 +77,22 @@ public class WorkbenchService {
    *          the component context
    */
   void activate(ComponentContext ctx) {
-    siteServletTracker = new SiteServletTracker(ctx.getBundleContext());
-    siteServletTracker.open();
+    try {
+      Filter filter = ctx.getBundleContext().createFilter(serviceFilter);
+      siteServletTracker = new SiteServletTracker(ctx.getBundleContext(), filter);
+      siteServletTracker.open();
+    } catch (InvalidSyntaxException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   /**
    * Callback from OSGi declarative services on component shutdown.
    */
   void deactivate() {
-    siteServletTracker.close();
+    if (siteServletTracker != null) {
+      siteServletTracker.close();
+    }
   }
 
   /**
@@ -198,7 +210,7 @@ public class WorkbenchService {
 
     Servlet servlet = siteServlets.get(site.getIdentifier());
 
-    String httpContextURI = UrlUtils.concat("weblounge-sites", site.getIdentifier());
+    String httpContextURI = UrlUtils.concat("/weblounge-sites", site.getIdentifier());
     int httpContextURILength = httpContextURI.length();
     String url = rendererURL.toExternalForm();
     int uriInPath = url.indexOf(httpContextURI);
@@ -265,9 +277,11 @@ public class WorkbenchService {
      * 
      * @param ctx
      *          the bundle context
+     * @param filter
+     *          the service filter
      */
-    SiteServletTracker(BundleContext ctx) {
-      super(ctx, Servlet.class.getName() + "(" + Site.class.getName().toLowerCase() + "=*)", null);
+    SiteServletTracker(BundleContext ctx, Filter filter) {
+      super(ctx, filter, null);
     }
 
     /**
