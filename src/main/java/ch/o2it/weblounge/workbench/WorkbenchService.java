@@ -155,6 +155,7 @@ public class WorkbenchService {
     }
 
     Pagelet pagelet = composer.getPagelet(pageletIndex);
+    pagelet = new TrimpathPageletWrapper(pagelet);
     PageletEditor pageletEditor = new PageletEditor(pagelet, pageURI, composerId, pageletIndex);
 
     // Load the contents of the renderer url
