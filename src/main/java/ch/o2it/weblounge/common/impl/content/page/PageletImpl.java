@@ -74,7 +74,7 @@ import java.util.Map.Entry;
  * 	&lt;/pagelet&gt;
  * </pre>
  */
-public final class PageletImpl extends LocalizableObject implements Pagelet {
+public class PageletImpl extends LocalizableObject implements Pagelet {
 
   /** Logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(Pagelet.class);
@@ -386,10 +386,10 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
   public boolean isCreatedAfter(Date date) {
     return creationCtx.isCreatedAfter(date);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
    */
   public void setCreator(User user) {
@@ -758,7 +758,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       SortedSet<Map.Entry<String, String[]>> entrySet = new TreeSet<Map.Entry<String, String[]>>(comparator);
       entrySet.addAll(content.get(l).entrySet());
       for (Map.Entry<String, String[]> e : entrySet) {
-        for (String value : e.getValue()) {
+        for (String value : getMultiValueContent(e.getKey(), l)) {
           b.append("<text id=\"");
           b.append(e.getKey());
           b.append("\"><![CDATA[");
@@ -778,7 +778,7 @@ public final class PageletImpl extends LocalizableObject implements Pagelet {
       SortedSet<Map.Entry<String, String[]>> entrySet = new TreeSet<Map.Entry<String, String[]>>(comparator);
       entrySet.addAll(properties.entrySet());
       for (Map.Entry<String, String[]> p : entrySet) {
-        for (String value : p.getValue()) {
+        for (String value : getMultiValueProperty(p.getKey())) {
           b.append("<property id=\"");
           b.append(p.getKey());
           b.append("\"><![CDATA[");
