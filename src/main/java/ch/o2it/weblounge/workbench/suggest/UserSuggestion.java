@@ -18,48 +18,50 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench;
+package ch.o2it.weblounge.workbench.suggest;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A tag suggestion includes everything that is needed to display a suggested
- * list of tags based on some input text.
+ * A user suggestion includes everything that is needed to display a suggested
+ * list of users based on some input text.
  */
-public class TagSuggestion extends SuggestionBase {
+public class UserSuggestion extends SuggestionBase {
 
-  /** The number of occurrences */
-  protected int count = 0;
+  /** The user id */
+  protected String id = null;
 
-  /** The tag name */
+  /** The user's full name */
   protected String name = null;
 
   /**
-   * Creates a new suggestion containing a tag's details.
+   * Creates a new suggestion containing a user's details.
    * 
-   * @param count
-   *          the tag count
+   * @param id
+   *          the user identifier
    * @param name
-   *          the tag name
+   *          the user's full name
    */
-  public TagSuggestion(int count, String name) {
+  public UserSuggestion(String id, String name) {
+    if (StringUtils.isBlank(id))
+      throw new IllegalArgumentException("Id must not be null");
     if (StringUtils.isBlank(name))
       throw new IllegalArgumentException("Name must not be null");
-    this.count = count;
+    this.id = id;
     this.name = name;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.workbench.Suggestion#toXml(java.lang.String,
+   * @see ch.o2it.weblounge.workbench.suggest.Suggestion#toXml(java.lang.String,
    *      java.lang.String)
    */
   public String toXml(String hint, String highlightTag) {
     StringBuffer xml = new StringBuffer();
-    xml.append("<tag count=\"").append(count).append("\">");
+    xml.append("<user id=\"").append(id).append("\">");
     xml.append("<name><[CDATA[").append(name).append("]]></name>");
-    xml.append("</tag>");
+    xml.append("</user>");
     return xml.toString();
   }
 

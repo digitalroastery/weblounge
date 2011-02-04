@@ -31,10 +31,12 @@ import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
+import ch.o2it.weblounge.workbench.suggest.PageSuggestion;
+import ch.o2it.weblounge.workbench.suggest.SubjectSuggestion;
+import ch.o2it.weblounge.workbench.suggest.UserSuggestion;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
@@ -111,19 +113,34 @@ public class WorkbenchService {
    * @param limit
    *          the maximum number of users to return
    * @return the list of suggested users
+   * @throws IllegalStateException
+   *           if the content repository is not available
+   * @throws ContentRepositoryException
+   *           if querying fails
    */
-  public List<UserSuggestion> suggestUsers(Site site, String text, int limit) {
+  public List<UserSuggestion> suggestUsers(Site site, String text, int limit)
+      throws IllegalStateException {
     List<UserSuggestion> users = new ArrayList<UserSuggestion>();
     SearchQuery search = new SearchQueryImpl(site);
-//    search.withUser(text + "*");
-//    search.withUserFacet();
+    // search.withUser(text + "*");
+    // search.withUserFacet();
+
+    // Get hold of the site's content repository
+    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+    if (contentRepository == null) {
+      logger.warn("No content repository found for site '{}'", site);
+      return null;
+    }
+
     // TODO: implement search
+
     return users;
   }
 
   /**
    * Returns a list of tags from the given site that are suggested based on what
-   * is passed in as <code>text</code>. If <code>limit</code> is
+   * is passed in as <code>text</code>. If <code>limit</code> is larger than
+   * <code>0</code>, then this is the maximum number of facet values returned.
    * 
    * @param site
    *          the site
@@ -132,13 +149,24 @@ public class WorkbenchService {
    * @param limit
    *          the maximum number of tags to return
    * @return the list of suggested tags
+   * @throws IllegalStateException
+   *           if the content repository is not available
+   * @throws ContentRepositoryException
+   *           if querying fails
    */
-  public List<TagSuggestion> suggestTags(Site site, String text, int limit) {
-    List<TagSuggestion> tags = new ArrayList<TagSuggestion>();
+  public List<SubjectSuggestion> suggestTags(Site site, String text, int limit)
+      throws IllegalStateException {
+    List<SubjectSuggestion> tags = new ArrayList<SubjectSuggestion>();
     SearchQuery search = new SearchQueryImpl(site);
-//    search.withSubject(text + "*");
-//    search.withSubjectFacet();
-    // TODO: implement search
+    search.withSubject(text + "*");
+    search.withSubjectFacet();
+
+    // Get hold of the site's content repository
+    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+    if (contentRepository == null) {
+      throw new IllegalStateException("No content repository found for site '" + site + "'");
+    }
+    
     return tags;
   }
 
@@ -153,12 +181,17 @@ public class WorkbenchService {
    * @param limit
    *          the maximum number of pages to return
    * @return the list of suggested pages
+   * @throws IllegalStateException
+   *           if the content repository is not available
+   * @throws ContentRepositoryException
+   *           if querying fails
    */
-  public List<PageSuggestion> suggestPages(Site site, String text, int limit) {
+  public List<PageSuggestion> suggestPages(Site site, String text, int limit)
+      throws IllegalStateException {
     List<PageSuggestion> pages = new ArrayList<PageSuggestion>();
     SearchQuery search = new SearchQueryImpl(site);
-//    search.withPage(text + "*");
-//    search.withPageFacet();
+    // search.withPage(text + "*");
+    // search.withPageFacet();
     // TODO: implement search
     return pages;
   }

@@ -18,50 +18,59 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench;
+package ch.o2it.weblounge.workbench.suggest;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A user suggestion includes everything that is needed to display a suggested
- * list of users based on some input text.
+ * A page suggestion includes everything that is needed to display a suggested
+ * list of pages based on some input text.
  */
-public class UserSuggestion extends SuggestionBase {
+public class PageSuggestion extends SuggestionBase {
 
-  /** The user id */
+  /** The page id */
   protected String id = null;
 
-  /** The user's full name */
-  protected String name = null;
+  /** The page url */
+  protected String url = null;
+
+  /** The page title */
+  protected String title = null;
 
   /**
-   * Creates a new suggestion containing a user's details.
+   * Creates a new suggestion containing a page's details.
    * 
    * @param id
-   *          the user identifier
-   * @param name
-   *          the user's full name
+   *          the page identifier
+   * @param url
+   *          the page url
+   * @param title
+   *          the page title
    */
-  public UserSuggestion(String id, String name) {
+  public PageSuggestion(String id, String url, String title) {
     if (StringUtils.isBlank(id))
       throw new IllegalArgumentException("Id must not be null");
-    if (StringUtils.isBlank(name))
-      throw new IllegalArgumentException("Name must not be null");
+    if (StringUtils.isBlank(url))
+      throw new IllegalArgumentException("Url must not be null");
+    if (StringUtils.isBlank(title))
+      throw new IllegalArgumentException("Title must not be null");
     this.id = id;
-    this.name = name;
+    this.url = url;
+    this.title = title;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.workbench.Suggestion#toXml(java.lang.String,
+   * @see ch.o2it.weblounge.workbench.suggest.Suggestion#toXml(java.lang.String,
    *      java.lang.String)
    */
   public String toXml(String hint, String highlightTag) {
     StringBuffer xml = new StringBuffer();
-    xml.append("<user id=\"").append(id).append("\">");
-    xml.append("<name><[CDATA[").append(name).append("]]></name>");
-    xml.append("</user>");
+    xml.append("<page id=\"").append(id).append("\">");
+    xml.append("<title><[CDATA[").append(title).append("]]></title>");
+    xml.append("<url>").append(url).append("</name>");
+    xml.append("</page>");
     return xml.toString();
   }
 

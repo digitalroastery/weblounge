@@ -28,6 +28,8 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.kernel.SiteManager;
 import ch.o2it.weblounge.workbench.PageletEditor;
 import ch.o2it.weblounge.workbench.WorkbenchService;
+import ch.o2it.weblounge.workbench.suggest.SubjectSuggestion;
+import ch.o2it.weblounge.workbench.suggest.SuggestionList;
 
 import java.io.IOException;
 
@@ -36,6 +38,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -50,7 +53,7 @@ public class WorkbenchEndpoint {
 
   /** The workbench */
   protected transient WorkbenchService workbench = null;
-  
+
   /** The sites that are online */
   protected transient SiteManager sites = null;
 
@@ -70,13 +73,15 @@ public class WorkbenchEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Path("/edit/{page}/{composer}/{pageletindex}")
   public Response getPageletEditor(@Context HttpServletRequest request,
-      @PathParam("page") String pageURI, @PathParam("composer") String composerId,@PathParam("pageletindex") int pagelet) {
+      @PathParam("page") String pageURI,
+      @PathParam("composer") String composerId,
+      @PathParam("pageletindex") int pagelet) {
 
     // Load the site
     Site site = getSite(request);
     if (site == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-    
+
     // Return the editor
     // TODO: Work on work page instead of live
     ResourceURI uri = new PageURIImpl(site, null, pageURI, Resource.LIVE);
@@ -88,10 +93,35 @@ public class WorkbenchEndpoint {
     }
     if (editor == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-    
+
     return Response.ok(editor.toXml()).build();
   }
-  
+
+  /**
+   * Returns a list of suggested subjects based on an initial hint. The number
+   * of suggestions returned can be specified using the <code>limit</code>
+   * parameter.
+   * 
+   * @return the endpoint documentation
+   */
+  @GET
+  @Produces(MediaType.TEXT_XML)
+  @Path("/suggest/subjects/{hint}")
+  public Response suggestSubjects(@Context HttpServletRequest request,
+      @PathParam("hint") String hint,
+      @QueryParam("highlight") String highlightTag,
+      @QueryParam("limit") int limit) {
+    SuggestionList<SubjectSuggestion> list = new SuggestionList<SubjectSuggestion>("subjects", hint, highlightTag);
+    try {
+      list.addAll(workbench.suggestTags(getSite(request), hint, limit));
+      return Response.ok(list.toXml()).build();
+    } catch (IllegalStateException e) {
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+    } catch (Exception e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   /**
    * Returns the endpoint documentation.
    * 

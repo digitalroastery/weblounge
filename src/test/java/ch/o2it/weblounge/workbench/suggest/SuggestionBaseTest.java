@@ -18,7 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench;
+package ch.o2it.weblounge.workbench.suggest;
+
+import ch.o2it.weblounge.workbench.suggest.SuggestionBase;
 
 import static org.junit.Assert.*;
 
@@ -60,7 +62,7 @@ public class SuggestionBaseTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.SuggestionBase#highlight(java.lang.String, java.lang.String)}
+   * {@link ch.o2it.weblounge.workbench.suggest.SuggestionBase#highlight(java.lang.String, java.lang.String)}
    * .
    */
   @Test

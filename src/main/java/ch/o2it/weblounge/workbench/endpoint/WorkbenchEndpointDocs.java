@@ -61,6 +61,18 @@ public final class WorkbenchEndpointDocs {
     getImageMetadata.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getImageMetadata);
 
+    // GET /suggest/subjects/{hint}
+    Endpoint suggestSubjects = new Endpoint("/suggest/subjects/{hint}", Method.GET, "suggestsubjects");
+    suggestSubjects.setDescription("Returns suggestions for subjects based on the given hint");
+    suggestSubjects.addFormat(new Format("xml", null, null));
+    suggestSubjects.addStatus(ok("suggestions based on the hint are returned"));
+    suggestSubjects.addStatus(serviceUnavailable("the site is temporarily offline"));
+    suggestSubjects.addPathParameter(new Parameter("hint", Parameter.Type.String, "The hint on which suggestions are based"));
+    suggestSubjects.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "The maximum number of suggestions"));
+    suggestSubjects.addOptionalParameter(new Parameter("highlight", Parameter.Type.String, "The tag name used to highlight matches"));
+    suggestSubjects.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, suggestSubjects);
+
     return EndpointDocumentationGenerator.generate(docs);
   }
 
