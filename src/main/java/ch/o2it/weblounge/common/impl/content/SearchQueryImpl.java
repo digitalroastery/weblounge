@@ -137,6 +137,9 @@ public class SearchQueryImpl implements SearchQuery {
   /** The query limit */
   protected int limit = -1;
   
+  /** True when using faceted search */
+  protected boolean subjectFacetEnabled = false;
+  
   /** Creation date order relation */
   protected Order creationDateSearchOrder = Order.None;
 
@@ -871,6 +874,25 @@ public class SearchQueryImpl implements SearchQuery {
    */
   public Order getPublishingDateSortOrder() {
     return publicationDateSearchOrder;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withSubjectFacet()
+   */
+  public SearchQuery withSubjectFacet() {
+    subjectFacetEnabled = true;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.SearchQuery#isSubjectFacetEnabled()
+   */
+  public boolean isSubjectFacetEnabled() {
+    return subjectFacetEnabled;
   }
   
   /**
