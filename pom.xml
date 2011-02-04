@@ -142,8 +142,8 @@
               javax.activation,
               javax.servlet;version="2.5.0",
               javax.servlet.http;version="2.5.0",
-              javax.ws.rs,
-              javax.ws.rs.core,
+              javax.ws.rs;version="1.0",
+              javax.ws.rs.core;version="1.0"
              </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.kernel;version=${project.version},
