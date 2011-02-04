@@ -75,3 +75,4 @@ versioned
 serializers
 registry
 admin
+trimpath
