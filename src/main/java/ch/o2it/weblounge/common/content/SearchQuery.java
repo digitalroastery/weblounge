@@ -668,4 +668,18 @@ public interface SearchQuery {
    */
   Order getPublishingDateSortOrder();
 
+  /**
+   * Turns on faceting for subjects
+   * 
+   * @return the search query
+   */
+  SearchQuery withSubjectFacet();
+
+  /**
+   * Returns <code>true</code> if faceting on subjects is enabled.
+   * 
+   * @return <code>true</code> the subject facet is enabled
+   */
+  boolean isSubjectFacetEnabled();
+
 }
