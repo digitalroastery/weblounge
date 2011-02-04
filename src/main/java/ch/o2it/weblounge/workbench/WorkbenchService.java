@@ -21,14 +21,17 @@
 package ch.o2it.weblounge.workbench;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
+import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
@@ -46,7 +49,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -93,6 +98,69 @@ public class WorkbenchService {
     if (siteServletTracker != null) {
       siteServletTracker.close();
     }
+  }
+
+  /**
+   * Returns a list of users From the given site that are suggested based on
+   * what is passed in as <code>text</code>. If <code>limit</code> is
+   * 
+   * @param site
+   *          the site
+   * @param text
+   *          the starting test
+   * @param limit
+   *          the maximum number of users to return
+   * @return the list of suggested users
+   */
+  public List<UserSuggestion> suggestUsers(Site site, String text, int limit) {
+    List<UserSuggestion> users = new ArrayList<UserSuggestion>();
+    SearchQuery search = new SearchQueryImpl(site);
+//    search.withUser(text + "*");
+//    search.withUserFacet();
+    // TODO: implement search
+    return users;
+  }
+
+  /**
+   * Returns a list of tags from the given site that are suggested based on what
+   * is passed in as <code>text</code>. If <code>limit</code> is
+   * 
+   * @param site
+   *          the site
+   * @param text
+   *          the starting test
+   * @param limit
+   *          the maximum number of tags to return
+   * @return the list of suggested tags
+   */
+  public List<TagSuggestion> suggestTags(Site site, String text, int limit) {
+    List<TagSuggestion> tags = new ArrayList<TagSuggestion>();
+    SearchQuery search = new SearchQueryImpl(site);
+//    search.withSubject(text + "*");
+//    search.withSubjectFacet();
+    // TODO: implement search
+    return tags;
+  }
+
+  /**
+   * Returns a list of pages from the given site that are suggested based on
+   * what is passed in as <code>text</code>. If <code>limit</code> is
+   * 
+   * @param site
+   *          the site
+   * @param text
+   *          the starting test
+   * @param limit
+   *          the maximum number of pages to return
+   * @return the list of suggested pages
+   */
+  public List<PageSuggestion> suggestPages(Site site, String text, int limit) {
+    List<PageSuggestion> pages = new ArrayList<PageSuggestion>();
+    SearchQuery search = new SearchQueryImpl(site);
+//    search.withPage(text + "*");
+//    search.withPageFacet();
+    // TODO: implement search
+    return pages;
   }
 
   /**
