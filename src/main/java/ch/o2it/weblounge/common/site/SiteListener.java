@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.site;
 
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+
 /**
  * This interface defines the methods that have to be implemented by a
  * <code>SiteListener</code>. The listener will be informed about site relative
@@ -42,5 +44,23 @@ public interface SiteListener {
    *          the site that has been shut down
    */
   void siteStopped(Site site);
+
+  /**
+   * Indicates that a content repository has connected to the site.
+   * 
+   * @param site
+   *          the site
+   * @param repository TODO
+   */
+  void repositoryConnected(Site site, ContentRepository repository);
+
+  /**
+   * Indicates that a content repository has disconnected from the site.
+   * 
+   * @param site
+   *          the site
+   * @param repository TODO
+   */
+  void repositoryDisconnected(Site site, ContentRepository repository);
 
 }

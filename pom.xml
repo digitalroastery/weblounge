@@ -54,6 +54,7 @@
               ch.o2it.weblounge.common.content.file;version=${project.version},
               ch.o2it.weblounge.common.content.image;version=${project.version},
               ch.o2it.weblounge.common.content.page;version=${project.version},
+              ch.o2it.weblounge.common.content.repository;version=${project.version},
               ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.request;version=${project.version},
               ch.o2it.weblounge.common.scheduler;version=${project.version},

@@ -23,6 +23,7 @@ package ch.o2it.weblounge.common.site;
 import ch.o2it.weblounge.common.Customizable;
 import ch.o2it.weblounge.common.content.page.PageLayout;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
@@ -425,9 +426,17 @@ public interface Site extends Customizable, RequestListener, Serializable {
   /**
    * Returns <code>true</code> if the site has been started.
    * 
-   * @return <code>true</code> if the site is running
+   * @return <code>true</code> if the site is online
    */
-  boolean isRunning();
+  boolean isOnline();
+
+  /**
+   * Returns the site's content repository or <code>null</code> if no repository
+   * has connected to the site.
+   * 
+   * @return the content repository
+   */
+  ContentRepository getContentRepository();
 
   /**
    * Sets the site administrator.
@@ -495,5 +504,17 @@ public interface Site extends Customizable, RequestListener, Serializable {
    * @return the <code>XML</code> representation of the site
    */
   String toXml();
+
+  /**
+   * Sets the site's content repository.
+   * <p>
+   * This method will be called with <code>null</code> as the content repository
+   * if the repository was taken down, and the site implementation is required
+   * to take appropriate measures, such as switching into <tt>offline</tt> mode.
+   * 
+   * @param repository
+   *          the content repository
+   */
+  void setContentRepository(ContentRepository repository);
 
 }
