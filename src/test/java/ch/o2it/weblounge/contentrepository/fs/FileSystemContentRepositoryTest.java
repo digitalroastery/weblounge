@@ -36,6 +36,7 @@ import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
@@ -50,7 +51,6 @@ import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.FileResourceSerializer;
 import ch.o2it.weblounge.contentrepository.impl.ImageResourceSerializer;
@@ -216,8 +216,8 @@ public class FileSystemContentRepositoryTest {
     repository = new FileSystemContentRepository();
     Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
-    repositoryProperties.put(Site.class.getName(), site);
-    repository.connect(repositoryProperties);
+    repository.updated(repositoryProperties);
+    repository.connect(site);
     repository.start();
 
     // Resource serializers
@@ -268,32 +268,6 @@ public class FileSystemContentRepositoryTest {
     } catch (ContentRepositoryException e) {
       fail("Error disconnecting content repository: " + e.getMessage());
     }
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository#connect(java.util.Dictionary)}
-   * .
-   */
-  @Test
-  public void testConnect() {
-    try {
-      repository.disconnect();
-      FileUtils.deleteQuietly(repositoryRoot);
-    } catch (ContentRepositoryException e) {
-      fail("Error disconnecting content repository: " + e.getMessage());
-    }
-
-    // Connect to the repository without site
-    try {
-      Dictionary<String, Object> repositoryProperties = new Hashtable<String, Object>();
-      repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
-      repository.connect(repositoryProperties);
-      fail("Managed to connect repository without site");
-    } catch (ContentRepositoryException e) {
-      // This is expected
-    }
-
   }
 
   /**

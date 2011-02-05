@@ -24,10 +24,10 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

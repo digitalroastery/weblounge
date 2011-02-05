@@ -24,17 +24,17 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.common.site.Site;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Dictionary;
 import java.util.Iterator;
 
 /**
- * This is a placeholder implementation for sites that have no content
+ * This is a place holder implementation for sites that have no content
  * repository associated with them. The implementation will not return any
  * content. In addition, it's not writable, so nothing can be written to it.
  */
@@ -43,17 +43,16 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#connect(ch.o2it.weblounge.common.site.Site,
-   *      java.util.Dictionary)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#connect(ch.o2it.weblounge.common.site.Site)
    */
-  public void connect(Dictionary<?, ?> properties)
+  public void connect(Site site)
       throws ContentRepositoryException {
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#disconnect()
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#disconnect()
    */
   public void disconnect() throws ContentRepositoryException {
   }
@@ -61,7 +60,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#start()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#start()
    */
   public void start() throws ContentRepositoryException {
   }
@@ -69,7 +68,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#stop()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#stop()
    */
   public void stop() throws ContentRepositoryException {
   }
@@ -77,7 +76,16 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getType()
+   */
+  public String getType() {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
     return false;
@@ -86,7 +94,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
    */
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     return null;
@@ -95,7 +103,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
     return null;
@@ -104,7 +112,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public InputStream getContent(ResourceURI uri, Language language)
@@ -115,7 +123,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
@@ -125,7 +133,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public Language[] getLanguages(ResourceURI uri)
       throws ContentRepositoryException {
@@ -135,7 +143,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public Iterator<ResourceURI> list(ResourceURI uri)
       throws ContentRepositoryException {
@@ -145,7 +153,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      long)
    */
   public Iterator<ResourceURI> list(ResourceURI uri, long version)
@@ -156,7 +164,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int)
    */
   public Iterator<ResourceURI> list(ResourceURI uri, int level)
@@ -167,7 +175,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int, long)
    */
   public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
@@ -178,7 +186,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getResourceCount()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getResourceCount()
    */
   public long getResourceCount() {
     return 0;
@@ -187,7 +195,7 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getRevisionCount()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getRevisionCount()
    */
   public long getRevisionCount() {
     return 0;

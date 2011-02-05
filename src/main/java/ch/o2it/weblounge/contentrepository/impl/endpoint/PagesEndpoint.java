@@ -23,6 +23,8 @@ package ch.o2it.weblounge.contentrepository.impl.endpoint;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
+import ch.o2it.weblounge.common.content.repository.WritableContentRepository;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
@@ -34,8 +36,6 @@ import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;

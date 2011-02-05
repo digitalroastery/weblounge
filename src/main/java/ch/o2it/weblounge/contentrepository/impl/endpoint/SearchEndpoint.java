@@ -27,6 +27,8 @@ import static ch.o2it.weblounge.common.impl.util.doc.Status.serviceUnavailable;
 
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
@@ -37,9 +39,6 @@ import ch.o2it.weblounge.common.impl.util.doc.Format;
 import ch.o2it.weblounge.common.impl.util.doc.Parameter;
 import ch.o2it.weblounge.common.impl.util.doc.TestForm;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.kernel.SiteManager;
 
 import org.apache.commons.lang.StringUtils;
@@ -107,12 +106,12 @@ public class SearchEndpoint {
     Site site = sites.findSiteByURL(url);
     if (site == null) {
       return Response.status(Status.NOT_FOUND).build();
-    } else if (!site.isRunning()) {
+    } else if (!site.isOnline()) {
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
     
     // Load the content repository
-    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository repository = site.getContentRepository();
     if (repository == null) {
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }

@@ -25,9 +25,10 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository;
+import ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepositoryImpl;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -39,13 +40,13 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 /**
- * Test class for {@link BundleContentRepository}.
+ * Test class for {@link BundleContentRepositoryImpl}.
  */
 @Ignore
 public class BundleContentRepositoryTest {
 
   /** The bundle content repository */
-  protected BundleContentRepository repository = null;
+  protected BundleContentRepositoryImpl repository = null;
   
   /** The bundle */
   protected Bundle bundle = null;
@@ -80,35 +81,15 @@ public class BundleContentRepositoryTest {
     workSubURI = new PageURIImpl(site, subPath, Resource.WORK);
     bundle = new StandaloneBundle(BundleContentRepositoryTest.class.getClassLoader());
     
-    repository = new BundleContentRepository();
+    repository = new BundleContentRepositoryImpl();
     Dictionary<String, Object> properties = new Hashtable<String, Object>();
     properties.put(Site.class.getName(), site);
     properties.put(Bundle.class.getName(), bundle);
-    repository.connect(properties);
+    repository.updated(properties);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#connect(ch.o2it.weblounge.common.site.Site, java.util.Dictionary)}.
-   */
-  @Test
-  public void testConnect() {
-    Dictionary<String, Object> properties = new Hashtable<String, Object>();
-    try {
-      repository.connect(properties);
-      fail("Repository should not start without bundle in the connect properties");
-    } catch (ContentRepositoryException e) {
-      // this is excepted
-    }
-    try {
-      properties.put(Bundle.class.getName(), bundle);
-      repository.connect(properties);
-    } catch (ContentRepositoryException e) {
-      fail("Bundle repository was not able to connect despite of the bundle being part of the connect properties");
-    }
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#disconnect()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#disconnect()}.
    */
   @Test
   public void testDisconnect() {
@@ -120,7 +101,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testExistsPageURI() {
@@ -133,7 +114,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)}.
    */
   @Test
   public void testExistsPageURIUserPermission() {
@@ -141,7 +122,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)}.
    */
   @Test
   public void testFindPages() {
@@ -149,7 +130,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testGetPagePageURI() {
@@ -157,7 +138,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI, ch.o2it.weblounge.common.user.User, ch.o2it.weblounge.common.security.Permission)}.
    */
   @Test
   public void testGetPagePageURIUserPermission() {
@@ -165,7 +146,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testGetVersions() {
@@ -173,7 +154,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#listPages()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#listPages()}.
    */
   @Test
   public void testListPages() {
@@ -181,7 +162,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#list(long[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#list(long[])}.
    */
   @Test
   public void testListPagesLongArray() {
@@ -189,7 +170,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI)}.
    */
   @Test
   public void testListPagesPageURI() {
@@ -197,7 +178,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI, long[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI, long[])}.
    */
   @Test
   public void testListPagesPageURILongArray() {
@@ -205,7 +186,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI, int)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI, int)}.
    */
   @Test
   public void testListPagesPageURIInt() {
@@ -213,7 +194,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI, int, long[])}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI, int, long[])}.
    */
   @Test
   public void testListPagesPageURIIntLongArray() {
@@ -221,7 +202,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#setBundlePathPrefix(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#setBundlePathPrefix(java.lang.String)}.
    */
   @Test
   public void testSetURI() {
@@ -229,7 +210,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#setPagesURI(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#setPagesURI(java.lang.String)}.
    */
   @Test
   public void testSetPagesURI() {
@@ -237,7 +218,7 @@ public class BundleContentRepositoryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.repository.BundleContentRepository#setResourcesURI(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.BundleContentRepositoryImpl.BundleContentRepository#setResourcesURI(java.lang.String)}.
    */
   @Test
   public void testSetResourcesURI() {

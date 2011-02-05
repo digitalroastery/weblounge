@@ -24,17 +24,22 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
+import ch.o2it.weblounge.kernel.SiteManager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -44,7 +49,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -65,25 +69,29 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
 
   /** Prefix into the bundle */
   protected String bundlePathPrefix = "/repository";
-
-  /** The bundle */
+  
+  /** The site's bundle */
   protected Bundle bundle = null;
-
+  
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository#connect(java.util.Dictionary)
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository#connect(ch.o2it.weblounge.common.site.Site)
    */
   @Override
-  public void connect(Dictionary<?, ?> properties)
-      throws ContentRepositoryException {
-
-    super.connect(properties);
-
-    // Determine the bundle
-    this.bundle = (Bundle) properties.get(Bundle.class.getName());
-    if (bundle == null)
-      throw new ContentRepositoryException("Bundle was not found in connect properties");
+  public void connect(Site site) throws ContentRepositoryException {
+    Bundle bundle = FrameworkUtil.getBundle(this.getClass());
+    BundleContext ctx = bundle.getBundleContext();
+    ServiceReference ref = ctx.getServiceReference(SiteManager.class.getName());
+    if (ref == null)
+      throw new ContentRepositoryException("Unable to locate service manager used to load the site bundle");
+    SiteManager siteManager = (SiteManager)ctx.getService(ref);
+    if (siteManager == null)
+      throw new ContentRepositoryException("Unable to locate service manager used to load the site bundle");
+    this.bundle = siteManager.getSiteBundle(site);
+    if (this.bundle == null)
+      throw new ContentRepositoryException("No bundle seems to be associated with site '" + site.getIdentifier() + "'");
+    super.connect(site);
   }
 
   /**

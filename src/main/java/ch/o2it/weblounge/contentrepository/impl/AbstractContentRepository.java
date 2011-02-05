@@ -25,12 +25,12 @@ import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
@@ -46,8 +46,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.CharBuffer;
-import java.util.Dictionary;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,6 +62,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractContentRepository.class);
+
+  /** The repository type */
+  protected String type = null;
 
   /** Index into this repository */
   protected ContentRepositoryIndex index = null;
@@ -85,24 +88,41 @@ public abstract class AbstractContentRepository implements ContentRepository {
   protected static final Pattern resourceHeaderRegex = Pattern.compile(".*<\\s*([\\w]*) .*id=\"([a-z0-9-]*)\".*path=\"([^\"]*)\".*version=\"([^\"]*)\".*");
 
   /**
+   * Creates a new instance of the content repository.
+   * 
+   * @param type
+   *          the repository type
+   */
+  public AbstractContentRepository(String type) {
+    this.type = type;
+  }
+
+  /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#connect(java.util.Dictionary)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getType()
    */
-  public void connect(Dictionary<?, ?> properties)
+  public String getType() {
+    return type;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#connect(ch.o2it.weblounge.common.site.Site)
+   */
+  public void connect(Site site)
       throws ContentRepositoryException {
-
-    site = (Site) properties.get(Site.class.getName());
     if (site == null)
-      throw new ContentRepositoryException("Unable to connect content repository without site");
-
+      throw new ContentRepositoryException("Site must not be null");
+    this.site = site;
     connected = true;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#disconnect()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#disconnect()
    */
   public void disconnect() throws ContentRepositoryException {
     connected = false;
@@ -114,7 +134,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * This default implementation triggers loading of the index, so when
    * overwriting, make sure to invoke by calling <code>super.start()</code>.
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#start()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#start()
    */
   public void start() throws ContentRepositoryException {
     if (!connected)
@@ -135,7 +155,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * This implementation closes the index, so when overwriting, make sure to
    * invoke by calling <code>super.stop()</code>.
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#stop()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#stop()
    */
   public void stop() throws ContentRepositoryException {
     if (!connected)
@@ -153,7 +173,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#exists(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public boolean exists(ResourceURI uri) throws ContentRepositoryException {
     if (!isStarted())
@@ -168,7 +188,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#find(ch.o2it.weblounge.common.content.SearchQuery)
    */
   public SearchResult find(SearchQuery query) throws ContentRepositoryException {
     if (!isStarted())
@@ -179,7 +199,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public Resource<?> get(ResourceURI uri) throws ContentRepositoryException {
     if (!isStarted())
@@ -233,7 +253,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.language.Language)
    */
   public InputStream getContent(ResourceURI uri, Language language)
@@ -244,7 +264,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getVersions(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
@@ -267,7 +287,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getLanguages(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public Language[] getLanguages(ResourceURI uri)
       throws ContentRepositoryException {
@@ -292,7 +312,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public Iterator<ResourceURI> list(ResourceURI uri)
       throws ContentRepositoryException {
@@ -304,7 +324,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      long[])
    */
   public Iterator<ResourceURI> list(ResourceURI uri, long version)
@@ -315,7 +335,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int)
    */
   public Iterator<ResourceURI> list(ResourceURI uri, int level)
@@ -328,7 +348,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * 
    * This implementation uses the index to get the list.
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#list(ch.o2it.weblounge.common.content.ResourceURI,
    *      int, long)
    */
   public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
@@ -342,7 +362,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getResourceCount()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getResourceCount()
    */
   public long getResourceCount() {
     return index != null ? index.getResourceCount() : -1;
@@ -351,7 +371,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#getRevisionCount()
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getRevisionCount()
    */
   public long getRevisionCount() {
     return index != null ? index.getRevisionCount() : -1;
@@ -583,6 +603,35 @@ public abstract class AbstractContentRepository implements ContentRepository {
         reader.close();
       IOUtils.closeQuietly(is);
     }
+  }
+
+  /**
+   * Replaces templates inside the property value with their corresponding value
+   * from the system properties and environment.
+   * 
+   * @param v
+   *          the original property value
+   * @return the processed value
+   */
+  protected Object processPropertyTemplates(Object v) {
+    if (v == null || !(v instanceof String))
+      return v;
+
+    String value = (String) v;
+
+    // Do variable replacement using the system properties
+    for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+      StringBuffer envKey = new StringBuffer("\\$\\{").append(entry.getKey()).append("\\}");
+      value = value.replaceAll(envKey.toString(), entry.getValue().toString());
+    }
+
+    // Do variable replacement using the system environment
+    for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+      StringBuffer envKey = new StringBuffer("\\$\\{").append(entry.getKey()).append("\\}");
+      value = value.replaceAll(envKey.toString(), entry.getValue());
+    }
+
+    return value;
   }
 
 }

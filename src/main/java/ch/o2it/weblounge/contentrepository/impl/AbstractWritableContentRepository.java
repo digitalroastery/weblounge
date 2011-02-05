@@ -24,10 +24,10 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
+import ch.o2it.weblounge.common.content.repository.WritableContentRepository;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +44,18 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   private static final Logger logger = LoggerFactory.getLogger(AbstractWritableContentRepository.class);
 
   /**
+   * Creates a new instance of the content repository.
+   * 
+   * @param type the repository type
+   */
+  public AbstractWritableContentRepository(String type) {
+    super(type);
+  }
+  
+  /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public boolean delete(ResourceURI uri) throws ContentRepositoryException,
       IOException {
@@ -56,7 +65,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#delete(ch.o2it.weblounge.common.content.ResourceURI,
    *      boolean)
    */
   public boolean delete(ResourceURI uri, boolean allRevisions)
@@ -72,7 +81,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
 
     // Make sure the resource is not being referenced elsewhere
     // TODO: Make this it's own index
-    SearchQuery searchByResource = new SearchQueryImpl(site);
+    SearchQuery searchByResource = new SearchQueryImpl(uri.getSite());
     searchByResource.withProperty("resourceid", uri.getIdentifier());
     if (index.find(searchByResource).getItems().length > 0) {
       logger.warn("Resource '{}' is still being referenced", uri);
@@ -101,7 +110,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#move(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#move(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.content.ResourceURI)
    */
   public void move(ResourceURI uri, ResourceURI target) throws IOException,
@@ -115,7 +124,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#put(ch.o2it.weblounge.common.content.Resource)
+   * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#put(ch.o2it.weblounge.common.content.Resource)
    */
   public <T extends ResourceContent> Resource<T> put(Resource<T> resource)
       throws ContentRepositoryException, IOException, IllegalStateException {
@@ -163,7 +172,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#putContent(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#putContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.content.ResourceContent, java.io.InputStream)
    */
   @SuppressWarnings("unchecked")
@@ -206,7 +215,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#deleteContent(ch.o2it.weblounge.common.content.ResourceURI,
+   * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#deleteContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.content.ResourceContent)
    */
   @SuppressWarnings("unchecked")

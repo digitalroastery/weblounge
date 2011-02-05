@@ -23,8 +23,8 @@ package ch.o2it.weblounge.contentrepository.impl.jcr;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
@@ -35,6 +35,16 @@ import java.io.InputStream;
  * JRC implementation of the <code>WritableContentRepository</code> interface.
  */
 public class JCRContentRepositoryImpl extends AbstractWritableContentRepository {
+
+  /** The repository type */
+  public static final String TYPE = "ch.o2it.weblounge.contentrepository.jcr";
+
+  /**
+   * Creates a new instance of the jcr content repository service.
+   */
+  public JCRContentRepositoryImpl() {
+    super(TYPE);
+  }
 
   /**
    * {@inheritDoc}
@@ -85,7 +95,7 @@ public class JCRContentRepositoryImpl extends AbstractWritableContentRepository 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#index()
+   * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#index()
    */
   public void index() throws ContentRepositoryException {
     // TODO Auto-generated method stub

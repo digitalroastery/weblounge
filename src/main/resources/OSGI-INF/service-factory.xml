@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  activate="activate"
+  name="Weblounge Content Repository Service Factory">
+
+  <implementation class="ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceFactory" />
+  <property name="service.description" value="Weblounge Content Repository Service Factory" />
+  <property name="service.pid" value="ch.o2it.weblounge.contentrepository.factory"/>
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedServiceFactory" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+
+</scr:component>

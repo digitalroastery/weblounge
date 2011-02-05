@@ -24,18 +24,18 @@ import ch.o2it.weblounge.common.content.MalformedResourceURIException;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository;
-import ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
@@ -43,6 +43,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,13 +71,16 @@ import java.util.Set;
  * using {@link #setBundlePathPrefix(String)}, {@link #setPagesURI(String)} or
  * {@link #setResourcesURI()}.
  */
-public class BundleContentRepository extends AbstractContentRepository {
+public class BundleContentRepositoryImpl extends AbstractContentRepository implements ManagedService {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(BundleContentRepository.class);
+  private static final Logger logger = LoggerFactory.getLogger(BundleContentRepositoryImpl.class);
+
+  /** The repository type */
+  public static final String TYPE = "ch.o2it.weblounge.contentrepository.bundle";
 
   /** Prefix for repository configuration keys */
-  private static final String CONF_PREFIX = ContentRepositoryServiceImpl.OPT_PREFIX + ".bundle.";
+  private static final String CONF_PREFIX = "contentrepository.bundle.";
 
   /** Option to cleanup temporary bundle index on shutdown */
   private static final String OPT_CLEANUP = CONF_PREFIX + "cleanup";
@@ -93,40 +98,31 @@ public class BundleContentRepository extends AbstractContentRepository {
   protected boolean cleanupTemporaryIndex = false;
 
   /**
+   * Creates a new instance of the bundle content repository.
+   */
+  public BundleContentRepositoryImpl() {
+    super(TYPE);
+  }
+
+  /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#connect(ch.o2it.weblounge.common.site.Site,
-   *      java.util.Dictionary)
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#connect(ch.o2it.weblounge.common.site.Site)
    */
-  public void connect(Dictionary<?, ?> properties)
-      throws ContentRepositoryException {
-
-    super.connect(properties);
-
-    this.bundle = (Bundle) properties.get(Bundle.class.getName());
-    if (bundle == null)
-      throw new ContentRepositoryException("Bundle was not found in connect properties");
-
-    // Make sure we can create a temporary index
+  @Override
+  public void connect(Site site) throws ContentRepositoryException {
     idxRootDir = new File(PathUtils.concat(new String[] {
         System.getProperty("java.io.tmpdir"),
         "repository",
         getSite().getIdentifier(),
-        "index",
-    }));
+        "index", }));
     try {
       FileUtils.forceMkdir(idxRootDir);
     } catch (IOException e) {
       throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
     }
-
-    // Cleanup on shutdown?
-    if (properties.get(OPT_CLEANUP) != null) {
-      cleanupTemporaryIndex = ConfigurationUtils.isTrue((String) properties.get(OPT_CLEANUP));
-      logger.info("Bundle content repository indices will {} removed on shutdown", (cleanupTemporaryIndex ? "be" : "not be"));
-    }
-
-    logger.info("Content repository connected to bundle {}", bundle);
+    
+    super.connect(site);
   }
 
   /**
@@ -144,18 +140,45 @@ public class BundleContentRepository extends AbstractContentRepository {
   }
 
   /**
-   * Returns the bundle or <code>null</code> if no bundle has been set so far.
+   * {@inheritDoc}
    * 
-   * @return the bundle
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  public Bundle getBundle() {
+  @SuppressWarnings("rawtypes")
+  public void updated(Dictionary properties) throws ConfigurationException {
+    if (properties == null)
+      return;
+
+    // Cleanup after shutdown?
+    if (properties.get(OPT_CLEANUP) != null) {
+      cleanupTemporaryIndex = ConfigurationUtils.isTrue((String) properties.get(OPT_CLEANUP));
+      logger.info("Bundle content repository indices will {} removed on shutdown", (cleanupTemporaryIndex ? "be" : "not be"));
+    }
+  }
+
+  /**
+   * Sets the bundle that this repository connects to.
+   * 
+   * @param bundle
+   *          the bundle
+   */
+  public void setBundle(Bundle bundle) {
+    this.bundle = bundle;
+  }
+
+  /**
+   * Returns the bundle that contains the site.
+   * 
+   * @return the site bundle
+   */
+  protected Bundle getBundle() {
     return bundle;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
+   * @see ch.ch.o2it.weblounge.common.content.repository.ContentRepository#get(ch.o2it.weblounge.common.content.ResourceURI)
    */
   public ResourceURI[] getVersions(ResourceURI uri)
       throws ContentRepositoryException {
@@ -199,7 +222,7 @@ public class BundleContentRepository extends AbstractContentRepository {
         if (version != -1 && v != version)
           continue;
         try {
-          ResourceURI resourceURI = loadResourceURI(site, entry);
+          ResourceURI resourceURI = loadResourceURI(uri.getSite(), entry);
           if (resourceURI == null)
             throw new IllegalStateException("Resource " + entry + " has no uri");
           resources.add(resourceURI);
@@ -308,7 +331,7 @@ public class BundleContentRepository extends AbstractContentRepository {
           index.add(resource);
           revisionCount++;
           if (previousURI != null && !previousURI.getPath().equals(uri.getPath())) {
-            logger.info("Adding {}:{} to site index", site.getIdentifier(), uri.getPath());
+            logger.info("Adding {}:{} to site index", site, uri.getPath());
             resourceCount++;
           }
           previousURI = uri;
@@ -420,8 +443,8 @@ public class BundleContentRepository extends AbstractContentRepository {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof BundleContentRepository) {
-      BundleContentRepository repo = (BundleContentRepository) obj;
+    if (obj instanceof BundleContentRepositoryImpl) {
+      BundleContentRepositoryImpl repo = (BundleContentRepositoryImpl) obj;
       if (bundle != null) {
         return bundle.equals(repo.getBundle());
       } else {
@@ -438,7 +461,7 @@ public class BundleContentRepository extends AbstractContentRepository {
    */
   @Override
   public String toString() {
-    return "bundle content repository " + bundle.toString();
+    return bundle.toString();
   }
 
 }

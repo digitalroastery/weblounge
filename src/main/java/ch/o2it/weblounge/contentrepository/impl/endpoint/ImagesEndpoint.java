@@ -26,6 +26,8 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
@@ -34,8 +36,6 @@ import ch.o2it.weblounge.common.language.UnknownLanguageException;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
 
 import org.apache.commons.io.IOUtils;
 

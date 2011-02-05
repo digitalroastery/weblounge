@@ -25,23 +25,25 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceReader;
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
+import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.VersionedContentRepositoryIndex;
 import ch.o2it.weblounge.contentrepository.impl.AbstractWritableContentRepository;
-import ch.o2it.weblounge.contentrepository.impl.ContentRepositoryServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.ContentRepositoryIndex;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,13 +65,16 @@ import javax.xml.transform.TransformerFactory;
 /**
  * Implementation of a content repository that lives on a filesystem.
  */
-public class FileSystemContentRepository extends AbstractWritableContentRepository {
+public class FileSystemContentRepository extends AbstractWritableContentRepository implements ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(FileSystemContentRepository.class);
 
+  /** The repository type */
+  public static final String TYPE = "ch.o2it.weblounge.contentrepository.filesystem";
+
   /** Prefix for repository configuration keys */
-  private static final String CONF_PREFIX = ContentRepositoryServiceImpl.OPT_PREFIX + ".fs.";
+  private static final String CONF_PREFIX = "contentrepository.fs.";
 
   /** Configuration key for the repository's root directory */
   public static final String OPT_ROOT_DIR = CONF_PREFIX + "root";
@@ -79,9 +84,12 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
   /** Default directory root directory name */
   public static final String ROOT_DIR_DEFAULT = "sites-data";
-  
+
   /** Name of the index path element right below the repository root */
   public static final String INDEX_PATH = "index";
+
+  /** The repository storage root directory */
+  protected File repositoryStorageRoot = null;
 
   /** The repository root directory */
   protected File repositoryRoot = null;
@@ -96,26 +104,50 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   protected final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
   /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.contentrepository.ContentRepository#connect(java.util.Dictionary)
+   * Creates a new instance of the file system content repository.
    */
-  public void connect(Dictionary<?, ?> properties)
-      throws ContentRepositoryException {
+  public FileSystemContentRepository() {
+    super(TYPE);
+  }
 
-    // Call the super implementation
-    super.connect(properties);
-
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @SuppressWarnings("rawtypes")
+  public void updated(Dictionary properties) throws ConfigurationException {
+    
     // Detect the filesystem root directory
     String fsRootDir = null;
     if (StringUtils.isNotBlank(System.getProperty(PROP_ROOT_DIR)))
       fsRootDir = System.getProperty(PROP_ROOT_DIR);
-    else if (StringUtils.isNotBlank((String)properties.get(OPT_ROOT_DIR)))
+    else if (properties != null && StringUtils.isNotBlank((String) properties.get(OPT_ROOT_DIR)))
       fsRootDir = (String) properties.get(OPT_ROOT_DIR);
     else
       fsRootDir = PathUtils.concat(System.getProperty("java.io.tmpdir"), ROOT_DIR_DEFAULT);
-      
-    repositoryRoot = new File(PathUtils.concat(fsRootDir, site.getIdentifier()));
+    
+    repositoryStorageRoot = new File(fsRootDir);
+    logger.debug("Content repository storage root is located at {}", repositoryRoot);
+
+    // Make sure we can create a temporary index
+    try {
+      FileUtils.forceMkdir(repositoryStorageRoot);
+    } catch (IOException e) {
+      throw new ConfigurationException(OPT_ROOT_DIR, "Unable to create repository storage at " + repositoryStorageRoot, e);
+    }
+    
+    logger.debug("Content repository configured");
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#connect(ch.o2it.weblounge.common.site.Site)
+   */
+  @Override
+  public void connect(Site site) throws ContentRepositoryException {
+    repositoryRoot = new File(repositoryStorageRoot, site.getIdentifier());
     logger.debug("Content repository root is located at {}", repositoryRoot);
 
     // Make sure we can create a temporary index
@@ -126,13 +158,14 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       throw new ContentRepositoryException("Unable to create site index at " + idxRootDir, e);
     }
 
-    logger.info("Content repository for site '{}' connected at {}", site, repositoryRoot);
+    // Tell the super implementation
+    super.connect(site);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.WritableContentRepository#index()
+   * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#index()
    */
   public void index() throws ContentRepositoryException {
     if (!connected)
@@ -482,7 +515,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   public String toString() {
-    return "filesystem content repository " + repositoryRoot;
+    return repositoryRoot.getAbsolutePath();
   }
 
   /**
@@ -672,8 +705,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     } else {
       long resourceCount = index.getResourceCount();
       long resourceVersionCount = index.getRevisionCount();
-      logger.info("Loaded site index from {}", idxRootDir);
-      logger.info("Index contains {} resources and {} revisions", resourceCount, resourceVersionCount - resourceCount);
+      logger.info("Loaded site index with {} resources and {} revisions from {}", new Object[] {
+          resourceCount,
+          resourceVersionCount - resourceCount,
+          idxRootDir });
     }
 
     return index;
