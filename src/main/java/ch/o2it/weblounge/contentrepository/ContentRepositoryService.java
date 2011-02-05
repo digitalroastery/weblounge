@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository;
 
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.site.Site;
 
 /**
