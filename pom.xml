@@ -114,18 +114,19 @@
             <Import-Package>
               ch.o2it.weblounge.common.content;version=${project.version},
               ch.o2it.weblounge.common.content.page;version=${project.version},
+              ch.o2it.weblounge.common.content.repository;version=${project.version},
               ch.o2it.weblounge.common.language;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.url;version=${project.version},
               ch.o2it.weblounge.common.user;version=${project.version},
               ch.o2it.weblounge.common.impl.content;version=${project.version},
               ch.o2it.weblounge.common.impl.content.page;version=${project.version},
+              ch.o2it.weblounge.common.impl.site;version=${project.version},
               ch.o2it.weblounge.common.impl.request;version=${project.version},
               ch.o2it.weblounge.common.impl.url;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.common.impl.util.config;version=${project.version},
               ch.o2it.weblounge.common.impl.util.doc;version=${project.version},
-              ch.o2it.weblounge.contentrepository;version=${project.version},
               ch.o2it.weblounge.dispatcher;version=${project.version},
               ch.o2it.weblounge.testing;version=${project.version},
               org.apache.commons.lang;version="2.4",
@@ -149,7 +150,6 @@
               ch.o2it.weblounge.kernel;version=${project.version},
             </Export-Package>
             <Service-Component>
-              OSGI-INF/contentrepository-factory.xml,
               OSGI-INF/kernel-service.xml,
               OSGI-INF/shared-resources.xml,
               OSGI-INF/site-command.xml,

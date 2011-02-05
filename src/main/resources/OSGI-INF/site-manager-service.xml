@@ -8,5 +8,7 @@
   <service>
     <provide interface="ch.o2it.weblounge.kernel.SiteManager" />
   </service>
+  
+  <reference name="configurationadmin" interface="org.osgi.service.cm.ConfigurationAdmin" cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
 
 </scr:component>

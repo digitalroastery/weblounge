@@ -25,14 +25,13 @@ import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
+import ch.o2it.weblounge.common.content.repository.WritableContentRepository;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
-import ch.o2it.weblounge.contentrepository.WritableContentRepository;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -169,7 +168,7 @@ public class SiteCommand {
         int descriptionLength = buf.length();
         for (int j = 0; j < 64 - descriptionLength; j++)
           buf.append(".");
-        buf.append(site.isRunning() ? " STARTED " : " STOPPED");
+        buf.append(site.isOnline() ? " STARTED " : " STOPPED");
         while (buf.length() < 22)
           buf.append(" ");
         System.out.println(buf.toString());
@@ -192,7 +191,7 @@ public class SiteCommand {
     pad("autostart", (site.isStartedAutomatically() ? "yes" : "no"));
 
     // Started / Stopped
-    pad("running", (site.isRunning() ? "yes" : "no"));
+    pad("running", (site.isOnline() ? "yes" : "no"));
 
     // Hostnames
     if (site.getURLs().length > 0)
@@ -216,7 +215,7 @@ public class SiteCommand {
     }
 
     // Pages and revisions
-    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository repository = site.getContentRepository();
     long pages = repository != null ? repository.getResourceCount() : -1;
     pad("pages", (pages >= 0 ? Long.toString(pages) : "n/a"));
     long revisions = repository != null ? repository.getRevisionCount() : -1;
@@ -239,7 +238,7 @@ public class SiteCommand {
     }
 
     // What are we looking at?
-    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository repository = site.getContentRepository();
     Page page = null;
 
     // Is it a page?
@@ -345,7 +344,7 @@ public class SiteCommand {
     String text = StringUtils.join(args, " ");
 
     // Get hold of the content repository
-    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository repository = site.getContentRepository();
     SearchQuery query = new SearchQueryImpl(site);
     query.withText(text.toString());
 
@@ -382,17 +381,17 @@ public class SiteCommand {
    *          the site
    */
   private void index(Site site) {
-    boolean restart = site.isRunning();
+    boolean restart = site.isOnline();
 
     // Make sure we are in good shape before we index
-    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository repository = site.getContentRepository();
     if (repository == null) {
       System.out.println("Site " + site + " has no content repository");
       return;
     } else if (!(repository instanceof WritableContentRepository)) {
       System.out.println("Site " + site + " is read only");
       return;
-    } else if (site.isRunning()) {
+    } else if (site.isOnline()) {
       while (true) {
         String answer = System.console().readLine("Can't index a running site! Stop now? [y/n] ");
         if ("y".equalsIgnoreCase(answer)) {
@@ -495,7 +494,7 @@ public class SiteCommand {
    *          the site to start
    */
   private void start(Site site) {
-    if (site.isRunning()) {
+    if (site.isOnline()) {
       System.out.println("Site " + site + " is already running");
       return;
     }
@@ -515,7 +514,7 @@ public class SiteCommand {
    *          the site to stop
    */
   private void stop(Site site) {
-    if (!site.isRunning()) {
+    if (!site.isOnline()) {
       System.out.println("Site " + site + " is already stopped");
       return;
     }
@@ -531,7 +530,7 @@ public class SiteCommand {
    */
   private void restart(Site site) {
     try {
-      if (site.isRunning()) {
+      if (site.isOnline()) {
         site.stop();
         site.start();
       } else if (site.isStartedAutomatically()) {

@@ -20,20 +20,28 @@
 
 package ch.o2it.weblounge.kernel;
 
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteException;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +54,16 @@ import java.util.regex.PatternSyntaxException;
 public class SiteManager {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(SiteManager.class);
+  static final Logger logger = LoggerFactory.getLogger(SiteManager.class);
+
+  /** The configuration admin service */
+  private ConfigurationAdmin configurationAdmin = null;
 
   /** The site tracker */
   private SiteTracker siteTracker = null;
+
+  /** The content repository tracker */
+  private ContentRepositoryTracker repositoryTracker = null;
 
   /** The sites */
   private List<Site> sites = new ArrayList<Site>();
@@ -59,6 +73,12 @@ public class SiteManager {
 
   /** Maps sites to osgi bundles */
   private Map<Site, Bundle> siteBundles = new HashMap<Site, Bundle>();
+
+  /** Maps content repositories to site identifier */
+  private Map<String, ContentRepository> repositoriesBysite = new HashMap<String, ContentRepository>();
+
+  /** Maps content repository configurations to site identifier */
+  private Map<String, Configuration> repositoryConfigurations = new HashMap<String, Configuration>();
 
   /** Registered site listeners */
   private List<SiteServiceListener> listeners = new ArrayList<SiteServiceListener>();
@@ -102,6 +122,9 @@ public class SiteManager {
     siteTracker = new SiteTracker(this, bundleContext);
     siteTracker.open();
 
+    repositoryTracker = new ContentRepositoryTracker(this, bundleContext);
+    repositoryTracker.open();
+
     logger.debug("Site manager activated");
   }
 
@@ -118,6 +141,9 @@ public class SiteManager {
 
     siteTracker.close();
     siteTracker = null;
+
+    repositoryTracker.open();
+    repositoryTracker = null;
 
     logger.info("Site manager stopped");
   }
@@ -155,7 +181,7 @@ public class SiteManager {
     Site site = sitesByServerName.get(hostName);
     if (site != null)
       return site;
-    
+
     // There is obviously no direct match. Therefore, try to find a
     // wildcard match
     for (Map.Entry<String, Site> e : sitesByServerName.entrySet()) {
@@ -229,6 +255,31 @@ public class SiteManager {
 
     logger.debug("Site '{}' registered", site);
 
+    // Look for content repositories
+    ContentRepository repository = repositoriesBysite.get(site.getIdentifier());
+    if (repository != null && site.getContentRepository() == null) {
+      logger.info("Site '{}' connected to content repository at {}", site, repository);
+      site.setContentRepository(repository);
+    } else {
+      try {
+        Configuration config = configurationAdmin.createFactoryConfiguration("ch.o2it.weblounge.contentrepository.factory", null);
+        Dictionary<Object, Object> properties = new Hashtable<Object, Object>();
+        properties.put(Site.class.getName().toLowerCase(), site.getIdentifier());
+        for (Map.Entry<String, List<String>> option : site.getOptions().entrySet()) {
+          String key = option.getKey();
+          if (option.getValue().size() == 1) {
+            properties.put(key, option.getValue().get(0));
+          } else {
+            properties.put(key, option.getValue().toArray(new String[option.getValue().size()]));
+          }
+        }
+        config.update(properties);
+        repositoryConfigurations.put(site.getIdentifier(), config);
+      } catch (IOException e) {
+        logger.error("Unable to create configuration for content repository of site '" + site + "'", e);
+      }
+    }
+
     // Inform site listeners
     synchronized (listeners) {
       for (SiteServiceListener listener : listeners) {
@@ -270,10 +321,18 @@ public class SiteManager {
 
     // Stop the site if it's running
     try {
-      if (site.isRunning())
+      if (site.isOnline())
         site.stop();
     } catch (Throwable t) {
       logger.error("Error stopping site '{}'", site.getIdentifier(), t);
+    }
+    
+    // Tell the content repository factory to remove the repository
+    Configuration configuration = repositoryConfigurations.get(site.getIdentifier());
+    try {
+      configuration.delete();
+    } catch (IOException e) {
+      logger.error("Error deleting repository configuration for site '" + site.getIdentifier() + "'", e);
     }
 
     // Remove it from the registry
@@ -290,6 +349,82 @@ public class SiteManager {
     }
 
     logger.debug("Site {} unregistered", site);
+  }
+
+  /**
+   * Adds the content repository to the list of registered repositories.
+   * 
+   * @param siteIdentifier
+   *          the site identifier
+   * @param repository
+   *          the content repository
+   */
+  void addContentRepository(String siteIdentifier, ContentRepository repository) {
+    if (StringUtils.isBlank(siteIdentifier))
+      throw new IllegalArgumentException("Site identifier must not be null");
+    if (repository == null)
+      throw new IllegalArgumentException("Content repository must not be null");
+    synchronized (repositoriesBysite) {
+      repositoriesBysite.put(siteIdentifier, repository);
+    }
+
+    // See if the site is known already
+    Site site = findSiteByIdentifier(siteIdentifier);
+    if (site != null) {
+      try {
+        repository.connect(site);
+        repository.start();
+        logger.info("Site '{}' connected to content repository at {}", site, repository);
+        site.setContentRepository(repository);
+      } catch (ContentRepositoryException e) {
+        logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
+      }
+    }
+  }
+
+  /**
+   * Adds the content repository to the list of registered repositories.
+   * 
+   * @param repository
+   *          the content repository
+   */
+  void removeContentRepository(ContentRepository repository) {
+    if (repository == null)
+      throw new IllegalArgumentException("Content repository must not be null");
+
+    try {
+      repository.stop();
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error stopping content repository " + repository, e);
+    }
+
+    synchronized (repositoriesBysite) {
+      String siteIdentifier = null;
+      for (Map.Entry<String, ContentRepository> entry : repositoriesBysite.entrySet()) {
+        if (entry.getValue().equals(repository)) {
+          siteIdentifier = entry.getKey();
+          break;
+        }
+      }
+
+      if (siteIdentifier != null) {
+        repositoriesBysite.remove(siteIdentifier);
+        Site site = findSiteByIdentifier(siteIdentifier);
+        if (site != null) {
+          site.setContentRepository(null);
+        }
+      }
+    }
+  }
+
+  /**
+   * OSGi environment callback that passes in the configuration admin service.
+   * 
+   * @param configurationAdmin
+   *          the configuration admin service
+   */
+  void setConfigurationAdmin(ConfigurationAdmin configurationAdmin) {
+    this.configurationAdmin = configurationAdmin;
   }
 
   /**
@@ -336,6 +471,62 @@ public class SiteManager {
       Site site = (Site) service;
       siteManager.removeSite(site);
       super.removedService(reference, service);
+    }
+
+  }
+
+  /**
+   * This tracker is used to track <code>ContentRepository</code> services. When
+   * a repository either shows up or disappears, the associated site as updated
+   * accordingly.
+   */
+  private final class ContentRepositoryTracker extends ServiceTracker {
+
+    /** The site dispatcher */
+    private SiteManager siteManager = null;
+
+    /**
+     * Creates a new <code>ContentRepositoryTracker</code>.
+     * 
+     * @param siteManager
+     *          the site dispatcher
+     * @param context
+     *          the site dispatcher's bundle context
+     */
+    public ContentRepositoryTracker(SiteManager siteManager,
+        BundleContext context) {
+      super(context, ContentRepository.class.getName(), null);
+      this.siteManager = siteManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
+     */
+    public Object addingService(ServiceReference reference) {
+      String siteIdentifier = (String) reference.getProperty(Site.class.getName().toLowerCase());
+      if (siteIdentifier == null) {
+        logger.warn("Found content repository without site property");
+        return super.addingService(reference);
+      }
+
+      // Register the content repository
+      ContentRepository repository = (ContentRepository) super.addingService(reference);
+      siteManager.addContentRepository(siteIdentifier, repository);
+
+      return repository;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference,
+     *      java.lang.Object)
+     */
+    public void removedService(ServiceReference reference, Object service) {
+      ContentRepository repository = (ContentRepository) service;
+      siteManager.removeContentRepository(repository);
     }
 
   }
