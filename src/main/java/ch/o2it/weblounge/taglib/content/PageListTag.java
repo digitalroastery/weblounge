@@ -27,15 +27,15 @@ import ch.o2it.weblounge.common.content.SearchResultPageItem;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.request.CacheTag;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import org.slf4j.Logger;
@@ -187,12 +187,15 @@ public class PageListTag extends WebloungeTag {
    */
   public int doStartTag() throws JspException {
     index = 0;
-    
+
     // Save the current pagelet so that we can restore it later
     pagelet = (Pagelet) request.getAttribute(WebloungeRequest.PAGELET);
-    
+
     try {
       return (loadNextPage()) ? EVAL_BODY_INCLUDE : SKIP_BODY;
+    } catch (ContentRepositoryUnavailableException e) {
+      response.invalidate();
+      return SKIP_BODY;
     } catch (ContentRepositoryException e) {
       throw new JspException(e);
     }
@@ -210,6 +213,9 @@ public class PageListTag extends WebloungeTag {
         return EVAL_BODY_AGAIN;
       else
         return SKIP_BODY;
+    } catch (ContentRepositoryUnavailableException e) {
+      response.invalidate();
+      return SKIP_BODY;
     } catch (ContentRepositoryException e) {
       throw new JspException(e);
     }
@@ -234,16 +240,19 @@ public class PageListTag extends WebloungeTag {
    * @return <code>true</code> if a suitable page was found
    * @throws ContentRepositoryException
    *           if loading the pages fails
+   * @throws ContentRepositoryUnavailableException
+   *           if the repository is offline
    */
-  private boolean loadNextPage() throws ContentRepositoryException {
+  private boolean loadNextPage() throws ContentRepositoryException,
+      ContentRepositoryUnavailableException {
     Site site = request.getSite();
 
     // Check if headers have already been loaded
     if (pages == null) {
-      ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+      ContentRepository repository = site.getContentRepository();
       if (repository == null) {
-        logger.warn("Unable to load content repository for site '{}'", site);
-        return false;
+        logger.debug("Unable to load content repository for site '{}'", site);
+        throw new ContentRepositoryUnavailableException();
       }
 
       // Specify which pages to load
@@ -296,7 +305,8 @@ public class PageListTag extends WebloungeTag {
       this.url = url;
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW_PAGE, page);
       pageContext.setAttribute(PageListTagExtraInfo.PREVIEW, preview);
-      response.addTag(CacheTag.Url, url.getPath());
+      if (url != null)
+        response.addTag(CacheTag.Url, url.getPath());
     }
 
     return found;

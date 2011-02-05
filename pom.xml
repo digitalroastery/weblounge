@@ -83,6 +83,7 @@
               ch.o2it.weblounge.common.content.file;version=${project.version},
               ch.o2it.weblounge.common.content.image;version=${project.version},
               ch.o2it.weblounge.common.content.page;version=${project.version},
+              ch.o2it.weblounge.common.content.repository;version=${project.version},
               ch.o2it.weblounge.common.impl.content;version=${project.version},
               ch.o2it.weblounge.common.impl.content.file;version=${project.version},
               ch.o2it.weblounge.common.impl.content.image;version=${project.version},
@@ -98,7 +99,6 @@
               ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.url;version=${project.version},
               ch.o2it.weblounge.common.user;version=${project.version},
-              ch.o2it.weblounge.contentrepository;version=${project.version},
               org.apache.commons.lang;version="2.4",
               org.slf4j;version="1.5.6",
               javax.servlet;version="2.5",
@@ -113,9 +113,6 @@
               ch.o2it.weblounge.taglib.security;version=${project.version},
               ch.o2it.weblounge.taglib.util;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/contentrepository-factory.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

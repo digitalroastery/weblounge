@@ -26,6 +26,9 @@ import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.content.page.PageletRenderer;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -36,9 +39,6 @@ import ch.o2it.weblounge.common.site.HTMLAction;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.content.ComposerTag;
 
 import org.apache.commons.lang.StringUtils;
@@ -213,9 +213,14 @@ public class ComposerTagSupport extends WebloungeTag {
    *          the jsp output writer
    * @throws IOException
    *           if writing to the output fails
+   * @throws ContentRepositoryException
+   *           if reading content from the repository fails
+   * @throws ContentRepositoryUnavailableException
+   *           if the content repository is offline
    * @see #afterComposer(JspWriter)
    */
-  protected void beforeComposer(JspWriter writer) throws IOException {
+  protected void beforeComposer(JspWriter writer) throws IOException,
+      ContentRepositoryException, ContentRepositoryUnavailableException {
     StringBuffer buf = new StringBuffer("<div ");
     if (request.getVersion() == Resource.WORK && targetPage.isLocked()) {
       addCssClass(CLASS_LOCKED);
@@ -240,9 +245,14 @@ public class ComposerTagSupport extends WebloungeTag {
    *          the jsp output writer
    * @throws IOException
    *           if writing to the output fails
+   * @throws ContentRepositoryException
+   *           if reading content from the repository fails
+   * @throws ContentRepositoryUnavailableException
+   *           if the content repository is offline
    * @see #beforeComposer(JspWriter)
    */
-  protected void afterComposer(JspWriter writer) throws IOException {
+  protected void afterComposer(JspWriter writer) throws IOException,
+      ContentRepositoryException, ContentRepositoryUnavailableException {
     writer.println("</div>");
   }
 
@@ -311,9 +321,14 @@ public class ComposerTagSupport extends WebloungeTag {
    *         <code>{@link #SKIP_PAGELET}</code>
    * @throws IOException
    *           if writing to the composer fails
+   * @throws ContentRepositoryException
+   *           if reading content from the repository fails
+   * @throws ContentRepositoryUnavailableException
+   *           if the content repository is offline
    */
   protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException {
+      throws IOException, ContentRepositoryException,
+      ContentRepositoryUnavailableException {
     return EVAL_PAGELET;
   }
 
@@ -329,9 +344,14 @@ public class ComposerTagSupport extends WebloungeTag {
    *          the writer
    * @throws IOException
    *           if writing to the composer fails
+   * @throws ContentRepositoryException
+   *           if reading content from the repository fails
+   * @throws ContentRepositoryUnavailableException
+   *           if the content repository is offline
    */
   protected void afterPagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException {
+      throws IOException, ContentRepositoryException,
+      ContentRepositoryUnavailableException {
   }
 
   /**
@@ -339,18 +359,23 @@ public class ComposerTagSupport extends WebloungeTag {
    * and returned from a parent page.
    * 
    * @return the page that provided the content
+   * @throws SecurityException
+   *           if access to the content is denied
    * @throws ContentRepositoryException
+   *           if reading content from the repository fails
+   * @throws ContentRepositoryUnavailableException
+   *           if the content repository is offline
    */
   private void loadContent(boolean inheritFromParent) throws SecurityException,
-      ContentRepositoryException {
+      ContentRepositoryException, ContentRepositoryUnavailableException {
 
     try {
       WebUrl url = getRequest().getUrl();
       Site site = request.getSite();
-      ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+      ContentRepository contentRepository = site.getContentRepository();
       if (contentRepository == null) {
-        logger.warn("Content repository unavailable for site '{}'", site.getIdentifier());
-        return;
+        logger.debug("Content repository unavailable for site '{}'", site.getIdentifier());
+        throw new ContentRepositoryUnavailableException("Repository is offline");
       }
 
       targetPage = (Page) getRequest().getAttribute(WebloungeRequest.PAGE);
@@ -430,14 +455,15 @@ public class ComposerTagSupport extends WebloungeTag {
    * different page, as returned by {@link #getContentProvider()}.
    * 
    * @return the target page
+   * @throws ContentRepositoryUnavailableException
+   *           if the content repository is offline
+   * @throws ContentRepositoryException
+   *           if reading from the content repository fails
    */
-  protected Page getTargetPage() {
+  protected Page getTargetPage() throws ContentRepositoryUnavailableException,
+      ContentRepositoryException {
     if (!initialized) {
-      try {
-        loadContent(contentInheritanceEnabled);
-      } catch (Exception e) {
-        logger.warn("Unable to load composer content: {}", e.getMessage());
-      }
+      loadContent(contentInheritanceEnabled);
     }
     return targetPage;
   }
@@ -465,11 +491,13 @@ public class ComposerTagSupport extends WebloungeTag {
    * @return the pagelets
    * @throws ContentRepositoryException
    *           if loading the content fails
+   * @throws ContentRepositoryUnavailableException
+   *           if the content repository is offline
    * @throws SecurityException
    *           if accessing the content is forbidden
    */
   protected Pagelet[] getContent() throws SecurityException,
-      ContentRepositoryException {
+      ContentRepositoryException, ContentRepositoryUnavailableException {
     if (contentProvider == null)
       loadContent(contentInheritanceEnabled);
     if (pagelets == null)
@@ -579,6 +607,9 @@ public class ComposerTagSupport extends WebloungeTag {
     } catch (IOException e) {
       response.invalidate();
       logger.error("Unable to print to out", e);
+      return EVAL_PAGE;
+    } catch (ContentRepositoryUnavailableException e) {
+      response.invalidate();
       return EVAL_PAGE;
     } catch (Throwable t) {
       response.invalidate();
@@ -728,7 +759,15 @@ public class ComposerTagSupport extends WebloungeTag {
 
       // Syntactically close the pagelet
       if (renderingState.equals(RenderingState.InsidePagelet)) {
-        afterPagelet(pagelet, position, writer);
+        try {
+          afterPagelet(pagelet, position, writer);
+        } catch (ContentRepositoryException e) {
+          logger.warn("Failed to close pagelet: {}", e.getMessage());
+          response.invalidate();
+        } catch (ContentRepositoryUnavailableException e) {
+          logger.warn("Failed to close pagelet due to missing content repository");
+          response.invalidate();
+        }
         renderingState = RenderingState.InsideComposer;
       }
 

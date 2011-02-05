@@ -23,13 +23,12 @@ package ch.o2it.weblounge.taglib.resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileContent;
 import ch.o2it.weblounge.common.content.file.FileResource;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import org.apache.commons.lang.StringUtils;
@@ -89,9 +88,10 @@ public class FileResourceTag extends WebloungeTag {
     Site site = request.getSite();
     Language language = request.getLanguage();
 
-    ContentRepository repository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository repository = site.getContentRepository();
     if (repository == null) {
-      logger.warn("Unable to load content repository for site '{}'", site);
+      logger.debug("Unable to load content repository for site '{}'", site);
+      response.invalidate();
       return SKIP_BODY;
     }
 

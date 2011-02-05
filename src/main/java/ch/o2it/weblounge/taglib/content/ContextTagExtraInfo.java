@@ -23,12 +23,12 @@ package ch.o2it.weblounge.taglib.content;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Action;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.AuthenticatedUser;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
 import ch.o2it.weblounge.taglib.ParseException;
 import ch.o2it.weblounge.taglib.TagVariableDefinitionParser;
 

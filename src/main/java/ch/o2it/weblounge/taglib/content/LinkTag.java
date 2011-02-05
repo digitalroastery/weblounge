@@ -22,10 +22,9 @@ package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.request.CacheTag;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import org.slf4j.Logger;
@@ -103,9 +102,15 @@ public class LinkTag extends WebloungeTag {
     super.doStartTag();
 
     try {
-      ContentRepository repo = ContentRepositoryFactory.getRepository(request.getSite());
+      ContentRepository repository = request.getSite().getContentRepository();
+      if (repository == null) {
+        logger.debug("Content repository is offline");
+        response.invalidate();
+        return SKIP_BODY;
+      }
+      
       ResourceURI pageURI = new PageURIImpl(request.getSite(), null, resourceid);
-      Page page = (Page) repo.get(pageURI);
+      Page page = (Page) repository.get(pageURI);
       if (page == null) {
         logger.warn("Unable to link to non-existing page {}", pageURI);
         return SKIP_BODY;

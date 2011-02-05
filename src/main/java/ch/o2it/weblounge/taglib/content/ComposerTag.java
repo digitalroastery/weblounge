@@ -23,6 +23,8 @@ package ch.o2it.weblounge.taglib.content;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryUnavailableException;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.taglib.ComposerTagSupport;
@@ -60,7 +62,7 @@ public class ComposerTag extends ComposerTagSupport {
    * @see ch.o2it.weblounge.taglib.ComposerTagSupport#beforeComposer(javax.servlet.jsp.JspWriter)
    */
   @Override
-  protected void beforeComposer(JspWriter writer) throws IOException {
+  protected void beforeComposer(JspWriter writer) throws IOException, ContentRepositoryException, ContentRepositoryUnavailableException {
     User user = request.getUser();
     long version = request.getVersion();
     Page targetPage = getTargetPage();
@@ -102,7 +104,7 @@ public class ComposerTag extends ComposerTagSupport {
    */
   @Override
   protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException {
+      throws IOException, ContentRepositoryException, ContentRepositoryUnavailableException {
 
     // Start editing support
     // if (version == Page.WORK && isLockedByCurrentUser) {
@@ -120,7 +122,7 @@ public class ComposerTag extends ComposerTagSupport {
    */
   @Override
   protected void afterPagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException {
+      throws IOException, ContentRepositoryException, ContentRepositoryUnavailableException {
 
     // If user is not editing this page, then we are finished with
     // the current pagelet.

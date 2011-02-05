@@ -27,6 +27,8 @@ import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
@@ -35,9 +37,6 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import org.apache.commons.lang.StringUtils;
@@ -222,7 +221,13 @@ public class PagePreviewTag extends WebloungeTag {
       }
     } else {
       ContentRepository contentRepository = null;
-      contentRepository = ContentRepositoryFactory.getRepository(site);
+      contentRepository = site.getContentRepository();
+      if (contentRepository == null) {
+        logger.debug("Content repository is offline");
+        response.invalidate();
+        return SKIP_BODY;
+      }
+      
       ResourceURI pageURI = new PageURIImpl(site, null, pageId);
 
       try {

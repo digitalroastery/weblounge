@@ -21,9 +21,6 @@
 package ch.o2it.weblounge.taglib.content;
 
 import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.taglib.ParseException;
 import ch.o2it.weblounge.taglib.TagVariableDefinitionParser;
 import ch.o2it.weblounge.taglib.WebloungeTag;
@@ -122,7 +119,7 @@ public class ContextTag extends WebloungeTag {
         if (variables.getPagelet() != null)
           define(variables.getPagelet(), request.getAttribute(WebloungeRequest.PAGELET));
         if (variables.getRepository() != null)
-          define(variables.getRepository(), getRepository(request.getSite()));
+          define(variables.getRepository(), request.getSite().getContentRepository());
         if (variables.getSite() != null)
           define(variables.getSite(), request.getSite());
         if (variables.getUri() != null)
@@ -184,17 +181,6 @@ public class ContextTag extends WebloungeTag {
     }
 
     return super.doEndTag();
-  }
-
-  /**
-   * Returns the content repository that is associated with this site.
-   * 
-   * @param site
-   *          the site
-   * @return the site's repository
-   */
-  protected ContentRepository getRepository(Site site) {
-    return ContentRepositoryFactory.getRepository(site);
   }
 
   /**
