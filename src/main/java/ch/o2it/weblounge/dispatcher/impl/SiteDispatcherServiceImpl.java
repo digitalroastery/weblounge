@@ -20,6 +20,7 @@
 
 package ch.o2it.weblounge.dispatcher.impl;
 
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
@@ -459,7 +460,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       // Did we already miss the "siteStarted()" event? If so, we trigger it
       // for ourselves, so the modules are being started.
       site.addSiteListener(this);
-      if (site.isRunning()) {
+      if (site.isOnline()) {
         siteStarted(site);
       }
 
@@ -548,6 +549,20 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
       }
     }
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.SiteListener#repositoryConnected(ch.o2it.weblounge.common.site.Site, ch.o2it.weblounge.common.content.repository.ContentRepository)
+   */
+  public void repositoryConnected(Site site, ContentRepository repository) { }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.SiteListener#repositoryDisconnected(ch.o2it.weblounge.common.site.Site, ch.o2it.weblounge.common.content.repository.ContentRepository)
+   */
+  public void repositoryDisconnected(Site site, ContentRepository repository) { }
 
   /**
    * {@inheritDoc}

@@ -257,7 +257,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     WebloungeResponseImpl response = new WebloungeResponseImpl(httpResponse);
 
     // See if a site dispatcher was found, and if so, if it's enabled
-    if (!site.isRunning()) {
+    if (!site.isOnline()) {
       logger.warn("Dispatcher for site {} is temporarily not available", site);
       DispatchUtils.sendServiceUnavailable("Site is temporarily unavailable", request, response);
       return;
@@ -329,7 +329,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     if (sites == null)
       return null;
     Site site = sites.findSiteByRequest(request);
-    if (site != null && !site.isRunning()) {
+    if (site != null && !site.isOnline()) {
       logger.debug("Ignoring request for disabled site {}", site);
       return null;
     }

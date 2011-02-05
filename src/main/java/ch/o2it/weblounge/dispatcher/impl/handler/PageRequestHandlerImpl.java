@@ -28,6 +28,8 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.request.CacheTagSet;
 import ch.o2it.weblounge.common.impl.request.Http11Constants;
@@ -42,9 +44,6 @@ import ch.o2it.weblounge.common.site.HTMLAction;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.common.user.User;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.dispatcher.PageRequestHandler;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
@@ -167,7 +166,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
 
       // Load the page from the content repository
       else {
-        ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+        ContentRepository contentRepository = site.getContentRepository();
         if (contentRepository == null) {
           logger.warn("No content repository found for site '{}'", site);
           return false;
