@@ -22,6 +22,7 @@ package ch.o2it.weblounge.common.impl.site;
 
 import ch.o2it.weblounge.common.content.page.PageLayout;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
@@ -105,7 +106,7 @@ public class SiteImpl implements Site {
 
   /** Bundle property name of the site identifier */
   public static final String PROP_IDENTIFIER = "site.identifier";
-  
+
   /** Xml namespace for the site */
   public static final String SITE_XMLNS = "http://www.o2it.ch/weblounge/3.0/site";
 
@@ -119,7 +120,7 @@ public class SiteImpl implements Site {
   protected boolean autoStart = true;
 
   /** Site running state */
-  private boolean running = false;
+  private boolean isOnline = false;
 
   /** Url of this site */
   private WebUrl url = null;
@@ -159,9 +160,12 @@ public class SiteImpl implements Site {
 
   /** Jobs */
   protected Map<String, QuartzJob> jobs = null;
-  
+
   /** The i18n dictionary */
   protected I18nDictionaryImpl i18n = null;
+
+  /** The site's content repository */
+  protected ContentRepository contentRepository = null;
 
   /** Authentication modules */
   protected List<AuthenticationModule> authenticationModules = null;
@@ -235,7 +239,7 @@ public class SiteImpl implements Site {
    */
   public void setAutoStart(boolean enabled) {
     this.autoStart = enabled;
-    if (running)
+    if (isOnline)
       stop();
   }
 
@@ -290,13 +294,13 @@ public class SiteImpl implements Site {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.site.Site#getI18n()
    */
   public I18nDictionary getI18n() {
     return i18n;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -620,6 +624,30 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
+   * @see ch.o2it.weblounge.common.site.Site#setContentRepository(ch.o2it.weblounge.common.content.repository.ContentRepository)
+   */
+  public void setContentRepository(ContentRepository repository) {
+    ContentRepository oldRepository = contentRepository;
+    this.contentRepository = repository;
+    if (repository != null) {
+      fireRepositoryConnected(repository);
+    } else {
+      fireRepositoryDisconnected(oldRepository);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.site.Site#getContentRepository()
+   */
+  public ContentRepository getContentRepository() {
+    return contentRepository;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.o2it.weblounge.common.site.Site#addRequestListener(ch.o2it.weblounge.common.request.RequestListener)
    */
   public void addRequestListener(RequestListener listener) {
@@ -702,7 +730,7 @@ public class SiteImpl implements Site {
    */
   public synchronized void start() throws SiteException, IllegalStateException {
     logger.debug("Starting site {}", this);
-    if (running)
+    if (isOnline)
       throw new IllegalStateException("Site is already running");
 
     // Start the site modules
@@ -730,7 +758,7 @@ public class SiteImpl implements Site {
     }
 
     // Finally, mark this site as running
-    running = true;
+    isOnline = true;
     logger.info("Site '{}' started", this);
 
     // Tell listeners
@@ -744,7 +772,7 @@ public class SiteImpl implements Site {
    */
   public synchronized void stop() throws IllegalStateException {
     logger.debug("Stopping site '{}'", this);
-    if (!running)
+    if (!isOnline)
       throw new IllegalStateException("Site is not running");
 
     // Stop jobs
@@ -769,7 +797,7 @@ public class SiteImpl implements Site {
     }
 
     // Finally, mark this site as stopped
-    running = false;
+    isOnline = false;
     logger.info("Site '{}' stopped", this);
 
     // Tell listeners
@@ -779,10 +807,10 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#isRunning()
+   * @see ch.o2it.weblounge.common.site.Site#isOnline()
    */
-  public boolean isRunning() {
-    return running;
+  public boolean isOnline() {
+    return isOnline && contentRepository != null;
   }
 
   /**
@@ -943,6 +971,40 @@ public class SiteImpl implements Site {
     }
   }
 
+  /**
+   * Method to fire a <code>repositoryConnected()</code> message to all
+   * registered <code>SiteListener</code>s.
+   * 
+   * @param repository
+   *          the content repository
+   */
+  protected void fireRepositoryConnected(ContentRepository repository) {
+    if (siteListeners == null)
+      return;
+    synchronized (siteListeners) {
+      for (SiteListener listener : siteListeners) {
+        listener.repositoryConnected(this, repository);
+      }
+    }
+  }
+
+  /**
+   * Method to fire a <code>repositoryDisconnected()</code> message to all
+   * registered <code>SiteListener</code>s.
+   * 
+   * @param repository
+   *          the content repository
+   */
+  protected void fireRepositoryDisconnected(ContentRepository repository) {
+    if (siteListeners == null)
+      return;
+    synchronized (siteListeners) {
+      for (SiteListener listener : siteListeners) {
+        listener.repositoryDisconnected(this, repository);
+      }
+    }
+  }
+
   /* -------------------------------- OSGi -------------------------------- */
 
   /**
@@ -959,7 +1021,7 @@ public class SiteImpl implements Site {
     this.quartzTriggerListener = new QuartzTriggerListener(this);
     try {
       this.scheduler.addTriggerListener(quartzTriggerListener);
-      if (running) {
+      if (isOnline) {
         synchronized (jobs) {
           for (QuartzJob job : jobs.values()) {
             scheduleJob(job);
@@ -1027,7 +1089,7 @@ public class SiteImpl implements Site {
     docBuilderFactory.setSchema(moduleSchema);
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-    
+
     // Load the modules
     final Enumeration<URL> e = bundle.findEntries("site", "module.xml", true);
 
@@ -1037,7 +1099,7 @@ public class SiteImpl implements Site {
         int endIndex = moduleXmlUrl.toExternalForm().lastIndexOf('/');
         URL moduleUrl = new URL(moduleXmlUrl.toExternalForm().substring(0, endIndex));
         logger.debug("Loading module '{}' for site '{}'", moduleXmlUrl, this);
-        
+
         // Load and validate the module descriptor
         ValidationErrorHandler errorHandler = new ValidationErrorHandler(moduleXmlUrl);
         docBuilder.setErrorHandler(errorHandler);
@@ -1053,7 +1115,7 @@ public class SiteImpl implements Site {
         while (i18nEnum != null && i18nEnum.hasMoreElements()) {
           i18n.addDictionary(i18nEnum.nextElement());
         }
-        
+
         Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());
         logger.debug("Module '{}' loaded for site '{}'", m, this);
         addModule(m);
@@ -1093,6 +1155,30 @@ public class SiteImpl implements Site {
     } finally {
       isShutdownInProgress = false;
     }
+  }
+
+  /**
+   * Callback from the OSGi environment to set the site's content repository.
+   * 
+   * @param repository
+   *          the repository
+   */
+  protected void setContenRepository(ContentRepository repository) {
+    this.contentRepository = repository;
+    logger.info("Content repository {} connected to site '{}'", repository, this);
+    fireRepositoryConnected(repository);
+  }
+
+  /**
+   * Callback from the OSGi environment to set the site's content repository.
+   * 
+   * @param repository
+   *          the repository
+   */
+  protected void removeContenRepository(ContentRepository repository) {
+    this.contentRepository = null;
+    logger.info("Content repository {} disconnected from site '{}'", repository, this);
+    fireRepositoryDisconnected(repository);
   }
 
   /**
@@ -1288,7 +1374,7 @@ public class SiteImpl implements Site {
     XPathNamespaceContext nsCtx = new XPathNamespaceContext(false);
     nsCtx.defineNamespaceURI("ns", SITE_XMLNS);
     xpath.setNamespaceContext(nsCtx);
-    
+
     return fromXml(config, xpath);
   }
 
@@ -1308,7 +1394,7 @@ public class SiteImpl implements Site {
   public static Site fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    
+
     // identifier
     String identifier = XPathHelper.valueOf(config, "@id", xpathProcessor);
     if (identifier == null)
