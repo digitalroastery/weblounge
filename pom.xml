@@ -97,6 +97,7 @@
             <Import-Package>
               ch.o2it.weblounge.common.content;version="${project.version}",
               ch.o2it.weblounge.common.content.page;version="${project.version}",
+              ch.o2it.weblounge.common.content.repository;version=${project.version},
               ch.o2it.weblounge.common.language;version="${project.version}",
               ch.o2it.weblounge.common.impl.content;version="${project.version}",
               ch.o2it.weblounge.common.impl.content.page;version="${project.version}",
@@ -106,7 +107,6 @@
               ch.o2it.weblounge.common.security;version="${project.version}",
               ch.o2it.weblounge.common.site;version="${project.version}",
               ch.o2it.weblounge.common.user;version="${project.version}",
-              ch.o2it.weblounge.contentrepository;version="${project.version}",
               ch.o2it.weblounge.kernel;version="${project.version}",
               org.apache.commons.io;version="1.4",
               org.apache.commons.lang;version="2.4",

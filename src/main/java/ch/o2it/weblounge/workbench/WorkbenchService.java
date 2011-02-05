@@ -25,15 +25,14 @@ import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.testing.MockHttpServletRequest;
 import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.contentrepository.ContentRepository;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryException;
-import ch.o2it.weblounge.contentrepository.ContentRepositoryFactory;
 import ch.o2it.weblounge.workbench.suggest.PageSuggestion;
 import ch.o2it.weblounge.workbench.suggest.SubjectSuggestion;
 import ch.o2it.weblounge.workbench.suggest.UserSuggestion;
@@ -126,7 +125,7 @@ public class WorkbenchService {
     // search.withUserFacet();
 
     // Get hold of the site's content repository
-    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository contentRepository = site.getContentRepository();
     if (contentRepository == null) {
       logger.warn("No content repository found for site '{}'", site);
       return null;
@@ -162,7 +161,7 @@ public class WorkbenchService {
     search.withSubjectFacet();
 
     // Get hold of the site's content repository
-    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository contentRepository = site.getContentRepository();
     if (contentRepository == null) {
       throw new IllegalStateException("No content repository found for site '" + site + "'");
     }
@@ -222,7 +221,7 @@ public class WorkbenchService {
       throw new IllegalArgumentException("Pagelet index must be a positive integer");
 
     // Get hold of the site's content repository
-    ContentRepository contentRepository = ContentRepositoryFactory.getRepository(site);
+    ContentRepository contentRepository = site.getContentRepository();
     if (contentRepository == null) {
       logger.warn("No content repository found for site '{}'", site);
       return null;
