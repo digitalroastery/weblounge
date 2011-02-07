@@ -60,22 +60,6 @@ public class EmptyContentRepository implements ContentRepository {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#start()
-   */
-  public void start() throws ContentRepositoryException {
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#stop()
-   */
-  public void stop() throws ContentRepositoryException {
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see ch.o2it.weblounge.common.content.repository.ContentRepository#getType()
    */
   public String getType() {

@@ -218,7 +218,6 @@ public class FileSystemContentRepositoryTest {
     repositoryProperties.put(FileSystemContentRepository.OPT_ROOT_DIR, repositoryRoot.getAbsolutePath());
     repository.updated(repositoryProperties);
     repository.connect(site);
-    repository.start();
 
     // Resource serializers
     ResourceSerializerServiceImpl serializerService = new ResourceSerializerServiceImpl();
@@ -491,37 +490,6 @@ public class FileSystemContentRepositoryTest {
     } catch (Exception e) {
       e.printStackTrace();
       fail("Error deleting content");
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#start()}
-   * .
-   */
-  @Test
-  public void testStart() {
-    try {
-      repository.start();
-      fail("Managed to start the repository twice");
-    } catch (ContentRepositoryException e) {
-      // This is expected
-    }
-  }
-
-  /**
-   * Test method for
-   * {@link ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#stop()}
-   * .
-   */
-  @Test
-  public void testStop() {
-    try {
-      repository.stop();
-      repository.stop();
-      fail("Managed to stop the repository twice");
-    } catch (ContentRepositoryException e) {
-      // This is expected
     }
   }
 

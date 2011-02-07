@@ -69,13 +69,13 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
 
   /** Prefix into the bundle */
   protected String bundlePathPrefix = "/repository";
-  
+
   /** The site's bundle */
   protected Bundle bundle = null;
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository#connect(ch.o2it.weblounge.common.site.Site)
    */
   @Override
@@ -85,23 +85,26 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     ServiceReference ref = ctx.getServiceReference(SiteManager.class.getName());
     if (ref == null)
       throw new ContentRepositoryException("Unable to locate service manager used to load the site bundle");
-    SiteManager siteManager = (SiteManager)ctx.getService(ref);
+
+    // Locate the site's bundle
+    SiteManager siteManager = (SiteManager) ctx.getService(ref);
     if (siteManager == null)
       throw new ContentRepositoryException("Unable to locate service manager used to load the site bundle");
     this.bundle = siteManager.getSiteBundle(site);
     if (this.bundle == null)
       throw new ContentRepositoryException("No bundle seems to be associated with site '" + site.getIdentifier() + "'");
+
+    // Add the bundle contents to the index
+    indexBundleContents();
+    
     super.connect(site);
   }
 
   /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#start()
+   * Initializes the content repository by loading the resources from the bundle
+   * and adding it to the repository index.
    */
-  @Override
-  public void start() throws ContentRepositoryException {
-    super.start();
+  protected void indexBundleContents() throws ContentRepositoryException {
 
     // Are the serializers already up and running?
     Set<ResourceSerializer<?, ?>> serializers = ResourceSerializerFactory.getSerializers();

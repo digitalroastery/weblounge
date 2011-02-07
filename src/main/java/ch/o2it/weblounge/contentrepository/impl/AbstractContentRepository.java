@@ -75,9 +75,6 @@ public abstract class AbstractContentRepository implements ContentRepository {
   /** Flag indicating the connected state */
   protected boolean connected = false;
 
-  /** Flag indicating the started state */
-  protected boolean started = false;
-
   /** The document builder factory */
   protected final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -116,6 +113,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
     if (site == null)
       throw new ContentRepositoryException("Site must not be null");
     this.site = site;
+    
+    if (connected)
+      throw new ContentRepositoryException("Content repository has already been started");
+    try {
+      index = loadIndex();
+    } catch (IOException e) {
+      throw new ContentRepositoryException("Error loading repository index", e);
+    }
+
     connected = true;
   }
 
@@ -125,45 +131,10 @@ public abstract class AbstractContentRepository implements ContentRepository {
    * @see ch.o2it.weblounge.common.content.repository.ContentRepository#disconnect()
    */
   public void disconnect() throws ContentRepositoryException {
-    connected = false;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * This default implementation triggers loading of the index, so when
-   * overwriting, make sure to invoke by calling <code>super.start()</code>.
-   * 
-   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#start()
-   */
-  public void start() throws ContentRepositoryException {
-    if (!connected)
-      throw new ContentRepositoryException("Cannot start a disconnected content repository");
-    if (started)
-      throw new ContentRepositoryException("Content repository has already been started");
-    try {
-      index = loadIndex();
-      started = true;
-    } catch (IOException e) {
-      throw new ContentRepositoryException("Error loading repository index", e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * This implementation closes the index, so when overwriting, make sure to
-   * invoke by calling <code>super.stop()</code>.
-   * 
-   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#stop()
-   */
-  public void stop() throws ContentRepositoryException {
     if (!connected)
       throw new ContentRepositoryException("Cannot stop a disconnected content repository");
-    if (!started)
-      throw new ContentRepositoryException("Content repository is already stopped");
     try {
-      started = false;
+      connected = false;
       index.close();
     } catch (IOException e) {
       throw new ContentRepositoryException("Error closing repository index", e);
@@ -435,21 +406,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
   }
 
   /**
-   * Returns <code>true</code> if the repository is connected.
-   * 
-   * @return <code>true</code> if the repository is connected
-   */
-  protected boolean isConnected() {
-    return connected;
-  }
-
-  /**
    * Returns <code>true</code> if the repository is connected and started.
    * 
    * @return <code>true</code> if the repository is started
    */
   protected boolean isStarted() {
-    return connected && started;
+    return connected;
   }
 
   /**
