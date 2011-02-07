@@ -373,7 +373,6 @@ public class SiteManager {
     if (site != null) {
       try {
         repository.connect(site);
-        repository.start();
         logger.info("Site '{}' connected to content repository at {}", site, repository);
         site.setContentRepository(repository);
       } catch (ContentRepositoryException e) {
@@ -393,9 +392,9 @@ public class SiteManager {
       throw new IllegalArgumentException("Content repository must not be null");
 
     try {
-      repository.stop();
+      repository.disconnect();
     } catch (ContentRepositoryException e) {
-      logger.warn("Error stopping content repository " + repository, e);
+      logger.warn("Error disconnecting content repository " + repository, e);
     }
 
     synchronized (repositoriesBysite) {
