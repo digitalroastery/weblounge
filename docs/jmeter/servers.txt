@@ -1,0 +1,9 @@
+# The servers that need be tested. Their values will be used as a 
+# replacement for the ${sever} and ${port} variable in the HTTP Request
+# Defaults configuration element.
+#
+# Each server and port needs to go on a new line, server and port need
+# to be separated by a colon. Note that even if you connect on the standard
+# port (80), this port needs to be configured.
+
+localhost:8080

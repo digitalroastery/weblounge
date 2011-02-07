@@ -1,0 +1,9 @@
+# The languages that should be used when sending requests. Their values
+# will be used as a replacement for the ${languagecode} and ${language}
+# variable in the HTTP Header Defaults group. 
+#
+# Each request language needs to go on a new line, language code and
+# language need to be separated by a semicolon.
+
+en_us; en
+de_de; de
