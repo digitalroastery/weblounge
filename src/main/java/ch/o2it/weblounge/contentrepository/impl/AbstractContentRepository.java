@@ -110,12 +110,12 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public void connect(Site site)
       throws ContentRepositoryException {
+    if (connected)
+      throw new IllegalStateException("Content repository has already been started");
     if (site == null)
       throw new ContentRepositoryException("Site must not be null");
     this.site = site;
     
-    if (connected)
-      throw new ContentRepositoryException("Content repository has already been started");
     try {
       index = loadIndex();
     } catch (IOException e) {
@@ -132,7 +132,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public void disconnect() throws ContentRepositoryException {
     if (!connected)
-      throw new ContentRepositoryException("Cannot stop a disconnected content repository");
+      throw new IllegalStateException("Cannot stop a disconnected content repository");
     try {
       connected = false;
       index.close();

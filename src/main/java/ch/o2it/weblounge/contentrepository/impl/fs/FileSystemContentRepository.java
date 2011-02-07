@@ -167,10 +167,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * 
    * @see ch.o2it.weblounge.common.content.repository.WritableContentRepository#index()
    */
-  public void index() throws ContentRepositoryException {
-    if (!connected)
-      throw new IllegalStateException("Repository is not connected");
-
+  public void index() throws ContentRepositoryException {    
     // Temporary path for rebuilt site
     boolean success = true;
 
@@ -232,9 +229,6 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    *           if accessing a file fails
    */
   protected long index(String resourceType) throws IOException {
-    if (!connected)
-      throw new IllegalStateException("Repository is not connected");
-
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
     String homePath = UrlUtils.concat(repositoryRoot.getAbsolutePath(), resourceDirectory);

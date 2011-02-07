@@ -21,7 +21,6 @@
 package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.content.repository.ContentRepository;
-import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
 import org.apache.commons.lang.StringUtils;
@@ -209,13 +208,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
    */
   public void deleted(String pid) {
     ServiceRegistration registration = services.remove(pid);
-    ContentRepository repository = (ContentRepository) bundleCtx.getService(registration.getReference());
     registration.unregister();
-    try {
-      repository.disconnect();
-    } catch (ContentRepositoryException e) {
-      logger.warn("Error during content repository shutdown", e);
-    }
   }
 
   /**
