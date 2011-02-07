@@ -65,17 +65,20 @@ public interface ContentRepository {
    *          the associated site
    * @throws ContentRepositoryException
    *           if connecting to the repository fails
+   * @throws IllegalStateException
+   *           if the content repository is already connected
    */
-  void connect(Site site)
-      throws ContentRepositoryException;
+  void connect(Site site) throws ContentRepositoryException, IllegalStateException;
 
   /**
    * Disconnects from the content repository.
    * 
    * @throws ContentRepositoryException
    *           if disconnecting from the repository fails
+   * @throws IllegalStateException
+   *           if the content repository has never been connected
    */
-  void disconnect() throws ContentRepositoryException;
+  void disconnect() throws ContentRepositoryException, IllegalStateException;
 
   /**
    * Returns the resource identified by <code>uri</code> or <code>null</code> if
