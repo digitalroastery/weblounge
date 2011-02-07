@@ -105,7 +105,7 @@ public final class QuartzTriggerListener implements TriggerListener {
    * @see org.quartz.TriggerListener#triggerMisfired(org.quartz.Trigger)
    */
   public void triggerMisfired(Trigger trigger) {
-    logger.error("Failed to fire job trigger {}", trigger.getName());
+    logger.warn("Failed to fire job trigger {}", trigger.getName());
   }
 
   /**
