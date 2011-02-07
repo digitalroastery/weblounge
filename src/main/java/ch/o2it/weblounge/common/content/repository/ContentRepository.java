@@ -78,24 +78,6 @@ public interface ContentRepository {
   void disconnect() throws ContentRepositoryException;
 
   /**
-   * Starts the repository. This is the perfect place to create or load indices,
-   * pre-populate caches etc.
-   * 
-   * @throws ContentRepositoryException
-   *           if starting the repository fails
-   */
-  void start() throws ContentRepositoryException;
-
-  /**
-   * Stops the repository. This method will usually be called prior to a call to
-   * {@#disconnect()}.
-   * 
-   * @throws ContentRepositoryException
-   *           if starting the repository fails
-   */
-  void stop() throws ContentRepositoryException;
-
-  /**
    * Returns the resource identified by <code>uri</code> or <code>null</code> if
    * no resource was found at the specified location or revision.
    * 
