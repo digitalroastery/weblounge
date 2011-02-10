@@ -21,6 +21,7 @@ package ch.o2it.weblounge.common.impl.content.image;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
+import com.drew.lang.Rational;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
@@ -112,6 +113,11 @@ public final class ImageMetadataUtils {
           imgmeta.addKeyword(st.nextToken());
         }
       }
+      
+      for (int i=0; i < imgmeta.getLegend().length() - 1; i++) {
+        char c = imgmeta.getLegend().charAt(i);
+        System.out.println(c + " (" + (int)c + ")");
+      }
 
       // Extract EXIF information
       Directory exif = meta.getDirectory(ExifDirectory.class);
@@ -149,13 +155,40 @@ public final class ImageMetadataUtils {
         imgmeta.setCopyright(exif.getString(ExifDirectory.TAG_COPYRIGHT));
 
       // Extract GPS information
-      Directory gps = meta.getDirectory(GpsDirectory.class);
-      if (exif.containsTag(GpsDirectory.TAG_GPS_DEST_LATITUDE))
-        imgmeta.setGpsLat(gps.getString(GpsDirectory.TAG_GPS_DEST_LATITUDE));
-      if (exif.containsTag(GpsDirectory.TAG_GPS_DEST_LONGITUDE))
-        imgmeta.setGpsLong(gps.getString(GpsDirectory.TAG_GPS_DEST_LONGITUDE));
+      try {
+        Directory gps = meta.getDirectory(GpsDirectory.class);
+        if (gps.containsTag(GpsDirectory.TAG_GPS_LATITUDE)) {
+          Rational[] lat = gps.getRationalArray(GpsDirectory.TAG_GPS_LATITUDE);
+          String latRef = gps.getString(GpsDirectory.TAG_GPS_LATITUDE_REF);
+          double latitude = parseHMS(lat);
+          if (latitude != 0) {
+            if (StringUtils.isNotBlank(latRef) && "S".equalsIgnoreCase(latRef) && latitude > 0)
+              latitude *= -1;
+          }
+          imgmeta.setGpsLat(latitude);
+        }
+        if (gps.containsTag(GpsDirectory.TAG_GPS_LONGITUDE)) {
+          Rational[] lng = gps.getRationalArray(GpsDirectory.TAG_GPS_LONGITUDE);
+          String lngRef = gps.getString(GpsDirectory.TAG_GPS_LONGITUDE_REF);
+          double longitude = parseHMS(lng);
+          if (longitude != 0) {
+            if (StringUtils.isNotBlank(lngRef) && "W".equalsIgnoreCase(lngRef) && longitude > 0)
+              longitude *= -1;
+          }
+          imgmeta.setGpsLong(longitude);
+        }
+      } catch (MetadataException e) {
+        logger.info("Error while extracting GPS information out of an image.");
+        imgmeta.setGpsLat(0);
+        imgmeta.setGpsLong(0);
+      }
 
       return imgmeta;
     }
   }
+
+  private static double parseHMS(Rational[] hms) {
+    return hms[0].doubleValue() + (hms[1].doubleValue() + (hms[2].doubleValue() / 60)) / 60;
+  }
+
 }

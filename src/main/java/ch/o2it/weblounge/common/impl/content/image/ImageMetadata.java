@@ -51,10 +51,10 @@ public class ImageMetadata {
   private String location;
 
   /** GPS latitude of the place where the picture was taken */
-  private String gpsLat;
+  private double gpsLat;
 
   /** GPS longitude of the place where the picture was taken */
-  private String gpsLong;
+  private double gpsLong;
 
   /** film speed with which the picture was taken */
   private int filmspeed;
@@ -205,7 +205,7 @@ public class ImageMetadata {
    * 
    * @return the gpsLat
    */
-  public String getGpsLat() {
+  public double getGpsLat() {
     return gpsLat;
   }
 
@@ -213,14 +213,14 @@ public class ImageMetadata {
    * @param gpsLat
    *          the gpsLat to set
    */
-  public void setGpsLat(String gpsLat) {
+  public void setGpsLat(double gpsLat) {
     this.gpsLat = gpsLat;
   }
 
   /**
    * @return the gpsLong
    */
-  public String getGpsLong() {
+  public double getGpsLong() {
     return gpsLong;
   }
 
@@ -228,7 +228,7 @@ public class ImageMetadata {
    * @param gpsLong
    *          the gpsLong to set
    */
-  public void setGpsLong(String gpsLong) {
+  public void setGpsLong(double gpsLong) {
     this.gpsLong = gpsLong;
   }
 
