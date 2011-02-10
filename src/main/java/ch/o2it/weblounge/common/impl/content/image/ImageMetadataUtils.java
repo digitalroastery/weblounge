@@ -113,11 +113,6 @@ public final class ImageMetadataUtils {
           imgmeta.addKeyword(st.nextToken());
         }
       }
-      
-      for (int i=0; i < imgmeta.getLegend().length() - 1; i++) {
-        char c = imgmeta.getLegend().charAt(i);
-        System.out.println(c + " (" + (int)c + ")");
-      }
 
       // Extract EXIF information
       Directory exif = meta.getDirectory(ExifDirectory.class);
