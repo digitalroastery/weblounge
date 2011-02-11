@@ -40,7 +40,7 @@
   <options>
   	<option>
   		<name>contentrepository.type</name>
-  		<value>ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository</value>
+  		<value>ch.o2it.weblounge.contentrepository.impl.bundle.WritableBundleContentRepository</value>
   	</option>
   </options>
 </site>
