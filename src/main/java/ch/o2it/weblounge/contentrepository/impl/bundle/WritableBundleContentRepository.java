@@ -103,7 +103,8 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
       throw new ContentRepositoryException("Unable to locate bundle for site '" + site + "'");
 
     // Add the bundle contents to the index
-    indexBundleContents();    
+    if (getResourceCount() == 0)
+      indexBundleContents();
   }
 
   /**
