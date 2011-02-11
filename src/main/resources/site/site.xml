@@ -37,4 +37,10 @@
       <valid>1w1d1H1M</valid>
     </template>
   </templates>
+  <options>
+  	<option>
+  		<name>contentrepository.type</name>
+  		<value>ch.o2it.weblounge.contentrepository.impl.bundle.BundleContentRepository</value>
+  	</option>
+  </options>
 </site>

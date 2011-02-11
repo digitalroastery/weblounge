@@ -188,7 +188,7 @@ public class HTMLActionTest extends IntegrationTestBase {
       String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
       assertNull("Action is not rendered on configured page", testSuiteTitle);
 
-    } catch (Exception e) {
+    } catch (Throwable e) {
       fail("Request to " + request.getURI() + " failed" + e.getMessage());
     } finally {
       httpClient.getConnectionManager().shutdown();
@@ -226,7 +226,7 @@ public class HTMLActionTest extends IntegrationTestBase {
       String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
       assertEquals("Action is not rendered on start page", "Welcome to the Weblounge 3.0 testpage!", testSuiteTitle);
 
-    } catch (Exception e) {
+    } catch (Throwable e) {
       fail("Request to " + request.getURI() + " failed" + e.getMessage());
     } finally {
       httpClient.getConnectionManager().shutdown();

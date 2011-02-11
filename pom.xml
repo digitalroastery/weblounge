@@ -157,6 +157,7 @@
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.common.impl.util.config;version=${project.version},
               ch.o2it.weblounge.common.impl.util.xml;version=${project.version},
+							ch.o2it.weblounge.contentrepository.impl.bundle;version=${project.version},
               ch.o2it.weblounge.testing;version=${project.version},
               ch.o2it.weblounge.taglib;version=${project.version},
               ch.o2it.weblounge.taglib.content;version=${project.version},
