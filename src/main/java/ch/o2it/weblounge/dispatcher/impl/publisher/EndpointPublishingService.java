@@ -240,7 +240,7 @@ public class EndpointPublishingService implements ManagedService {
       httpService.registerServlet(contextPath, servlet, new Hashtable<String, String>(), httpContext);
       servletMap.put(contextPath, servlet);
 
-      logger.info("Registering {} at {}", service, contextPath);
+      logger.debug("Registering {} at {}", service, contextPath);
 
     } catch (Throwable t) {
       logger.error("Error registering rest service at " + contextPath, t);
@@ -256,7 +256,7 @@ public class EndpointPublishingService implements ManagedService {
    *          The endpoint's url space
    */
   protected void unregisterEndpoint(String contextPath) {
-    logger.info("Unregistering rest endpoint {}", contextPath);
+    logger.debug("Unregistering rest endpoint {}", contextPath);
 
     // Remove the servlet from the http service
     try {
