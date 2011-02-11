@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
@@ -36,10 +37,12 @@ import ch.o2it.weblounge.kernel.SiteManager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -49,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -66,6 +70,9 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WritableBundleContentRepository.class);
+
+  /** Option specifying the root directory */
+  private static final String OPT_ROOT_DIRECTORY = BundleContentRepository.CONF_PREFIX + "root";
 
   /** Prefix into the bundle */
   protected String bundlePathPrefix = "/repository";
@@ -98,6 +105,26 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     indexBundleContents();
     
     super.connect(site);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @Override
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public void updated(Dictionary properties) throws ConfigurationException {
+
+    // Since the bundle content repository is based on the file system content
+    // repository, the configuration properties need to be adjusted
+    String rootDirPath = PathUtils.trim((String) properties.get(OPT_ROOT_DIRECTORY));
+    if (StringUtils.isNotBlank(rootDirPath)) {
+      properties.put(OPT_ROOT_DIR, rootDirPath);
+      logger.info("Bundle content repository data will be stored at {}", rootDirPath);
+    }
+
+    super.updated(properties);
   }
 
   /**

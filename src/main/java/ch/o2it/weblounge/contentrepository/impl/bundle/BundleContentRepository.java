@@ -71,16 +71,16 @@ import java.util.Set;
  * using {@link #setBundlePathPrefix(String)}, {@link #setPagesURI(String)} or
  * {@link #setResourcesURI()}.
  */
-public class BundleContentRepositoryImpl extends AbstractContentRepository implements ManagedService {
+public class BundleContentRepository extends AbstractContentRepository implements ManagedService {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(BundleContentRepositoryImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(BundleContentRepository.class);
 
   /** The repository type */
   public static final String TYPE = "ch.o2it.weblounge.contentrepository.bundle";
 
   /** Prefix for repository configuration keys */
-  private static final String CONF_PREFIX = "contentrepository.bundle.";
+  public static final String CONF_PREFIX = "contentrepository.bundle.";
 
   /** Option to cleanup temporary bundle index on shutdown */
   private static final String OPT_CLEANUP = CONF_PREFIX + "cleanup";
@@ -91,6 +91,9 @@ public class BundleContentRepositoryImpl extends AbstractContentRepository imple
   /** Prefix into the bundle */
   protected String bundlePathPrefix = "/repository";
 
+  /** Path to the storage root directory */
+  protected String rootDirPath = null;
+
   /** The root directory for the temporary bundle index */
   protected File idxRootDir = null;
 
@@ -100,8 +103,9 @@ public class BundleContentRepositoryImpl extends AbstractContentRepository imple
   /**
    * Creates a new instance of the bundle content repository.
    */
-  public BundleContentRepositoryImpl() {
+  public BundleContentRepository() {
     super(TYPE);
+    rootDirPath = PathUtils.concat(System.getProperty("java.io.tmpdir"), "repository");
   }
 
   /**
@@ -111,17 +115,13 @@ public class BundleContentRepositoryImpl extends AbstractContentRepository imple
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
-    idxRootDir = new File(PathUtils.concat(new String[] {
-        System.getProperty("java.io.tmpdir"),
-        "repository",
-        getSite().getIdentifier(),
-        "index", }));
+    idxRootDir = new File(PathUtils.concat(rootDirPath, getSite().getIdentifier(), "index"));
     try {
       FileUtils.forceMkdir(idxRootDir);
     } catch (IOException e) {
       throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
     }
-    
+
     super.connect(site);
   }
 
@@ -150,10 +150,11 @@ public class BundleContentRepositoryImpl extends AbstractContentRepository imple
       return;
 
     // Cleanup after shutdown?
-    if (properties.get(OPT_CLEANUP) != null) {
+    if (StringUtils.isNotBlank((String) properties.get(OPT_CLEANUP))) {
       cleanupTemporaryIndex = ConfigurationUtils.isTrue((String) properties.get(OPT_CLEANUP));
       logger.info("Bundle content repository indices will {} removed on shutdown", (cleanupTemporaryIndex ? "be" : "not be"));
     }
+
   }
 
   /**
@@ -443,8 +444,8 @@ public class BundleContentRepositoryImpl extends AbstractContentRepository imple
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof BundleContentRepositoryImpl) {
-      BundleContentRepositoryImpl repo = (BundleContentRepositoryImpl) obj;
+    if (obj instanceof BundleContentRepository) {
+      BundleContentRepository repo = (BundleContentRepository) obj;
       if (bundle != null) {
         return bundle.equals(repo.getBundle());
       } else {

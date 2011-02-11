@@ -158,7 +158,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
       Class<ContentRepository> repositoryImplementation;
       ContentRepository repository = null;
       try {
-        repositoryImplementation = (Class<ContentRepository>) Class.forName(className);
+        repositoryImplementation = (Class<ContentRepository>) Thread.currentThread().getContextClassLoader().loadClass(className);
         repository = repositoryImplementation.newInstance();
 
         // If this is a managed service, make sure it's configured properly
