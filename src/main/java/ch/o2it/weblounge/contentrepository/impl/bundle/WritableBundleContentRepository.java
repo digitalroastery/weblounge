@@ -33,7 +33,6 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
-import ch.o2it.weblounge.kernel.SiteManager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -41,6 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
@@ -71,14 +71,22 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WritableBundleContentRepository.class);
 
+  /** The repository type */
+  public static final String TYPE = "ch.o2it.weblounge.contentrepository.bundle";
+
   /** Option specifying the root directory */
-  private static final String OPT_ROOT_DIRECTORY = BundleContentRepository.CONF_PREFIX + "root";
+  public static final String OPT_ROOT_DIR = BundleContentRepository.CONF_PREFIX + "root";
 
   /** Prefix into the bundle */
   protected String bundlePathPrefix = "/repository";
 
   /** The site's bundle */
   protected Bundle bundle = null;
+
+  @Override
+  public String getType() {
+    return TYPE;
+  }
 
   /**
    * {@inheritDoc}
@@ -87,24 +95,15 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
-    Bundle bundle = FrameworkUtil.getBundle(this.getClass());
-    BundleContext ctx = bundle.getBundleContext();
-    ServiceReference ref = ctx.getServiceReference(SiteManager.class.getName());
-    if (ref == null)
-      throw new ContentRepositoryException("Unable to locate service manager used to load the site bundle");
+    super.connect(site);
 
-    // Locate the site's bundle
-    SiteManager siteManager = (SiteManager) ctx.getService(ref);
-    if (siteManager == null)
-      throw new ContentRepositoryException("Unable to locate service manager used to load the site bundle");
-    this.bundle = siteManager.getSiteBundle(site);
-    if (this.bundle == null)
-      throw new ContentRepositoryException("No bundle seems to be associated with site '" + site.getIdentifier() + "'");
+    // Find the site's bundle
+    bundle = loadBundle(site);
+    if (bundle == null)
+      throw new ContentRepositoryException("Unable to locate bundle for site '" + site + "'");
 
     // Add the bundle contents to the index
-    indexBundleContents();
-    
-    super.connect(site);
+    indexBundleContents();    
   }
 
   /**
@@ -118,9 +117,9 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
 
     // Since the bundle content repository is based on the file system content
     // repository, the configuration properties need to be adjusted
-    String rootDirPath = PathUtils.trim((String) properties.get(OPT_ROOT_DIRECTORY));
+    String rootDirPath = (String) properties.get(OPT_ROOT_DIR);
     if (StringUtils.isNotBlank(rootDirPath)) {
-      properties.put(OPT_ROOT_DIR, rootDirPath);
+      properties.put(FileSystemContentRepository.OPT_ROOT_DIR, PathUtils.trim(rootDirPath));
       logger.info("Bundle content repository data will be stored at {}", rootDirPath);
     }
 
@@ -324,6 +323,34 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     if (url == null)
       return null;
     return url.openStream();
+  }
+
+  /**
+   * Tries to find the site's bundle in the OSGi service registry and returns
+   * it, <code>null</code> otherwise.
+   * 
+   * @param site
+   *          the site
+   * @return the bundle
+   */
+  protected Bundle loadBundle(Site site) {
+    BundleContext bundleCtx = FrameworkUtil.getBundle(site.getClass()).getBundleContext();
+    String siteClass = Site.class.getName();
+    try {
+      ServiceReference[] refs = bundleCtx.getServiceReferences(siteClass, null);
+      if (refs == null || refs.length == 0)
+        return null;
+      for (ServiceReference ref : refs) {
+        Site s = (Site) bundleCtx.getService(ref);
+        if (s == site)
+          return ref.getBundle();
+      }
+      return null;
+    } catch (InvalidSyntaxException e) {
+      // Can't happen
+      logger.error("Error trying to locate the site's bundle", e);
+      return null;
+    }
   }
 
 }

@@ -43,6 +43,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -82,6 +86,9 @@ public class BundleContentRepository extends AbstractContentRepository implement
   /** Prefix for repository configuration keys */
   public static final String CONF_PREFIX = "contentrepository.bundle.";
 
+  /** Option specifying the root directory */
+  public static final String OPT_ROOT_DIR = CONF_PREFIX + "root";
+
   /** Option to cleanup temporary bundle index on shutdown */
   private static final String OPT_CLEANUP = CONF_PREFIX + "cleanup";
 
@@ -115,12 +122,17 @@ public class BundleContentRepository extends AbstractContentRepository implement
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
-    idxRootDir = new File(PathUtils.concat(rootDirPath, getSite().getIdentifier(), "index"));
+    idxRootDir = new File(PathUtils.concat(rootDirPath, site.getIdentifier(), "index"));
     try {
       FileUtils.forceMkdir(idxRootDir);
     } catch (IOException e) {
       throw new ContentRepositoryException("Unable to create temporary site index at " + idxRootDir, e);
     }
+
+    // Find the site's bundle
+    bundle = loadBundle(site);
+    if (bundle == null)
+      throw new ContentRepositoryException("Unable to locate bundle for site '" + site + "'");
 
     super.connect(site);
   }
@@ -148,23 +160,20 @@ public class BundleContentRepository extends AbstractContentRepository implement
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
+    
+    // Path to the root directory
+    String rootDirPath = (String) properties.get(OPT_ROOT_DIR);
+    if (StringUtils.isNotBlank(rootDirPath)) {
+      this.rootDirPath = PathUtils.trim(rootDirPath);
+      logger.info("Bundle content repository index data will be stored at {}", rootDirPath);
+    }
 
     // Cleanup after shutdown?
     if (StringUtils.isNotBlank((String) properties.get(OPT_CLEANUP))) {
       cleanupTemporaryIndex = ConfigurationUtils.isTrue((String) properties.get(OPT_CLEANUP));
-      logger.info("Bundle content repository indices will {} removed on shutdown", (cleanupTemporaryIndex ? "be" : "not be"));
+      logger.info("Bundle content repository indicex will {} removed on shutdown", (cleanupTemporaryIndex ? "be" : "not be"));
     }
 
-  }
-
-  /**
-   * Sets the bundle that this repository connects to.
-   * 
-   * @param bundle
-   *          the bundle
-   */
-  public void setBundle(Bundle bundle) {
-    this.bundle = bundle;
   }
 
   /**
@@ -174,6 +183,34 @@ public class BundleContentRepository extends AbstractContentRepository implement
    */
   protected Bundle getBundle() {
     return bundle;
+  }
+
+  /**
+   * Tries to find the site's bundle in the OSGi service registry and returns
+   * it, <code>null</code> otherwise.
+   * 
+   * @param site
+   *          the site
+   * @return the bundle
+   */
+  protected Bundle loadBundle(Site site) {
+    BundleContext bundleCtx = FrameworkUtil.getBundle(site.getClass()).getBundleContext();
+    String siteClass = Site.class.getName();
+    try {
+      ServiceReference[] refs = bundleCtx.getServiceReferences(siteClass, null);
+      if (refs == null || refs.length == 0)
+        return null;
+      for (ServiceReference ref : refs) {
+        Site s = (Site) bundleCtx.getService(ref);
+        if (s == site)
+          return ref.getBundle();
+      }
+      return null;
+    } catch (InvalidSyntaxException e) {
+      // Can't happen
+      logger.error("Error trying to locate the site's bundle", e);
+      return null;
+    }
   }
 
   /**
@@ -207,12 +244,12 @@ public class BundleContentRepository extends AbstractContentRepository implement
   @SuppressWarnings("unchecked")
   public Iterator<ResourceURI> list(ResourceURI uri, int level, long version)
       throws ContentRepositoryException {
-    String entryPath = uri.getPath();
-    if (!entryPath.startsWith("/"))
+    String resourcePathPrefix = PathUtils.concat(bundlePathPrefix, uri.getPath());
+    if (!resourcePathPrefix.startsWith("/"))
       throw new IllegalArgumentException("Resource uri must be absolute");
     int startLevel = StringUtils.countMatches(uri.getPath(), "/");
     List<ResourceURI> resources = new ArrayList<ResourceURI>();
-    Enumeration<URL> entries = bundle.findEntries(entryPath, "*.xml", level > 0);
+    Enumeration<URL> entries = bundle.findEntries(resourcePathPrefix, "*.xml", level > 0);
     if (entries != null) {
       while (entries.hasMoreElements()) {
         URL entry = entries.nextElement();
@@ -295,7 +332,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
     }
 
     try {
-      logger.info("Populating temporary site index '{}'...", site);
+      logger.info("Populating temporary site index '{}' at {}", site, idxRootDir);
       long time = System.currentTimeMillis();
       long resourceCount = 0;
       long revisionCount = 0;
@@ -379,7 +416,8 @@ public class BundleContentRepository extends AbstractContentRepository implement
         return null;
     }
 
-    String entryPath = UrlUtils.concat(uriPath, ResourceUtils.getDocument(uri.getVersion()));
+    String typePathPrefix = "/" + uri.getType() + "s";
+    String entryPath = UrlUtils.concat(bundlePathPrefix, typePathPrefix, uriPath, ResourceUtils.getDocument(uri.getVersion()));
     URL url = bundle.getEntry(entryPath);
     if (url == null)
       return null;
@@ -398,6 +436,7 @@ public class BundleContentRepository extends AbstractContentRepository implement
    * @see ch.o2it.weblounge.contentrepository.impl.AbstractContentRepository#openStreamToResourceContent(ch.o2it.weblounge.common.content.ResourceURI,
    *      ch.o2it.weblounge.common.language.Language)
    */
+  @SuppressWarnings("unchecked")
   @Override
   protected InputStream openStreamToResourceContent(ResourceURI uri,
       Language language) throws IOException {
@@ -411,17 +450,23 @@ public class BundleContentRepository extends AbstractContentRepository implement
         return null;
     }
 
-    String entryPath = UrlUtils.concat(uriPath, ResourceUtils.getDocument(uri.getVersion()));
-    URL url = bundle.getEntry(entryPath);
-    if (url == null)
-      return null;
-    try {
-      return url.openStream();
-    } catch (IOException e) {
-      throw new IOException("I/O error while reading page '" + uri + "'", e);
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
+    String typePathPrefix = "/" + uri.getType() + "s";
+    String entryPath = UrlUtils.concat(bundlePathPrefix, typePathPrefix, uriPath);
+    String fileFilter = language.getIdentifier() + ".*";
+
+    Enumeration<URL> entries = bundle.findEntries(entryPath, fileFilter, false);
+    if (entries != null && entries.hasMoreElements()) {
+      URL url = entries.nextElement();
+      try {
+        return url.openStream();
+      } catch (IOException e) {
+        throw new IOException("I/O error while reading page '" + uri + "'", e);
+      } catch (Exception e) {
+        throw new IllegalStateException(e);
+      }
     }
+
+    return null;
   }
 
   /**

@@ -158,7 +158,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
       Class<ContentRepository> repositoryImplementation;
       ContentRepository repository = null;
       try {
-        repositoryImplementation = (Class<ContentRepository>) Thread.currentThread().getContextClassLoader().loadClass(className);
+        repositoryImplementation = (Class<ContentRepository>) Class.forName(className);
         repository = repositoryImplementation.newInstance();
 
         // If this is a managed service, make sure it's configured properly
@@ -230,7 +230,7 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
       ConfigurationAdmin configurationAdmin = (ConfigurationAdmin) bundleCtx.getService(ref);
       Configuration config;
       try {
-        config = configurationAdmin.getConfiguration(SERVICE_PID);
+        config = configurationAdmin.getConfiguration(pid);
         if (config != null)
           return (Dictionary<Object, Object>) config.getProperties();
       } catch (IOException e) {
