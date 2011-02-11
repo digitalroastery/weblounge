@@ -250,7 +250,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   private synchronized boolean configure(Dictionary<?, ?> config)
       throws ConfigurationException {
 
-    logger.info("Configuring the site registration service");
+    logger.debug("Configuring the site registration service");
     boolean configurationChanged = true;
 
     // Activate precompilation?
