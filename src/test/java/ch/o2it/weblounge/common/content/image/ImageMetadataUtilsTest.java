@@ -53,7 +53,7 @@ public class ImageMetadataUtilsTest {
     File iptcImg = new File(ImageMetadataUtilsTest.class.getResource(iptcImage).getPath());
     ImageMetadata iptcMeta = ImageMetadataUtils.extractMetadata(iptcImg);
     assertNull(iptcMeta.getCaption());
-    // assertEquals(legend, meta.getLegend());
+    // assertEquals(legend, iptcMeta.getLegend());
     assertEquals(photographer, iptcMeta.getPhotographer());
     assertEquals(2.8, iptcMeta.getFNumber());
     assertEquals(200, iptcMeta.getFocalWidth());

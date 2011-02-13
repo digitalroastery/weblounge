@@ -100,7 +100,7 @@ public final class ImageMetadataUtils {
       if (iptc.containsTag(IptcDirectory.TAG_HEADLINE))
         imgmeta.setCaption(iptc.getString(IptcDirectory.TAG_HEADLINE));
       if (iptc.containsTag(IptcDirectory.TAG_CAPTION))
-        imgmeta.setLegend(iptc.getString(IptcDirectory.TAG_CAPTION));
+          imgmeta.setLegend(iptc.getString(IptcDirectory.TAG_CAPTION));
       if (iptc.containsTag(IptcDirectory.TAG_BY_LINE))
         imgmeta.setPhotographer(iptc.getString(IptcDirectory.TAG_BY_LINE));
       if (iptc.containsTag(IptcDirectory.TAG_COPYRIGHT_NOTICE))
