@@ -1,149 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<taglib xmlns="http://java.sun.com/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
-    version="2.1">
-    
-	<description>Tag library providing access to the WebLounge CMS security features</description>
- 	<display-name>WebLounge Security Tags</display-name>
-	<tlib-version>3.0</tlib-version>
-	<short-name>webl-sec</short-name>
-	<uri>http://o2it.ch/weblounge/3.0/security</uri>
- 
-    <!-- FINNISH IMPLEMENTATION
- 	<tag>
-		<name>ifpermission</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfPermissionTag</tag-class>
-		<body-content>JSP</body-content>
-		<display-name>WebLounge Permission Check Tag</display-name>
-		<description>Checks if the current user meets the permission requirements</description>
-		<attribute>
-			<name>permission</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>oneof</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>allof</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-	</tag>
-    -->
+<taglib xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd" version="2.1">
 
-    <!-- FINNISH IMPLEMENTATION
- 	<tag>
-		<name>ifnotpermission</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfNotPermissionTag</tag-class>
-		<body-content>JSP</body-content>
-		<display-name>WebLounge Permission Check Tag</display-name>
-		<description>Checks if the current user meets the permission requirements</description>
-		<attribute>
-			<name>permission</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>oneof</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>allof</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-	</tag>
-    -->
- 
-    <!-- FINNISH IMPLEMENTATION
-	<tag>
-		<name>ifrole</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfRoleTag</tag-class>
-		<body-content>JSP</body-content>
-		<display-name>WebLounge Role Check Tag</display-name>
-		<description>Checks if the current user meets the role requirements</description>
-		<attribute>
-			<name>context</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>roleid</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>role</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>oneof</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>allof</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-	</tag>
-    -->
+  <description>Tag library providing access to the WebLounge CMS security features</description>
+  <display-name>WebLounge Security Tags</display-name>
+  <tlib-version>3.0</tlib-version>
+  <short-name>webl-sec</short-name>
+  <uri>http://o2it.ch/weblounge/3.0/security</uri>
 
-    <!-- FINNISH IMPLEMENTATION
-	<tag>
-		<name>ifnotrole</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfNotRoleTag</tag-class>
-		<body-content>JSP</body-content>
-		<display-name>WebLounge Role Check Tag</display-name>
-		<description>Checks if the current user failes to meet the role requirements</description>
-		<attribute>
-			<name>role</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>context</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>roleid</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>oneof</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>allof</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-	</tag>
-	-->
-  
-	<tag>
-		<description>Checks if the current user is logged in</description>
-		<display-name>Weblounge Authentication Check</display-name>
-		<name>ifauthenticated</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfAuthenticatedTag</tag-class>
-		<body-content>JSP</body-content>
-	</tag>
-	
-	<tag>
-		<description>Checks if the current user is not logged in</description>
-		<display-name>Weblounge Authentication Check</display-name>
-		<name>ifnotauthenticated</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfNotAuthenticatedTag</tag-class>
-		<body-content>JSP</body-content>
-	</tag>
+  <!-- FINNISH IMPLEMENTATION <tag> <name>ifpermission</name> <tag-class>ch.o2it.weblounge.taglib.security.IfPermissionTag</tag-class> <body-content>JSP</body-content> <display-name>WebLounge Permission Check Tag</display-name> <description>Checks if the current user meets the permission requirements</description> <attribute> <name>permission</name> <required>false</required> <rtexprvalue>true</rtexprvalue> </attribute> <attribute> <name>oneof</name> <required>false</required> <rtexprvalue>true</rtexprvalue> 
+    </attribute> <attribute> <name>allof</name> <required>false</required> <rtexprvalue>true</rtexprvalue> </attribute> </tag> -->
+
+  <!-- FINNISH IMPLEMENTATION <tag> <name>ifnotpermission</name> <tag-class>ch.o2it.weblounge.taglib.security.IfNotPermissionTag</tag-class> <body-content>JSP</body-content> <display-name>WebLounge Permission Check Tag</display-name> <description>Checks if the current user meets the permission requirements</description> <attribute> <name>permission</name> <required>false</required> <rtexprvalue>true</rtexprvalue> </attribute> <attribute> <name>oneof</name> <required>false</required> <rtexprvalue>true</rtexprvalue> 
+    </attribute> <attribute> <name>allof</name> <required>false</required> <rtexprvalue>true</rtexprvalue> </attribute> </tag> -->
+
+  <tag>
+    <description>Checks if the current user meets the role requirements</description>
+    <display-name>WebLounge Role Check Tag</display-name>
+    <name>ifrole</name>
+    <tag-class>ch.o2it.weblounge.taglib.security.IfRoleTag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>context</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>roleid</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>role</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>oneof</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>allof</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Checks if the current user failes to meet the role requirements</description>
+    <display-name>WebLounge Role Check Tag</display-name>
+    <name>ifnotrole</name>
+    <tag-class>ch.o2it.weblounge.taglib.security.IfNotRoleTag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>role</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>context</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>roleid</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>oneof</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>allof</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>Checks if the current user is logged in</description>
+    <display-name>Weblounge Authentication Check</display-name>
+    <name>ifauthenticated</name>
+    <tag-class>ch.o2it.weblounge.taglib.security.IfAuthenticatedTag</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
+
+  <tag>
+    <description>Checks if the current user is not logged in</description>
+    <display-name>Weblounge Authentication Check</display-name>
+    <name>ifnotauthenticated</name>
+    <tag-class>ch.o2it.weblounge.taglib.security.IfNotAuthenticatedTag</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
 
 </taglib>
