@@ -1,8 +1,5 @@
-<i18n>
-  <message name="greeting.hello">
-    <value>hello</value>
-  </message>
-  <message name="greeting.world">
-    <value>world</value>
-  </message>
-</i18n>
+<?xml version="1.0" encoding="utf-8"?> 
+<resources>
+  <string name="greeting.hello">hello</string>
+  <string name="greeting.world">world</string>
+</resources>
