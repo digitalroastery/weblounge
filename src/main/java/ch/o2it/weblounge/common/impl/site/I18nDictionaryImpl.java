@@ -239,11 +239,11 @@ public class I18nDictionaryImpl implements I18nDictionary {
       // Read and store the messages
 
       XPath path = XMLUtilities.getXPath();
-      NodeList nodes = XPathHelper.selectList(doc, "/i18n/message", path);
+      NodeList nodes = XPathHelper.selectList(doc, "/resources/string", path);
       for (int j = 0; j < nodes.getLength(); j++) {
         Node messageNode = nodes.item(j);
         String key = XPathHelper.valueOf(messageNode, "@name", path);
-        String value = XPathHelper.valueOf(messageNode, "value/text()", path);
+        String value = XPathHelper.valueOf(messageNode, "text()", path);
         if (p.containsKey(key)) {
           logger.warn("I18n key '{}' redefined in {}", key, url);
         }
