@@ -454,7 +454,8 @@ public interface Resource<T extends ResourceContent> extends Localizable, Creata
   void setModified(User user, Date date);
 
   /**
-   * Sets the publisher and the publishing start and end date.
+   * Sets the publisher and the publishing start and end date. In order to
+   * specify no publishing end date, <code>null</code> can be passed instead.
    * 
    * @param publisher
    *          the publisher

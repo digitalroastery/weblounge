@@ -52,6 +52,15 @@ public interface ContentRepository {
   String getType();
 
   /**
+   * Returns <code>true</code> if this repository is read only. If
+   * <code>false</code> is returned, the repository can safely be casted to a
+   * {@link WritableContentRepository}.
+   * 
+   * @return <code>true</code> if the respository is read only
+   */
+  boolean isReadOnly();
+
+  /**
    * Opens the repository. Depending on the type of the repository
    * implementation, this might involve mounting network volumes, opening
    * database connections etc.
@@ -68,7 +77,8 @@ public interface ContentRepository {
    * @throws IllegalStateException
    *           if the content repository is already connected
    */
-  void connect(Site site) throws ContentRepositoryException, IllegalStateException;
+  void connect(Site site) throws ContentRepositoryException,
+      IllegalStateException;
 
   /**
    * Disconnects from the content repository.
