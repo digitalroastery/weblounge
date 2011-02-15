@@ -73,6 +73,31 @@
       <class>ch.o2it.weblounge.test.site.GreeterJob</class>
       <schedule>*/10 * * * *</schedule>
     </job>
+    <!--  UNCOMMENT TO ACTIVATE
+    <job id="mailpublisher">
+      <name>Mail Aggregator</name>
+      <class>ch.o2it.weblounge.bridge.mail.MailAggregator</class>
+      <schedule>* * * * *</schedule>
+      <options>
+        <option>
+          <name>provider</name>
+          <value>pop3</value>
+        </option>
+        <option>
+          <name>host</name>
+          <value>mail.digitalcafe.ch</value>
+        </option>
+        <option>
+          <name>login</name>
+          <value>weblounge</value>
+        </option>
+        <option>
+          <name>password</name>
+          <value>test</value>
+        </option>
+      </options>
+    </job>
+    -->
   </jobs>
   <imagestyles>
     <imagestyle id="none">
