@@ -94,6 +94,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>modules/weblounge-bridge</module>
         <module>modules/weblounge-cache-api</module>
         <module>modules/weblounge-cache</module>
         <module>modules/weblounge-common-api</module>
