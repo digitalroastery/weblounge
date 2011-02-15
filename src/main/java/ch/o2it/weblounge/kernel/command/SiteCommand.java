@@ -388,7 +388,7 @@ public class SiteCommand {
     if (repository == null) {
       System.out.println("Site " + site + " has no content repository");
       return;
-    } else if (!(repository instanceof WritableContentRepository)) {
+    } else if (repository.isReadOnly()) {
       System.out.println("Site " + site + " is read only");
       return;
     } else if (site.isOnline()) {
