@@ -310,6 +310,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     Site site = getSite(request);
+    
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to write to read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+    
     // TODO: Replace with current user
     User admin = site.getAdministrator();
     User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
@@ -379,6 +386,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     ResourceURI uri = resource.getURI();
     Site site = getSite(request);
+    
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to write to read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     // TODO: Replace with real user
 
@@ -432,6 +446,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Extract the site
     Site site = getSite(request);
+    
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to write to read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+    
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     ResourceURI resourceURI = new ResourceURIImpl(null, site, null, resourceId);
@@ -511,6 +532,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       @FormParam("resource") String resourceXml, @FormParam("path") String path) {
 
     Site site = getSite(request);
+
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to write to read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 
     // Create the resource uri
@@ -615,6 +643,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     Site site = getSite(request);
+    
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to write to read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
     ResourceURI resourceURI = new ResourceURIImpl(null, site, null, resourceId);
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
 

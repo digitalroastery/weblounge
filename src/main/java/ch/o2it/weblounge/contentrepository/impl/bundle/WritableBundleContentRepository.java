@@ -144,7 +144,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     // do anything. If not, we need to copy everything that's currently in the
     // bundle.
     for (ResourceSerializer<?, ?> serializer : serializers) {
-      String resourceDirectoryPath = UrlUtils.concat(repositoryRoot.getAbsolutePath(), serializer.getType() + "s");
+      String resourceDirectoryPath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), serializer.getType() + "s");
       File resourceDirectory = new File(resourceDirectoryPath);
       if (resourceDirectory.isDirectory() && resourceDirectory.list().length > 0) {
         logger.debug("Found existing {}s for site '{}' at {}", new Object[] {
@@ -218,10 +218,10 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
   private void cleanupAfterFailure() {
     try {
       index.close();
-      FileUtils.deleteDirectory(repositoryRoot);
+      FileUtils.deleteDirectory(repositorySiteRoot);
       logger.error("Site index and repository directory have been reset");
     } catch (IOException e2) {
-      logger.error("Unable to clean up index and repository directory " + repositoryRoot);
+      logger.error("Unable to clean up index and repository directory " + repositorySiteRoot);
     }
   }
 

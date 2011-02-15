@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
+import ch.o2it.weblounge.common.content.repository.WritableContentRepository;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.language.Language;
@@ -101,6 +102,15 @@ public abstract class AbstractContentRepository implements ContentRepository {
    */
   public String getType() {
     return type;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#isReadOnly()
+   */
+  public boolean isReadOnly() {
+    return !(this instanceof WritableContentRepository);
   }
 
   /**

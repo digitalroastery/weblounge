@@ -45,8 +45,7 @@ public class EmptyContentRepository implements ContentRepository {
    * 
    * @see ch.o2it.weblounge.common.content.repository.ContentRepository#connect(ch.o2it.weblounge.common.site.Site)
    */
-  public void connect(Site site)
-      throws ContentRepositoryException {
+  public void connect(Site site) throws ContentRepositoryException {
   }
 
   /**
@@ -64,6 +63,15 @@ public class EmptyContentRepository implements ContentRepository {
    */
   public String getType() {
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.repository.ContentRepository#isReadOnly()
+   */
+  public boolean isReadOnly() {
+    return false;
   }
 
   /**

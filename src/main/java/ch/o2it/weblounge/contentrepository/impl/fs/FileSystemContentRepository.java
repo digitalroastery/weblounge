@@ -89,10 +89,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   public static final String INDEX_PATH = "index";
 
   /** The repository storage root directory */
-  protected File repositoryStorageRoot = null;
+  protected File repositoryRoot = null;
 
   /** The repository root directory */
-  protected File repositoryRoot = null;
+  protected File repositorySiteRoot = null;
 
   /** The root directory for the temporary bundle index */
   protected File idxRootDir = null;
@@ -127,14 +127,16 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
     else
       fsRootDir = PathUtils.concat(System.getProperty("java.io.tmpdir"), ROOT_DIR_DEFAULT);
     
-    repositoryStorageRoot = new File(fsRootDir);
+    repositoryRoot = new File(fsRootDir);
+    if (site != null)
+      repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
     logger.debug("Content repository storage root is located at {}", repositoryRoot);
 
     // Make sure we can create a temporary index
     try {
-      FileUtils.forceMkdir(repositoryStorageRoot);
+      FileUtils.forceMkdir(repositoryRoot);
     } catch (IOException e) {
-      throw new ConfigurationException(OPT_ROOT_DIR, "Unable to create repository storage at " + repositoryStorageRoot, e);
+      throw new ConfigurationException(OPT_ROOT_DIR, "Unable to create repository storage at " + repositoryRoot, e);
     }
     
     logger.debug("Content repository configured");
@@ -147,11 +149,11 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   public void connect(Site site) throws ContentRepositoryException {
-    repositoryRoot = new File(repositoryStorageRoot, site.getIdentifier());
-    logger.debug("Content repository root is located at {}", repositoryRoot);
+    repositorySiteRoot = new File(repositoryRoot, site.getIdentifier());
+    logger.debug("Content repository root is located at {}", repositorySiteRoot);
 
     // Make sure we can create a temporary index
-    idxRootDir = new File(repositoryRoot, INDEX_PATH);
+    idxRootDir = new File(repositorySiteRoot, INDEX_PATH);
     try {
       FileUtils.forceMkdir(idxRootDir);
     } catch (IOException e) {
@@ -231,7 +233,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   protected long index(String resourceType) throws IOException {
     // Temporary path for rebuilt site
     String resourceDirectory = resourceType + "s";
-    String homePath = UrlUtils.concat(repositoryRoot.getAbsolutePath(), resourceDirectory);
+    String homePath = UrlUtils.concat(repositorySiteRoot.getAbsolutePath(), resourceDirectory);
     File resourcesRootDirectory = new File(homePath);
     FileUtils.forceMkdir(resourcesRootDirectory);
     if (resourcesRootDirectory.list().length == 0) {
@@ -247,7 +249,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       return 0;
     }
 
-    File restructuredResources = new File(repositoryRoot, "." + resourceDirectory);
+    File restructuredResources = new File(repositorySiteRoot, "." + resourceDirectory);
     long resourceCount = 0;
     long resourceVersionCount = 0;
     boolean restructured = false;
@@ -336,10 +338,10 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
       // Move restructured resources in place
       if (restructured) {
         String oldResourcesDirectory = resourceDirectory + "-old";
-        File movedOldResources = new File(repositoryRoot, oldResourcesDirectory);
+        File movedOldResources = new File(repositorySiteRoot, oldResourcesDirectory);
         if (movedOldResources.exists()) {
           for (int i = 1; i < Integer.MAX_VALUE; i++) {
-            movedOldResources = new File(repositoryRoot, oldResourcesDirectory + " " + i);
+            movedOldResources = new File(repositorySiteRoot, oldResourcesDirectory + " " + i);
             if (!movedOldResources.exists())
               break;
           }
@@ -374,7 +376,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @return the repository root directory
    */
   public File getRootDirectory() {
-    return repositoryRoot;
+    return repositorySiteRoot;
   }
 
   /**
@@ -387,7 +389,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @return the file
    */
   protected File uriToFile(ResourceURI uri) throws IOException {
-    StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
+    StringBuffer path = new StringBuffer(repositorySiteRoot.getAbsolutePath());
     if (uri.getType() == null)
       throw new IllegalArgumentException("Resource uri has no type");
     path.append("/").append(uri.getType()).append("s");
@@ -453,7 +455,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    * @return the parent directory
    */
   protected File uriToDirectory(ResourceURI uri) throws IOException {
-    StringBuffer path = new StringBuffer(repositoryRoot.getAbsolutePath());
+    StringBuffer path = new StringBuffer(repositorySiteRoot.getAbsolutePath());
     if (uri.getType() == null)
       throw new IllegalArgumentException("Resource uri has no type");
     path.append("/").append(uri.getType()).append("s");
@@ -478,8 +480,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   public int hashCode() {
-    if (repositoryRoot != null)
-      return repositoryRoot.hashCode();
+    if (repositorySiteRoot != null)
+      return repositorySiteRoot.hashCode();
     else
       return super.hashCode();
   }
@@ -493,8 +495,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
   public boolean equals(Object obj) {
     if (obj instanceof FileSystemContentRepository) {
       FileSystemContentRepository repo = (FileSystemContentRepository) obj;
-      if (repositoryRoot != null) {
-        return repositoryRoot.equals(repo.getRootDirectory());
+      if (repositorySiteRoot != null) {
+        return repositorySiteRoot.equals(repo.getRootDirectory());
       } else {
         return super.equals(obj);
       }
@@ -509,7 +511,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
    */
   @Override
   public String toString() {
-    return repositoryRoot.getAbsolutePath();
+    return repositorySiteRoot.getAbsolutePath();
   }
 
   /**
