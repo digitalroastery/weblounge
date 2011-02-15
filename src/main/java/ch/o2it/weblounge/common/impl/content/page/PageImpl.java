@@ -147,9 +147,17 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
     if (t == null)
       throw new IllegalStateException("Page template '" + template + "' not found");
     String stage = t.getStage();
-    if (StringUtils.isNotBlank(stage))
-      return getComposer(stage);
-    return null;
+    if (StringUtils.isBlank(stage))
+      throw new IllegalStateException("Page template '" + template + "' does not define a stage");
+
+    Composer c = getComposer(stage);
+    if (c == null) {
+      List<Pagelet> pagelets = new ArrayList<Pagelet>();
+      c = new ComposerImpl(stage, pagelets);
+      composers.put(stage, pagelets);
+    }
+      
+    return c;
   }
   
   /**

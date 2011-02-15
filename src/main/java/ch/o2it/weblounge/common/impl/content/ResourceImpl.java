@@ -246,9 +246,8 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
 
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.content.Publishable#setPublished(ch.o2it.weblounge.common.user.User,
-   *      java.util.Date, java.util.Date)
+   *
+   * @see ch.o2it.weblounge.common.content.Resource#setPublished(ch.o2it.weblounge.common.user.User, java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
     publishingCtx.setPublished(publisher, from, to);

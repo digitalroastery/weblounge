@@ -1317,7 +1317,7 @@ public class SiteImpl implements Site {
         Date date = scheduler.scheduleJob(jobDetail, quartzTrigger);
         jobs.put(jobIdentifier, new QuartzJob(jobIdentifier, jobClass, trigger));
         String repeat = trigger.getNextExecutionAfter(date) != null ? " first" : "";
-        logger.info("Job '{}' scheduled,{} execution at {}", new Object[] {
+        logger.info("Job '{}' scheduled,{} execution scheduled for {}", new Object[] {
             jobIdentifier,
             repeat,
             date });

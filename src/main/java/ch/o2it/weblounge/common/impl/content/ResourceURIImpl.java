@@ -150,7 +150,7 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
     if (site == null)
       throw new IllegalArgumentException("Site must not be null");
     if (path != null && !path.startsWith("/"))
-      throw new MalformedResourceURIException(path);
+      path = "/" + path;
     this.type = type;
     this.site = site;
     this.id = id;
