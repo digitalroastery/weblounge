@@ -817,6 +817,21 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     contents.addAll(content.values());
     return contents;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.language.LocalizableObject#switchTo(ch.o2it.weblounge.common.language.Language)
+   */
+  @Override
+  public Language switchTo(Language language) {
+    Language l = super.switchTo(language);
+    title.switchTo(language);
+    description.switchTo(language);
+    coverage.switchTo(language);
+    rights.switchTo(language);
+    return l;
+  }
 
   /**
    * {@inheritDoc}
