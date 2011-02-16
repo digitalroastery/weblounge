@@ -170,7 +170,7 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
       return true;
     }
 
-    // Can the page be accessed by the current user?
+    // Can the image be accessed by the current user?
     User user = request.getUser();
     try {
       // TODO: Check permission
