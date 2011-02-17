@@ -238,19 +238,17 @@ public class SiteManager {
    * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#addSite(ch.o2it.weblounge.common.site.Site,
    *      org.osgi.framework.ServiceReference)
    */
-  void addSite(Site site, ServiceReference reference) {
-    synchronized (sites) {
-      sites.add(site);
-      siteBundles.put(site, reference.getBundle());
-      for (URL url : site.getURLs()) {
-        String hostName = url.getHost();
-        Site registeredFirst = sitesByServerName.get(hostName);
-        if (registeredFirst != null && !site.equals(registeredFirst)) {
-          logger.error("Another site is already registered to " + url);
-          continue;
-        }
-        sitesByServerName.put(hostName, site);
+  synchronized void addSite(Site site, ServiceReference reference) {
+    sites.add(site);
+    siteBundles.put(site, reference.getBundle());
+    for (URL url : site.getURLs()) {
+      String hostName = url.getHost();
+      Site registeredFirst = sitesByServerName.get(hostName);
+      if (registeredFirst != null && !site.equals(registeredFirst)) {
+        logger.error("Another site is already registered to " + url);
+        continue;
       }
+      sitesByServerName.put(hostName, site);
     }
 
     logger.debug("Site '{}' registered", site);
@@ -258,8 +256,13 @@ public class SiteManager {
     // Look for content repositories
     ContentRepository repository = repositoriesBysite.get(site.getIdentifier());
     if (repository != null && site.getContentRepository() == null) {
-      logger.info("Site '{}' connected to content repository at {}", site, repository);
-      site.setContentRepository(repository);
+      try {
+        repository.connect(site);
+        site.setContentRepository(repository);
+        logger.info("Site '{}' connected to content repository at {}", site, repository);
+      } catch (ContentRepositoryException e) {
+        logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
+      }
     } else {
       try {
         Configuration config = configurationAdmin.createFactoryConfiguration("ch.o2it.weblounge.contentrepository.factory", null);
@@ -310,7 +313,7 @@ public class SiteManager {
    * 
    * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#removeSite(ch.o2it.weblounge.common.site.Site)
    */
-  void removeSite(Site site) {
+  synchronized void removeSite(Site site) {
 
     // Inform site listeners
     synchronized (listeners) {
@@ -326,7 +329,7 @@ public class SiteManager {
     } catch (Throwable t) {
       logger.error("Error stopping site '{}'", site.getIdentifier(), t);
     }
-    
+
     // Tell the content repository factory to remove the repository
     Configuration configuration = repositoryConfigurations.get(site.getIdentifier());
     try {
@@ -336,15 +339,13 @@ public class SiteManager {
     }
 
     // Remove it from the registry
-    synchronized (sites) {
-      sites.remove(site);
-      siteBundles.remove(site);
-      Iterator<Site> si = sitesByServerName.values().iterator();
-      while (si.hasNext()) {
-        Site s = si.next();
-        if (site.equals(s)) {
-          si.remove();
-        }
+    sites.remove(site);
+    siteBundles.remove(site);
+    Iterator<Site> si = sitesByServerName.values().iterator();
+    while (si.hasNext()) {
+      Site s = si.next();
+      if (site.equals(s)) {
+        si.remove();
       }
     }
 
@@ -359,16 +360,13 @@ public class SiteManager {
    * @param repository
    *          the content repository
    */
-  void addContentRepository(String siteIdentifier, ContentRepository repository) {
+  synchronized void addContentRepository(String siteIdentifier,
+      ContentRepository repository) {
     if (StringUtils.isBlank(siteIdentifier))
       throw new IllegalArgumentException("Site identifier must not be null");
     if (repository == null)
       throw new IllegalArgumentException("Content repository must not be null");
-    synchronized (repositoriesBysite) {
-      repositoriesBysite.put(siteIdentifier, repository);
-    }
 
-    // See if the site is known already
     Site site = findSiteByIdentifier(siteIdentifier);
     if (site != null) {
       try {
@@ -379,6 +377,8 @@ public class SiteManager {
         logger.warn("Error connecting content repository " + repository + " to site '" + site + "'", e);
       }
     }
+
+    repositoriesBysite.put(siteIdentifier, repository);
   }
 
   /**
@@ -387,7 +387,7 @@ public class SiteManager {
    * @param repository
    *          the content repository
    */
-  void removeContentRepository(ContentRepository repository) {
+  synchronized void removeContentRepository(ContentRepository repository) {
     if (repository == null)
       throw new IllegalArgumentException("Content repository must not be null");
 
@@ -397,21 +397,19 @@ public class SiteManager {
       logger.warn("Error disconnecting content repository " + repository, e);
     }
 
-    synchronized (repositoriesBysite) {
-      String siteIdentifier = null;
-      for (Map.Entry<String, ContentRepository> entry : repositoriesBysite.entrySet()) {
-        if (entry.getValue().equals(repository)) {
-          siteIdentifier = entry.getKey();
-          break;
-        }
+    String siteIdentifier = null;
+    for (Map.Entry<String, ContentRepository> entry : repositoriesBysite.entrySet()) {
+      if (entry.getValue().equals(repository)) {
+        siteIdentifier = entry.getKey();
+        break;
       }
+    }
 
-      if (siteIdentifier != null) {
-        repositoriesBysite.remove(siteIdentifier);
-        Site site = findSiteByIdentifier(siteIdentifier);
-        if (site != null) {
-          site.setContentRepository(null);
-        }
+    if (siteIdentifier != null) {
+      repositoriesBysite.remove(siteIdentifier);
+      Site site = findSiteByIdentifier(siteIdentifier);
+      if (site != null) {
+        site.setContentRepository(null);
       }
     }
   }
