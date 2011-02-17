@@ -43,6 +43,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.SUB
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TEMPLATE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_BOOST;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TITLE_LOCALIZED;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.TYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils.clean;
 
@@ -120,6 +121,11 @@ public class SolrRequester {
     // Path
     if (query.getPath() != null) {
       and(solrQuery, PATH, query.getPath(), true, true);
+    }
+    
+    // Type
+    if (query.getType() != null) {
+      and(solrQuery, TYPE, query.getType(), true, true);
     }
 
     // Subjects
