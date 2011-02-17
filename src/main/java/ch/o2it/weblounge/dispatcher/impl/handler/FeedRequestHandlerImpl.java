@@ -208,7 +208,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
         entry.setLink(item.getUrl().getLink());
         entry.setAuthor(page.getCreator().getName());
         entry.setCategories(Arrays.asList(page.getSubjects()));
-        entry.setTitle(item.getTitle());
+        entry.setTitle(page.getTitle());
 
         // TODO: Can the page be accessed?
 
