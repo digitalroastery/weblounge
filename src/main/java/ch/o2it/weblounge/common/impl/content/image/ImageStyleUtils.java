@@ -432,9 +432,8 @@ public final class ImageStyleUtils {
       FileUtils.forceMkdir(dir);
 
     // Get scaled width and height
-    float scale = ImageStyleUtils.getScale(image.getWidth(), image.getHeight(), style);
-    float styledWidth = image.getWidth() * scale - ImageStyleUtils.getCropX(image.getWidth(), image.getHeight(), style);
-    float styledHeight = image.getHeight() * scale - ImageStyleUtils.getCropY(image.getWidth(), image.getHeight(), style);
+    float styledWidth = ImageStyleUtils.getStyledWidth(image.getWidth(), image.getHeight(), style);
+    float styledHeight = ImageStyleUtils.getStyledHeight(image.getWidth(), image.getHeight(), style);
 
     // Create the filename
     StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(image.getFilename()));
