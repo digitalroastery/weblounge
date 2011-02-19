@@ -158,7 +158,7 @@ public class PagePreviewTag extends WebloungeTag {
    * <li><code>None</code> - All elements of the page's stage composer are
    * included</li>
    * <li><code>Elements</code> - Only elements of the given types are included</li>
-   * <li><code>End</code> - All elements up until the appearance of the stop
+   * <li><code>Endmarker</code> - All elements up until the appearance of the stop
    * marker are included</li>
    * <li><code>PagePreview - The page preview elements are included</code></li>
    * </ul>
