@@ -28,10 +28,7 @@ import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 
-import com.sun.media.jai.codec.ImageCodec;
-import com.sun.media.jai.codec.ImageEncoder;
-import com.sun.media.jai.codec.JPEGEncodeParam;
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
+import com.sun.media.jai.codec.FileCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 
 import org.apache.commons.io.FileUtils;
@@ -55,9 +52,6 @@ import javax.media.jai.RenderedOp;
  */
 public final class ImageStyleUtils {
 
-  /** JPEG image quality */
-  private static final float JPEG_IMAGE_QUALITY = 0.75f;
-
   /**
    * This class is not meant to be instantiated.
    */
@@ -80,9 +74,9 @@ public final class ImageStyleUtils {
     float height = image.getHeight();
     width *= getScale(width, height, style);
     width -= getCropX(width, height, style);
-    return (int)width;
+    return (int) width;
   }
-  
+
   /**
    * Returns the calculated height in pixels for the image with the given image
    * style applied to it.
@@ -98,12 +92,12 @@ public final class ImageStyleUtils {
     float height = image.getHeight();
     height *= getScale(width, height, style);
     height -= getCropY(width, height, style);
-    return (int)height;
+    return (int) height;
   }
 
   /**
-   * Returns the scaling factor needed for the image in order to
-   * comply with the image style.
+   * Returns the scaling factor needed for the image in order to comply with the
+   * image style.
    * 
    * @param imageWidth
    *          width of the original image
@@ -299,20 +293,22 @@ public final class ImageStyleUtils {
    */
   public static void style(InputStream is, OutputStream os, String format,
       ImageStyle style) throws IOException, OutOfMemoryError {
+
+    // Is an image style permitted?
     if (style == null)
       throw new IllegalArgumentException("Image style cannot be null");
 
+    // Do we need to do any work at all?
+    if (ImageScalingMode.None.equals(style.getScalingMode())) {
+      IOUtils.copy(is, os);
+      return;
+    }
+
+    SeekableStream seekableInputStream = null;
     RenderedOp image = null;
     try {
-
-      // Do we need to do any work at all?
-      if (ImageScalingMode.None.equals(style.getScalingMode())) {
-        IOUtils.copy(is, os);
-        return;
-      }
-
       // Load the image from the given input stream
-      SeekableStream seekableInputStream = new MemoryCacheSeekableStream(is);
+      seekableInputStream = new FileCacheSeekableStream(is);
       image = JAI.create("stream", seekableInputStream);
       if (image == null)
         throw new IOException("Error reading image from input stream");
@@ -334,13 +330,15 @@ public final class ImageStyleUtils {
         scaleParams.addSource(image);
         scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
         scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
+        
         image = JAI.create("scale", scaleParams, scaleHints);
       } else if (scale < 1.0) {
-        ParameterBlock scaleParams = new ParameterBlock();
-        scaleParams.addSource(image);
-        scaleParams.add(Double.valueOf(scale)).add(Double.valueOf(scale)).add(0.0f).add(0.0f);
-        scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
-        image = JAI.create("SubsampleAverage", scaleParams, scaleHints);
+        ParameterBlock subsampleAverageParams = new ParameterBlock();
+        subsampleAverageParams.addSource(image);
+        subsampleAverageParams.add(Double.valueOf(scale));
+        subsampleAverageParams.add(Double.valueOf(scale));
+        
+        image = JAI.create("subsampleaverage", subsampleAverageParams, scaleHints);        
       }
 
       float scaledWidth = image.getWidth();
@@ -363,22 +361,16 @@ public final class ImageStyleUtils {
 
         image = JAI.create("crop", cropTopLeftParams, croppingHints);
       }
+      
+      // Write resized/cropped image encoded as JPEG to the output stream
+      ParameterBlock encodeParams = new ParameterBlock();
+      encodeParams.addSource(image);
+      encodeParams.add(os);
+      encodeParams.add("jpeg");
+      JAI.create("encode", encodeParams);
 
-      JPEGEncodeParam jpegEncodeParam = new JPEGEncodeParam();
-      jpegEncodeParam.setQuality(JPEG_IMAGE_QUALITY);
-      jpegEncodeParam.setHorizontalSubsampling(0, 1);
-      jpegEncodeParam.setHorizontalSubsampling(1, 1);
-      jpegEncodeParam.setHorizontalSubsampling(2, 1);
-      jpegEncodeParam.setVerticalSubsampling(0, 1);
-      jpegEncodeParam.setVerticalSubsampling(1, 1);
-      jpegEncodeParam.setVerticalSubsampling(2, 1);
-
-      ImageEncoder encoder = ImageCodec.createImageEncoder("JPEG", os, jpegEncodeParam);
-      encoder.encode(image.getAsBufferedImage());
-
-    } catch (OutOfMemoryError t) {
-      throw new IOException(t);
     } finally {
+      IOUtils.closeQuietly(seekableInputStream);
       if (image != null)
         image.dispose();
     }
@@ -432,15 +424,7 @@ public final class ImageStyleUtils {
       IllegalStateException {
 
     // If needed, create the scaled file's parent directory
-    File dir = new File(PathUtils.concat(
-        System.getProperty("java.io.tmpdir"),
-        "sites",
-        site.getIdentifier(),
-        "images",
-        style.getIdentifier(),
-        resource.getIdentifier(),
-        image.getLanguage().getIdentifier()
-    ));
+    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), resource.getIdentifier(), image.getLanguage().getIdentifier()));
 
     if (dir.exists() && !dir.isDirectory())
       throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
