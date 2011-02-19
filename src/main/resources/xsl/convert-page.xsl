@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:importer="ch.o2it.weblounge.tools.importer.Importer" exclude-result-prefixes="uuid">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:importer="ch.o2it.weblounge.tools.importer.Importer" exclude-result-prefixes="importer">
   <xsl:output method="xml" omit-xml-declaration="no" indent="true" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property" />
 
   <xsl:param name="uuid" />
@@ -29,7 +29,10 @@
   <xsl:template match="header">
     <head>
       <template>
-        <xsl:value-of select="renderer" />
+        <xsl:choose>
+          <xsl:when test="string-length(renderer) = 0">default</xsl:when>
+          <xsl:otherwise><xsl:value-of select="renderer" /></xsl:otherwise>
+        </xsl:choose>
       </template>
       <xsl:copy-of select="layout"></xsl:copy-of>
       <promote>true</promote>

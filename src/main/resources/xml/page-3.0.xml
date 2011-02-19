@@ -1,86 +1,377 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<page id="/service/test" version="live" xmlns="http://www.o2it.ch/weblounge/3.0/page" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/page http://www.o2it.ch/xsd/weblounge/3.0/page.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.o2it.ch/weblounge/3.0/page" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/page http://www.o2it.ch/xsd/weblounge/3.0/page.xsd" id="3bec8ae8-d994-4e42-88da-560f0dc08d6f" path="/schiedsrichter/news/8310" version="live">
   <head>
-    <template>home</template>
-    <layout>news</layout>
+    <template>default</template>
+    <layout>default</layout>
     <promote>true</promote>
     <index>true</index>
     <metadata>
-      <title language="de"><![CDATA[Seitentitel]]></title>
-      <title language="fr"><![CDATA[Il titre de la page]]></title>
-      <description language="de"><![CDATA[Beschreibung]]></description>
-      <description language="fr"><![CDATA[Déscription]]></description>
-      <subject><![CDATA[Other topic]]></subject>
-      <subject><![CDATA[This subject]]></subject>
-      <type><![CDATA[Text]]></type>
-      <coverage language="de"><![CDATA[Zürich]]></coverage>
-      <coverage language="fr"><![CDATA[Zurich]]></coverage>
-      <rights language="de"><![CDATA[Copyright 2009 by T. Wunden]]></rights>
+      <title language="de"><![CDATA[Schiedsrichter]]></title>
+      <title language="it"><![CDATA[Arbitri]]></title>
+      <title language="fr"><![CDATA[Arbitres]]></title>
     </metadata>
-    <created>
-      <user id="hans" realm="testland">Hans Muster</user>
-      <date>2009-01-07T19:05:41+01:00</date>
-    </created>
-    <modified>
-      <user id="amelie" realm="testland">Amélie Poulard</user>
-      <date>2009-02-18T21:06:40+01:00</date>
-    </modified>
-    <published>
-      <user id="hans" realm="testland">Hans Muster</user>
-      <from>2006-05-05T16:58:21+01:00</from>
-      <to>2010-01-01T00:00:00+01:00</to>
-    </published>
     <security>
       <owner>
-        <user id="hans" realm="testland">Hans Muster</user>
+        <user id="" realm="weblounge"> </user>
       </owner>
     </security>
-    <locked>
-      <user id="amelie" realm="testland">Amélie Poulard</user>
-    </locked>
+    <created>
+      <date>2005-02-15T15:17:47+01:00</date>
+      <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+    </created>
+    <modified>
+      <date>2005-02-15T15:17:47+01:00</date>
+      <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+    </modified>
+    <published>
+      <from>2005-02-15T15:17:47+01:00</from>
+      <to>292278994-08-17T07:12:55+01:00</to>
+      <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+    </published>
   </head>
   <body>
     <composer id="main">
       <pagelet module="text" id="title">
         <security>
           <owner>
-            <user id="hans" realm="testland">Hans Muster</user>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
           </owner>
         </security>
         <created>
-          <user id="hans" realm="testland">Hans Muster</user>
-          <date>2009-01-07T19:05:41+01:00</date>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-11T23:28:02+01:00</date>
         </created>
         <published>
-          <user id="hans" realm="testland">Hans Muster</user>
-          <from>2009-01-07T19:05:41+01:00</from>
-          <to>2009-02-18T21:06:40+01:00</to>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
         </published>
         <locale language="de" original="true">
           <modified>
-            <user id="hans" realm="testland">Hans Muster</user>
-            <date>2009-01-07T19:05:41+01:00</date>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-11T23:28:02+01:00</date>
           </modified>
-          <text id="credits"><![CDATA[Friedrich Nietzsche]]></text>
-          <text id="tag"><![CDATA[Neu]]></text>
-          <text id="tag"><![CDATA[Technik]]></text>
-          <text id="title"><![CDATA[Ein amüsanter Titel]]></text>
-        </locale>
-        <locale language="fr">
-          <modified>
-            <user id="amelie" realm="testland">Amélie Poulard</user>
-            <date>2009-02-18T21:06:40+01:00</date>
-          </modified>
-          <text id="tag"><![CDATA[Nouveau]]></text>
-          <text id="tag"><![CDATA[Technique]]></text>
-          <text id="title"><![CDATA[Un titre joyeux]]></text>
+          <text id="keyword"><![CDATA[News]]></text>
+          <text id="title"><![CDATA[Memorandum "Besondere Vorfälle"]]></text>
+          <text id="lead"><![CDATA[Das Ressort National hat festgestellt, dass verschiedene Schiedsrichter offenbar nicht genau wissen, wie sie im Falle von "besonderen Vorfällen" bei Spielen (z. B. bei Matchstrafen, Protesten, Problemen mit Teams/Veranstaltern, etc.) vorzugehen haben.]]></text>
         </locale>
         <properties>
-          <property id="headline"><![CDATA[true]]></property>
-          <property id="tags"><![CDATA[a]]></property>
-          <property id="tags"><![CDATA[b]]></property>
+          <property id="date"><![CDATA[true]]></property>
+          <property id="author"><![CDATA[false]]></property>
+        </properties>
+      </pagelet>
+      <pagelet module="text" id="paragraph">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-11T23:28:24+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-11T23:28:24+01:00</date>
+          </modified>
+          <text id="paragraph"><![CDATA[Es kam diese Saison leider wiederholt vor, dass die Disziplinarkommission Beschwerden und Meldungen von Schiedsrichtern zu "besonderen Vorfällen" nicht behandeln konnte, da diese Meldungen entweder nicht fristgerecht eingereicht worden waren oder formell nicht in Ordnung waren. Die Disziplinarkommission hält fest, dass sie nur auf Meldungen der Schiedsrichter eintreten kann, die termingerecht eintreffen und formell richtig (d. h. mit den nötigen Angaben auf den vorgeschriebenen Formularen) abgefasst sind.]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="paragraph">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-11T23:28:26+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-11T23:28:26+01:00</date>
+          </modified>
+          <text id="paragraph"><![CDATA[Im Folgenden wird deshalb noch einmal im Detail ausgeführt, bei welchen "besonderen Vorfällen" die Schiedsrichter wie vorzugehen haben:]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="faq">
+        <security>
+          <owner>
+            <user id="" realm="weblounge"> </user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:12:37+01:00</date>
+        </created>
+        <published>
+          <user id="" realm="weblounge"> </user>
+          <from>2005-02-15T15:11:34+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:12:37+01:00</date>
+          </modified>
+          <text id="answer"><![CDATA[1. Kreuze auf der Vorderseite des offiziellen Spielberichts das Feld Matchstrafe an, und fülle auf der Rückseite des offiziellen Spielberichts unter dem Punkt Matchstrafe die entsprechenden Felder aus.
+(Falls es Dir nicht möglich ist, den Spielbericht wie beschrieben auszufüllen, dann schreib bitte auf dem Formular "Offizielles Protest- und Rapportformular", aus welchem Grund Dir dies nicht möglich war.)]]></text>
+          <text id="question"><![CDATA[Wie muss ich vorgehen, wenn ich in einem Spiel eine Matchstrafe aussprechen musste?]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="paragraph">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:12:51+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:12:51+01:00</date>
+          </modified>
+          <text id="paragraph"><![CDATA[2. Für die weiteren von Dir bei einer Matchstrafe zu unternehmenden Schritte konsultiere die Weisung Vorgehen bei Matchstrafen.]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="faq">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:13:28+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:13:28+01:00</date>
+          </modified>
+          <text id="answer"><![CDATA[Das protestführende Team muss innert 30 Minuten nach Spielende auf dem Spielbericht den Protest vermerken und auf der Rückseite des "offiziellen Protest- und Rapportformular" den genauen Grund des Protests festhalten. Anschliessend musst Du auf der Vorderseite des "offiziellen Protest- und Rapportformulars" schriftlich zum genauen Sachverhalt Stellung nehmen. Hast Du dies getan, dürfen auf dem Formular keine Änderungen mehr vorgenommen werden. Du musst das Formular wieder dem protestführenden Captain übergeben, denn dieser ist für das Einreichen des Formulars verantwortlich.
+Für genauere Informationen zum Thema "Protest" konsultiere das Wettspielreglement (Abschnitt 3 - Protest).]]></text>
+          <text id="question"><![CDATA[Wie muss ich vorgehen, wenn ein Team einen angekündigten Protest bestätigt?]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="faq">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:14:00+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:14:00+01:00</date>
+          </modified>
+          <text id="answer" />
+          <text id="question"><![CDATA[Wie muss ich vorgehen, wenn...]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="enumeration">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:15:12+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:15:12+01:00</date>
+          </modified>
+          <text id="text"><![CDATA[die Spielerkontrolle vor dem Spiel nicht wie vorgeschrieben durchgeführt werden kann?]]></text>
+          <text id="text"><![CDATA[am Spiel anwesende Verbandsvertreter (in offizieller Funktion oder als Zuschauer anwesende Funktionäre oder Schiedsrichter) sich unkorrekt aufführen?]]></text>
+          <text id="text"><![CDATA[es zu Ausschreitungen kommt?]]></text>
+          <text id="text"><![CDATA[das Spiel abgebrochen werden muss?]]></text>
+          <text id="text"><![CDATA[sich das Spielsekretariat nicht neutral verhält?]]></text>
+          <text id="text"><![CDATA[ich durch den Veranstalter nicht angemessen verpflegt werde?]]></text>
+          <text id="text"><![CDATA[die durch den Veranstalter bereitzustellende Infrastruktur nicht zum vorgeschriebenen Zeitpunkt vollständig vorhanden ist oder wenn die Infrastruktur während dem Spiel jeweils nicht rechtzeitig wieder instand gesetzt wird?]]></text>
+          <text id="text"><![CDATA[das Meeting vor dem Spiel (bei Einzelspielen auf dem Grossfeld) nicht wie vorgeschrieben durchgeführt werden kann?]]></text>
+          <text id="text"><![CDATA[mir andere Unkorrektheiten auffallen?]]></text>
+          <text id="text"><![CDATA[ich nach Ende des Spiels von Mannschaftsmitgliedern, Veranstaltern oder Verbandsvertretern unkorrekt behandelt werde?]]></text>
+        </locale>
+        <properties>
+          <property id="type"><![CDATA[ul]]></property>
+        </properties>
+      </pagelet>
+      <pagelet module="text" id="paragraph">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:15:28+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:15:28+01:00</date>
+          </modified>
+          <text id="paragraph"><![CDATA[1. Kreuze auf der Vorderseite des offiziellen Spielberichts das Feld Besonderes Ereignis an, und vermerke auf der Rückseite des offiziellen Spielberichts unter dem Punkt Besonderes Ereignis zusammenfassend, worum es sich beim gemeldeten besonderen Ereignis handelt.
+(Falls es Dir nicht möglich ist, den Spielbericht wie beschrieben auszufüllen, dann schreib bitte auf dem Formular "Offizielles Protest- und Rapportformular", aus welchem Grund Dir dies nicht möglich war.)]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="paragraph">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:15:34+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:15:34+01:00</date>
+          </modified>
+          <text id="paragraph"><![CDATA[2. Anschliessend hast Du auf dem Formular Offizielles Protest- und Rapportformular aus Deiner Sicht zum Sachverhalt des besonderen Ereignisses Stellung zu nehmen. Dieses Formular ist am nächsten Arbeitstag per A-Post an die Geschäftsstelle zu senden. Behalte bitte eine Kopie des eingereichten Formulars bei Dir (zum einen aus Beweisgründen, und zum anderen, damit Du bei Rückfragen noch weisst, was Du genau geschrieben hast).]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="paragraph">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:15:39+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:15:39+01:00</date>
+          </modified>
+          <text id="paragraph"><![CDATA[3. Grossfeldschiedsrichter haben das besondere Ereignis zusätzlich noch ihrem Teamleiter zu melden.]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="text" id="paragraph">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:16:29+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:16:29+01:00</date>
+          </modified>
+          <text id="paragraph"><![CDATA[Das Formular "Offizielles Protest- und Rapportformular" steht Dir auf der Download-Seite der Verbands-Homepage zum Herunterladen zur Verfügung:]]></text>
+        </locale>
+        <properties />
+      </pagelet>
+      <pagelet module="navigation" id="linkinternal">
+        <security>
+          <owner>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          </owner>
+        </security>
+        <created>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <date>2005-02-15T15:17:41+01:00</date>
+        </created>
+        <published>
+          <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+          <from>292278994-08-17T07:12:55+01:00</from>
+          <to>292278994-08-17T07:12:55+01:00</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="simon.betschmann" realm="weblounge">Simon Betschmann</user>
+            <date>2005-02-15T15:17:41+01:00</date>
+          </modified>
+          <text id="title"><![CDATA[Downloads]]></text>
+          <text id="description" />
+        </locale>
+        <properties>
+          <property id="pageid"><![CDATA[e92a5e41-ffd8-49f7-87b1-16decfbecf9d]]></property>
+          <property id="partition"><![CDATA[service]]></property>
+          <property id="path"><![CDATA[/downloads/]]></property>
+          <property id="anchor" />
         </properties>
       </pagelet>
     </composer>
+    <composer id="boxes" />
   </body>
 </page>
