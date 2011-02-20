@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module id="text" xmlns="http://www.o2it.ch/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/module http://www.o2it.ch/xsd/weblounge/3.0/module.xsd">
+
+  <enable>true</enable>
+
+  <name>Text</name>
+
+  <pagelets>
+
+    <pagelet id="title" composeable="true">
+      <name>Title</name>
+      <renderer>file://${module.root}/jsp/title/title.jsp</renderer>
+      <renderer type="feed">file://${module.root}/jsp/title/title-feed.jsp</renderer>
+      <preview>first</preview>
+    </pagelet>
+
+    <pagelet id="subtitle" composeable="true">
+      <name>Subtitle</name>
+      <renderer>file://${module.root}/jsp/subtitle/subtitle.jsp</renderer>
+    </pagelet>
+
+    <pagelet id="paragraph" composeable="true">
+      <name>Paragraph</name>
+      <renderer>file://${module.root}/jsp/paragraph/paragraph.jsp</renderer>
+      <renderer type="feed">file://${module.root}/jsp/paragraph/paragraph-feed.jsp</renderer>
+    </pagelet>
+
+  </pagelets>
+
+</module>
