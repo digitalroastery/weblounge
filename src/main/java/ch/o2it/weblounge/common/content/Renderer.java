@@ -39,6 +39,11 @@ public interface Renderer extends Composeable {
   /** The default recheck time for a renderer */
   long DEFAULT_RECHECK_TIME = Times.MS_PER_DAY;
 
+  /** Enumeration of well-known renderer types */
+  public enum RendererType {
+    Page, Search, Feed
+  }
+
   /**
    * Adds a flavor to the list of supported flavors.
    * 
@@ -74,8 +79,8 @@ public interface Renderer extends Composeable {
   boolean supportsFlavor(RequestFlavor flavor);
 
   /**
-   * Sets the url of the actual renderer. This will usually be a file path to a
-   * java server page (JSP) file or an http link to an XML style sheet (XSL).
+   * Sets the url of the default renderer with a renderer type of
+   * {@link RendererType#Page}.
    * 
    * @param renderer
    *          url to the renderer
@@ -83,12 +88,36 @@ public interface Renderer extends Composeable {
   void setRenderer(URL renderer);
 
   /**
-   * Returns the file used to locate the concrete <code>JSP</code> or
-   * <code>XSL</code> file.
+   * Sets the url of the renderer that is used for output of type
+   * <code>type</code>. This will usually be a file path to a java server page
+   * (JSP) file or an http link to an XML style sheet (XSL).
+   * <p>
+   * It is up to the author of the site to define suitable renderer types and
+   * call them where appropriate. The enum {@link RendererType} defines those
+   * that are well-known by weblounge.
+   * 
+   * @param renderer
+   *          url to the renderer
+   * @param type
+   *          the renderer output type
+   */
+  void addRenderer(URL renderer, String type);
+
+  /**
+   * Returns the url to the renderer that is used to render the content. This
+   * implementation assumes a content type of {@link RendererType#Page}.
    * 
    * @return the renderer url
    */
   URL getRenderer();
+
+  /**
+   * Returns the url to the renderer that is used to render content into the
+   * given type.
+   * 
+   * @return the renderer url
+   */
+  URL getRenderer(String type);
 
   /**
    * Performs the rendering by including any renderer output in the response's
