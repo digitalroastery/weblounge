@@ -31,6 +31,7 @@ import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.site.Site;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ import org.w3c.dom.NodeList;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
@@ -60,9 +62,12 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /** Default page layout */
   protected String layout = null;
-  
+
   /** Is this the default template? */
   protected boolean isDefault = false;
+
+  /** Flag to indicate whether template processing in the urls has happened */
+  private boolean urlTemplatesProcessed = false;
 
   /**
    * Creates a new page template.
@@ -123,22 +128,22 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.page.PageTemplate#setDefault(boolean)
    */
   public void setDefault(boolean v) {
     isDefault = v;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.page.PageTemplate#isDefault()
    */
   public boolean isDefault() {
     return isDefault;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -147,15 +152,9 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   public void render(WebloungeRequest request, WebloungeResponse response)
       throws RenderException {
-    String path = renderer.toExternalForm();
-    if (path.matches(".*\\$\\{.*\\}.*")) {
-      try {
-        renderer = new URL(ConfigurationUtils.processTemplate(path, request));
-      } catch (MalformedURLException e) {
-        logger.error("Error processing renderer url '" + renderer + "'", e);
-        throw new RenderException(this, e);
-      }
-    }
+    if (!urlTemplatesProcessed)
+      processURLTemplates(request.getSite());
+    URL renderer = renderers.get(RendererType.Page.toString().toLowerCase());
     includeJSP(request, response, renderer);
   }
 
@@ -196,14 +195,20 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
    */
   public static PageTemplate fromXml(Node node) throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
-    
+
     // Define the xml namespace
     xpath.setNamespaceContext(new NamespaceContext() {
       public String getNamespaceURI(String prefix) {
         return "ns".equals(prefix) ? SiteImpl.SITE_XMLNS : null;
       }
-      public String getPrefix(String namespaceURI) { return null; }
-      public Iterator<?> getPrefixes(String namespaceURI) { return null; }
+
+      public String getPrefix(String namespaceURI) {
+        return null;
+      }
+
+      public Iterator<?> getPrefixes(String namespaceURI) {
+        return null;
+      }
     });
 
     return fromXml(node, xpath);
@@ -227,7 +232,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       throws IllegalStateException {
 
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    
+
     // Identifier
     String id = XPathHelper.valueOf(node, "@id", xpath);
     if (id == null)
@@ -238,7 +243,7 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
     // Renderer url
     URL rendererUrl = null;
-    String rendererUrlNode = XPathHelper.valueOf(node, "ns:renderer", xpath); 
+    String rendererUrlNode = XPathHelper.valueOf(node, "ns:renderer", xpath);
     if (rendererUrlNode == null)
       throw new IllegalStateException("Missing renderer in page template definition");
     try {
@@ -352,7 +357,13 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
       buf.append("<class>").append(getClass().getName()).append("</class>");
 
     // Renderer url
-    buf.append("<renderer>").append(renderer.toExternalForm()).append("</renderer>");
+    for (Map.Entry<String, URL> entry : renderers.entrySet()) {
+      if (renderers.size() > 1)
+        buf.append("<renderer type=\"").append(entry.getKey()).append("\">");
+      else
+        buf.append("<renderer>");
+      buf.append(entry.getValue().toExternalForm()).append("</renderer>");
+    }
 
     // Stage name
     if (stage != null && !DEFAULT_STAGE.equals(stage))
@@ -392,6 +403,37 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
     buf.append("</template>");
     return buf.toString();
+  }
+
+  /**
+   * Processes both renderer and editor url by replacing templates in their
+   * paths with real values from the actual module.
+   * 
+   * @param site
+   *          the site
+   * @return <code>false</code> if the paths don't end up being real urls,
+   *         <code>true</code> otherwise
+   */
+  private boolean processURLTemplates(Site site) {
+    if (site == null)
+      return false;
+    
+    urlTemplatesProcessed = true;
+
+    // Process the renderer URL
+    for (Map.Entry<String, URL> entry : renderers.entrySet()) {
+      URL renderer = entry.getValue();
+      String rendererURL = ConfigurationUtils.processTemplate(renderer.toExternalForm(), site);
+      try {
+        renderer = new URL(rendererURL);
+        renderers.put(entry.getKey(), renderer);
+      } catch (MalformedURLException e) {
+        logger.error("Renderer url {} of pagelet {} is malformed", rendererURL, this);
+        return false;
+      }
+    }
+
+    return true;
   }
 
 }

@@ -615,4 +615,36 @@ public final class ConfigurationUtils {
     return text;
   }
 
+  /**
+   * Processes the given text by replacing these placeholders with their actual
+   * values:
+   * <ul>
+   * <li><code>file://${site.root}</code> with
+   * <code>http://&lt;servername&gt;/weblounge-sites/&lt;sitegt;</li>
+   * </li>
+   * </ul>
+   * 
+   * @param text
+   *          the text to process
+   * @param site
+   *          the site
+   * @return the processed text
+   */
+  public static String processTemplate(String text, Site site) {
+    text = processTemplate(text);
+
+    Map<String, String> replacements = new HashMap<String, String>();
+    URL url = site.getURL();
+
+    StringBuffer siteRootReplacement = new StringBuffer();
+    siteRootReplacement.append(url);
+    siteRootReplacement.append("/weblounge-sites/").append(site.getIdentifier());
+    replacements.put("file://\\$\\{site.root\\}", siteRootReplacement.toString());
+
+    for (Map.Entry<String, String> entry : replacements.entrySet()) {
+      text = text.replaceAll(entry.getKey(), entry.getValue());
+    }
+    return text;
+  }
+
 }

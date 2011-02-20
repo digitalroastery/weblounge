@@ -1,6 +1,7 @@
 <pagelet id="renderer" composeable="true">
   <name>Pagelet renderer</name>
-  <renderer>file://renderer/renderer.jsp</renderer>
+  <renderer type="feed">file://renderer/renderer-feed.jsp</renderer>
+  <renderer type="page">file://renderer/renderer.jsp</renderer>
   <editor>file://renderer/editor.jsp</editor>
   <recheck>1d10M</recheck>
   <valid>1w2d1H</valid>

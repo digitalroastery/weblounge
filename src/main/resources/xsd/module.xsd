@@ -32,7 +32,7 @@
   		<xsd:sequence>
         <xsd:element name="name" type="xsd:string" minOccurs="0" />
         <xsd:element name="class" type="xsd:string" minOccurs="0" />
-  			<xsd:element name="renderer" type="xsd:anyURI" />
+        <xsd:element ref="renderer" minOccurs="1" maxOccurs="unbounded"/>
   			<xsd:element name="editor" type="xsd:anyURI" minOccurs="0" />
   			<xsd:element name="recheck" type="durationType" minOccurs="0" />
   			<xsd:element name="valid" type="durationType" minOccurs="0" />
@@ -42,6 +42,16 @@
   		<xsd:attribute name="id" type="idType" use="required" />
   		<xsd:attribute name="composeable" type="xsd:boolean" />
   	</xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="renderer">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:anyURI">
+          <xsd:attribute name="type" type="xsd:string" />
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
   </xsd:element>
 
   <xsd:element name="preview">

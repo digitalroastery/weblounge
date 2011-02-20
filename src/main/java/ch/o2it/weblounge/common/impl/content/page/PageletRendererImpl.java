@@ -41,6 +41,7 @@ import org.w3c.dom.NodeList;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -123,10 +124,12 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     urlTemplatesProcessed = true;
 
     // Process the renderer URL
-    if (renderer != null) {
+    for (Map.Entry<String, URL> entry : renderers.entrySet()) {
+      URL renderer = entry.getValue();
       String rendererURL = ConfigurationUtils.processTemplate(renderer.toExternalForm(), module);
       try {
         renderer = new URL(rendererURL);
+        renderers.put(entry.getKey(), renderer);
       } catch (MalformedURLException e) {
         logger.error("Renderer url {} of pagelet {} is malformed", rendererURL, this);
         return false;
@@ -192,9 +195,19 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
    */
   @Override
   public URL getRenderer() {
+    return getRenderer(RendererType.Page.toString());
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#getRenderer(java.lang.String)
+   */
+  @Override
+  public URL getRenderer(String type) {
     if (!urlTemplatesProcessed)
       processURLTemplates(module);
-    return super.getRenderer();
+    return super.getRenderer(type);
   }
 
   /**
@@ -228,6 +241,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       throws RenderException {
     if (!urlTemplatesProcessed)
       processURLTemplates(module);
+    URL renderer = renderers.get(RendererType.Page.toString().toLowerCase());
     includeJSP(request, response, renderer);
   }
 
@@ -311,17 +325,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     // Class
     String className = XPathHelper.valueOf(node, "m:class", xpath);
 
-    // Renderer url
-    URL rendererUrl = null;
-    String rendererUrlNode = XPathHelper.valueOf(node, "m:renderer", xpath);
-    if (rendererUrlNode == null)
-      throw new IllegalStateException("Missing renderer in page template definition");
-    try {
-      rendererUrl = new URL(rendererUrlNode);
-    } catch (MalformedURLException e) {
-      throw new IllegalStateException("Malformed renderer url in page template definition: " + rendererUrlNode);
-    }
-
     // Create the pagelet renderer
     PageletRenderer renderer = null;
     if (className != null) {
@@ -330,7 +333,6 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
         c = (Class<? extends PageletRenderer>) classLoader.loadClass(className);
         renderer = c.newInstance();
         renderer.setIdentifier(id);
-        renderer.setRenderer(rendererUrl);
       } catch (ClassNotFoundException e) {
         throw new IllegalStateException("Pagelet renderer implementation " + className + " not found", e);
       } catch (InstantiationException e) {
@@ -341,7 +343,23 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     } else {
       renderer = new PageletRendererImpl();
       renderer.setIdentifier(id);
-      renderer.setRenderer(rendererUrl);
+    }
+
+    // Renderer url
+    NodeList rendererUrlNodes = XPathHelper.selectList(node, "m:renderer", xpath);
+    if (rendererUrlNodes.getLength() == 0)
+      throw new IllegalStateException("Missing renderer in page template definition");
+    for (int i = 0; i < rendererUrlNodes.getLength(); i++) {
+      Node rendererUrlNode = rendererUrlNodes.item(i);
+      URL rendererUrl = null;
+      Node typeNode = rendererUrlNode.getAttributes().getNamedItem("type");
+      String type = (typeNode != null) ? typeNode.getNodeValue() : RendererType.Page.toString();
+      try {
+        rendererUrl = new URL(rendererUrlNode.getFirstChild().getNodeValue());
+        renderer.addRenderer(rendererUrl, type);
+      } catch (MalformedURLException e) {
+        throw new IllegalStateException("Malformed renderer url in page template definition: " + rendererUrlNode);
+      }
     }
 
     // Composeable
@@ -430,7 +448,13 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
       buf.append("<class>").append(getClass().getName()).append("</class>");
 
     // Renderer url
-    buf.append("<renderer>").append(renderer.toExternalForm()).append("</renderer>");
+    for (Map.Entry<String, URL> entry : renderers.entrySet()) {
+      if (renderers.size() > 1)
+        buf.append("<renderer type=\"").append(entry.getKey()).append("\">");
+      else
+        buf.append("<renderer>");
+      buf.append(entry.getValue().toExternalForm()).append("</renderer>");
+    }
 
     // Editor url
     buf.append("<editor>").append(editor.toExternalForm()).append("</editor>");

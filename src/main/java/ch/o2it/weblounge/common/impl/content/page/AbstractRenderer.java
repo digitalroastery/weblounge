@@ -39,7 +39,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -54,8 +56,8 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractRenderer.class);
 
-  /** Renderer URL */
-  protected URL renderer = null;
+  /** Renderer URLs by type */
+  protected Map<String, URL> renderers = new HashMap<String, URL>(5);
 
   /** The supported flavors */
   protected Set<RequestFlavor> flavors = new HashSet<RequestFlavor>();
@@ -90,7 +92,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    */
   public AbstractRenderer(String identifier, URL renderer) {
     super(identifier, Times.MS_PER_DAY, Times.MS_PER_WEEK);
-    this.renderer = renderer;
+    this.renderers.put(RendererType.Page.toString().toLowerCase(), renderer);
   }
 
   /**
@@ -120,7 +122,7 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.content.Renderer#getFlavors()
    */
   public RequestFlavor[] getFlavors() {
@@ -142,9 +144,21 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    * @see ch.o2it.weblounge.common.content.Renderer#setRenderer(java.net.URL)
    */
   public void setRenderer(URL renderer) {
+    addRenderer(renderer, RendererType.Page.toString());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.content.Renderer#addRenderer(java.net.URL,
+   *      java.lang.String)
+   */
+  public void addRenderer(URL renderer, String type) {
     if (renderer == null)
       throw new IllegalArgumentException("Renderer must not be null");
-    this.renderer = renderer;
+    if (StringUtils.isBlank(type))
+      throw new IllegalArgumentException("Type must not be blank");
+    this.renderers.put(type.toLowerCase(), renderer);
   }
 
   /**
@@ -153,7 +167,18 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
    * @see ch.o2it.weblounge.common.content.Renderer#getRenderer()
    */
   public URL getRenderer() {
-    return renderer;
+    return getRenderer(RendererType.Page.toString());
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.content.Renderer#getRenderer(java.lang.String)
+   */
+  public URL getRenderer(String type) {
+    if (StringUtils.isBlank(type))
+      throw new IllegalArgumentException("Type must not be blank");
+    return renderers.get(type.toLowerCase());
   }
 
   /**
@@ -190,28 +215,28 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
             break;
           }
         }
-  
+
         // Did we find a suitable JSP?
         if (jsp == null) {
           response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           throw new RenderException(this, "No suitable java server page found for " + renderer + " and language '" + language.getIdentifier() + "'");
         }
-  
+
         // Check readability
         if (!jsp.canRead()) {
           response.sendError(HttpServletResponse.SC_FORBIDDEN);
           throw new RenderException(this, "Java server page at " + jsp + " cannot be read");
         }
-  
+
         // No directory listings allowed
         if (!jsp.isFile()) {
           response.sendError(HttpServletResponse.SC_FORBIDDEN);
           throw new RenderException(this, "Java server page at " + jsp + " is not a file");
         }
-        
+
         renderer = jsp.toURI().toURL();
       }
-      
+
       // Prepare a request to site resources
       String requestPath = renderer.getPath();
       if (!StringUtils.isBlank(request.getContextPath()))
@@ -221,11 +246,11 @@ public abstract class AbstractRenderer extends GeneralComposeable implements Ren
       RequestDispatcher dispatcher = request.getRequestDispatcher(siteRequest.getServletPath());
       if (dispatcher == null)
         throw new IllegalStateException("No dispatcher found for site '" + site + "'");
-        
+
       // Finally serve the JSP
       logger.debug("Including jsp {}", renderer);
       dispatcher.include(siteRequest, response);
-      
+
     } catch (IOException e) {
       logger.error("Exception while including jsp {}", renderer, e);
     } catch (Throwable t) {

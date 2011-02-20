@@ -57,6 +57,15 @@ public class PageletRendererImplTest {
   /** The renderer url */
   protected URL rendererUrl = null;
 
+  /** Type identifier for feed renderer */
+  protected String feedRendererType = "feed";
+
+  /** The feed renderer path */
+  protected String feedRendererPath = "file://renderer/renderer-feed.jsp";
+
+  /** The feed renderer url */
+  protected URL feedRendererUrl = null;
+
   /** The editor path */
   protected String editorPath = "file://renderer/editor.jsp";
 
@@ -93,6 +102,7 @@ public class PageletRendererImplTest {
     renderer = new PageletRendererImpl();
     renderer.setIdentifier(identifier);
     renderer.setRenderer(rendererUrl);
+    renderer.addRenderer(feedRendererUrl, feedRendererType);
     renderer.setEditor(editorUrl);
     renderer.setRecheckTime(recheckTime);
     renderer.setValidTime(validTime);
@@ -110,6 +120,7 @@ public class PageletRendererImplTest {
    */
   protected void setUpPreliminaries() throws Exception {
     rendererUrl = new URL(rendererPath);
+    feedRendererUrl = new URL(feedRendererPath);
     editorUrl = new URL(editorPath);
   }
 
