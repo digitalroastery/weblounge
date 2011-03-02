@@ -332,10 +332,14 @@ public class SiteManager {
 
     // Tell the content repository factory to remove the repository
     Configuration configuration = repositoryConfigurations.get(site.getIdentifier());
-    try {
-      configuration.delete();
-    } catch (IOException e) {
-      logger.error("Error deleting repository configuration for site '" + site.getIdentifier() + "'", e);
+    if (configuration != null) {
+      try {
+        configuration.delete();
+      } catch (IOException e) {
+        logger.error("Error deleting repository configuration for site '" + site.getIdentifier() + "'", e);
+      }
+    } else {
+      logger.debug("No connected content repository found to shutdown for site '{}'", site.getIdentifier());
     }
 
     // Remove it from the registry
