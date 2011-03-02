@@ -249,7 +249,9 @@
       * acknowledgementMode - the JMS Acknowledgement mode for both publisher and subscriber. The available choices are
                               AUTO_ACKNOWLEDGE, DUPS_OK_ACKNOWLEDGE and SESSION_TRANSACTED. The default is AUTO_ACKNOWLEDGE.
     -->
+    <!--
     <cacheManagerPeerProviderFactory class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory" properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1, multicastGroupPort=4446, timeToLive=1" propertySeparator=","/>
+    -->
 
     <!--
       CacheManagerPeerListener
@@ -287,7 +289,9 @@
         messages to the listener. This should be long enough for the slowest message.
         If not specified it defaults to 120000ms.
     -->
+    <!--
     <cacheManagerPeerListenerFactory class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"/>
+    -->
 
     <!--
       TerracottaConfig

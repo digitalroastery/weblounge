@@ -28,6 +28,8 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -53,9 +55,12 @@ import java.util.Map;
  */
 public class CacheServiceFactory implements ManagedServiceFactory {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(CacheServiceFactory.class);
+  
   /** The factory's service pid */
   static final String SERVICE_PID = "ch.o2it.weblounge.cache.factory";
-  
+
   /** Service registrations per configuration pid */
   private Map<String, ServiceRegistration> services = new HashMap<String, ServiceRegistration>();
 
@@ -96,22 +101,28 @@ public class CacheServiceFactory implements ManagedServiceFactory {
     // is this an update to an existing service?
     if (services.containsKey(pid)) {
       ServiceRegistration registration = services.get(pid);
-      ManagedService service = (ManagedService)bundleCtx.getService(registration.getReference());
+      ManagedService service = (ManagedService) bundleCtx.getService(registration.getReference());
       service.updated(properties);
-    } 
-    
+    }
+
     // Create a new cache service instance
     else {
+
       String id = (String) properties.get(CacheServiceImpl.OPT_ID);
       String name = (String) properties.get(CacheServiceImpl.OPT_NAME);
       String diskStorePath = (String) properties.get(CacheServiceImpl.OPT_DISKSTORE_PATH);
-      CacheServiceImpl cache = new CacheServiceImpl(id, name, diskStorePath);
-      cache.updated(properties);
-  
-      // Register the service
-      String serviceType = CacheService.class.getName();
-      properties.put("service.pid", pid);
-      services.put(pid, bundleCtx.registerService(serviceType, cache, properties));
+      
+      try {
+        CacheServiceImpl cache = new CacheServiceImpl(id, name, diskStorePath);
+        cache.updated(properties);
+
+        // Register the service
+        String serviceType = CacheService.class.getName();
+        properties.put("service.pid", pid);
+        services.put(pid, bundleCtx.registerService(serviceType, cache, properties));
+      } catch (Throwable t) {
+        logger.error("Failed to create cache for site '{}': {}", id, t.getMessage());
+      }
     }
   }
 
@@ -122,7 +133,11 @@ public class CacheServiceFactory implements ManagedServiceFactory {
    */
   public void deleted(String pid) {
     ServiceRegistration registration = services.remove(pid);
-    CacheService cache = (CacheService)bundleCtx.getService(registration.getReference());
+    if (registration == null) {
+      logger.debug("Cache service with pid '{}' was never registered and can therefore not be deleted", pid);
+      return;
+    }
+    CacheService cache = (CacheService) bundleCtx.getService(registration.getReference());
     registration.unregister();
     cache.shutdown();
   }
