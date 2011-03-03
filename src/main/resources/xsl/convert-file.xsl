@@ -12,9 +12,7 @@
   <xsl:variable name="adminusername">
     <xsl:text>Administrator</xsl:text>
   </xsl:variable>
-  <xsl:variable name="entry">
-    <xsl:copy-of select="/collection/entry[@id=$fileid and  1]"></xsl:copy-of>
-  </xsl:variable>
+  <xsl:variable name="entry" select="/collection/entry[@id=$fileid][1]" />
 
   <xsl:template match="/">
     <file xmlns="http://www.o2it.ch/weblounge/3.0/file" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/file http://www.o2it.ch/xsd/weblounge/3.0/file.xsd">

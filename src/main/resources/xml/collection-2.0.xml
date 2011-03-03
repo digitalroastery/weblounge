@@ -16,6 +16,26 @@
       <to />
     </publish>
   </header>
+  <entry id="/demo/test.jpg">
+    <filename>portrait.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
+    <size>39249</size>
+    <created>2007/12/13 12:56:10 GMT</created>
+    <modified>
+      <date>2007/12/13 12:56:10 GMT</date>
+      <user>evelyne.balsiger</user>
+    </modified>
+    <name language="de">Barbara Buff</name>
+    <description language="de">null</description>
+    <keywords />
+    <security>
+      <owner>evelyne.balsiger</owner>
+    </security>
+    <publish>
+      <from>2006/08/25 21:32:02 GMT</from>
+      <to>292278994/08/17 07:12:55 GMT</to>
+    </publish>
+  </entry>
   <entry id="/portrait/spieler/damen/b/1009/club/portrait.jpg">
     <filename>portrait.jpg</filename>
     <mimetype>image/jpeg</mimetype>
@@ -30,6 +50,26 @@
     <keywords />
     <security>
       <owner>evelyne.balsiger</owner>
+    </security>
+    <publish>
+      <from>2006/08/25 21:32:02 GMT</from>
+      <to>292278994/08/17 07:12:55 GMT</to>
+    </publish>
+  </entry>
+  <entry id="/portrait/spieler/damen/b/1009/club/portrait.jpg">
+    <filename>portrait.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
+    <size>39249</size>
+    <created>2007/12/13 12:56:10 GMT</created>
+    <modified>
+      <date>2007/12/13 12:56:10 GMT</date>
+      <user>evelyne.balsiger</user>
+    </modified>
+    <name language="de">Barbara Buff2</name>
+    <description language="fr"></description>
+    <keywords />
+    <security>
+      <owner>balsiger</owner>
     </security>
     <publish>
       <from>2006/08/25 21:32:02 GMT</from>

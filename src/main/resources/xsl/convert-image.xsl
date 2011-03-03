@@ -14,9 +14,7 @@
   <xsl:variable name="adminusername">
     <xsl:text>Administrator</xsl:text>
   </xsl:variable>
-  <xsl:variable name="entry">
-    <xsl:copy-of select="/collection/entry[@id=$fileid and  1]"></xsl:copy-of>
-  </xsl:variable>
+  <xsl:variable name="entry" select="/collection/entry[@id=$fileid][1]" />
 
   <xsl:template match="/">
     <image xmlns="http://www.o2it.ch/weblounge/3.0/image" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/image http://www.o2it.ch/xsd/weblounge/3.0/image.xsd">
@@ -80,6 +78,20 @@
             <xsl:matching-substring>
               <subject>player:<xsl:value-of select="regex-group(2)" /></subject>
               <subject>portrait:<xsl:value-of select="regex-group(3)" /></subject>
+            </xsl:matching-substring>
+          </xsl:analyze-string>
+        </xsl:if>
+        <xsl:if test="string-length($entry/@id) > 0">
+          <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+\.\w+$" flags="i">
+            <xsl:matching-substring>
+              <subject>clublogo:<xsl:value-of select="regex-group(2)" /></subject>
+            </xsl:matching-substring>
+          </xsl:analyze-string>
+          <xsl:analyze-string select="$entry/@id" regex="^/portrait/teams/(damen|herren)/[A-Za-z]/(\d+)/\d+_(\d+)\.\w+$" flags="i">
+            <xsl:matching-substring>
+              <subject>club:<xsl:value-of select="regex-group(2)" /></subject>
+              <subject>leaguecode:<xsl:value-of select="regex-group(3)" /></subject>
+              <subject>portrait:team</subject>
             </xsl:matching-substring>
           </xsl:analyze-string>
         </xsl:if>

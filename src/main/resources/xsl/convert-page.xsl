@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:importer="ch.o2it.weblounge.tools.importer.Importer" exclude-result-prefixes="importer">
+<xsl:stylesheet version="2.0" xmlns="http://www.o2it.ch/weblounge/3.0/page" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:importer="ch.o2it.weblounge.tools.importer.Importer" exclude-result-prefixes="importer">
   <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property" />
 
   <xsl:param name="uuid" />
