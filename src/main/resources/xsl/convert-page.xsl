@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:importer="ch.o2it.weblounge.tools.importer.Importer" exclude-result-prefixes="importer">
-  <xsl:output method="xml" omit-xml-declaration="no" indent="true" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property" />
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:importer="ch.o2it.weblounge.tools.importer.Importer" exclude-result-prefixes="importer">
+  <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property" />
 
   <xsl:param name="uuid" />
   <xsl:param name="path" />
@@ -47,59 +47,43 @@
             <xsl:with-param name="userid" select="security/owner" />
           </xsl:call-template>
         </owner>
-        <!-- permissions/restrictions are not used yet -->
-        <!-- <xsl:apply-templates select="./security/permission" /> -->
       </security>
       <created>
         <date>
           <xsl:call-template name="formatdate">
-            <xsl:with-param name="DateTime" select="./modified/date" />
+            <xsl:with-param name="DateTime" select="modified/date" />
           </xsl:call-template>
         </date>
         <xsl:call-template name="user">
-          <xsl:with-param name="userid" select="./modified/user" />
+          <xsl:with-param name="userid" select="modified/user" />
         </xsl:call-template>
       </created>
       <modified>
         <date>
           <xsl:call-template name="formatdate">
-            <xsl:with-param name="DateTime" select="./modified/date" />
+            <xsl:with-param name="DateTime" select="modified/date" />
           </xsl:call-template>
         </date>
         <xsl:call-template name="user">
-          <xsl:with-param name="userid" select="./modified/user" />
+          <xsl:with-param name="userid" select="modified/user" />
         </xsl:call-template>
       </modified>
       <published>
         <from>
           <xsl:call-template name="formatdate">
-            <xsl:with-param name="DateTime" select="./publish/from" />
+            <xsl:with-param name="DateTime" select="publish/from" />
           </xsl:call-template>
         </from>
         <to>
           <xsl:call-template name="formatdate">
-            <xsl:with-param name="DateTime" select="./publish/to" />
+            <xsl:with-param name="DateTime" select="publish/to" />
           </xsl:call-template>
         </to>
         <xsl:call-template name="user">
-          <xsl:with-param name="userid" select="./modified/user" />
+          <xsl:with-param name="userid" select="modified/user" />
         </xsl:call-template>
       </published>
     </head>
-  </xsl:template>
-
-  <xsl:template match="header/security/permission">
-    <restrict>
-      <permission>
-        <xsl:attribute name="realm">weblounge</xsl:attribute>
-        <xsl:value-of select="substring-after(@id,':')" />
-      </permission>
-      <group>
-        <xsl:attribute name="realm">weblounge</xsl:attribute>
-        <xsl:value-of select="substring-after(.,':')" />
-        <xsl:text>s</xsl:text>
-      </group>
-    </restrict>
   </xsl:template>
 
   <xsl:template match="keywords">
@@ -142,11 +126,11 @@
       </security>
       <created>
         <xsl:call-template name="user">
-          <xsl:with-param name="userid" select="content/modified/user" />
+          <xsl:with-param name="userid" select="content[@original='true']/modified/user" />
         </xsl:call-template>
         <date>
           <xsl:call-template name="formatdate">
-            <xsl:with-param name="DateTime" select="content/modified/date" />
+            <xsl:with-param name="DateTime" select="content[@original='true']/modified/date" />
           </xsl:call-template>
         </date>
       </created>
@@ -216,11 +200,18 @@
   <xsl:template name="user">
     <xsl:param name="userid"></xsl:param>
     <xsl:choose>
-      <xsl:when test="$userid = 'www'">
+      <xsl:when test="$userid = 'www' or $userid = 'guest'">
         <user>
           <xsl:attribute name="id"><xsl:value-of select="$adminuserid" /></xsl:attribute>
           <xsl:attribute name="realm">weblounge</xsl:attribute>
           <xsl:value-of select="$adminusername" />
+        </user>
+      </xsl:when>
+      <xsl:when test="$userid = 'balsiger'">
+        <user>
+          <xsl:attribute name="id">evelyne.balsiger</xsl:attribute>
+          <xsl:attribute name="realm">weblounge</xsl:attribute>
+          <xsl:text>Evelyne Balsiger</xsl:text>
         </user>
       </xsl:when>
       <xsl:otherwise>

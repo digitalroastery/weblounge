@@ -1,191 +1,39 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<collection id="/2006/">
+<?xml version="1.0" encoding="utf-8"?>
+<collection id="/portrait/spieler/damen/B/1009/club/">
   <header>
-    <created>2006/08/26 17:39:59 GMT</created>
+    <created>2006/08/25 21:32:01 GMT</created>
     <modified>
-      <date>2006/08/26 17:39:59 GMT</date>
-      <user>evelyne.balsiger</user>
+      <date>2006/08/25 21:32:02 GMT</date>
+      <user>tobias.wunden</user>
     </modified>
+    <name language="de">Club</name>
     <keywords />
     <security>
-      <owner>evelyne.balsiger</owner>
+      <owner>tobias.wunden</owner>
     </security>
-    <publish />
+    <publish>
+      <from>2006/08/25 21:32:02 GMT</from>
+      <to />
+    </publish>
   </header>
-  <entry id="/2006/Rivellagames_Flyer_2006.pdf">
-    <filename>Rivellagames_Flyer_2006.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>156028</size>
-    <created>2006/08/26 17:41:09 GMT</created>
+  <entry id="/portrait/spieler/damen/b/1009/club/portrait.jpg">
+    <filename>portrait.jpg</filename>
+    <mimetype>image/jpeg</mimetype>
+    <size>39249</size>
+    <created>2007/12/13 12:56:10 GMT</created>
     <modified>
-      <date>2006/08/26 17:41:09 GMT</date>
-      <user>basil.brunner</user>
-    </modified>
-    <name language="de">Rivellagames Flyer 2006</name>
-    <keywords>
-      <keyword>rivellagames</keyword>
-      <keyword>2006</keyword>
-      <keyword>flyer</keyword>
-    </keywords>
-    <security>
-      <owner>simon.betschmann</owner>
-    </security>
-    <publish>
-      <from>2006/08/26 17:39:59 GMT</from>
-      <to />
-    </publish>
-  </entry>
-  <entry id="/2006/Plakat Finaltag.pdf">
-    <filename>Plakat Finaltag.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>557824</size>
-    <created>2006/08/26 17:42:49 GMT</created>
-    <modified>
-      <date>2006/08/26 17:42:49 GMT</date>
+      <date>2007/12/13 12:56:10 GMT</date>
       <user>evelyne.balsiger</user>
     </modified>
-    <name language="de">Plakat Finaltag deutsch</name>
-    <keywords />
-    <security>
-      <owner>evelyne.balsiger</owner>
-    </security>
-    <publish>
-      <from>2006/08/26 17:39:59 GMT</from>
-      <to />
-    </publish>
-  </entry>
-  <entry id="/2006/Plakat Finaltag_f.pdf">
-    <filename>Plakat Finaltag_f.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>558320</size>
-    <created>2006/08/26 17:44:49 GMT</created>
-    <modified>
-      <date>2006/08/26 17:44:49 GMT</date>
-      <user>evelyne.balsiger</user>
-    </modified>
-    <name language="de">Plakat Finaltag franz</name>
-    <keywords />
-    <security>
-      <owner>evelyne.balsiger</owner>
-    </security>
-    <publish>
-      <from>2006/08/26 17:39:59 GMT</from>
-      <to />
-    </publish>
-  </entry>
-  <entry id="/2006/Plakat Finaltag_i.pdf">
-    <filename>Plakat Finaltag_i.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>558015</size>
-    <created>2006/08/26 21:22:14 GMT</created>
-    <modified>
-      <date>2006/08/26 21:22:14 GMT</date>
-      <user>evelyne.balsiger</user>
-    </modified>
-    <name language="de">Plakat Finaltag italienisch</name>
-    <keywords />
-    <security>
-      <owner>evelyne.balsiger</owner>
-    </security>
-    <publish>
-      <from>2006/08/26 17:39:59 GMT</from>
-      <to />
-    </publish>
-  </entry>
-  <entry id="/2006/Unihockey Regeln f￼r die Schule.pdf">
-    <filename>Unihockey Regeln f￼r die Schule.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>176319</size>
-    <created>2006/08/26 21:22:58 GMT</created>
-    <modified>
-      <date>2006/08/26 21:22:58 GMT</date>
-      <user>evelyne.balsiger</user>
-    </modified>
-    <name language="de">Regeln deutsch</name>
-    <keywords />
-    <security>
-      <owner>evelyne.balsiger</owner>
-    </security>
-    <publish>
-      <from>2006/08/26 17:39:59 GMT</from>
-      <to />
-    </publish>
-  </entry>
-  <entry id="/2006/Unihockey Regeln f￼r die Schule_f.pdf">
-    <filename>Unihockey Regeln f￼r die Schule_f.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>124423</size>
-    <created>2006/08/26 21:23:25 GMT</created>
-    <modified>
-      <date>2006/08/26 21:23:25 GMT</date>
-      <user>evelyne.balsiger</user>
-    </modified>
-    <name language="de">Regeln französisch</name>
-    <keywords />
-    <security>
-      <owner>evelyne.balsiger</owner>
-    </security>
-    <publish>
-      <from>2006/08/26 17:39:59 GMT</from>
-      <to />
-    </publish>
-  </entry>
-  <entry id="/2006/Regeln_fuer_die_Schule.pdf">
-    <filename>Regeln_fuer_die_Schule.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>176319</size>
-    <created>2006/08/27 10:14:45 GMT</created>
-    <modified>
-      <date>2006/08/27 10:14:45 GMT</date>
-      <user>evelyne.balsiger</user>
-    </modified>
-    <name language="de">Regeln fuer die Schule deutsch</name>
-    <keywords />
-    <security>
-      <owner>evelyne.balsiger</owner>
-    </security>
-    <publish>
-      <from>2006/08/26 17:39:59 GMT</from>
-      <to />
-    </publish>
-  </entry>
-  <entry id="/2006/Regeln_fuer_die_Schule_f.pdf">
-    <filename>Regeln_fuer_die_Schule_f.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>124423</size>
-    <created>2006/08/27 10:15:12 GMT</created>
-    <modified>
-      <date>2006/08/27 10:15:12 GMT</date>
-      <user>evelyne.balsiger</user>
-    </modified>
-    <name language="de">Regeln fuer die Schule franz</name>
-    <keywords />
-    <security>
-      <owner>evelyne.balsiger</owner>
-    </security>
-    <publish>
-      <from>2006/08/26 17:39:59 GMT</from>
-      <to />
-    </publish>
-  </entry>
-  <entry id="/2006/flyer_rivellagamesA6.pdf">
-    <filename>flyer_rivellagamesA6.pdf</filename>
-    <mimetype>application/pdf</mimetype>
-    <size>1615399</size>
-    <created>2006/12/05 19:07:50 GMT</created>
-    <modified>
-      <date>2006/12/05 19:07:52 GMT</date>
-      <user>evelyne.balsiger</user>
-    </modified>
-    <name language="de">Flyer Stock</name>
+    <name language="de">Barbara Buff</name>
     <description language="de">null</description>
     <keywords />
     <security>
       <owner>evelyne.balsiger</owner>
     </security>
     <publish>
-      <from>2006/12/05 05:02:51 GMT</from>
-      <to />
+      <from>2006/08/25 21:32:02 GMT</from>
+      <to>292278994/08/17 07:12:55 GMT</to>
     </publish>
   </entry>
 </collection>

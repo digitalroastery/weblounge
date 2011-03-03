@@ -1,5 +1,5 @@
 /*
- * PageImporterCallback.java
+y * PageImporterCallback.java
  *
  * Copyright 2007 by O2 IT Engineering
  * Zurich, Switzerland (CH)
@@ -12,6 +12,8 @@
  */
 
 package ch.o2it.weblounge.tools.importer;
+
+import net.sf.saxon.TransformerFactoryImpl;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.sanselan.ImageInfo;
@@ -67,7 +69,7 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
     try {
       // create temporary resource descriptor file
       resourceXml = File.createTempFile(uuid.toString(), ".xml");
-      
+
       // try loading file as image
       imageInfo = Sanselan.getImageInfo(f);
     } catch (IOException e) {
@@ -87,6 +89,8 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
     if (imageInfo != null) {
       subfolder = "images";
       Source xsl = new StreamSource(this.getClass().getResourceAsStream("/xsl/convert-image.xsl"));
+      // set the TransformFactory to use the Saxon TransformerFactoryImpl method
+      System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
       TransformerFactory transFact = TransformerFactory.newInstance();
       Transformer trans;
       try {

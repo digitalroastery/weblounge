@@ -72,6 +72,12 @@
       <artifactId>sanselan</artifactId>
       <version>0.97-incubator</version>
     </dependency>
+    
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>saxon</artifactId>
+      <version>8.7</version>
+    </dependency>
 
     <!-- testing -->
 

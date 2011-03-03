@@ -134,7 +134,7 @@ public abstract class AbstractImporterCallback implements ImporterCallback {
     try {
       trans.transform(src, result);
     } catch (TransformerException e) {
-      System.err.println("Error transforming file '" + srcFile.getName() + "': " + e.getMessage());
+      System.err.println("Error transforming file '" + srcFile.getPath() + "': " + e.getMessage());
       return false;
     }
     return true;
