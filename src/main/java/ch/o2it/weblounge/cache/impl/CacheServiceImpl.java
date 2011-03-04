@@ -536,29 +536,37 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     }
 
     // Make sure that there are no two transactions producing the same content.
-    // If there is a transaction already working on a specific content, have
-    // this transaction sit and wait.
+    // If there is a transaction already working on specific content, have
+    // this transaction simply wait for the outcome.
     synchronized (transactions) {
       CacheTransaction tx = transactions.get(handle.getKey());
-      if (tx == null) {
-        tx = cacheableResponse.startTransaction(handle, filter);
-        transactions.put(handle.getKey(), tx);
-      } else {
+      if (tx != null) {
         try {
-          logger.debug("Waiting for cache transaction {} to be finished", tx);
-          synchronized (tx) {
-            tx.wait();
-          }
-          element = cache.get(handle.getKey());        
+          logger.info("Waiting for cache transaction {} to be finished", tx);
+          while (transactions.get(handle.getKey()) != null) {
+            transactions.wait();
+          }          
+//          synchronized (tx) {
+//            tx.wait();
+//            logger.info("Cache transaction {} finished", tx);
+//          }
+
         } catch (InterruptedException e) {
           // Done sleeping!
         }
+      }
+      element = cache.get(handle.getKey());
+      if (element == null) {
+        tx = cacheableResponse.startTransaction(handle, filter);
+        transactions.put(handle.getKey(), tx);
+        logger.info("Starting work on caching {}", request);
       }
     }
 
     // If we were waiting for an active cache transaction, let's try again
     if (element != null && element.getValue() != null) {
       try {
+        logger.info("Answering {} from the cache", request);
         writeCacheEntry(element, handle, request, response);
         return null;
       } catch (IOException e) {
@@ -637,42 +645,45 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (!enabled)
       return true;
 
-    // Finish writing the element
-    CacheTransaction transaction = cacheableResponse.endOutput();
-
-    // Is the response ready to be cached?
-    if (transaction == null || !transaction.isValid() || !response.isValid()) {
-      logger.debug("Response to {} was invalid and is not being cached", response);
-      return false;
-    }
-
     // Make sure the cache is still available
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
     if (cache == null) {
-      logger.debug("Cache for {} disappeared, response is not being cached", response);
+      logger.debug("Cache for {} was deactivated, response is not being cached", response);
       return false;
     }
 
-    // Write the entry to the cache
-    logger.trace("Writing response for {} to the cache", response);
-    CacheEntry entry = new CacheEntry(transaction.getHandle(), transaction.getContent(), transaction.getHeaders());
-    Element element = new Element(entry.getKey(), entry);
-    cache.put(element);
+    // Finish writing the element
+    CacheTransaction tx = cacheableResponse.endOutput();
 
-    // Mark the current transaction as finished and notify anybody that was
-    // waiting for it to be finished
-    synchronized (transactions) {
-      CacheTransaction tx = transactions.remove(transaction.getHandle().getKey());
-      if (tx != null) {
-        synchronized (tx) {
-          tx.notifyAll();
-        }
-      } else {
-        logger.warn("Active cache transaction was lost on finish", tx);
-      }
+    // Is the response ready to be cached?
+    if (tx == null) {
+      logger.debug("Response to {} was not associated with a transaction", response);
+      return false;
     }
 
-    return true;
+    // Is the response ready to be cached?
+    if (tx.isValid() && response.isValid()) {
+      // Write the entry to the cache
+      logger.trace("Writing response for {} to the cache", response);
+      CacheEntry entry = new CacheEntry(tx.getHandle(), tx.getContent(), tx.getHeaders());
+      Element element = new Element(entry.getKey(), entry);
+      cache.put(element);
+    } else {
+      logger.debug("Response to {} was invalid and is not being cached", response);
+    }
+
+    // Mark the current transaction as finished and notify anybody who was
+    // waiting for it to be finished
+    synchronized (transactions) {
+      transactions.remove(tx.getHandle().getKey());
+      logger.info("Cache transaction {} finished", tx);
+      transactions.notifyAll();
+//        synchronized (tx) {
+//          tx.notifyAll();
+//        }
+    }
+
+    return tx.isValid() && response.isValid();
   }
 
   /**
@@ -685,7 +696,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (cacheableResponse == null || cacheableResponse.getTransaction() == null)
       return;
     cacheableResponse.invalidate();
-    invalidate(cacheableResponse.getTransaction().getHandle());
+    CacheTransaction tx = cacheableResponse.getTransaction();
+    invalidate(tx.getHandle());
   }
 
   /**
@@ -728,12 +740,13 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     synchronized (transactions) {
       CacheTransaction tx = transactions.remove(handle.getKey());
       if (tx != null) {
-        synchronized (tx) {
-          tx.notifyAll();
-        }
+        transactions.notifyAll();
+//        synchronized (tx) {
+//          tx.notifyAll();
+//        }
       }
     }
-    
+
     logger.debug("Removed {} from cache '{}'", handle.getKey(), id);
   }
 
