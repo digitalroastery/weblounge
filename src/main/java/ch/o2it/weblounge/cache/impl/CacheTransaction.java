@@ -134,5 +134,15 @@ final class CacheTransaction {
   boolean isValid() {
     return valid;
   }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return hnd.toString();
+  }
 
 }
