@@ -27,6 +27,7 @@ import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -49,13 +50,13 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   private int responseStatus = SC_OK;
 
   /** Associated HTTP request object */
-  private WebloungeRequest request = null;
+  private WeakReference<WebloungeRequest> request = null;
 
   /** The cache service */
-  private ResponseCache cache = null;
+  private WeakReference<ResponseCache> cache = null;
 
   /** The response's cache handle */
-  private CacheHandle cacheHandle = null;
+  private WeakReference<CacheHandle> cacheHandle = null;
 
   /**
    * Creates a new <code>HttpServletResponse</code> wrapper around the original
@@ -116,7 +117,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *          the request
    */
   public void setRequest(WebloungeRequest request) {
-    this.request = request;
+    this.request = new WeakReference<WebloungeRequest>(request);
   }
 
   /**
@@ -126,7 +127,7 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *          the cache
    */
   public void setResponseCache(ResponseCache cache) {
-    this.cache = cache;
+    this.cache = new WeakReference<ResponseCache>(cache);
   }
 
   /**
@@ -137,8 +138,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public boolean addTag(String name, String value) {
     boolean result = false;
-    if (cacheHandle != null) {
-      result = cacheHandle.addTag(name, value);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      result = cacheHandle.get().addTag(name, value);
     }
     return result;
   }
@@ -150,8 +151,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public boolean addTags(Collection<CacheTag> tags) {
     boolean result = false;
-    if (cacheHandle != null) {
-      result = cacheHandle.addTags(tags);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      result = cacheHandle.get().addTags(tags);
     }
     return result;
   }
@@ -163,8 +164,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public boolean addTag(CacheTag tag) {
     boolean result = false;
-    if (cacheHandle != null) {
-      result = cacheHandle.addTag(tag);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      result = cacheHandle.get().addTag(tag);
     }
     return result;
   }
@@ -175,8 +176,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#clearTags()
    */
   public void clearTags() {
-    if (cacheHandle != null) {
-      cacheHandle.clearTags();
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      cacheHandle.get().clearTags();
     }
   }
 
@@ -186,8 +187,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#containsTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean containsTag(CacheTag tag) {
-    if (cacheHandle != null) {
-      return cacheHandle.containsTag(tag);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().containsTag(tag);
     }
     return false;
   }
@@ -198,8 +199,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#containsTag(java.lang.String)
    */
   public boolean containsTag(String name) {
-    if (cacheHandle != null) {
-      return cacheHandle.containsTag(name);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().containsTag(name);
     }
     return false;
   }
@@ -211,8 +212,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *      java.lang.String)
    */
   public boolean containsTag(String name, String value) {
-    if (cacheHandle != null) {
-      return cacheHandle.containsTag(name, value);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().containsTag(name, value);
     }
     return false;
   }
@@ -223,8 +224,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#isTagged()
    */
   public boolean isTagged() {
-    if (cacheHandle != null) {
-      return cacheHandle.isTagged();
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().isTagged();
     }
     return false;
   }
@@ -235,8 +236,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#removeTag(ch.o2it.weblounge.common.content.Tag)
    */
   public boolean removeTag(CacheTag tag) {
-    if (cacheHandle != null) {
-      return cacheHandle.removeTag(tag);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().removeTag(tag);
     }
     return false;
   }
@@ -247,8 +248,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#removeTags(java.lang.String)
    */
   public boolean removeTags(String name) {
-    if (cacheHandle != null) {
-      return cacheHandle.removeTags(name);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().removeTags(name);
     }
     return false;
   }
@@ -260,8 +261,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    *      java.lang.String)
    */
   public boolean removeTag(String name, String value) {
-    if (cacheHandle != null) {
-      return cacheHandle.removeTag(name, value);
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().removeTag(name, value);
     }
     return false;
   }
@@ -272,8 +273,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#tags()
    */
   public Iterator<CacheTag> tags() {
-    if (cacheHandle != null) {
-      return cacheHandle.tags();
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().tags();
     }
     return new ArrayList<CacheTag>().iterator();
   }
@@ -284,8 +285,8 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    * @see ch.o2it.weblounge.common.content.Taggable#getTags()
    */
   public CacheTag[] getTags() {
-    if (cacheHandle != null) {
-      return cacheHandle.getTags();
+    if (cacheHandle != null && cacheHandle.get() != null) {
+      return cacheHandle.get().getTags();
     }
     return new CacheTag[] {};
   }
@@ -300,14 +301,19 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
       throws IllegalStateException {
     if (!isValid || cache == null)
       return false;
+    ResponseCache cache = this.cache.get();
+    if (cache == null)
+      return false;
     if (cacheHandle != null)
       throw new IllegalStateException("The response is already being cached");
 
     // Is the response in the cache?
-    cacheHandle = cache.startResponse(tags, request, this, validTime, recheckTime);
-    if (cacheHandle == null)
+    CacheHandle hdl = cache.startResponse(tags, request.get(), this, validTime, recheckTime);
+    if (hdl == null)
       return true;
-
+    
+    // It's not, meaning we need to do the processing ourselves
+    cacheHandle = new WeakReference<CacheHandle>(hdl);
     return false;
   }
 
@@ -319,11 +325,15 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   public void endResponse() throws IllegalStateException {
     if (!isValid || cache == null)
       return;
-    if (cacheHandle == null)
-      throw new IllegalStateException("Cache root entry is missing");
+    ResponseCache cache = this.cache.get();
+    if (cache == null)
+      return;
+    if (cacheHandle == null || cacheHandle.get() == null)
+      return;
 
     // End the response and have the output sent back to the client
     cache.endResponse(this);
+    cacheHandle = null;
   }
 
   /**
@@ -334,7 +344,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   public void setMaximumRecheckTime(long recheckTime) {
     if (cacheHandle == null)
       return;
-    cacheHandle.setRecheckTime(Math.min(recheckTime, cacheHandle.getRecheckTime()));
+    CacheHandle hdl = cacheHandle.get();
+    if (hdl == null)
+      return;
+    hdl.setRecheckTime(Math.min(recheckTime, hdl.getRecheckTime()));
   }
 
   /**
@@ -345,7 +358,10 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
   public void setMaximumValidTime(long validTime) {
     if (cacheHandle == null)
       return;
-    cacheHandle.setExpireTime(Math.min(validTime, cacheHandle.getExpireTime()));
+    CacheHandle hdl = cacheHandle.get();
+    if (hdl == null)
+      return;
+    hdl.setExpireTime(Math.min(validTime, hdl.getExpireTime()));
     
     // The recheck time can't be longer than the valid time
     setMaximumRecheckTime(validTime);
@@ -358,6 +374,12 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public void invalidate() {
     isValid = false;
+    if (cache != null) {
+      ResponseCache c = cache.get();
+      if (c != null) {
+        c.invalidate(this);
+      }
+    }
   }
 
   /**
@@ -367,6 +389,18 @@ public class WebloungeResponseImpl extends HttpServletResponseWrapper implements
    */
   public boolean isValid() {
     return isValid;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    if (request == null || request.get() == null)
+      return super.toString();
+    return request.get().toString();
   }
 
 }

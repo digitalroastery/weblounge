@@ -642,6 +642,8 @@ public class SiteImpl implements Site {
    * @see ch.o2it.weblounge.common.site.Site#getContentRepository()
    */
   public ContentRepository getContentRepository() {
+    if (!isOnline)
+      return null;
     return contentRepository;
   }
 
