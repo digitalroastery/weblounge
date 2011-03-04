@@ -79,13 +79,13 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
 
   /** List of dispatcher listeners */
   private List<RequestHandler> requestHandler = null;
-  
+
   /** List with well known urls and files */
   private static List<String> wellknownFiles = new ArrayList<String>();
-  
+
   /** The response caches */
   private Map<String, ResponseCache> caches = null;
-  
+
   static {
     wellknownFiles.add("/favicon.ico");
     wellknownFiles.add("/robots.txt");
@@ -100,7 +100,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     requestHandler = new CopyOnWriteArrayList<RequestHandler>();
     caches = new HashMap<String, ResponseCache>();
   }
-  
+
   /**
    * Sets the site locator.
    * 
@@ -110,7 +110,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   void setSiteDispatcher(SiteDispatcherService siteDispatcher) {
     this.sites = siteDispatcher;
   }
-  
+
   /**
    * Removes the site locator.
    * 
@@ -282,7 +282,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
           
           // Notify listeners about finished request
           if (response.hasError()) {
-            logger.info("Request processing failed on {}", request);
+            logger.debug("Request processing failed on {}", request);
             fireRequestFailed(request, response, site);
           } else {
             fireRequestDelivered(request, response, site);
@@ -301,9 +301,12 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
             params });
         logger.error(t.getMessage(), t);
         DispatchUtils.sendInternalError(t.getMessage(), request, response);
+        break;
       } finally {
-        if (!response.isValid() && cache != null)
-          cache.invalidate(response);
+        if (cache != null) {
+          if (response.isValid())
+            response.endResponse();
+        }
         logger.debug("Finished processing of {}", httpRequest.getRequestURI());
       }
     }

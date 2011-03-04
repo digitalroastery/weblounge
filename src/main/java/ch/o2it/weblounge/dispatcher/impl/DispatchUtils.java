@@ -329,7 +329,7 @@ public final class DispatchUtils {
         response.getOutputStream().flush();
       }
     } catch (Throwable t) {
-      logger.error("Unable to send response status {} to client", status);
+      logger.debug("Unable to send response status {} to client", status);
     }
   }
 
@@ -374,7 +374,7 @@ public final class DispatchUtils {
         response.getOutputStream().flush();
       }
     } catch (Throwable t) {
-      logger.error("Error when sending back error message {}: {}", status, t.getMessage());
+      logger.debug("Error when sending back error message {}: {}", status, t.getMessage());
     }
   }
 
