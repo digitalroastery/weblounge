@@ -75,7 +75,7 @@ public class SiteManager {
   private Map<Site, Bundle> siteBundles = new HashMap<Site, Bundle>();
 
   /** Maps content repositories to site identifier */
-  private Map<String, ContentRepository> repositoriesBysite = new HashMap<String, ContentRepository>();
+  private Map<String, ContentRepository> repositoriesBySite = new HashMap<String, ContentRepository>();
 
   /** Maps content repository configurations to site identifier */
   private Map<String, Configuration> repositoryConfigurations = new HashMap<String, Configuration>();
@@ -254,7 +254,7 @@ public class SiteManager {
     logger.debug("Site '{}' registered", site);
 
     // Look for content repositories
-    ContentRepository repository = repositoriesBysite.get(site.getIdentifier());
+    ContentRepository repository = repositoriesBySite.get(site.getIdentifier());
     if (repository != null && site.getContentRepository() == null) {
       try {
         repository.connect(site);
@@ -382,7 +382,7 @@ public class SiteManager {
       }
     }
 
-    repositoriesBysite.put(siteIdentifier, repository);
+    repositoriesBySite.put(siteIdentifier, repository);
   }
 
   /**
@@ -395,27 +395,31 @@ public class SiteManager {
     if (repository == null)
       throw new IllegalArgumentException("Content repository must not be null");
 
-    try {
-      repository.disconnect();
-    } catch (ContentRepositoryException e) {
-      logger.warn("Error disconnecting content repository " + repository, e);
-    }
-
+    // Find the site that is associated with the content repository
     String siteIdentifier = null;
-    for (Map.Entry<String, ContentRepository> entry : repositoriesBysite.entrySet()) {
+    for (Map.Entry<String, ContentRepository> entry : repositoriesBySite.entrySet()) {
       if (entry.getValue().equals(repository)) {
         siteIdentifier = entry.getKey();
         break;
       }
     }
 
+    // Tell the site to no longer use it
     if (siteIdentifier != null) {
-      repositoriesBysite.remove(siteIdentifier);
+      repositoriesBySite.remove(siteIdentifier);
       Site site = findSiteByIdentifier(siteIdentifier);
       if (site != null) {
         site.setContentRepository(null);
       }
     }
+
+    // Tell the repository to clean up
+    try {
+      repository.disconnect();
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error disconnecting content repository " + repository, e);
+    }
+
   }
 
   /**
