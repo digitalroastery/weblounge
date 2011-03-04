@@ -35,10 +35,6 @@ import ch.o2it.weblounge.common.request.CacheTag;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Test case for the implementation at {@link CacheEntry}.
  */
@@ -106,18 +102,6 @@ public class CacheEntryTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.cache.impl.CacheEntry#getTags()}.
-   */
-  @Test
-  public void testGetTags() {
-    assertNotNull(entry.getTags());
-    Set<CacheTag> tags = new HashSet<CacheTag>(Arrays.asList(entry.getTags()));
-    assertEquals(this.tags.size(), tags.size());
-    assertTrue(tags.contains(tag));
-    assertTrue(tags.contains(otherTag));
-  }
-
-  /**
    * Test method for {@link ch.o2it.weblounge.cache.impl.CacheEntry#getETag()}.
    */
   @Test
@@ -147,16 +131,6 @@ public class CacheEntryTest {
     assertTrue(entry.containsTag(tag));
     assertTrue(entry.containsTag(otherTag));
     assertFalse(entry.containsTag(new CacheTagImpl("a", "x")));
-  }
-
-  /**
-   * Test method for {@link ch.o2it.weblounge.cache.impl.CacheEntry#getHandle()}.
-   */
-  @Test
-  public void testGetHandle() {
-    CacheHandle h = entry.getHandle();
-    assertNotNull(h);
-    assertEquals(handle, h);
   }
 
   /**

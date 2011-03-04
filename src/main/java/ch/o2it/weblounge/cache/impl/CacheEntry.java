@@ -35,9 +35,9 @@ public final class CacheEntry implements Serializable {
   /** Serial version uid */
   private static final long serialVersionUID = 5694887351734158681L;
 
-  /** The cache handle */
-  private CacheHandle handle = null;
-
+  /** The key for this cache entry */
+  private String key = null;
+  
   /** The content buffer */
   private byte[] content;
 
@@ -68,7 +68,7 @@ public final class CacheEntry implements Serializable {
       throw new IllegalArgumentException("Content cannot be null");
     if (headers == null)
       throw new IllegalArgumentException("Headers cannot be null");
-    this.handle = handle;
+    this.key = handle.getKey();
     this.content = content;
     this.headers = headers;
     this.entryCreationDate = handle.getCreationDate();
@@ -81,16 +81,7 @@ public final class CacheEntry implements Serializable {
    * @return the key
    */
   public String getKey() {
-    return handle.getKey();
-  }
-
-  /**
-   * Returns the tags for this entry.
-   * 
-   * @return the tags
-   */
-  public CacheTag[] getTags() {
-    return handle.getTags();
+    return key;
   }
 
   /**
@@ -121,22 +112,8 @@ public final class CacheEntry implements Serializable {
    * @return <code>true</code> if the entry is tagged
    */
   public boolean containsTag(CacheTag tag) {
-    if (handle.getTags() == null)
-      return false;
-    for (CacheTag t : handle.getTags()) {
-      if (t.equals(tag))
-        return true;
-    }
-    return false;
-  }
-
-  /**
-   * Returns the entry's handle.
-   * 
-   * @return the handle
-   */
-  public CacheHandle getHandle() {
-    return handle;
+    String keyPart = tag.getName() + "=" + tag.getValue();
+    return key.contains(keyPart);
   }
 
   /**
@@ -214,7 +191,7 @@ public final class CacheEntry implements Serializable {
    */
   @Override
   public String toString() {
-    return handle.getKey();
+    return key;
   }
 
 }

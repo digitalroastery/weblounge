@@ -33,6 +33,7 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.Status;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
@@ -233,6 +234,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       Configuration cacheManagerConfig = ConfigurationFactory.parseConfiguration(configInputStream);
       cacheManagerConfig.getDiskStoreConfiguration().setPath(diskStorePath);
       cacheManager = new CacheManager(cacheManagerConfig);
+      cacheManager.setName(id);
     } finally {
       IOUtils.closeQuietly(configInputStream);
     }
@@ -518,6 +520,13 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       return handle;
     }
 
+    // Make sure the cache is still alive
+    if (cacheManager.getStatus() != Status.STATUS_ALIVE) {
+      logger.debug("Cache '{}' has unexpected status '{}'", request.getSite().getIdentifier(), cacheManager.getStatus());
+      return null;
+    }
+
+    // Load the cache
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
     if (cache == null)
       throw new IllegalStateException("No cache found for site '" + id + "'");
@@ -528,10 +537,12 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // If it exists, write the contents back to the response
     if (element != null && element.getValue() != null) {
       try {
+        logger.debug("Answering {} from cache '{}'", request, id);
         writeCacheEntry(element, handle, request, response);
         return null;
       } catch (IOException e) {
-        logger.warn("Error writing cached response to client");
+        logger.debug("Error writing cached response to client");
+        return null;
       }
     }
 
@@ -542,35 +553,38 @@ public class CacheServiceImpl implements CacheService, ManagedService {
       CacheTransaction tx = transactions.get(handle.getKey());
       if (tx != null) {
         try {
-          logger.info("Waiting for cache transaction {} to be finished", tx);
-          while (transactions.get(handle.getKey()) != null) {
+          logger.debug("Waiting for cache transaction {} to be finished", request);
+          while (transactions.containsKey(handle.getKey())) {
             transactions.wait();
-          }          
-//          synchronized (tx) {
-//            tx.wait();
-//            logger.info("Cache transaction {} finished", tx);
-//          }
-
+          }
         } catch (InterruptedException e) {
           // Done sleeping!
         }
       }
-      element = cache.get(handle.getKey());
+
+      // The cache might have been shut down in the meantime
+      if (cacheManager.getStatus() == Status.STATUS_ALIVE) {
+        element = cache.get(handle.getKey());
+      } else {
+        logger.debug("Cache '{}' changed status to '{}'", request.getSite().getIdentifier(), cacheManager.getStatus());
+      }
+
       if (element == null) {
         tx = cacheableResponse.startTransaction(handle, filter);
         transactions.put(handle.getKey(), tx);
-        logger.info("Starting work on caching {}", request);
+        logger.debug("Starting work on cached version of {}", request);
       }
     }
 
     // If we were waiting for an active cache transaction, let's try again
     if (element != null && element.getValue() != null) {
       try {
-        logger.info("Answering {} from the cache", request);
+        logger.debug("Answering {} from cache '{}'", request, id);
         writeCacheEntry(element, handle, request, response);
         return null;
       } catch (IOException e) {
         logger.warn("Error writing cached response to client");
+        return null;
       }
     }
 
@@ -645,7 +659,13 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (!enabled)
       return true;
 
-    // Make sure the cache is still available
+    // Make sure the cache is still available and active
+    if (cacheManager.getStatus() != Status.STATUS_ALIVE) {
+      logger.debug("Cache '{}' has unexpected status '{}'", cacheManager.getName(), cacheManager.getStatus());
+      return false;
+    }
+
+    // Load the cache
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
     if (cache == null) {
       logger.debug("Cache for {} was deactivated, response is not being cached", response);
@@ -676,11 +696,8 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     // waiting for it to be finished
     synchronized (transactions) {
       transactions.remove(tx.getHandle().getKey());
-      logger.info("Cache transaction {} finished", tx);
+      logger.debug("Caching of {} finished", response);
       transactions.notifyAll();
-//        synchronized (tx) {
-//          tx.notifyAll();
-//        }
     }
 
     return tx.isValid() && response.isValid();
@@ -698,6 +715,7 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     cacheableResponse.invalidate();
     CacheTransaction tx = cacheableResponse.getTransaction();
     invalidate(tx.getHandle());
+    logger.debug("Removed {} from cache '{}'", response, id);
   }
 
   /**
@@ -731,20 +749,26 @@ public class CacheServiceImpl implements CacheService, ManagedService {
     if (handle == null)
       throw new IllegalArgumentException("Handle cannot be null");
 
+    // Make sure the cache is still available and active
+    if (cacheManager.getStatus() != Status.STATUS_ALIVE) {
+      logger.debug("Cache '{}' has unexpected status '{}'", cacheManager.getName(), cacheManager.getStatus());
+      return;
+    }
+
     // Load the cache
     Cache cache = cacheManager.getCache(DEFAULT_CACHE);
+    if (cache == null) {
+      logger.debug("Cache for {} was deactivated, response is not being invalidated");
+      return;
+    }
+
     cache.remove(handle.getKey());
 
     // Mark the current transaction as finished and notify anybody that was
     // waiting for it to be finished
     synchronized (transactions) {
-      CacheTransaction tx = transactions.remove(handle.getKey());
-      if (tx != null) {
-        transactions.notifyAll();
-//        synchronized (tx) {
-//          tx.notifyAll();
-//        }
-      }
+      transactions.remove(handle.getKey());
+      transactions.notifyAll();
     }
 
     logger.debug("Removed {} from cache '{}'", handle.getKey(), id);
