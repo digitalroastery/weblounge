@@ -352,7 +352,7 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
 
           // Evaluate the preview mode
           PagePreviewMode previewMode = r.getPreviewMode();
-          if (previewMode.equals(PagePreviewMode.First.equals(previewMode) && !previewRenderers.contains(r))) {
+          if (previewMode.equals(PagePreviewMode.First) && !previewRenderers.contains(r)) {
             preview.add(p);
             previewRenderers.add(r);
           } else if (PagePreviewMode.All.equals(previewMode)) {
