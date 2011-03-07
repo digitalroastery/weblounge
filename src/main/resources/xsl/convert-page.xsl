@@ -150,7 +150,30 @@
         </to>
       </published>
       <xsl:apply-templates select="./content" />
-      <xsl:apply-templates select="./properties" />
+      <properties>
+        <xsl:if test="property[@id='partition'] and property[@id='path']">
+          <property id="pageid">
+            <xsl:value-of select="importer:getUUID(property[@id='partition'], property[@id='path'])" />
+          </property>
+        </xsl:if>
+        <xsl:if test="properties/property[@id='partition'] and properties/property[@id='path']">
+          <property id="pageid">
+            <xsl:value-of select="importer:getUUID(properties/property[@id='partition'], properties/property[@id='path'])" />
+          </property>
+        </xsl:if>
+        <xsl:if test="not(property[@id='partition']) and property[@id='path']">
+          <property id="resourceid">
+            <xsl:value-of select="importer:getUUID(property[@id='path'])" />
+          </property>
+        </xsl:if>
+        <xsl:if test="not(properties/property[@id='partition']) and properties/property[@id='path']">
+          <property id="resourceid">
+            <xsl:value-of select="importer:getUUID(properties/property[@id='path'])" />
+          </property>
+        </xsl:if>
+        <xsl:apply-templates select="./properties/property" />
+        <xsl:apply-templates select="./property" />
+      </properties>
     </pagelet>
   </xsl:template>
 
@@ -172,22 +195,6 @@
       </modified>
       <xsl:copy-of select="./text" />
     </locale>
-  </xsl:template>
-
-  <xsl:template match="properties">
-    <properties>
-      <xsl:if test="property[@id='partition'] and property[@id='path']">
-        <property id="pageid">
-          <xsl:value-of select="importer:getUUID(property[@id='partition'], property[@id='path'])" />
-        </property>
-      </xsl:if>
-      <xsl:if test="not(property[@id='partition']) and property[@id='path']">
-        <property id="resourceid">
-          <xsl:value-of select="importer:getUUID(property[@id='path'])" />
-        </property>
-      </xsl:if>
-      <xsl:apply-templates select="./property" />
-    </properties>
   </xsl:template>
 
   <xsl:template match="property">
