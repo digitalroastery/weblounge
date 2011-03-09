@@ -176,6 +176,10 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
    * @see ch.o2it.weblounge.common.site.Action#setPath(java.lang.String)
    */
   public void setPath(String path) {
+    if (StringUtils.isBlank(path))
+      throw new IllegalArgumentException("Path cannot be blank");
+    if (!path.startsWith("/"))
+      throw new IllegalArgumentException("Action mountpoint must be absolute");
     this.mountpoint = UrlUtils.trim(path);
   }
 
