@@ -1118,9 +1118,17 @@ public class SiteImpl implements Site {
           i18n.addDictionary(i18nEnum.nextElement());
         }
 
-        Module m = ModuleImpl.fromXml(moduleXml.getFirstChild());
-        logger.debug("Module '{}' loaded for site '{}'", m, this);
-        addModule(m);
+        Node moduleNode = moduleXml.getFirstChild();
+        String moduleId = moduleNode.getAttributes().getNamedItem("id").getNodeValue();
+
+        try {
+          Module m = ModuleImpl.fromXml(moduleNode);
+          logger.debug("Module '{}' loaded for site '{}'", m, this);
+          addModule(m);
+        } catch (Exception t) {
+          logger.error("Error loading module '{}' of site {}", moduleId, identifier);
+          throw t;
+        }
       }
     } else {
       logger.debug("Site '{}' has no modules", this);

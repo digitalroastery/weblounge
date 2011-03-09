@@ -179,7 +179,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     if (StringUtils.isBlank(path))
       throw new IllegalArgumentException("Path cannot be blank");
     if (!path.startsWith("/"))
-      throw new IllegalArgumentException("Action mountpoint must be absolute");
+      throw new IllegalArgumentException("Action mountpoint '" + path + "' must be absolute");
     this.mountpoint = UrlUtils.trim(path);
   }
 
