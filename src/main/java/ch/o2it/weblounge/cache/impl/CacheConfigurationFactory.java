@@ -256,7 +256,8 @@ public class CacheConfigurationFactory implements ManagedService {
       return;
     
     Configuration config = configHolder.getConfiguration();
-    config.delete();
+    if (config != null)
+      config.delete();
   }
 
   /**
