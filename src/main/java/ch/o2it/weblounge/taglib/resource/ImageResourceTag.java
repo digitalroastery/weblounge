@@ -118,8 +118,8 @@ public class ImageResourceTag extends WebloungeTag {
       uri = new ImageResourceURIImpl(site, null, imageId);
     } else if (StringUtils.isNotBlank(imagePath)) {
       uri = new ImageResourceURIImpl(site, imagePath, null);
-    } else if (!request.getRequestURI().endsWith(".jsp")) {
-      logger.warn("Neither uuid nor path were specified for image");
+    } else {
+      logger.debug("Neither uuid nor path were specified for image");
       return SKIP_BODY;
     }
       

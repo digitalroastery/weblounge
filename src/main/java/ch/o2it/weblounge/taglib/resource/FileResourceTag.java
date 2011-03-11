@@ -102,7 +102,7 @@ public class FileResourceTag extends WebloungeTag {
       uri = new FileResourceURIImpl(site, null, fileId);
     } else if (StringUtils.isNotBlank(filePath)) {
       uri = new FileResourceURIImpl(site, filePath, null);
-    } else if (!request.getRequestURI().endsWith(".jsp")) {
+    } else {
       logger.debug("Neither uuid nor path were specified for file");
       return SKIP_BODY;
     }
