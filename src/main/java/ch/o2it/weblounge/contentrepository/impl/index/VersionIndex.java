@@ -59,7 +59,6 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
   /** Name for the version index file */
   public static final String VERSION_IDX_NAME = "version.idx";
-
   
   /** Start of the index's header */
   protected static final long IDX_START_OF_HEADER = 0;
@@ -250,7 +249,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public synchronized long size() {
+  public long size() {
     return IDX_START_OF_CONTENT + (slots * slotSizeInBytes);
   }
 
@@ -259,7 +258,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public synchronized long getSlots() {
+  public long getSlots() {
     return slots;
   }
 
@@ -268,7 +267,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public synchronized long getEntries() {
+  public long getEntries() {
     return entries;
   }
 
@@ -281,7 +280,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of versions per entry
    */
-  public synchronized int getEntriesPerSlot() {
+  public int getEntriesPerSlot() {
     return versionsPerEntry;
   }
 
@@ -291,7 +290,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public synchronized float getLoadFactor() {
+  public float getLoadFactor() {
     return (float) entries / (float) (slots * versionsPerEntry);
   }
 
@@ -306,7 +305,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized long add(String id, long version) throws IOException {
+  public long add(String id, long version) throws IOException {
     long entry = slots;
 
     // See if there is an empty slot
@@ -339,7 +338,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized long addVersion(long entry, long version)
+  public long addVersion(long entry, long version)
       throws IOException {
     return add(entry, null, version);
   }
@@ -420,7 +419,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if removing the entry from the index fails
    */
-  public synchronized void delete(long entry) throws IOException {
+  public void delete(long entry) throws IOException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
 
     idx.seek(startOfEntry + bytesPerId);
@@ -450,7 +449,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if removing the entry from the index fails
    */
-  public synchronized void delete(long entry, long version) throws IOException {
+  public void delete(long entry, long version) throws IOException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
 
     // Remove the version from the indicated entry
@@ -500,7 +499,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized void clear() throws IOException {
+  public void clear() throws IOException {
     init(bytesPerId, versionsPerEntry);
   }
 
@@ -515,7 +514,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized long[] getVersions(long entry) throws IOException,
+  public long[] getVersions(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
     idx.seek(startOfEntry);
@@ -542,7 +541,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized boolean hasVersion(long entry, long version)
+  public boolean hasVersion(long entry, long version)
       throws IOException, EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
     idx.seek(startOfEntry);
@@ -567,7 +566,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized boolean hasVersions(long entry) throws IOException,
+  public boolean hasVersions(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
     idx.seek(startOfEntry);
@@ -630,7 +629,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public synchronized void resize(int newBytesPerId, int newVersionsPerEntry)
+  public void resize(int newBytesPerId, int newVersionsPerEntry)
       throws IOException {
     if (this.bytesPerId > newBytesPerId && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of bytes per id when there are entries in the index");

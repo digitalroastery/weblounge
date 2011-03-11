@@ -64,7 +64,6 @@ public class IdIndex implements VersionedContentRepositoryIndex {
   /** Name for the id index file */
   public static final String ID_IDX_NAME = "id.idx";
 
-  
   /** Start of the index's header */
   protected static final long IDX_START_OF_HEADER = 0;
 
@@ -222,7 +221,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public synchronized long size() {
+  public long size() {
     return IDX_START_OF_CONTENT + (slots * slotSizeInBytes);
   }
 
@@ -231,7 +230,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public synchronized long getSlots() {
+  public long getSlots() {
     return slots;
   }
 
@@ -240,7 +239,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries per slot
    */
-  public synchronized int getEntriesPerSlot() {
+  public int getEntriesPerSlot() {
     return entriesPerSlot;
   }
 
@@ -249,7 +248,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public synchronized long getEntries() {
+  public long getEntries() {
     return entries;
   }
 
@@ -259,7 +258,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public synchronized float getLoadFactor() {
+  public float getLoadFactor() {
     return (float)entries / (float)(slots * entriesPerSlot);
   }
 
@@ -273,7 +272,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized void set(long addressOfId, String id) throws IOException {
+  public void set(long addressOfId, String id) throws IOException {
     long slot = findSlot(id);
     long startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
 
@@ -322,7 +321,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * @throws IllegalStateException
    *           if the id is not part of the index
    */
-  public synchronized void delete(long addressOfId, String id)
+  public void delete(long addressOfId, String id)
       throws IOException {
 
     // Move to the beginning of the slot
@@ -368,7 +367,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized void clear() throws IOException {
+  public void clear() throws IOException {
     init(slots, entriesPerSlot);
   }
 
@@ -400,7 +399,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized long[] locate(String id) throws IOException {
+  public long[] locate(String id) throws IOException {
     long slot = findSlot(id);
     long startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
     idx.seek(startOfSlot);
@@ -473,7 +472,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public synchronized void resize(long slots, int entriesPerSlot)
+  public void resize(long slots, int entriesPerSlot)
       throws IOException {
     if (slots != this.slots && this.entries > 0)
       throw new IllegalStateException("Cannot resize the number of slots when there are entries in the index");

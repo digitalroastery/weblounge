@@ -224,7 +224,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public synchronized long size() {
+  public long size() {
     return IDX_START_OF_CONTENT + (slots * bytesPerSlot);
   }
 
@@ -233,7 +233,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public synchronized long getSlots() {
+  public long getSlots() {
     return slots;
   }
 
@@ -242,7 +242,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries per slot
    */
-  public synchronized int getEntriesPerSlot() {
+  public int getEntriesPerSlot() {
     return entriesPerSlot;
   }
 
@@ -251,7 +251,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public synchronized long getEntries() {
+  public long getEntries() {
     return entries;
   }
 
@@ -261,7 +261,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public synchronized float getLoadFactor() {
+  public float getLoadFactor() {
     return entries / (slots * entriesPerSlot);
   }
 
@@ -275,7 +275,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized void set(long addressOfPath, String path)
+  public void set(long addressOfPath, String path)
       throws IOException {
 
     long slot = findSlot(path);
@@ -327,7 +327,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * @throws IllegalStateException
    *           if the path is not part of the index
    */
-  public synchronized void delete(String path, long addressOfPath)
+  public void delete(String path, long addressOfPath)
       throws IOException {
 
     // Move to the beginning of the slot
@@ -373,7 +373,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public synchronized void clear() throws IOException {
+  public void clear() throws IOException {
     init(slots, entriesPerSlot);
   }
 
@@ -406,7 +406,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public synchronized long[] locate(String path) throws IOException {
+  public long[] locate(String path) throws IOException {
     long slot = findSlot(path);
     long startOfSlot = IDX_START_OF_CONTENT + (slot * bytesPerSlot);
     idx.seek(startOfSlot);
@@ -479,7 +479,7 @@ public class PathIndex implements VersionedContentRepositoryIndex {
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public synchronized void resize(long slots, int entriesPerSlot)
+  public void resize(long slots, int entriesPerSlot)
       throws IOException {
     if (this.slots != slots && this.entries > 0)
       throw new IllegalStateException("Cannot resize the number of slots when there are entries in the index");
