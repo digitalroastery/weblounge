@@ -419,13 +419,11 @@ public class ComposerTagSupport extends WebloungeTag {
             ResourceURI pageURI = new PageURIImpl(site, pageUrl);
             try {
               contentProvider = (Page) contentRepository.get(pageURI);
-              if (contentProvider != null) {
-                if (!Page.TYPE.equals(contentProvider.getType())) {
-                  logger.debug("Home page is not of type '{}'", Page.TYPE);
-                  return;
-                }
-                content = contentProvider.getPagelets(name);
+              if (contentProvider == null) {
+                logger.debug("Parent page {} could not be loaded", pageUrl);
+                return;
               }
+              content = contentProvider.getPagelets(name);
             } catch (SecurityException e) {
               logger.debug("Prevented loading of protected content from inherited page {} for composer {}", pageURI, name);
             }
@@ -505,6 +503,11 @@ public class ComposerTagSupport extends WebloungeTag {
     return pagelets;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
+   */
   @Override
   public int doStartTag() throws JspException {
     Enumeration<?> e = request.getAttributeNames();
