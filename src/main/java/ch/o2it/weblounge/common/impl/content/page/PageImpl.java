@@ -76,6 +76,7 @@ public class PageImpl extends ResourceImpl<ResourceContent> implements Page {
    */
   public PageImpl(ResourceURI uri) {
     super(uri);
+    uri.setType(TYPE);
     this.composers = new HashMap<String, List<Pagelet>>();
   }
 

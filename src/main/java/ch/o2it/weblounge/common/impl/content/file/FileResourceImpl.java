@@ -40,6 +40,7 @@ public class FileResourceImpl extends ResourceImpl<FileContent> implements FileR
    */
   public FileResourceImpl(ResourceURI uri) {
     super(uri);
+    uri.setType(TYPE);
     setLanguageResolution(LanguageResolution.Original);
   }
 

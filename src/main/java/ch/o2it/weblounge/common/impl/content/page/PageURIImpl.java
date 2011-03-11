@@ -60,6 +60,7 @@ public class PageURIImpl extends ResourceURIImpl {
    */
   public PageURIImpl(ResourceURI uri, long version) {
     super(uri, version);
+    setType(TYPE);
   }
 
   /**

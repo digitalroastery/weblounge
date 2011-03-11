@@ -38,6 +38,7 @@ public class ImageResourceImpl extends ResourceImpl<ImageContent> implements Ima
    */
   public ImageResourceImpl(ResourceURI uri) {
     super(uri);
+    uri.setType(TYPE);
   }
 
   /**
