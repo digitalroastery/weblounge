@@ -235,6 +235,9 @@ public class I18nDictionaryImpl implements I18nDictionary {
       } else {
         p = defaults;
       }
+      
+      boolean warnInvalidKeys = false;
+      boolean warnInvalidValues = false;
 
       // Read and store the messages
 
@@ -248,14 +251,21 @@ public class I18nDictionaryImpl implements I18nDictionary {
           logger.warn("I18n key '{}' redefined in {}", key, url);
         }
         if (key == null) {
-          logger.warn("I18n dictionary {} contains invalid key (null)", url);
+          warnInvalidKeys = true;
           continue;
         } else if (value == null) {
-          logger.warn("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
+          logger.debug("I18n dictionary {} contains invalid value (null) for key '{}'", url, key);
+          warnInvalidValues = true;
           continue;
         }
         p.put(key, value);
       }
+      
+      if (warnInvalidKeys)
+        logger.warn("I18n dictionary {} contains null keys", url);
+      if (warnInvalidValues)
+        logger.warn("I18n dictionary {} contains invalid values", url);
+
     } catch (ParserConfigurationException e) {
       logger.warn("Parser configuration error when reading i18n dictionary {}: {}", url, e.getMessage());
     } catch (SAXException e) {
