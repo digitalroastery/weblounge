@@ -140,8 +140,8 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">10</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <stringProp name="ThreadGroup.num_threads">50</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
         <longProp name="ThreadGroup.start_time">1291806919000</longProp>
         <longProp name="ThreadGroup.end_time">1291806919000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -175,7 +175,7 @@
         </LoopController>
         <hashTree>
           <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
-            <stringProp name="ConstantTimer.delay">100</stringProp>
+            <stringProp name="ConstantTimer.delay">1000</stringProp>
             <stringProp name="RandomTimer.range">100</stringProp>
           </GaussianRandomTimer>
           <hashTree/>
@@ -191,7 +191,7 @@
               <stringProp name="HTTPSampler.domain"></stringProp>
               <stringProp name="HTTPSampler.port"></stringProp>
               <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout">1000</stringProp>
               <stringProp name="HTTPSampler.protocol">HTTP</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
               <stringProp name="HTTPSampler.path">${page}</stringProp>
@@ -264,8 +264,8 @@
         </LoopController>
         <hashTree>
           <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
-            <stringProp name="ConstantTimer.delay">100</stringProp>
-            <stringProp name="RandomTimer.range">100</stringProp>
+            <stringProp name="ConstantTimer.delay">500</stringProp>
+            <stringProp name="RandomTimer.range">500</stringProp>
           </GaussianRandomTimer>
           <hashTree/>
           <RandomController guiclass="RandomControlGui" testclass="RandomController" testname="Random Pages (Cached)" enabled="true">
@@ -375,7 +375,7 @@
       </ResultCollector>
       <hashTree/>
       <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Test Plan Summary Report" enabled="true">
-        <boolProp name="ResultCollector.error_logging">true</boolProp>
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
           <value class="SampleSaveConfiguration">
@@ -404,7 +404,9 @@
             <url>true</url>
           </value>
         </objProp>
-        <stringProp name="filename">/Users/wunden/Desktop/test.txt</stringProp>
+        <stringProp name="filename"></stringProp>
+        <boolProp name="useGroupName">true</boolProp>
+        <boolProp name="ResultCollector.success_only_logging">true</boolProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
