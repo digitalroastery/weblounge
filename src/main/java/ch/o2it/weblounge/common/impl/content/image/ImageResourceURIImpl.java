@@ -57,8 +57,7 @@ public class ImageResourceURIImpl extends ResourceURIImpl {
    *          the version
    */
   public ImageResourceURIImpl(ResourceURI uri, long version) {
-    super(uri, version);
-    setType(ImageResource.TYPE);
+    super(ImageResource.TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), version);
   }
 
   /**

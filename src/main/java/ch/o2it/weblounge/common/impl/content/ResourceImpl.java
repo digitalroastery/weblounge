@@ -135,10 +135,9 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   }
 
   /**
-   * Returns the page type, which is used to include this page into news lists
-   * etc.
+   * Returns the resource type.
    * 
-   * @return the page type
+   * @return the resource type
    */
   public String getType() {
     return type;
@@ -148,7 +147,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
    * Sets the page type: news, feature, ...
    * 
    * @param type
-   *          the page type
+   *          the resource type
    */
   public void setType(String type) {
     this.type = type;

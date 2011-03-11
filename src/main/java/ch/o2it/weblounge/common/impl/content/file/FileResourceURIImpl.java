@@ -57,8 +57,7 @@ public class FileResourceURIImpl extends ResourceURIImpl {
    *          the version
    */
   public FileResourceURIImpl(ResourceURI uri, long version) {
-    super(uri, version);
-    setType(FileResource.TYPE);
+    super(FileResource.TYPE, uri.getSite(), uri.getPath(), uri.getIdentifier(), uri.getVersion());
   }
 
   /**
