@@ -51,6 +51,10 @@ import java.io.RandomAccessFile;
  * |------------------------------------------
  * | a-b-c-d | 6     | 1 876876876
  * </pre>
+ * 
+ * <p>
+ * Note that the current implementation is <b>not thread-safe</b> due to the
+ * use of a single instance of the {@link RandomAccessFile}.
  */
 public class VersionIndex implements VersionedContentRepositoryIndex {
 
@@ -59,6 +63,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
   /** Name for the version index file */
   public static final String VERSION_IDX_NAME = "version.idx";
+
   
   /** Start of the index's header */
   protected static final long IDX_START_OF_HEADER = 0;
@@ -80,7 +85,6 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
 
   /** Start of the index's body */
   protected static final long IDX_START_OF_CONTENT = IDX_HEADER_ENTRIES + 8;
-
   
   /** Default number of bytes used per id */
   private static final int DEFAULT_BYTES_PER_ID = 36;
@@ -249,7 +253,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public long size() {
+  public synchronized long size() {
     return IDX_START_OF_CONTENT + (slots * slotSizeInBytes);
   }
 
@@ -258,7 +262,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public long getSlots() {
+  public synchronized long getSlots() {
     return slots;
   }
 
@@ -267,7 +271,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public long getEntries() {
+  public synchronized long getEntries() {
     return entries;
   }
 
@@ -280,7 +284,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of versions per entry
    */
-  public int getEntriesPerSlot() {
+  public synchronized int getEntriesPerSlot() {
     return versionsPerEntry;
   }
 
@@ -290,7 +294,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public float getLoadFactor() {
+  public synchronized float getLoadFactor() {
     return (float) entries / (float) (slots * versionsPerEntry);
   }
 
@@ -305,7 +309,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public long add(String id, long version) throws IOException {
+  public synchronized long add(String id, long version) throws IOException {
     long entry = slots;
 
     // See if there is an empty slot
@@ -338,7 +342,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public long addVersion(long entry, long version)
+  public synchronized long addVersion(long entry, long version)
       throws IOException {
     return add(entry, null, version);
   }
@@ -419,7 +423,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if removing the entry from the index fails
    */
-  public void delete(long entry) throws IOException {
+  public synchronized void delete(long entry) throws IOException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
 
     idx.seek(startOfEntry + bytesPerId);
@@ -449,7 +453,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if removing the entry from the index fails
    */
-  public void delete(long entry, long version) throws IOException {
+  public synchronized void delete(long entry, long version) throws IOException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
 
     // Remove the version from the indicated entry
@@ -499,7 +503,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public void clear() throws IOException {
+  public synchronized void clear() throws IOException {
     init(bytesPerId, versionsPerEntry);
   }
 
@@ -514,7 +518,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public long[] getVersions(long entry) throws IOException,
+  public synchronized long[] getVersions(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
     idx.seek(startOfEntry);
@@ -541,7 +545,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public boolean hasVersion(long entry, long version)
+  public synchronized boolean hasVersion(long entry, long version)
       throws IOException, EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
     idx.seek(startOfEntry);
@@ -566,7 +570,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public boolean hasVersions(long entry) throws IOException,
+  public synchronized boolean hasVersions(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * slotSizeInBytes);
     idx.seek(startOfEntry);
@@ -629,7 +633,7 @@ public class VersionIndex implements VersionedContentRepositoryIndex {
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public void resize(int newBytesPerId, int newVersionsPerEntry)
+  public synchronized void resize(int newBytesPerId, int newVersionsPerEntry)
       throws IOException {
     if (this.bytesPerId > newBytesPerId && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of bytes per id when there are entries in the index");

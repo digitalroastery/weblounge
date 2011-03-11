@@ -55,6 +55,10 @@ import java.util.Set;
  * |------------------------------------------
  * | a-b-c-d | de en
  * </pre>
+ * 
+ * <p>
+ * Note that the current implementation is <b>not thread-safe</b> due to the
+ * use of a single instance of the {@link RandomAccessFile}. 
  */
 public class LanguageIndex implements VersionedContentRepositoryIndex {
 
@@ -252,7 +256,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public long size() {
+  public synchronized long size() {
     return IDX_START_OF_CONTENT + (slots * bytesPerSlot);
   }
 
@@ -265,7 +269,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of languages per entry
    */
-  public int getEntriesPerSlot() {
+  public synchronized int getEntriesPerSlot() {
     return languagesPerSlot;
   }
 
@@ -275,7 +279,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public float getLoadFactor() {
+  public synchronized float getLoadFactor() {
     return (float) entries / (float) (slots * languagesPerSlot);
   }
 
@@ -284,7 +288,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public long getSlots() {
+  public synchronized long getSlots() {
     return slots;
   }
 
@@ -293,7 +297,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public long getEntries() {
+  public synchronized long getEntries() {
     return entries;
   }
 
@@ -308,7 +312,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public long set(String id, Set<Language> languages)
+  public synchronized long set(String id, Set<Language> languages)
       throws IOException {
 
     long entry = slots;
@@ -350,7 +354,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public void add(long entry, Language language)
+  public synchronized void add(long entry, Language language)
       throws IOException {
     set(entry, null, language);
   }
@@ -366,7 +370,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public void set(long entry, Set<Language> languages)
+  public synchronized void set(long entry, Set<Language> languages)
       throws IOException {
     set(entry, null, null);
     if (languages == null || languages.size() == 0)
@@ -462,7 +466,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if removing the entry from the index fails
    */
-  public void delete(long entry) throws IOException {
+  public synchronized void delete(long entry) throws IOException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
 
     idx.seek(startOfEntry + bytesPerId);
@@ -492,7 +496,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if removing the entry from the index fails
    */
-  public void delete(long entry, Language language)
+  public synchronized void delete(long entry, Language language)
       throws IOException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
 
@@ -546,7 +550,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public void clear() throws IOException {
+  public synchronized void clear() throws IOException {
     init(bytesPerId, languagesPerSlot);
   }
 
@@ -561,7 +565,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public Language[] get(long entry) throws IOException,
+  public synchronized Language[] get(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     idx.seek(startOfEntry);
@@ -590,7 +594,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public boolean hasLanguage(long entry, Language language)
+  public synchronized boolean hasLanguage(long entry, Language language)
       throws IOException, EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     idx.seek(startOfEntry);
@@ -617,7 +621,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public boolean hasLanguage(long entry) throws IOException,
+  public synchronized boolean hasLanguage(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     try {
@@ -685,7 +689,7 @@ public class LanguageIndex implements VersionedContentRepositoryIndex {
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public void resize(int newBytesPerId, int newLanguagesPerSlot)
+  public synchronized void resize(int newBytesPerId, int newLanguagesPerSlot)
       throws IOException {
     if (this.bytesPerId > newBytesPerId && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of bytes per id when there are entries in the index");

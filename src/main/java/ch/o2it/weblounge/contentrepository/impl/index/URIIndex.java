@@ -50,6 +50,10 @@ import java.io.RandomAccessFile;
  * |------------------------------------------
  * | a-b-c-d | /etc/weblounge
  * </pre>
+ * 
+ * <p>
+ * Note that the current implementation is <b>not thread-safe</b> due to the
+ * use of a single instance of the {@link RandomAccessFile}.
  */
 public class URIIndex implements VersionedContentRepositoryIndex {
 
@@ -58,7 +62,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
 
   /** Name for the uri index file */
   public static final String URI_IDX_NAME = "uri.idx";
-
+  
   /** Start of the index's header */
   protected static final long IDX_START_OF_HEADER = 0;
 
@@ -83,7 +87,6 @@ public class URIIndex implements VersionedContentRepositoryIndex {
   /** Start of the index's body */
   protected static final long IDX_START_OF_CONTENT = IDX_HEADER_ENTRIES + 8;
 
-  
   /** Default number of bytes used per id */
   private static final int DEFAULT_BYTES_PER_ID = 36;
 
@@ -258,7 +261,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public long size() {
+  public synchronized long size() {
     return IDX_START_OF_CONTENT + (slots * bytesPerSlot);
   }
 
@@ -267,7 +270,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public long getSlots() {
+  public synchronized long getSlots() {
     return slots;
   }
 
@@ -276,7 +279,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of bytes per entry
    */
-  public int getEntrySize() {
+  public synchronized int getEntrySize() {
     return bytesPerSlot;
   }
 
@@ -285,7 +288,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public long getEntries() {
+  public synchronized long getEntries() {
     return entries;
   }
 
@@ -295,7 +298,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public float getLoadFactor() {
+  public synchronized float getLoadFactor() {
     return (float)entries / (float)slots;
   }
 
@@ -312,7 +315,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public long add(String id, String type, String path)
+  public synchronized long add(String id, String type, String path)
       throws IOException {
     if (id == null)
       throw new IllegalArgumentException("Id cannot be null");
@@ -407,7 +410,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if removing the entry from the index fails
    */
-  public void delete(long entry) throws IOException {
+  public synchronized void delete(long entry) throws IOException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
 
     // Remove the entry by writing a '\n' to the first byte
@@ -435,7 +438,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if updating the path in the index fails
    */
-  public void update(long entry, String type, String path)
+  public synchronized void update(long entry, String type, String path)
       throws IOException {
     if (type == null)
       throw new IllegalArgumentException("Type cannot be null");
@@ -489,7 +492,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public void clear() throws IOException {
+  public synchronized void clear() throws IOException {
     init(bytesPerId, bytesPerType, bytesPerPath);
   }
 
@@ -506,7 +509,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public String getId(long entry) throws IOException, EOFException {
+  public synchronized String getId(long entry) throws IOException, EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     idx.seek(startOfEntry);
     byte[] bytes = new byte[bytesPerId];
@@ -527,7 +530,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public String getType(long entry) throws IOException,
+  public synchronized String getType(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     idx.seek(startOfEntry);
@@ -556,7 +559,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public String getPath(long entry) throws IOException,
+  public synchronized String getPath(long entry) throws IOException,
       EOFException {
     long startOfEntry = IDX_START_OF_CONTENT + (entry * bytesPerSlot);
     idx.seek(startOfEntry);
@@ -634,7 +637,7 @@ public class URIIndex implements VersionedContentRepositoryIndex {
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public int resize(int newBytesPerId, int newBytesPerType, int newBytesPerPath)
+  public synchronized int resize(int newBytesPerId, int newBytesPerType, int newBytesPerPath)
       throws IOException {
     if (this.bytesPerId > newBytesPerId && this.entries > 0)
       throw new IllegalStateException("Cannot reduce the number of bytes per id when there are entries in the index");

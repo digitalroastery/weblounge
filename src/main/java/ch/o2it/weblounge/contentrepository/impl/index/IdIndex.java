@@ -55,6 +55,9 @@ import java.io.RandomAccessFile;
  * bytes) followed by the number of addresses per slot (4 bytes), the number of
  * entries currently in the index and then the slots containing the indicated
  * number of 64-bit addresses (8 bytes).
+ * <p>
+ * Note that the current implementation is <b>not thread-safe</b> due to the
+ * use of a single instance of the {@link RandomAccessFile}.
  */
 public class IdIndex implements VersionedContentRepositoryIndex {
 
@@ -82,7 +85,6 @@ public class IdIndex implements VersionedContentRepositoryIndex {
   /** Start of the index's body */
   protected static final long IDX_START_OF_CONTENT = IDX_HEADER_ENTRIES + 8;
 
-  
   /** Default number of slots in index */
   private static final int DEFAULT_SLOTS = 128;
 
@@ -221,7 +223,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the index size
    */
-  public long size() {
+  public synchronized long size() {
     return IDX_START_OF_CONTENT + (slots * slotSizeInBytes);
   }
 
@@ -230,7 +232,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of slots
    */
-  public long getSlots() {
+  public synchronized long getSlots() {
     return slots;
   }
 
@@ -239,7 +241,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries per slot
    */
-  public int getEntriesPerSlot() {
+  public synchronized int getEntriesPerSlot() {
     return entriesPerSlot;
   }
 
@@ -248,7 +250,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the number of entries
    */
-  public long getEntries() {
+  public synchronized long getEntries() {
     return entries;
   }
 
@@ -258,7 +260,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * 
    * @return the load factor
    */
-  public float getLoadFactor() {
+  public synchronized float getLoadFactor() {
     return (float)entries / (float)(slots * entriesPerSlot);
   }
 
@@ -272,7 +274,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public void set(long addressOfId, String id) throws IOException {
+  public synchronized void set(long addressOfId, String id) throws IOException {
     long slot = findSlot(id);
     long startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
 
@@ -321,7 +323,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * @throws IllegalStateException
    *           if the id is not part of the index
    */
-  public void delete(long addressOfId, String id)
+  public synchronized void delete(long addressOfId, String id)
       throws IOException {
 
     // Move to the beginning of the slot
@@ -367,7 +369,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if writing to the index fails
    */
-  public void clear() throws IOException {
+  public synchronized void clear() throws IOException {
     init(slots, entriesPerSlot);
   }
 
@@ -399,7 +401,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    * @throws IOException
    *           if reading from the index fails
    */
-  public long[] locate(String id) throws IOException {
+  public synchronized long[] locate(String id) throws IOException {
     long slot = findSlot(id);
     long startOfSlot = IDX_START_OF_CONTENT + (slot * slotSizeInBytes);
     idx.seek(startOfSlot);
@@ -472,7 +474,7 @@ public class IdIndex implements VersionedContentRepositoryIndex {
    *           if the index is read only or if the user tries to resize the
    *           number of slots while there are already entries in the index
    */
-  public void resize(long slots, int entriesPerSlot)
+  public synchronized void resize(long slots, int entriesPerSlot)
       throws IOException {
     if (slots != this.slots && this.entries > 0)
       throw new IllegalStateException("Cannot resize the number of slots when there are entries in the index");
