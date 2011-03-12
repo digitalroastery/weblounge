@@ -1125,9 +1125,11 @@ public class SiteImpl implements Site {
           Module m = ModuleImpl.fromXml(moduleNode);
           logger.debug("Module '{}' loaded for site '{}'", m, this);
           addModule(m);
-        } catch (Exception t) {
+        } catch (Throwable t) {
           logger.error("Error loading module '{}' of site {}", moduleId, identifier);
-          throw t;
+          if (t instanceof Exception)
+            throw (Exception)t;
+          throw new Exception(t);
         }
       }
     } else {
