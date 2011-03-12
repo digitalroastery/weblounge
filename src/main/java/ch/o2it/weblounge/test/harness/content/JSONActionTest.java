@@ -22,6 +22,7 @@ package ch.o2it.weblounge.test.harness.content;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;
@@ -93,9 +94,9 @@ public class JSONActionTest extends IntegrationTestBase {
       logger.debug("Sending request to {}", request.getURI());
       HttpClient httpClient = new DefaultHttpClient();
       try {
-        HttpResponse response = TestSiteUtils.request(httpClient, request, params);
+        HttpResponse response = TestUtils.request(httpClient, request, params);
         Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        JSONObject json = TestSiteUtils.parseJSONResponse(response);
+        JSONObject json = TestUtils.parseJSONResponse(response);
         Assert.assertEquals(greeting, json.getJSONObject("greetings").getString(language));    
       } finally {
         httpClient.getConnectionManager().shutdown();

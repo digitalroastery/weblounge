@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -116,11 +117,11 @@ public class HTMLActionTest extends IntegrationTestBase {
         logger.debug("Sending request to {}", request.getURI());
         HttpClient httpClient = new DefaultHttpClient();
         try {
-          HttpResponse response = TestSiteUtils.request(httpClient, request, params);
+          HttpResponse response = TestUtils.request(httpClient, request, params);
           assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 
           // Get the document contents
-          Document xml = TestSiteUtils.parseXMLResponse(response);
+          Document xml = TestUtils.parseXMLResponse(response);
 
           // Look for page content output
           String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");
@@ -178,11 +179,11 @@ public class HTMLActionTest extends IntegrationTestBase {
     logger.info("Sending request to {}", request.getURI());
     HttpClient httpClient = new DefaultHttpClient();
     try {
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 
       // Get the document contents
-      Document xml = TestSiteUtils.parseXMLResponse(response);
+      Document xml = TestUtils.parseXMLResponse(response);
 
       // Make sure it is rendered on the home page
       String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");
@@ -216,11 +217,11 @@ public class HTMLActionTest extends IntegrationTestBase {
     logger.info("Sending request to {}", request.getURI());
     HttpClient httpClient = new DefaultHttpClient();
     try {
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 
       // Get the document contents
-      Document xml = TestSiteUtils.parseXMLResponse(response);
+      Document xml = TestUtils.parseXMLResponse(response);
 
       // Make sure it is rendered on the home page
       String testSuiteTitle = XPathHelper.valueOf(xml, "/html/body/h1");

@@ -27,8 +27,8 @@ import static org.junit.Assert.assertTrue;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -106,7 +106,7 @@ public class CacheTest extends IntegrationTestBase {
     logger.debug("Sending request to {}", request.getURI());
     HttpClient httpClient = new DefaultHttpClient();
     try {
-      HttpResponse response = TestSiteUtils.request(httpClient, request, params);
+      HttpResponse response = TestUtils.request(httpClient, request, params);
       int statusCode = response.getStatusLine().getStatusCode();
       boolean okOrNotModified = statusCode == HttpServletResponse.SC_OK || statusCode == HttpServletResponse.SC_NOT_MODIFIED;
       assertTrue(okOrNotModified);
@@ -128,7 +128,7 @@ public class CacheTest extends IntegrationTestBase {
       request.setHeader("If-None-Match", eTag);
       request.setHeader("If-Modified-Since", df.format(System.currentTimeMillis()));
       
-      response = TestSiteUtils.request(httpClient, request, params);
+      response = TestUtils.request(httpClient, request, params);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
 
       // Get the Expires header

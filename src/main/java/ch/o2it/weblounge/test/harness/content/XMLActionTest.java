@@ -22,6 +22,7 @@ package ch.o2it.weblounge.test.harness.content;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.test.util.TestSiteUtils;
 
@@ -94,9 +95,9 @@ public class XMLActionTest extends IntegrationTestBase {
       logger.debug("Sending request to {}", request.getURI());
       HttpClient httpClient = new DefaultHttpClient();
       try {
-        HttpResponse response = TestSiteUtils.request(httpClient, request, params);
+        HttpResponse response = TestUtils.request(httpClient, request, params);
         Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        Document xml = TestSiteUtils.parseXMLResponse(response);
+        Document xml = TestUtils.parseXMLResponse(response);
         String xpath = "/greetings/greeting[@language=\"" + language + "\"]/text()";
         Assert.assertEquals(greeting, XPathHelper.valueOf(xml, xpath));    
       } finally {

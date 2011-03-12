@@ -26,8 +26,8 @@ import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -89,13 +89,13 @@ public class JavaServerPagesTest extends IntegrationTestBase {
     // Send and the request and examine the response
     HttpClient httpClient = new DefaultHttpClient();
     try {
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       String contentType = response.getEntity().getContentType().getValue();
       assertEquals(CONTENT_TYPE_HTML, contentType.split(";")[0]);
 
       // Test template contents
-      Document xml = TestSiteUtils.parseXMLResponse(response);
+      Document xml = TestUtils.parseXMLResponse(response);
       String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");
       assertNotNull("General template output does not work", templateOutput);
       assertEquals("Template title is not as expected", "Weblounge Test Site", templateOutput);

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNull;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -92,7 +92,7 @@ public class StaticResourcesTest extends IntegrationTestBase {
       HttpGet request = new HttpGet(requestUrl);
 
       logger.info("Sending request to {}", requestUrl);
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       String contentType = response.getEntity().getContentType().getValue();
       assertEquals(CONTENT_TYPE_IMAGE, contentType.split(";")[0]);
@@ -116,7 +116,7 @@ public class StaticResourcesTest extends IntegrationTestBase {
       request.addHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", requestUrl);
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {

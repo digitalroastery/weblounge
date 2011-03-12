@@ -32,8 +32,8 @@ import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
@@ -442,7 +442,7 @@ public class ImagesTest extends IntegrationTestBase {
     HttpClient httpClient = new DefaultHttpClient();
     String eTagValue = null;
     try {
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -470,7 +470,7 @@ public class ImagesTest extends IntegrationTestBase {
       request.setHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
@@ -489,7 +489,7 @@ public class ImagesTest extends IntegrationTestBase {
     String eTagValue = null;
     try {
       logger.info("Requesting original German image at {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -517,7 +517,7 @@ public class ImagesTest extends IntegrationTestBase {
       request.setHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
@@ -539,7 +539,7 @@ public class ImagesTest extends IntegrationTestBase {
     String eTagValue = null;
     try {
       logger.info("Requesting scaled English image '{}' at {}", style.getIdentifier(), request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("Response did not contain any content", response.getEntity().getContentLength() > 0);
 
@@ -583,7 +583,7 @@ public class ImagesTest extends IntegrationTestBase {
       request.setHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
@@ -605,7 +605,7 @@ public class ImagesTest extends IntegrationTestBase {
     String eTagValue = null;
     try {
       logger.info("Requesting scaled German image '{}' at {}", style.getIdentifier(), request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("Response did not contain any content", response.getEntity().getContentLength() > 0);
 
@@ -649,7 +649,7 @@ public class ImagesTest extends IntegrationTestBase {
       request.setHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {

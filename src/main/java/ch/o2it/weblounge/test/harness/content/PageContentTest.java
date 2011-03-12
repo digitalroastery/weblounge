@@ -27,9 +27,9 @@ import static org.junit.Assert.assertNull;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -113,11 +113,11 @@ public class PageContentTest extends IntegrationTestBase {
       logger.debug("Sending request to {}", request.getURI());
       HttpClient httpClient = new DefaultHttpClient();
       try {
-        HttpResponse response = TestSiteUtils.request(httpClient, request, params);
+        HttpResponse response = TestUtils.request(httpClient, request, params);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
 
         // Get the document contents
-        Document xml = TestSiteUtils.parseXMLResponse(response);
+        Document xml = TestUtils.parseXMLResponse(response);
 
         // Test template output
         String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");

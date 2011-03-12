@@ -22,7 +22,7 @@ package ch.o2it.weblounge.test.harness.content;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -82,7 +82,7 @@ public class ProtectedStaticResourcesTest extends IntegrationTestBase {
       HttpGet request = new HttpGet(requestUrl);
       try {
         logger.info("Testing loading of the protected resource {}", resource);
-        HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+        HttpResponse response = TestUtils.request(httpClient, request, null);
         Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatusLine().getStatusCode());
       } finally {
         httpClient.getConnectionManager().shutdown();

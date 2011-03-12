@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -128,7 +128,7 @@ public class FilesTest extends IntegrationTestBase {
     String eTagValue = null;
     try {
       logger.info("Requesting original document from {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -156,7 +156,7 @@ public class FilesTest extends IntegrationTestBase {
       request.addHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", url);
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
@@ -183,7 +183,7 @@ public class FilesTest extends IntegrationTestBase {
     String eTagValue = null;
     try {
       logger.info("Requesting German document version from {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -211,7 +211,7 @@ public class FilesTest extends IntegrationTestBase {
       request.setHeader("Accept-Language", "de");
 
       logger.info("Sending 'If-None-Match' request to {}", url);
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
@@ -243,7 +243,7 @@ public class FilesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     try {
       logger.info("Requesting German document version from {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -276,7 +276,7 @@ public class FilesTest extends IntegrationTestBase {
     String eTagValue = null;
     try {
       logger.info("Requesting English document from {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -303,7 +303,7 @@ public class FilesTest extends IntegrationTestBase {
       request.addHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", englishUrl);
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
@@ -316,7 +316,7 @@ public class FilesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     try {
       logger.info("Requesting German document from {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -343,7 +343,7 @@ public class FilesTest extends IntegrationTestBase {
       request.addHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", germanUrl);
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
@@ -373,7 +373,7 @@ public class FilesTest extends IntegrationTestBase {
     String eTagValue = null;
     try {
       logger.info("Requesting English document from {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -400,7 +400,7 @@ public class FilesTest extends IntegrationTestBase {
       request.addHeader("If-None-Match", eTagValue);
 
       logger.info("Sending 'If-None-Match' request to {}", englishUrl);
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {
@@ -414,7 +414,7 @@ public class FilesTest extends IntegrationTestBase {
     httpClient = new DefaultHttpClient();
     try {
       logger.info("Requesting German document from {}", request.getURI());
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       assertTrue("No content received", response.getEntity().getContentLength() > 0);
 
@@ -442,7 +442,7 @@ public class FilesTest extends IntegrationTestBase {
       request.setHeader("Accept-Language", "de");
 
       logger.info("Sending 'If-None-Match' request to {}", germanUrl);
-      HttpResponse response = TestSiteUtils.request(httpClient, request, null);
+      HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatusLine().getStatusCode());
       assertNull(response.getEntity());
     } finally {

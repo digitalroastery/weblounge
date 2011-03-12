@@ -80,24 +80,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>4.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpmime</artifactId>
-      <version>4.0</version>
-    </dependency>
-
-    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
@@ -146,8 +128,10 @@
               ch.o2it.weblounge.common.content;version=${project.version},
               ch.o2it.weblounge.common.request;version=${project.version},
               ch.o2it.weblounge.common.scheduler;version=${project.version},
+              ch.o2it.weblounge.common.security;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.url;version=${project.version},
+              ch.o2it.weblounge.common.user;version=${project.version},
               ch.o2it.weblounge.common.impl.content;version=${project.version},
               ch.o2it.weblounge.common.impl.request;version=${project.version},
               ch.o2it.weblounge.common.impl.scheduler;version=${project.version},

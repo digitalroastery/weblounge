@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
+import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -87,7 +87,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
     logger.debug("Sending empty get request to {}", searchRequest.getURI());
     HttpClient httpClient = new DefaultHttpClient();
     try {
-      HttpResponse response = TestSiteUtils.request(httpClient, searchRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, searchRequest, null);
       assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatusLine().getStatusCode());
       assertEquals(0, response.getEntity().getContentLength());
     } finally {
@@ -100,9 +100,9 @@ public class SearchEndpointTest extends IntegrationTestBase {
     searchRequest = new HttpGet(UrlUtils.concat(requestUrl, searchTerms));
     logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
     try {
-      HttpResponse response = TestSiteUtils.request(httpClient, searchRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, searchRequest, null);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      Document xml = TestSiteUtils.parseXMLResponse(response);
+      Document xml = TestUtils.parseXMLResponse(response);
       assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@documents"));
       assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@hits"));
       assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@offset"));
@@ -120,9 +120,9 @@ public class SearchEndpointTest extends IntegrationTestBase {
     String[][] params = new String[][] {{"limit", "5"}};
     logger.info("Sending search request for '{}' to {}", searchTerms, requestUrl);
     try {
-      HttpResponse response = TestSiteUtils.request(httpClient, searchRequest, params);
+      HttpResponse response = TestUtils.request(httpClient, searchRequest, params);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      Document xml = TestSiteUtils.parseXMLResponse(response);
+      Document xml = TestUtils.parseXMLResponse(response);
       assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@documents"));
       assertEquals("1", XPathHelper.valueOf(xml, "/searchresult/@hits"));
       assertEquals("0", XPathHelper.valueOf(xml, "/searchresult/@offset"));
