@@ -158,6 +158,11 @@
               javax.xml.transform.stream,
               org.apache.commons.io;version="1.4",
               org.apache.commons.lang;version="2.4",
+              org.apache.http,
+              org.apache.http.client,
+              org.apache.http.client.entity,
+              org.apache.http.client.methods,
+              org.apache.http.impl.client,
               org.slf4j;version="1.5.6",
               org.w3c.dom,
               org.osgi.framework;version="1.4.0",
@@ -165,15 +170,11 @@
               *;resolution:=optional
             </Import-Package>
             <Private-Package>
-              org.apache.commons.*,
               org.json.*,
               ch.o2it.weblounge.test.harness.*,
               ch.o2it.weblounge.test.util
             </Private-Package>
             <Embed-Dependency>
-              httpclient,
-              httpcore,
-              httpmime,
               json,
               junit,
               com.springsource.javax.media.jai.core,
