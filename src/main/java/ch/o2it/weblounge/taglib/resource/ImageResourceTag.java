@@ -21,11 +21,14 @@
 package ch.o2it.weblounge.taglib.resource;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
+import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleUtils;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
@@ -37,6 +40,10 @@ import ch.o2it.weblounge.taglib.WebloungeTag;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.servlet.jsp.JspException;
 
@@ -61,6 +68,12 @@ public class ImageResourceTag extends WebloungeTag {
   /** The image path */
   private String imagePath = null;
 
+  /** The image subjects */
+  private List<String> imageSubjects = null;
+
+  /** The alternative image identifier */
+  private String altImageId = null;
+
   /** The image style */
   private String imageStyle = null;
 
@@ -83,6 +96,32 @@ public class ImageResourceTag extends WebloungeTag {
    */
   public void setPath(String path) {
     imagePath = path;
+  }
+
+  /**
+   * Sets the image subjects. If neither path nor uuid have been defined, a
+   * repository search with the given subjects is done.
+   * 
+   * @param subjects
+   *          image subjects
+   */
+  public void setSubjects(String subjects) {
+    if (imageSubjects == null)
+      imageSubjects = new ArrayList<String>();
+    StringTokenizer st = new StringTokenizer(subjects, ",;");
+    while (st.hasMoreTokens()) {
+      imageSubjects.add(st.nextToken());
+    }
+  }
+
+  /**
+   * Sets the image identifier of the alternative image.
+   * 
+   * @param altImage
+   *          image identifier
+   */
+  public void setAltimage(String altImage) {
+    altImageId = altImage;
   }
 
   /**
@@ -113,16 +152,33 @@ public class ImageResourceTag extends WebloungeTag {
 
     // Create the image uri, either from the id or the path. If none is
     // specified, and we are not in jsp compilation mode, issue a warning
-    ResourceURI uri = null;    
+    ResourceURI uri = null;
     if (StringUtils.isNotBlank(imageId)) {
       uri = new ImageResourceURIImpl(site, null, imageId);
     } else if (StringUtils.isNotBlank(imagePath)) {
       uri = new ImageResourceURIImpl(site, imagePath, null);
-    } else {
-      logger.debug("Neither uuid nor path were specified for image");
-      return SKIP_BODY;
+    } else if (imageSubjects.size() > 0) {
+      SearchQuery query = new SearchQueryImpl(site);
+      query.withType(ImageResource.TYPE);
+      for (int i = 0; i < imageSubjects.size(); i++)
+        query.withSubject(imageSubjects.get(i));
+      SearchResult result;
+      try {
+        result = repository.find(query);
+      } catch (ContentRepositoryException e) {
+        logger.warn("Error searching for image with given subjects.");
+        return SKIP_BODY;
+      }
+      if (result.getHitCount() > 1)
+        logger.info("Search returned {} images. Will take no. 1 for further processing.", result.getHitCount());
+      if (result.getHitCount() > 0)
+        uri = new ImageResourceURIImpl(site, null, result.getItems()[0].getId());
     }
-      
+    if (uri == null) {
+      // no image found, try to load alternative image
+      uri = new ImageResourceURIImpl(site, null, altImageId);
+    }
+
     // Try to load the image from the content repository
     try {
       if (!repository.exists(uri)) {
@@ -155,7 +211,7 @@ public class ImageResourceTag extends WebloungeTag {
       logger.warn("Error trying to load image " + uri + ": " + e.getMessage(), e);
       return SKIP_BODY;
     }
-    
+
     // Find the image style
     if (StringUtils.isNotBlank(imageStyle)) {
       style = ImageStyleUtils.findStyle(imageStyle, site);

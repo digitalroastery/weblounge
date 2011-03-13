@@ -6,9 +6,9 @@
     
   <description>Tag library providing access to Weblounge resources</description>
   <display-name>Weblounge Resource Tags</display-name>
-	<tlib-version>3.0</tlib-version>
-	<short-name>weblr</short-name>
-	<uri>http://o2it.ch/weblounge/3.0/resources</uri>
+  <tlib-version>3.0</tlib-version>
+  <short-name>weblr</short-name>
+  <uri>http://o2it.ch/weblounge/3.0/resources</uri>
   
   <tag>
     <description>Loads a page</description>
@@ -21,16 +21,16 @@
     <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
   </tag>
   
-	<tag>
-		<description>Loads a file resource</description>
-		<display-name>File Resource Tag</display-name>
-		<name>file</name>
-		<tag-class>ch.o2it.weblounge.taglib.resource.FileResourceTag</tag-class>
-		<tei-class>ch.o2it.weblounge.taglib.resource.FileResourceTagExtraInfo</tei-class>
-		<body-content>JSP</body-content>
-		<attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-	</tag>
+  <tag>
+    <description>Loads a file resource</description>
+    <display-name>File Resource Tag</display-name>
+    <name>file</name>
+    <tag-class>ch.o2it.weblounge.taglib.resource.FileResourceTag</tag-class>
+    <tei-class>ch.o2it.weblounge.taglib.resource.FileResourceTagExtraInfo</tei-class>
+    <body-content>JSP</body-content>
+    <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+  </tag>
 
   <tag>
     <description>Load an image resource</description>
@@ -41,7 +41,8 @@
     <body-content>JSP</body-content>
     <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>subjects</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
+    <attribute><name>altimage</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>imagestyle</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
   </tag>
-	
 </taglib>
