@@ -54,7 +54,7 @@ public final class FilesEndpointDocs {
     docs.setTitle("Weblounge Files");
 
     // GET /?path=
-    Endpoint getFileByPathEndpoint = new Endpoint("/{resource}", Method.GET, "getfile");
+    Endpoint getFileByPathEndpoint = new Endpoint("/", Method.GET, "getfile");
     getFileByPathEndpoint.setDescription("Returns the file that is located at the given path");
     getFileByPathEndpoint.addFormat(Format.xml());
     getFileByPathEndpoint.addStatus(ok("the file was found and is returned as part of the response"));
