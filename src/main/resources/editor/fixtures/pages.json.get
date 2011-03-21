@@ -1,0 +1,56 @@
+{
+   "id":"7d5d150e-b233-49ad-918b-494848f7ae1c",
+   "path":"/spielbetrieb/",
+   "version":"live",
+   "template":"default",
+   "layout":"default",
+   "index":true,
+   "title":{
+      "de":"Spielbetrieb",
+      "fr":"Matches",
+      "it":"Campionato"
+   },
+   "subjects":[
+      "Spielbetrieb",
+      "hnla",
+      "dnla",
+      "sml"
+   ],
+   "composers":{
+      "navigation":[
+         {
+            "module":"text",
+            "type":"title",
+            "locales":{
+               "de":[
+                  {
+                     "id":"title",
+                     "value":"Hallo Welt!"
+                  },
+                  {
+                     "id":"greeting",
+                     "value":"Ich heisse Hans."
+                  }
+               ],
+               "fr":[
+                  {
+                     "id":"title",
+                     "value":"Bonjour tout le monde!"
+                  },
+                  {
+                     "id":"greeting",
+                     "value":"Je m'apelle Jean."
+                  }
+               ]
+            },
+            "properties":{
+               "big":true,
+               "color":"#fcfcfc"
+            }
+         }
+      ],
+      "main":{
+
+      }
+   }
+}
