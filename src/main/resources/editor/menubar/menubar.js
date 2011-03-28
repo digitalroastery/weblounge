@@ -1,20 +1,24 @@
 steal.plugins(
-	'jquery/controller', 
-	'jquery/controller/view',
-	'jquery/view', 
-	'jquery/view/tmpl')
-	.views('//editor/menubar/views/menubar.tmpl').css('menubar').then(function($) {
+'jquery/controller',
+'jquery/controller/view',
+'jquery/view',
+'jquery/view/tmpl')
+.views('//editor/menubar/views/menubar.tmpl').css('menubar').then(function($) {
 
-  $.Controller("Editor.Menubar",
+    $.Controller("Editor.Menubar",
 
-  /* @prototype */
-  {
-    /**
+    /* @prototype */
+    {
+        /**
      * Initialize a new MenuBar controller.
      */
-    init: function(el) {
-      $(el).html('//editor/menubar/views/menubar.tmpl', {});
-    }
-  });
+        init: function(el) {
+            $(el).html('//editor/menubar/views/menubar.tmpl', {});
+        },
+
+		".uploader click": function(el, ev) {
+			$(this.element).trigger('startuploader');
+		}
+    });
 
 });

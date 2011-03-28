@@ -1,0 +1,16 @@
+steal.plugins(
+	"jqueryui/effects/blind",
+	"jqueryui/effects/bounce",
+	"jqueryui/effects/blind",
+	"jqueryui/effects/clip",
+	"jqueryui/effects/drop",
+	"jqueryui/effects/explode",
+	"jqueryui/effects/fade",
+	"jqueryui/effects/fold",
+	"jqueryui/effects/highlight",
+	"jqueryui/effects/pulsate",
+	"jqueryui/effects/scale",
+	"jqueryui/effects/shake",
+	"jqueryui/effects/slide",
+	"jqueryui/effects/transfer"
+)

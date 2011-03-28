@@ -1,18 +1,21 @@
-steal.plugins(	
-	'jquery/controller',			// a widget factory
-	'jquery/controller/subscribe',	// subscribe to OpenAjax.hub
-	'jquery/view/ejs',				// client side templates
-	'jquery/controller/view',		// lookup views with the controller's name
-	'jquery/model',					// Ajax wrappers
-	'jquery/dom/fixture',			// simulated Ajax requests
-	'jquery/dom/form_params')		// form data helper
+steal.plugins('jquery/view/tmpl', 'editor/menubar', 'editor/massuploader')
+.then(function($) {
+
+$(document).ready(function() {
 	
-	.css('editor')	// loads styles
+	// Append the Weblor skeleton at the end of the page body
+	$(document.body).append('//editor/views/app', {});
+	
+	$('#weblor .menubar').editor_menubar();
+	
+	var uploader = $('#weblor .massuploader').editor_massuploader();
+	
+	$('#weblor .menubar').bind('startuploader', function() {
+		uploader.myshow();
+	});
+	
+	
+});
 
-	.resources()					// 3rd party script's (like jQueryUI), in resources folder
 
-	.models()						// loads files in models folder 
-
-	.controllers()					// loads files in controllers folder
-
-	.views();						// adds views to be added to build
+});
