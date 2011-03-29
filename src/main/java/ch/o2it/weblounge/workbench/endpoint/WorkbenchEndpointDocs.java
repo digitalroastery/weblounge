@@ -37,6 +37,10 @@ import ch.o2it.weblounge.common.impl.util.doc.TestForm;
  */
 public final class WorkbenchEndpointDocs {
 
+  private static final Format XML = new Format("xml", null, null);
+
+  private static final Format JSON = new Format("json", null, "http://www.json.org/");
+
   /**
    * Creates the documentation.
    * 
@@ -48,23 +52,46 @@ public final class WorkbenchEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "workbench");
     docs.setTitle("Weblounge Workbench");
 
+    // GET /page/{page}/head
+    Endpoint getPageHead = new Endpoint("/page/{page}/head", Method.GET, "getpagehead");
+    getPageHead.setDescription("Returns the head for the given page");
+    getPageHead.addFormat(JSON);
+    getPageHead.addStatus(ok("the page head was found and it's returned"));
+    getPageHead.addStatus(notFound("the page head was not found"));
+    getPageHead.addStatus(serviceUnavailable("the site is temporarily offline"));
+    getPageHead.addPathParameter(new Parameter("page", Parameter.Type.String, "The page uri"));
+    getPageHead.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getPageHead);
+
     // GET /edit/{page}/{composer}/{pageletindex}
-    Endpoint getImageMetadata = new Endpoint("/edit/{page}/{composer}/{pageletindex}", Method.GET, "getpageleteditor");
-    getImageMetadata.setDescription("Returns the editor for the given pagelet");
-    getImageMetadata.addFormat(new Format("xml", null, null));
-    getImageMetadata.addStatus(ok("the pagelet was found and it's editing information is returned"));
-    getImageMetadata.addStatus(notFound("the page, the composer or the pagelet were not found"));
-    getImageMetadata.addStatus(serviceUnavailable("the site is temporarily offline"));
-    getImageMetadata.addPathParameter(new Parameter("page", Parameter.Type.String, "The page uri"));
-    getImageMetadata.addPathParameter(new Parameter("composer", Parameter.Type.String, "The composer identifier"));
-    getImageMetadata.addPathParameter(new Parameter("pageletindex", Parameter.Type.String, "The pagelet's index within the composer (0 based)"));
-    getImageMetadata.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getImageMetadata);
+    Endpoint getPageletEditor = new Endpoint("/edit/{page}/{composer}/{pageletindex}", Method.GET, "getpageleteditor");
+    getPageletEditor.setDescription("Returns the editor for the given pagelet");
+    getPageletEditor.addFormat(XML);
+    getPageletEditor.addFormat(JSON);
+    getPageletEditor.addStatus(ok("the pagelet was found and it's editing information is returned"));
+    getPageletEditor.addStatus(notFound("the page, the composer or the pagelet were not found"));
+    getPageletEditor.addStatus(serviceUnavailable("the site is temporarily offline"));
+    getPageletEditor.addPathParameter(new Parameter("page", Parameter.Type.String, "The page uri"));
+    getPageletEditor.addPathParameter(new Parameter("composer", Parameter.Type.String, "The composer identifier"));
+    getPageletEditor.addPathParameter(new Parameter("pageletindex", Parameter.Type.String, "The pagelet's index within the composer (0 based)"));
+    getPageletEditor.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getPageletEditor);
+    
+    // GET /edit/{page}/{composer}/{pageletindex}
+    Endpoint getLanguages = new Endpoint("/languages}", Method.GET, "getlanguages");
+    getLanguages.setDescription("Returns the languages of the site");
+    getLanguages.addFormat(JSON);
+    getLanguages.addStatus(ok("the site was found and it's languages are returned"));
+    //getLanguages.addStatus(notFound("the page, the composer or the pagelet were not found"));
+    //getLanguages.addStatus(serviceUnavailable("the site is temporarily offline"));
+    getLanguages.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getLanguages);
 
     // GET /suggest/subjects/{hint}
     Endpoint suggestSubjects = new Endpoint("/suggest/subjects/{hint}", Method.GET, "suggestsubjects");
     suggestSubjects.setDescription("Returns suggestions for subjects based on the given hint");
-    suggestSubjects.addFormat(new Format("xml", null, null));
+    suggestSubjects.addFormat(XML);
+    suggestSubjects.addFormat(JSON);
     suggestSubjects.addStatus(ok("suggestions based on the hint are returned"));
     suggestSubjects.addStatus(serviceUnavailable("the site is temporarily offline"));
     suggestSubjects.addPathParameter(new Parameter("hint", Parameter.Type.String, "The hint on which suggestions are based"));
