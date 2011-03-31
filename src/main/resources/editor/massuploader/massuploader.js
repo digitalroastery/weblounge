@@ -1,4 +1,7 @@
-steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl', 'jqueryui/dialog').views('//editor/massuploader/views/file_queued.tmpl', '//editor/massuploader/views/file_edit.tmpl').resources('plupload.js', 'plupload.html5.js').then(function($) {
+steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl', 'jqueryui/dialog')
+.views('//editor/massuploader/views/file_queued.tmpl', '//editor/massuploader/views/file_edit.tmpl')
+.css('massuploader')
+.resources('plupload.js', 'plupload.html5.js').then(function($) {
 
   $.Controller("Editor.Massuploader",
   /* @static */
@@ -26,7 +29,7 @@ steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl', 'jqueryui/
 	        browse_button: 'filebrowser',
 	        container: 'massuploader',
 	        max_file_size: this.options.max_file_size,
-	        url: 'http://web:8080/system/weblounge/workbench/files',
+	        url: 'http://web:8080/system/weblounge/workbench/files/add',
 	        resize: this.options.resize
 	      });
 

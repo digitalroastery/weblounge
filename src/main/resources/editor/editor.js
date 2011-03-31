@@ -1,4 +1,5 @@
 steal.plugins('jquery/view/tmpl', 'editor/menubar', 'editor/massuploader')
+.css('editor')
 .then(function($) {
 
 $(document).ready(function() {
@@ -7,12 +8,6 @@ $(document).ready(function() {
 	$(document.body).append('//editor/views/app', {});
 	
 	$('#weblor .menubar').editor_menubar();
-	
-	var uploader = $('#weblor .massuploader').editor_massuploader();
-	
-	$('#weblor .menubar').bind('startuploader', function() {
-		uploader.myshow();
-	});
 	
 	
 });
