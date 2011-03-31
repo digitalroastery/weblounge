@@ -25,14 +25,18 @@ import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.file.FileContent;
+import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.content.repository.WritableContentRepository;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
+import ch.o2it.weblounge.common.impl.content.file.FileContentImpl;
+import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
@@ -43,6 +47,9 @@ import ch.o2it.weblounge.workbench.WorkbenchService;
 import ch.o2it.weblounge.workbench.suggest.SubjectSuggestion;
 import ch.o2it.weblounge.workbench.suggest.SuggestionList;
 
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
@@ -54,6 +61,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,24 +141,41 @@ public class WorkbenchEndpoint {
     // Return the page header
     return Response.ok(pageJSON.toJSONString()).build();
   }
-  
+
   @SuppressWarnings("unchecked")
   @GET
   @Path("/languages")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getLanguages(@Context HttpServletRequest request,
-      @PathParam("pageid") String pageId) {
+  public Response getLanguages(@Context HttpServletRequest request) {
     Site site = getSite(request);
-    
+
     JSONArray langs = new JSONArray();
     for (Language lang : site.getLanguages()) {
       JSONObject l = new JSONObject();
       l.put("id", lang.getIdentifier());
-      //l.put("locale", lang.getLocale());
+      // l.put("locale", lang.getLocale());
       l.put("name", lang.getDescription(lang));
       langs.add(l);
     }
-    
+
+    return Response.ok(langs.toJSONString()).build();
+  }
+  
+  @GET
+  @Path("/templates")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getTemplates(@Context HttpServletRequest request) {
+    Site site = getSite(request);
+
+    JSONArray langs = new JSONArray();
+    for (PageTemplate template : site.getTemplates()) {
+      JSONObject l = new JSONObject();
+      l.put("id", template.getIdentifier());
+      // l.put("locale", lang.getLocale());
+      l.put("name", template.getName());
+      langs.add(l);
+    }
+
     return Response.ok(langs.toJSONString()).build();
   }
 
@@ -270,19 +296,64 @@ public class WorkbenchEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }
-  
+
   @POST
-  @Path("/files")
+  @Path("/files/add")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response createFile(@Context HttpServletRequest request) {
+  public Response addFile(@Context HttpServletRequest request) {
     
+    List<Resource> addedFiles = new ArrayList<Resource>();
+
     if (ServletFileUpload.isMultipartContent(request)) {
-      // for the moment, just return the dummy response
+      // Create a new file upload handler
+      ServletFileUpload upload = new ServletFileUpload();
+
+      // Parse the request
+      FileItemIterator iter;
+      try {
+        iter = upload.getItemIterator(request);
+        while (iter.hasNext()) {
+          FileItemStream item = iter.next();
+          String name = item.getFieldName();
+          InputStream stream = item.openStream();
+          if (!item.isFormField()) {
+            addedFiles.add(addNewFileToRepo(getSite(request), name, stream));
+          }
+        }
+      } catch (FileUploadException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     } else {
       return Response.status(Status.BAD_REQUEST).build();
     }
-    
+
     return Response.ok("{\"id\":\"153354-asdf543-as5-a5s3-\"}").build();
+  }
+
+  private Resource addNewFileToRepo(Site site, String filename, InputStream stream) {
+    ResourceURI fileUri = new ResourceURIImpl(FileResource.TYPE, site, "/my/path/to/the/file/"+filename.hashCode());
+    Resource res = new FileResourceImpl(fileUri);
+    ResourceContent content = new FileContentImpl(filename, site.getDefaultLanguage(), "application/pdf");
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+    res.addContent(content);
+    try {
+      contentRepository.put(res);
+    } catch (IllegalStateException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ContentRepositoryException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+    return res;
   }
 
   /**
