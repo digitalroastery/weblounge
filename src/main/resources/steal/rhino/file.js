@@ -167,7 +167,6 @@
 
 
 		mkdir: function() {
-			print(this.path)
 			var out = new java.io.File(this.path)
 			out.mkdir();
 		},

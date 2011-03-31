@@ -1,0 +1,15 @@
+<div class="pageheadeditor">
+	<h2>Seiteneigenschaften</h2>
+	<form>
+		{{each(j, lang) languages}}
+		${lang.name}: <input type="text" name="title_${lang.id}"><br>
+		{{/each}}
+		Pfad: <input type="text" name="path"><br>
+		Typ: <select name="type"><option value="news">News</option></select><br>
+		Layout: <select name="layout">
+			{{each(i, temp) templates}}
+			<option value="${temp.id}">${temp.name}</option>
+			{{/each}}
+		</select><br>
+	</form>
+</div>

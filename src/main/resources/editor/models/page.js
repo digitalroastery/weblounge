@@ -1,4 +1,4 @@
-$.Model.extend('Page',
+$.Model('Page',
 /* @Static */
 {},
 /* @Prototype */

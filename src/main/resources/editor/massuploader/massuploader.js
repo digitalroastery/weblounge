@@ -1,4 +1,4 @@
-steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl', 'jqueryui/dialog')
+steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl')
 .views('//editor/massuploader/views/file_queued.tmpl', '//editor/massuploader/views/file_edit.tmpl')
 .css('massuploader')
 .resources('plupload.js', 'plupload.html5.js').then(function($) {

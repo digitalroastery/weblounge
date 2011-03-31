@@ -32,7 +32,30 @@ steal.plugins('jquery/dom').then(function( $ ) {
 				settings.fixture = overwrites[index].fixture;
 			}
 
-		}; // by url
+		},
+		/**
+		 * Makes an attempt to guess where the id is at in the url and returns it.
+		 * @param {Object} settings
+		 */
+		getId = function(settings){
+        	var id = settings.data.id;
+
+			if(id === undefined){
+                settings.url.replace(/\/(\d+)(\/|$)/g, function(all, num){
+                    id = num;
+                });
+            }
+			
+            if(id === undefined){
+                id = settings.url.replace(/\/(\w+)(\/|$)/g, function(all, num){
+                    if(num != 'update'){
+                        id = num;
+                    }
+                })
+            }
+
+			return id;
+		};
 
 	/**
 	 * @class jQuery.fixture
@@ -241,7 +264,7 @@ steal.plugins('jquery/dom').then(function( $ ) {
 		return left + right;
 	};
 
-	$.extend($.fixture, {
+	$.extend($.fixture, {	
 		/**
 		 * Provides a rest update fixture function
 		 */
@@ -249,12 +272,13 @@ steal.plugins('jquery/dom').then(function( $ ) {
 			switch ( cbType ) {
 			case "success":
 				return [$.extend({
-					id: parseInt(settings.url, 10)
+					id: getId(settings)
 				}, settings.data), "success", $.fixture.xhr()];
 			case "complete":
 				return [$.fixture.xhr(), "success"];
 			}
 		},
+		
 		/**
 		 * Provides a rest destroy fixture function
 		 */
@@ -266,6 +290,7 @@ steal.plugins('jquery/dom').then(function( $ ) {
 				return [$.fixture.xhr(), "success"];
 			}
 		},
+		
 		/**
 		 * Provides a rest create fixture function
 		 */
@@ -282,9 +307,8 @@ steal.plugins('jquery/dom').then(function( $ ) {
 					}
 				}), "success"];
 			}
-
-
 		},
+		
 		/**
 		 * Used to make fixtures for findAll / findOne style requests.
 		 * @codestart
@@ -323,7 +347,15 @@ steal.plugins('jquery/dom').then(function( $ ) {
 				types = [types+"s",types ]
 			}
 			// make all items
-			var items = ($.fixture["~" + types[0]] = []);
+			var items = ($.fixture["~" + types[0]] = []), // TODO: change this to a hash
+				findOne = function(id){
+					for ( var i = 0; i < items.length; i++ ) {
+						if ( id == items[i].id ) {
+							return items[i];
+						}
+					}
+				};
+				
 			for ( var i = 0; i < (count); i++ ) {
 				//call back provided make
 				var item = make(i, items);
@@ -387,15 +419,42 @@ steal.plugins('jquery/dom').then(function( $ ) {
 					"data": retArr.slice(offset, offset + limit)
 				}];
 			};
-
+            // findOne
 			$.fixture["-" + types[1]] = function( settings ) {
-				for ( var i = 0; i < (count); i++ ) {
-					if ( settings.data.id == items[i].id ) {
-						return [items[i]];
+				return [findOne(settings.data.id)];
+			};
+            // update
+            $.fixture["-" + types[1]+"Update"] = function( settings, cbType ) {
+                var id = getId(settings);
+
+                // TODO: make it work with non-linear ids ..
+                $.extend(findOne(id), settings.data);
+				return $.fixture["-restUpdate"](settings, cbType)
+			};
+			$.fixture["-" + types[1]+"Destroy"] = function( settings, cbType ) {
+				var id = getId(settings);
+				for(var i = 0; i < items.length; i ++ ){
+					if(items[i].id == id){
+						items.splice(i, 1);
+						break;
 					}
 				}
+				
+                // TODO: make it work with non-linear ids ..
+                $.extend(findOne(id), settings.data);
+				return $.fixture["-restDestroy"](settings, cbType)
 			};
-
+			$.fixture["-" + types[1]+"Create"] = function( settings, cbType ) {
+                var item = make(items.length, items);
+				$.extend(item, settings.data);
+				
+				if(!item.id){
+					item.id = items.length;
+				}
+				
+				items.push(item);
+				return $.fixture["-restCreate"](settings, cbType)
+			};
 		},
 		/**
 		 * Use $.fixture.xhr to create an object that looks like an xhr object. 

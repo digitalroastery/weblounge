@@ -199,55 +199,94 @@ steal.plugins("jquery").then(function( $ ) {
 	 * @param {Object} [callback] Optional callback function.  If present, the template is 
 	 * retrieved asynchronously.  This is a good idea if you aren't compressing the templates
 	 * into your view.
-	 * @return {String} The rendered result of the view.
+	 * @return {String} The rendered result of the view or if deferreds are passed, a deferred that will contain
+	 * the rendered result of the view.
 	 */
 
-	var $view, render, checkText, get;
+	var $view, render, checkText, get, 
+		isDeferred = function(obj){
+			return $.isFunction(obj.promise) // check if obj is a $.Deferred
+		};
 
 	$view = $.View = function( view, data, helpers, callback ) {
-		var suffix = view.match(/\.[\w\d]+$/),
-			type, el, id, renderer, url = view;
-                // if we have an inline template, derive the suffix from the 'text/???' part
-                // this only supports '<script></script>' tags
-                if ( el = document.getElementById(view)) {
-                  suffix = el.type.match(/\/[\d\w]+$/)[0].replace(/^\//, '.');
-                }
-		if ( typeof helpers === 'function' ) {
-			callback = helpers;
-			helpers = undefined;
-		}
-		//if there is no suffix, add one
-		if (!suffix ) {
-			suffix = $view.ext;
-			url = url + $view.ext;
-		}
-
-		//convert to a unique and valid id
-		id = toId(url);
-
-		//if a absolute path, use steal to get it
-		if ( url.match(/^\/\//) ) {
-			if (typeof steal === "undefined") {
-				url = "/"+url.substr(2);
-			}
-			else {
-				url = steal.root.join(url.substr(2));
+		var deferreds = [];
+		// handles a deferred or an object with deferreds in it.
+		if(isDeferred(data)){
+			deferreds = [data]
+		}else{
+			for(var prop in data) {
+				if(isDeferred(data[prop])) {
+					deferreds.push(data[prop]);
+				}
 			}
 		}
-
-		//get the template engine
-		type = $view.types[suffix];
-
-		//get the renderer function
-		renderer =
-		$view.cached[id] ? // is it cached?
-		$view.cached[id] : // use the cached version
-		((el = document.getElementById(view)) ? //is it in the document?
-		type.renderer(id, el.innerHTML) : //use the innerHTML of the elemnt
-		get(type, id, url, data, helpers, callback) //do an ajax request for it
-		);
-		// we won't always get a renderer (if async ajax)
-		return renderer && render(renderer, type, id, data, helpers, callback);
+		
+		
+		if(deferreds.length) { // does data contain any deferreds?
+			var deferred = $.Deferred();
+			
+			
+			$.when.apply($, deferreds).then(function(resolved) {
+				var objs = $.makeArray(arguments)
+				if (isDeferred(data)) {
+					data = resolved;
+				}
+				else {
+					for (var prop in data) {
+						if (isDeferred(data[prop])) {
+							data[prop] = objs.shift();
+						}
+					}
+				}
+				deferred.resolve( $view(view, data, helpers, callback) ); // this does not work as is...
+			});
+			return deferred.promise();
+		}
+		else {
+			var suffix = view.match(/\.[\w\d]+$/),
+				type, el, id, renderer, url = view;
+	                // if we have an inline template, derive the suffix from the 'text/???' part
+	                // this only supports '<script></script>' tags
+	                if ( el = document.getElementById(view)) {
+	                  suffix = el.type.match(/\/[\d\w]+$/)[0].replace(/^\//, '.');
+	                }
+			if ( typeof helpers === 'function' ) {
+				callback = helpers;
+				helpers = undefined;
+			}
+			//if there is no suffix, add one
+			if (!suffix ) {
+				suffix = $view.ext;
+				url = url + $view.ext;
+			}
+	
+			//convert to a unique and valid id
+			id = toId(url);
+	
+			//if a absolute path, use steal to get it
+			if ( url.match(/^\/\//) ) {
+				if (typeof steal === "undefined") {
+					url = "/"+url.substr(2);
+				}
+				else {
+					url = steal.root.join(url.substr(2));
+				}
+			}
+	
+			//get the template engine
+			type = $view.types[suffix];
+	
+			//get the renderer function
+			renderer =
+			$view.cached[id] ? // is it cached?
+			$view.cached[id] : // use the cached version
+			((el = document.getElementById(view)) ? //is it in the document?
+			type.renderer(id, el.innerHTML) : //use the innerHTML of the elemnt
+			get(type, id, url, data, helpers, callback) //do an ajax request for it
+			);
+			// we won't always get a renderer (if async ajax)
+			return renderer && render(renderer, type, id, data, helpers, callback);
+		}
 	};
 	// caches the template, renders the content, and calls back if it should
 	render = function( renderer, type, id, data, helpers, callback ) {
@@ -419,7 +458,10 @@ steal.plugins("jquery").then(function( $ ) {
 
 		$.fn[func_name] = function() {
 			var args = $.makeArray(arguments),
-				callbackNum, callback, self = this;
+				callbackNum, 
+				callback, 
+				self = this,
+				result;
 
 			//check if a template
 			if ( isTemplate(args) ) {
@@ -434,9 +476,17 @@ steal.plugins("jquery").then(function( $ ) {
 					$view.apply($view, args);
 					return this;
 				}
-
+				result = $view.apply($view, args);
+				if(!isDeferred( result ) ){
+					args = [result];
+				}else{
+					result.done(function(res){
+						modify.call(self, [res], old);
+					})
+					return this;
+				}
 				//otherwise do the template now
-				args = [$view.apply($view, args)];
+				
 			}
 
 			return modify.call(this, args, old);
