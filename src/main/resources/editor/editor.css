@@ -1,0 +1,11 @@
+/* Primary CSS-Styles for weblounge-editor */
+
+#weblor {
+	font-family: verdana;
+	font-size: 12px;
+}
+
+body {
+	position: relative;
+	top: 33px;
+}

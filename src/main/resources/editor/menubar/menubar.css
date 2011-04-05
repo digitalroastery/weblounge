@@ -5,7 +5,9 @@
     height: 44px;
     line-height: 44px;
     position: fixed;
-	top: 0px;
+	top: 0;
+	bottom: 0;
+	left: 0;
     text-align: left;
     width: 100%;
     z-index: 99;
@@ -16,11 +18,12 @@
     border-right: 1px solid transparent;
     color: #FFFFFF;
     margin: 0 1px;
-    padding: 16px 15px;
+    padding: 15px 15px;
     text-decoration: none;
 }
 
-.menubar a.tab.active, header.weblounge a.tab:hover {
+.menubar a.tab.active,
+.menubar a.tab:hover {
     background-color: #2C2C2D;
     background-image: -moz-linear-gradient(left center , #323232 0%, #454444 50%, #323232 100%);
     border-left: 1px solid #464647;
@@ -40,3 +43,7 @@
     float: right;
     margin-right: 10px;
 }
+
+.error {border: solid 1px red;}
+.error_text { color: red; font-size: 10px;}
+td {padding: 3px;}
