@@ -148,7 +148,7 @@ var Docs = (function($) {
 	                              }
 	                              
 	                              // response body
-	                              if (data !== undefined && data != "" && contentType.indexOf("text") == 0) {
+	                              if (data !== undefined && data != "" && (contentType.indexOf("text") == 0 || contentType == "application/xml" || contentType == "application/json")) {
 	                                responseBody.find("pre.response_body").text(prettify(data, contentType));
 	                                responseBody.find("pre.response_body").show();
 	                              } else {
@@ -262,7 +262,7 @@ var Docs = (function($) {
      * Returns a pretty-printed version of an xml response body.
      */
     var prettify = function(content, contentType) {
-        if (contentType !== "text/xml")
+        if (contentType !== "application/xml")
             return content;
 
         var reg = /(>)(<)(\/*)/g;
