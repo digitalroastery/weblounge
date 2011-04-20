@@ -83,6 +83,9 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   /** List with well known urls and files */
   private static List<String> wellknownFiles = new ArrayList<String>();
 
+  /** List of sites that have already issued a warning once */
+  private List<Site> missingRepositoryWarnings = new ArrayList<Site>();
+
   /** The response caches */
   private Map<String, ResponseCache> caches = null;
 
@@ -229,7 +232,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
       httpResponse.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
       return;
     }
-    
+
     logger.debug("Serving {}", httpRequest.getRequestURI());
 
     // Get the site dispatcher
@@ -239,14 +242,29 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         logger.warn("No site found to handle {}", httpRequest.getRequestURL());
       httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;
+    } else if (!site.isOnline()) {
+      if (site.getContentRepository() == null) {
+        if (!missingRepositoryWarnings.contains(site)) {
+          logger.warn("No content repository connected to site '{}'", site);
+          missingRepositoryWarnings.add(site);
+        } else {
+          logger.debug("No content repository connected to site '{}'", site);
+        }
+      } else {
+        logger.debug("Ignoring request for disabled site '{}'", site);
+      }
+      httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    } else if (missingRepositoryWarnings.size() > 0) {
+      missingRepositoryWarnings.remove(site);
     }
 
     // Get the servlet that is responsible for the site's content
     Servlet siteServlet = sites.getSiteServlet(site);
-    
+
     // Get the response cache, if available
     ResponseCache cache = caches.get(site.getIdentifier());
-    
+
     // Wrap for caching
     if (cache != null) {
       httpResponse = cache.createCacheableResponse(httpRequest, httpResponse);
@@ -279,7 +297,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         logger.trace("Asking {} to serve {}", handler, request);
         if (handler.service(request, response)) {
           logger.debug("{} served request {}", handler, request);
-          
+
           // Notify listeners about finished request
           if (response.hasError()) {
             logger.debug("Request processing failed on {}", request);
@@ -310,7 +328,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
         logger.debug("Finished processing of {}", httpRequest.getRequestURI());
       }
     }
-    
+
     // Apparently, nobody felt responsible for this request
     logger.debug("No handler found for {}", request);
     DispatchUtils.sendNotFound(request, response);
@@ -320,9 +338,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
   }
 
   /**
-   * Returns the site that is being targeted by <code>request</code> or
-   * <code>null</code> if either no site was found or the site is disabled right
-   * now.
+   * Returns the site that is being targeted by <code>request</code>.
    * 
    * @param request
    *          the http request
@@ -332,17 +348,13 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     if (sites == null)
       return null;
     Site site = sites.findSiteByRequest(request);
-    if (site != null && !site.isOnline()) {
-      logger.debug("Ignoring request for disabled site {}", site);
-      return null;
-    }
     return site;
   }
 
   /**
    * Adds <code>listener</code> to the list of request listeners if it has not
-   * already been registered. The listener is called a few times during the
-   * lifecycle of a request.
+   * already been registered. The listener is called a few times during the life
+   * cycle of a request.
    * 
    * @param listener
    *          the lister
