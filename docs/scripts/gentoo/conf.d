@@ -68,14 +68,14 @@ JAVA_HOME="$(java-config --jre-home)"
 # JVM Memory configuration parameter
 JVM_MEMORY_OPTS="-Xmx1024m -Xms512m"
 
+# Options to pass to the JVM on behalf of Jetty. Uncomment to disable debugging
+#JVM_DEBUG_OPTS="-Xdebug -ea:ch -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"
+
 # Path to additional jre libraries
 JVM_LIBRARY_PATH="-Djava.library.path=$(java-config -i sun-jai-bin)"
 
 # Options for the advanced windowing toolkit
 JVM_AWT_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
-
-# Options to pass to the JVM on behalf of Jetty. Uncomment to disable debugging
-#JVM_DEBUG_OPTS="-Xdebug -ea:ch -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n"
 
 # Set the vm encoding
 JVM_ENCODING_OPTS="-Dfile.encoding=utf-8"

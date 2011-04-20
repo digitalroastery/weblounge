@@ -8,6 +8,8 @@
 # The arguments are needed to convince gogo to run in non-interactive mode 
 # without shutting down the framework when the start-stop-daemon detaches.
 
+opts="${opts} reset update"
+
 depend() {
         use net
         after logger
@@ -44,7 +46,7 @@ start() {
 	        return 1
 	    fi
         mkdir -p "${WEBLOUNGE_LOG_DIR}" "${FELIX_BUNDLECACHE_DIR}" "${WEBLOUNGE_SITES_DIR}" "${WEBLOUNGE_SITES_DATA_DIR}"
-        chown -R ${WEBLOUNGE_USER}:${WEBLOUNGE_GROUP} "${WEBLOUNGE_LOG_DIR}" "${FELIX_BUNDLECACHE_DIR}"
+        chown -R ${WEBLOUNGE_USER}:${WEBLOUNGE_GROUP} "${WEBLOUNGE_LOG_DIR}" "${FELIX_BUNDLECACHE_DIR}" "${WEBLOUNGE_SITES_DIR}" "${WEBLOUNGE_SITES_DATA_DIR}"
         start-stop-daemon --start \
             --background \
 	        --user ${WEBLOUNGE_USER} \
@@ -66,4 +68,53 @@ stop()  {
           rm "${PID_FILE}"
         fi
         eend $?
+}
+
+reset() {
+		if [ -z "${WEBLOUNGE_TEMP_DIR}" ]; then
+		    eerror "Weblounge work directory (WEBLOUNGE_TEMP_DIR) not set"
+		    return 1
+		fi
+
+	    STARTED=
+		if [ -e "${PID_FILE}" ]; then
+	    	STARTED="true"
+		    stop
+		fi
+		
+		ebegin "Removing weblounge work files"
+		rm -rf ${WEBLOUNGE_TEMP_DIR}
+		eend $?
+		
+		if [ ! -z "${STARTED}" ]; then
+		    start
+		fi
+}
+
+update() {
+		if [ -z "${FELIX_BUNDLECACHE_DIR}" ]; then
+		    eerror "Felix bundle cache directory (FELIX_BUNDLECACHE_DIR) not set"
+		    return 1
+		elif [ -z "${WEBLOUNGE_TEMP_DIR}" ]; then
+		    eerror "Weblounge work directory (WEBLOUNGE_TEMP_DIR) not set"
+		    return 1
+		fi
+
+	    STARTED=
+		if [ -e "${PID_FILE}" ]; then
+	    	STARTED="true"
+		    stop
+		fi
+		
+		ebegin "Cleaning felix bundle cache"
+		rm -rf ${FELIX_BUNDLECACHE_DIR}
+		eend $?
+		
+		ebegin "Removing weblounge work files"
+		rm -rf ${WEBLOUNGE_TEMP_DIR}
+		eend $?
+		
+		if [ ! -z "${STARTED}" ]; then
+		    start
+		fi
 }
