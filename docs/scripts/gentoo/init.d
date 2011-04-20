@@ -5,7 +5,7 @@
 # Note that the gogo shell arguments (-Dgosh.args) are needed here rather
 # than in the conf.d file because there is now other way than this to get
 # the quotes right for the start-stop-daemon.
-# The arguments are needed to convince gogo to run in non-interactive mode
+# The arguments are needed to convince gogo to run in non-interactive mode 
 # without shutting down the framework when the start-stop-daemon detaches.
 
 depend() {
@@ -15,17 +15,41 @@ depend() {
 
 start() {
         ebegin "Starting Weblounge"
-        mkdir -p "${WEBLOUNGE_LOGDIR}" "${FELIX_BUNDLECACHE}"
-        chown -R ${WEBLOUNGE_USER}:${WEBLOUNGE_GROUP} "${WEBLOUNGE_LOGDIR}" "${FELIX_BUNDLECACHE}"
         if [ ! -d "${WEBLOUNGE_HOME}" ]; then
-            eerror "Weblounge home directory ${WEBLOUNGE_HOME} not found"
+	        eerror "Weblounge home directory ${WEBLOUNGE_HOME} not found"
             return 1
-        fi
+	    elif [ -z "${WEBLOUNGE_SITES_DIR}" ]; then
+		    eerror "Weblounge sites directory (WEBLOUNGE_SITES_DIR) not set"
+	        return 1
+	    elif [ -z "${WEBLOUNGE_SITES_DATA_DIR}" ]; then
+		    eerror "Weblounge sites data directory (WEBLOUNGE_SITES_DATA_DIR) not set"
+	        return 1
+	    elif [ -z "${WEBLOUNGE_LOG_DIR}" ]; then
+		    eerror "Weblounge log directory (WEBLOUNGE_LOG_DIR) not set"
+	        return 1
+	    elif [ -z "${FELIX_BUNDLECACHE_DIR}" ]; then
+		    eerror "Felix bundle cache directory (FELIX_BUNDLECACHE_DIR) not set"
+	        return 1
+	    elif [ -z "${PID_FILE}" ]; then
+		    eerror "Felix pid file (PID_FILE) not set"
+	        return 1
+	    elif [ -z "${LOG_FILE}" ]; then
+		    eerror "Weblounge log file (LOG_FILE) not set"
+	        return 1
+	    elif [ -z "${RUN_CMD}" ]; then
+		    eerror "Java commandline (RUN_CMD) not set"
+	        return 1
+	    elif [ -z "${RUN_OPTS}" ]; then
+		    eerror "Java options (RUN_OPTS) not set"
+	        return 1
+	    fi
+        mkdir -p "${WEBLOUNGE_LOG_DIR}" "${FELIX_BUNDLECACHE_DIR}" "${WEBLOUNGE_SITES_DIR}" "${WEBLOUNGE_SITES_DATA_DIR}"
+        chown -R ${WEBLOUNGE_USER}:${WEBLOUNGE_GROUP} "${WEBLOUNGE_LOG_DIR}" "${FELIX_BUNDLECACHE_DIR}"
         start-stop-daemon --start \
             --background \
-            --user ${WEBLOUNGE_USER} \
+	        --user ${WEBLOUNGE_USER} \
             --group ${WEBLOUNGE_GROUP} \
-            --chdir ${WEBLOUNGE_HOME} \
+	        --chdir ${WEBLOUNGE_HOME} \
             --make-pidfile \
             --pidfile "${PID_FILE}" \
             --stdout "${LOG_FILE}" \
