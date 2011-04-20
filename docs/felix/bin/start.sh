@@ -2,11 +2,15 @@
 # Configure these variables to match your environment
 ##
 
-# Main Weblounge path configuration. Make sure that the user executing Weblounge
-# has write access to WEBLOUNGE_WORKDIR.
+if [ -z "$WEBLOUNGE_HOME" ]; then
+  echo "Please define WEBLOUNGE_HOME"
+  exit 1
+fi
 
-WEBLOUNGE_HOME="/Applications/Weblounge"
-WEBLOUNGE_WORKDIR=$WEBLOUNGE_HOME
+# Main Weblounge path configuration. Make sure that the user executing Weblounge
+# has write access to WEBLOUNGE_WORK_DIR.
+
+WEBLOUNGE_WORK_DIR="$WEBLOUNGE_HOME"
 
 # Memory settings
 MEMORY_OPTS="-Xmx1024m"
@@ -16,37 +20,35 @@ DEBUG_PORT="8000"
 DEBUG_SUSPEND="n"
 
 # Detail configuration for weblounge directories. Usually, it is fine to simply
-# adjust the two paths above, namely $WEBLOUNGE_HOME and $WEBLOUNGE_WORKDIR.
+# adjust the two paths above, namely $WEBLOUNGE_HOME and $WEBLOUNGE_WORK_DIR.
 
-WEBLOUNGE_LOGDIR="$WEBLOUNGE_WORKDIR/logs"
-WEBLOUNGE_CACHEDIR="$WEBLOUNGE_WORKDIR/cache"
-WEBLOUNGE_TEMPDIR="$WEBLOUNGE_WORKDIR/work"
-WEBLOUNGE_SITESDIR="$WEBLOUNGE_WORKDIR/sites"
-WEBLOUNGE_SITESDATADIR="$WEBLOUNGE_WORKDIR/sites-data"
+WEBLOUNGE_LOG_DIR="$WEBLOUNGE_WORK_DIR/logs"
+WEBLOUNGE_CACHE_DIR="$WEBLOUNGE_WORK_DIR/cache"
+WEBLOUNGE_TEMP_DIR="$WEBLOUNGE_WORK_DIR/work"
+WEBLOUNGE_SITES_DIR="$WEBLOUNGE_WORK_DIR/sites"
+WEBLOUNGE_SITESDATA_DIR="$WEBLOUNGE_WORK_DIR/sites-data"
 
 ##
 # Only change the line below if you want to customize the server
 ##
 
-WEBLOUNGE_OPTS="-Dweblounge.sitesdir=$WEBLOUNGE_SITESDIR -Dweblounge.sitesdatadir=$WEBLOUNGE_SITESDATADIR"
+WEBLOUNGE_SITES_OPTS="-Dweblounge.sitesdir=$WEBLOUNGE_SITES_DIR"
+WEBLOUNGE_SITES_DATA_OPTS="-Dweblounge.sitesdatadir=$WEBLOUNGE_SITESDATA_DIR"
 WEBLOUNGE_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$WEBLOUNGE_HOME/load"
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$WEBLOUNGE_HOME/conf"
-PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dweblounge.logdir=$WEBLOUNGE_LOGDIR"
+PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dweblounge.logdir=$WEBLOUNGE_LOG_DIR"
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
-TEMPDIR_OPTS="-Djava.io.tmpdir=$WEBLOUNGE_TEMPDIR"
+TEMP_DIR_OPTS="-Djava.io.tmpdir=$WEBLOUNGE_TEMP_DIR"
 
 # Create the debug config
 DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,server=y,suspend=$DEBUG_SUSPEND"
 
-# Create the java runtime options
-RUNTIME_OPTS="$WEBLOUNGE_OPTS $TEMPDIR_OPTS $GRAPHICS_OPTS $WEBLOUNGE_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS"
-
 # Create the directories
-mkdir -p "$WEBLOUNGE_LOGDIR"
-mkdir -p "$WEBLOUNGE_CACHEDIR"
-mkdir -p "$WEBLOUNGE_TEMPDIR"
-mkdir -p "$WEBLOUNGE_SITESDIR"
-mkdir -p "$WEBLOUNGE_SITESDATADIR"
+mkdir -p "$WEBLOUNGE_LOG_DIR"
+mkdir -p "$WEBLOUNGE_CACHE_DIR"
+mkdir -p "$WEBLOUNGE_TEMP_DIR"
+mkdir -p "$WEBLOUNGE_SITES_DIR"
+mkdir -p "$WEBLOUNGE_SITESDATA_DIR"
 
 # Finally start Weblounge
-java $MEMORY_OPTS $RUNTIME_OPTS $DEBUG_OPTS -jar $WEBLOUNGE_HOME/bin/felix.jar $WEBLOUNGE_CACHEDIR
+java $MEMORY_OPTS $DEBUG_OPTS "$WEBLOUNGE_SITES_OPTS" "$WEBLOUNGE_SITES_DATA_OPTS" "$TEMP_DIR_OPTS" "$GRAPHICS_OPTS" "$WEBLOUNGE_FILEINSTALL_OPTS" "$PAX_CONFMAN_OPTS" "$PAX_LOGGING_OPTS" -jar "$WEBLOUNGE_HOME/bin/felix.jar" "$WEBLOUNGE_CACHE_DIR"
