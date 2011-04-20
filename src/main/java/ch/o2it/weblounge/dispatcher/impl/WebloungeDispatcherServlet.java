@@ -236,7 +236,7 @@ public final class WebloungeDispatcherServlet extends HttpServlet {
     Site site = getSiteByRequest(httpRequest);
     if (site == null) {
       if (!wellknownFiles.contains(httpRequest.getRequestURI()))
-        logger.warn("No dispatcher found for {}", httpRequest.getRequestURL());
+        logger.warn("No site found to handle {}", httpRequest.getRequestURL());
       httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;
     }
