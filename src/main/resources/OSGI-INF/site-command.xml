@@ -6,6 +6,6 @@
 
   <implementation class="ch.o2it.weblounge.kernel.command.SiteCommand" />
   <property name="service.description" value="Weblounge Site Command" />
-  <reference name="site" interface="ch.o2it.weblounge.common.site.Site" cardinality="1..n" policy="dynamic" bind="addSite" unbind="removeSite" />
+  <reference name="site" interface="ch.o2it.weblounge.common.site.Site" cardinality="0..n" policy="dynamic" bind="addSite" unbind="removeSite" />
 
 </scr:component>
