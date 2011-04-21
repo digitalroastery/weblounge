@@ -51,5 +51,14 @@ mkdir -p "$WEBLOUNGE_TEMP_DIR"
 mkdir -p "$WEBLOUNGE_SITES_DIR"
 mkdir -p "$WEBLOUNGE_SITESDATA_DIR"
 
+# Reload weblounge bundles
+if [ -d "$WEBLOUNGE_CACHE_DIR" ]; then
+  cd "$WEBLOUNGE_CACHE_DIR"
+  for bundle in `find . -type f -name "bundle.location" | xargs grep --files-with-match -e "file:" | sed -e 's/.\/\(.*\)\/bundle.location/\1/'`; do
+    rm -r "$WEBLOUNGE_CACHE_DIR/$bundle"
+  done
+fi
+
 # Finally start Weblounge
+cd "$WEBLOUNGE_HOME"
 java $MEMORY_OPTS $DEBUG_OPTS "$WEBLOUNGE_SITES_OPTS" "$WEBLOUNGE_SITES_DATA_OPTS" "$WEBLOUNGE_LOGGING_OPTS" "$TEMP_DIR_OPTS" "$GRAPHICS_OPTS" "$WEBLOUNGE_FILEINSTALL_OPTS" "$PAX_CONFMAN_OPTS" "$PAX_LOGGING_OPTS" -jar "$WEBLOUNGE_HOME/bin/felix.jar" "$WEBLOUNGE_CACHE_DIR"
