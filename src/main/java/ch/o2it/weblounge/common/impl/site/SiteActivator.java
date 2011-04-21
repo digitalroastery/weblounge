@@ -94,16 +94,17 @@ public class SiteActivator {
     // Load the site
     Enumeration<URL> e = bundleContext.getBundle().findEntries("site", "site.xml", false);
     if (e != null && e.hasMoreElements()) {
+      String bundleName = bundleContext.getBundle().getSymbolicName();
       URL siteUrl = e.nextElement();
 
-      logger.info("Loading site from bundle at {}", siteUrl);
+      logger.info("Loading site from bundle '{}'", bundleName);
 
       // Load and validate the site descriptor
       ValidationErrorHandler errorHandler = new ValidationErrorHandler(siteUrl);
       docBuilder.setErrorHandler(errorHandler);
       final Document siteXml = docBuilder.parse(siteUrl.openStream());
       if (errorHandler.hasErrors()) {
-        logger.error("Errors found while validating site descriptor {}. Site is not loaded", siteUrl);
+        logger.error("Errors found while validating site descriptor in bundle '{}'. Site is not loaded", bundleName);
         return;
       }
 
