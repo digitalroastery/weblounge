@@ -33,12 +33,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
-      <artifactId>weblounge-kernel</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- osgi support -->
 
     <dependency>
@@ -148,7 +142,7 @@
             </Export-Package>
             <Private-Package>
               ch.o2it.weblounge.workbench.suggest,
-              org.json,
+              org.json;-split-package:=merge-first,
               org.json.simple,
               org.json.simple.parser
             </Private-Package>
