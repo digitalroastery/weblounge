@@ -7,6 +7,7 @@
 ../../../modules/weblounge-contentrepository-api/trunk	modules/weblounge-contentrepository-api
 ../../../modules/weblounge-dispatcher/trunk	modules/weblounge-dispatcher
 ../../../modules/weblounge-dispatcher-api/trunk	modules/weblounge-dispatcher-api
+../../../modules/weblounge-i18n-mygengo/trunk	modules/weblounge-i18n-mygengo
 ../../../modules/weblounge-importer/trunk	modules/weblounge-importer
 ../../../modules/weblounge-kernel/trunk	modules/weblounge-kernel
 ../../../modules/weblounge-site/trunk	modules/weblounge-site
