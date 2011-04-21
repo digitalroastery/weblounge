@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.kernel.webconsole;
 
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.kernel.WebloungeSharedResources;
+import ch.o2it.weblounge.kernel.shared.WebloungeSharedResources;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.webconsole.AbstractWebConsolePlugin;

@@ -38,6 +38,13 @@ import ch.o2it.weblounge.common.impl.util.doc.TestForm;
 public final class SitesEndpointDocs {
 
   /**
+   * This class does not need to be instantiated.
+   */
+  private SitesEndpointDocs() {
+    // Nothing to do
+  }
+
+  /**
    * Creates the documentation.
    * 
    * @param endpointUrl

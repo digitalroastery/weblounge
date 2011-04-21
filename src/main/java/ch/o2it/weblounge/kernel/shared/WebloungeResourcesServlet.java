@@ -18,7 +18,7 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.kernel;
+package ch.o2it.weblounge.kernel.shared;
 
 import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
 import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
@@ -46,13 +46,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet that serves both resources from an external directory and the kernel
- * bundle's <code>html</code> resource directory.
+ * Servlet that serves both resources from an arbitrary directory or a bundle's
+ * classpath.
  * <p>
- * Note that in cases where a resource exists in both places, the external
- * directory takes precedence.
+ * Note that in cases where both a directory and a bundle have been configured,
+ * and a resource exists in both places, the directory takes precedence. This
+ * allows to overwrite
  */
-public class WebloungeSharedResourcesServlet extends HttpServlet {
+public class WebloungeResourcesServlet extends HttpServlet {
 
   /** Serial version uid */
   private static final long serialVersionUID = 4007081684493732350L;
@@ -61,39 +62,81 @@ public class WebloungeSharedResourcesServlet extends HttpServlet {
   private static final Logger logger = LoggerFactory.getLogger(WebloungeSharedResources.class);
 
   /** Directory with external resources */
-  protected File externalResourcesDir = null;
+  protected File resourcesDir = null;
 
   /** Bundle context */
   private Bundle bundle = null;
-  
-  /** The servlet config */
+
+  /** The path into the bundle's classpath */
+  private String bundlePath = null;
+
+  /** The servlet configuration */
   private ServletConfig servletConfig = null;
 
   /**
+   * Creates a new servlet that serves resources from the bundle's classpath.
+   * The resources are exposed in such a way that <code>bundlePath</code> will
+   * be mounted as the root.
+   * 
+   * @param bundle
+   *          the bundle
+   * @param bundlePath
+   *          path into the bundle's classpath
+   */
+  public WebloungeResourcesServlet(Bundle bundle, String bundlePath) {
+    this(null, bundle, bundlePath);
+    if (bundle == null)
+      throw new IllegalArgumentException("Bundle must not be null");
+    if (StringUtils.isBlank(bundlePath))
+      throw new IllegalArgumentException("Bundle path must not be blank");
+  }
+
+  /**
+   * Creates a new servlet that serves resources from an arbitrary directory on
+   * the filesystem.
+   * 
+   * @param resourcesDir
+   *          directory for resources
+   */
+  public WebloungeResourcesServlet(File resourcesDir) {
+    this(resourcesDir, null, null);
+    if (resourcesDir == null)
+      throw new IllegalArgumentException("Resources directory must not be null");
+  }
+
+  /**
+   * Creates a new servlet that serves both resources from an arbitrary
+   * directory on the filesystem and the bundle's classpath.
+   * 
+   * @param resourcesDir
+   *          directory for external resources
+   * @param bundle
+   *          the bundle
+   * @param bundlePath
+   *          path into the bundle's classpath
+   * @throws IllegalArgumentException
+   *           if both <code>resourcesDir</code> and <code>bundle</code> are
+   *           <code>null</code>
+   */
+  public WebloungeResourcesServlet(File resourcesDir, Bundle bundle,
+      String bundlePath) {
+    this.resourcesDir = resourcesDir;
+    this.bundle = bundle;
+    if (resourcesDir == null && (bundle == null || StringUtils.isBlank(bundlePath)))
+      throw new IllegalArgumentException("Either one of resources directory or bundle and bundle path must be provided");
+    MimetypesFileTypeMap fileTypes = (MimetypesFileTypeMap) FileTypeMap.getDefaultFileTypeMap();
+    fileTypes.addMimeTypes("text/javascript js");
+    fileTypes.addMimeTypes("text/css css");
+    FileTypeMap.setDefaultFileTypeMap(fileTypes);
+  }
+
+  /**
    * {@inheritDoc}
-   *
+   * 
    * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
    */
   public void init(ServletConfig config) throws ServletException {
     this.servletConfig = config;
-  }
-
-  /**
-   * Creates a new servlet that serves both resources from an external directory
-   * and the kernel bundle's <code>html</code> resource directory.
-   * 
-   * @param externalResourcesDir
-   *          directory for external resources
-   * @param bundle
-   *          the kernel bundle
-   */
-  WebloungeSharedResourcesServlet(File externalResourcesDir, Bundle bundle) {
-    this.externalResourcesDir = externalResourcesDir;
-    this.bundle = bundle;
-    MimetypesFileTypeMap fileTypes = (MimetypesFileTypeMap)FileTypeMap.getDefaultFileTypeMap();
-    fileTypes.addMimeTypes("text/javascript js");
-    fileTypes.addMimeTypes("text/css css");
-    FileTypeMap.setDefaultFileTypeMap(fileTypes);
   }
 
   /**
@@ -109,6 +152,7 @@ public class WebloungeSharedResourcesServlet extends HttpServlet {
     Http11ResponseType responseType = null;
     String requestPath = request.getPathInfo();
     URL url = null;
+    long lastModified = 0L;
     long contentLength = 0L;
 
     // Are we looking at the top-level directory?
@@ -117,28 +161,40 @@ public class WebloungeSharedResourcesServlet extends HttpServlet {
       return;
     }
 
-    File resource = new File(PathUtils.concat(externalResourcesDir.getAbsolutePath(), requestPath));
+    // Serve from directory
 
-    // Don't serve directory listings
-    if (resource.isDirectory() || StringUtils.isBlank((FilenameUtils.getExtension(requestPath)))) {
-      response.sendError(HttpServletResponse.SC_FORBIDDEN);
-      return;
-    }
+    if (resourcesDir != null) {
+      File resource = new File(PathUtils.concat(resourcesDir.getAbsolutePath(), requestPath));
 
-    // If the resource doesn't exist, try to serve it from the bundle
-    if (resource.exists() && resource.canRead()) {
-      url = resource.toURI().toURL();
-    } else {
-      String resourcePath = PathUtils.concat(WebloungeSharedResources.RESOURCES_BUNDLE_DIR, requestPath);
-      url = bundle.getEntry(resourcePath);
-      if (url == null) {
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      // Don't serve directory listings
+      if (resource.isDirectory() || StringUtils.isBlank((FilenameUtils.getExtension(requestPath)))) {
+        response.sendError(HttpServletResponse.SC_FORBIDDEN);
         return;
       }
+
+      // Check if the file exists
+      if (resource.exists() && resource.canRead()) {
+        url = resource.toURI().toURL();
+      }
+    }
+
+    // Serve from bundle if the same resource wasn't loaded from the directory
+    // already
+
+    if (bundle != null && url == null) {
+      String resourcePath = PathUtils.concat(bundlePath, requestPath);
+      url = bundle.getEntry(resourcePath);
+    }
+
+    // Check if the resource exists
+    if (url == null) {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
     }
 
     URLConnection conn = url.openConnection();
     contentLength = conn.getContentLength();
+    lastModified = conn.getLastModified();
     String mimeType = servletConfig.getServletContext().getMimeType(requestPath);
     String encoding = null;
 
@@ -159,7 +215,7 @@ public class WebloungeSharedResourcesServlet extends HttpServlet {
     InputStream is = url.openStream();
     try {
       logger.debug("Serving {}", url);
-      responseType = Http11ProtocolHandler.analyzeRequest(request, resource.lastModified(), 0, contentLength);
+      responseType = Http11ProtocolHandler.analyzeRequest(request, lastModified, 0, contentLength);
       if (!Http11ProtocolHandler.generateResponse(response, responseType, is)) {
         logger.warn("I/O error while generating content from {}", url);
       }
@@ -168,5 +224,4 @@ public class WebloungeSharedResourcesServlet extends HttpServlet {
     }
 
   }
-
 }

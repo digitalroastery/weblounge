@@ -18,7 +18,8 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.kernel;
+package ch.o2it.weblounge.kernel.shared;
+
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -159,7 +160,7 @@ public class WebloungeSharedResources implements ManagedService {
     String externalResources = (String) properties.get(OPT_EXT_RESOURCES);
     if (StringUtils.trimToNull(externalResources) != null) {
       externalResourcesDir = new File(externalResources);
-      servlet = new WebloungeSharedResourcesServlet(externalResourcesDir, bundleContext.getBundle());
+      servlet = new WebloungeResourcesServlet(externalResourcesDir, bundleContext.getBundle(), RESOURCES_BUNDLE_DIR);
       logger.debug("Configured external shared resources directory at '{}'", externalResources);
     } else {
       servlet = null;
