@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ch.o2it.weblounge</groupId>
+  <artifactId>weblounge-ui</artifactId>
+  <packaging>bundle</packaging>
+  <name>Weblounge UI</name>
+  <parent>
+    <groupId>ch.o2it.weblounge</groupId>
+    <artifactId>weblounge-base</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.ui</Bundle-SymbolicName>
+            <Http-Alias>/weblounge</Http-Alias>
+            <Http-Classpath>/</Http-Classpath>
+            <Http-Welcome>index.html</Http-Welcome>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
