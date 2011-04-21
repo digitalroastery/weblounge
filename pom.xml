@@ -19,8 +19,8 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.ui</Bundle-SymbolicName>
-            <Http-Alias>/weblounge</Http-Alias>
-            <Http-Classpath>/</Http-Classpath>
+            <Http-Context>/weblounge</Http-Context>
+            <Http-Resource>/</Http-Resource>
             <Http-Welcome>index.html</Http-Welcome>
           </instructions>
         </configuration>
