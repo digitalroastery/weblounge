@@ -158,7 +158,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     // If there is no content repository at the target location, copy the
     // initial bundle contents to the filesystem. Otherwise, keep working with
     // what's there already.
-    logger.info("Loading resources for '{}' from bundle {}", site, bundle);
+    logger.info("Loading resources for '{}' from bundle '{}'", site, bundle.getSymbolicName());
     try {
       for (Iterator<ResourceURI> pi = getResourceURIsFromBundle(); pi.hasNext();) {
         ResourceURI uri = pi.next();
