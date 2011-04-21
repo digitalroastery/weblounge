@@ -8,7 +8,7 @@
   <service>
     <provide interface="javax.servlet.Servlet" />
   </service>
-  <reference name="resources" interface="ch.o2it.weblounge.kernel.WebloungeSharedResources" cardinality="1..1" policy="static" bind="setSharedResources" />
+  <reference name="resources" interface="ch.o2it.weblounge.kernel.shared.WebloungeSharedResources" cardinality="1..1" policy="static" bind="setSharedResources" />
   <reference name="site" interface="ch.o2it.weblounge.common.site.Site" cardinality="0..n" policy="dynamic" bind="addSite" unbind="removeSite" />
 
 </scr:component>
