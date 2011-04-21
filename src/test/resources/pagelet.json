@@ -1,0 +1,63 @@
+{
+   "module":"text",
+   "id":"title",
+   "created":{
+      "user":{
+         "id":"hans",
+         "realm":"testland",
+         "name":"Hans Muster"
+      },
+      "date":"2009-01-07T20:05:41Z"
+   },
+   "published":{
+      "user":{
+         "id":"hans",
+         "realm":"testland",
+         "name":"Hans Muster"
+      },
+      "from":"2009-01-07T20:05:41Z",
+      "to":"2009-01-07T20:05:41Z"
+   },
+   "locales":{
+      "de":{
+         "original":true,
+         "modified":{
+            "user":{
+               "id":"hans",
+               "realm":"testland",
+               "name":"Hans Muster"
+            },
+            "date":"2009-01-07T20:05:41Z"
+         },
+         "credits":"Friedrich Nietzsche",
+         "tags":[
+            "Neu",
+            "Technik"
+         ],
+         "title":"Ein amüsanter Titel"
+      },
+      "fr":{
+         "modified":{
+            "user":{
+               "id":"hans",
+               "realm":"testland",
+               "name":"Hans Muster"
+            },
+            "date":"2009-01-07T20:05:41Z"
+         },
+         "credits":"Friedrich Nietzsche",
+         "tags":[
+            "Nouveau",
+            "Technique"
+         ],
+         "title":"Un titre joyeux"
+      }
+   },
+   "props":{
+      "headline":true,
+      "tags":[
+         "a",
+         "b"
+      ]
+   }
+}
