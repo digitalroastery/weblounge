@@ -292,7 +292,8 @@
               ch.o2it.weblounge.kernel.command;version=${project.version},
               ch.o2it.weblounge.kernel.endpoint;version=${project.version},
               ch.o2it.weblounge.kernel.publisher;version=${project.version},
-              ch.o2it.weblounge.kernel.shared;version=${project.version}
+              ch.o2it.weblounge.kernel.shared;version=${project.version},
+              ch.o2it.weblounge.kernel.webconsole;version=${project.version}
             </Export-Package>
             <Private-Package>
               org.json
