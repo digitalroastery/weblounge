@@ -80,6 +80,9 @@ public class ComposerTagSupport extends WebloungeTag {
   /** Css class name for horizontal composer */
   public static final String CLASS_HCOMPOSER = "hcomposer";
 
+  /** CSS class name for composer */
+  public static final String CLASS_COMPOSER = "composer";
+
   /** Css class name for a locked composer */
   public static final String CLASS_LOCKED = "locked";
 
@@ -222,6 +225,7 @@ public class ComposerTagSupport extends WebloungeTag {
   protected void beforeComposer(JspWriter writer) throws IOException,
       ContentRepositoryException, ContentRepositoryUnavailableException {
     StringBuffer buf = new StringBuffer("<div ");
+    addCssClass(CLASS_COMPOSER);
     if (request.getVersion() == Resource.WORK && targetPage.isLocked()) {
       addCssClass(CLASS_LOCKED);
     }
