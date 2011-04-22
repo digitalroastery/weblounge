@@ -1,4 +1,4 @@
-steal.plugins('jquery/view/tmpl', 'editor/menubar', 'editor/massuploader', 'jqueryui/sortable')
+steal.plugins('jquery/view/tmpl', 'editor/menubar', 'editor/massuploader', 'editor/composer')
 .css('editor')
 .then(function($) {
 
@@ -9,7 +9,7 @@ $(document).ready(function() {
 	
 	$('#weblor .menubar').editor_menubar();
 	
-	$('.composer').sortable({connectWidth: "composer"});
+	$('.composer').editor_composer();
 	
 	
 });
