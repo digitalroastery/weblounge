@@ -25,7 +25,9 @@ import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.content.repository.ContentRepositoryUnavailableException;
+import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.taglib.ComposerTagSupport;
 
@@ -58,11 +60,12 @@ public class ComposerTag extends ComposerTagSupport {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.taglib.ComposerTagSupport#beforeComposer(javax.servlet.jsp.JspWriter)
    */
   @Override
-  protected void beforeComposer(JspWriter writer) throws IOException, ContentRepositoryException, ContentRepositoryUnavailableException {
+  protected void beforeComposer(JspWriter writer) throws IOException,
+      ContentRepositoryException, ContentRepositoryUnavailableException {
     User user = request.getUser();
     long version = request.getVersion();
     Page targetPage = getTargetPage();
@@ -72,10 +75,10 @@ public class ComposerTag extends ComposerTagSupport {
     boolean isLockedByCurrentUser = targetPage != null && isLocked && user.equals(targetPage.getLockOwner());
     boolean isWorkVersion = version == Resource.WORK;
     boolean allowContentInheritance = !isLockedByCurrentUser && !isWorkVersion;
-    
+
     // Enable / disable content inheritance for this composer
     setInherit(allowContentInheritance);
-    
+
     // Mark inherited composer and ghost content in locked work mode
     if (isWorkVersion && isLockedByCurrentUser) {
       if (allowContentInheritance)
@@ -86,62 +89,54 @@ public class ComposerTag extends ComposerTagSupport {
 
     // Let the default implementation kick in
     super.beforeComposer(writer);
-    
-    // Add first handle
-    // if (version == Page.WORK && isLockedByCurrentUser) {
-    // request.setAttribute(WebloungeRequest.COMPOSER, composer);
-    // PageletEditorTag editorTag = new PageletEditorTag();
-    // editorTag.showPageletEditor(getRequest(), getResponse(), writer);
-    // writer.flush();
-    // }
 
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.taglib.ComposerTagSupport#beforePagelet(ch.o2it.weblounge.common.content.page.Pagelet, int, javax.servlet.jsp.JspWriter)
+   * 
+   * @see ch.o2it.weblounge.taglib.ComposerTagSupport#beforePagelet(ch.o2it.weblounge.common.content.page.Pagelet,
+   *      int, javax.servlet.jsp.JspWriter)
    */
   @Override
   protected int beforePagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException, ContentRepositoryException, ContentRepositoryUnavailableException {
+      throws IOException, ContentRepositoryException,
+      ContentRepositoryUnavailableException {
 
     // Start editing support
+    // FIXME temporary solution
     // if (version == Page.WORK && isLockedByCurrentUser) {
-    // writer.println("<div class=\"pagelet\">");
-    // writer.flush();
+    writer.println("<div class=\"pagelet\">");
+    writer.flush();
     // }
 
     return super.beforePagelet(pagelet, position, writer);
   }
-  
+
   /**
    * {@inheritDoc}
-   *
-   * @see ch.o2it.weblounge.taglib.ComposerTagSupport#afterPagelet(ch.o2it.weblounge.common.content.page.Pagelet, int, javax.servlet.jsp.JspWriter)
+   * 
+   * @see ch.o2it.weblounge.taglib.ComposerTagSupport#afterPagelet(ch.o2it.weblounge.common.content.page.Pagelet,
+   *      int, javax.servlet.jsp.JspWriter)
    */
   @Override
   protected void afterPagelet(Pagelet pagelet, int position, JspWriter writer)
-      throws IOException, ContentRepositoryException, ContentRepositoryUnavailableException {
+      throws IOException, ContentRepositoryException,
+      ContentRepositoryUnavailableException {
 
     // If user is not editing this page, then we are finished with
     // the current pagelet.
     // finally {
-    // if (version == Page.WORK && isLockedByCurrentUser &&
-    // request.getAttribute(PageletEditorTag.ID) == null) {
-    // request.setAttribute(WebloungeRequest.PAGE, targetPage);
-    // request.setAttribute(WebloungeRequest.PAGELET, pagelet);
-    // request.setAttribute(WebloungeRequest.COMPOSER, composer);
-    // PageletEditorTag editorTag = new PageletEditorTag();
-    // editorTag.showPageletEditor(getRequest(), getResponse(), writer);
-    // writer.println("</div>");
-    // }
-    // }
-
-    // Remove temporary request attributes
-    // request.removeAttribute(PageletEditorTag.ID);
+    // FIXME temporary solution
+    // if (version == Page.WORK && isLockedByCurrentUser && request.getAttribute(PageletEditorTag.ID) == null) {
+      request.setAttribute(WebloungeRequest.PAGE, targetPage);
+      request.setAttribute(WebloungeRequest.PAGELET, pagelet);
+      request.setAttribute(WebloungeRequest.COMPOSER, new ComposerImpl(name));
+      writer.println("</div>");
+      writer.flush();
+    //}
 
     super.afterPagelet(pagelet, position, writer);
   }
-  
+
 }
