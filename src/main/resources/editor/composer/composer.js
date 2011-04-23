@@ -1,6 +1,10 @@
 steal.plugins('jqueryui/sortable').css('composer').then(function($) {
 
     $.Controller("Editor.Composer",
+	/* @static */
+	{
+		defaults: {connectWith: ".composer"} 
+	},
 
     /* @prototype */
     {
@@ -8,7 +12,7 @@ steal.plugins('jqueryui/sortable').css('composer').then(function($) {
      * Initialize a new MenuBar controller.
      */
         init: function(el) {
-          $(el).sortable({connectWith: ".composer", distance: 15});
+          $(el).sortable({connectWith: this.options.connectWith, distance: 15});
 
 		$(el).bind('sortupdate', function(event, ui){
 			

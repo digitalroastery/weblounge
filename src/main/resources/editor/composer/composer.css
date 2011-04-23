@@ -1,4 +1,8 @@
-.composer :hover {
+.composer {
+	min-height: 50px;
+}
+
+.pagelet:hover {
 	background-color: yellow;
 }
 
