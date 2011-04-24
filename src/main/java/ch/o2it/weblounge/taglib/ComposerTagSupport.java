@@ -41,7 +41,6 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
 import ch.o2it.weblounge.taglib.content.ComposerTag;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,21 +63,10 @@ public class ComposerTagSupport extends WebloungeTag {
   /** Logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(ComposerTag.class);
 
-  /** The composer orientation */
-  public enum Orientation {
-    Horizontal, Vertical
-  };
-
   /** The possible states that this tag can be in while rendering the composer */
   public enum RenderingState {
     Outside, InsideComposer, InsidePagelet
   };
-
-  /** Css class name for vertical composer */
-  public static final String CLASS_VCOMPOSER = "vcomposer";
-
-  /** Css class name for horizontal composer */
-  public static final String CLASS_HCOMPOSER = "hcomposer";
 
   /** CSS class name for composer */
   public static final String CLASS_COMPOSER = "composer";
@@ -103,9 +91,6 @@ public class ComposerTagSupport extends WebloungeTag {
 
   /** True to enable content inheritance */
   protected boolean contentInheritanceEnabled = false;
-
-  /** The composer orientation */
-  protected Orientation orientation = Orientation.Vertical;
 
   /** The composer title */
   protected String description = null;
@@ -155,24 +140,6 @@ public class ComposerTagSupport extends WebloungeTag {
    */
   public void setDebug(String debug) {
     this.debug = ConfigurationUtils.isTrue(debug);
-  }
-
-  /**
-   * Sets the composer orientation. Currently, this feature is not implemented.
-   * 
-   * @param value
-   *          the composer orientation
-   */
-  public void setOrientation(String value) {
-    if (StringUtils.trimToNull(value) == null)
-      throw new IllegalStateException("Orientation must not be null or empty");
-    for (Orientation o : Orientation.values()) {
-      if (o.toString().equalsIgnoreCase(value)) {
-        orientation = o;
-        return;
-      }
-    }
-    throw new IllegalStateException("Unknown composer orientation: '" + value + "'");
   }
 
   /**
@@ -268,34 +235,7 @@ public class ComposerTagSupport extends WebloungeTag {
    * @return the attributes that should be added to the composer
    */
   protected Map<String, String> getComposerAttributes() {
-    addCssClass(getOrientationClass(orientation));
     return getStandardAttributes();
-  }
-
-  /**
-   * Returns the css class that should be added to the composer according to the
-   * composer's orientation.
-   * <p>
-   * This default implementation will return
-   * <ul>
-   * <li><code>vcomposer</code> for vertical orientation</li>
-   * <li><code>hcomposer</code> for horizontal orientation</li>
-   * </ul>
-   * </p>
-   * Returning <code>null</code> will result in no class attribute to be added.
-   * 
-   * @param orientation
-   *          the composer orientation
-   * @return the css class name
-   */
-  protected String getOrientationClass(Orientation orientation) {
-    switch (orientation) {
-      case Horizontal:
-        return CLASS_HCOMPOSER;
-      case Vertical:
-        return CLASS_VCOMPOSER;
-    }
-    return null;
   }
 
   /**
@@ -803,7 +743,6 @@ public class ComposerTagSupport extends WebloungeTag {
     debug = false;
     description = null;
     initialized = false;
-    orientation = Orientation.Vertical;
     pagelets = null;
     renderingState = RenderingState.Outside;
     targetPage = null;

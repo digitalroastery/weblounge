@@ -30,7 +30,6 @@
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>inherit</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>description</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
-		<attribute><name>orientation</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>locked</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 
 		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
