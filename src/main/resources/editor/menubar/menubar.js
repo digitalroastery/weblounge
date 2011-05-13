@@ -3,7 +3,7 @@ steal.plugins(
 'jquery/controller/view',
 'jquery/view',
 'jquery/view/tmpl')
-.views('//editor/menubar/views/menubar.tmpl').css('menubar').then(function($) {
+.views('//editor/menubar/views/menubar.tmpl').css('menubar', 'general').then(function($) {
 
     $.Controller("Editor.Menubar",
 
@@ -23,16 +23,24 @@ steal.plugins(
 			$(this.element).trigger('startuploader');
 		},
 		
-		// Beispiel
-		// ========
-		//"a.pages click": function() {
-		//	this.halloWelt();
-		//	console.log('Konsolenmeldung');
-		//},
-		//
-		//halloWelt: function() {
-		//  alert('Jetzt bin ich Hallo Welt!');
-		//}	
+		// trigger menus
+		".editor_menubar img.add click": function(el, ev) {
+			$('div#add-menu').show().hover(function() { }, function() {$(this).hide();});
+		},
+		
+		".editor_menubar span.profile-menu click": function() {
+			$('.menu').hide();
+			$('div#profile-menu').show().hover(function() { }, function() {$(this).hide();});
+		},
+		
+		".editor_menubar input#search focus": function() {
+			$('div.search-result').show();
+		},
+		
+		".editor_menubar input#search blur": function() {
+			$('div.search-result').hide();
+		},
+		
 				
     });
 

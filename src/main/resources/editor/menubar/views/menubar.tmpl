@@ -2,8 +2,38 @@
 <a class="tab designer active" href="#">Designer</a>
 <a class="tab pages" href="#">Pages</a>
 <a class="tab media" href="#">Media</a>
-<a class="tab uploader" href="#">Uploader</a>
+<img src="images/menu_add.png" class="add"/>
+
 <span class="right">
 	<input type="search" name="search" placeholder="/schiedsrichter/" />
-	<img src="images/user.png" class="user" /><span id="user">Simon</span><span class="triangle-down"></span>
+	<span class="profile-menu">
+		<img src="images/user.png" class="user" alt="">
+		<span id="user">Simon</span>
+		<span class="triangle-down"></span>
+	</span>
 </span>
+
+<div id="add-menu" class="menu">
+	<span class="triangle-up"></span>
+	<ul>
+		<li id="new_page">Neue Seite erstellen</li>
+		<li id="new_upload">Neues Medium hochladen</li>
+		<li id="new_note" class="inactive">Neue Notiz erstellen</li>
+	</ul>
+</div>
+
+<div id="profile-menu" class="menu">
+	<span class="triangle-up"></span>
+	<ul>
+		<li>Einstellungen</li>
+		<li>Nachrichten</li>
+		<li>Logout</li>
+	</ul>
+</div>
+
+<div id="search-result">
+	<p class="section">Webseiten <span class="website">\home\schiedsrichter\</span></p>
+	<p class="section">Dokumente <span class="documents pdf">Kursaufgebot R1</span></p>
+	<p>&nbsp;<span class="documents pdf">Kursaufgebot R2</span></p>
+	<p class="footer">Weitere Resultate...</p>
+</div>
