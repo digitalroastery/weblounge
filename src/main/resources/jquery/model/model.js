@@ -92,16 +92,34 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 					deferred.rejectWith(self, [data])
 				},
 				args = [self.attrs(), resolve, reject];
-			if(type !== 'create'){
+				
+			if(type == 'destroy'){
+				args.shift();
+			}	
+				
+			if(type !== 'create' ){
 				args.unshift(getId(self))
-			}
+			} 
+			
 			deferred.then(success);
 			deferred.fail(error);
 			
 			self.Class[type].apply(self.Class, args);
 				
 			return deferred.promise();
-		};
+		},
+		// a quick way to tell if it's an object and not some string
+		isObject = function(obj){
+			return typeof obj === 'object' && obj !== null && obj;
+		},
+		$method = function(name){
+			return function( eventType, handler ) {
+				$.fn[name].apply($([this]), arguments);
+				return this;
+			}
+		},
+		bind = $method('bind'),
+		unbind = $method('unbind');
 	/**
 	 * @class jQuery.Model
 	 * @tag core
@@ -499,7 +517,7 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 			 *         return $.ajax({
 			 *         	 url: '/things.json',
 			 *           type: 'get',
-			 *           dataType: 'json models',
+			 *           dataType: 'json thing.models',
 			 *           data: params,
 			 *           success: success,
 			 *           error: error})
@@ -543,10 +561,10 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 			 *         var self = this,
 			 *             id = params.id;
 			 *         delete params.id;
-			 *         $.get("/things/"+id+".json",
+			 *         return $.get("/things/"+id+".json",
 			 *           params,
 			 *           success,
-			 *           "json model")
+			 *           "json thing.model")
 			 *       }
 			 *     },{})
 			 * 
@@ -653,7 +671,9 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 		attributes: {},
 		/**
 		 * @function wrap
-		 * 
+		 * @tag deprecated
+		 * __warning__ : wrap is deprecated in favor of [jQuery.Model.static.model].  They 
+		 * provide the same functionality; however, model works better with Deferreds.
 		 * 
 		 * Wrap is used to create a new instance from data returned from the server.
 		 * It is very similar to doing <code> new Model(attributes) </code> 
@@ -672,10 +692,67 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 		 */
 		// wrap place holder
 		/**
-		 * Model is an AJAX converter used to convert raw data from the server, and return an instance of a model class.
-		 * This method can be overwritten within the model
+		 * $.Model.model is used as a [http://api.jquery.com/extending-ajax/#Converters Ajax converter] 
+		 * to convert the response of a [jQuery.Model.static.findOne] request 
+		 * into a model instance.  
 		 * 
-		 * @param {Object} attributes
+		 * You will never call this method directly.  Instead, you tell $.ajax about it in findOne:
+		 * 
+		 *     $.Model('Recipe',{
+		 *       findOne : function(params, success, error ){
+		 *         return $.ajax({
+		 *           url: '/services/recipes/'+params.id+'.json',
+		 *           type: 'get',
+		 *           
+		 *           dataType : 'json recipe.model' //LOOK HERE!
+		 *         });
+		 *       }
+		 *     },{})
+		 * 
+		 * This makes the result of findOne a [http://api.jquery.com/category/deferred-object/ $.Deferred]
+		 * that resolves to a model instance:
+		 * 
+		 *     var deferredRecipe = Recipe.findOne({id: 6});
+		 *     
+		 *     deferredRecipe.then(function(recipe){
+		 *       console.log('I am '+recipes.description+'.');
+		 *     })
+		 * 
+		 * ## Non-standard Services
+		 * 
+		 * $.jQuery.model expects data to be name-value pairs like:
+		 * 
+		 *     {id: 1, name : "justin"}
+		 *     
+		 * It can also take an object with attributes in a data, attributes, or
+		 * 'shortName' property.  For a App.Models.Person model the following will  all work:
+		 * 
+		 *     { data : {id: 1, name : "justin"} }
+		 *     
+		 *     { attributes : {id: 1, name : "justin"} }
+		 *     
+		 *     { person : {id: 1, name : "justin"} }
+		 * 
+		 * 
+		 * ### Overwriting Model
+		 * 
+		 * If your service returns data like:
+		 * 
+		 *     {id : 1, name: "justin", data: {foo : "bar"} }
+		 *     
+		 * This will confuse $.Model.model.  You will want to overwrite it to create 
+		 * an instance manually:
+		 * 
+		 *     $.Model('Person',{
+		 *       model : function(data){
+		 *         return new this(data);
+		 *       }
+		 *     },{})
+		 *     
+		 * ## API
+		 * 
+		 * @param {Object} attributes An object of name-value pairs or an object that has a 
+		 *  data, attributes, or 'shortName' property that maps to an object of name-value pairs.
 		 * @return {Model} an instance of the model
 		 */
 		model: function( attributes ) {
@@ -683,34 +760,39 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 				return null;
 			}
 			return new this(
-			// checks for properties in an object (like rails 2.0 gives);
-			attributes[this.singularName] || attributes.data || attributes.attributes || attributes);
+				// checks for properties in an object (like rails 2.0 gives);
+				isObject(attributes[this.singularName]) || 
+				isObject(attributes.data) || 
+				isObject(attributes.attributes) || 
+				attributes);
 		},
 		/**
 		 * @function wrapMany
-		 * Takes raw data from the server, and returns an array of model instances.
-		 * Each item in the raw array becomes an instance of a model class.
+		 * @tag deprecated
 		 * 
-		 * @codestart
-		 * $.Model.extend("Recipe",{
-		 *   helper : function(){
-		 *     return i*i;
-		 *   }
-		 * })
+		 * __warning__ : wrapMany is deprecated in favor of [jQuery.Model.static.models].  They 
+		 * provide the same functionality; however, models works better with Deferreds.
 		 * 
-		 * var recipes = Recipe.wrapMany([{id: 1},{id: 2}])
-		 * recipes[0].helper() //-> 1
-		 * @codeend
+		 * $.Model.wrapMany converts a raw array of JavaScript Objects into an array (or [jQuery.Model.List $.Model.List]) of model instances.
+		 * 
+		 *     // a Recipe Model wi
+		 *     $.Model.extend("Recipe",{
+		 *       squareId : function(){
+		 *         return this.id*this.id;
+		 *       }
+		 *     })
+		 * 
+		 *     var recipes = Recipe.wrapMany([{id: 1},{id: 2}])
+		 *     recipes[0].squareId() //-> 1
 		 * 
 		 * If an array is not passed to wrapMany, it will look in the object's .data
 		 * property.  
 		 * 
 		 * For example:
 		 * 
-		 * @codestart
-		 * var recipes = Recipe.wrapMany({data: [{id: 1},{id: 2}]})
-		 * recipes[0].helper() //-> 1
-		 * @codeend
+		 *     var recipes = Recipe.wrapMany({data: [{id: 1},{id: 2}]})
+		 *     recipes[0].squareId() //-> 1
+		 * 
 		 * 
 		 * Often wrapMany is used with this.callback inside a model's [jQuery.Model.static.findAll findAll]
 		 * method like:
@@ -718,7 +800,7 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 		 *     findAll : function(params, success, error){
 		 *       $.get('/url',
 		 *             params,
-		 *             this.callback(['wrapMany',success]) )
+		 *             this.callback(['wrapMany',success]), 'json' )
 		 *     }
 		 * 
 		 * If you are having problems getting your model to callback success correctly,
@@ -731,21 +813,85 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 		 *             params,
 		 *             function(data){
 		 *               var wrapped = self.wrapMany(data);
-		 *               success(data)
-		 *             })
+		 *               success(wrapped)
+		 *             },
+		 *             'json')
 		 *     }
 		 * 
 		 * ## API
 		 * 
-		 * @param {Array} instancesRawData an array of raw name - value pairs.
+		 * @param {Array} instancesRawData an array of raw name - value pairs like
+		 * 
+		 *     [{name: "foo", id: 4},{name: "bar", id: 5}]
+		 *     
 		 * @return {Array} a JavaScript array of instances or a [jQuery.Model.List list] of instances
 		 *  if the model list plugin has been included.
 		 */
 		// wrapMany placeholder
 		/**
-		 * Models is an AJAX converter used to convert raw data from the server, and return an array of model instances.
-		 * Each item in the raw array becomes an instance of a model class.
-		 * This method can be overwritten within the model
+		 * $.Model.models is used as a [http://api.jquery.com/extending-ajax/#Converters Ajax converter] 
+		 * to convert the response of a [jQuery.Model.static.findAll] request 
+		 * into an array (or [jQuery.Model.List $.Model.List]) of model instances.  
+		 * 
+		 * You will never call this method directly.  Instead, you tell $.ajax about it in findAll:
+		 * 
+		 *     $.Model('Recipe',{
+		 *       findAll : function(params, success, error ){
+		 *         return $.ajax({
+		 *           url: '/services/recipes.json',
+		 *           type: 'get',
+		 *           data: params
+		 *           
+		 *           dataType : 'json recipe.models' //LOOK HERE!
+		 *         });
+		 *       }
+		 *     },{})
+		 * 
+		 * This makes the result of findAll a [http://api.jquery.com/category/deferred-object/ $.Deferred]
+		 * that resolves to a list of model instances:
+		 * 
+		 *     var deferredRecipes = Recipe.findAll({});
+		 *     
+		 *     deferredRecipes.then(function(recipes){
+		 *       console.log('I have '+recipes.length+'recipes.');
+		 *     })
+		 * 
+		 * ## Non-standard Services
+		 * 
+		 * $.jQuery.models expects data to be an array of name-value pairs like:
+		 * 
+		 *     [{id: 1, name : "justin"},{id:2, name: "brian"}, ...]
+		 *     
+		 * It can also take an object with additional data about the array like:
+		 * 
+		 *     {
+		 *       count: 15000 //how many total items there might be
+		 *       data: [{id: 1, name : "justin"},{id:2, name: "brian"}, ...]
+		 *     }
+		 * 
+		 * In this case, models will return an array of instances found in 
+		 * data, but with additional properties as expandos on the array:
+		 * 
+		 *     var people = Person.models({
+		 *       count : 1500,
+		 *       data : [{id: 1, name: 'justin'}, ...]
+		 *     })
+		 *     people[0].name // -> justin
+		 *     people.count // -> 1500
+		 * 
+		 * ### Overwriting Models
+		 * 
+		 * If your service returns data like:
+		 * 
+		 *     {ballers: [{name: "justin", id: 5}]}
+		 * 
+		 * You will want to overwrite models to pass the base models what it expects like:
+		 * 
+		 *     $.Model('Person',{
+		 *       models : function(data){
+		 *         this._super(data.ballers);
+		 *       }
+		 *     },{})
 		 * 
 		 * @param {Array} instancesRawData an array of raw name - value pairs.
 		 * @return {Array} a JavaScript array of instances or a [jQuery.Model.List list] of instances
@@ -852,7 +998,9 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 			"boolean": function( val ) {
 				return Boolean(val);
 			}
-		}
+		},
+		bind: bind,
+		unbind: unbind
 	},
 	/**
 	 * @Prototype
@@ -1070,11 +1218,7 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 		 * @param {Function} handler a function to call back when an event happens on this model.
 		 * @return {model} the model instance for chaining
 		 */
-		bind: function( eventType, handler ) {
-			var wrapped = $(this);
-			wrapped.bind.apply(wrapped, arguments);
-			return this;
-		},
+		bind: bind,
 		/**
 		 * Unbinds an event handler from this instance.
 		 * Read [jQuery.Model.prototype.bind] for 
@@ -1082,11 +1226,7 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 		 * @param {String} eventType
 		 * @param {Function} handler
 		 */
-		unbind: function( eventType, handler ) {
-			var wrapped = $(this);
-			wrapped.unbind.apply(wrapped, arguments);
-			return this;
-		},
+		unbind: unbind,
 		/**
 		 * Checks if there is a set_<i>property</i> value.  If it returns true, lets it handle; otherwise
 		 * saves it.
@@ -1106,9 +1246,10 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 					$(self).triggerHandler("error." + property, errors);
 				};
 
-			// if the setter returns nothing, do not set
-			// we might want to indicate if this was set ok
-			if ( this[setName] && (value = this[setName](value, this.callback('_updateProperty', property, value, old, success, errorCallback), errorCallback)) === undefined ) {
+			// provides getter / setters
+			// 
+			if ( this[setName] && 
+				(value = this[setName](value, this.callback('_updateProperty', property, value, old, success, errorCallback), errorCallback)) === undefined ) {
 				return;
 			}
 			this._updateProperty(property, value, old, success, errorCallback);
@@ -1143,14 +1284,15 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 				errorCallback(errors);
 			} else {
 				if ( old !== val && !this._init ) {
-					$(this).triggerHandler(property, val);
+					$(this).triggerHandler(property, [val]);
+					$(this).triggerHandler("updated.attr", [property,val, old]); // this is for 3.1
 				}
 				stub = success && success(this);
 
 			}
 
 			//if this class has a global list, add / remove from the list.
-			if ( property == Class.id && val !== null && Class.list ) {
+			if ( property === Class.id && val !== null && Class.list ) {
 				// if we didn't have an old id, add ourselves
 				if (!old ) {
 					Class.list.push(this);
@@ -1358,9 +1500,10 @@ steal.plugins('jquery/class', 'jquery/lang').then(function() {
 			if ( funcName === 'destroyed' && this.Class.list ) {
 				this.Class.list.remove(getId(this));
 			}
-			$(this).triggerHandler(funcName);
 			stub = attrs && typeof attrs == 'object' && this.attrs(attrs.attrs ? attrs.attrs() : attrs);
+			$(this).triggerHandler(funcName);
 			this.publish(funcName, this);
+			$([this.Class]).triggerHandler(funcName, this);
 			return [this].concat(makeArray(arguments)); // return like this for this.callback chains
 		};
 	});
