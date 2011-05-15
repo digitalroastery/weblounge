@@ -1,4 +1,8 @@
-steal.plugins('jquery/view/tmpl', 'editor/app').css('editor').then(function($) {
+steal.plugins(
+'jquery/view/tmpl', 
+'editor/app')
+.css('editor')
+.then(function($) {
 
   $(document).ready(function() {
 	

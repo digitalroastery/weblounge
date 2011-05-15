@@ -1,10 +1,15 @@
 steal.plugins(
-'jquery/controller',
-'jquery/controller/view',
-'jquery/view',
-'jquery/view/tmpl')
-.views('//editor/menubar/views/menubar.tmpl')
-.css('menubar').then(function($) {
+	'jquery/controller',
+	'jquery/controller/view',
+	'jquery/view',
+	'jquery/view/tmpl',
+	'jqueryui/button')
+.views(
+	'//editor/menubar/views/menubar.tmpl')
+.css(
+	'menubar',
+	'css/blitzer/jquery-ui-1.8.11')
+.then(function($) {
 
     $.Controller("Editor.Menubar",
 
@@ -14,7 +19,41 @@ steal.plugins(
      * Initialize a new MenuBar controller.
      */
         init: function(el) {
-            $(el).html('//editor/menubar/views/menubar.tmpl', {});            
+            $(el).html('//editor/menubar/views/menubar.tmpl', {});
+            // initiate buttons
+            $('nav.weblounge div.view').buttonset();
+            $('nav.weblounge div.filter').buttonset();
+            $('nav.weblounge button.list').button({
+            	icons: {primary: "icon-list"},
+            	text: false
+            }).click(function() { 
+            		steal.dev.log('switch to list view');
+            		$('.center.icons').show();
+            		$('div.listview').show();
+            		$('div.treeview').hide();
+            		$('div.thumbnailview').hide();
+            });
+            $('button.tree').button({
+            	icons: {primary: "icon-tree"},
+            	disabled: true,
+            	text: false
+            }).click(function() { 
+            		steal.dev.log('switch to tree view') 
+            		$('div.treeview').show();
+            		$('div.listview').hide();
+            		$('div.thumbnailview').hide();
+            });
+            $('nav.weblounge button.thumbnails').button({
+            	disabled: false,
+            	icons: {primary: "icon-thumbnails"},
+            	text: false }).click(function() { 
+            		steal.dev.log('switch to thumbnail view');
+            		$('.center.icons').hide();
+            		$('div.treeview').hide();
+            		$('div.listview').hide();
+            		$('div.thumbnailview').show();
+            });
+                
         },
 
 		changeMode: function() {},
@@ -45,9 +84,14 @@ steal.plugins(
 		
 		".editor_menubar input blur": function() {
 			$('div#search-result').hide();
-		}
+		},
 		
-				
+		/* move to new plugin "designer" */
+		".pagelet hover": function() {
+			$(this).addClass('hover');
+		},
+		
+		
     });
 
 });

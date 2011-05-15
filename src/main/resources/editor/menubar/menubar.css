@@ -90,11 +90,11 @@ img.add {
 	display: none;
 	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
     border: 1px solid #FFFFFF;
+    -moz-border-radius: 5px;
     line-height: 20px;
     padding: 20px 0;
-    position: relative;
-    top: 10px;
     width: 200px;
+    z-index: 2;
 }
 
 .menu ul {
@@ -113,7 +113,9 @@ img.add {
 }
 
 #add-menu {
-    left: 250px;
+	position: absolute;
+	top: 55px;
+    left: 240px;
 }
 
 #profile-menu {
@@ -135,6 +137,7 @@ div#search-result {
 	position: absolute;
 	right: 150px;
 	color: #fff;
+	z-index: 2;
 }
 
 div#search-result span {
@@ -161,11 +164,11 @@ div#search-result p.section:first-child {
 }
 
 div#search-result span.pdf {
-	background: url('../images/search_result_pdf.png') no-repeat;
+	background: url('images/search_result_pdf.png') no-repeat;
 }
 
 div#search-result span.website {
-	background: url('../images/search_result_page.png') no-repeat;
+	background: url('images/search_result_page.png') no-repeat;
 }
 
 div#search-result p.footer {
@@ -179,3 +182,32 @@ div#search-result p.footer {
 	padding: 5px 0;
 	cursor: pointer;
 }
+
+nav.weblounge {
+	position: relative;
+	height: 30px;
+	line-height: 30px;
+	text-align: left;
+	padding: 10px 5px;
+	padding: 10px 0;
+}
+
+.align_left {
+	float: left;
+}
+
+.align_center {
+	margin: 0 auto;
+	text-align: center;
+}
+
+.align_right {
+	float: right;
+}
+
+/* custom button icons */
+.icon-list {background: url('images/icon_list.png') no-repeat top left !important}
+.icon-tree {background: url('images/icon_tree.png') no-repeat top left !important}
+.icon-thumbnails {background: url('images/icon_thumbnails.png') no-repeat top left !important}
+
+button:hover {color: #000}
