@@ -78,7 +78,7 @@ steal.plugins(
 			$('div#profile-menu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
-		".editor_menubar input focusin": function(el, ev) {
+		".editor_menubar input focus": function(el, ev) {
 			$('div#search-result').show();
 		},
 		
