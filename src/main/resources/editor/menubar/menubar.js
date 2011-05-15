@@ -3,7 +3,8 @@ steal.plugins(
 'jquery/controller/view',
 'jquery/view',
 'jquery/view/tmpl')
-.views('//editor/menubar/views/menubar.tmpl').css('menubar', 'general').then(function($) {
+.views('//editor/menubar/views/menubar.tmpl')
+.css('menubar').then(function($) {
 
     $.Controller("Editor.Menubar",
 
@@ -13,11 +14,16 @@ steal.plugins(
      * Initialize a new MenuBar controller.
      */
         init: function(el) {
-            $(el).html('//editor/menubar/views/menubar.tmpl', {});
-            
-            // initiate buttons
-            
+            $(el).html('//editor/menubar/views/menubar.tmpl', {});            
         },
+
+		changeMode: function() {},
+
+		".tab click": function(el, ev) {
+			this.element.find('.tab.active').removeClass('active');
+			el.addClass('active');
+			this.element.trigger('menubarmodechange', {mode: 'mymode'});
+		},
 
 		".uploader click": function(el, ev) {
 			$(this.element).trigger('startuploader');
@@ -33,13 +39,13 @@ steal.plugins(
 			$('div#profile-menu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
-		".editor_menubar input#search focus": function() {
-			$('div.search-result').show();
+		".editor_menubar input focusin": function(el, ev) {
+			$('div#search-result').show();
 		},
 		
-		".editor_menubar input#search blur": function() {
-			$('div.search-result').hide();
-		},
+		".editor_menubar input blur": function() {
+			$('div#search-result').hide();
+		}
 		
 				
     });

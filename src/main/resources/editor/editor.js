@@ -1,18 +1,13 @@
-steal.plugins('jquery/view/tmpl', 'editor/menubar', 'editor/massuploader', 'editor/composer')
-.css('editor')
-.then(function($) {
+steal.plugins('jquery/view/tmpl', 'editor/app').css('editor').then(function($) {
 
-$(document).ready(function() {
+  $(document).ready(function() {
 	
-	// Append the Weblor skeleton at the end of the page body
-	$(document.body).append('//editor/views/app', {});
-	
-	$('#weblor .menubar').editor_menubar();
-	
-	$('.composer').editor_composer();
-	
-	
-});
+    // Append the Weblounge Editor skeleton at the end of the page body
+    $(document.body).append('//editor/views/app', {});
 
+    // Start the Weblounge Editor App
+    $('#weblounge-editor').editor_app();
+
+  });
 
 });
