@@ -3,6 +3,15 @@
 	padding-top: 100px;
 }
 
+/* mini-rest & general declarations */
+html * {
+    font-size: 100.01%;
+}
+body {
+    font-family: arial,verdana,tahoma;
+    font-size: 12px;
+}
+
 /* move to new plugin "designer" */
 .pagelet:hover,
 .pagelet:hover div,
