@@ -134,8 +134,8 @@ public class MyGengoI18nImport extends AbstractMojo {
         else
           path = "/i18n/message_" + lang + ".xml";
       } else {
-        String filename_wo_site = filename.substring(filename.indexOf("_") + 1);
-        String module = filename_wo_site.substring(filename_wo_site.indexOf("_") + 1, filename_wo_site.indexOf("."));
+        String filenameNoSite = filename.substring(filename.indexOf("_") + 1);
+        String module = filenameNoSite.substring(filenameNoSite.indexOf("_") + 1, filenameNoSite.indexOf("."));
         if (isWeblounge2)
           path = "/module/" + module + "/conf/i18n/message_" + lang + ".xml";
         else

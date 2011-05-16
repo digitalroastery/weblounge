@@ -104,15 +104,18 @@ public class MyGengoI18nExport extends AbstractMojo {
     // get i18n files of modules
     File modules = new File(siteDir, "modules");
     if (!modules.exists()) {
-      modules = new File(siteDir, "module"); // fallback for Weblounge 2 site structure
+      modules = new File(siteDir, "module"); // fallback for Weblounge 2 site
+                                             // structure
     }
     if (modules.exists()) {
       for (File module : modules.listFiles()) {
         if (module.isDirectory()) {
           for (String lang : langs) {
             File moduleI18n = new File(module, "i18n");
-            if(!moduleI18n.exists()) {
-              moduleI18n = new File(module, "conf/i18n"); // fallback for Weblounge 2 site structure
+            if (!moduleI18n.exists()) {
+              moduleI18n = new File(module, "conf/i18n"); // fallback for
+                                                          // Weblounge 2 site
+                                                          // structure
             }
             File file = new File(moduleI18n, "message_".concat(lang).concat(".xml"));
             if (file.exists()) {
