@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="Weblounge Security Service">
+	
+  <implementation class="ch.o2it.weblounge.kernel.security.SpringSecurityServiceImpl" />
+  <property name="service.description" value="Weblounge Security Service" />
+  <service>
+    <provide interface="ch.o2it.weblounge.security.api.SecurityService" />
+  </service>
+
+</scr:component>
