@@ -16,7 +16,7 @@
     <weblounge.basedir>${project.parent.basedir}</weblounge.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-  
+
   <dependencies>
 
     <!-- weblounge -->
@@ -111,7 +111,13 @@
 
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -136,18 +142,18 @@
               ch.o2it.weblounge.common.impl.scheduler;version=${project.version},
               ch.o2it.weblounge.common.impl.site;version=${project.version},
               ch.o2it.weblounge.common.impl.testing;version=${project.version},
-              ch.o2it.weblounge.common.impl.url;version=${project.version}, 
+              ch.o2it.weblounge.common.impl.url;version=${project.version},
               ch.o2it.weblounge.common.impl.util;version=${project.version},
               ch.o2it.weblounge.common.impl.util.config;version=${project.version},
               ch.o2it.weblounge.common.impl.util.xml;version=${project.version},
-							ch.o2it.weblounge.bridge.mail;version=${project.version},
-							ch.o2it.weblounge.contentrepository.impl.bundle;version=${project.version},
+              ch.o2it.weblounge.bridge.mail;version=${project.version},
+              ch.o2it.weblounge.contentrepository.impl.bundle;version=${project.version},
               ch.o2it.weblounge.testing;version=${project.version},
               ch.o2it.weblounge.taglib;version=${project.version},
               ch.o2it.weblounge.taglib.content;version=${project.version},
               ch.o2it.weblounge.taglib.security;version=${project.version},
               ch.o2it.weblounge.taglib.util;version=${project.version},
-							javax.mail;version="1.4",
+              javax.mail;version="1.4",
               javax.servlet;version="2.5",
               javax.servlet.jsp;version="2.1.0",
               javax.servlet.jsp.tagext;version="2.1.0",
