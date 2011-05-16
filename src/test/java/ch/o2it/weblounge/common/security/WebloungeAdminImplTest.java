@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.security;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.security.WebloungeAdminImpl;
-import ch.o2it.weblounge.common.security.User;
 
 import org.junit.Before;
 import org.junit.Test;

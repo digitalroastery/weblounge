@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.content.page;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletReader;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
 
@@ -34,7 +33,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
- * Test case for the implementation at {@link PageletImpl}.
+ * Test case for the implementation at
+ * {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl}.
  */
 public class PageletImplXmlTest extends PageletImplTest {
 

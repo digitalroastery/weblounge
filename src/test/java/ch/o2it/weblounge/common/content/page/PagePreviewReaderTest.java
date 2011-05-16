@@ -106,7 +106,6 @@ public class PagePreviewReaderTest {
    * {@link ch.o2it.weblounge.common.impl.content.page.PagePreviewReader#read(ch.o2it.weblounge.common.content.PageURI, java.io.InputStream)}
    * .
    */
-  @SuppressWarnings("null")
   @Test
   public void testRead() {
     InputStream is = getClass().getResourceAsStream(previewFile);
@@ -114,8 +113,8 @@ public class PagePreviewReaderTest {
     try {
       PagePreviewReader reader = new PagePreviewReader();
       preview = reader.read(is, pageURI);
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error parsing page preview");
     }
 

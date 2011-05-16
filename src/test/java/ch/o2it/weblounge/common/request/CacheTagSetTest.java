@@ -40,10 +40,10 @@ import java.util.List;
  * Test case for {@link CacheTagSet}.
  */
 public class CacheTagSetTest {
-  
+
   /** The cache tag set under test */
   protected CacheTagSet set = null;
-  
+
   /** Value for tag "a" */
   protected String aValue = "a";
 
@@ -77,7 +77,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#add(java.lang.String, java.lang.Object)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#add(java.lang.String, java.lang.Object)}
+   * .
    */
   @Test
   public void testAddStringObject() {
@@ -90,7 +92,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#add(ch.o2it.weblounge.common.content.Tag)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#add(ch.o2it.weblounge.common.content.Tag)}
+   * .
    */
   @Test
   public void testAddTag() {
@@ -103,7 +107,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#excludeTagsWith(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#excludeTagsWith(java.lang.String)}
+   * .
    */
   @Test
   public void testExcludeTagsWithString() {
@@ -112,7 +118,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#excludeTagsWith(java.util.Collection)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#excludeTagsWith(java.util.Collection)}
+   * .
    */
   @Test
   public void testExcludeTagsWithCollectionOfString() {
@@ -125,7 +133,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#addAll(java.util.Collection)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#addAll(java.util.Collection)}
+   * .
    */
   @Test
   public void testAddAll() {
@@ -139,7 +149,8 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#clear()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#clear()}.
    */
   @Test
   public void testClear() {
@@ -149,7 +160,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#contains(java.lang.Object)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#contains(java.lang.Object)}
+   * .
    */
   @Test
   public void testContains() {
@@ -158,7 +171,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#containsAll(java.util.Collection)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#containsAll(java.util.Collection)}
+   * .
    */
   @Test
   public void testContainsAll() {
@@ -169,7 +184,8 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#isEmpty()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#isEmpty()}.
    */
   @Test
   public void testIsEmpty() {
@@ -179,20 +195,23 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#iterator()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#iterator()}.
    */
   @Test
   public void testIterator() {
     assertNotNull(set.iterator());
     assertTrue(set.iterator().hasNext());
     Iterator<CacheTag> iter = set.iterator();
-    for (int i=0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
       iter.next();
     assertFalse(iter.hasNext());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#remove(java.lang.Object)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#remove(java.lang.Object)}
+   * .
    */
   @Test
   public void testRemoveObject() {
@@ -203,7 +222,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#remove(java.lang.String, java.lang.Object)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#remove(java.lang.String, java.lang.Object)}
+   * .
    */
   @Test
   public void testRemoveStringObject() {
@@ -216,7 +237,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#removeAll(java.util.Collection)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#removeAll(java.util.Collection)}
+   * .
    */
   @Test
   public void testRemoveAll() {
@@ -229,7 +252,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#removeAllByTagName(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#removeAllByTagName(java.lang.String)}
+   * .
    */
   @Test
   public void testRemoveAllByTagName() {
@@ -241,7 +266,9 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#retainAll(java.util.Collection)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#retainAll(java.util.Collection)}
+   * .
    */
   @Test
   public void testRetainAll() {
@@ -254,7 +281,8 @@ public class CacheTagSetTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#size()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagSet#size()}.
    */
   @Test
   public void testSize() {

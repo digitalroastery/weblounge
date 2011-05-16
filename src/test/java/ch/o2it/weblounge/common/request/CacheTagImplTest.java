@@ -27,7 +27,6 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.Tag;
 import ch.o2it.weblounge.common.impl.request.CacheTagImpl;
-import ch.o2it.weblounge.common.request.CacheTag;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +38,7 @@ public class CacheTagImplTest {
 
   /** A test tag instances */
   protected CacheTagImpl tag = null;
-  
+
   /** The tag name */
   protected static final String tagName = "test";
 
@@ -89,12 +88,12 @@ public class CacheTagImplTest {
   @Test
   public void testCacheTagImplStringObject() {
     Tag t = null;
-    
+
     // Test null value
     t = new CacheTagImpl(tagName, null);
     assertEquals("test", t.getName());
     assertEquals(CacheTag.ANY, t.getValue());
-    
+
     // Test non-null value
     t = new CacheTagImpl(tagName, tagValue);
     assertEquals("test", t.getName());
@@ -109,8 +108,8 @@ public class CacheTagImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#getName()}
-   * .
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#getName()} .
    */
   @Test
   public void testGetName() {
@@ -128,7 +127,8 @@ public class CacheTagImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}
+   * .
    */
   @Test
   public void testEqualsObject() {
@@ -137,7 +137,7 @@ public class CacheTagImplTest {
     // Test equals -> true
     strictTag = new CacheTagImpl(tagName, tagValue);
     assertTrue(tag.equals(strictTag));
-    
+
     // Test differing value
     strictTag = new CacheTagImpl(tagName, "othervalue");
     assertFalse(tag.equals(strictTag));
@@ -150,15 +150,16 @@ public class CacheTagImplTest {
     strictTag = new CacheTagImpl(tagName);
     assertFalse(tag.equals(strictTag));
   }
-  
+
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}.
+   * {@link ch.o2it.weblounge.common.impl.request.CacheTagImpl#equals(java.lang.Object)}
+   * .
    */
   @Test
   public void testSetMatchAny() {
     tag.setMatchAny();
     assertTrue(tag.matchesAny());
-  }  
+  }
 
 }

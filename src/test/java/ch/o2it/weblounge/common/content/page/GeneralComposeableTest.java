@@ -26,8 +26,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.page.Link;
-import ch.o2it.weblounge.common.content.page.Script;
 import ch.o2it.weblounge.common.impl.content.GeneralComposeable;
 import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
@@ -76,7 +74,7 @@ public class GeneralComposeableTest {
 
   /** English name */
   protected String name = "Default template";
-  
+
   /** Cascading stylesheet include */
   protected Link css = new LinkImpl("http://localhost/css.css");
 

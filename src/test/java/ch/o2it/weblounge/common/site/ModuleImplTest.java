@@ -78,13 +78,13 @@ public class ModuleImplTest {
   protected String name = "Test module";
 
   /** The English language */
-  protected final Language English = new LanguageImpl(new Locale("en"));
+  protected static final Language ENGLISH = new LanguageImpl(new Locale("en"));
 
   /** The German language */
-  protected final Language German = new LanguageImpl(new Locale("de"));
+  protected static final Language GERMAN = new LanguageImpl(new Locale("de"));
 
   /** The Italian language */
-  protected final Language Italian = new LanguageImpl(new Locale("it"));
+  protected static final Language ITALIAN = new LanguageImpl(new Locale("it"));
   
   /** The test action */
   protected Action action = null;

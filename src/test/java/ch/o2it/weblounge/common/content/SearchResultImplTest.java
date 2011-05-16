@@ -41,28 +41,28 @@ import org.junit.Test;
 public class SearchResultImplTest {
 
   /** The search result */
-  protected SearchResultImpl result = null; 
-  
+  protected SearchResultImpl result = null;
+
   /** The search query */
   protected SearchQueryImpl query = null;
-  
+
   /** The mock site */
   protected Site site = null;
 
   /** The total number of hits */
-  protected long hitCount = 100; 
+  protected long hitCount = 100;
 
   /** The number of items included in this result set */
-  protected long documentCount = 10; 
+  protected long documentCount = 10;
 
   /** The first result item */
-  protected int offset = 30; 
+  protected int offset = 30;
 
   /** The maximum number of result items to include */
-  protected int limit = 10; 
+  protected int limit = 10;
 
   /** The search time in milliseconds */
-  protected long searchTime = 23; 
+  protected long searchTime = 23;
 
   /**
    * @throws java.lang.Exception
@@ -76,11 +76,11 @@ public class SearchResultImplTest {
     query.withLimit(limit);
     result = new SearchResultImpl(query, hitCount, documentCount);
     result.setSearchTime(searchTime);
-    
+
     Object source = new Object();
     String id = "4bb19980-8f98-4873-a813-71b5dfac22af";
     WebUrl url = new WebUrlImpl(site, "/");
-    for (int i=0; i < limit; i++) {
+    for (int i = 0; i < limit; i++) {
       double relevance = Math.random();
       SearchResultItemImpl item = new SearchResultItemImpl(site, id, url, Page.TYPE, relevance, source);
       result.addResultItem(item);
@@ -88,7 +88,8 @@ public class SearchResultImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getItems()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getItems()}.
    */
   @Test
   public void testGetItems() {
@@ -102,7 +103,8 @@ public class SearchResultImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getLimit()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getLimit()}.
    */
   @Test
   public void testGetLimit() {
@@ -110,7 +112,8 @@ public class SearchResultImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getOffset()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getOffset()}.
    */
   @Test
   public void testGetOffset() {
@@ -118,16 +121,19 @@ public class SearchResultImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getPage()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getPage()}.
    */
   @Test
   public void testGetPage() {
-    long page = (long)Math.floor(offset/limit) + 1;
+    long page = (long) Math.floor(offset / limit) + 1;
     assertEquals(page, result.getPage());
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getPageSize()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getPageSize()}
+   * .
    */
   @Test
   public void testGetPageSize() {
@@ -135,7 +141,8 @@ public class SearchResultImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getQuery()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getQuery()}.
    */
   @Test
   public void testGetQuery() {
@@ -143,7 +150,9 @@ public class SearchResultImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getSearchTime()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getSearchTime()}
+   * .
    */
   @Test
   public void testGetSearchTime() {
@@ -151,7 +160,9 @@ public class SearchResultImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getHitCount()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getHitCount()}
+   * .
    */
   @Test
   public void testGetHitCount() {
@@ -159,7 +170,9 @@ public class SearchResultImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getDocumentCount()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.content.SearchResultImpl#getDocumentCount()}
+   * .
    */
   @Test
   public void testGetDocumentCount() {

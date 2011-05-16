@@ -46,22 +46,22 @@ public class RequestUtilsTest {
   private Action action = null;
 
   /** The path of the request */
-  private static String REQUEST_PATH = "/my/action/my/param/";
+  private static final String REQUEST_PATH = "/my/action/my/param/";
 
   /** The value of the first url param */
-  private static String URL_PARAM_1 = "my";
+  private static final String URL_PARAM_1 = "my";
 
   /** The value of the second url param */
-  private static String URL_PARAM_2 = "param";
+  private static final String URL_PARAM_2 = "param";
 
   /** The action mountpoint */
-  private static String ACTION_MOUNTPOINT = "/my/action/";
+  private static final String ACTION_MOUNTPOINT = "/my/action/";
 
   @Before
   public void setUp() {
     Site site = EasyMock.createNiceMock(Site.class);
     WebUrl url = new WebUrlImpl(site, REQUEST_PATH);
-    
+
     request = EasyMock.createNiceMock(WebloungeRequest.class);
     EasyMock.expect(request.getUrl()).andReturn(url).anyTimes();
 

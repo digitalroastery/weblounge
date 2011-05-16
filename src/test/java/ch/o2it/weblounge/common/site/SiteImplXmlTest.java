@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.site;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.impl.site.SiteReader;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
 
@@ -34,7 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
- * Test case for the xml capabilities of {@link SiteImpl}.
+ * Test case for the xml capabilities of {@link ch.o2it.weblounge.common.impl.site.SiteImpl}.
  */
 public class SiteImplXmlTest extends SiteImplTest {
 

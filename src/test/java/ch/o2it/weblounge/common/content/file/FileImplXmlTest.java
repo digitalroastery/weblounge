@@ -24,7 +24,6 @@ import static org.junit.Assert.fail;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
 
@@ -35,7 +34,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
- * Test case to test {@link FileResourceImpl}.
+ * Test case to test {@link ch.o2it.weblounge.common.impl.content.file.FileResourceImpl}.
  */
 public class FileImplXmlTest extends FileImplTest {
   

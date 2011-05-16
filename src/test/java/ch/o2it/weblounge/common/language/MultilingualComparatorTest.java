@@ -130,7 +130,7 @@ public class MultilingualComparatorTest {
     assertEquals(germanFirst, localizables.get(0));
     try {
       Collections.sort(localizables, frenchComparator);
-    } catch (Exception e) {
+    } catch (Throwable t) {
       fail("Sorting with an unknown language failed");
     }
   }

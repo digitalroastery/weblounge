@@ -37,13 +37,13 @@ import java.util.Locale;
 public class LanguageImplTest {
 
   /** English locale */
-  Locale englishLocale = new Locale("en");
+  private Locale englishLocale = new Locale("en");
   
   /** English */
-  Language english = new LanguageImpl(englishLocale);
+  private Language english = new LanguageImpl(englishLocale);
 
   /** French */
-  Language french = new LanguageImpl(new Locale("fr"));
+  private Language french = new LanguageImpl(new Locale("fr"));
 
   /**
    * @throws java.lang.Exception

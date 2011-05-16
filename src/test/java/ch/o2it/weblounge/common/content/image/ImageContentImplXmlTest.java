@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.content.image;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.impl.content.image.ImageContentImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageContentReader;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
 
@@ -34,7 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
- * Test case for class {@link ImageContentImpl}.
+ * Test case for class {@link ch.o2it.weblounge.common.impl.content.image.ImageContentImpl}.
  */
 public class ImageContentImplXmlTest extends ImageContentImplTest {
     

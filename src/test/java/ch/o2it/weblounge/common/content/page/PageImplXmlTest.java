@@ -20,11 +20,9 @@
 
 package ch.o2it.weblounge.common.content.page;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import static org.junit.Assert.assertEquals;
-
-import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
 
@@ -35,7 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
- * Test case to test {@link PageImpl}.
+ * Test case to test {@link ch.o2it.weblounge.common.impl.content.page.PageImpl}.
  */
 public class PageImplXmlTest extends PageImplTest {
   

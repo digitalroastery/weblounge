@@ -23,9 +23,6 @@ package ch.o2it.weblounge.common.content.page;
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.content.page.Link;
-import ch.o2it.weblounge.common.content.page.PagePreviewMode;
-import ch.o2it.weblounge.common.content.page.PageletRenderer;
 import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
@@ -38,7 +35,7 @@ import java.net.URL;
 import java.util.Locale;
 
 /**
- * Test case for {@link PageletRendererImpl}.
+ * Test case for {@link ch.o2it.weblounge.common.impl.content.page.PageletRendererImpl}.
  */
 public class PageletRendererImplTest {
 

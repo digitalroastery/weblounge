@@ -42,7 +42,7 @@ public class IdentityHashSetTest {
   private Set<Object> s;
 
   /** some helpers */
-  Object o[] = new Object[5];
+  private Object[] o = new Object[5];
 
   /**
    * @throws java.lang.Exception

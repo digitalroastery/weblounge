@@ -144,10 +144,10 @@ public class SiteImplTest {
   protected ImageStyle highresImageStyle = null;
 
   /** The English language */
-  protected final Language English = new LanguageImpl(new Locale("en"));
+  protected static final Language ENGLISH = new LanguageImpl(new Locale("en"));
 
   /** The German language */
-  protected final Language German = new LanguageImpl(new Locale("de"));
+  protected static final Language GERMAN = new LanguageImpl(new Locale("de"));
   
   /** The admin login module */
   protected AuthenticationModule adminAuthenticationModule = null;
@@ -171,8 +171,8 @@ public class SiteImplTest {
     site.setAdministrator(administrator);
     site.setDefaultTemplate(defaultTemplate);
     site.addTemplate(mobileTemplate);
-    site.setDefaultLanguage(German);
-    site.addLanguage(English);
+    site.setDefaultLanguage(GERMAN);
+    site.addLanguage(ENGLISH);
     site.setDefaultURL(defaultURL);
     site.addURL(fallbackURL);
     site.addURL(localhost);
@@ -367,7 +367,7 @@ public class SiteImplTest {
    */
   @Test
   public void testAddLanguage() {
-    site.addLanguage(English);
+    site.addLanguage(ENGLISH);
     assertEquals(2, site.getLanguages().length);
     site.addLanguage(new LanguageImpl(new Locale("fr")));
     assertEquals(3, site.getLanguages().length);
@@ -380,7 +380,7 @@ public class SiteImplTest {
    */
   @Test
   public void testRemoveLanguage() {
-    site.removeLanguage(German);
+    site.removeLanguage(GERMAN);
     assertEquals(1, site.getLanguages().length);
     assertTrue(site.getDefaultLanguage() == null);
   }
@@ -392,7 +392,7 @@ public class SiteImplTest {
    */
   @Test
   public void testGetLanguage() {
-    assertEquals(German, site.getLanguage(German.getIdentifier()));
+    assertEquals(GERMAN, site.getLanguage(GERMAN.getIdentifier()));
     assertTrue(site.getLanguage("fr") == null);
   }
 
@@ -412,8 +412,8 @@ public class SiteImplTest {
    */
   @Test
   public void testSupportsLanguage() {
-    assertTrue(site.supportsLanguage(German));
-    assertTrue(site.supportsLanguage(English));
+    assertTrue(site.supportsLanguage(GERMAN));
+    assertTrue(site.supportsLanguage(ENGLISH));
     assertFalse(site.supportsLanguage(new LanguageImpl(new Locale("fr"))));
   }
 
@@ -423,7 +423,7 @@ public class SiteImplTest {
    */
   @Test
   public void testGetDefaultLanguage() {
-    assertEquals(German, site.getDefaultLanguage());
+    assertEquals(GERMAN, site.getDefaultLanguage());
   }
 
   /**

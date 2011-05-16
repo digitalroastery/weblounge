@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.content.page.Link;
 import ch.o2it.weblounge.common.impl.content.page.LinkImpl;
-import ch.o2it.weblounge.common.impl.site.ActionSupport;
 import ch.o2it.weblounge.common.impl.site.ModuleImpl;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
@@ -41,7 +40,7 @@ import org.junit.Test;
 import java.net.URL;
 
 /**
- * Test case for {@link ActionSupport}.
+ * Test case for {@link ch.o2it.weblounge.common.impl.site.ActionSupport}.
  */
 public class ActionSupportTest {
 

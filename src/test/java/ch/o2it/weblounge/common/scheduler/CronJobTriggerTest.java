@@ -423,9 +423,9 @@ public class CronJobTriggerTest {
    */
   @Test
   public void testAnnually() {
-    CronJobTrigger AnnuallyTrigger = new CronJobTrigger("@annually");
+    CronJobTrigger annuallyTrigger = new CronJobTrigger("@annually");
     CronJobTrigger equivalentTrigger = new CronJobTrigger("0 0 1 1 *");
-    assertTrue(compare(AnnuallyTrigger, equivalentTrigger));
+    assertTrue(compare(annuallyTrigger, equivalentTrigger));
   }
 
   /**

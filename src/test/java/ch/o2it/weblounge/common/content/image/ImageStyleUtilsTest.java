@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.common.content.image;
 
+import static org.junit.Assert.fail;
+
 import static org.junit.Assert.assertEquals;
 
 import ch.o2it.weblounge.common.impl.content.image.ImageContentImpl;
@@ -119,6 +121,8 @@ public class ImageStyleUtilsTest {
         case None:
           assertEquals(1.0f, scale);
           break;
+        default:
+          fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
   }
@@ -143,6 +147,8 @@ public class ImageStyleUtilsTest {
         case None:
           assertEquals(0.0f, cropX);
           break;
+        default:
+          fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
   }
@@ -167,6 +173,8 @@ public class ImageStyleUtilsTest {
         case None:
           assertEquals(0.0f, cropY);
           break;
+        default:
+          fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
   }
@@ -197,6 +205,8 @@ public class ImageStyleUtilsTest {
         case None:
           assertEquals(originalWidth, scaledWidth);
           break;
+        default:
+          fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
   }
@@ -229,6 +239,8 @@ public class ImageStyleUtilsTest {
         case None:
           assertEquals(originalHeight, scaledHeight);
           break;
+        default:
+          fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
   }
@@ -282,6 +294,8 @@ public class ImageStyleUtilsTest {
             assertEquals(width, image.getWidth());
             assertEquals(originalHeight * (width / originalWidth), image.getHeight());
             break;
+          default:
+            fail("Unknown scaling mode " + style.getScalingMode());
         }
       } finally {
         IOUtils.closeQuietly(is);
@@ -333,6 +347,8 @@ public class ImageStyleUtilsTest {
           assertEquals(width, scaledWidth);
           assertEquals(originalHeight * (width / originalWidth), scaledHeight);
           break;
+        default:
+          fail("Unknown scaling mode " + style.getScalingMode());
       }
     }
   }

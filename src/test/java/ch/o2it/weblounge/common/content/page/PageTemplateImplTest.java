@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 

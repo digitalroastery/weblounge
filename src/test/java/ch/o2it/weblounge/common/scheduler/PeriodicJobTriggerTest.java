@@ -20,10 +20,8 @@
 
 package ch.o2it.weblounge.common.scheduler;
 
-import static org.junit.Assert.assertTrue;
-
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger;
@@ -52,7 +50,7 @@ public class PeriodicJobTriggerTest {
 
   /** The trigger frequency (one second) */
   protected long period = 100L;
-  
+
   /** Number of times that the trigger is expected to be fired */
   protected long expectedTriggerCount = -1;
 
@@ -62,13 +60,15 @@ public class PeriodicJobTriggerTest {
   @Before
   public void setUp() throws Exception {
     expectedTriggerCount = 5;
-    startDate = new Date(now.getTime() + 10L*period);
-    endDate = new Date(startDate.getTime() + expectedTriggerCount*period);
+    startDate = new Date(now.getTime() + 10L * period);
+    endDate = new Date(startDate.getTime() + expectedTriggerCount * period);
     trigger = new PeriodicJobTrigger(period, startDate, endDate, expectedTriggerCount);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#getNextExecutionAfter(java.util.Date)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#getNextExecutionAfter(java.util.Date)}
+   * .
    */
   @Test
   public void testGetNextExecutionAfter() {
@@ -78,14 +78,16 @@ public class PeriodicJobTriggerTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#triggered(java.util.Date)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#triggered(java.util.Date)}
+   * .
    */
   @Test
   public void testTriggeredDate() {
     Date now = startDate;
     int i = 0;
     try {
-      for (i=0; i < expectedTriggerCount + 1; i++) {
+      for (i = 0; i < expectedTriggerCount + 1; i++) {
         trigger.triggered(now);
         now = new Date(now.getTime() + period);
       }
@@ -97,7 +99,9 @@ public class PeriodicJobTriggerTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#getPeriod()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#getPeriod()}
+   * .
    */
   @Test
   public void testGetPeriod() {
@@ -105,11 +109,13 @@ public class PeriodicJobTriggerTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#setPeriod(long)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#setPeriod(long)}
+   * .
    */
   @Test
   public void testSetPeriod() {
-    long newPeriod = 2*period;
+    long newPeriod = 2 * period;
     long regularTriggerTime = startDate.getTime() + period;
     long adjustedTriggerTime = startDate.getTime() + newPeriod;
     assertEquals(regularTriggerTime, trigger.getNextExecutionAfter(startDate).getTime());
@@ -119,13 +125,15 @@ public class PeriodicJobTriggerTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#setRepeatCount(long)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#setRepeatCount(long)}
+   * .
    */
   @Test
   public void testSetRepeatCount() {
     trigger.setRepeatCount(expectedTriggerCount);
     Date now = startDate;
-    for (int i=0; i < expectedTriggerCount; i++) {
+    for (int i = 0; i < expectedTriggerCount; i++) {
       trigger.triggered(now);
       now = new Date(now.getTime() + period);
     }
@@ -139,7 +147,9 @@ public class PeriodicJobTriggerTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#getRepeatCount()}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.scheduler.PeriodicJobTrigger#getRepeatCount()}
+   * .
    */
   @Test
   public void testGetRepeatCount() {

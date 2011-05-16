@@ -156,7 +156,7 @@ public class LanguageUtilsTest {
    */
   @Test
   public void testGetLanguageVariantsByPriority() {
-    String result[] = LanguageUtils.getLanguageVariantsByPriority("test.jsp", french, italian);
+    String[] result = LanguageUtils.getLanguageVariantsByPriority("test.jsp", french, italian);
     assertEquals(3, result.length);
     assertEquals("test_fr.jsp", result[0]);
     assertEquals("test_it.jsp", result[1]);
@@ -171,7 +171,7 @@ public class LanguageUtilsTest {
   @Test
   public void testGetLanguageVariantsStringLanguageArray() {
     Language[] languages = new Language[] { english, french };
-    String result[] = LanguageUtils.getLanguageVariants("test.jsp", languages);
+    String[] result = LanguageUtils.getLanguageVariants("test.jsp", languages);
     assertEquals(3, result.length);
     assertEquals("test_en.jsp", result[0]);
     assertEquals("test_fr.jsp", result[1]);

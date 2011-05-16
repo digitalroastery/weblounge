@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.content.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileContentReader;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
 
@@ -34,7 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
 /**
- * Test case for class {@link ResourceContentImpl}.
+ * Test case for class {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl}.
  */
 public class FileContentImplXmlTest extends FileContentImplTest {
     

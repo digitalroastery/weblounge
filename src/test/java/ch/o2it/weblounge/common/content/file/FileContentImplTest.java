@@ -24,7 +24,6 @@ import static org.junit.Assert.assertFalse;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.content.ResourceContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileContentImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.security.UserImpl;
@@ -37,7 +36,7 @@ import org.junit.Test;
 import java.util.Date;
 
 /**
- * Test case for class {@link ResourceContentImpl}.
+ * Test case for class {@link ch.o2it.weblounge.common.impl.content.ResourceContentImpl}.
  */
 public class FileContentImplTest {
   

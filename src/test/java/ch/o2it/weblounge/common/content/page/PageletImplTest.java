@@ -27,7 +27,6 @@ import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
@@ -53,7 +52,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Test case for the implementation at {@link PageletImpl}.
+ * Test case for the implementation at {@link ch.o2it.weblounge.common.impl.content.page.PageletImpl}.
  */
 public class PageletImplTest {
 

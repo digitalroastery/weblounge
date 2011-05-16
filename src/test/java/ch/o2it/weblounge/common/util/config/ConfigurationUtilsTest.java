@@ -32,19 +32,19 @@ import org.junit.Test;
  * Test case for {@link ConfigurationUtils}.
  */
 public class ConfigurationUtilsTest {
-  
+
   /** Options test */
   protected String options = "a b, c ; d";
 
   /** 25 minutes in milliseconds */
-  protected long twentyFiveMinutes = 25*Times.MS_PER_MIN;
-  
+  protected long twentyFiveMinutes = 25 * Times.MS_PER_MIN;
+
   /** 2 hours in milliseconds */
-  protected long twoHours = 2*Times.MS_PER_HOUR;
-  
+  protected long twoHours = 2 * Times.MS_PER_HOUR;
+
   /** 1 week in milliseconds */
-  protected long oneWeek = 1*Times.MS_PER_WEEK;
-  
+  protected long oneWeek = 1 * Times.MS_PER_WEEK;
+
   /** everything in milliseconds */
   protected long durationInMillis = twentyFiveMinutes + twoHours + oneWeek;
 
@@ -52,7 +52,9 @@ public class ConfigurationUtilsTest {
   protected String duration = "1w2H25M";
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#getMultiOptionValues(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#getMultiOptionValues(java.lang.String)}
+   * .
    */
   @Test
   public void testGetMultiOptionValues() {
@@ -64,7 +66,9 @@ public class ConfigurationUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#isTrue(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#isTrue(java.lang.String)}
+   * .
    */
   @Test
   public void testIsTrue() {
@@ -75,7 +79,9 @@ public class ConfigurationUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#isFalse(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#isFalse(java.lang.String)}
+   * .
    */
   @Test
   public void testIsFalse() {
@@ -86,48 +92,54 @@ public class ConfigurationUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#toDuration(long)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#toDuration(long)}
+   * .
    */
   @Test
   public void testToDuration() {
     assertEquals(duration, ConfigurationUtils.toDuration(durationInMillis));
     assertEquals("1y", ConfigurationUtils.toDuration(Times.MS_PER_YEAR));
-    assertEquals("2y", ConfigurationUtils.toDuration(2*Times.MS_PER_YEAR));
+    assertEquals("2y", ConfigurationUtils.toDuration(2 * Times.MS_PER_YEAR));
     assertEquals("1m", ConfigurationUtils.toDuration(Times.MS_PER_MONTH));
-    assertEquals("2m", ConfigurationUtils.toDuration(2*Times.MS_PER_MONTH));
+    assertEquals("2m", ConfigurationUtils.toDuration(2 * Times.MS_PER_MONTH));
     assertEquals("1w", ConfigurationUtils.toDuration(Times.MS_PER_WEEK));
-    assertEquals("2w", ConfigurationUtils.toDuration(2*Times.MS_PER_WEEK));
+    assertEquals("2w", ConfigurationUtils.toDuration(2 * Times.MS_PER_WEEK));
     assertEquals("1d", ConfigurationUtils.toDuration(Times.MS_PER_DAY));
-    assertEquals("2d", ConfigurationUtils.toDuration(2*Times.MS_PER_DAY));
+    assertEquals("2d", ConfigurationUtils.toDuration(2 * Times.MS_PER_DAY));
     assertEquals("1H", ConfigurationUtils.toDuration(Times.MS_PER_HOUR));
-    assertEquals("2H", ConfigurationUtils.toDuration(2*Times.MS_PER_HOUR));
+    assertEquals("2H", ConfigurationUtils.toDuration(2 * Times.MS_PER_HOUR));
     assertEquals("1M", ConfigurationUtils.toDuration(Times.MS_PER_MIN));
-    assertEquals("2M", ConfigurationUtils.toDuration(2*Times.MS_PER_MIN));
+    assertEquals("2M", ConfigurationUtils.toDuration(2 * Times.MS_PER_MIN));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#parseDuration(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#parseDuration(java.lang.String)}
+   * .
    */
   @Test
   public void testParseDuration() {
     long m = ConfigurationUtils.parseDuration(duration);
     assertEquals(durationInMillis, m);
     assertEquals(Times.MS_PER_YEAR, ConfigurationUtils.parseDuration("1y"));
-    assertEquals(2*Times.MS_PER_YEAR, ConfigurationUtils.parseDuration("2y"));
+    assertEquals(2 * Times.MS_PER_YEAR, ConfigurationUtils.parseDuration("2y"));
     assertEquals(Times.MS_PER_MONTH, ConfigurationUtils.parseDuration("1m"));
-    assertEquals(2*Times.MS_PER_MONTH, ConfigurationUtils.parseDuration("2m"));
+    assertEquals(2 * Times.MS_PER_MONTH, ConfigurationUtils.parseDuration("2m"));
     assertEquals(Times.MS_PER_WEEK, ConfigurationUtils.parseDuration("1w"));
-    assertEquals(2*Times.MS_PER_WEEK, ConfigurationUtils.parseDuration("2w"));
+    assertEquals(2 * Times.MS_PER_WEEK, ConfigurationUtils.parseDuration("2w"));
     assertEquals(Times.MS_PER_DAY, ConfigurationUtils.parseDuration("1d"));
-    assertEquals(2*Times.MS_PER_DAY, ConfigurationUtils.parseDuration("2d"));
+    assertEquals(2 * Times.MS_PER_DAY, ConfigurationUtils.parseDuration("2d"));
     assertEquals(Times.MS_PER_HOUR, ConfigurationUtils.parseDuration("1H"));
-    assertEquals(2*Times.MS_PER_HOUR, ConfigurationUtils.parseDuration("2H"));
+    assertEquals(2 * Times.MS_PER_HOUR, ConfigurationUtils.parseDuration("2H"));
     assertEquals(Times.MS_PER_MIN, ConfigurationUtils.parseDuration("1M"));
-    assertEquals(2*Times.MS_PER_MIN, ConfigurationUtils.parseDuration("2M"));
+    assertEquals(2 * Times.MS_PER_MIN, ConfigurationUtils.parseDuration("2M"));
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#processTemplate(java.lang.String)}.
+   * Test method for
+   * {@link ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils#processTemplate(java.lang.String)}
+   * .
    */
   @Test
   public void testProcessTemplateString() {
