@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2011 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -20,27 +20,31 @@
 
 package ch.o2it.weblounge.common.security;
 
-
 /**
- * A <code>UserListener</code> is notified about users logging into and out of a
- * site.
+ * A rule that defines whether a certain roles may perform an actions.
  */
-public interface UserListener {
+public interface AccessControlEntry {
 
   /**
-   * This method is called if a user logs in.
+   * Returns the role identifier.
    * 
-   * @param user
-   *          the user that logged in
+   * @return the role
    */
-  void userLoggedIn(User user);
+  String getRole();
 
   /**
-   * This method is called if a user logs out.
+   * Returns the action.
    * 
-   * @param user
-   *          the user that logged out
+   * @return the action
    */
-  void userLoggedOut(User user);
+  String getAction();
+
+  /**
+   * Returns <code>true</code> if the role returned by {@link #getRole()} is
+   * allowed the action defined by {@link #getAction()}.
+   * 
+   * @return <code>true</code> if the action is allowed by the role
+   */
+  boolean isAllowed();
 
 }

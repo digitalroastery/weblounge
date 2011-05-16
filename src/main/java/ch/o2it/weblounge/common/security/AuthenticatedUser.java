@@ -20,27 +20,40 @@
 
 package ch.o2it.weblounge.common.security;
 
+import java.security.Principal;
+
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 /**
- * A <code>UserListener</code> is notified about users logging into and out of a
- * site.
+ * Interface defining the fields and methods for an authenticated user.
  */
-public interface UserListener {
+public interface AuthenticatedUser extends User, Principal {
 
   /**
-   * This method is called if a user logs in.
+   * Sets the login context which is later used to perform a clean logout
+   * operation.
    * 
-   * @param user
-   *          the user that logged in
+   * @param context
+   *          the login context
    */
-  void userLoggedIn(User user);
+  void setLoginContext(LoginContext context);
 
   /**
-   * This method is called if a user logs out.
+   * Returns the user's login context. This method returns <code>null</code> if
+   * the user is not authenticated.
    * 
-   * @param user
-   *          the user that logged out
+   * @return the login context
    */
-  void userLoggedOut(User user);
+  LoginContext getLoginContext();
+
+  /**
+   * This method is called by the authentication service when the user is logged
+   * out of the site.
+   * 
+   * @throws LoginException
+   *           if logout fails for some reason
+   */
+  void logout() throws LoginException;
 
 }

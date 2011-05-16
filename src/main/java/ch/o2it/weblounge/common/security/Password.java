@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2011 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -20,27 +20,23 @@
 
 package ch.o2it.weblounge.common.security;
 
-
 /**
- * A <code>UserListener</code> is notified about users logging into and out of a
- * site.
+ * Password credentials.
  */
-public interface UserListener {
+public interface Password {
 
   /**
-   * This method is called if a user logs in.
+   * Returns the digest type.
    * 
-   * @param user
-   *          the user that logged in
+   * @return the type
    */
-  void userLoggedIn(User user);
+  DigestType getDigestType();
 
   /**
-   * This method is called if a user logs out.
+   * Returns the password.
    * 
-   * @param user
-   *          the user that logged out
+   * @return the password
    */
-  void userLoggedOut(User user);
+  String getPassword();
 
 }

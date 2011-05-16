@@ -20,27 +20,17 @@
 
 package ch.o2it.weblounge.common.security;
 
-
 /**
- * A <code>UserListener</code> is notified about users logging into and out of a
- * site.
+ * Provides access to users and roles.
  */
-public interface UserListener {
+public interface SiteDirectory extends DirectoryService {
 
   /**
-   * This method is called if a user logs in.
+   * Returns the identifier for the site that is associated with this user
+   * provider.
    * 
-   * @param user
-   *          the user that logged in
+   * @return the defining site
    */
-  void userLoggedIn(User user);
-
-  /**
-   * This method is called if a user logs out.
-   * 
-   * @param user
-   *          the user that logged out
-   */
-  void userLoggedOut(User user);
+  String getSite();
 
 }

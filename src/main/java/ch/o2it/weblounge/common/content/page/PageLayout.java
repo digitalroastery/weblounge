@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.content.page;
 
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 /**
  * A <code>Layout</code> enforces the placement of certain elements on the page.

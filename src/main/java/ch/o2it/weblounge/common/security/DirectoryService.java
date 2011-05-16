@@ -18,52 +18,43 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.user;
+package ch.o2it.weblounge.common.security;
 
 /**
- * Defines a user with login, realm and name.
+ * A directory provides user and role information. Note that more than one
+ * directory can be registered in the system.
  */
-public interface User extends Cloneable {
-
-  /** Default realm for weblounge users */
-  String DefaultRealm = "weblounge";
-
-  /** Default realm for system users */
-  String SystemRealm = "system";
+public interface DirectoryService {
 
   /**
-   * Returns the name of this user.
+   * Loads a user by its login name or returns <code>null</code> if this user is
+   * not known.
    * 
-   * @returns the user name
+   * @param login
+   *          the login
+   * @return the user
    */
-  String getName();
+  User loadUser(String login);
 
   /**
-   * Returns the login name of this user.
+   * Return all roles.
    * 
-   * @return the login
+   * @return the roles
    */
-  String getLogin();
+  Role[] getRoles();
 
   /**
-   * Returns the realm where this user can be looked up.
+   * Returns the local role name for the abstract role or <code>null</code> if
+   * undefined.
+   * <p>
+   * This method is used to translate roles that are referred to by weblounge
+   * (e. g. <code>abstract_admin</code>) to each individual site, since these
+   * roles will have different names depending on the site's directory.
    * 
-   * @return the realm
+   * @param role
+   *          the abstract role
+   * @return the local role
    */
-  String getRealm();
-
-  /**
-   * Creates a clone of this user.
-   * 
-   * @return the cloned user
-   */
-  Object clone() throws CloneNotSupportedException;
-
-  /**
-   * Returns the <code>XML</code> representation of this user.
-   * 
-   * @return the <code>XML</code> representation
-   */
-  String toXml();
+  Role getLocalRole(Role role);
 
 }

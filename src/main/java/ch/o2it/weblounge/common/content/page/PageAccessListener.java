@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.content.page;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 /**
  * This interface defines the methods for listeners that are interested in page

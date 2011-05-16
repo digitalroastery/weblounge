@@ -20,27 +20,27 @@
 
 package ch.o2it.weblounge.common.security;
 
-
 /**
- * A <code>UserListener</code> is notified about users logging into and out of a
- * site.
+ * Common security constant definitions.
  */
-public interface UserListener {
+public interface SecurityConstants {
 
-  /**
-   * This method is called if a user logs in.
-   * 
-   * @param user
-   *          the user that logged in
-   */
-  void userLoggedIn(User user);
+  /** Name of the admin role */
+  String MH_ADMIN = "weblounge_admin";
 
-  /**
-   * This method is called if a user logs out.
-   * 
-   * @param user
-   *          the user that logged out
-   */
-  void userLoggedOut(User user);
+  /** Name of the anonymous role */
+  String MH_ANONYMOUS = "weblounge_anonymous";
+
+  /** The default organization identifier */
+  String DEFAULT_ORGANIZATION_ID = "weblounge_system";
+
+  /** The default organization name */
+  String DEFAULT_ORGANIZATION_NAME = "Weblounge";
+
+  /** Name of the default organization's local admin role */
+  String DEFAULT_ORGANIZATION_ADMIN = "admin";
+
+  /** Name of the default organization's local anonymous role */
+  String DEFAULT_ORGANIZATION_ANONYMOUS = "anonymous";
 
 }

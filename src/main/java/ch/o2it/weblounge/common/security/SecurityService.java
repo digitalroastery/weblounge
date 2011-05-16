@@ -20,27 +20,43 @@
 
 package ch.o2it.weblounge.common.security;
 
+import ch.o2it.weblounge.common.site.Site;
 
 /**
- * A <code>UserListener</code> is notified about users logging into and out of a
- * site.
+ * Provides access to the current user's username and roles, if any.
  */
-public interface UserListener {
+public interface SecurityService {
 
   /**
-   * This method is called if a user logs in.
+   * Gets the current user, or the local organization's anonymous user if the
+   * user has not been authenticated.
    * 
-   * @param user
-   *          the user that logged in
+   * @return the user
    */
-  void userLoggedIn(User user);
+  User getUser();
 
   /**
-   * This method is called if a user logs out.
+   * Gets the site associated with the current thread context.
+   * 
+   * @return the site
+   */
+  Site getSite();
+
+  /**
+   * Sets the site for the calling thread.
+   * 
+   * @param site
+   *          the site
+   */
+  void setSite(Site organization);
+
+  /**
+   * Sets the current thread's user context to another user. This is useful when
+   * spawning new threads that must contain the parent thread's user context.
    * 
    * @param user
-   *          the user that logged out
+   *          the user to set for the current user context
    */
-  void userLoggedOut(User user);
+  void setUser(User user);
 
 }

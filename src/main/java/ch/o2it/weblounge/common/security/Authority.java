@@ -32,7 +32,7 @@ package ch.o2it.weblounge.common.security;
  * and resolve the permissions that were applied. For example, if a secured
  * object <code>o</code> is told to only allow access to {@link Role}
  * <code>r</code>, and then <code>o</code> is being accessed by
- * {@link ch.o2it.weblounge.common.user.User} <code>u</code> who happens to have
+ * {@link ch.o2it.weblounge.common.security.User} <code>u</code> who happens to have
  * role <code>r</code> assigned, access should be granted.
  * <p>
  * Known authorities are:

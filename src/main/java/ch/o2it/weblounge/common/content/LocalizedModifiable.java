@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.content;
 
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import java.util.Date;
 

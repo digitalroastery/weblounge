@@ -21,7 +21,7 @@
 package ch.o2it.weblounge.common.content.page;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 /**
  * This interface defines the methods and fields for a listener that is

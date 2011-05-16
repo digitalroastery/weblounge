@@ -1,6 +1,6 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
+ *  Copyright (c) 2011 The Weblounge Team
  *  http://weblounge.o2it.ch
  *
  *  This program is free software; you can redistribute it and/or
@@ -20,27 +20,18 @@
 
 package ch.o2it.weblounge.common.security;
 
+import java.util.List;
 
 /**
- * A <code>UserListener</code> is notified about users logging into and out of a
- * site.
+ * A list of rules that define whether certain roles may perform actions.
  */
-public interface UserListener {
+public interface AccessControlList {
 
   /**
-   * This method is called if a user logs in.
+   * Returns the access control list entries.
    * 
-   * @param user
-   *          the user that logged in
+   * @return the entries
    */
-  void userLoggedIn(User user);
-
-  /**
-   * This method is called if a user logs out.
-   * 
-   * @param user
-   *          the user that logged out
-   */
-  void userLoggedOut(User user);
+  List<AccessControlEntry> getEntries();
 
 }

@@ -27,10 +27,9 @@ import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestListener;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
-import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.UserListener;
-import ch.o2it.weblounge.common.user.WebloungeUser;
+import ch.o2it.weblounge.common.security.WebloungeUser;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -448,26 +447,36 @@ public interface Site extends Customizable, RequestListener, Serializable {
 
   /**
    * Returns the administrator user.
+   * <p>
+   * Preferably, the {@link ch.o2it.weblounge.common.security.SecurityService}
+   * is used instead of this method.
    * 
    * @return the site administrator user
    */
+  @Deprecated
   WebloungeUser getAdministrator();
 
   /**
    * Returns the user with the given login name or <code>null</code> if no such
    * user exists.
+   * <p>
+   * Preferably, the {@link ch.o2it.weblounge.common.security.SecurityService}
+   * is used instead of this method.
    * 
    * @param login
    *          the user's login name
    * @return the user
    */
+  @Deprecated
   WebloungeUser getUser(String login);
 
   /**
    * Returns the role with the given identifier, defined in the specified
    * context or <code>null</code> if no such role was found.
    * 
-   * TODO: Remove
+   * <p>
+   * Preferably, the {@link ch.o2it.weblounge.common.security.SecurityService}
+   * is used instead of this method.
    * 
    * @param role
    *          the role identifier
@@ -475,21 +484,8 @@ public interface Site extends Customizable, RequestListener, Serializable {
    *          the role domain
    * @return the role
    */
+  @Deprecated
   Role getRole(String role, String context);
-
-  /**
-   * Returns the group with the given identifier, defined in the specified
-   * context or <code>null</code> if no such group was found.
-   * 
-   * TODO: Remove
-   * 
-   * @param group
-   *          the group identifier
-   * @param context
-   *          the group domain
-   * @return the role
-   */
-  Group getGroup(String group, String context);
 
   /**
    * Returns an <code>XML</code> representation of the site, which will look
@@ -516,5 +512,27 @@ public interface Site extends Customizable, RequestListener, Serializable {
    *          the content repository
    */
   void setContentRepository(ContentRepository repository);
+
+  /**
+   * Returns the name of the site's administrator role.
+   * <p>
+   * Weblounge needs to know what that role name is in order to be able to
+   * assign it to system administrative users.
+   * <p>
+   * In addition, many access restricted actions need to be performed by an
+   * administrator by default.
+   * 
+   * 
+   * @return the name of the administrative role
+   */
+  String getAdministratorRole();
+
+  /**
+   * Returns the name of the site's anonymous role. Weblounge needs to know what
+   * that role name is in order to be able to assign it to unknown users.
+   * 
+   * @return the name of the anonymous role
+   */
+  String getAnonymousRole();
 
 }

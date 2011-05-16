@@ -56,7 +56,7 @@ public interface ContentRepository {
    * <code>false</code> is returned, the repository can safely be casted to a
    * {@link WritableContentRepository}.
    * 
-   * @return <code>true</code> if the respository is read only
+   * @return <code>true</code> if the repository is read only
    */
   boolean isReadOnly();
 

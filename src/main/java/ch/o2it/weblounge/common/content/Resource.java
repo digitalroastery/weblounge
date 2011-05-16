@@ -25,7 +25,7 @@ import ch.o2it.weblounge.common.language.Localizable;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SystemPermission;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import java.util.Date;
 import java.util.Set;
