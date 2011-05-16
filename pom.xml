@@ -19,14 +19,6 @@
 
   <dependencies>
   
-    <!-- weblounge -->
-	
-	  <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
-      <artifactId>weblounge-common-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  
     <!-- osgi support -->
 
     <dependency>
@@ -41,11 +33,6 @@
   
     <!-- thirdparty -->
 
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-  
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
