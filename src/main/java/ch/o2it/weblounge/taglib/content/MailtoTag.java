@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.taglib.content;
 
-import ch.o2it.weblounge.common.user.WebloungeUser;
+import ch.o2it.weblounge.common.security.WebloungeUser;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import org.slf4j.Logger;

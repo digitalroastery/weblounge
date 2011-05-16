@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.taglib.security;
 
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 import javax.servlet.jsp.JspException;

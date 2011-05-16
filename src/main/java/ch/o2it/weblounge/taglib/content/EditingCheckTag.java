@@ -23,7 +23,7 @@ package ch.o2it.weblounge.taglib.content;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.taglib.WebloungeTag;
 
 /**

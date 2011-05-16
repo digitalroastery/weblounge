@@ -28,7 +28,7 @@ import ch.o2it.weblounge.common.content.repository.ContentRepositoryUnavailableE
 import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.taglib.ComposerTagSupport;
 
 import java.io.IOException;
