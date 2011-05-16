@@ -79,17 +79,11 @@
     </dependency>
 
     <!-- apache solr -->
-    
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-common</artifactId>
-      <version>1.3.0</version>
-    </dependency>
-    
+
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
-      <version>1.3.0</version>
+      <version>1.4.1</version>
       <exclusions>
         <exclusion>
           <groupId>woodstox</groupId>
@@ -97,75 +91,37 @@
         </exclusion>
       </exclusions>
     </dependency>
- 
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-lucene-core</artifactId>
-      <version>1.3.0</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-lucene-highlighter</artifactId>
-      <version>1.3.0</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-lucene-queries</artifactId>
-      <version>1.3.0</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-lucene-snowball</artifactId>
-      <version>1.3.0</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-lucene-spellchecker</artifactId>
-      <version>1.3.0</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-dataimporthandler</artifactId>
-      <version>1.3.0</version>
-    </dependency>
- 
+
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
-      <version>1.3.0</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.codehaus.woodstox</groupId>
-      <artifactId>woodstox-core-asl</artifactId>
-      <version>4.0.6</version>
+      <version>1.4.1</version>
     </dependency>
 
-    <!-- apache lucene -->
- 
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>2.9.3</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-analyzers</artifactId>
-      <version>2.4.1</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-memory</artifactId>
-      <version>2.4.1</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>net.java.dev.stax-utils</groupId>
-      <artifactId>stax-utils</artifactId>
-      <version>20040917</version>
+      <version>2.9.3</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-highlighter</artifactId>
+      <version>2.9.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-snowball</artifactId>
+      <version>2.9.3</version>
+    </dependency>
+    
     <dependency>
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
@@ -196,13 +152,37 @@
             <Bundle-SymbolicName>${project.groupId}.contentrepository</Bundle-SymbolicName>
             <Import-Package>
               ch.o2it.weblounge.common.content;version=${project.version},
+              ch.o2it.weblounge.common.content.file;version=${project.version},
               ch.o2it.weblounge.common.content.image;version=${project.version},
+              ch.o2it.weblounge.common.content.page;version=${project.version},
+              ch.o2it.weblounge.common.content.repository;version=${project.version},
               ch.o2it.weblounge.common.impl.content;version=${project.version},
+              ch.o2it.weblounge.common.impl.content.file;version=${project.version},
               ch.o2it.weblounge.common.impl.content.image;version=${project.version},
-              ch.o2it.weblounge.common.site;version=${project.version},
+              ch.o2it.weblounge.common.impl.content.page;version=${project.version},
+              ch.o2it.weblounge.common.impl.language;version=${project.version},
+              ch.o2it.weblounge.common.impl.security;version=${project.version},
+              ch.o2it.weblounge.common.impl.url;version=${project.version},
+              ch.o2it.weblounge.common.impl.util.config;version=${project.version},
               ch.o2it.weblounge.common.impl.util.doc;version=${project.version},
+              ch.o2it.weblounge.common.language;version=${project.version},
+              ch.o2it.weblounge.common.security;version=${project.version},
+              ch.o2it.weblounge.common.site;version=${project.version},
+              ch.o2it.weblounge.common.url;version=${project.version},
               ch.o2it.weblounge.contentrepository;version=${project.version},
               ch.o2it.weblounge.kernel;version=${project.version},
+              org.apache.commons.codec;version="1.3",
+              org.apache.commons.codec.binary;version="1.3",
+              org.apache.commons.codec.language;version="1.3",
+              org.apache.commons.csv,
+              org.apache.commons.fileupload;version="1.2.1",
+              org.apache.commons.fileupload.disk;version="1.2.1",
+              org.apache.commons.fileupload.servlet;version="1.2.1",
+              org.apache.commons.httpclient;version="4.0.1",
+              org.apache.commons.httpclient.methods;version="4.0.1",
+              org.apache.commons.httpclient.methods.multipart;version="4.0.1",
+              org.apache.commons.httpclient.params;version="4.0.1",
+              org.apache.commons.httpclient.util;version="4.0.1",
               org.apache.commons.io;version="1.4",
               org.apache.commons.lang;version="2.4",
               org.slf4j;version="1.5.6",
@@ -214,6 +194,22 @@
               javax.servlet.http;version="2.5",
               javax.ws.rs;version="1.0",
               javax.ws.rs.core;version="1.0",
+              javax.management,
+              javax.management.remote,
+              javax.naming,
+              javax.xml.namespace,
+              javax.xml.parsers,
+              javax.xml.stream,
+              javax.xml.stream.events,
+              javax.xml.stream.util,
+              javax.xml.transform,
+              javax.xml.transform.sax,
+              javax.xml.transform.stream,
+              javax.xml.xpath,
+              org.w3c.dom,
+              org.xml.sax,
+              org.xml.sax.ext,
+              org.xml.sax.helpers,
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
@@ -227,24 +223,16 @@
             </Export-Package>
             <Embed-Dependency>
               jcr;inline=true,
-              lucene-analyzers;inline=true,
-              lucene-memory;inline=true,
-              solr-common;inline=true,
               solr-core;inline=true,
-              solr-dataimporthandler;inline=true,
               solr-solrj;inline=true,
-              solr-lucene-core;inline=true,
-              solr-lucene-highlighter;inline=true,
-              solr-lucene-queries;inline=true,
-              solr-lucene-snowball;inline=true,
-              solr-lucene-spellchecker;inline=true,
-              stax-utils;inline=true
+              lucene-core;inline=true,
+              lucene-analyzers;inline=true,
+              lucene-highlighter;inline=true,
+              lucene-snowball;inline=true
             </Embed-Dependency>
             <Private-Package>
-              solr.*,
-              org.tartarus.*;-split-package:=merge-first,
-              org.apache.solr.*;-split-package:=merge-first,
-              org.apache.lucene.*;-split-package:=merge-first,
+              org.tartarus.snowball;-split-package:=merge-first,
+              org.tartarus.snowball.ext;-split-package:=merge-first,
             </Private-Package>
             <Service-Component>
               OSGI-INF/files-rest-service.xml,

@@ -39,7 +39,6 @@ import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.request.UpdateRequest.ACTION;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.core.SolrCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +46,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
 
 /**
  * A Solr-based search index implementation.
@@ -297,7 +295,6 @@ public class SearchIndex {
       initSolr(solrRoot);
     }
 
-    SolrCore.log.getParent().setLevel(Level.SEVERE);
     solrConnection = new SolrConnection(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
     solrRequester = new SolrRequester(solrConnection);
   }

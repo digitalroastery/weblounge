@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.content.repository.ContentRepository;
+import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.contentrepository.impl.fs.FileSystemContentRepository;
 
 import org.apache.commons.lang.StringUtils;
@@ -172,14 +173,20 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
           if (configuration != null) {
             for (Enumeration<Object> keys = configuration.keys(); keys.hasMoreElements();) {
               Object key = keys.nextElement();
-              finalProperties.put(key, processPropertyTemplates(configuration.get(key)));
+              Object value = configuration.get(key);
+              if (value instanceof String)
+                value = ConfigurationUtils.processTemplate((String)value);
+              finalProperties.put(key, value);
             }
           }
 
           // Overwrite the default configuration with what was passed in
           for (Enumeration<Object> keys = properties.keys(); keys.hasMoreElements();) {
             Object key = keys.nextElement();
-            finalProperties.put(key, processPropertyTemplates(properties.get(key)));
+            Object value = properties.get(key);
+            if (value instanceof String)
+              value = ConfigurationUtils.processTemplate((String)value);
+            finalProperties.put(key, value);
           }
 
           // push the repository configuration
@@ -239,35 +246,6 @@ public class ContentRepositoryServiceFactory implements ManagedServiceFactory, M
     }
 
     return null;
-  }
-
-  /**
-   * Replaces templates inside the property value with their corresponding value
-   * from the system properties and environment.
-   * 
-   * @param value
-   *          the original property value
-   * @return the processed value
-   */
-  private Object processPropertyTemplates(Object v) {
-    if (v == null || !(v instanceof String))
-      return v;
-    
-    String value = (String)v;
-    
-    // Do variable replacement using the system properties
-    for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
-      StringBuffer envKey = new StringBuffer("\\$\\{").append(entry.getKey()).append("\\}");
-      value = value.replaceAll(envKey.toString(), entry.getValue().toString());
-    }
-
-    // Do variable replacement using the system environment
-    for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
-      StringBuffer envKey = new StringBuffer("\\$\\{").append(entry.getKey()).append("\\}");
-      value = value.replaceAll(envKey.toString(), entry.getValue());
-    }
-
-    return value;
   }
 
 }

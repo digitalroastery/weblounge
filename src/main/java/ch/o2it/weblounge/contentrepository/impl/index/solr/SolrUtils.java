@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

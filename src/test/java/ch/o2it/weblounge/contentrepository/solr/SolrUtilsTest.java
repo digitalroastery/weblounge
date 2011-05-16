@@ -22,8 +22,8 @@ package ch.o2it.weblounge.contentrepository.solr;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.impl.security.WebloungeUserImpl;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils;
 
 import org.junit.Test;
@@ -103,7 +103,7 @@ public class SolrUtilsTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils#serializeUser(ch.o2it.weblounge.common.user.User)}.
+   * Test method for {@link ch.o2it.weblounge.contentrepository.impl.index.solr.SolrUtils#serializeUser(ch.o2it.weblounge.common.security.User)}.
    */
   @Test
   public void testSerializeUser() {
