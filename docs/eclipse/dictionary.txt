@@ -76,3 +76,6 @@ serializers
 registry
 admin
 trimpath
+oauth
+jdbc
+datasource
