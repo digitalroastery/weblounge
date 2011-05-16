@@ -23,7 +23,7 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * Provides a static reference to a Config object, modeling the main
+ * Provides a static reference to a Configuration object, modeling the main
  * configuration data for a a Solr instance.
  */
 public class WebloungeSolrConfig extends SolrConfig {

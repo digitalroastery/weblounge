@@ -373,8 +373,8 @@
     <!--
       pingQuery should be "URLish" ... &amp; separated key=val pairs ...
       but there shouldn't be any URL escaping of the values
-    -->
     <pingQuery>qt=standard&amp;q=solrpingquery</pingQuery>
+    -->
     <!--
       configure a healthcheck file for servers behind a loadbalancer
       <healthcheck type="file">server-enabled</healthcheck>
