@@ -119,7 +119,6 @@
               ch.o2it.weblounge.common.impl.util.doc;version="${project.version}",
               ch.o2it.weblounge.common.security;version="${project.version}",
               ch.o2it.weblounge.common.site;version="${project.version}",
-              ch.o2it.weblounge.common.user;version="${project.version}",
               ch.o2it.weblounge.contentrepository.impl.endpoint;version="${project.version}",
               ch.o2it.weblounge.kernel;version="${project.version}",
               org.apache.commons.fileupload,

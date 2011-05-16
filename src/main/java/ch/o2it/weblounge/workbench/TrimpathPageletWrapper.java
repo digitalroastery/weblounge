@@ -28,7 +28,7 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -131,7 +131,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.security.User)
    */
   public void setOwner(User owner) {
     pagelet.setOwner(owner);
@@ -186,7 +186,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.security.User)
    */
   public void setCreator(User user) {
     pagelet.setCreator(user);
@@ -605,7 +605,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setCreated(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
@@ -615,7 +615,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setModified(ch.o2it.weblounge.common.security.User,
    *      java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
@@ -625,7 +625,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setPublished(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setPublished(ch.o2it.weblounge.common.security.User,
    *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
