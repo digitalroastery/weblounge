@@ -299,7 +299,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-scr-plugin</artifactId>
-          <version>1.6.0</version>
+          <version>1.7.0</version>
           <executions>
             <execution>
               <id>generate-scr-scrdescriptor</id>
@@ -531,9 +531,45 @@
       </dependency>
 
       <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.2.2</version>
+      </dependency>
+
+      <dependency>
         <groupId>javax.ws.rs</groupId>
         <artifactId>jsr311-api</artifactId>
         <version>1.1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.core</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.jpa</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.asm</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.antlr</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>javax.persistence</artifactId>
+        <version>2.0.0</version>
       </dependency>
 
       <dependency>
@@ -610,30 +646,6 @@
       </dependency>
   
       <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>org.springframework.security.core</artifactId>
-        <version>3.0.2.RELEASE</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>org.springframework.security.config</artifactId>
-        <version>3.0.2.RELEASE</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>org.springframework.security.web</artifactId>
-        <version>3.0.2.RELEASE</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>org.springframework.security.openid</artifactId>
-        <version>3.0.2.RELEASE</version>
-      </dependency>
-  
-      <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
         <version>20090211</version>
@@ -650,17 +662,25 @@
         <artifactId>slf4j-api</artifactId>
         <version>1.5.6</version>
       </dependency>
-  
-      <dependency>
-        <groupId>rome</groupId>
-        <artifactId>rome</artifactId>
-        <version>1.0</version>
-      </dependency>
+    
+      <!-- Testing -->
   
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>1.5.6</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>1.3.149</version>
+      </dependency>
+
+      <dependency>
+        <groupId>c3p0</groupId>
+        <artifactId>c3p0</artifactId>
+        <version>0.9.1.2</version>
       </dependency>
       
     </dependencies>
