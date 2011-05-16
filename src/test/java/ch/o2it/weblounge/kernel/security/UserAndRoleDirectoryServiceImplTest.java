@@ -73,7 +73,7 @@ public class UserAndRoleDirectoryServiceImplTest {
   protected Password password = new PasswordImpl("secret", DigestType.plain);
 
   @Before
-  public void setup() {
+  public void setUp() {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getIdentifier()).andReturn("testsite").anyTimes();
     EasyMock.replay(site);

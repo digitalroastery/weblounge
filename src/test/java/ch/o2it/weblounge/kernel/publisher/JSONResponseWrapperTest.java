@@ -25,7 +25,6 @@ import static org.junit.Assert.assertNotNull;
 
 import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
-import ch.o2it.weblounge.kernel.publisher.JSONResponseWrapper;
 
 import org.junit.Before;
 import org.junit.Test;
