@@ -103,7 +103,7 @@ public class DataSourceProvider implements ManagedService {
   public static final String DEFAULT_JDBC_DRIVER = "org.h2.Driver";
 
   /** Default jdbc url */
-  public static final String DEFAULT_JDBC_URL = "jdbc:h2:" + System.getProperty("java.io.tmpDir");
+  public static final String DEFAULT_JDBC_URL = "jdbc:h2:" + System.getProperty("java.io.tmpdir") + "/h2";
 
   /** Default jdbc username */
   public static final String DEFAULT_JDBC_USER = "sa";
@@ -115,10 +115,10 @@ public class DataSourceProvider implements ManagedService {
   protected ServiceRegistration propertiesRegistration = null;
 
   /** The datasource registration */
-  protected ServiceRegistration datasourceRegistration;
+  protected ServiceRegistration datasourceRegistration = null;
 
   /** The registered datasource */
-  protected ComboPooledDataSource dataSource;
+  protected ComboPooledDataSource dataSource = null;
 
   /** The bundle context */
   protected BundleContext bundleCtx = null;
@@ -196,7 +196,7 @@ public class DataSourceProvider implements ManagedService {
    *           if the jdbc driver is unknown
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private void registerDatasource(Dictionary properties) throws SQLException,
+  private synchronized void registerDatasource(Dictionary properties) throws SQLException,
       PropertyVetoException {
 
     // Create the datasource
@@ -253,7 +253,7 @@ public class DataSourceProvider implements ManagedService {
    * @throws SQLException
    *           if destroying the datasource fails
    */
-  private void unregisterDatasource() throws SQLException {
+  private synchronized void unregisterDatasource() throws SQLException {
     if (propertiesRegistration != null) {
       logger.debug("Unregistering EclipseLink properties");
       propertiesRegistration.unregister();

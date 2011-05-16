@@ -138,7 +138,7 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>
-    
+ 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -465,7 +465,6 @@
             <Embed-Dependency>
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
-              json;inline=true,
               c3p0;inline=true,
               h2;inline=true,
               mysql-connector-java;inline=true,
@@ -477,7 +476,6 @@
               org.jboss.security.xacml.core.model.policy
             </Private-Package>
             <Service-Component>
-              OSGI-INF/datasource-provider-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,
               OSGI-INF/eclipselink-bundle-sanitizer-service.xml,
               OSGI-INF/kernel-service.xml,
