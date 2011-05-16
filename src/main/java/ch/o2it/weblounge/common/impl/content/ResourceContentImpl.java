@@ -22,7 +22,7 @@ package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -162,7 +162,7 @@ public class ResourceContentImpl implements ResourceContent {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.security.User)
    */
   public void setCreator(User user) {
     creationCtx.setCreator(user);

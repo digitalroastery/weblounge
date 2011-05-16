@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.impl.language.LocalizableContent;
 import ch.o2it.weblounge.common.impl.language.LocalizableObject;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 /**
  * This class represents the default implementation of a {@link PageLayout}. Its
@@ -93,7 +93,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    *          the user
    * @return <code>true</code>
    * @see ch.o2it.weblounge.common.content.page.PageLayout#isEditable(java.lang.String,
-   *      ch.o2it.weblounge.common.user.User)
+   *      ch.o2it.weblounge.common.security.User)
    */
   public boolean isEditable(String composer, User user) {
     return true;
@@ -110,7 +110,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    * @param user
    *          the user
    * @see ch.o2it.weblounge.common.content.page.PageLayout#isEditable(java.lang.String,
-   *      int, ch.o2it.weblounge.common.user.User)
+   *      int, ch.o2it.weblounge.common.security.User)
    */
   public boolean isEditable(String composer, int position, User user) {
     return true;
@@ -128,7 +128,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    *          the user
    * 
    * @see ch.o2it.weblounge.common.content.page.PageLayout#isMovable(java.lang.String,
-   *      int, ch.o2it.weblounge.common.user.User)
+   *      int, ch.o2it.weblounge.common.security.User)
    */
   public boolean isMovable(String composer, int position, User user) {
     return true;
@@ -145,7 +145,7 @@ public class DefaultPageLayout extends LocalizableObject implements PageLayout {
    * @param user
    *          the user
    * @see ch.o2it.weblounge.common.content.page.PageLayout#isRemovable(java.lang.String,
-   *      int, ch.o2it.weblounge.common.user.User)
+   *      int, ch.o2it.weblounge.common.security.User)
    */
   public boolean isRemovable(String composer, int position, User user) {
     return true;

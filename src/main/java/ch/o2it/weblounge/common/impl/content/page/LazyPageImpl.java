@@ -32,7 +32,7 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -725,7 +725,7 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Page#setLocked(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.page.Page#setLocked(ch.o2it.weblounge.common.security.User)
    */
   public void setLocked(User user) throws IllegalStateException {
     if (!isHeaderLoaded)
@@ -736,7 +736,7 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Resource#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.Resource#setCreated(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setCreated(User user, Date date) {
@@ -748,7 +748,7 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Page#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Page#setModified(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setModified(User user, Date date) {
@@ -771,7 +771,7 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Page#setPublished(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Page#setPublished(ch.o2it.weblounge.common.security.User,
    *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
@@ -961,7 +961,7 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.security.User)
    */
   public void setCreator(User user) {
     if (!isHeaderLoaded)
@@ -1176,7 +1176,7 @@ public class LazyPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.security.User)
    */
   public void setOwner(User owner) {
     if (!isHeaderLoaded)

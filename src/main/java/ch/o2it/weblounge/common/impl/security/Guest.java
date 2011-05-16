@@ -18,9 +18,8 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.user;
+package ch.o2it.weblounge.common.impl.security;
 
-import ch.o2it.weblounge.common.impl.security.SystemRole;
 
 /**
  * Guest user, which is automatically taken as the user object if no valid user
@@ -35,7 +34,7 @@ public class Guest extends WebloungeUserImpl {
   public Guest() {
     super("guest");
     setName("Guest");
-    assignRole(SystemRole.GUEST);
+    addPublicCredentials(SystemRole.GUEST);
   }
 
 }

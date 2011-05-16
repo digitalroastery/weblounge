@@ -18,13 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.user;
+package ch.o2it.weblounge.common.security;
 
 import static org.junit.Assert.fail;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
 
@@ -41,12 +41,13 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 /**
- * Tests loading a {@link WebloungeUserImpl} from a piece of <code>XML</code>.
+ * Tests loading and serializing of {@link UserImpl} objects from and to
+ * <code>XML</code>.
  */
-public class WebloungeUserImplXmlTest extends WebloungeUserImplTest {
+public class UserImplXmlTest extends UserImplTest {
 
   /** File path and name */
-  protected String testFile = "/webloungeuser.xml";
+  protected String testFile = "/user.xml";
 
   /**
    * @throws java.lang.Exception
@@ -60,12 +61,12 @@ public class WebloungeUserImplXmlTest extends WebloungeUserImplTest {
     Document doc = docBuilder.parse(testContext.openStream());
     XPath xpath = XPathFactory.newInstance().newXPath();
     xpath.setNamespaceContext(new XPathNamespaceContext(true));
-    setUpPrerequisites();
-    user = WebloungeUserImpl.fromXml(doc.getFirstChild(), mockSite, xpath);
+    user = UserImpl.fromXml(doc.getFirstChild(), xpath);
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#toXml()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#toXml()}
+   * .
    */
   @Test
   public void testToXml() {

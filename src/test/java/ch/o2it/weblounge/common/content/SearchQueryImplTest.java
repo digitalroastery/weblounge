@@ -29,11 +29,11 @@ import ch.o2it.weblounge.common.content.page.Pagelet;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -342,7 +342,7 @@ public class SearchQueryImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withAuthor(ch.o2it.weblounge.common.user.User)}
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withAuthor(ch.o2it.weblounge.common.security.User)}
    * .
    */
   @Test
@@ -454,7 +454,7 @@ public class SearchQueryImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withCreator(ch.o2it.weblounge.common.user.User)}
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withCreator(ch.o2it.weblounge.common.security.User)}
    * .
    */
   @Test
@@ -466,7 +466,7 @@ public class SearchQueryImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withModifier(ch.o2it.weblounge.common.user.User)}
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withModifier(ch.o2it.weblounge.common.security.User)}
    * .
    */
   @Test
@@ -478,7 +478,7 @@ public class SearchQueryImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withPublisher(ch.o2it.weblounge.common.user.User)}
+   * {@link ch.o2it.weblounge.common.impl.content.SearchQueryImpl#withPublisher(ch.o2it.weblounge.common.security.User)}
    * .
    */
   @Test

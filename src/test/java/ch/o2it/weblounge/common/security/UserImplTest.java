@@ -18,13 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.user;
+package ch.o2it.weblounge.common.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class UserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#hashCode()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#hashCode()}.
    */
   @Test
   public void testHashCode() {
@@ -63,7 +63,7 @@ public class UserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#getLogin()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#getLogin()}.
    */
   @Test
   public void testGetLogin() {
@@ -71,7 +71,7 @@ public class UserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#setName(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#setName(java.lang.String)}.
    */
   @Test
   public void testSetName() {
@@ -81,7 +81,7 @@ public class UserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#getName()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#getName()}.
    */
   @Test
   public void testGetName() {
@@ -89,7 +89,7 @@ public class UserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#setRealm(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#setRealm(java.lang.String)}.
    */
   @Test
   public void testSetRealm() {
@@ -99,7 +99,7 @@ public class UserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#getRealm()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#getRealm()}.
    */
   @Test
   public void testGetRealm() {
@@ -107,7 +107,7 @@ public class UserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#equals(java.lang.Object)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#equals(java.lang.Object)}.
    */
   @Test
   public void testEqualsObject() {

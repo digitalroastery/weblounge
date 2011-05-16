@@ -21,11 +21,11 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.impl.util.xml.WebloungeSAXHandler;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

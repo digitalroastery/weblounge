@@ -29,10 +29,10 @@ import ch.o2it.weblounge.common.impl.scheduler.QuartzJob;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobTrigger;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzJobWorker;
 import ch.o2it.weblounge.common.impl.scheduler.QuartzTriggerListener;
+import ch.o2it.weblounge.common.impl.security.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
-import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.config.OptionsHelper;
 import ch.o2it.weblounge.common.impl.util.xml.ValidationErrorHandler;
@@ -47,9 +47,10 @@ import ch.o2it.weblounge.common.scheduler.Job;
 import ch.o2it.weblounge.common.scheduler.JobTrigger;
 import ch.o2it.weblounge.common.scheduler.JobWorker;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
-import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Role;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.security.UserListener;
+import ch.o2it.weblounge.common.security.WebloungeUser;
 import ch.o2it.weblounge.common.site.I18nDictionary;
 import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.ModuleException;
@@ -57,8 +58,6 @@ import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteException;
 import ch.o2it.weblounge.common.site.SiteListener;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.User;
-import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -112,6 +111,12 @@ public class SiteImpl implements Site {
 
   /** Regular expression to test the validity of a site identifier */
   private static final String SITE_IDENTIFIER_REGEX = "^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*$";
+
+  /** Name of the administrator role. TODO: Should be configurable */
+  private static final String ADMINISTRATOR_ROLE = "administrator";
+
+  /** Name of the anonymous role. TODO: Should be configurable */
+  private static final String ANONYMOUS_ROLE = "anonymous";
 
   /** The site identifier */
   protected String identifier = null;
@@ -273,7 +278,7 @@ public class SiteImpl implements Site {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.Site#setAdministrator(ch.o2it.weblounge.common.user.WebloungeUser)
+   * @see ch.o2it.weblounge.common.site.Site#setAdministrator(ch.o2it.weblounge.common.security.WebloungeUser)
    */
   public void setAdministrator(WebloungeUser administrator) {
     if (administrator != null)
@@ -723,6 +728,24 @@ public class SiteImpl implements Site {
         userListeners.remove(listener);
       }
     }
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#getAdministratorRole()
+   */
+  public String getAdministratorRole() {
+    return ADMINISTRATOR_ROLE;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.o2it.weblounge.common.site.Site#getAnonymousRole()
+   */
+  public String getAnonymousRole() {
+    return ANONYMOUS_ROLE;
   }
 
   /**
@@ -1191,17 +1214,6 @@ public class SiteImpl implements Site {
     this.contentRepository = null;
     logger.info("Content repository {} disconnected from site '{}'", repository, this);
     fireRepositoryDisconnected(repository);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see ch.o2it.weblounge.common.site.Site#getGroup(java.lang.String,
-   *      java.lang.String)
-   */
-  public Group getGroup(String group, String context) {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   /**

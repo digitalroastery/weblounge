@@ -22,15 +22,15 @@ package ch.o2it.weblounge.common.impl.request;
 
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
+import ch.o2it.weblounge.common.impl.security.Guest;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
-import ch.o2it.weblounge.common.impl.user.Guest;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

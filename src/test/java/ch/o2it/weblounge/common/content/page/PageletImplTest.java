@@ -33,14 +33,14 @@ import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Securable;
 import ch.o2it.weblounge.common.security.SecurityListener;
 import ch.o2it.weblounge.common.security.SystemPermission;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 
 import org.easymock.EasyMock;
 import org.junit.Before;

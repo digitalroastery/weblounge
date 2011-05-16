@@ -25,8 +25,8 @@ import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.content.CreationContext;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
+import ch.o2it.weblounge.common.security.User;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +94,7 @@ public class CreationContextImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#setCreator(ch.o2it.weblounge.common.user.User)}
+   * {@link ch.o2it.weblounge.common.impl.content.CreationContext#setCreator(ch.o2it.weblounge.common.security.User)}
    * .
    */
   @Test

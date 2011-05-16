@@ -24,9 +24,9 @@ import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.User;
 
 import java.util.Collections;
 import java.util.Enumeration;

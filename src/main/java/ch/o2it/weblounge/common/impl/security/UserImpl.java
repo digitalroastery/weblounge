@@ -18,12 +18,15 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.user;
+package ch.o2it.weblounge.common.impl.security;
 
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.w3c.dom.Node;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -43,6 +46,12 @@ public class UserImpl implements User {
 
   /** The user's name */
   protected String name = null;
+
+  /** the public credentials set */
+  protected Set<Object> publicCredentials = null;
+
+  /** the private credentials set */
+  protected Set<Object> privateCredentials = null;
 
   /**
    * Creates a new user with the given login.
@@ -87,7 +96,7 @@ public class UserImpl implements User {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.User#getLogin()
+   * @see ch.o2it.weblounge.common.security.User#getLogin()
    */
   public String getLogin() {
     return login;
@@ -106,7 +115,7 @@ public class UserImpl implements User {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.User#getName()
+   * @see ch.o2it.weblounge.common.security.User#getName()
    */
   public String getName() {
     return name;
@@ -128,10 +137,122 @@ public class UserImpl implements User {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.User#getRealm()
+   * @see ch.o2it.weblounge.common.security.User#getRealm()
    */
   public String getRealm() {
     return realm;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.User#addPrivateCredentials(java.lang.Object[])
+   */
+  public void addPrivateCredentials(Object... credentials) {
+    if (privateCredentials == null) {
+      privateCredentials = new HashSet<Object>();
+    }
+    for (Object o : credentials) {
+      privateCredentials.add(o);
+    }
+  }
+
+  /**
+   * Removes the private credentials from this user.
+   * 
+   * @param credentials
+   *          the credentials
+   * @return <code>true</code> if the credentials was removed
+   */
+  public boolean removePrivateCredentials(Object credentials) {
+    if (privateCredentials == null)
+      return false;
+    return privateCredentials.remove(credentials);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.User#getPrivateCredentials()
+   */
+  public Set<Object> getPrivateCredentials() {
+    if (privateCredentials != null) {
+      return privateCredentials;
+    } else {
+      return new HashSet<Object>();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.User#getPrivateCredentials(java.lang.Class)
+   */
+  public Set<Object> getPrivateCredentials(Class<?> type) {
+    Set<Object> set = new HashSet<Object>();
+    if (privateCredentials != null) {
+      for (Object c : privateCredentials) {
+        if (type.isAssignableFrom(c.getClass()))
+          set.add(c);
+      }
+    }
+    return set;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.User#addPublicCredentials(java.lang.Object[])
+   */
+  public void addPublicCredentials(Object... credentials) {
+    if (publicCredentials == null) {
+      publicCredentials = new HashSet<Object>();
+    }
+    for (Object o : credentials) {
+      publicCredentials.add(o);
+    }
+  }
+
+  /**
+   * Removes the public credentials from this user.
+   * 
+   * @param credentials
+   *          the credentials
+   * @return <code>true</code> if the credentials was removed
+   */
+  public boolean removePublicCredentials(Object credentials) {
+    if (publicCredentials == null)
+      return false;
+    return publicCredentials.remove(credentials);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.User#getPublicCredentials()
+   */
+  public Set<Object> getPublicCredentials() {
+    if (publicCredentials != null) {
+      return publicCredentials;
+    } else {
+      return new HashSet<Object>();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.o2it.weblounge.common.security.User#getPublicCredentials(java.lang.Class)
+   */
+  public Set<Object> getPublicCredentials(Class<?> type) {
+    Set<Object> set = new HashSet<Object>();
+    if (publicCredentials != null) {
+      for (Object c : publicCredentials) {
+        if (type.isAssignableFrom(c.getClass()))
+          set.add(c);
+      }
+    }
+    return set;
   }
 
   /**
@@ -188,7 +309,7 @@ public class UserImpl implements User {
    */
   @Override
   public Object clone() throws CloneNotSupportedException {
-    UserImpl user = (UserImpl)super.clone();
+    UserImpl user = (UserImpl) super.clone();
     user.login = login;
     user.realm = realm;
     user.name = name;
@@ -236,7 +357,7 @@ public class UserImpl implements User {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.User#toXml()
+   * @see ch.o2it.weblounge.common.security.User#toXml()
    */
   public String toXml() {
     StringBuffer buf = new StringBuffer();

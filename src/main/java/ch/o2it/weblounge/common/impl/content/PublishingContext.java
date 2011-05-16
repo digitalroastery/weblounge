@@ -21,10 +21,10 @@
 package ch.o2it.weblounge.common.impl.content;
 
 import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.w3c.dom.Node;
 

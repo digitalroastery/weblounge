@@ -37,11 +37,11 @@ import ch.o2it.weblounge.common.impl.content.file.FileContentImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.security.SiteAdminImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 
 import org.easymock.EasyMock;
 import org.junit.Before;

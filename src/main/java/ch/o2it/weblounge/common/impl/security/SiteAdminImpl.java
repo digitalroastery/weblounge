@@ -18,23 +18,23 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.user;
+package ch.o2it.weblounge.common.impl.security;
 
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.DigestType;
+import ch.o2it.weblounge.common.security.Password;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
@@ -54,14 +54,14 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
    */
   public SiteAdminImpl(String login) {
     super(login, SystemRealm);
-    assignRole(SystemRole.SITEADMIN);
+    addPublicCredentials(SystemRole.SITEADMIN);
     setName("Site Administrator (" + login + ")");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.user.UserImpl#setRealm(java.lang.String)
+   * @see ch.o2it.weblounge.common.impl.security.UserImpl#setRealm(java.lang.String)
    */
   @Override
   public void setRealm(String realm) {
@@ -71,7 +71,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#equals(java.lang.Object)
+   * @see ch.o2it.weblounge.common.impl.security.AuthenticatedUserImpl#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
@@ -82,7 +82,7 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#hashCode()
+   * @see ch.o2it.weblounge.common.impl.security.AuthenticatedUserImpl#hashCode()
    */
   @Override
   public int hashCode() {
@@ -162,8 +162,8 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
       String digestType = null;
       try {
         digestType = XPathHelper.valueOf(userNode, "ns:password/@type", xpath);
-        user.passwordDigestType = DigestType.valueOf(digestType);
-        user.password = password.getBytes();
+        Password pw = new PasswordImpl(password, DigestType.valueOf(digestType));
+        user.addPrivateCredentials(pw);
       } catch (Throwable t) {
         throw new IllegalStateException("Unknown password digest found: " + digestType);
       }
@@ -203,15 +203,14 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
     b.append("<login>").append(login).append("</login>");
 
     // Password
-    try {
+    Set<Object> passwords = getPrivateCredentials(Password.class);
+    for (Object o : passwords) {
+      Password password = (Password)o;
       b.append("<password type=\"");
-      b.append(passwordDigestType.toString());
+      b.append(password.getDigestType().toString());
       b.append("\">");
-      b.append(new String(password, "utf-8"));
+      b.append(password.getPassword());
       b.append("</password>");
-    } catch (UnsupportedEncodingException e) {
-      // Can't happen, utf-8 support is mandatory
-      throw new IllegalStateException("This platform is missing utf-8 encoding support");
     }
 
     // First name

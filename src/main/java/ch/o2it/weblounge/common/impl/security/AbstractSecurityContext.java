@@ -21,11 +21,10 @@
 package ch.o2it.weblounge.common.impl.security;
 
 import ch.o2it.weblounge.common.security.Authority;
-import ch.o2it.weblounge.common.security.Group;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +54,6 @@ public abstract class AbstractSecurityContext {
   static {
     addAuthorityTypeShortcut(User.class.getName(), "user");
     addAuthorityTypeShortcut(Role.class.getName(), "role");
-    addAuthorityTypeShortcut(Group.class.getName(), "group");
   }
 
   /**

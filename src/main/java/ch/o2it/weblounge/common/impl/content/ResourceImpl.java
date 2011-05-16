@@ -33,7 +33,7 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -246,7 +246,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.content.Resource#setPublished(ch.o2it.weblounge.common.user.User, java.util.Date, java.util.Date)
+   * @see ch.o2it.weblounge.common.content.Resource#setPublished(ch.o2it.weblounge.common.security.User, java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
     publishingCtx.setPublished(publisher, from, to);
@@ -477,7 +477,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.security.User)
    */
   public void setOwner(User owner) {
     securityCtx.setOwner(owner);
@@ -639,7 +639,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreated(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
@@ -667,7 +667,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.security.User)
    */
   public void setCreator(User user) {
     creationCtx.setCreator(user);
@@ -712,7 +712,7 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Modifiable#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.Modifiable#setModified(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setModified(User user, Date date) {

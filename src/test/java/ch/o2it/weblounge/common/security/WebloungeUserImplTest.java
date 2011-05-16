@@ -18,21 +18,18 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.user;
+package ch.o2it.weblounge.common.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.language.English;
-import ch.o2it.weblounge.common.impl.security.GroupImpl;
+import ch.o2it.weblounge.common.impl.security.PasswordImpl;
 import ch.o2it.weblounge.common.impl.security.RoleImpl;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
-import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
+import ch.o2it.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
-import ch.o2it.weblounge.common.security.DigestType;
-import ch.o2it.weblounge.common.security.Group;
-import ch.o2it.weblounge.common.security.Role;
 import ch.o2it.weblounge.common.site.Site;
 
 import org.easymock.EasyMock;
@@ -40,6 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Tests the {@link WebloungeUserImpl} implementation.
@@ -59,7 +57,7 @@ public class WebloungeUserImplTest {
   protected String realm = "testland";
 
   /** Password */
-  protected byte[] password = "test".getBytes();
+  protected String password = "pass";
 
   /** The digest */
   protected DigestType passwordDigestType = DigestType.md5;
@@ -88,9 +86,6 @@ public class WebloungeUserImplTest {
   /** Test property value */
   protected String propertyValue = "/test";
   
-  /** Publisher group */
-  protected Group publisherGroup = new GroupImpl("publisher", "system");
-
   /** Application role */
   protected Role apprenticeRole = new RoleImpl("myapp", "apprentice");
 
@@ -117,7 +112,6 @@ public class WebloungeUserImplTest {
   protected void setUpPrerequisites() throws Exception {
     mockSite = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(mockSite.getIdentifier()).andReturn("test");
-    EasyMock.expect(mockSite.getGroup("publisher", "system")).andReturn(publisherGroup);
     EasyMock.expect(mockSite.getRole("apprentice", "myapp")).andReturn(apprenticeRole);
     EasyMock.replay(mockSite);
     lastLoginDate = WebloungeDateFormat.parseStatic("2009-03-17T03:22:05Z");
@@ -129,13 +123,12 @@ public class WebloungeUserImplTest {
    * setup themselves.
    */
   protected void setUpUser() throws Exception {
-    user.setPassword(password, passwordDigestType);
+    user.addPrivateCredentials(new PasswordImpl(password, passwordDigestType));
     user.setFirstName(firstname);
     user.setLastName(lastname);
     user.setLanguage(English.getInstance());
     user.setEmail(email);
-    user.addMembership(publisherGroup);
-    user.assignRole(apprenticeRole);
+    user.addPublicCredentials(apprenticeRole);
     lastLoginDate = WebloungeDateFormat.parseStatic("2009-03-17T03:22:05Z");
     user.setLastLogin(lastLoginDate, lastLoginSource);
     user.setProperty(propertyName, propertyValue);
@@ -143,7 +136,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.UserImpl#getLogin()}.
+   * {@link ch.o2it.weblounge.common.impl.security.UserImpl#getLogin()}.
    */
   @Test
   public void testGetLogin() {
@@ -152,7 +145,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.UserImpl#setRealm(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.security.UserImpl#setRealm(java.lang.String)}
    * .
    */
   @Test
@@ -164,7 +157,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.UserImpl#getRealm()}.
+   * {@link ch.o2it.weblounge.common.impl.security.UserImpl#getRealm()}.
    */
   @Test
   public void testGetRealm() {
@@ -175,7 +168,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.UserImpl#getRealm()}.
+   * {@link ch.o2it.weblounge.common.impl.security.UserImpl#getRealm()}.
    */
   @Test
   public void testDefaultRealm() {
@@ -185,12 +178,11 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.UserImpl#equals(java.lang.Object)}
+   * {@link ch.o2it.weblounge.common.impl.security.UserImpl#equals(java.lang.Object)}
    * .
    */
   @Test
   public void testEqualsObject() {
-    assertTrue(user.isAuthorizedBy(user));
     assertTrue(user.equals(new UserImpl(login, realm)));
     assertTrue(user.equals(new UserImpl(login, realm)));
     assertFalse(user.equals(new UserImpl(login, "wonderland")));
@@ -199,7 +191,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.UserImpl#setName(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.security.UserImpl#setName(java.lang.String)}
    * .
    */
   @Test
@@ -211,7 +203,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getName()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
    */
   @Test
   public void testGetName() {
@@ -221,7 +213,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getName()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
    */
   @Test
   public void testGetNameFirstnameOnly() {
@@ -231,7 +223,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getName()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
    */
   @Test
   public void testGetNameLastnameOnly() {
@@ -241,7 +233,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getName()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
    */
   @Test
   public void testGetNameNoFirstNoLastname() {
@@ -252,7 +244,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#isEnabled()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#isEnabled()}.
    */
   @Test
   public void testIsEnabled() {
@@ -261,7 +253,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#canLogin()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#canLogin()}.
    */
   @Test
   public void testCanLogin() {
@@ -270,17 +262,19 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#canLogin()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#canLogin()}.
    */
   @Test
   public void testCanLoginWithoutPassword() {
-    user.setPassword(null);
+    Set<Object> pwList = user.getPrivateCredentials(Password.class);
+    for (Object pw : pwList)
+      user.removePrivateCredentials(pw);
     assertFalse(user.canLogin());
   }
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#canLogin()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#canLogin()}.
    */
   @Test
   public void testCanLoginWithoutEnabled() {
@@ -290,7 +284,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#setEnabled(boolean)}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#setEnabled(boolean)}
    * .
    */
   @Test
@@ -301,7 +295,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#setFirstName(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#setFirstName(java.lang.String)}
    * .
    */
   @Test
@@ -313,7 +307,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getFirstName()}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getFirstName()}
    * .
    */
   @Test
@@ -323,7 +317,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#setLastName(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#setLastName(java.lang.String)}
    * .
    */
   @Test
@@ -335,7 +329,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getLastName()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getLastName()}.
    */
   @Test
   public void testGetLastName() {
@@ -344,7 +338,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getEmail()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getEmail()}.
    */
   @Test
   public void testGetEmail() {
@@ -353,7 +347,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getLanguage()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getLanguage()}.
    */
   @Test
   public void testGetLanguage() {
@@ -362,7 +356,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getInitials()}.
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getInitials()}.
    */
   @Test
   public void testGetInitials() {
@@ -371,7 +365,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#setInitials(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#setInitials(java.lang.String)}
    * .
    */
   @Test
@@ -382,7 +376,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getLastLogin()}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getLastLogin()}
    * .
    */
   @Test
@@ -392,7 +386,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getLastLoginFrom()}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getLastLoginFrom()}
    * .
    */
   @Test
@@ -402,7 +396,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getProperty(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getProperty(java.lang.String)}
    * .
    */
   @Test
@@ -413,7 +407,7 @@ public class WebloungeUserImplTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#removeProperty(java.lang.String)}
+   * {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#removeProperty(java.lang.String)}
    * .
    */
   @Test
@@ -424,19 +418,11 @@ public class WebloungeUserImplTest {
   }
 
   /**
-   * Test method for group memberships.
-   */
-  @Test
-  public void testMembership() {
-    assertTrue(user.isMemberOf(publisherGroup));
-  }
-
-  /**
    * Test method for role assignments.
    */
   @Test
   public void testRole() {
-    assertTrue(user.hasRole(apprenticeRole));
+    assertTrue(user.getPublicCredentials().contains(apprenticeRole));
   }
 
 }

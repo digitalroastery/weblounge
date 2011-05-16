@@ -18,23 +18,22 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.user;
+package ch.o2it.weblounge.common.impl.security;
 
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.DigestType;
+import ch.o2it.weblounge.common.security.Password;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -52,24 +51,14 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
    */
   public WebloungeAdminImpl(String login) {
     super(login, User.SystemRealm);
-    assignRole(SystemRole.SYSTEMADMIN);
+    addPublicCredentials(SystemRole.SYSTEMADMIN);
     setName("Weblounge Administrator");
-  }
-
-  /**
-   * Returns <code>true</code> if <code>authority</code> represents the same
-   * user.
-   * 
-   * @see ch.o2it.weblounge.common.security.Authority#isAuthorizedBy(ch.o2it.weblounge.common.security.Authority)
-   */
-  public boolean isAuthorizedBy(Authority authority) {
-    return authority instanceof WebloungeAdminImpl;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.user.UserImpl#setRealm(java.lang.String)
+   * @see ch.o2it.weblounge.common.impl.security.UserImpl#setRealm(java.lang.String)
    */
   @Override
   public void setRealm(String realm) {
@@ -129,13 +118,13 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
     }
 
     // Password
-    String password = XPathHelper.valueOf(userNode, "password", xpath);
+    String password = XPathHelper.valueOf(userNode, "ns:password", xpath);
     if (password != null) {
       String digestType = null;
       try {
-        digestType = XPathHelper.valueOf(userNode, "password/@type", xpath);
-        user.passwordDigestType = DigestType.valueOf(digestType);
-        user.password = password.getBytes();
+        digestType = XPathHelper.valueOf(userNode, "ns:password/@type", xpath);
+        Password pw = new PasswordImpl(password, DigestType.valueOf(digestType));
+        user.addPrivateCredentials(pw);
       } catch (Throwable t) {
         throw new IllegalStateException("Unknown password digest found: " + digestType);
       }
@@ -175,15 +164,14 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
     b.append("<login>").append(login).append("</login>");
 
     // Password
-    try {
+    Set<Object> passwords = getPrivateCredentials(Password.class);
+    for (Object o : passwords) {
+      Password password = (Password)o;
       b.append("<password type=\"");
-      b.append(passwordDigestType.toString());
+      b.append(password.getDigestType().toString());
       b.append("\">");
-      b.append(new String(password, "utf-8"));
+      b.append(password.getPassword());
       b.append("</password>");
-    } catch (UnsupportedEncodingException e) {
-      // Can't happen, utf-8 support is mandatory
-      throw new IllegalStateException("This platform is missing utf-8 encoding support");
     }
 
     // First name

@@ -29,9 +29,9 @@ import static org.junit.Assert.assertTrue;
 import ch.o2it.weblounge.common.Times;
 import ch.o2it.weblounge.common.impl.content.LocalizedModificationContext;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -171,7 +171,7 @@ public class LocalizedModificationContextImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#setModified(ch.o2it.weblounge.common.user.User, java.util.Date, ch.o2it.weblounge.common.language.Language)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.content.LocalizedModificationContext#setModified(ch.o2it.weblounge.common.security.User, java.util.Date, ch.o2it.weblounge.common.language.Language)}.
    */
   @Test
   public void testSetModified() {

@@ -18,21 +18,18 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.impl.user;
+package ch.o2it.weblounge.common.impl.security;
 
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.security.GroupImpl;
-import ch.o2it.weblounge.common.impl.security.RoleImpl;
-import ch.o2it.weblounge.common.impl.security.SystemRole;
 import ch.o2it.weblounge.common.impl.util.WebloungeDateFormat;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.DigestType;
-import ch.o2it.weblounge.common.security.Group;
+import ch.o2it.weblounge.common.security.Password;
 import ch.o2it.weblounge.common.security.Role;
+import ch.o2it.weblounge.common.security.WebloungeUser;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -40,12 +37,12 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
@@ -127,7 +124,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.WebloungeUser#isEnabled()
+   * @see ch.o2it.weblounge.common.security.WebloungeUser#isEnabled()
    */
   public boolean isEnabled() {
     return enabled;
@@ -136,10 +133,11 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.WebloungeUser#canLogin()
+   * @see ch.o2it.weblounge.common.security.WebloungeUser#canLogin()
    */
   public boolean canLogin() {
-    return isEnabled() && password != null;
+    Set<Object> passwords = getPrivateCredentials(Password.class);
+    return isEnabled() && passwords.size() > 0;
   }
 
   /**
@@ -333,7 +331,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.WebloungeUser#getProperty(java.lang.String)
+   * @see ch.o2it.weblounge.common.security.WebloungeUser#getProperty(java.lang.String)
    */
   public Object getProperty(String name) {
     return properties.get(name);
@@ -342,7 +340,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.WebloungeUser#removeProperty(java.lang.String)
+   * @see ch.o2it.weblounge.common.security.WebloungeUser#removeProperty(java.lang.String)
    */
   public Object removeProperty(String name) {
     return properties.remove(name);
@@ -351,7 +349,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.user.WebloungeUser#setProperty(java.lang.String,
+   * @see ch.o2it.weblounge.common.security.WebloungeUser#setProperty(java.lang.String,
    *      java.lang.Object)
    */
   public void setProperty(String name, Object value) {
@@ -418,8 +416,8 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       String digestType = null;
       try {
         digestType = XPathHelper.valueOf(userNode, "security/password/@type", xpath);
-        user.passwordDigestType = DigestType.valueOf(digestType);
-        user.password = password.getBytes();
+        Password pw = new PasswordImpl(password, DigestType.valueOf(digestType));
+        user.addPrivateCredentials(pw);
       } catch (Throwable t) {
         throw new IllegalStateException("Unknown password digest found: " + digestType);
       }
@@ -459,24 +457,9 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
         String roleId = XPathHelper.valueOf(roleNode, "text()", xpath);
         Role r = site.getRole(roleId, roleContext);
         if (r != null)
-          user.assignRole(r);
+          user.addPublicCredentials(r);
         else
-          user.assignRole(new RoleImpl(roleContext, roleId));
-      }
-    }
-
-    // Groups
-    NodeList groups = XPathHelper.selectList(userNode, "security/groups/group", xpath);
-    if (groups != null) {
-      for (int i = 0; i < groups.getLength(); i++) {
-        Node groupNode = groups.item(i);
-        String groupContext = XPathHelper.valueOf(groupNode, "@context", xpath);
-        String groupId = XPathHelper.valueOf(groupNode, "text()", xpath);
-        Group g = site.getGroup(groupId, groupContext);
-        if (g != null)
-          user.addMembership(g);
-        else
-          user.addMembership(new GroupImpl(groupId, groupContext));
+          user.addPublicCredentials(new RoleImpl(roleContext, roleId));
       }
     }
 
@@ -570,15 +553,14 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
     b.append("<security>");
 
     // Password
-    try {
+    Set<Object> passwords = getPrivateCredentials(Password.class);
+    for (Object o : passwords) {
+      Password password = (Password)o;
       b.append("<password type=\"");
-      b.append(passwordDigestType.toString());
+      b.append(password.getDigestType().toString());
       b.append("\">");
-      b.append(new String(password, "utf-8"));
+      b.append(password.getPassword());
       b.append("</password>");
-    } catch (UnsupportedEncodingException e) {
-      // Can't happen, utf-8 support is mandatory
-      throw new IllegalStateException("This platform is missing utf-8 encoding support");
     }
 
     // challenge - response
@@ -605,25 +587,12 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
       b.append("</lastlogin>");
     }
 
-    // Groups
-    if (groups != null && groups.size() > 0) {
-      b.append("<groups>");
-      for (Iterator<Group> gi = groups.iterator(); gi.hasNext();) {
-        Group g = gi.next();
-        b.append("<group context=\"");
-        b.append(g.getContext());
-        b.append("\">");
-        b.append(g.getIdentifier());
-        b.append("</group>");
-      }
-      b.append("</groups>");
-    }
-
     // Roles
+    Set<Object> roles = getPublicCredentials(Role.class);
     if (roles != null && roles.size() > 0) {
       b.append("<roles>");
-      for (Iterator<Role> ri = roles.iterator(); ri.hasNext();) {
-        Role r = ri.next();
+      for (Iterator<Object> ri = roles.iterator(); ri.hasNext();) {
+        Role r = (Role)ri.next();
         if (!r.isAuthorizedBy(SystemRole.GUEST)) {
           b.append("<role context=\"");
           b.append(r.getContext());
@@ -662,7 +631,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#equals(java.lang.Object)
+   * @see ch.o2it.weblounge.common.impl.security.AuthenticatedUserImpl#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
@@ -673,7 +642,7 @@ public class WebloungeUserImpl extends AuthenticatedUserImpl implements Webloung
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.user.AuthenticatedUserImpl#hashCode()
+   * @see ch.o2it.weblounge.common.impl.security.AuthenticatedUserImpl#hashCode()
    */
   @Override
   public int hashCode() {

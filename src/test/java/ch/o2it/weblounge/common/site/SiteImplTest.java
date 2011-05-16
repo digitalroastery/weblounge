@@ -20,11 +20,10 @@
 
 package ch.o2it.weblounge.common.site;
 
-import static org.junit.Assert.assertNull;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -34,14 +33,16 @@ import ch.o2it.weblounge.common.content.image.ImageStyle;
 import ch.o2it.weblounge.common.content.page.PageTemplate;
 import ch.o2it.weblounge.common.impl.content.page.PageTemplateImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
+import ch.o2it.weblounge.common.impl.security.PasswordImpl;
+import ch.o2it.weblounge.common.impl.security.WebloungeAdminImpl;
+import ch.o2it.weblounge.common.impl.security.WebloungeUserImpl;
 import ch.o2it.weblounge.common.impl.security.jaas.AuthenticationModuleImpl;
 import ch.o2it.weblounge.common.impl.site.SiteImpl;
-import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
-import ch.o2it.weblounge.common.impl.user.WebloungeUserImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.AuthenticationModule;
-import ch.o2it.weblounge.common.security.DigestType;
 import ch.o2it.weblounge.common.security.AuthenticationModule.Relevance;
+import ch.o2it.weblounge.common.security.DigestType;
+import ch.o2it.weblounge.common.security.Password;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -51,6 +52,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Test case for {@link SiteImpl}.
@@ -192,7 +194,7 @@ public class SiteImplTest {
     administrator = new WebloungeAdminImpl(administratorLogin);
     administrator.setName(administratorName);
     administrator.setEmail(administratorEmail);
-    administrator.setPassword(administratorPassword.getBytes(), DigestType.plain);
+    administrator.addPrivateCredentials(new PasswordImpl(administratorPassword, DigestType.plain));
     // Default template
     defaultTemplate = new PageTemplateImpl(defaultTemplateId, new URL(defaultTemplateUrl));
     defaultTemplate.setRecheckTime(defaultTemplateRecheckTime);
@@ -268,7 +270,12 @@ public class SiteImplTest {
     assertEquals(administratorEmail, site.getAdministrator().getEmail());
     assertEquals(administratorLogin, site.getAdministrator().getLogin());
     assertTrue(site.getAdministrator().canLogin());
-    assertTrue(site.getAdministrator().checkPassword(administratorPassword));
+    
+    Set<Object> passwords = site.getAdministrator().getPrivateCredentials(Password.class);
+    for (Object o : passwords) {
+      Password password = (Password)o;
+      assertEquals(administratorPassword, password.getPassword());
+    }
   }
 
   /**

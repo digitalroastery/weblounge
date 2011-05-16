@@ -28,9 +28,9 @@ import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.User;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -420,7 +420,7 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withAuthor(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withAuthor(ch.o2it.weblounge.common.security.User)
    */
   public SearchQuery withAuthor(User author) {
     clearExpectations();
@@ -613,7 +613,7 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withCreator(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withCreator(ch.o2it.weblounge.common.security.User)
    */
   public SearchQuery withCreator(User creator) {
     clearExpectations();
@@ -633,7 +633,7 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withModifier(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withModifier(ch.o2it.weblounge.common.security.User)
    */
   public SearchQuery withModifier(User modifier) {
     clearExpectations();
@@ -653,7 +653,7 @@ public class SearchQueryImpl implements SearchQuery {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.SearchQuery#withPublisher(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.SearchQuery#withPublisher(ch.o2it.weblounge.common.security.User)
    */
   public SearchQuery withPublisher(User publisher) {
     clearExpectations();

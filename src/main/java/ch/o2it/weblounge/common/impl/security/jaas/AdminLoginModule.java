@@ -20,16 +20,15 @@
 
 package ch.o2it.weblounge.common.impl.security.jaas;
 
+import ch.o2it.weblounge.common.impl.security.SiteAdminImpl;
 import ch.o2it.weblounge.common.impl.security.SystemRole;
-import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
-import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
+import ch.o2it.weblounge.common.impl.security.WebloungeAdminImpl;
+import ch.o2it.weblounge.common.security.Password;
+import ch.o2it.weblounge.common.security.WebloungeUser;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.WebloungeUser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
@@ -54,12 +53,14 @@ public class AdminLoginModule extends AbstractLoginModule {
 
       // Test for site admin
       if (siteadmin.getLogin().equals(username)) {
-        if (Arrays.equals(siteadmin.getPassword(), password)) {
-          user = siteadmin;
-          return true;
-        } else {
-          throw new FailedLoginException("Wrong password");
+        for (Object o : siteadmin.getPrivateCredentials(Password.class)) {
+          Password pw = (Password) o;
+          if (pw.getPassword().equals(password)) {
+            user = siteadmin;
+            return true;
+          }
         }
+        throw new FailedLoginException("Wrong password");
       }
 
       return false;

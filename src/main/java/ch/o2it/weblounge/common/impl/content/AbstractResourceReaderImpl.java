@@ -27,8 +27,8 @@ import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,7 +218,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.security.User)
    */
   @Override
   protected void setOwner(User owner) {
@@ -239,7 +239,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setCreated(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   @Override
@@ -250,7 +250,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setModified(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   @Override
@@ -261,7 +261,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setPublished(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setPublished(ch.o2it.weblounge.common.security.User,
    *      java.util.Date, java.util.Date)
    */
   @Override

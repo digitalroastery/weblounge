@@ -18,19 +18,20 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.common.user;
+package ch.o2it.weblounge.common.security;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.user.WebloungeAdminImpl;
+import ch.o2it.weblounge.common.impl.security.SiteAdminImpl;
+import ch.o2it.weblounge.common.security.User;
 
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link WebloungeAdminImpl}.
+ * Tests the {@link SiteAdminImpl}.
  */
-public class WebloungeAdminImplTest extends WebloungeUserImplTest {
+public class SiteAdminImplTest extends WebloungeUserImplTest {
   
   /** Name of the site administrator */
   protected String adminName = null;
@@ -41,14 +42,14 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   @Before
   public void setUp() throws Exception {
     setUpPrerequisites();
-    user = new WebloungeAdminImpl(login);
+    user = new SiteAdminImpl(login);
     realm = User.SystemRealm;
-    adminName = "Weblounge Administrator";
+    adminName = "Site Administrator (" + login + ")";
     setUpUser();
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#setRealm(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#setRealm(java.lang.String)}.
    */
   @Test
   public void testSetRealm() {
@@ -60,7 +61,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.UserImpl#getRealm()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.UserImpl#getRealm()}.
    */
   @Test
   public void testGetRealm() {
@@ -68,7 +69,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getName()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
    */
   @Test
   public void testGetName() {
@@ -76,7 +77,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getName()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
    */
   @Test
   public void testGetNameFirstnameOnly() {
@@ -85,7 +86,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getName()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
    */
   @Test
   public void testGetNameLastnameOnly() {
@@ -94,7 +95,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#getName()}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#getName()}.
    */
   @Test
   public void testGetNameNoFirstNoLastname() {
@@ -104,7 +105,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#setFirstName(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#setFirstName(java.lang.String)}.
    */
   @Test
   public void testSetFirstName() {
@@ -114,7 +115,7 @@ public class WebloungeAdminImplTest extends WebloungeUserImplTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.common.impl.user.WebloungeUserImpl#setLastName(java.lang.String)}.
+   * Test method for {@link ch.o2it.weblounge.common.impl.security.WebloungeUserImpl#setLastName(java.lang.String)}.
    */
   @Test
   public void testSetLastName() {

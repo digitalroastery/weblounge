@@ -24,7 +24,7 @@ import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -327,6 +327,7 @@ public class SecurityContextImpl extends AbstractSecurityContext implements Clon
    * 
    * @see ch.o2it.weblounge.common.security.SecurityContext#getDenied(ch.o2it.weblounge.common.security.Permission)
    */
+  @SuppressWarnings("unused")
   public Authority[] getDenied(Permission p) {
     return new Authority[] {};
   }

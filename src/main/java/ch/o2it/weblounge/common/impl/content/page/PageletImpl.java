@@ -35,7 +35,7 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,7 +230,7 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.security.User)
    */
   public void setOwner(User owner) {
     securityCtx.setOwner(owner);
@@ -353,7 +353,7 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setCreated(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
@@ -390,7 +390,7 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.security.User)
    */
   public void setCreator(User user) {
     creationCtx.setCreator(user);
@@ -435,7 +435,7 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setPublished(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setPublished(ch.o2it.weblounge.common.security.User,
    *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
@@ -517,7 +517,7 @@ public class PageletImpl extends LocalizableObject implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.page.Pagelet#setModified(ch.o2it.weblounge.common.security.User,
    *      java.util.Date, ch.o2it.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {

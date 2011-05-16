@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.content.page.PageletURI;
 import ch.o2it.weblounge.common.impl.content.WebloungeContentReader;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,7 +134,7 @@ public final class PagePreviewReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.security.User)
    */
   @Override
   protected void setOwner(User owner) {
@@ -155,7 +155,7 @@ public final class PagePreviewReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setCreated(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   @Override
@@ -166,7 +166,7 @@ public final class PagePreviewReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setModified(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   @Override
@@ -177,7 +177,7 @@ public final class PagePreviewReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setPublished(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setPublished(ch.o2it.weblounge.common.security.User,
    *      java.util.Date, java.util.Date)
    */
   @Override

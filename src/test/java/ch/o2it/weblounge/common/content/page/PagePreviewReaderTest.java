@@ -31,7 +31,7 @@ import ch.o2it.weblounge.common.impl.content.page.PagePreviewReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
+import ch.o2it.weblounge.common.impl.security.SiteAdminImpl;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.site.Site;
 

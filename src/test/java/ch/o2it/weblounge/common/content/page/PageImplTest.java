@@ -34,11 +34,11 @@ import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageImpl;
-import ch.o2it.weblounge.common.impl.user.SiteAdminImpl;
-import ch.o2it.weblounge.common.impl.user.UserImpl;
+import ch.o2it.weblounge.common.impl.security.SiteAdminImpl;
+import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.language.Language;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 
 import org.easymock.EasyMock;
 import org.junit.Before;

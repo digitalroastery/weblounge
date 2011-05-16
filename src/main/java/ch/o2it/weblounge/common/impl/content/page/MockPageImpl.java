@@ -33,8 +33,8 @@ import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
 import ch.o2it.weblounge.common.security.PermissionSet;
 import ch.o2it.weblounge.common.security.SecurityListener;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.user.User;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -221,7 +221,7 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Resource#setLocked(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.Resource#setLocked(ch.o2it.weblounge.common.security.User)
    */
   public void setLocked(User user) throws IllegalStateException {
     throw new UnsupportedOperationException("Not implemented in mock page");
@@ -427,7 +427,7 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Resource#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.Resource#setCreated(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setCreated(User user, Date date) {
@@ -437,7 +437,7 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Resource#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.Resource#setModified(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setModified(User user, Date date) {
@@ -447,7 +447,7 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Resource#setPublished(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.content.Resource#setPublished(ch.o2it.weblounge.common.security.User,
    *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
@@ -576,7 +576,7 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.security.User)
    */
   public void setCreator(User user) {
     throw new UnsupportedOperationException("Not implemented in mock page");
@@ -675,7 +675,7 @@ public class MockPageImpl implements Page {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.security.User)
    */
   public void setOwner(User owner) {
     throw new UnsupportedOperationException("Not implemented in mock page");

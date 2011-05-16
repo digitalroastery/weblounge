@@ -20,7 +20,7 @@
 
 package ch.o2it.weblounge.common.impl.security.jaas;
 
-import ch.o2it.weblounge.common.user.AuthenticatedUser;
+import ch.o2it.weblounge.common.security.AuthenticatedUser;
 
 import java.io.IOException;
 import java.util.HashMap;

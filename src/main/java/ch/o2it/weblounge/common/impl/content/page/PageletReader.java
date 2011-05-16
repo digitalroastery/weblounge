@@ -26,7 +26,7 @@ import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.security.Authority;
 import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,7 +217,7 @@ public final class PageletReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setModified(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setModified(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   protected void setModified(User user, Date date) {
@@ -230,7 +230,7 @@ public final class PageletReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.user.User)
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setOwner(ch.o2it.weblounge.common.security.User)
    */
   protected void setOwner(User user) {
     if (pagelet == null)
@@ -265,7 +265,7 @@ public final class PageletReader extends WebloungeContentReader {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setCreated(ch.o2it.weblounge.common.user.User,
+   * @see ch.o2it.weblounge.common.impl.content.WebloungeContentReader#setCreated(ch.o2it.weblounge.common.security.User,
    *      java.util.Date)
    */
   @Override

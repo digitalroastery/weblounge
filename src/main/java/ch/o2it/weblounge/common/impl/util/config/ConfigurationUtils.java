@@ -51,6 +51,48 @@ public final class ConfigurationUtils {
   }
 
   /**
+   * Returns <code>object</code> if it is not <code>null</code>,
+   * <code>defaultObject</code> otherwise.
+   * <p>
+   * Note that this method will try to process templates that are contained in
+   * either one of <code>object</code> or <code>defaultObject</code>.
+   * 
+   * @param object
+   *          the object to use if not <code>null</code>
+   * @param defaultObject
+   *          the default object to use if <code>object</code> is
+   *          <code>null</code>
+   * @return <code>object</code> if it is not <code>null</code>,
+   *         <code>defaultObject</code> otherwise
+   */
+  public static Object getValue(Object object, Object defaultObject) {
+    return getValue(object, defaultObject, true);
+  }
+
+  /**
+   * Returns <code>object</code> if it is not <code>null</code>,
+   * <code>defaultObject</code> otherwise.
+   * 
+   * @param object
+   *          the object to use if not <code>null</code>
+   * @param defaultObject
+   *          the default object to use if <code>object</code> is
+   *          <code>null</code>
+   * @param processTemplates
+   *          <code>true</code> to process templates
+   * @return <code>object</code> if it is not <code>null</code>,
+   *         <code>defaultObject</code> otherwise
+   */
+  public static Object getValue(Object object, Object defaultObject,
+      boolean processTemplates) {
+    Object o = object != null ? object : defaultObject;
+    if (processTemplates && o instanceof String)
+      return processTemplate((String) o);
+    else
+      return o;
+  }
+
+  /**
    * Returns the <code>int</code> value or <code>defaultValue</code> if
    * <code>value</code> is either <code>null</code> or blank.
    * 
