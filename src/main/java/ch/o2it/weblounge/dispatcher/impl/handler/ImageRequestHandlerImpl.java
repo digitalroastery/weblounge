@@ -33,10 +33,10 @@ import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
+import ch.o2it.weblounge.common.security.User;
 import ch.o2it.weblounge.common.site.ImageScalingMode;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.common.user.User;
 import ch.o2it.weblounge.dispatcher.RequestHandler;
 import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 
