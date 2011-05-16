@@ -33,7 +33,7 @@ final class CacheOutputStream extends ServletOutputStream {
   private static final int BUFFER_SIZE = 20 * 1024;
 
   /** Output buffer */
-  private byte buf[] = new byte[BUFFER_SIZE];
+  private byte[] buf = new byte[BUFFER_SIZE];
 
   /** Write position in the output buffer */
   private int pos = 0;
