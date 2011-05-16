@@ -22,7 +22,7 @@ package ch.o2it.weblounge.contentrepository;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.page.PageListener;
-import ch.o2it.weblounge.common.user.User;
+import ch.o2it.weblounge.common.security.User;
 
 import java.io.IOException;
 
