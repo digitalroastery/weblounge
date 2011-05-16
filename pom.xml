@@ -259,6 +259,7 @@
             <skip>${checkstyle.skip}</skip>
             <configLocation>${weblounge.basedir}/docs/checkstyle/weblounge-rules.xml</configLocation>
             <headerLocation>${weblounge.basedir}/docs/checkstyle/header.txt</headerLocation>
+            <includeTestSourceDirectory>true</includeTestSourceDirectory>
             <consoleOutput>true</consoleOutput>
             <logViolationsToConsole>true</logViolationsToConsole>
             <excludes>**/package-info.java</excludes>
