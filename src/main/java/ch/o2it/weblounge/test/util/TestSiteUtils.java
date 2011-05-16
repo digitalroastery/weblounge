@@ -20,12 +20,12 @@
 
 package ch.o2it.weblounge.test.util;
 
-import ch.o2it.weblounge.test.site.GreeterHTMLAction;
-
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,9 +65,11 @@ public final class TestSiteUtils {
    */
   public static Map<String, String> loadGreetings() {
     Map<String, String> greetings = new HashMap<String, String>();
+    ClassLoader c = TestSiteUtils.class.getClassLoader();
+    InputStream is = c.getResourceAsStream(GREETING_PROPS);
     try {
       Properties props = new Properties();
-      props.load(GreeterHTMLAction.class.getResourceAsStream(GREETING_PROPS));
+      props.load(is);
       for (Entry<Object, Object> entry : props.entrySet()) {
         try {
           String isoLatin1Value = entry.getValue().toString();
@@ -79,6 +81,9 @@ public final class TestSiteUtils {
       }
     } catch (IOException e) {
       logger.error("Error reading greetings from " + GREETING_PROPS, e);
+      return null;
+    } finally {
+      IOUtils.closeQuietly(is);
     }
     return greetings;
   }

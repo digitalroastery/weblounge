@@ -131,7 +131,6 @@
               ch.o2it.weblounge.common.security;version=${project.version},
               ch.o2it.weblounge.common.site;version=${project.version},
               ch.o2it.weblounge.common.url;version=${project.version},
-              ch.o2it.weblounge.common.user;version=${project.version},
               ch.o2it.weblounge.common.impl.content;version=${project.version},
               ch.o2it.weblounge.common.impl.request;version=${project.version},
               ch.o2it.weblounge.common.impl.scheduler;version=${project.version},
@@ -170,7 +169,8 @@
               *;resolution:=optional
             </Import-Package>
             <Private-Package>
-              org.json.*,
+              org.json,
+              javax.media.jai,
               ch.o2it.weblounge.test.harness.*,
               ch.o2it.weblounge.test.util
             </Private-Package>

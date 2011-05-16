@@ -570,7 +570,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       if (!ImageScalingMode.None.equals(style.getScalingMode())) {
         float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
         float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth, originalHeight, style);
-        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth, originalHeight, style);
+        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth, originalHeight, style) + 1;
         fileName.append("_").append((int)scaledWidth).append("x").append((int)scaledHeight);
       }
       fileName.append(".").append(FilenameUtils.getExtension(filenameGerman));
