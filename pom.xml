@@ -99,12 +99,6 @@
     <dependency>
       <groupId>quartz</groupId>
       <artifactId>quartz</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -122,24 +116,12 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>4.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
       <version>4.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -222,6 +204,7 @@
               org.apache.commons.io;version="1.4",
               org.apache.commons.lang;version="2.4",
               org.apache.commons.lang.time;version="2.4",
+              org.apache.commons.logging;version="1.0.4",
               org.apache.commons.pool;version="1.5.3",
               org.apache.commons.pool.impl;version="1.5.3",
               org.apache.http,
@@ -229,9 +212,9 @@
               org.apache.http.client,
               org.apache.http.client.entity,
               org.apache.http.client.methods,
-	            org.apache.http.client.utils,
+              org.apache.http.client.utils,
               org.apache.http.impl.client,
-	            org.apache.http.message,
+              org.apache.http.message,
               org.quartz;version="1.5.2",
               org.quartz.impl;version="1.5.2",
               org.slf4j;version="1.5.6",
