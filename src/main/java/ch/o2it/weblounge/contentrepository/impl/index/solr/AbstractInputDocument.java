@@ -30,7 +30,12 @@ import org.apache.solr.common.SolrInputDocument;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
@@ -38,15 +43,15 @@ import java.util.List;
  * that will ease handling of objects such as dates or users and help prevent
  * posting of <code>null</code> values.
  */
-public abstract class AbstractInputDocument extends SolrInputDocument {
+public abstract class AbstractInputDocument extends SolrInputDocument implements Map<String, Collection<Object>> {
 
   /** Serial version uid */
   private static final long serialVersionUID = 1812364663819822015L;
 
   /**
    * Adds the field and its value to the search index. This method is here for
-   * convenience so we don't need to do null check on each and every field
-   * value.
+   * convenience so we don't need to do <code>null</code> check on each and
+   * every field value.
    * 
    * @param fieldName
    *          the field name
@@ -194,6 +199,121 @@ public abstract class AbstractInputDocument extends SolrInputDocument {
       }
     }
     return result.toArray(new String[result.size()]);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#containsKey(java.lang.Object)
+   */
+  public boolean containsKey(Object o) {
+    return super.getFieldNames().contains(o);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#containsValue(java.lang.Object)
+   */
+  public boolean containsValue(Object o) {
+    for (String fieldName : super.getFieldNames()) {
+      if (super.getFieldValues(fieldName).contains(o))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#entrySet()
+   */
+  public Set<java.util.Map.Entry<String, Collection<Object>>> entrySet() {
+    Map<String, Collection<Object>> m = new HashMap<String, Collection<Object>>();
+    for (String fieldName : super.getFieldNames()) {
+      List<Object> values = new ArrayList<Object>();
+      for (Object v : super.getFieldValues(fieldName))
+        values.add(v.toString());
+      m.put(fieldName, values);
+    }
+    return m.entrySet();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#get(java.lang.Object)
+   */
+  public Collection<Object> get(Object name) {
+    return super.getFieldValues(name.toString());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#isEmpty()
+   */
+  public boolean isEmpty() {
+    return super.getFieldNames().size() == 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#keySet()
+   */
+  public Set<String> keySet() {
+    return new HashSet<String>(super.getFieldNames());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+   */
+  public Collection<Object> put(String name, Collection<Object> values) {
+    throw new UnsupportedOperationException("Use addField() instead of this method");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#putAll(java.util.Map)
+   */
+  public void putAll(Map<? extends String, ? extends Collection<Object>> m) {
+    throw new UnsupportedOperationException("Use addField() instead of this method");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#remove(java.lang.Object)
+   */
+  public Collection<Object> remove(Object name) {
+    Collection<Object> values = super.getFieldValues(name.toString());
+    return values;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#size()
+   */
+  public int size() {
+    return super.getFieldNames().size();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Map#values()
+   */
+  public Collection<Collection<Object>> values() {
+    List<Collection<Object>> values = new ArrayList<Collection<Object>>();
+    for (String field : super.getFieldNames()) {
+      values.add(super.getFieldValues(field));
+    }
+    return values;
   }
 
 }

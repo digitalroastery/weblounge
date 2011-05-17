@@ -27,8 +27,10 @@ import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.PageInputDocument;
 
-import org.apache.solr.common.SolrInputDocument;
 import org.xml.sax.SAXException;
+
+import java.util.Collection;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -60,7 +62,7 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
    *
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
    */
-  public SolrInputDocument getInputDocument(Resource<?> page) {
+  public Map<String, Collection<Object>> getInputDocument(Resource<?> page) {
     return new PageInputDocument((Page)page);
   }
 

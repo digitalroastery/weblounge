@@ -28,8 +28,10 @@ import ch.o2it.weblounge.common.impl.content.file.FileContentReader;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.FileInputDocument;
 
-import org.apache.solr.common.SolrInputDocument;
 import org.xml.sax.SAXException;
+
+import java.util.Collection;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -58,16 +60,16 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
    */
-  public SolrInputDocument getInputDocument(Resource<?> resource) {
-    return new FileInputDocument((FileResource)resource);
+  public Map<String, Collection<Object>> getInputDocument(Resource<?> resource) {
+    return new FileInputDocument((FileResource) resource);
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getContentReader()
    */
   public ResourceContentReader<FileContent> getContentReader()
@@ -77,7 +79,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

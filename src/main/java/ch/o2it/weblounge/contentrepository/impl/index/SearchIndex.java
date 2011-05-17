@@ -28,6 +28,7 @@ import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.ResourceInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.ResourceURIInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrConnection;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
@@ -46,6 +47,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * A Solr-based search index implementation.
@@ -190,7 +193,19 @@ public class SearchIndex {
 
     // Post everything to the search index
     try {
-      SolrInputDocument inputDoc = serializer.getInputDocument(resource);
+      Map<String, Collection<Object>> inputData = serializer.getInputDocument(resource);
+      SolrInputDocument inputDoc = null;
+      if (inputData instanceof SolrInputDocument)
+        inputDoc = (SolrInputDocument)inputData;
+      else {
+        inputDoc = new ResourceInputDocument();
+        for (Map.Entry<String, Collection<Object>> entry : inputData.entrySet()) {
+          String key = entry.getKey();
+          for (Object value : entry.getValue()) {
+            inputDoc.addField(key, value);
+          }
+        }
+      }
       solrRequest.add(inputDoc);
       solrConnection.update(solrRequest);
       return true;
@@ -220,7 +235,19 @@ public class SearchIndex {
 
     // Post the updated data to the search index
     try {
-      SolrInputDocument inputDoc = serializer.getInputDocument(resource);
+      Map<String, Collection<Object>> inputData = serializer.getInputDocument(resource);
+      SolrInputDocument inputDoc = null;
+      if (inputData instanceof SolrInputDocument)
+        inputDoc = (SolrInputDocument)inputData;
+      else {
+        inputDoc = new ResourceInputDocument();
+        for (Map.Entry<String, Collection<Object>> entry : inputData.entrySet()) {
+          String key = entry.getKey();
+          for (Object value : entry.getValue()) {
+            inputDoc.addField(key, value);
+          }
+        }
+      }
       update(inputDoc);
       return true;
     } catch (Exception e) {
