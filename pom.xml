@@ -21,19 +21,13 @@
 
     <!-- weblounge -->
 
-  	<dependency>
-  		<groupId>ch.o2it.weblounge</groupId>
-  		<artifactId>weblounge-common-api</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
+    <dependency>
+      <groupId>ch.o2it.weblounge</groupId>
+      <artifactId>weblounge-common-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- thirdparty -->
-
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-common</artifactId>
-      <version>1.3.0</version>
-    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -66,9 +60,6 @@
             <Export-Package>
               ch.o2it.weblounge.contentrepository;version=${project.version}
             </Export-Package>
-            <Embed-Dependency>
-              solr-common;inline=true,
-            </Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>

@@ -25,8 +25,10 @@ import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceContentReader;
 import ch.o2it.weblounge.common.content.ResourceReader;
 
-import org.apache.solr.common.SolrInputDocument;
 import org.xml.sax.SAXException;
+
+import java.util.Collection;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -65,7 +67,7 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    *          the resource
    * @return the input document
    */
-  SolrInputDocument getInputDocument(Resource<?> resource);
+  Map<String, Collection<Object>> getInputDocument(Resource<?> resource);
 
   /**
    * Returns a <code>ResourceContentReader</code> for the type of resources that
