@@ -15,10 +15,10 @@
  */
 package org.apache.solr.core;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -33,13 +33,19 @@ public class WebloungeSolrConfig extends SolrConfig {
    * {@link SolrResourceLoader}.
    * 
    * @param instanceDir
+   *          the directory used to create the resource loader
    * @param name
+   *          the configuration name used by the loader if the stream is null
    * @param is
+   *          the configuration stream
    * @throws ParserConfigurationException
+   *           if parser setup fails
    * @throws IOException
+   *           if the input source cannot be read
    * @throws SAXException
+   *           if there is a parsing error
    */
-  public WebloungeSolrConfig(String instanceDir, String name, InputStream is)
+  public WebloungeSolrConfig(String instanceDir, String name, InputSource is)
       throws ParserConfigurationException, IOException, SAXException {
     super(new SolrResourceLoader(instanceDir, WebloungeSolrConfig.class.getClassLoader()), name, is);
   }

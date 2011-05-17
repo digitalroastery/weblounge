@@ -35,8 +35,8 @@ import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION;
 import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.apache.solr.client.solrj.request.UpdateRequest.ACTION;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
@@ -321,6 +321,7 @@ public class SearchIndex {
       FileUtils.forceMkdir(solrDataDir);
 
       // Make sure there is a configuration in place
+      copyBundleResourceToFile("/solr/elevate.xml", solrConfigDir);
       copyBundleResourceToFile("/solr/protwords.txt", solrConfigDir);
       copyBundleResourceToFile("/solr/schema.xml", solrConfigDir);
       copyBundleResourceToFile("/solr/scripts.conf", solrConfigDir);

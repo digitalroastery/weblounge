@@ -173,10 +173,8 @@ public class SolrRequester {
       // TODO: Language?
       solrQuery.append(" ").append(PAGELET_CONTENTS).append(":");
       solrQuery.append("\"").append(entry.getKey()).append(":=\"");
-      int i = 0;
       for (String contentValue : StringUtils.split(entry.getValue())) {
         solrQuery.append(" \"").append(SolrUtils.clean(contentValue)).append("\"");
-        i++;
       }
     }
 

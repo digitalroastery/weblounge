@@ -12,7 +12,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <dependencies>
-	
+
     <!-- weblounge -->
 
     <dependency>
@@ -20,7 +20,7 @@
       <artifactId>weblounge-contentrepository-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
+
     <dependency>
       <groupId>ch.o2it.weblounge</groupId>
       <artifactId>weblounge-common-api</artifactId>
@@ -87,11 +87,11 @@
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
       <exclusions>
-	    <exclusion>
-		  <groupId>commons-logging</groupId>
-		  <artifactId>commons-logging</artifactId>
-		</exclusion>
-	  </exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- apache solr -->
@@ -99,11 +99,11 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
-      <version>1.4.1</version>
+      <version>3.1.0</version>
       <exclusions>
         <exclusion>
-          <groupId>woodstox</groupId>
-          <artifactId>wstx-asl</artifactId>
+          <groupId>org.apache.velocity</groupId>
+          <artifactId>velocity-tools</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -111,70 +111,119 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
-      <version>1.4.1</version>
+      <version>3.1.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-commons-csv</artifactId>
-      <version>1.4.1</version>
+      <version>3.1.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-noggit</artifactId>
+      <version>3.1.0</version>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
-      <version>2.9.3</version>
+      <version>3.1.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-analyzers</artifactId>
-      <version>2.9.3</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-memory</artifactId>
-      <version>2.9.3</version>
+      <version>3.1.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-highlighter</artifactId>
-      <version>2.9.3</version>
+      <version>3.1.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-memory</artifactId>
+      <version>3.1.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-misc</artifactId>
+      <version>3.1.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-queries</artifactId>
-      <version>2.9.3</version>
+      <version>3.1.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-snowball</artifactId>
-      <version>2.9.3</version>
+      <artifactId>lucene-spatial</artifactId>
+      <version>3.1.0</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-spellchecker</artifactId>
-      <version>2.9.3</version>
+      <version>3.1.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.zookeeper</groupId>
+      <artifactId>zookeeper</artifactId>
+      <version>3.3.1</version>
+      <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>jline</groupId>
+          <artifactId>jline</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta-regexp</groupId>
+      <artifactId>jakarta-regexp</artifactId>
+      <version>1.4</version>
       <scope>runtime</scope>
     </dependency>
     
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.6.4</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>oro</groupId>
+      <artifactId>oro</artifactId>
+      <version>2.0.8</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
       <version>1.0</version>
     </dependency>
-    
+
     <!-- testing -->
 
     <dependency>
@@ -194,13 +243,13 @@
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
   </dependencies>
   <build>
     <plugins>
@@ -235,11 +284,15 @@
               org.apache.commons.codec.binary;version="1.3",
               org.apache.commons.codec.language;version="1.3",
               org.apache.commons.codec.net;version="1.3",
+              org.apache.commons.collections;version="3.2.1",
+              org.apache.commons.collections.map;version="3.2.1",
               org.apache.commons.fileupload;version="1.2.1",
               org.apache.commons.fileupload.disk;version="1.2.1",
               org.apache.commons.fileupload.servlet;version="1.2.1",
               org.apache.commons.io;version="1.4",
               org.apache.commons.lang;version="2.4",
+              org.apache.commons.lang.builder;version="2.4",
+              org.apache.commons.lang.text;version="2.4",
               org.apache.commons.logging;version="1.1.1",
               org.slf4j;version="1.5.6",
               org.osgi.framework;version="1.4.0",
@@ -266,13 +319,22 @@
               javax.xml.transform.sax,
               javax.xml.transform.stream,
               javax.xml.xpath,
+              org.jdom,
+              org.jdom.input,
+              org.jdom.output,
               org.w3c.dom,
               org.xml.sax,
               org.xml.sax.ext,
               org.xml.sax.helpers,
-              !junit.framework,
+              !com.werken.xpath,
+              !javax.sql,
+              !javax.swing.text,
+              !jline,
+              !org.apache.log.*,
+              !org.apache.log4j.*,
+              !org.apache.tools.ant.*,
+              !org.apache.velocity.*,
               !org.mortbay.*,
-              !sun.misc
             </Import-Package>
             <Export-Package>
               ch.o2it.weblounge.contentrepository.impl;version=${project.version},
@@ -288,19 +350,23 @@
               solr-core;inline=true,
               solr-solrj;inline=true,
               solr-commons-csv;inline=true,
+              solr-noggit;inline=true,
               lucene-core;inline=true,
               lucene-analyzers;inline=true,
               lucene-highlighter;inline=true,
               lucene-memory;inline=true,
+              lucene-misc;inline=true,
               lucene-queries;inline=true,
-              lucene-snowball;inline=true,
+              lucene-spatial;inline=true,
               lucene-spellchecker;inline=true,
-              commons-httpclient;inline=true
+              commons-httpclient;inline=true,
+              jakarta-regexp;inline=true,
+              velocity;inline=true,
+              oro;inline=true,
+              zookeeper;inline=true
             </Embed-Dependency>
             <Private-Package>
-              org.apache.solr.core,
-              org.tartarus.snowball;-split-package:=merge-first,
-              org.tartarus.snowball.ext;-split-package:=merge-first,
+              org.apache.solr.core
             </Private-Package>
             <Service-Component>
               OSGI-INF/files-rest-service.xml,
