@@ -1,6 +1,6 @@
 steal.plugins().then(function($) {
 
-  $.Controller('Editor.Resourceview'), 
+  $.Controller('Editor.Resourceview', 
 	{
 		
 		init: function(el) {
