@@ -79,3 +79,5 @@ trimpath
 oauth
 jdbc
 datasource
+lucene
+apache
