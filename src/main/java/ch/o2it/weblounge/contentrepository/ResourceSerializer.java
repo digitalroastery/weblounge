@@ -23,12 +23,12 @@ package ch.o2it.weblounge.contentrepository;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceContentReader;
+import ch.o2it.weblounge.common.content.ResourceMetadata;
 import ch.o2it.weblounge.common.content.ResourceReader;
 
 import org.xml.sax.SAXException;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -60,14 +60,13 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
       SAXException;
 
   /**
-   * Creates a Solr input document, used to write the resource to the search
-   * index.
+   * Returns the list of metadata, used to add the resource to the search index.
    * 
    * @param resource
    *          the resource
-   * @return the input document
+   * @return the resource metadata
    */
-  Map<String, Collection<Object>> getInputDocument(Resource<?> resource);
+  List<ResourceMetadata<?>> getMetadata(Resource<?> resource);
 
   /**
    * Returns a <code>ResourceContentReader</code> for the type of resources that
@@ -79,7 +78,7 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @throws SAXException
    *           if an error occurs during parser instantiation
    */
-  ResourceContentReader<S> getContentReader() throws ParserConfigurationException,
-      SAXException;
+  ResourceContentReader<S> getContentReader()
+      throws ParserConfigurationException, SAXException;
 
 }
