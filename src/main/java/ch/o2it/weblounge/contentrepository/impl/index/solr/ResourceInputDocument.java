@@ -60,10 +60,7 @@ import org.apache.commons.lang.StringUtils;
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
  * posting weblounge resources to solr.
  */
-public class ResourceInputDocument extends AbstractInputDocument {
-
-  /** Serial version uid */
-  private static final long serialVersionUID = 1812364663819822015L;
+public class ResourceInputDocument extends ResourceMetadataCollection {
 
   /**
    * Populates this input document with the resource data.
@@ -82,7 +79,8 @@ public class ResourceInputDocument extends AbstractInputDocument {
       addField(SUBJECT, subject, true);
 
     // Creation, modification and publishing information
-    //setField(CREATED, SolrUtils.serializeDate(resource.getCreationDate()), false);
+    // setField(CREATED, SolrUtils.serializeDate(resource.getCreationDate()),
+    // false);
     addField(CREATED, resource.getCreationDate(), false);
     addField(CREATED_BY, SolrUtils.serializeUser(resource.getCreator()), false);
     addField(MODIFIED, resource.getModificationDate(), false);
@@ -112,7 +110,7 @@ public class ResourceInputDocument extends AbstractInputDocument {
     if (!StringUtils.isBlank(headerXml)) {
       addField(HEADER_XML, headerXml, false);
     }
-    
+
     // Resource contents
     for (ResourceContent content : resource.contents()) {
       Language l = content.getLanguage();
@@ -124,7 +122,7 @@ public class ResourceInputDocument extends AbstractInputDocument {
       addField(CONTENT_MIMETYPE, content.getMimetype(), true);
       addField(getLocalizedFieldName(CONTENT_MIMETYPE_LOCALIZED, l), content.getMimetype(), false);
     }
-    
+
   }
 
 }

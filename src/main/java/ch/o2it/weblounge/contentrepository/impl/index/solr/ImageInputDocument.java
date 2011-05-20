@@ -29,9 +29,6 @@ import ch.o2it.weblounge.common.content.image.ImageResource;
  */
 public class ImageInputDocument extends ResourceInputDocument {
 
-  /** Serial version uid */
-  private static final long serialVersionUID = 1812364663819822015L;
-
   /**
    * Creates an input document for the given image.
    * 
@@ -50,7 +47,7 @@ public class ImageInputDocument extends ResourceInputDocument {
    */
   protected void init(FileResource resource) {
     super.init(resource);
-    
+
     // TODO: Create preview and add it to the index
 
   }

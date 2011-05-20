@@ -28,9 +28,6 @@ import ch.o2it.weblounge.common.content.file.FileResource;
  */
 public class FileInputDocument extends ResourceInputDocument {
 
-  /** Serial version uid */
-  private static final long serialVersionUID = 1812364663819822015L;
-
   /**
    * Creates an input document for the given resource.
    * 
@@ -49,7 +46,7 @@ public class FileInputDocument extends ResourceInputDocument {
    */
   protected void init(FileResource resource) {
     super.init(resource);
-    
+
     // Preview information
     // TODO: Create preview
 

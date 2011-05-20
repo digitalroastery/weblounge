@@ -22,6 +22,7 @@ package ch.o2it.weblounge.contentrepository.impl;
 
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContentReader;
+import ch.o2it.weblounge.common.content.ResourceMetadata;
 import ch.o2it.weblounge.common.content.image.ImageContent;
 import ch.o2it.weblounge.common.content.image.ImageResource;
 import ch.o2it.weblounge.common.impl.content.image.ImageContentReader;
@@ -30,8 +31,7 @@ import ch.o2it.weblounge.contentrepository.impl.index.solr.ImageInputDocument;
 
 import org.xml.sax.SAXException;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -69,10 +69,10 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
+   * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getMetadata(ch.o2it.weblounge.common.content.Resource)
    */
-  public Map<String, Collection<Object>> getInputDocument(Resource<?> resource) {
-    return new ImageInputDocument((ImageResource) resource);
+  public List<ResourceMetadata<?>> getMetadata(Resource<?> resource) {
+    return new ImageInputDocument((ImageResource) resource).getMetadata();
   }
 
   /**

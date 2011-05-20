@@ -20,22 +20,27 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index;
 
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.LOCALIZED_FULLTEXT;
+
 import ch.o2it.weblounge.common.content.Resource;
+import ch.o2it.weblounge.common.content.ResourceMetadata;
 import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
+import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.ResourceInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.ResourceURIInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrConnection;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest.ACTION;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -47,8 +52,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Map;
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * A Solr-based search index implementation.
@@ -158,6 +163,7 @@ public class SearchIndex {
    */
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
+    
     UpdateRequest solrRequest = new UpdateRequest();
     StringBuilder query = new StringBuilder();
     query.append("id:").append(uri.getIdentifier()).append(" AND version:").append(uri.getVersion());
@@ -181,8 +187,6 @@ public class SearchIndex {
    */
   public boolean add(Resource<?> resource) throws ContentRepositoryException {
     logger.debug("Adding resource {} to search index", resource);
-    UpdateRequest solrRequest = new UpdateRequest();
-    solrRequest.setAction(ACTION.COMMIT, true, true);
 
     // Have the serializer create an input document
     String resourceType = resource.getURI().getType();
@@ -191,26 +195,14 @@ public class SearchIndex {
       throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
     }
 
-    // Post everything to the search index
+    // Post the updated data to the search index
     try {
-      Map<String, Collection<Object>> inputData = serializer.getInputDocument(resource);
-      SolrInputDocument inputDoc = null;
-      if (inputData instanceof SolrInputDocument)
-        inputDoc = (SolrInputDocument)inputData;
-      else {
-        inputDoc = new ResourceInputDocument();
-        for (Map.Entry<String, Collection<Object>> entry : inputData.entrySet()) {
-          String key = entry.getKey();
-          for (Object value : entry.getValue()) {
-            inputDoc.addField(key, value);
-          }
-        }
-      }
-      solrRequest.add(inputDoc);
-      solrConnection.update(solrRequest);
+      List<ResourceMetadata<?>> metadata = serializer.getMetadata(resource);
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
+      update(doc);
       return true;
     } catch (Exception e) {
-      throw new ContentRepositoryException("Cannot add resource " + resource + " to index", e);
+      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", e);
     }
   }
 
@@ -235,24 +227,84 @@ public class SearchIndex {
 
     // Post the updated data to the search index
     try {
-      Map<String, Collection<Object>> inputData = serializer.getInputDocument(resource);
-      SolrInputDocument inputDoc = null;
-      if (inputData instanceof SolrInputDocument)
-        inputDoc = (SolrInputDocument)inputData;
-      else {
-        inputDoc = new ResourceInputDocument();
-        for (Map.Entry<String, Collection<Object>> entry : inputData.entrySet()) {
-          String key = entry.getKey();
-          for (Object value : entry.getValue()) {
-            inputDoc.addField(key, value);
-          }
-        }
-      }
-      update(inputDoc);
+      List<ResourceMetadata<?>> metadata = serializer.getMetadata(resource);
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
+      update(doc);
       return true;
     } catch (Exception e) {
       throw new ContentRepositoryException("Cannot update resource " + resource + " in index", e);
     }
+  }
+
+  /**
+   * Adds <code>metadata</code> as fields to the input document.
+   * 
+   * @param doc
+   *          the solr input document
+   * @param metadata
+   *          the metadata
+   * @return the enriched input document
+   */
+  private SolrInputDocument updateDocument(SolrInputDocument doc,
+      List<ResourceMetadata<?>> metadata) {
+    for (ResourceMetadata<?> entry : metadata) {
+      String metadataKey = entry.getName();
+
+      // Add language neutral metadata values
+      for (Object value : entry.getValues()) {
+        doc.addField(metadataKey, value);
+        
+        // Add to fulltext?
+        if (entry.addToFulltext()) {
+          String fulltext = StringUtils.trimToEmpty((String) doc.getFieldValue(SolrFields.FULLTEXT));
+          if (value.getClass().isArray()) {
+            Object[] fieldValues = (Object[]) value;
+            for (Object v : fieldValues) {
+              fulltext = StringUtils.join(new Object[] {
+                  fulltext,
+                  v.toString() }, " ");
+            }
+          } else {
+            fulltext = StringUtils.join(new Object[] {
+                fulltext,
+                value.toString() }, " ");
+          }
+          doc.setField(SolrFields.FULLTEXT, fulltext);
+        }
+      }
+
+      // Add localized metadata values
+      for (Language language : entry.getLocalizedValues().keySet()) {
+        List<?> values = entry.getLocalizedValues().get(language);
+        for (Object value : values) {
+          doc.addField(metadataKey, value);
+ 
+          // Add to fulltext
+          if (entry.addToFulltext()) {
+
+            // Update the localized fulltext
+            String localizedFieldName = MessageFormat.format(LOCALIZED_FULLTEXT, language.getIdentifier());
+            String localizedFulltext = StringUtils.trimToEmpty((String) doc.getFieldValue(localizedFieldName));
+            if (value.getClass().isArray()) {
+              Object[] fieldValues = (Object[]) value;
+              for (Object v : fieldValues) {
+                localizedFulltext = StringUtils.join(new Object[] {
+                    localizedFulltext,
+                    v.toString() }, " ");
+              }
+            } else {
+              localizedFulltext = StringUtils.join(new Object[] {
+                  localizedFulltext,
+                  value.toString() }, " ");
+            }
+            doc.setField(localizedFieldName, localizedFulltext);
+          }
+        }     
+      }
+
+    }
+
+    return doc;
   }
 
   /**
@@ -288,12 +340,15 @@ public class SearchIndex {
   public boolean move(ResourceURI uri, String path)
       throws ContentRepositoryException {
     logger.debug("Updating path {} in search index to ", uri.getPath(), path);
+
+    ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getIdentifier(), uri.getVersion());
     try {
-      ResourceURIImpl newURI = new ResourceURIImpl(uri.getType(), uri.getSite(), path, uri.getIdentifier(), uri.getVersion());
-      update(new ResourceURIInputDocument(newURI));
+      List<ResourceMetadata<?>> metadata = (new ResourceURIInputDocument(newURI)).getMetadata();
+      SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
+      update(doc);
       return true;
     } catch (Exception e) {
-      throw new ContentRepositoryException("Cannot update resource uri " + uri + " in index", e);
+      throw new ContentRepositoryException("Cannot update resource " + newURI + " in index", e);
     }
   }
 

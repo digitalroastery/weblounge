@@ -20,22 +20,18 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
-import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.LOCALIZED_FULLTEXT;
-
+import ch.o2it.weblounge.common.content.ResourceMetadata;
 import ch.o2it.weblounge.common.content.page.Pagelet;
+import ch.o2it.weblounge.common.impl.content.ResourceMetadataImpl;
 import ch.o2it.weblounge.common.language.Language;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.common.SolrInputDocument;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
@@ -43,15 +39,13 @@ import java.util.Set;
  * that will ease handling of objects such as dates or users and help prevent
  * posting of <code>null</code> values.
  */
-public abstract class AbstractInputDocument extends SolrInputDocument implements Map<String, Collection<Object>> {
+public class ResourceMetadataCollection implements Collection<ResourceMetadata<?>> {
 
-  /** Serial version uid */
-  private static final long serialVersionUID = 1812364663819822015L;
+  /** The metadata */
+  protected Map<String, ResourceMetadata<?>> metadata = new HashMap<String, ResourceMetadata<?>>();
 
   /**
-   * Adds the field and its value to the search index. This method is here for
-   * convenience so we don't need to do <code>null</code> check on each and
-   * every field value.
+   * Adds the field and its value to the search index.
    * 
    * @param fieldName
    *          the field name
@@ -61,36 +55,31 @@ public abstract class AbstractInputDocument extends SolrInputDocument implements
    *          <code>true</code> to add the contents to the fulltext field as
    *          well
    */
+  @SuppressWarnings("unchecked")
   public void addField(String fieldName, Object fieldValue,
       boolean addToFulltext) {
     if (fieldName == null)
       throw new IllegalArgumentException("Field name cannot be null");
     if (fieldValue == null)
       return;
+
+    ResourceMetadata<Object> m = (ResourceMetadata<Object>)metadata.get(fieldName);
+    if (m == null) {
+      m = new ResourceMetadataImpl<Object>(fieldName);
+      metadata.put(fieldName, m);
+    }
+
+    m.setAddToFulltext(addToFulltext);
+
     if (fieldValue.getClass().isArray()) {
       Object[] fieldValues = (Object[]) fieldValue;
       for (Object v : fieldValues) {
-        super.addField(fieldName, v);
+        m.addValue(v);
       }
     } else {
-      super.addField(fieldName, fieldValue);
+      m.addValue(fieldValue);
     }
 
-    // Add to fulltext
-    if (addToFulltext) {
-      String fulltext = (String) super.getFieldValue(SolrFields.FULLTEXT);
-      if (fieldValue.getClass().isArray()) {
-        Object[] fieldValues = (Object[]) fieldValue;
-        for (Object v : fieldValues) {
-          fulltext = StringUtils.join(new Object[] { fulltext, v.toString() }, " ");
-        }
-      } else {
-        fulltext = StringUtils.join(new Object[] {
-            fulltext,
-            fieldValue.toString() }, " ");
-      }
-      super.setField(SolrFields.FULLTEXT, fulltext);
-    }
   }
 
   /**
@@ -109,6 +98,7 @@ public abstract class AbstractInputDocument extends SolrInputDocument implements
    *          <code>true</code> to add the contents to the fulltext field as
    *          well
    */
+  @SuppressWarnings("unchecked")
   public void addField(String fieldName, Object fieldValue, Language language,
       boolean addToFulltext) {
     if (fieldName == null)
@@ -116,29 +106,14 @@ public abstract class AbstractInputDocument extends SolrInputDocument implements
     if (fieldValue == null)
       return;
 
-    addField(fieldName, fieldValue);
-
-    // Add to fulltext
-    if (addToFulltext) {
-
-      // Update the localized fulltext
-      String localizedFieldName = getLocalizedFieldName(LOCALIZED_FULLTEXT, language);
-      String localizedFulltext = (String) super.getFieldValue(localizedFieldName);
-      if (fieldValue.getClass().isArray()) {
-        Object[] fieldValues = (Object[]) fieldValue;
-        for (Object v : fieldValues) {
-          localizedFulltext = StringUtils.join(new Object[] {
-              localizedFulltext,
-              v.toString() }, " ");
-        }
-      } else {
-        localizedFulltext = StringUtils.join(new Object[] {
-            localizedFulltext,
-            fieldValue.toString() }, " ");
-      }
-      super.setField(localizedFieldName, localizedFulltext);
-
+    ResourceMetadata<Object> m = (ResourceMetadata<Object>)metadata.get(fieldValue);
+    if (m == null) {
+      m = new ResourceMetadataImpl<Object>(fieldName);
+      metadata.put(fieldName, m);
     }
+
+    m.setAddToFulltext(addToFulltext);
+    m.addValue(fieldValue);
   }
 
   /**
@@ -202,118 +177,151 @@ public abstract class AbstractInputDocument extends SolrInputDocument implements
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the metadata as a list of {@link ResourceMetadata} items.
    * 
-   * @see java.util.Map#containsKey(java.lang.Object)
+   * @return the metadata items
    */
-  public boolean containsKey(Object o) {
-    return super.getFieldNames().contains(o);
+  public List<ResourceMetadata<?>> getMetadata() {
+    List<ResourceMetadata<?>> result = new ArrayList<ResourceMetadata<?>>();
+    result.addAll(metadata.values());
+    return result;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#containsValue(java.lang.Object)
+   * @see java.util.Collection#add(java.lang.Object)
    */
-  public boolean containsValue(Object o) {
-    for (String fieldName : super.getFieldNames()) {
-      if (super.getFieldValues(fieldName).contains(o))
-        return true;
+  public boolean add(ResourceMetadata<?> e) {
+    return metadata.put(e.getName(), e) != null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Collection#addAll(java.util.Collection)
+   */
+  public boolean addAll(Collection<? extends ResourceMetadata<?>> c) {
+    for (ResourceMetadata<?> m : c) {
+      metadata.put(m.getName(), m);
     }
-    return false;
+    return true;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#entrySet()
+   * @see java.util.Collection#clear()
    */
-  public Set<java.util.Map.Entry<String, Collection<Object>>> entrySet() {
-    Map<String, Collection<Object>> m = new HashMap<String, Collection<Object>>();
-    for (String fieldName : super.getFieldNames()) {
-      List<Object> values = new ArrayList<Object>();
-      for (Object v : super.getFieldValues(fieldName))
-        values.add(v.toString());
-      m.put(fieldName, values);
+  public void clear() {
+    metadata.clear();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Collection#contains(java.lang.Object)
+   */
+  public boolean contains(Object o) {
+    return metadata.values().contains(o);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Collection#containsAll(java.util.Collection)
+   */
+  public boolean containsAll(Collection<?> c) {
+    for (Object o : c) {
+      if (!metadata.values().contains(o))
+        return false;
     }
-    return m.entrySet();
+    return true;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#get(java.lang.Object)
-   */
-  public Collection<Object> get(Object name) {
-    return super.getFieldValues(name.toString());
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see java.util.Map#isEmpty()
+   * @see java.util.Collection#isEmpty()
    */
   public boolean isEmpty() {
-    return super.getFieldNames().size() == 0;
+    return metadata.isEmpty();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#keySet()
+   * @see java.util.Collection#iterator()
    */
-  public Set<String> keySet() {
-    return new HashSet<String>(super.getFieldNames());
+  public Iterator<ResourceMetadata<?>> iterator() {
+    List<ResourceMetadata<?>> result = new ArrayList<ResourceMetadata<?>>();
+    result.addAll(metadata.values());
+    return result.iterator();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+   * @see java.util.Collection#remove(java.lang.Object)
    */
-  public Collection<Object> put(String name, Collection<Object> values) {
-    throw new UnsupportedOperationException("Use addField() instead of this method");
+  public boolean remove(Object o) {
+    return metadata.remove(o) != null;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#putAll(java.util.Map)
+   * @see java.util.Collection#removeAll(java.util.Collection)
    */
-  public void putAll(Map<? extends String, ? extends Collection<Object>> m) {
-    throw new UnsupportedOperationException("Use addField() instead of this method");
+  public boolean removeAll(Collection<?> c) {
+    boolean removed = false;
+    for (Object o : c)
+      removed |= metadata.remove(o) != null;
+    return removed;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#remove(java.lang.Object)
+   * @see java.util.Collection#retainAll(java.util.Collection)
    */
-  public Collection<Object> remove(Object name) {
-    Collection<Object> values = super.getFieldValues(name.toString());
-    return values;
+  public boolean retainAll(Collection<?> c) {
+    boolean removed = false;
+    for (ResourceMetadata<?> m : metadata.values()) {
+      if (!c.contains(m)) {
+        metadata.remove(m);
+        removed = true;
+      }
+    }
+    return removed;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#size()
+   * @see java.util.Collection#size()
    */
   public int size() {
-    return super.getFieldNames().size();
+    return metadata.size();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see java.util.Map#values()
+   * @see java.util.Collection#toArray()
    */
-  public Collection<Collection<Object>> values() {
-    List<Collection<Object>> values = new ArrayList<Collection<Object>>();
-    for (String field : super.getFieldNames()) {
-      values.add(super.getFieldValues(field));
-    }
-    return values;
+  public Object[] toArray() {
+    return metadata.values().toArray();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.util.Collection#toArray(T[])
+   */
+  @SuppressWarnings({ "unchecked", "hiding" })
+  public <ResourceMetadata> ResourceMetadata[] toArray(ResourceMetadata[] a) {
+    return (ResourceMetadata[]) metadata.values().toArray(new ResourceMetadataImpl[metadata.size()]);
   }
 
 }

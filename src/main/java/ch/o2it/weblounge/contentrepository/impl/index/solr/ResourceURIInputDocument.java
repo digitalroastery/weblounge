@@ -31,10 +31,7 @@ import ch.o2it.weblounge.common.content.ResourceURI;
  * Extension to a <code>SolrUpdateableInputDocument</code> that facilitates in
  * updating resource paths.
  */
-public class ResourceURIInputDocument extends AbstractInputDocument {
-
-  /** Serial version uid */
-  private static final long serialVersionUID = 1812364663819822016L;
+public class ResourceURIInputDocument extends ResourceMetadataCollection {
 
   /**
    * Creates an input document for the given uri. On update, only the uri will
@@ -55,10 +52,10 @@ public class ResourceURIInputDocument extends AbstractInputDocument {
    *          the resource uri
    */
   private void init(ResourceURI uri) {
-    setField(ID, uri.getIdentifier());
-    setField(PATH, uri.getPath());
-    setField(TYPE, uri.getType());
-    setField(VERSION, uri.getVersion());
+    addField(ID, uri.getIdentifier(), false);
+    addField(PATH, uri.getPath(), true);
+    addField(TYPE, uri.getType(), false);
+    addField(VERSION, uri.getVersion(), false);
   }
 
 }

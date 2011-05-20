@@ -23,14 +23,14 @@ package ch.o2it.weblounge.contentrepository.impl;
 import ch.o2it.weblounge.common.content.Resource;
 import ch.o2it.weblounge.common.content.ResourceContent;
 import ch.o2it.weblounge.common.content.ResourceContentReader;
+import ch.o2it.weblounge.common.content.ResourceMetadata;
 import ch.o2it.weblounge.common.content.page.Page;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.PageInputDocument;
 
 import org.xml.sax.SAXException;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -60,10 +60,10 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getInputDocument(ch.o2it.weblounge.common.content.Resource)
+   * @see ch.o2it.weblounge.contentrepository.ResourceSerializer#getMetadata(ch.o2it.weblounge.common.content.Resource)
    */
-  public Map<String, Collection<Object>> getInputDocument(Resource<?> page) {
-    return new PageInputDocument((Page)page);
+  public List<ResourceMetadata<?>> getMetadata(Resource<?> page) {
+    return new PageInputDocument((Page)page).getMetadata();
   }
 
   /**

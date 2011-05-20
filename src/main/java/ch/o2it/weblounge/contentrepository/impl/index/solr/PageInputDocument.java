@@ -45,9 +45,6 @@ import java.text.MessageFormat;
  */
 public class PageInputDocument extends ResourceInputDocument {
 
-  /** Serial version uid */
-  private static final long serialVersionUID = 1812364663819822015L;
-
   /**
    * Creates an input document for the given page.
    * 
@@ -71,7 +68,7 @@ public class PageInputDocument extends ResourceInputDocument {
 
     // Page-level
     addField(TEMPLATE, page.getTemplate(), false);
-    
+
     // Determine the stage composer
     String stage = null;
     PageTemplate template = page.getURI().getSite().getTemplate(page.getTemplate());
