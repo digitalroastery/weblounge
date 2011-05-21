@@ -181,10 +181,10 @@
               ch.o2it.weblounge.test.util
             </Private-Package>
             <Embed-Dependency>
-              json,
-              junit,
-              com.springsource.javax.media.jai.core,
-              com.springsource.javax.media.jai.codec
+              json;inline=true,
+              junit;inline=true,
+              com.springsource.javax.media.jai.core;inline=true,
+              com.springsource.javax.media.jai.codec;inline=true
             </Embed-Dependency>
             <Service-Component>
               OSGI-INF/site-activator.xml
