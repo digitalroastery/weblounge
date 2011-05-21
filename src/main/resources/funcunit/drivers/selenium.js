@@ -1,5 +1,7 @@
 steal.then(function(){
-	if (navigator.userAgent.match(/Rhino/) && FuncUnit.browsers !== undefined) {
+	
+	// TODO: we should not do this if documenting ...
+	if (navigator.userAgent.match(/Rhino/) && !window.DocumentJS && !(steal && steal.pluginify)) {
 
 		// configuration defaults
 		FuncUnit.serverHost = FuncUnit.serverHost || "localhost";
@@ -20,19 +22,29 @@ steal.then(function(){
 		
 		FuncUnit.startSelenium();
 		(function(){
-			var browser = 0;
+			var browser = 0,
+				fails = 0,
+				totals = 0;
 			//convert spaces to %20.
 			var location = /file:/.test(window.location.protocol) ? window.location.href.replace(/ /g,"%20") : window.location.href;
+			
+			
+			// overwrite QUnit.done to do the 'restarting' ....
 			QUnit.done = function(failures, total){
 				FuncUnit.selenium.close();
 				FuncUnit.selenium.stop();
 				FuncUnit.endtime = new Date().getTime();
 				var formattedtime = (FuncUnit.endtime - FuncUnit.starttime) / 1000;
-				print("\nALL DONE " + failures + ", " + total + (FuncUnit.showTimestamps? (' - ' 
-						+ formattedtime + ' seconds'): ""))
+				
+				FuncUnit.browserDone(FuncUnit.browsers[browser], failures, total);
+				fails +=  failures;
+				totals += total;
+				
+				
 				browser++;
 				if (browser < FuncUnit.browsers.length) {
-					print("\nSTARTING " + FuncUnit.browsers[browser])
+					FuncUnit.browserStart(  FuncUnit.browsers[browser] );
+					
 					
 					FuncUnit.selenium = new DefaultSelenium(FuncUnit.serverHost, 
 						FuncUnit.serverPort, FuncUnit.browsers[browser], location);
@@ -40,49 +52,51 @@ steal.then(function(){
 					FuncUnit.selenium.start();
 					QUnit.restart();
 				} else {
+					// Exit ...
 					if (java.lang.System.getProperty("os.name").indexOf("Windows") != -1) {
 						runCommand("cmd", "/C", 'taskkill /fi "Windowtitle eq selenium" > NUL')
 						//quit()
 					}
+					FuncUnit.done(fails, totals);
+					//
 				}
 			}
+			FuncUnit.browserStart(FuncUnit.browsers[0]);
 			
-			
-			print("\nSTARTING " + FuncUnit.browsers[0])
 			FuncUnit.selenium = new DefaultSelenium(FuncUnit.serverHost, 
-				FuncUnit.serverPort, FuncUnit.browsers[0], location);
+				FuncUnit.serverPort, 
+				FuncUnit.browsers[0], 
+				location);
+				
 			FuncUnit.starttime = new Date().getTime();
 			FuncUnit.selenium.start();
+			
+			
 			FuncUnit._open = function(url){
 				this.selenium.open(url);
 			};
+			var confirms = [], prompts = [];
+			FuncUnit.confirm = function(answer){
+				confirms.push(!!answer)
+				print(FuncUnit.jquery.toJSON(confirms))
+				FuncUnit.selenium.getEval("_win().confirm = function(){var confirms = "+FuncUnit.jquery.toJSON(confirms)+
+					";return confirms.shift();};");
+			}
+			FuncUnit.prompt = function(answer){
+				prompts.push(answer)
+				FuncUnit.selenium.getEval("_win().prompt = function(){var prompts = "+FuncUnit.jquery.toJSON(prompts)+
+					";return prompts.shift();};");
+			}
 			FuncUnit._onload = function(success, error){
 				setTimeout(function(){
 					FuncUnit.selenium.getEval("selenium.browserbot.getCurrentWindow().focus();selenium.browserbot.getCurrentWindow().document.documentElement.tabIndex = 0;");
+					FuncUnit.selenium.getEval("_win().alert = function(){};");
 					success();
 				}, 1000)
 			};
 			var convertToJson = function(arg){
 				return arg === FuncUnit.window ? "selenium.browserbot.getCurrentWindow()" : FuncUnit.jquery.toJSON(arg)
 				
-			}
-			FuncUnit.prompt = function(answer){
-				this.selenium.answerOnNextPrompt(answer);
-			}
-			FuncUnit.confirm = function(answer, callback){
-				var self = this;
-				FuncUnit.add({
-					method: function(success, error){
-						var confirm = FuncUnit.selenium.getConfirmation();
-						if (answer) 
-							FuncUnit.selenium.chooseOkOnNextConfirmation();
-						else 
-							FuncUnit.selenium.chooseCancelOnNextConfirmation();
-						setTimeout(success, 13)
-					},
-					callback: callback,
-					error: "Could not confirm"
-				});
 			}
 			FuncUnit.$ = function(selector, context, method){
 				var args = FuncUnit.makeArray(arguments);
@@ -124,6 +138,14 @@ steal.then(function(){
 				} else {
 					return eval("(" + response + ")")//  q[method].apply(q, args);
 				}
+			}
+			/**
+			 * var val = S.eval("$(\".contacts\").controller().val()");
+			 * Appends "window." to the front of the string, so currently this method only works with one liners
+			 * @param {Object} str
+			 */
+			FuncUnit.eval = function(str){
+				return FuncUnit.selenium.getEval("selenium.browserbot.getCurrentWindow()."+str)
 			}
 			
 			
