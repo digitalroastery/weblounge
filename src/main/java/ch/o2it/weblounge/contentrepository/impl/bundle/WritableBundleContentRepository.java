@@ -296,8 +296,8 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
       throw new IOException("I/O error while reading " + uri.getType() + " '" + uri + "'", e);
     } catch (ParserConfigurationException e) {
       throw new IllegalStateException("Parser configuration error while reading " + uri.getType() + " '" + uri + "'", e);
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
+    } catch (Throwable t) {
+      throw new IllegalStateException(t);
     }
   }
 

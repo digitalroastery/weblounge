@@ -223,9 +223,9 @@ public abstract class AbstractContentRepository implements ContentRepository {
       }
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
-    } catch (Exception e) {
-      logger.error("Error loading {}: {}", uri, e.getMessage());
-      throw new ContentRepositoryException(e);
+    } catch (Throwable t) {
+      logger.error("Error loading {}: {}", uri, t.getMessage());
+      throw new ContentRepositoryException(t);
     } finally {
       IOUtils.closeQuietly(is);
     }
@@ -511,7 +511,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
-    } catch (Exception e) {
+    } catch (Throwable t) {
       throw new IOException("Error reading resource from " + uri);
     } finally {
       IOUtils.closeQuietly(is);
@@ -534,7 +534,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
-    } catch (Exception e) {
+    } catch (Throwable t) {
       throw new IOException("Error reading resource from " + contentUrl);
     } finally {
       IOUtils.closeQuietly(is);

@@ -358,8 +358,8 @@ public class BundleContentRepository extends AbstractContentRepository implement
               logger.warn("Unkown error loading resource {}", uri);
               continue;
             }
-          } catch (Exception e) {
-            logger.error("Error loading resource '{}' from bundle: {}", uri, e.getMessage());
+          } catch (Throwable t) {
+            logger.error("Error loading resource '{}' from bundle: {}", uri, t.getMessage());
             continue;
           } finally {
             IOUtils.closeQuietly(is);
@@ -425,8 +425,8 @@ public class BundleContentRepository extends AbstractContentRepository implement
       return url.openStream();
     } catch (IOException e) {
       throw new IOException("I/O error while reading page '" + uri + "'", e);
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
+    } catch (Throwable t) {
+      throw new IllegalStateException(t);
     }
   }
 
@@ -461,8 +461,8 @@ public class BundleContentRepository extends AbstractContentRepository implement
         return url.openStream();
       } catch (IOException e) {
         throw new IOException("I/O error while reading page '" + uri + "'", e);
-      } catch (Exception e) {
-        throw new IllegalStateException(e);
+      } catch (Throwable t) {
+        throw new IllegalStateException(t);
       }
     }
 

@@ -538,8 +538,8 @@ public class SearchIndexTest {
     // Delete the page
     try {
       idx.delete(pages[0].getURI());
-    } catch (Exception e) {
-      fail("Error adding page to the search index: " + e.getMessage());
+    } catch (Throwable t) {
+      fail("Error adding page to the search index: " + t.getMessage());
     }
 
     // Test if we can query for the added document
@@ -548,7 +548,7 @@ public class SearchIndexTest {
       assertEquals(idxSize - 1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
-      fail("Error querying cleared index");
+      fail("Error querying cleared index: " + e.getMessage());
     }
   }
 
@@ -565,7 +565,7 @@ public class SearchIndexTest {
       assertEquals(idxSize, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
-      fail("Error querying for added documents");
+      fail("Error querying for added documents: " + e.getMessage());
     }
   }
 
@@ -595,7 +595,7 @@ public class SearchIndexTest {
       assertEquals(1, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
-      fail("Error querying for updated document");
+      fail("Error querying for updated document: " + e.getMessage());
     }
   }
 
@@ -627,7 +627,7 @@ public class SearchIndexTest {
       assertEquals(resources, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
-      fail("Error querying cleared index");
+      fail("Error querying cleared index: " + e.getMessage());
     }
   }
 
@@ -646,27 +646,27 @@ public class SearchIndexTest {
         idx.add(page);
         count++;
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Adding sample page to the index failed");
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail("Adding sample page to the index failed: " + t.getMessage());
     }
 
     // Add the file
     try {
       idx.add(file);
       count++;
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Adding sample file to the index failed");
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail("Adding sample file to the index failed: " + t.getMessage());
     }
 
     // Add the image
     try {
       idx.add(image);
       count++;
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Adding sample image to the index failed");
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail("Adding sample image to the index failed: " + t.getMessage());
     }
     return count;
   }

@@ -20,28 +20,33 @@
 
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
+import static ch.o2it.weblounge.common.impl.util.doc.Status.badRequest;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.conflict;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.methodNotAllowed;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.preconditionFailed;
-
-import static ch.o2it.weblounge.common.impl.util.doc.Status.badRequest;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.notFound;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.ok;
+import static ch.o2it.weblounge.common.impl.util.doc.Status.preconditionFailed;
 import static ch.o2it.weblounge.common.impl.util.doc.Status.serviceUnavailable;
 
 import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
+import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentation;
 import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentationGenerator;
 import ch.o2it.weblounge.common.impl.util.doc.Format;
 import ch.o2it.weblounge.common.impl.util.doc.Parameter;
 import ch.o2it.weblounge.common.impl.util.doc.TestForm;
-import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
 
 /**
  * File endpoint documentation generator.
  */
 public final class FilesEndpointDocs {
 
+  /**
+   * No need to instantiate this utility class.
+   */
+  private FilesEndpointDocs() {
+  }
+  
   /**
    * Creates the documentation.
    * 

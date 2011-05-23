@@ -97,8 +97,8 @@ public class SearchIndex {
     this.isReadOnly = readOnly;
     try {
       loadSolr(solrRoot);
-    } catch (Exception e) {
-      throw new IOException("Error loading solr index", e);
+    } catch (Throwable t) {
+      throw new IOException("Error loading solr index", t);
     }
 
   }
@@ -131,8 +131,8 @@ public class SearchIndex {
     logger.debug("Searching index using query '{}'", query);
     try {
       return solrRequester.getByQuery(query);
-    } catch (Exception e) {
-      throw new ContentRepositoryException("Error querying solr index", e);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Error querying solr index", t);
     }
   }
 
@@ -147,8 +147,8 @@ public class SearchIndex {
       solrConnection.destroy();
       initSolr(solrRoot);
       loadSolr(solrRoot);
-    } catch (Exception e) {
-      throw new IOException("Cannot clear solr index", e);
+    } catch (Throwable t) {
+      throw new IOException("Cannot clear solr index", t);
     }
   }
 
@@ -172,8 +172,8 @@ public class SearchIndex {
     try {
       solrConnection.update(solrRequest);
       return true;
-    } catch (Exception e) {
-      throw new ContentRepositoryException("Unable to clear solr index", e);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Unable to clear solr index", t);
     }
   }
 
@@ -201,8 +201,8 @@ public class SearchIndex {
       SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
       update(doc);
       return true;
-    } catch (Exception e) {
-      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", e);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", t);
     }
   }
 
@@ -231,8 +231,8 @@ public class SearchIndex {
       SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
       update(doc);
       return true;
-    } catch (Exception e) {
-      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", e);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Cannot update resource " + resource + " in index", t);
     }
   }
 
@@ -323,8 +323,8 @@ public class SearchIndex {
     solrRequest.add(document);
     try {
       return solrConnection.update(solrRequest);
-    } catch (Exception e) {
-      throw new ContentRepositoryException("Cannot update document " + document + " in index", e);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Cannot update document " + document + " in index", t);
     }
   }
 
@@ -347,8 +347,8 @@ public class SearchIndex {
       SolrInputDocument doc = updateDocument(new SolrInputDocument(), metadata);
       update(doc);
       return true;
-    } catch (Exception e) {
-      throw new ContentRepositoryException("Cannot update resource " + newURI + " in index", e);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException("Cannot update resource " + newURI + " in index", t);
     }
   }
 
@@ -394,7 +394,7 @@ public class SearchIndex {
       File solrConfigDir = new File(solrRoot, CONF_DIR);
       File solrDataDir = new File(solrRoot, DATA_DIR);
 
-      // Delete and re-create the config directory
+      // Delete and re-create the configuration directory
       FileUtils.deleteQuietly(solrConfigDir);
       FileUtils.forceMkdir(solrConfigDir);
 
@@ -417,12 +417,12 @@ public class SearchIndex {
 
   /**
    * Utility method that will copy the specified class path resource to the
-   * config directory.
+   * configuration directory.
    * 
    * @param classpath
    *          the path inside the bundle
    * @param dir
-   *          the config directory
+   *          the configuration directory
    */
   private void copyBundleResourceToFile(String classpath, File dir) {
     InputStream is = SearchIndex.class.getResourceAsStream(classpath);

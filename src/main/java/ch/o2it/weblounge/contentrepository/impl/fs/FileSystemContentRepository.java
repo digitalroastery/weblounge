@@ -288,8 +288,8 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
                   continue;
                 }
                 uri = resource.getURI();
-              } catch (Exception e) {
-                logger.error("Error loading {}: {}", f, e.getMessage());
+              } catch (Throwable t) {
+                logger.error("Error loading {}: {}", f, t.getMessage());
                 continue;
               } finally {
                 IOUtils.closeQuietly(is);

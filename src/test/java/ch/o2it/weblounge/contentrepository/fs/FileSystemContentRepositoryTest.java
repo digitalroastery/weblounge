@@ -307,8 +307,8 @@ public class FileSystemContentRepositoryTest {
       repository.delete(documentURI);
       assertNull(repository.get(documentURI));
       assertEquals(resources - 1, repository.getResourceCount());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error deleting resource");
     }
 
@@ -319,8 +319,8 @@ public class FileSystemContentRepositoryTest {
       }
       assertNotNull(repository.get(imageURI));
       assertEquals(resources - 1, repository.getResourceCount());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error trying to delete a resource");
     }
   }
@@ -343,8 +343,8 @@ public class FileSystemContentRepositoryTest {
       revisions++;
       assertEquals(resources, repository.getResourceCount());
       assertEquals(revisions, repository.getRevisionCount());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error adding documents to the repository");
     }
 
@@ -353,8 +353,8 @@ public class FileSystemContentRepositoryTest {
       repository.delete(workURI, true);
       assertEquals(resources - 1, repository.getResourceCount());
       assertEquals(revisions - 2, repository.getRevisionCount());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error deleting document from the repository");
     }
   }
@@ -375,8 +375,8 @@ public class FileSystemContentRepositoryTest {
       assertEquals(resources, repository.getResourceCount());
       assertNull(repository.get(new PageURIImpl(site, oldPath)));
       assertNotNull(repository.get(new PageURIImpl(site, newPath)));
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error moving resource");
     }
   }
@@ -395,8 +395,8 @@ public class FileSystemContentRepositoryTest {
     try {
       repository.put(file);
       assertEquals(resources, repository.getResourceCount());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error moving resource");
     }
 
@@ -406,8 +406,8 @@ public class FileSystemContentRepositoryTest {
       file.getURI().setPath(UrlUtils.concat(file.getURI().getPath(), "2"));
       repository.put(file);
       assertEquals(resources + 1, repository.getResourceCount());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error moving resource");
     }
 
@@ -430,8 +430,8 @@ public class FileSystemContentRepositoryTest {
       r = repository.putContent(imageURI, pngContent, pngContentURL.openStream());
       assertEquals(2, repository.get(imageURI).contents().size());
       assertEquals(pngFileSize, r.getContent(pngContent.getLanguage()).getSize());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error adding content");
     }
 
@@ -445,8 +445,8 @@ public class FileSystemContentRepositoryTest {
       ResourceContent c = r.getContent(language);
       assertEquals(pngFileSize, c.getSize());
       assertEquals(mimetype, c.getMimetype());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error replacing content");
     }
 
@@ -455,7 +455,7 @@ public class FileSystemContentRepositoryTest {
       ResourceURI uri = new ImageResourceURIImpl(site, "/x/y/z");
       repository.putContent(uri, jpegContent, jpegContentURL.openStream());
       fail("Managed to add content to non-existing resource");
-    } catch (Exception e) {
+    } catch (Throwable t) {
       // Expected
     }
 
@@ -487,8 +487,8 @@ public class FileSystemContentRepositoryTest {
       
       assertEquals(0, repository.deleteContent(imageURI, pngContent).contents().size());
       assertEquals(0, repository.get(imageURI).contents().size());
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error deleting content");
     }
   }
@@ -582,8 +582,8 @@ public class FileSystemContentRepositoryTest {
       assertNotNull(repository.getContent(imageURI, english));
       assertNull(repository.getContent(imageURI, french));
       assertNull(repository.getContent(documentURI, german));      
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Error adding content");
     }
   }
@@ -613,9 +613,9 @@ public class FileSystemContentRepositoryTest {
       assertEquals(1, repository.getVersions(live1URI).length);
       assertEquals(2, repository.getVersions(live2URI).length);
       assertEquals(2, repository.getVersions(work2URI).length);
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -657,9 +657,9 @@ public class FileSystemContentRepositoryTest {
 
       assertEquals(page2Work.languages().size(), repository.getLanguages(work2URI).length);
       assertTrue(page2Work.languages().containsAll(Arrays.asList(repository.getLanguages(work2URI))));
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -738,9 +738,9 @@ public class FileSystemContentRepositoryTest {
       assertEquals(count - 1, repository.getRevisionCount());
       repository.delete(page2URI);
       assertEquals(count - 2, repository.getRevisionCount());
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
 
   }
@@ -760,8 +760,8 @@ public class FileSystemContentRepositoryTest {
         repository.put(page);
         count++;
       }
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Adding sample page to the repository failed");
     }
 
@@ -774,8 +774,8 @@ public class FileSystemContentRepositoryTest {
       repository.put(file);
       // TODO: Add resource contents
       count++;
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Adding sample file to the repository failed");
     }
 
@@ -788,8 +788,8 @@ public class FileSystemContentRepositoryTest {
       repository.put(jpeg);
       // TODO: Add resource contents
       count++;
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Adding sample image to the repository failed");
     }
 

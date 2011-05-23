@@ -54,7 +54,7 @@ import java.util.List;
 public class SolrConnection {
 
   /** Logging facility */
-  static Logger logger = LoggerFactory.getLogger(SolrConnection.class);
+  private static Logger logger = LoggerFactory.getLogger(SolrConnection.class);
 
   /** The solr core */
   private SolrCore core = null;
@@ -83,8 +83,8 @@ public class SolrConnection {
       IndexSchema schema = new IndexSchema(config, solrDir + "/conf/schema.xml", null);
       core = new SolrCore(null, dataDir, config, schema, null);
       parser = new SolrRequestParsers(config);
-    } catch (Exception ee) {
-      throw new RuntimeException(ee);
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
     }
   }
 
@@ -199,8 +199,8 @@ public class SolrConnection {
 
     } catch (IOException iox) {
       throw iox;
-    } catch (Exception ex) {
-      throw new SolrServerException(ex);
+    } catch (Throwable t) {
+      throw new SolrServerException(t);
     }
 
   }
@@ -222,8 +222,8 @@ public class SolrConnection {
       writer.write(bos, req, rsp);
       BinaryResponseParser parser = new BinaryResponseParser();
       return parser.processResponse(new ByteArrayInputStream(bos.toByteArray()), "utf-8");
-    } catch (Exception ex) {
-      throw new RuntimeException(ex);
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
     }
   }
 

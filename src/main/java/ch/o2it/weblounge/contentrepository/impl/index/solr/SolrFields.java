@@ -25,138 +25,138 @@ package ch.o2it.weblounge.contentrepository.impl.index.solr;
  */
 public interface SolrFields {
 
-  public static final String ID = "id";
+  String ID = "id";
 
   /** Path field name */
-  public static final String PATH = "path";
+  String PATH = "path";
 
   /** Type field name */
-  public static final String TYPE = "type";
+  String TYPE = "type";
 
   /** Version field name */
-  public static final String VERSION = "version";
+  String VERSION = "version";
 
   /** Subjects field name */
-  public static final String SUBJECT = "subjects";
+  String SUBJECT = "subjects";
 
   /** Template field name */
-  public static final String TEMPLATE = "template";
+  String TEMPLATE = "template";
 
   /** Page field name */
-  public static final String XML = "page-xml";
+  String XML = "page-xml";
 
   /** Page header field name */
-  public static final String HEADER_XML = "page-header-xml";
+  String HEADER_XML = "page-header-xml";
 
   /** Preview field name */
-  public static final String PREVIEW_XML = "preview-xml";
+  String PREVIEW_XML = "preview-xml";
 
   /** Description field name */
-  public static final String DESCRIPTION = "description";
+  String DESCRIPTION = "description";
 
   /** Description field name (localized) */
-  public static final String DESCRIPTION_LOCALIZED = "description-{0}";
+  String DESCRIPTION_LOCALIZED = "description-{0}";
 
   /** Coverage field name */
-  public static final String COVERAGE = "coverage";
+  String COVERAGE = "coverage";
 
   /** Coverage field name (localized) */
-  public static final String COVERAGE_LOCALIZED = "coverage-{0}";
+  String COVERAGE_LOCALIZED = "coverage-{0}";
 
   /** Rights field name */
-  public static final String RIGHTS = "rights";
+  String RIGHTS = "rights";
 
   /** Rights field name (localized) */
-  public static final String RIGHTS_LOCALIZED = "rights-{0}";
+  String RIGHTS_LOCALIZED = "rights-{0}";
 
   /** Title field name */
-  public static final String TITLE = "title";
+  String TITLE = "title";
 
   /** Title field name (localized) */
-  public static final String TITLE_LOCALIZED = "title-{0}";
+  String TITLE_LOCALIZED = "title-{0}";
 
   /** Created field name */
-  public static final String CREATED = "created";
+  String CREATED = "created";
 
   /** Creator field name */
-  public static final String CREATED_BY = "created-by";
+  String CREATED_BY = "created-by";
 
   /** Modified field name */
-  public static final String MODIFIED = "modified";
+  String MODIFIED = "modified";
 
   /** Modifier field name */
-  public static final String MODIFIED_BY = "modified-by";
+  String MODIFIED_BY = "modified-by";
 
   /** Publishing start date field name */
-  public static final String PUBLISHED_FROM = "published-from";
+  String PUBLISHED_FROM = "published-from";
 
   /** Publishing end date field name */
-  public static final String PUBLISHED_TO = "published-to";
+  String PUBLISHED_TO = "published-to";
 
   /** Publisher field name */
-  public static final String PUBLISHED_BY = "published-by";
+  String PUBLISHED_BY = "published-by";
 
   /** Pagelet text and properties values */
-  public static final String PAGELET_CONTENTS = "pagelet-contents";
+  String PAGELET_CONTENTS = "pagelet-contents";
 
   /** Pagelet text and properties values (localized) */
-  public static final String PAGELET_CONTENTS_LOCALIZED = "pagelet-contents-language-{0}";
+  String PAGELET_CONTENTS_LOCALIZED = "pagelet-contents-language-{0}";
 
   /** Pagelet properties field name */
-  public static final String PAGELET_PROPERTIES = "pagelet-properties";
+  String PAGELET_PROPERTIES = "pagelet-properties";
 
   /** Pagelet xml field name (composer) */
-  public static final String PAGELET_XML_COMPOSER = "pagelet-xml-composer-{0}";
+  String PAGELET_XML_COMPOSER = "pagelet-xml-composer-{0}";
 
   /** Pagelet xml field name (position within composer) */
-  public static final String PAGELET_XML_COMPOSER_POSITION = "pagelet-xml-position-{0}";
+  String PAGELET_XML_COMPOSER_POSITION = "pagelet-xml-position-{0}";
 
   /** Pagelet type field name */
-  public static final String PAGELET_TYPE = "pagelet-type";
+  String PAGELET_TYPE = "pagelet-type";
 
   /** Pagelet type field name (composer) */
-  public static final String PAGELET_TYPE_COMPOSER = "pagelet-type-composer-{0}";
+  String PAGELET_TYPE_COMPOSER = "pagelet-type-composer-{0}";
 
   /** Pagelet type field name (position within composer) */
-  public static final String PAGELET_TYPE_COMPOSER_POSITION = "pagelet-type-position-{0}";
+  String PAGELET_TYPE_COMPOSER_POSITION = "pagelet-type-position-{0}";
 
   /** Resource content filename field name */
-  public static final String CONTENT_FILENAME = "content-filename";
+  String CONTENT_FILENAME = "content-filename";
 
   /** Resource content filename field name (localized) */
-  public static final String CONTENT_FILENAME_LOCALIZED = "content-filename-{0}";
+  String CONTENT_FILENAME_LOCALIZED = "content-filename-{0}";
 
   /** Resource content mime type field name */
-  public static final String CONTENT_MIMETYPE = "content-mimetype";
+  String CONTENT_MIMETYPE = "content-mimetype";
 
   /** Resource content mime type field name (localized) */
-  public static final String CONTENT_MIMETYPE_LOCALIZED = "content-mimetype-{0}";
+  String CONTENT_MIMETYPE_LOCALIZED = "content-mimetype-{0}";
 
   /** Resource content creation date field name */
-  public static final String CONTENT_CREATED = "content-created-{0}";
+  String CONTENT_CREATED = "content-created-{0}";
 
   /** Resource content creator field name */
-  public static final String CONTENT_CREATED_BY = "content-created-by-{0}";
+  String CONTENT_CREATED_BY = "content-created-by-{0}";
 
   /** Resource content xml field name */
-  public static final String CONTENT_XML = "content-xml-{0}";
+  String CONTENT_XML = "content-xml-{0}";
 
   /** Solr ranking score */
-  public static final String SCORE = "score";
+  String SCORE = "score";
   
   /** Accumulative, language-sensitive fulltext field */
-  public static final String LOCALIZED_FULLTEXT = "fulltext-{0}";
+  String LOCALIZED_FULLTEXT = "fulltext-{0}";
 
   /** Accumulative fulltext field */
-  public static final String FULLTEXT = "fulltext";
+  String FULLTEXT = "fulltext";
 
   /** The solr date format string tag. */
-  public static final String SOLR_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+  String SOLR_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
   /** The solr highlighting tag to use. */
-  public static final String HIGHLIGHT_MATCH = "b";
+  String HIGHLIGHT_MATCH = "b";
 
   /** Boost values for ranking */
-  public static final double TITLE_BOOST = 6.0;
+  double TITLE_BOOST = 6.0;
 
 }

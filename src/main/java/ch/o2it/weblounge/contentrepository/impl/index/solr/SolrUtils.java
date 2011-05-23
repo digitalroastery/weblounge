@@ -29,7 +29,7 @@ import java.util.Date;
 /**
  * Utility class for the solr database.
  */
-public class SolrUtils {
+public final class SolrUtils {
 
   /** The solr supported date format. **/
   protected static DateFormat dateFormat = new SimpleDateFormat(SolrFields.SOLR_DATE_FORMAT);
@@ -39,6 +39,12 @@ public class SolrUtils {
 
   /** The regular filter expression for single characters */
   private static final String charCleanerRegex = "([\\+\\-\\!\\(\\)\\{\\}\\[\\]\\\\^\"\\~\\*\\?\\:])";
+
+  /**
+   * Utility classes should not be initialized.
+   */
+  private SolrUtils() {
+  }
 
   /**
    * Clean up the user query input string to avoid invalid input parameters.

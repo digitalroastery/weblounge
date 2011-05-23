@@ -295,8 +295,8 @@ public class SolrRequester {
     QueryResponse solrResponse = null;
     try {
       solrResponse = solrConnection.request(q.toString());
-    } catch (Exception e) {
-      throw new SolrServerException(e);
+    } catch (Throwable t) {
+      throw new SolrServerException(t);
     }
 
     // Create and configure the query result

@@ -270,8 +270,8 @@ public class URIIndexTest {
       fail("Accessing deleted data by id did not result in an exception");
     } catch (IllegalStateException e) {
       // Expected
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Unexpected exception while trying to access deleted data");
     }
     try {
@@ -279,8 +279,8 @@ public class URIIndexTest {
       fail("Accessing deleted data by address did not result in an exception");
     } catch (IllegalStateException e) {
       // Expected
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      t.printStackTrace();
       fail("Unexpected exception while trying to access deleted data");
     }
     

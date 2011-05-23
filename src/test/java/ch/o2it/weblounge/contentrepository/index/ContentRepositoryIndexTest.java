@@ -173,9 +173,9 @@ public class ContentRepositoryIndexTest {
       assertEquals(1, idx.size());
       idx.add(file);
       assertEquals(2, idx.size());
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
     
     String oldId = page.getURI().getIdentifier();
@@ -186,7 +186,7 @@ public class ContentRepositoryIndexTest {
       page.getURI().setPath(UrlUtils.concat(file.getURI().getPath(), "pathext"));
       idx.add(page);
       fail("Managed to add a resource with an existing identifier");
-    } catch (Exception e) {
+    } catch (Throwable t) {
       // This is expected
       page.getURI().setPath(oldPath);
     }
@@ -196,7 +196,7 @@ public class ContentRepositoryIndexTest {
       page.getURI().setIdentifier(page.getIdentifier().substring(1) + "x");
       idx.add(page);
       fail("Managed to add a resource with an existing path");
-    } catch (Exception e) {
+    } catch (Throwable t) {
       // This is expected
       page.getURI().setIdentifier(oldId);
     }
@@ -215,9 +215,9 @@ public class ContentRepositoryIndexTest {
       assertEquals(1, idx.size());
       idx.delete(file.getURI());
       assertEquals(0, idx.size());
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -240,9 +240,9 @@ public class ContentRepositoryIndexTest {
       assertEquals(2, revisions.length);
       assertEquals(Resource.LIVE, revisions[0]);
       assertEquals(Resource.WORK, revisions[1]);
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -271,9 +271,9 @@ public class ContentRepositoryIndexTest {
       assertEquals(english, idx.getLanguages(live1URI)[0]);
       assertEquals(page2Live.languages().size(), idx.getLanguages(live2URI).length);
       assertTrue(page2Live.languages().containsAll(Arrays.asList(idx.getLanguages(live2URI))));
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -288,9 +288,9 @@ public class ContentRepositoryIndexTest {
       idx.move(page.getURI(), newPath);
       assertEquals(1, idx.size());
       assertEquals(id, idx.getIdentifier(new PageURIImpl(site, newPath)));
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -303,9 +303,9 @@ public class ContentRepositoryIndexTest {
       idx.add(page);
       idx.clear();
       assertEquals(0, idx.size());
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -323,9 +323,9 @@ public class ContentRepositoryIndexTest {
       
       // This seems strange, but if there is an identifier, we take it
       assertTrue(idx.exists(new PageURIImpl(site, "/xxx", id)));
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -356,9 +356,9 @@ public class ContentRepositoryIndexTest {
       assertEquals(0, idx.size());
       idx.add(page);
       assertEquals(1, idx.size());
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
   }
 
@@ -408,9 +408,9 @@ public class ContentRepositoryIndexTest {
         assertEquals(1, idx.getLanguages(p.getURI()).length);
         assertEquals(1, idx.getRevisions(p.getURI()).length);
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail(t.getMessage());
     }
     
   }

@@ -257,7 +257,7 @@ public abstract class AbstractWritableContentRepository extends AbstractContentR
    * @throws IOException
    *           if the resource can't be written to the storage
    */
-  abstract protected <T extends ResourceContent, R extends Resource<T>> R storeResource(
+  protected abstract <T extends ResourceContent, R extends Resource<T>> R storeResource(
       R resource) throws IOException;
 
   /**
