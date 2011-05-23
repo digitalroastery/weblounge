@@ -370,7 +370,7 @@
               zookeeper;inline=true
             </Embed-Dependency>
             <Private-Package>
-              org.apache.solr.core
+              org.apache.solr.core;-split-package:=merge-first
             </Private-Package>
             <Service-Component>
               OSGI-INF/files-rest-service.xml,
