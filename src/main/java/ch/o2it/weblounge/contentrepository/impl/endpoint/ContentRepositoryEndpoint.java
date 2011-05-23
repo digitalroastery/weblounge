@@ -144,8 +144,8 @@ public class ContentRepositoryEndpoint {
         response.type(fileContent.getMimetype());
       else
         response.type(MediaType.APPLICATION_OCTET_STREAM);
-      if (fileContent.getSize() > 0)
-        response.header("Content-Length", fileContent.getSize());
+       if (fileContent.getSize() > 0)
+       response.header("Content-Length", fileContent.getSize());
     }
 
     // Add an e-tag and send the response
