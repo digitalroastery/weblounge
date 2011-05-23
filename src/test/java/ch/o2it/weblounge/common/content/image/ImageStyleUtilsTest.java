@@ -20,9 +20,8 @@
 
 package ch.o2it.weblounge.common.content.image;
 
-import static org.junit.Assert.fail;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.impl.content.image.ImageContentImpl;
 import ch.o2it.weblounge.common.impl.content.image.ImageStyleImpl;
@@ -64,10 +63,10 @@ public class ImageStyleUtilsTest {
   protected final float originalHeight = 666;
 
   /** The style's width */
-  protected static final float width = 250;
+  protected static final float styleWidth = 250;
 
   /** The style's height */
-  protected static final float height = 250;
+  protected static final float styleHeight = 250;
 
   /** The image styles to test */
   protected static List<ImageStyle> styles = null;
@@ -80,12 +79,12 @@ public class ImageStyleUtilsTest {
     imageURL = ImageStyleUtilsTest.class.getResource(imagePath).toURI().toURL();
 
     styles = new ArrayList<ImageStyle>();
-    styles.add(new ImageStyleImpl("box", (int) width, (int) height, ImageScalingMode.Box, false));
-    styles.add(new ImageStyleImpl("cover", (int) width, (int) height, ImageScalingMode.Cover, false));
-    styles.add(new ImageStyleImpl("fill", (int) width, (int) height, ImageScalingMode.Fill, false));
-    styles.add(new ImageStyleImpl("width", (int) width, (int) height, ImageScalingMode.Width, false));
-    styles.add(new ImageStyleImpl("height", (int) width, (int) height, ImageScalingMode.Height, false));
-    styles.add(new ImageStyleImpl("none", (int) width, (int) height, ImageScalingMode.None, false));
+    styles.add(new ImageStyleImpl("box", (int) styleWidth, (int) styleHeight, ImageScalingMode.Box, false));
+    styles.add(new ImageStyleImpl("cover", (int) styleWidth, (int) styleHeight, ImageScalingMode.Cover, false));
+    styles.add(new ImageStyleImpl("fill", (int) styleWidth, (int) styleHeight, ImageScalingMode.Fill, false));
+    styles.add(new ImageStyleImpl("width", (int) styleWidth, (int) styleHeight, ImageScalingMode.Width, false));
+    styles.add(new ImageStyleImpl("height", (int) styleWidth, (int) styleHeight, ImageScalingMode.Height, false));
+    styles.add(new ImageStyleImpl("none", (int) styleWidth, (int) styleHeight, ImageScalingMode.None, false));
 
     // Make sure it's working on headless systems
     System.setProperty("java.awt.headless", "true");
@@ -98,8 +97,8 @@ public class ImageStyleUtilsTest {
    */
   @Test
   public void testGetScale() {
-    float scaleToWidth = width / originalWidth;
-    float scaleToHeight = height / originalHeight;
+    float scaleToWidth = styleWidth / originalWidth;
+    float scaleToHeight = styleHeight / originalHeight;
     for (ImageStyle style : styles) {
       float scale = ImageStyleUtils.getScale((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
@@ -138,7 +137,7 @@ public class ImageStyleUtilsTest {
       float cropX = ImageStyleUtils.getCropX((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
         case Fill:
-          assertEquals(originalWidth - width, cropX);
+          assertEquals(originalWidth - styleWidth, cropX);
           break;
         case Box:
         case Cover:
@@ -164,7 +163,7 @@ public class ImageStyleUtilsTest {
       float cropY = ImageStyleUtils.getCropY((int) originalWidth, (int) originalHeight, style);
       switch (style.getScalingMode()) {
         case Fill:
-          assertEquals(originalHeight - height, cropY);
+          assertEquals(originalHeight - styleHeight, cropY);
           break;
         case Box:
         case Cover:
@@ -191,16 +190,16 @@ public class ImageStyleUtilsTest {
       switch (style.getScalingMode()) {
         case Fill:
         case Box:
-          assertEquals(width, scaledWidth);
+          assertEquals(styleWidth, scaledWidth);
           break;
         case Cover:
-          assertEquals(Math.max(scale * originalWidth, width), scaledWidth);
+          assertEquals(Math.max(scale * originalWidth, styleWidth), scaledWidth);
           break;
         case Width:
-          assertEquals(width, scaledWidth);
+          assertEquals(styleWidth, scaledWidth);
           break;
         case Height:
-          assertEquals(Math.min(width, scale * originalWidth), scaledWidth);
+          assertEquals(Math.round(originalWidth * scale), scaledWidth);
           break;
         case None:
           assertEquals(originalWidth, scaledWidth);
@@ -222,19 +221,19 @@ public class ImageStyleUtilsTest {
       float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
       switch (style.getScalingMode()) {
         case Fill:
-          assertEquals(height, scaledHeight);
+          assertEquals(styleHeight, scaledHeight);
           break;
         case Box:
           assertEquals(Math.round(scale * originalHeight), scaledHeight);
           break;
         case Cover:
-          assertEquals(height, scaledHeight);
+          assertEquals(styleHeight, scaledHeight);
           break;
         case Width:
-          assertEquals(Math.round(Math.min(height, scale * originalHeight)), scaledHeight);
+          assertEquals(Math.round(scale * originalHeight), scaledHeight);
           break;
         case Height:
-          assertEquals(height, scaledHeight);
+          assertEquals(styleHeight, scaledHeight);
           break;
         case None:
           assertEquals(originalHeight, scaledHeight);
@@ -271,28 +270,28 @@ public class ImageStyleUtilsTest {
         // Test width and height
         switch (style.getScalingMode()) {
           case Box:
-            assertEquals(width, image.getWidth());
-            assertEquals(originalHeight * (width / originalWidth), image.getHeight());
+            assertEquals(styleWidth, image.getWidth());
+            assertEquals(originalHeight * (styleWidth / originalWidth), image.getHeight());
             break;
           case Cover:
-            assertEquals(originalWidth * (height / originalHeight), image.getWidth());
-            assertEquals(height, image.getHeight());
+            assertEquals(originalWidth * (styleHeight / originalHeight), image.getWidth());
+            assertEquals(styleHeight, image.getHeight());
             break;
           case Fill:
-            assertEquals(width, image.getWidth());
-            assertEquals(height, image.getHeight());
+            assertEquals(styleWidth, image.getWidth());
+            assertEquals(styleHeight, image.getHeight());
             break;
           case Height:
-            assertEquals(originalWidth * (height / originalHeight), image.getWidth());
-            assertEquals(height, image.getHeight());
+            assertEquals(originalWidth * (styleHeight / originalHeight), image.getWidth());
+            assertEquals(styleHeight, image.getHeight());
             break;
           case None:
             assertEquals(originalWidth, image.getWidth());
             assertEquals(originalHeight, image.getHeight());
             break;
           case Width:
-            assertEquals(width, image.getWidth());
-            assertEquals(originalHeight * (width / originalWidth), image.getHeight());
+            assertEquals(styleWidth, image.getWidth());
+            assertEquals(originalHeight * (styleWidth / originalWidth), image.getHeight());
             break;
           default:
             fail("Unknown scaling mode " + style.getScalingMode());
@@ -324,28 +323,28 @@ public class ImageStyleUtilsTest {
 
       switch (style.getScalingMode()) {
         case Box:
-          assertEquals(width, scaledWidth);
-          assertEquals(originalHeight * (width / originalWidth), scaledHeight);
+          assertEquals(styleWidth, scaledWidth);
+          assertEquals(originalHeight * (styleWidth / originalWidth), scaledHeight);
           break;
         case Cover:
-          assertEquals(originalWidth * (height / originalHeight), scaledWidth);
-          assertEquals(height, scaledHeight);
+          assertEquals(originalWidth * (styleHeight / originalHeight), scaledWidth);
+          assertEquals(styleHeight, scaledHeight);
           break;
         case Fill:
-          assertEquals(width, scaledWidth);
-          assertEquals(height, scaledHeight);
+          assertEquals(styleWidth, scaledWidth);
+          assertEquals(styleHeight, scaledHeight);
           break;
         case Height:
-          assertEquals(originalWidth * (height / originalHeight), scaledWidth);
-          assertEquals(height, scaledHeight);
+          assertEquals(originalWidth * (styleHeight / originalHeight), scaledWidth);
+          assertEquals(styleHeight, scaledHeight);
           break;
         case None:
           assertEquals(originalWidth, scaledWidth);
           assertEquals(originalHeight, scaledHeight);
           break;
         case Width:
-          assertEquals(width, scaledWidth);
-          assertEquals(originalHeight * (width / originalWidth), scaledHeight);
+          assertEquals(styleWidth, scaledWidth);
+          assertEquals(originalHeight * (styleWidth / originalWidth), scaledHeight);
           break;
         default:
           fail("Unknown scaling mode " + style.getScalingMode());
