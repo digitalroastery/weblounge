@@ -227,7 +227,7 @@ public final class ImageStyleUtils {
         width = Math.round(scale * imageWidth);
         break;
       case Height:
-        width = Math.min(Math.round(scale * imageWidth), style.getWidth());
+        width = Math.round(scale * imageWidth);
         break;
       case None:
         width = imageWidth;
@@ -263,7 +263,7 @@ public final class ImageStyleUtils {
         height = Math.round(scale * imageHeight);
         break;
       case Width:
-        height = Math.min(Math.round(scale * imageHeight), style.getHeight());
+        height = Math.round(scale * imageHeight);
         break;
       case None:
         height = imageHeight;
