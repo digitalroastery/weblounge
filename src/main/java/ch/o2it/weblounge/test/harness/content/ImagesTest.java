@@ -550,14 +550,17 @@ public class ImagesTest extends IntegrationTestBase {
 
       // Test filename
       StringBuffer fileName = new StringBuffer(FilenameUtils.getBaseName(filenameEnglish));
+      StringBuffer fileNamePrefix = new StringBuffer(fileName);
       if (!ImageScalingMode.None.equals(style.getScalingMode())) {
         float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth, originalHeight, style);
-        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth, originalHeight, style);
-        fileName.append("_").append((int)scaledWidth).append("x").append((int)scaledHeight);
+        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
+        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
+        fileName.append("_").append((int) scaledWidth).append("x").append((int) scaledHeight);
+        fileNamePrefix.append("_").append((int) scaledWidth).append("x");
       }
       fileName.append(".").append(FilenameUtils.getExtension(filenameEnglish));
-      assertEquals("inline; filename=" + fileName.toString(), response.getHeaders("Content-Disposition")[0].getValue());
+      String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
+      assertTrue(contentDisposition.startsWith("inline; filename=" + fileNamePrefix.toString()));
 
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("Etag");
@@ -616,14 +619,17 @@ public class ImagesTest extends IntegrationTestBase {
 
       // Test filename
       StringBuffer fileName = new StringBuffer(FilenameUtils.getBaseName(filenameGerman));
+      StringBuffer fileNamePrefix = new StringBuffer(fileName);
       if (!ImageScalingMode.None.equals(style.getScalingMode())) {
         float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth, originalHeight, style);
-        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth, originalHeight, style);
-        fileName.append("_").append((int)scaledWidth).append("x").append((int)scaledHeight);
+        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
+        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
+        fileName.append("_").append((int) scaledWidth).append("x").append((int) scaledHeight);
+        fileNamePrefix.append("_").append((int) scaledWidth).append("x");
       }
       fileName.append(".").append(FilenameUtils.getExtension(filenameGerman));
-      assertEquals("inline; filename=" + fileName.toString(), response.getHeaders("Content-Disposition")[0].getValue());
+      String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
+      assertTrue(contentDisposition.startsWith("inline; filename=" + fileNamePrefix.toString()));
 
       // Test ETag header
       Header eTagHeader = response.getFirstHeader("Etag");
