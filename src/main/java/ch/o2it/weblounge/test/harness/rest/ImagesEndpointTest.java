@@ -198,7 +198,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    */
   private void testGetImageStyle(String serverUrl) throws Exception {
     HttpClient httpClient = null;
-    
+
     logger.info("");
     logger.info("Testing single image styles");
     logger.info("");
@@ -232,7 +232,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    */
   private void testGetImageMetadata(String serverUrl) throws Exception {
     HttpClient httpClient = null;
-    
+
     logger.info("");
     logger.info("Testing image metadata");
     logger.info("");
@@ -262,7 +262,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetOriginalImage(String serverUrl) throws Exception {
-    
+
     logger.info("");
     logger.info("Testing original image");
     logger.info("");
@@ -281,8 +281,9 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    * @throws Exception
    *           if an exception occurs
    */
-  private void testGetOriginalImageByLanguage(String serverUrl) throws Exception {
-    
+  private void testGetOriginalImageByLanguage(String serverUrl)
+      throws Exception {
+
     logger.info("");
     logger.info("Testing original localized image by id");
     logger.info("");
@@ -302,7 +303,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
    *           if an exception occurs
    */
   private void testGetStyledImageByLanguage(String serverUrl) throws Exception {
-    
+
     logger.info("");
     logger.info("Testing styled, localized images");
     logger.info("");
@@ -311,7 +312,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
     for (ImageStyle style : styles) {
       String url = null;
       HttpGet request = null;
-      
+
       // English
       url = UrlUtils.concat(serverUrl, imageId, "locales", "en", "styles", style.getIdentifier());
       request = new HttpGet(url);
@@ -411,7 +412,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
-      
+
       // Read the content
       response.getEntity().consumeContent();
     } finally {
@@ -452,7 +453,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertEquals(mimetypeGerman, response.getHeaders("Content-Type")[0].getValue());
       assertEquals(sizeGerman, response.getEntity().getContentLength());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
-      
+
       // Test filename
       assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
 
@@ -461,7 +462,7 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
-      
+
       // Read the content
       response.getEntity().consumeContent();
     } finally {
@@ -510,10 +511,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       StringBuffer fileNamePrefix = new StringBuffer(fileName);
       if (!ImageScalingMode.None.equals(style.getScalingMode())) {
         float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth, originalHeight, style);
-        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth, originalHeight, style) + 1;
-        fileName.append("_").append((int)scaledWidth).append("x").append((int)scaledHeight);
-        fileNamePrefix.append("_").append((int)scaledWidth).append("x");
+        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
+        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
+        fileName.append("_").append((int) scaledWidth).append("x").append((int) scaledHeight);
+        fileNamePrefix.append("_").append((int) scaledWidth).append("x");
       }
       fileName.append(".").append(FilenameUtils.getExtension(filenameEnglish));
       String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
@@ -579,10 +580,10 @@ public class ImagesEndpointTest extends IntegrationTestBase {
       StringBuffer fileNamePrefix = new StringBuffer(fileName);
       if (!ImageScalingMode.None.equals(style.getScalingMode())) {
         float scale = ImageStyleUtils.getScale(originalWidth, originalHeight, style);
-        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth, originalHeight, style);
-        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth, originalHeight, style) + 1;
-        fileName.append("_").append((int)scaledWidth).append("x").append((int)scaledHeight);
-        fileNamePrefix.append("_").append((int)scaledWidth).append("x");
+        float scaledWidth = originalWidth * scale - ImageStyleUtils.getCropX(originalWidth * scale, originalHeight * scale, style);
+        float scaledHeight = originalHeight * scale - ImageStyleUtils.getCropY(originalWidth * scale, originalHeight * scale, style);
+        fileName.append("_").append((int) scaledWidth).append("x").append((int) scaledHeight);
+        fileNamePrefix.append("_").append((int) scaledWidth).append("x");
       }
       fileName.append(".").append(FilenameUtils.getExtension(filenameGerman));
       String contentDisposition = response.getHeaders("Content-Disposition")[0].getValue();
