@@ -47,6 +47,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -274,6 +275,9 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
         response.setHeader("Content-Disposition", "inline; filename=" + imageContents.getFilename());
         IOUtils.copy(imageInputStream, response.getOutputStream());
         response.getOutputStream().flush();
+      } catch (EOFException e) {
+        logger.debug("Error writing image '{}' back to client: connection closed by client", imageResource);
+        return true;
       } catch (IOException e) {
         logger.error("Error writing {} image '{}' back to client: {}", new Object[] {
             language,
@@ -315,13 +319,16 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
           e });
       DispatchUtils.sendInternalError(request, response);
       return true;
+    } catch (EOFException e) {
+      logger.debug("Error writing image '{}' back to client: connection closed by client", imageResource);
+      return true;
     } catch (IOException e) {
-      logger.error("Error sending image {} to the client: {}", imageURI, e.getMessage());
+      logger.error("Error sending image '{}' to the client: {}", imageURI, e.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;
     } catch (Throwable t) {
       FileUtils.deleteQuietly(scaledImageFile);
-      logger.error("Error creating scaled image {}: {}", imageURI, t.getMessage());
+      logger.error("Error creating scaled image '{}': {}", imageURI, t.getMessage());
       DispatchUtils.sendInternalError(request, response);
       return true;
     } finally {

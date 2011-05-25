@@ -20,8 +20,8 @@
 
 package ch.o2it.weblounge.dispatcher.impl.handler;
 
-import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.Renderer.RendererType;
+import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchQuery.Order;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.SearchResultItem;
@@ -69,6 +69,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -350,6 +351,9 @@ public class FeedRequestHandlerImpl implements RequestHandler {
     } catch (FeedException e) {
       logger.error("Error creating {} feed: {}", feedType, e.getMessage());
       DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (EOFException e) {
+      logger.debug("Error writing feed '{}' back to client: connection closed by client", feedType);
       return true;
     } catch (IOException e) {
       logger.error("Error sending {} feed to the client: {}", feedType, e.getMessage());

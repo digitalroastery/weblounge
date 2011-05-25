@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -244,6 +245,9 @@ public final class FileRequestHandlerImpl implements RequestHandler {
           e.getMessage(),
           e });
       DispatchUtils.sendInternalError(request, response);
+      return true;
+    } catch (EOFException e) {
+      logger.debug("Error writing file '{}' back to client: connection closed by client", fileURI);
       return true;
     } catch (IOException e) {
       logger.error("Error sending file {} to the client: {}", fileURI, e.getMessage());

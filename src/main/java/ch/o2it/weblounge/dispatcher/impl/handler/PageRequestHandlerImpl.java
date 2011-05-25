@@ -52,6 +52,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -271,6 +272,9 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
         DispatchUtils.sendInternalError(request, response);
       }
 
+      return true;
+    } catch (EOFException e) {
+      logger.debug("Error writing page '{}' back to client: connection closed by client", url);
       return true;
     } catch (IOException e) {
       logger.error("I/O exception while sending error status: {}", e.getMessage(), e);

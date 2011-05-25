@@ -54,6 +54,7 @@ import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -355,6 +356,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           response.getWriter().print("\n\t</body>\n</html>");
         }
       }
+    } catch (EOFException e) {
+      logger.debug("Error writing action '{}' back to client: connection closed by client", url);
     } catch (IOException e) {
       logger.error("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
@@ -392,6 +395,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           ((XMLAction) action).startXML(request, response);
         }
       }
+    } catch (EOFException e) {
+      logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
     } catch (IOException e) {
       logger.debug("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
@@ -426,6 +431,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
           ((JSONAction) action).startJSON(request, response);
         }
       }
+    } catch (EOFException e) {
+      logger.debug("Error writing action '{}' back to client: connection closed by client", request.getUrl());
     } catch (IOException e) {
       logger.debug("Error writing action output to client: {}", e.getMessage());
     } catch (ActionException e) {
