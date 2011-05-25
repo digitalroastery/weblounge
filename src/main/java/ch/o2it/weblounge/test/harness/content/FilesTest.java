@@ -144,6 +144,9 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+      
+      // Consume the content
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -199,6 +202,9 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+      
+      // Consume the content
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -253,6 +259,9 @@ public class FilesTest extends IntegrationTestBase {
       assertEquals(sizeGerman, response.getEntity().getContentLength());
       assertEquals(1, response.getHeaders("Content-Disposition").length);
       assertEquals("inline; filename=" + filenameGerman, response.getHeaders("Content-Disposition")[0].getValue());
+      
+      // Consume the content
+      response.getEntity().consumeContent();      
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -292,6 +301,9 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+      
+      // Consume the content
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -332,6 +344,9 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+      
+      // Consume the content
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -389,6 +404,9 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+
+      // Consume the content
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -430,6 +448,9 @@ public class FilesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+
+      // Consume the content
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }

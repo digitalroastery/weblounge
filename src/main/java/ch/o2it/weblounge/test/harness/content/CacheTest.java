@@ -122,7 +122,12 @@ public class CacheTest extends IntegrationTestBase {
       Date expires = df.parse(response.getHeaders("Expires")[0].getValue());
 
       // Prepare the second request
+      response.getEntity().consumeContent();
       httpClient.getConnectionManager().shutdown();
+      
+      // Give the cache time to persist the entry
+      Thread.sleep(1000);
+      
       httpClient = new DefaultHttpClient();
       
       request.setHeader("If-None-Match", eTag);

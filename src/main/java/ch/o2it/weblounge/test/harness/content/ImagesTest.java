@@ -460,6 +460,9 @@ public class ImagesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+
+      // Consume the content
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
@@ -507,6 +510,9 @@ public class ImagesTest extends IntegrationTestBase {
       assertNotNull(eTagHeader);
       assertNotNull(eTagHeader.getValue());
       eTagValue = eTagHeader.getValue();
+            
+      // Consume the content
+      response.getEntity().consumeContent();
     } finally {
       httpClient.getConnectionManager().shutdown();
     }

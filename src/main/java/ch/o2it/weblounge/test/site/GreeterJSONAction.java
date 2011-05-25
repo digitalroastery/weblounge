@@ -20,18 +20,16 @@
 
 package ch.o2it.weblounge.test.site;
 
+import ch.o2it.weblounge.common.impl.request.RequestUtils;
 import ch.o2it.weblounge.common.request.RequestFlavor;
 import ch.o2it.weblounge.common.request.WebloungeRequest;
 import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.JSONAction;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +46,7 @@ public class GreeterJSONAction extends GreeterHTMLAction implements JSONAction {
     clearFlavors();
     addFlavor(RequestFlavor.JSON);
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -58,17 +56,13 @@ public class GreeterJSONAction extends GreeterHTMLAction implements JSONAction {
   public void startJSON(WebloungeRequest request, WebloungeResponse response)
       throws IOException, ActionException {
     try {
-      JSONObject json = new JSONObject();
-      if (greeting != null) {
-        Map<String, String> g = new HashMap<String, String>();
-        g.put(language, greeting);
-        json.put("greetings", g);
-      }
-      IOUtils.copy(new StringReader(json.toString()), response.getWriter());
+      String language = RequestUtils.getParameter(request, LANGUAGE_PARAM);
+      Map<String, String> data = new HashMap<String, String>();
+      data.put(language, greeting);
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.writeValue(response.getWriter(), data);
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
-    } catch (JSONException e) {
-      throw new ActionException("Unable to create json response", e);
     }
   }
 

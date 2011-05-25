@@ -29,12 +29,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
+import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,7 +72,7 @@ public class JSONActionTest extends IntegrationTestBase {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
@@ -84,24 +87,30 @@ public class JSONActionTest extends IntegrationTestBase {
     // Prepare the request
     logger.info("Testing greeter action's json output");
     logger.info("Sending requests to {}", requestUrl);
-    
+
     for (String language : languages) {
       String greeting = greetings.get(language);
       HttpGet request = new HttpGet(requestUrl);
-      String[][] params = new String[][] {{"language", language}};
-  
+      String[][] params = new String[][] { { "language", language } };
+
       // Send and the request and examine the response
       logger.debug("Sending request to {}", request.getURI());
       HttpClient httpClient = new DefaultHttpClient();
       try {
         HttpResponse response = TestUtils.request(httpClient, request, params);
         Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        JSONObject json = TestUtils.parseJSONResponse(response);
-        Assert.assertEquals(greeting, json.getJSONObject("greetings").getString(language));    
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        };
+        String responseJson = EntityUtils.toString(response.getEntity(), "utf-8");
+        HashMap<String, Object> json = jsonMapper.readValue(responseJson, typeRef);
+
+        Assert.assertEquals(greeting, json.get(language));
       } finally {
         httpClient.getConnectionManager().shutdown();
       }
     }
   }
-  
+
 }
