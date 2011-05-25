@@ -160,7 +160,7 @@ public class DataSourceProvider implements ManagedService {
    * @param context
    * @throws Exception
    */
-  public void stop(BundleContext context) throws Exception {
+  public void deactivate(BundleContext context) throws Exception {
     unregisterDatasource();
   }
 
@@ -268,6 +268,7 @@ public class DataSourceProvider implements ManagedService {
 
     if (dataSource != null) {
       logger.debug("Releasing jpa datasource");
+      dataSource.close();
       DataSources.destroy(dataSource);
     }
   }
