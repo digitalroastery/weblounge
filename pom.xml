@@ -102,8 +102,13 @@
     </dependency>
 
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-lgpl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-lgpl</artifactId>
     </dependency>
 
     <dependency>
@@ -257,12 +262,10 @@
               ch.o2it.weblounge.common.impl.util.*;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
-              com.springsource.javax.media.jai.core,
-              com.springsource.javax.media.jai.codec,
-              json
+              com.springsource.javax.media.jai.core;inline=true,
+              com.springsource.javax.media.jai.codec;inline=true,
             </Embed-Dependency>
             <Private-Package>
-              org.json,
               javax.media.jai
             </Private-Package>
           </instructions>

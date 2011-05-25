@@ -34,7 +34,6 @@ import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
@@ -147,22 +146,6 @@ public final class TestUtils {
       throws Exception {
     String responseText = EntityUtils.toString(response.getEntity(), "utf-8");
     return responseText;
-  }
-
-  /**
-   * Parses the <code>HTTP</code> response body into a <code>JSON</code> object.
-   * 
-   * @param response
-   *          the response
-   * @return the parsed json
-   * @throws Exception
-   *           if parsing fails
-   */
-  public static JSONObject parseJSONResponse(HttpResponse response)
-      throws Exception {
-    String responseJson = EntityUtils.toString(response.getEntity(), "utf-8");
-    JSONObject json = new JSONObject(responseJson);
-    return json;
   }
 
   /**

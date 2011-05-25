@@ -26,11 +26,9 @@ import ch.o2it.weblounge.common.request.WebloungeResponse;
 import ch.o2it.weblounge.common.site.ActionException;
 import ch.o2it.weblounge.common.site.JSONAction;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
-import java.io.StringReader;
 
 /**
  * This class is the default implementation for an <code>JSONAction</code>. The
@@ -43,6 +41,9 @@ import java.io.StringReader;
  * accordingly and include the respective super implementations.
  */
 public class JSONActionSupport extends ActionSupport implements JSONAction {
+
+  /** Jackson object mapper */
+  private final ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Creates a new action implementation that directly supports the generation
@@ -86,16 +87,16 @@ public class JSONActionSupport extends ActionSupport implements JSONAction {
   }
 
   /**
-   * Serialized the json object and sends it to the client.
+   * Serialize the object to <code>JSON</code> and sends it to the client.
    * 
    * @param json
-   *          the json data
+   *          the data object
    * @throws ActionException
    *           if the response cannot be written to the client
    */
-  protected void returnJSON(JSONObject json) throws ActionException {
+  protected void returnJSON(Object json) throws ActionException {
     try {
-      IOUtils.copy(new StringReader(json.toString()), response.getWriter());
+      mapper.writeValue(response.getWriter(), json);
     } catch (IOException e) {
       throw new ActionException("Unable to send json response", e);
     }
