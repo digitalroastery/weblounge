@@ -1421,6 +1421,30 @@
     </highlighting>
   </searchComponent>
 
+  <searchComponent class="solr.SpellCheckComponent" name="suggest-path">
+    <lst name="spellchecker">
+      <str name="name">suggest_path</str>
+      <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>
+      <str name="field">path</str>
+      <float name="threshold">0.005</float>
+      <str name="buildOnCommit">true</str>
+    </lst>
+  </searchComponent>
+
+  <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
+    <lst name="defaults">
+      <str name="spellcheck">true</str>
+      <str name="spellcheck.dictionary">suggest-path</str>
+      <str name="spellcheck.onlyMorePopular">false</str>
+      <str name="spellcheck.count">25</str>
+      <str name="spellcheck.collate">true</str>
+    </lst>
+    <arr name="components">
+      <str>suggest-path</str>
+    </arr>
+  </requestHandler>
+
   <!-- Update Processors
 
        Chains of Update Processor Factories for dealing with Update

@@ -446,51 +446,51 @@
     <field name="template" type="string" indexed="true" stored="true" required="false" /> 
 
     <!-- Page, page header and page preview -->
-    <field name="page-xml" type="string" indexed="false" stored="true" required="false" />
-    <field name="page-header-xml" type="string" indexed="false" stored="true" required="false" />
-    <field name="preview-xml" type="string" indexed="false" stored="true" required="false" />
+    <field name="page_xml" type="string" indexed="false" stored="true" required="false" />
+    <field name="page_header_xml" type="string" indexed="false" stored="true" required="false" />
+    <field name="preview_xml" type="string" indexed="false" stored="true" required="false" />
 
     <!-- Workflow-specific fields -->
     <field name="created" type="date" indexed="true" stored="true" required="false" />
-    <field name="created-by" type="string" indexed="true" stored="true" required="false" />
+    <field name="created_by" type="string" indexed="true" stored="true" required="false" />
     <field name="modified" type="date" indexed="true" stored="true" required="false" />
-    <field name="modified-by" type="string" indexed="true" stored="true" required="false" />
-    <field name="published-from" type="date" indexed="true" stored="true" required="false" />
-    <field name="published-to" type="date" indexed="true" stored="true" required="false" />
-    <field name="published-by" type="string" indexed="true" stored="true" required="false" />
+    <field name="modified_by" type="string" indexed="true" stored="true" required="false" />
+    <field name="published_from" type="date" indexed="true" stored="true" required="false" />
+    <field name="published_to" type="date" indexed="true" stored="true" required="false" />
+    <field name="published_by" type="string" indexed="true" stored="true" required="false" />
 
     <!-- Language sensitive page-level content -->
     <field name="description" type="string" indexed="true" stored="false" required="false" multiValued="true" />
-    <dynamicField name="description-*" type="string" indexed="true" stored="true" required="false" />
+    <dynamicField name="description_*" type="string" indexed="true" stored="true" required="false" />
     <field name="coverage" type="string" indexed="true" stored="false" required="false" multiValued="true" />
-    <dynamicField name="coverage-*" type="string" indexed="true" stored="true" required="false" />
+    <dynamicField name="coverage_*" type="string" indexed="true" stored="true" required="false" />
     <field name="rights" type="string" indexed="true" stored="false" required="false" multiValued="true" />
-    <dynamicField name="rights-*" type="string" indexed="true" stored="true" required="false" />
+    <dynamicField name="rights_*" type="string" indexed="true" stored="true" required="false" />
     <field name="title" type="string" indexed="true" stored="false" required="false" multiValued="true" />
-    <dynamicField name="title-*" type="string" indexed="true" stored="true" required="false" />
+    <dynamicField name="title_*" type="string" indexed="true" stored="true" required="false" />
    
     <!-- Dynamic fields for pagelet texts and properties -->
-    <field name="pagelet-type" type="text" indexed="true" stored="false" multiValued="true"/>
-    <dynamicField name="pagelet-type-composer-*" type="text" indexed="true" stored="true" multiValued="true"/>
-    <dynamicField name="pagelet-type-position-*" type="text" indexed="true" stored="true" multiValued="true"/>
-    <field name="pagelet-contents" type="text" indexed="true" stored="false" multiValued="true"/>
-    <dynamicField name="pagelet-contents-language-*" type="text" indexed="true" stored="true" multiValued="true"/>
-    <dynamicField name="pagelet-contents-composer-*" type="text" indexed="true" stored="true" multiValued="true"/>
-    <dynamicField name="pagelet-contents-position-*" type="text" indexed="true" stored="true" multiValued="true"/>
-    <field name="pagelet-properties" type="text" indexed="true" stored="false" multiValued="true"/>
-    <dynamicField name="pagelet-xml-*" type="text" indexed="false" stored="true" multiValued="true"/>
+    <field name="pagelet_type" type="text" indexed="true" stored="false" multiValued="true"/>
+    <dynamicField name="pagelet_type_composer_*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet_type_position_*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <field name="pagelet_contents" type="text" indexed="true" stored="false" multiValued="true"/>
+    <dynamicField name="pagelet_contents_language_*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet_contents_composer_*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <dynamicField name="pagelet_contents_position_*" type="text" indexed="true" stored="true" multiValued="true"/>
+    <field name="pagelet_properties" type="text" indexed="true" stored="false" multiValued="true"/>
+    <dynamicField name="pagelet_xml_*" type="text" indexed="false" stored="true" multiValued="true"/>
 
     <!-- Dynamic fields for resource content -->
-    <field name="content-mimetype" type="text" indexed="true" stored="false" multiValued="true"/>
-    <dynamicField name="content-mimetype-*" type="text" indexed="true" stored="true"/>
-    <field name="content-filename" type="text" indexed="true" stored="false" multiValued="true"/>
-    <dynamicField name="content-filename-*" type="text" indexed="true" stored="true"/>
-    <dynamicField name="content-created-*" type="text" indexed="true" stored="true"/>
-    <dynamicField name="content-created-by-*" type="text" indexed="true" stored="true"/>
-    <dynamicField name="content-xml-*" type="text" indexed="false" stored="true"/>
+    <field name="content_mimetype" type="text" indexed="true" stored="false" multiValued="true"/>
+    <dynamicField name="content_mimetype_*" type="text" indexed="true" stored="true"/>
+    <field name="content_filename" type="text" indexed="true" stored="false" multiValued="true"/>
+    <dynamicField name="content_filename_*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="content_created_*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="content_created_by_*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="content_xml_*" type="text" indexed="false" stored="true"/>
 
     <!-- Language sensitive fulltext search -->
-    <dynamicField name="fulltext-*" type="text" indexed="true" stored="false"/>
+    <dynamicField name="fulltext_*" type="text" indexed="true" stored="false"/>
 
     <!-- A fulltext copy field. -->
     <field name="fulltext" type="text" indexed="true" stored="false"/>
@@ -523,10 +523,10 @@
  <copyField source="path" dest="fulltext"/>
  <copyField source="subjects" dest="fulltext"/>
  <copyField source="description-*" dest="fulltext"/>
- <copyField source="coverage-*" dest="fulltext"/>
- <copyField source="rights-*" dest="fulltext"/>
- <copyField source="title-*" dest="fulltext"/>
- <copyField source="pagelet-contents-*" dest="fulltext"/>
+ <copyField source="coverage_*" dest="fulltext"/>
+ <copyField source="rights_*" dest="fulltext"/>
+ <copyField source="title_*" dest="fulltext"/>
+ <copyField source="pagelet_contents_*" dest="fulltext"/>
  -->
 
  <!-- Similarity is the scoring routine for each document vs. a query.

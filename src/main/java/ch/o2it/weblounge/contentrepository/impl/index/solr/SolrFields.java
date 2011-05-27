@@ -15,7 +15,7 @@
  *
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program; if not, write to the Free Software Foundation
- *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110_1301, USA.
  */
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
@@ -43,109 +43,109 @@ public interface SolrFields {
   String TEMPLATE = "template";
 
   /** Page field name */
-  String XML = "page-xml";
+  String XML = "page_xml";
 
   /** Page header field name */
-  String HEADER_XML = "page-header-xml";
+  String HEADER_XML = "page_header_xml";
 
   /** Preview field name */
-  String PREVIEW_XML = "preview-xml";
+  String PREVIEW_XML = "preview_xml";
 
   /** Description field name */
   String DESCRIPTION = "description";
 
   /** Description field name (localized) */
-  String DESCRIPTION_LOCALIZED = "description-{0}";
+  String DESCRIPTION_LOCALIZED = "description_{0}";
 
   /** Coverage field name */
   String COVERAGE = "coverage";
 
   /** Coverage field name (localized) */
-  String COVERAGE_LOCALIZED = "coverage-{0}";
+  String COVERAGE_LOCALIZED = "coverage_{0}";
 
   /** Rights field name */
   String RIGHTS = "rights";
 
   /** Rights field name (localized) */
-  String RIGHTS_LOCALIZED = "rights-{0}";
+  String RIGHTS_LOCALIZED = "rights_{0}";
 
   /** Title field name */
   String TITLE = "title";
 
   /** Title field name (localized) */
-  String TITLE_LOCALIZED = "title-{0}";
+  String TITLE_LOCALIZED = "title_{0}";
 
   /** Created field name */
   String CREATED = "created";
 
   /** Creator field name */
-  String CREATED_BY = "created-by";
+  String CREATED_BY = "created_by";
 
   /** Modified field name */
   String MODIFIED = "modified";
 
   /** Modifier field name */
-  String MODIFIED_BY = "modified-by";
+  String MODIFIED_BY = "modified_by";
 
   /** Publishing start date field name */
-  String PUBLISHED_FROM = "published-from";
+  String PUBLISHED_FROM = "published_from";
 
   /** Publishing end date field name */
-  String PUBLISHED_TO = "published-to";
+  String PUBLISHED_TO = "published_to";
 
   /** Publisher field name */
-  String PUBLISHED_BY = "published-by";
+  String PUBLISHED_BY = "published_by";
 
   /** Pagelet text and properties values */
-  String PAGELET_CONTENTS = "pagelet-contents";
+  String PAGELET_CONTENTS = "pagelet_contents";
 
   /** Pagelet text and properties values (localized) */
-  String PAGELET_CONTENTS_LOCALIZED = "pagelet-contents-language-{0}";
+  String PAGELET_CONTENTS_LOCALIZED = "pagelet_contents_language_{0}";
 
   /** Pagelet properties field name */
-  String PAGELET_PROPERTIES = "pagelet-properties";
+  String PAGELET_PROPERTIES = "pagelet_properties";
 
   /** Pagelet xml field name (composer) */
-  String PAGELET_XML_COMPOSER = "pagelet-xml-composer-{0}";
+  String PAGELET_XML_COMPOSER = "pagelet_xml_composer_{0}";
 
   /** Pagelet xml field name (position within composer) */
-  String PAGELET_XML_COMPOSER_POSITION = "pagelet-xml-position-{0}";
+  String PAGELET_XML_COMPOSER_POSITION = "pagelet_xml_position_{0}";
 
   /** Pagelet type field name */
-  String PAGELET_TYPE = "pagelet-type";
+  String PAGELET_TYPE = "pagelet_type";
 
   /** Pagelet type field name (composer) */
-  String PAGELET_TYPE_COMPOSER = "pagelet-type-composer-{0}";
+  String PAGELET_TYPE_COMPOSER = "pagelet_type_composer_{0}";
 
   /** Pagelet type field name (position within composer) */
-  String PAGELET_TYPE_COMPOSER_POSITION = "pagelet-type-position-{0}";
+  String PAGELET_TYPE_COMPOSER_POSITION = "pagelet_type_position_{0}";
 
   /** Resource content filename field name */
-  String CONTENT_FILENAME = "content-filename";
+  String CONTENT_FILENAME = "content_filename";
 
   /** Resource content filename field name (localized) */
-  String CONTENT_FILENAME_LOCALIZED = "content-filename-{0}";
+  String CONTENT_FILENAME_LOCALIZED = "content_filename_{0}";
 
   /** Resource content mime type field name */
-  String CONTENT_MIMETYPE = "content-mimetype";
+  String CONTENT_MIMETYPE = "content_mimetype";
 
   /** Resource content mime type field name (localized) */
-  String CONTENT_MIMETYPE_LOCALIZED = "content-mimetype-{0}";
+  String CONTENT_MIMETYPE_LOCALIZED = "content_mimetype_{0}";
 
   /** Resource content creation date field name */
-  String CONTENT_CREATED = "content-created-{0}";
+  String CONTENT_CREATED = "content_created_{0}";
 
   /** Resource content creator field name */
-  String CONTENT_CREATED_BY = "content-created-by-{0}";
+  String CONTENT_CREATED_BY = "content_created_by_{0}";
 
   /** Resource content xml field name */
-  String CONTENT_XML = "content-xml-{0}";
+  String CONTENT_XML = "content_xml_{0}";
 
   /** Solr ranking score */
   String SCORE = "score";
   
-  /** Accumulative, language-sensitive fulltext field */
-  String LOCALIZED_FULLTEXT = "fulltext-{0}";
+  /** Accumulative, language_sensitive fulltext field */
+  String LOCALIZED_FULLTEXT = "fulltext_{0}";
 
   /** Accumulative fulltext field */
   String FULLTEXT = "fulltext";

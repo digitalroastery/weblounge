@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.SearchQuery.Order;
 import ch.o2it.weblounge.common.content.SearchResult;
 import ch.o2it.weblounge.common.content.file.FileResource;
 import ch.o2it.weblounge.common.content.image.ImageResource;
@@ -363,6 +364,25 @@ public class SearchIndexTest {
     } catch (ParseException e) {
       e.printStackTrace();
       fail("Error parsing modification date");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetSortedByPublicationDate() {
+    populateIndex();
+    try {
+      SearchQuery q = new SearchQueryImpl(site).sortByPublishingDate(Order.Descending);
+      SearchResult result = idx.getByQuery(q);
+      assertEquals(4, result.getItems().length);
+      assertEquals(4, result.getHitCount());
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+      fail("Error querying ordered by publishing date");
     }
   }
 
