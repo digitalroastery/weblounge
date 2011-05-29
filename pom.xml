@@ -144,7 +144,7 @@
     <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>
-      <version>2.3.15</version>
+      <version>2.3.18</version>
     </dependency>
 
     <dependency>
@@ -264,8 +264,11 @@
             <Embed-Dependency>
               com.springsource.javax.media.jai.core;inline=true,
               com.springsource.javax.media.jai.codec;inline=true,
+              freemarker
             </Embed-Dependency>
             <Private-Package>
+              freemarker.core,
+              freemarker.template,
               javax.media.jai
             </Private-Package>
           </instructions>
