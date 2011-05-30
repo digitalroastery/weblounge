@@ -33,9 +33,11 @@ import ch.o2it.weblounge.common.language.Language;
 import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.ResourceURIInputDocument;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.SearchRequest;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrConnection;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.SuggestRequest;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.Suggestions;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -73,7 +75,7 @@ public class SearchIndex {
   private SolrConnection solrConnection = null;
 
   /** Solr query execution */
-  private SolrRequester solrRequester = null;
+  private SearchRequest solrRequester = null;
 
   /** True if this is a readonly index */
   protected boolean isReadOnly = false;
@@ -163,7 +165,7 @@ public class SearchIndex {
    */
   public boolean delete(ResourceURI uri) throws ContentRepositoryException {
     logger.debug("Removing element with id '{}' from searching index", uri.getIdentifier());
-    
+
     UpdateRequest solrRequest = new UpdateRequest();
     StringBuilder query = new StringBuilder();
     query.append("id:").append(uri.getIdentifier()).append(" AND version:").append(uri.getVersion());
@@ -253,16 +255,14 @@ public class SearchIndex {
       // Add language neutral metadata values
       for (Object value : entry.getValues()) {
         doc.addField(metadataKey, value);
-        
+
         // Add to fulltext?
         if (entry.addToFulltext()) {
           String fulltext = StringUtils.trimToEmpty((String) doc.getFieldValue(SolrFields.FULLTEXT));
           if (value.getClass().isArray()) {
             Object[] fieldValues = (Object[]) value;
             for (Object v : fieldValues) {
-              fulltext = StringUtils.join(new Object[] {
-                  fulltext,
-                  v.toString() }, " ");
+              fulltext = StringUtils.join(new Object[] { fulltext, v.toString() }, " ");
             }
           } else {
             fulltext = StringUtils.join(new Object[] {
@@ -278,7 +278,7 @@ public class SearchIndex {
         List<?> values = entry.getLocalizedValues().get(language);
         for (Object value : values) {
           doc.addField(metadataKey, value);
- 
+
           // Add to fulltext
           if (entry.addToFulltext()) {
 
@@ -299,7 +299,7 @@ public class SearchIndex {
             }
             doc.setField(localizedFieldName, localizedFulltext);
           }
-        }     
+        }
       }
 
     }
@@ -353,6 +353,27 @@ public class SearchIndex {
   }
 
   /**
+   * Returns the suggestions as returned from the selected dictionary.
+   * 
+   * @param dictionary
+   *          the dictionary
+   * @param seed
+   *          the seed used for suggestions
+   */
+  public Suggestions suggest(Suggestions.Dictionary dictionary, String seed,
+      boolean onlyMorePopular, int count, boolean collate)
+      throws ContentRepositoryException {
+    if (StringUtils.isBlank(seed))
+      throw new IllegalArgumentException("Seed must not be blank");
+    SuggestRequest request = new SuggestRequest(solrConnection, dictionary, onlyMorePopular, count, collate);
+    try {
+      return request.getSuggestions(seed);
+    } catch (Throwable t) {
+      throw new ContentRepositoryException(t);
+    }
+  }
+
+  /**
    * Tries to load solr from the specified directory. If that directory is not
    * there, or in the case where either one of solr configuration or data
    * directory is missing, a preceding call to <code>initSolr()</code> is made.
@@ -378,7 +399,7 @@ public class SearchIndex {
     }
 
     solrConnection = new SolrConnection(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
-    solrRequester = new SolrRequester(solrConnection);
+    solrRequester = new SearchRequest(solrConnection);
   }
 
   /**

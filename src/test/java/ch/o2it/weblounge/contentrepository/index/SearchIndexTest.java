@@ -48,6 +48,7 @@ import ch.o2it.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.o2it.weblounge.contentrepository.impl.PageSerializer;
 import ch.o2it.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.SearchIndex;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.Suggestions;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -56,6 +57,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -645,6 +647,30 @@ public class SearchIndexTest {
       // Make sure the number of pages remains the same
       q = new SearchQueryImpl(site);
       assertEquals(resources, idx.getByQuery(q).getItems().length);
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+      fail("Error querying cleared index: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#suggest(ch.o2it.weblounge.contentrepository.impl.index.solr.Suggestions.Dictionary, String, boolean, int, boolean)}
+   * .
+   */
+  @Test
+  @Ignore
+  public void testSuggest() {
+    int resources = populateIndex();
+    String seed = "t";
+    boolean onlyMorePopular = false;
+    int count = 5;
+    boolean collate = false;
+
+    // Make sure there is a page with the new path
+    try {
+      Suggestions suggestions = idx.suggest(Suggestions.Dictionary.Path, seed, onlyMorePopular, count, collate);
+      assertEquals(resources, suggestions.size());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying cleared index: " + e.getMessage());

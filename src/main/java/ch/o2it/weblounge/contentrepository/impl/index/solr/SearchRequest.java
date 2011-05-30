@@ -75,10 +75,10 @@ import java.util.Map;
  * Class implementing <code>LookupRequester</code> to provide connection to solr
  * indexing facility.
  */
-public class SolrRequester {
+public class SearchRequest {
 
   /** Logging facility */
-  private static Logger logger = LoggerFactory.getLogger(SolrRequester.class);
+  private static Logger logger = LoggerFactory.getLogger(SearchRequest.class);
 
   /** The connection to the solr database */
   private SolrConnection solrConnection = null;
@@ -90,7 +90,7 @@ public class SolrRequester {
    * @param connection
    *          the solr connection
    */
-  public SolrRequester(SolrConnection connection) {
+  public SearchRequest(SolrConnection connection) {
     if (connection == null)
       throw new IllegalStateException("Unable to run queries on null connection");
     this.solrConnection = connection;
