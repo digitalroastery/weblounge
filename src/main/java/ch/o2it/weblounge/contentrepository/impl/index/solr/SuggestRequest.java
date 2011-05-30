@@ -21,8 +21,20 @@
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
+import org.apache.solr.client.solrj.response.SpellCheckResponse.Correction;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.MapSolrParams;
+import org.apache.solr.handler.component.SpellCheckComponent;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Request for suggestions based on existing values in the search index. This
@@ -60,11 +72,16 @@ import org.apache.solr.client.solrj.response.QueryResponse;
  */
 public class SuggestRequest {
 
+  /** The dictionaries available for suggestions */
+  public enum Dictionary {
+    Default, Path, Subject
+  }
+
   /** Name of the solr request handler */
-  protected String handlerName = "suggest";
+  protected String suggestHandler = "/suggest";
 
   /** Name of the dictionary component that we configured above */
-  protected Suggestions.Dictionary dictionary = null;
+  protected String dictionary = null;
 
   /** Whether suggestions will be sorted by weight ("popularity") */
   protected boolean onlyMorePopular = true;
@@ -76,7 +93,7 @@ public class SuggestRequest {
   protected boolean collate = true;
 
   /** The connection to the solr database */
-  private SolrConnection solrConnection = null;
+  private SolrRequester solrConnection = null;
 
   /**
    * Creates a new suggest request which uses the given connection to solr and a
@@ -94,10 +111,10 @@ public class SuggestRequest {
    *          whether to provide a query collated with the first matching
    *          suggestion
    */
-  public SuggestRequest(SolrConnection connection, Suggestions.Dictionary dictionary,
+  public SuggestRequest(SolrRequester connection, String dictionary,
       boolean onlyMorePopular, int count, boolean collate) {
     this.solrConnection = connection;
-    this.dictionary = dictionary;
+    this.dictionary = dictionary.toLowerCase();
     this.onlyMorePopular = onlyMorePopular;
     this.count = count;
     this.collate = collate;
@@ -114,27 +131,60 @@ public class SuggestRequest {
    * @throws SolrServerException
    *           if querying solr fails
    */
-  public Suggestions getSuggestions(String seed)
+  public List<String> getSuggestions(String seed)
       throws IllegalArgumentException, SolrServerException {
     if (StringUtils.isBlank(seed))
       throw new IllegalArgumentException("Seed cannot be blank");
-
-    StringBuffer q = new StringBuffer(handlerName);
-    q.append("?dictionary=").append(dictionary.toString().toLowerCase());
-    q.append("&count=").append(count);
-    q.append("&onlyMorePopular=").append(onlyMorePopular);
-    q.append("&collate=").append(collate);
-    q.append("&q=").append(seed);
+    
+    SolrQuery query = new SolrQuery();
+    query.setQueryType(suggestHandler);
+    query.setQuery(seed);
+    
+    Map<String, String> params = new HashMap<String, String>();
+    params.put(CommonParams.ROWS, Integer.toString(count));
+    params.put(SpellCheckComponent.SPELLCHECK_PREFIX + "dictionary", dictionary);
+    params.put(SpellCheckComponent.SPELLCHECK_ONLY_MORE_POPULAR, Boolean.toString(onlyMorePopular));
+    params.put(SpellCheckComponent.SPELLCHECK_MAX_COLLATION_TRIES, Integer.toString(1));
+    params.put(SpellCheckComponent.SPELLCHECK_COLLATE_EXTENDED_RESULTS, Boolean.toString(collate));
+    params.put(SpellCheckComponent.SPELLCHECK_COLLATE, Boolean.toString(collate));
+    
+    query.add(new MapSolrParams(params));
 
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
     try {
-      solrResponse = solrConnection.request(q.toString());
+      solrResponse = solrConnection.request(query);
     } catch (Throwable t) {
       throw new SolrServerException(t);
     }
 
-    return new Suggestions(solrResponse, seed, onlyMorePopular, count, collate);
+    SpellCheckResponse spResponse = solrResponse.getSpellCheckResponse();
+    List<String> result = new ArrayList<String>();
+    
+    if (spResponse == null)
+      return result;
+
+    // Add suggestions (100% hits)
+    for (SpellCheckResponse.Suggestion suggestion : spResponse.getSuggestions()) {
+      result.addAll(suggestion.getAlternatives());
+    }
+
+    // Add collation results (including corrections and misspellings)
+
+    if (collate) {
+      List<Collation> collationResults = spResponse.getCollatedResults();
+      if (collationResults != null) {
+        for (Collation collation : collationResults) {
+          for (Correction correction : collation.getMisspellingsAndCorrections()) {
+            String c = correction.getCorrection();
+            if (!result.contains(c))
+              result.add(c);
+          }
+        }
+      }
+    }
+
+    return result;
   }
 
 }

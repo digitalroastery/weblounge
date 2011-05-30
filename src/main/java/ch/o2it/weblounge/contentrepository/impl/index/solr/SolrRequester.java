@@ -20,6 +20,8 @@
 
 package ch.o2it.weblounge.contentrepository.impl.index.solr;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.BinaryResponseParser;
 import org.apache.solr.client.solrj.request.UpdateRequest;
@@ -28,12 +30,12 @@ import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
-import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.SolrConfig;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.WebloungeSolrConfig;
 import org.apache.solr.request.SolrQueryRequest;
+import org.apache.solr.request.SolrQueryRequestBase;
 import org.apache.solr.request.SolrRequestHandler;
 import org.apache.solr.response.BinaryResponseWriter;
 import org.apache.solr.response.SolrQueryResponse;
@@ -45,16 +47,14 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The solr connection.
  */
-public class SolrConnection {
+public class SolrRequester {
 
   /** Logging facility */
-  private static Logger logger = LoggerFactory.getLogger(SolrConnection.class);
+  private static Logger logger = LoggerFactory.getLogger(SolrRequester.class);
 
   /** The solr core */
   private SolrCore core = null;
@@ -72,7 +72,7 @@ public class SolrConnection {
    * @param dataDir
    *          The directory of the solr index data.
    */
-  public SolrConnection(String solrDir, String dataDir) {
+  public SolrRequester(String solrDir, String dataDir) {
     // Initialize SolrConfig
     SolrConfig config = null;
     try {
@@ -105,41 +105,46 @@ public class SolrConnection {
    * @throws Exception
    */
   public QueryResponse request(String query) throws Exception {
+    return request(new SolrQuery(query));
+  }
 
-    String handlerName = "select";
-    SolrParams params = SolrRequestParsers.parseQueryString(query);
+  /**
+   * Processes a solr request. If the request doesn't specify a handler, it
+   * is processed using the default <code>select</code> handler.
+   * 
+   * @param request
+   *          the request
+   * @return the query result
+   * @throws Exception
+   *           if processing the query fails
+   */
+  public QueryResponse request(SolrQuery query) throws Exception {
+
+    // Determine the handler to use
+    String handlerName = query.getQueryType();
+    if (StringUtils.isBlank(handlerName))
+      handlerName = "search";
+    
+    // Make sure the handler has been configured
     SolrRequestHandler handler = core.getRequestHandler(handlerName);
-
-    String qt = params.get(CommonParams.QT);
-    handler = core.getRequestHandler(qt);
-
-    if (handler == null) {
+    if (handler == null)
       throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, "unknown handler: " + handlerName);
+
+    SolrQueryResponse rsp = new SolrQueryResponse();
+    SolrParams params = SolrParams.toSolrParams(query.toNamedList());
+    SolrQueryRequest request = new SolrQueryRequestBase(core, params) { };
+    core.execute(handler, request, rsp);
+
+    if (rsp.getException() != null) {
+      logger.warn(rsp.getException().toString());
+      throw rsp.getException();
     }
 
-    List<ContentStream> streams = new ArrayList<ContentStream>(1);
+    // Create the solrj response.
+    QueryResponse qrsp = new QueryResponse();
+    qrsp.setResponse(getParsedResponse(request, rsp));
 
-    SolrQueryRequest req = null;
-    try {
-      req = parser.buildRequestFrom(core, params, streams);
-      SolrQueryResponse rsp = new SolrQueryResponse();
-      core.execute(handler, req, rsp);
-
-      if (rsp.getException() != null) {
-        logger.warn(rsp.getException().toString());
-        throw rsp.getException();
-      }
-
-      // create solrj response.
-      QueryResponse qrsp = new QueryResponse();
-      qrsp.setResponse(getParsedResponse(req, rsp));
-
-      return qrsp;
-    } finally {
-      if (req != null) {
-        req.close();
-      }
-    }
+    return qrsp;
   }
 
   /**
@@ -153,7 +158,7 @@ public class SolrConnection {
   public QueryResponse update(UpdateRequest request) throws Exception {
     String path = request.getPath();
     if (path == null || !path.startsWith("/")) {
-      path = "/select";
+      path = "/update";
     }
 
     if (core == null) {

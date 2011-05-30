@@ -48,7 +48,6 @@ import ch.o2it.weblounge.contentrepository.impl.ImageResourceSerializer;
 import ch.o2it.weblounge.contentrepository.impl.PageSerializer;
 import ch.o2it.weblounge.contentrepository.impl.ResourceSerializerServiceImpl;
 import ch.o2it.weblounge.contentrepository.impl.index.SearchIndex;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.Suggestions;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -57,7 +56,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -66,6 +64,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -112,6 +111,9 @@ public class SearchIndexTest {
 
   /** Path of page 2 */
   protected String path2 = "/a/b/c";
+  
+  /** The topic */
+  protected String subject = "topic";
 
   /** Filename */
   protected String filename = "image.jpg";
@@ -659,18 +661,44 @@ public class SearchIndexTest {
    * .
    */
   @Test
-  @Ignore
   public void testSuggest() {
-    int resources = populateIndex();
-    String seed = "t";
+    populateIndex();
+    
+    String subject = "Topic a";
+    String seed = subject.split(" ")[0];
     boolean onlyMorePopular = false;
     int count = 5;
-    boolean collate = false;
+    boolean collate = true;
+    
+    String dictionary = "subject";
 
-    // Make sure there is a page with the new path
+    // Make sure the matching topic is
     try {
-      Suggestions suggestions = idx.suggest(Suggestions.Dictionary.Path, seed, onlyMorePopular, count, collate);
-      assertEquals(resources, suggestions.size());
+      List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
+      assertEquals(1, suggestions.size());
+      //assertEquals(subject, suggestions.first());
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+      fail("Error querying cleared index: " + e.getMessage());
+    }
+
+    // Prevent case sensitivity
+    seed = seed.toLowerCase();
+    try {
+      List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
+      assertEquals(1, suggestions.size());
+      //assertEquals(subject, suggestions.first());
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+      fail("Error querying cleared index: " + e.getMessage());
+    }
+    
+    // Prevent case sensitivity
+    seed = "Another";
+    try {
+      List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
+      assertEquals(2, suggestions.size());
+      //assertEquals(subject, suggestions.first());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying cleared index: " + e.getMessage());

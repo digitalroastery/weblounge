@@ -663,7 +663,7 @@
        http://wiki.apache.org/solr/SearchHandler
 
        For processing Search Queries, the primary Request Handler
-       provided with Solr is "SearchHandler" It delegates to a sequent
+       provided with Solr is "SearchHandler" It delegates to a sequence
        of SearchComponents (see below) and supports distributed
        queries across multiple shards
   -->
@@ -824,6 +824,7 @@
        type header if posted in the body. For example, curl now
        requires: -H 'Content-type:text/xml; charset=utf-8'
   -->
+  <!--  -->
   <requestHandler name="/update"  
                   class="solr.XmlUpdateRequestHandler">
 
@@ -1421,27 +1422,57 @@
     </highlighting>
   </searchComponent>
 
-  <searchComponent class="solr.SpellCheckComponent" name="paths">
+  <!-- Suggest component
+  
+       The component defines the dictionaries that are available. By
+       specifying the correct dictionary, the request can choose the
+       dictionary that is used to answer the request.
+
+       http://wiki.apache.org/solr/Suggester
+  -->
+  <searchComponent class="solr.SpellCheckComponent" name="suggester">
+    <str name="queryAnalyzerFieldType">suggest</str> <!-- defined in schema.xml -->
     <lst name="spellchecker">
-      <str name="name">paths</str>
+      <str name="name">default</str>
       <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
       <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>
-      <str name="field">path</str>
+      <str name="field">fulltext_suggest</str>
+      <float name="threshold">0.005</float>
+      <str name="buildOnCommit">true</str>
+    </lst>
+    <lst name="spellchecker">
+      <str name="name">path</str>
+      <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>
+      <str name="field">path_suggest</str>
+      <float name="threshold">0.005</float>
+      <str name="buildOnCommit">true</str>
+    </lst>
+    <lst name="spellchecker">
+      <str name="name">subject</str>
+      <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>
+      <str name="field">subject_suggest</str>
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
     </lst>
   </searchComponent>
 
+  <!-- Suggest request handler
+
+       http://wiki.apache.org/solr/Suggester
+  -->
   <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
     <lst name="defaults">
       <str name="spellcheck">true</str>
-      <str name="spellcheck.dictionary">paths</str>
+      <str name="spellcheck.dictionary">default</str>
       <str name="spellcheck.onlyMorePopular">false</str>
       <str name="spellcheck.count">25</str>
       <str name="spellcheck.collate">true</str>
+      <str name="spellcheck.collateExtendedResults">true</str>
     </lst>
     <arr name="components">
-      <str>paths</str>
+      <str>suggester</str>
     </arr>
   </requestHandler>
 

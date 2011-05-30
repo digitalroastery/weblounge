@@ -34,10 +34,9 @@ import ch.o2it.weblounge.contentrepository.ResourceSerializer;
 import ch.o2it.weblounge.contentrepository.ResourceSerializerFactory;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.ResourceURIInputDocument;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SearchRequest;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrConnection;
+import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrRequester;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields;
 import ch.o2it.weblounge.contentrepository.impl.index.solr.SuggestRequest;
-import ch.o2it.weblounge.contentrepository.impl.index.solr.Suggestions;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -72,7 +71,7 @@ public class SearchIndex {
   private static final String DATA_DIR = "data";
 
   /** Connection to the solr database */
-  private SolrConnection solrConnection = null;
+  private SolrRequester solrConnection = null;
 
   /** Solr query execution */
   private SearchRequest solrRequester = null;
@@ -360,11 +359,14 @@ public class SearchIndex {
    * @param seed
    *          the seed used for suggestions
    */
-  public Suggestions suggest(Suggestions.Dictionary dictionary, String seed,
+  public List<String> suggest(String dictionary, String seed,
       boolean onlyMorePopular, int count, boolean collate)
       throws ContentRepositoryException {
     if (StringUtils.isBlank(seed))
       throw new IllegalArgumentException("Seed must not be blank");
+    if (StringUtils.isBlank(dictionary))
+      throw new IllegalArgumentException("Dictionary must not be blank");
+
     SuggestRequest request = new SuggestRequest(solrConnection, dictionary, onlyMorePopular, count, collate);
     try {
       return request.getSuggestions(seed);
@@ -398,7 +400,7 @@ public class SearchIndex {
       initSolr(solrRoot);
     }
 
-    solrConnection = new SolrConnection(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
+    solrConnection = new SolrRequester(solrRoot.getAbsolutePath(), dataDir.getAbsolutePath());
     solrRequester = new SearchRequest(solrConnection);
   }
 

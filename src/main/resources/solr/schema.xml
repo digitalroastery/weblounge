@@ -247,11 +247,23 @@
         <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
         <filter class="solr.EnglishMinimalStemFilterFactory"/>
         <!-- this filter can remove any duplicate tokens that appear at the same position - sometimes
-             possible with WordDelimiterFilter in conjuncton with stemming. -->
+             possible with WordDelimiterFilter in conjunction with stemming. -->
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
     </fieldType>
-
+    
+    <!-- Field definition that support suggest -->
+    <fieldType name="suggest" class="solr.TextField">
+      <analyzer type="index">
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.TrimFilterFactory"/>
+      </analyzer>
+    </fieldType>
 
     <!-- A general unstemmed text field - good if one does not know the language of the field -->
     <fieldType name="textgen" class="solr.TextField" positionIncrementGap="100">
@@ -273,7 +285,6 @@
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
-
 
     <!-- A general unstemmed text field that indexes tokens normally and also
          reversed (via ReversedWildcardFilterFactory), to enable more efficient 
@@ -494,12 +505,17 @@
 
     <!-- A fulltext copy field. -->
     <field name="fulltext" type="text" indexed="true" stored="false"/>
+    
+    <!-- Suggest fields -->
+    <field name="path_suggest" type="suggest" indexed="true" stored="false"/>
+    <field name="subject_suggest" type="suggest" multiValued="true" indexed="true" stored="false"/>
+    <field name="fulltext_suggest" type="suggest" indexed="true" stored="false"/>
 
-   <!-- uncomment the following to ignore any fields that don't already match an existing 
+    <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
         alternately, change the type="ignored" to some other type e.g. "text" if you want 
         unknown fields indexed and/or stored by default --> 
-   <!--dynamicField name="*" type="ignored" multiValued="true" /-->
+    <!--dynamicField name="*" type="ignored" multiValued="true" /-->
    
  </fields>
 
@@ -528,6 +544,10 @@
  <copyField source="title_*" dest="fulltext"/>
  <copyField source="pagelet_contents_*" dest="fulltext"/>
  -->
+ 
+ <copyField source="fulltext" dest="fulltext_suggest"/>
+ <copyField source="path" dest="path_suggest"/>
+ <copyField source="subjects" dest="subject_suggest"/>
 
  <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
