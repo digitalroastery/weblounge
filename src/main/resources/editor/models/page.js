@@ -1,8 +1,13 @@
 $.Model('Page',
 /* @Static */
 {
-	create: function(attrs, success, error) {
-		$.post("/system/weblounge/pages/", );
+	findOne: function(params, success, error) {
+		if ('id' in params) {
+			$.ajax({
+				url: '/system/weblounge/pages/' + params.id,
+				
+			});
+		}
 	}
 	
 },

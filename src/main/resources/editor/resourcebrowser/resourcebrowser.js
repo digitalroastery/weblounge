@@ -1,13 +1,16 @@
 steal.plugins(
 	'jquery/controller/view', 
-	'jquery/view/tmpl',
-	'editor/resourcebrowser/resourcescrollview')
+	'jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/init.tmpl')
+.css('resourcebrowser')
+.then('resourcescrollview', 'resourcelistview')
 .then(function($) {
 
   $.Controller('Editor.Resourcebrowser', 
 	{
 		defaults: {
+			resources: {},
+			resourceType: 'pages',
 			view: 'scrollview'
 		}
 	},
@@ -16,29 +19,8 @@ steal.plugins(
 		
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/init.tmpl', {});
-			steal.dev.log('demo');
 			
-			this.element.find('div.resourceview').editor_resourcescrollview();
-		},
-		
-		changeView: function() {
-			
-		},
-		
-		loadRecent: function() {
-			
-		},
-		
-		loadFavorites: function() {
-			
-		},
-		
-		loadPending: function() {
-			
-		},
-		
-		loadAll: function() {
-			
+			this.element.find('div.resourceview').editor_resourcescrollview({resources: this.options.resources});
 		}
 		
 	});
