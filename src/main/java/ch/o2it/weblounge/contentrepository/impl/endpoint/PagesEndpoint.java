@@ -21,12 +21,17 @@
 package ch.o2it.weblounge.contentrepository.impl.endpoint;
 
 import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.o2it.weblounge.common.content.SearchQuery;
+import ch.o2it.weblounge.common.content.SearchResult;
+import ch.o2it.weblounge.common.content.SearchResultItem;
 import ch.o2it.weblounge.common.content.page.Composer;
 import ch.o2it.weblounge.common.content.page.Page;
+import ch.o2it.weblounge.common.content.repository.ContentRepository;
 import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.content.repository.WritableContentRepository;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
+import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
@@ -102,7 +107,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    Page page = (Page)loadResourceByPath(request, path, Page.TYPE);
+    Page page = (Page) loadResourceByPath(request, path, Page.TYPE);
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -118,7 +123,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     response.lastModified(page.getModificationDate());
     return response.build();
   }
-  
+
   /**
    * Returns the page with the given identifier or a <code>404</code> if the
    * page could not be found.
@@ -139,7 +144,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    Page page = (Page)loadResource(request, pageId, Page.TYPE);
+    Page page = (Page) loadResource(request, pageId, Page.TYPE);
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -153,6 +158,56 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     ResponseBuilder response = Response.ok(page.toXml());
     response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
     response.lastModified(page.getModificationDate());
+    return response.build();
+  }
+
+  /**
+   * Returns child pages of the page with the given identifier or a
+   * <code>404</code> if the page could not be found.
+   * 
+   * @param request
+   *          the request
+   * @param pageId
+   *          the page identifier
+   * @return the child pages
+   */
+  @GET
+  @Path("/{page}/children")
+  public Response getChildPagesByURI(@Context HttpServletRequest request,
+      @PathParam("page") String pageId) {
+
+    // Check the parameters
+    if (pageId == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    // Load the page
+    Page page = (Page) loadResource(request, pageId, Page.TYPE);
+    if (page == null) {
+      return Response.status(Status.NOT_FOUND).build();
+    }
+    
+    Site site = getSite(request);
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withPathPrefix(page.getURI().getPath());
+    
+    ContentRepository repository = getContentRepository(site, false);
+    SearchResult result = null;
+    try {
+      result = repository.find(q);
+    } catch (ContentRepositoryException e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    StringBuffer buf = new StringBuffer();
+    for (SearchResultItem item : result.getItems()) {
+      if (!(item instanceof Page))
+        continue;
+      Page p = (Page)item;
+      buf.append(p.toXml());
+    }
+    
+    // Create the response
+    ResponseBuilder response = Response.ok(buf.toString());
     return response.build();
   }
 
@@ -185,7 +240,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     // Extract the site
     Site site = getSite(request);
-    
+
     // Make sure the content repository is writable
     if (site.getContentRepository().isReadOnly()) {
       logger.warn("Attempt to write to read-only content repository {}", site);
@@ -278,7 +333,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @FormParam("content") String pageXml, @FormParam("path") String path) {
 
     Site site = getSite(request);
-    
+
     // Make sure the content repository is writable
     if (site.getContentRepository().isReadOnly()) {
       logger.warn("Attempt to write to read-only content repository {}", site);
@@ -386,7 +441,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     Site site = getSite(request);
-    
+
     // Make sure the content repository is writable
     if (site.getContentRepository().isReadOnly()) {
       logger.warn("Attempt to write to read-only content repository {}", site);
@@ -447,8 +502,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   @GET
   @Path("/{page}/composers/{composer}")
   public Response getComposer(@Context HttpServletRequest request,
-      @PathParam("page") String pageId,
-      @PathParam("composer") String composerId) {
+      @PathParam("page") String pageId, @PathParam("composer") String composerId) {
 
     // Check the parameters
     if (pageId == null)
@@ -457,7 +511,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    Page page = (Page)loadResource(request, pageId, Page.TYPE);
+    Page page = (Page) loadResource(request, pageId, Page.TYPE);
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
@@ -505,7 +559,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     // Load the page
-    Page page = (Page)loadResource(request, pageId, Page.TYPE);
+    Page page = (Page) loadResource(request, pageId, Page.TYPE);
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }

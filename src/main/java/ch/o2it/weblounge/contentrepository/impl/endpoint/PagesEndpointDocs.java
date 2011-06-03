@@ -152,6 +152,18 @@ public final class PagesEndpointDocs {
     pageletEndpoint.addPathParameter(new Parameter("pageletindex", Parameter.Type.String, "The zero-based pagelet index"));
     pageletEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, pageletEndpoint);
+    
+    // GET /{page}/children
+    Endpoint getChildPagesByURIEndpoint = new Endpoint("/{page}/children", Method.GET, "getpagechildren");
+    getChildPagesByURIEndpoint.setDescription("Returns children of the page with the given id");
+    getChildPagesByURIEndpoint.addFormat(Format.xml());
+    getChildPagesByURIEndpoint.addStatus(ok("the page was found and its children are returned as part of the response"));
+    getChildPagesByURIEndpoint.addStatus(notFound("the page was not found or could not be loaded"));
+    getChildPagesByURIEndpoint.addStatus(badRequest("an invalid page identifier was received"));
+    getChildPagesByURIEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getChildPagesByURIEndpoint.addPathParameter(new Parameter("page", Parameter.Type.String, "The page identifier"));
+    getChildPagesByURIEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getChildPagesByURIEndpoint);
 
     return EndpointDocumentationGenerator.generate(docs);
   }
