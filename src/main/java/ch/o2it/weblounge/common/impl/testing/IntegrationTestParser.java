@@ -23,7 +23,6 @@ package ch.o2it.weblounge.common.impl.testing;
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
 import ch.o2it.weblounge.common.impl.util.xml.XPathNamespaceContext;
-import ch.o2it.weblounge.testing.IntegrationTest;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -68,7 +67,7 @@ public final class IntegrationTestParser {
    *           if the test cannot be parsed
    * @see #fromXml(Node, XPath)
    */
-  public static IntegrationTest fromXml(Node config)
+  public static IntegrationTestGroup fromXml(Node config)
       throws IllegalStateException {
     XPath xpath = XPathFactory.newInstance().newXPath();
 
@@ -90,18 +89,18 @@ public final class IntegrationTestParser {
    * @throws IllegalStateException
    *           if the test cannot be parsed
    */
-  public static IntegrationTest fromXml(Node config, XPath xpathProcessor)
+  public static IntegrationTestGroup fromXml(Node config, XPath xpathProcessor)
       throws IllegalStateException {
 
     // Create the test group
     IntegrationTestGroup testGroup = null;
-    String name = XPathHelper.valueOf(config, "name", xpathProcessor);
+    String name = XPathHelper.valueOf(config, "/test/name", xpathProcessor);
     if (name == null)
       throw new IllegalStateException("Unable to create test without identifier");
     testGroup = new IntegrationTestGroup(name);
 
     // Get the test cases
-    NodeList testCaseNodes = XPathHelper.selectList(config, "test-case");
+    NodeList testCaseNodes = XPathHelper.selectList(config, "/test/test-case");
     if (testCaseNodes == null || testCaseNodes.getLength() == 0) {
       logger.warn("Found test definition without test cases");
       return testGroup;
@@ -111,8 +110,8 @@ public final class IntegrationTestParser {
       Node testCaseNode = testCaseNodes.item(i);
 
       // Name, url and query
-      String testCaseName = XPathHelper.valueOf(config, "name", xpathProcessor);
-      String url = XPathHelper.valueOf(config, "url", xpathProcessor);
+      String testCaseName = XPathHelper.valueOf(testCaseNode, "name", xpathProcessor);
+      String url = XPathHelper.valueOf(testCaseNode, "url", xpathProcessor);
 
       // Parameters
       Map<String, String[]> parameters = new HashMap<String, String[]>();
@@ -137,13 +136,13 @@ public final class IntegrationTestParser {
       IntegrationTestCase testCase = new IntegrationTestCase(testCaseName, url, parameters);
 
       // Status codes
-      String expectedCodes = XPathHelper.valueOf(config, "assert-status", xpathProcessor);
+      String expectedCodes = XPathHelper.valueOf(testCaseNode, "assert-status", xpathProcessor);
       if (StringUtils.isNotBlank(expectedCodes)) {
         String[] codeTexts = expectedCodes.split(",");
         int[] codes = new int[codeTexts.length];
         int v = 0;
         for (String code : codeTexts) {
-          codes[v] = Integer.parseInt(StringUtils.trim(code));
+          codes[v++] = Integer.parseInt(StringUtils.trim(code));
         }
         testCase.assertResponseStatus(codes);
       }
@@ -198,6 +197,7 @@ public final class IntegrationTestParser {
         }
       }
 
+      testGroup.addTestCase(testCase);
     }
 
     return testGroup;

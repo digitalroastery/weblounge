@@ -94,7 +94,7 @@ public class IntegrationTestCase {
   public void execute(String serverUrl) throws Exception {
 
     HttpGet request = new HttpGet(UrlUtils.concat(serverUrl, path));
-    String[][] params = new String[][] { };
+    String[][] params = new String[][] {};
     if (this.parameters != null) {
       int parameterCount = 0;
       for (String[] parameterValues : this.parameters.values()) {
@@ -116,7 +116,7 @@ public class IntegrationTestCase {
     HttpClient httpClient = new DefaultHttpClient();
     try {
       HttpResponse response = TestUtils.request(httpClient, request, params);
-      
+
       // Prepare status code and response body
       int code = response.getStatusLine().getStatusCode();
       Document xml = TestUtils.parseXMLResponse(response);
@@ -141,6 +141,24 @@ public class IntegrationTestCase {
   }
 
   /**
+   * Returns the assertions that have been registered.
+   * 
+   * @return the assertions
+   */
+  public List<IntegrationTestCaseAssertion> getAssertions() {
+    return assertions;
+  }
+
+  /**
+   * Returns the request parameters.
+   * 
+   * @return the parameters
+   */
+  public Map<String, String[]> getParameters() {
+    return parameters;
+  }
+
+  /**
    * Tests if the http response code matches any of the given values. By
    * default, the test requires a status code of <code>200</code>.
    * 
@@ -149,7 +167,8 @@ public class IntegrationTestCase {
    * @throws IllegalArgumentException
    *           if no status codes are given
    */
-  public void assertResponseStatus(int[] statusCodes) throws IllegalArgumentException {
+  public void assertResponseStatus(int[] statusCodes)
+      throws IllegalArgumentException {
     if (statusCodes == null || statusCodes.length == 0)
       throw new IllegalArgumentException("At least one code si required");
     assertions.add(new StatusCodeAssertion(statusCodes));
@@ -239,7 +258,7 @@ public class IntegrationTestCase {
    * Implementation of an assertion that tests the status code to be in a
    * predefined list of codes.
    */
-  private class StatusCodeAssertion implements IntegrationTestCaseAssertion {
+  public class StatusCodeAssertion implements IntegrationTestCaseAssertion {
 
     /** The list of acceptable status codes */
     protected List<Integer> statusCodes = new ArrayList<Integer>();
@@ -269,13 +288,22 @@ public class IntegrationTestCase {
         throw new IllegalStateException("Unexpected response code " + statusCode);
     }
 
+    /**
+     * Returns a list of expected status codes.
+     * 
+     * @return the status codes
+     */
+    public List<Integer> getExpectedCodes() {
+      return statusCodes;
+    }
+
   }
 
   /**
    * Assertion that will verify that the response contains given
    * <code>xpath</code> expression.
    */
-  private class ExistenceAssertion implements IntegrationTestCaseAssertion {
+  public class ExistenceAssertion implements IntegrationTestCaseAssertion {
 
     /** The path to test for */
     private String xpath = null;
@@ -315,13 +343,31 @@ public class IntegrationTestCase {
         throw new IllegalStateException("Found unexpected content at " + xpath);
     }
 
+    /**
+     * Returns the xpath expression.
+     * 
+     * @return the xpath
+     */
+    public String getXPath() {
+      return xpath;
+    }
+
+    /**
+     * Returns <code>true</code> if the test is testing for positive outcome.
+     * 
+     * @return <code>true</code> for testing of positive outcome
+     */
+    public boolean isPositive() {
+      return testPositive;
+    }
+
   }
 
   /**
    * Assertion that will verify that the response contains an element at the
    * given <code>xpath</code> expression that matches an expected value.
    */
-  private class EqualityAssertion implements IntegrationTestCaseAssertion {
+  public class EqualityAssertion implements IntegrationTestCaseAssertion {
 
     /** The path to test for */
     private String xpath = null;
@@ -387,6 +433,51 @@ public class IntegrationTestCase {
         throw new IllegalStateException("Expected '" + this.expectedValue + "' at " + xpath + " but found '" + actualValue + "'");
       if (!testPositive && matches)
         throw new IllegalStateException("Found unexpected content '" + actualValue + "' at " + xpath);
+    }
+
+    /**
+     * Returns the xpath expression.
+     * 
+     * @return the xpath
+     */
+    public String getXPath() {
+      return xpath;
+    }
+
+    /**
+     * Returns <code>true</code> if the test should ignore whitespace.
+     * 
+     * @return <code>true</code> if the test ignores whitespace
+     */
+    public boolean ignoreWhitespace() {
+      return ignoreWhitespace;
+    }
+
+    /**
+     * Returns <code>true</code> if the test should ignore case.
+     * 
+     * @return <code>true</code> if the test ignores case
+     */
+    public boolean ignoreCase() {
+      return ignoreCase;
+    }
+
+    /**
+     * Returns <code>true</code> if the test is testing for positive outcome.
+     * 
+     * @return <code>true</code> for testing of positive outcome
+     */
+    public boolean isPositive() {
+      return testPositive;
+    }
+
+    /**
+     * Returns the expected value.
+     * 
+     * @return the expected value
+     */
+    public String getExpectedValue() {
+      return expectedValue;
     }
 
   }

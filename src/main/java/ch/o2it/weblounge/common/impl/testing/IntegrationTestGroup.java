@@ -105,4 +105,13 @@ public class IntegrationTestGroup extends IntegrationTestBase {
     testCases.add(testCase);
   }
 
+  /**
+   * Returns the list of test cases.
+   * 
+   * @return the test cases
+   */
+  public List<IntegrationTestCase> getTestCases() {
+    return testCases;
+  }
+
 }
