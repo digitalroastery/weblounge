@@ -284,7 +284,7 @@ public class IntegrationTestCase {
      */
     public void verify(int statusCode, Map<String, String> headers,
         Node response) throws Exception {
-      if (!statusCodes.contains(statusCodes))
+      if (!statusCodes.contains(statusCode))
         throw new IllegalStateException("Unexpected response code " + statusCode);
     }
 

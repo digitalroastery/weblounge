@@ -67,7 +67,7 @@ public class IntegrationTestParserTest {
    *           if parsing fails
    */
   @BeforeClass
-  public static void setup() throws Exception {
+  public static void setUpBeforeClass() throws Exception {
     String testXml = TestUtils.loadXmlFromResource(testFile);
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
