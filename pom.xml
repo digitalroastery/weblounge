@@ -477,6 +477,7 @@
               org.jboss.security.xacml.core.model.policy
             </Private-Package>
             <Service-Component>
+              OSGI-INF/datasource-provider-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,
               OSGI-INF/eclipselink-bundle-sanitizer-service.xml,
               OSGI-INF/kernel-service.xml,

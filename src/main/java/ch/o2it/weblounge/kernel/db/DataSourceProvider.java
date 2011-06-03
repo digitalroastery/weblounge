@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
-import java.rmi.activation.Activator;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Dictionary;
@@ -67,7 +66,7 @@ import javax.sql.DataSource;
 public class DataSourceProvider implements ManagedService {
 
   /** The logging facility */
-  protected static final Logger logger = LoggerFactory.getLogger(Activator.class);
+  protected static final Logger logger = LoggerFactory.getLogger(DataSourceProvider.class);
 
   /** Service pid */
   public static final String PID = "ch.o2it.weblounge.datasource";
@@ -209,7 +208,7 @@ public class DataSourceProvider implements ManagedService {
     // Test if the connection is actually working
     Connection connection = null;
     try {
-      logger.info("Testing datasource at {}", jdbcUrl);
+      logger.debug("Testing datasource at {}", jdbcUrl);
       connection = dataSource.getConnection();
     } catch (SQLException e) {
       logger.error("Connection attempt to {} failed", jdbcUrl);
@@ -221,7 +220,6 @@ public class DataSourceProvider implements ManagedService {
     }
 
     // Register the connection in the service registry
-    logger.info("Established datasource at {}", jdbcUrl);
     Dictionary dataSourceProperties = new Hashtable<String, String>();
     dataSourceProperties.put("issuer", "weblounge");
     datasourceRegistration = bundleCtx.registerService(DataSource.class.getName(), dataSource, dataSourceProperties);
@@ -245,6 +243,7 @@ public class DataSourceProvider implements ManagedService {
     // EclipseLink is looking for the properties map
     logger.debug("Registering eclipselink properties");
     propertiesRegistration = bundleCtx.registerService(Map.class.getName(), props, props);
+    logger.info("Datasource {} established", jdbcUrl);
   }
 
   /**
