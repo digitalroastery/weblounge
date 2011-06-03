@@ -122,6 +122,7 @@ public class WebloungeResourcesServlet extends HttpServlet {
       String bundlePath) {
     this.resourcesDir = resourcesDir;
     this.bundle = bundle;
+    this.bundlePath = bundlePath;
     if (resourcesDir == null && (bundle == null || StringUtils.isBlank(bundlePath)))
       throw new IllegalArgumentException("Either one of resources directory or bundle and bundle path must be provided");
     MimetypesFileTypeMap fileTypes = (MimetypesFileTypeMap) FileTypeMap.getDefaultFileTypeMap();
