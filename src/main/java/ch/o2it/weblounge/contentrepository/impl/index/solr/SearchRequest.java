@@ -34,6 +34,7 @@ import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAG
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PAGELET_TYPE_COMPOSER_POSITION;
+import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PARENT_PATH;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PATH;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PREVIEW_XML;
 import static ch.o2it.weblounge.contentrepository.impl.index.solr.SolrFields.PUBLISHED_BY;
@@ -121,6 +122,10 @@ public class SearchRequest {
     // Path
     if (query.getPath() != null) {
       and(solrQuery, PATH, query.getPath(), true, true);
+    }
+    
+    if (query.getPathPrefix() != null) {
+      and(solrQuery, PARENT_PATH, query.getPathPrefix(), true, true);
     }
     
     // Type

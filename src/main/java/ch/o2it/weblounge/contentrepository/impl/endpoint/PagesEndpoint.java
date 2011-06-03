@@ -32,6 +32,7 @@ import ch.o2it.weblounge.common.content.repository.WritableContentRepository;
 import ch.o2it.weblounge.common.impl.content.ResourceURIImpl;
 import ch.o2it.weblounge.common.impl.content.ResourceUtils;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
+import ch.o2it.weblounge.common.impl.content.SearchResultPageItemImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
 import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
@@ -188,6 +189,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
+    q.withType(Page.TYPE);
     q.withPathPrefix(page.getURI().getPath());
     
     ContentRepository repository = getContentRepository(site, false);
@@ -198,13 +200,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
 
-    StringBuffer buf = new StringBuffer();
+    StringBuffer buf = new StringBuffer("<pages>");
     for (SearchResultItem item : result.getItems()) {
-      if (!(item instanceof Page))
-        continue;
-      Page p = (Page)item;
-      buf.append(p.toXml());
+      String headerXml = ((SearchResultPageItemImpl)item).getPageHeaderXml(); 
+      buf.append(headerXml);
     }
+    buf.append("</pages>");
     
     // Create the response
     ResponseBuilder response = Response.ok(buf.toString());

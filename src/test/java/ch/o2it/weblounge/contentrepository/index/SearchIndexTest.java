@@ -23,6 +23,7 @@ package ch.o2it.weblounge.contentrepository.index;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import ch.o2it.weblounge.common.content.ResourceURI;
 import ch.o2it.weblounge.common.content.SearchQuery;
 import ch.o2it.weblounge.common.content.SearchQuery.Order;
 import ch.o2it.weblounge.common.content.SearchResult;
@@ -34,7 +35,9 @@ import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
 import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
 import ch.o2it.weblounge.common.impl.content.file.FileResourceReader;
 import ch.o2it.weblounge.common.impl.content.image.ImageResourceReader;
+import ch.o2it.weblounge.common.impl.content.page.PageImpl;
 import ch.o2it.weblounge.common.impl.content.page.PageReader;
+import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
 import ch.o2it.weblounge.common.impl.language.LanguageUtils;
 import ch.o2it.weblounge.common.impl.security.UserImpl;
 import ch.o2it.weblounge.common.impl.url.PathUtils;
@@ -111,7 +114,7 @@ public class SearchIndexTest {
 
   /** Path of page 2 */
   protected String path2 = "/a/b/c";
-  
+
   /** The topic */
   protected String subject = "topic";
 
@@ -175,6 +178,7 @@ public class SearchIndexTest {
     site = EasyMock.createNiceMock(Site.class);
     EasyMock.expect(site.getIdentifier()).andReturn("test").anyTimes();
     EasyMock.expect(site.getTemplate((String) EasyMock.anyObject())).andReturn(template).anyTimes();
+    EasyMock.expect(site.getDefaultTemplate()).andReturn(template).anyTimes();
     EasyMock.expect(site.getLanguages()).andReturn(languages.toArray(new Language[languages.size()])).anyTimes();
     EasyMock.replay(site);
 
@@ -211,7 +215,8 @@ public class SearchIndexTest {
    * Does the cleanup after each test.
    */
   @After
-  public void tearDown() {
+  public void tearDown() throws Exception {
+    idx.clear();
   }
 
   /**
@@ -242,6 +247,41 @@ public class SearchIndexTest {
     try {
       SearchQuery q = new SearchQueryImpl(site).withPath(path1);
       assertEquals(1, idx.getByQuery(q).getItems().length);
+    } catch (ContentRepositoryException e) {
+      e.printStackTrace();
+      fail("Error querying by path");
+    }
+  }
+
+  /**
+   * Test method for
+   * {@link ch.o2it.weblounge.contentrepository.impl.index.SearchIndex#getByQuery(ch.o2it.weblounge.common.content.SearchQuery)}
+   * .
+   */
+  @Test
+  public void testGetWithPathPrefix() throws Exception {
+    populateIndex();
+
+    // Add 10 sub pages
+    for (int i = 0; i < 10; i++) {
+      String id = UUID.randomUUID().toString();
+      String path = PathUtils.concat(path1, id);
+      ResourceURI uri = new PageURIImpl(site, path, id);
+      Page p = new PageImpl(uri);
+      p.setTemplate(template.getIdentifier());
+      idx.add(p);
+
+      String subPageId = UUID.randomUUID().toString();
+      String subPath = PathUtils.concat(path, subPageId);
+      uri = new PageURIImpl(site, subPath, subPageId);
+      p = new PageImpl(uri);
+      p.setTemplate(template.getIdentifier());
+      idx.add(p);
+    }
+
+    try {
+      SearchQuery q = new SearchQueryImpl(site).withPathPrefix(path1);
+      assertEquals(10, idx.getByQuery(q).getItems().length);
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying by path");
@@ -663,20 +703,20 @@ public class SearchIndexTest {
   @Test
   public void testSuggest() {
     populateIndex();
-    
+
     String subject = "Topic a";
     String seed = subject.split(" ")[0];
     boolean onlyMorePopular = false;
     int count = 5;
     boolean collate = true;
-    
+
     String dictionary = "subject";
 
     // Make sure the matching topic is
     try {
       List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
       assertEquals(1, suggestions.size());
-      //assertEquals(subject, suggestions.first());
+      // assertEquals(subject, suggestions.first());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying cleared index: " + e.getMessage());
@@ -687,18 +727,18 @@ public class SearchIndexTest {
     try {
       List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
       assertEquals(1, suggestions.size());
-      //assertEquals(subject, suggestions.first());
+      // assertEquals(subject, suggestions.first());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying cleared index: " + e.getMessage());
     }
-    
+
     // Prevent case sensitivity
     seed = "Another";
     try {
       List<String> suggestions = idx.suggest(dictionary, seed, onlyMorePopular, count, collate);
       assertEquals(2, suggestions.size());
-      //assertEquals(subject, suggestions.first());
+      // assertEquals(subject, suggestions.first());
     } catch (ContentRepositoryException e) {
       e.printStackTrace();
       fail("Error querying cleared index: " + e.getMessage());

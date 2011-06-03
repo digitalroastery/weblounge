@@ -30,6 +30,9 @@ public interface SolrFields {
   /** Path field name */
   String PATH = "path";
 
+  /** Parent path field name */
+  String PARENT_PATH = "parent_path";
+
   /** Type field name */
   String TYPE = "type";
 

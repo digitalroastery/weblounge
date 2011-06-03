@@ -264,6 +264,17 @@
         <filter class="solr.TrimFilterFactory"/>
       </analyzer>
     </fieldType>
+    
+    <!-- A field that is used to represent parent paths -->
+    <fieldType name="parent" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index"> 
+        <tokenizer class="solr.KeywordTokenizerFactory"/> 
+        <filter class="solr.PatternReplaceFilterFactory" pattern="^(.*/)[^/]*/$" replacement="$1" replace="all" /> 
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+      </analyzer>
+    </fieldType>
 
     <!-- A general unstemmed text field - good if one does not know the language of the field -->
     <fieldType name="textgen" class="solr.TextField" positionIncrementGap="100">
@@ -510,6 +521,9 @@
     <field name="path_suggest" type="suggest" indexed="true" stored="false"/>
     <field name="subject_suggest" type="suggest" multiValued="true" indexed="true" stored="false"/>
     <field name="fulltext_suggest" type="suggest" indexed="true" stored="false"/>
+    
+    <!-- Additional utility fields -->
+    <field name="parent_path" type="parent" indexed="true" stored="false"/>
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
@@ -548,6 +562,7 @@
  <copyField source="fulltext" dest="fulltext_suggest"/>
  <copyField source="path" dest="path_suggest"/>
  <copyField source="subjects" dest="subject_suggest"/>
+ <copyField source="path" dest="parent_path"/>
 
  <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
