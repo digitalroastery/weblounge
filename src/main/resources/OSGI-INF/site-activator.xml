@@ -8,5 +8,6 @@
   <implementation class="ch.o2it.weblounge.common.impl.site.SiteActivator" />
   <property name="service.description" value="Weblounge Test Site" />
   <property name="contentrepository.type" value="ch.o2it.weblounge.contentrepository.impl.bundle.WritableBundleContentRepository" />
+  <property name="tests" value="true" />
 
 </scr:component>
