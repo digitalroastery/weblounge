@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
+import ch.o2it.weblounge.common.impl.url.PathUtils;
 import ch.o2it.weblounge.common.impl.url.UrlUtils;
 import ch.o2it.weblounge.common.impl.util.TestUtils;
 import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
@@ -61,6 +62,12 @@ public class PagesEndpointTest extends IntegrationTestBase {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(PagesEndpointTest.class);
 
+  /** Page id */
+  protected String pageId = null;
+
+  /** Page path */
+  protected String pagePath = null;
+
   /**
    * Creates a new instance of the content repository's page endpoint test.
    */
@@ -88,15 +95,39 @@ public class PagesEndpointTest extends IntegrationTestBase {
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of pages endpoint");
 
-    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
-    String testPath = "/" + System.currentTimeMillis() + "/";
+    pagePath = "/" + System.currentTimeMillis() + "/";
 
-    // Prepare the request
+    // Create a new page
+    testCreate(serverUrl);
+
+    // Make sure the page can be retrieved both by its id and path
+    testGetPageById(serverUrl, pageId);
+    testGetPageByPath(serverUrl, pagePath);
+
+    // Update the page
+    testUpdatePage(serverUrl, pageId);
+
+    // Move the page
+    testMovePage(serverUrl, pageId);
+
+    // Test page deletion
+    testDeletePage(serverUrl, pageId);
+  }
+
+  /**
+   * Tests the creation of a page.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @throws Exception
+   *           if page creation fails
+   */
+  private void testCreate(String serverUrl) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
     HttpPost createPageRequest = new HttpPost(requestUrl);
-    String[][] params = new String[][] { { "path", testPath } };
+    String[][] params = new String[][] { { "path", pagePath } };
     logger.debug("Creating new page at {}", createPageRequest.getURI());
     HttpClient httpClient = new DefaultHttpClient();
-    String pageId = null;
     try {
       HttpResponse response = TestUtils.request(httpClient, createPageRequest, params);
       assertEquals(HttpServletResponse.SC_CREATED, response.getStatusLine().getStatusCode());
@@ -112,45 +143,97 @@ public class PagesEndpointTest extends IntegrationTestBase {
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
+  }
 
-    // Check if a page has been created
-    HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, pageId));
-    httpClient = new DefaultHttpClient();
+  /**
+   * Tries to retrieve a page by its id.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param id
+   *          the page identifier
+   * @throws Exception
+   *           if retrieval failed
+   */
+  private void testGetPageById(String serverUrl, String id) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
+    HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
+    HttpClient httpClient = new DefaultHttpClient();
     Document pageXml = null;
-    String creator = null;
     logger.info("Requesting page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageXml = TestUtils.parseXMLResponse(response);
-      assertEquals(pageId, XPathHelper.valueOf(pageXml, "/page/@id"));
-      assertEquals(testPath, XPathHelper.valueOf(pageXml, "/page/@path"));
-      creator = XPathHelper.valueOf(pageXml, "/page/head/created/user");
+      assertEquals(id, XPathHelper.valueOf(pageXml, "/page/@id"));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
-    
-    // See if we can get the new page by path
+  }
+
+  /**
+   * Tries to retrieve a page by its id.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param path
+   *          the page path
+   * @throws Exception
+   *           if retrieval failed
+   */
+  private void testGetPageByPath(String serverUrl, String path)
+      throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
     HttpGet getPageByPathRequest = new HttpGet(requestUrl);
-    params = new String[][] {{"path", testPath}};
-    httpClient = new DefaultHttpClient();
+    String[][] params = new String[][] { { "path", pagePath } };
+    HttpClient httpClient = new DefaultHttpClient();
     Document pageByPathXml = null;
     logger.info("Requesting page by path at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
       pageByPathXml = TestUtils.parseXMLResponse(response);
-      assertEquals(pageId, XPathHelper.valueOf(pageByPathXml, "/page/@id"));
+      assertEquals(path, XPathHelper.valueOf(pageByPathXml, "/page/@path"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+
+  /**
+   * Updates the creator field of the page.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param id
+   *          the page identifier
+   * @throws Exception
+   *           if updating failed
+   */
+  private void testUpdatePage(String serverUrl, String id) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
+
+    HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
+    HttpClient httpClient = new DefaultHttpClient();
+    Document pageXml = null;
+    String creator = null;
+
+    // Read what's currently stored
+    logger.info("Requesting page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      pageXml = TestUtils.parseXMLResponse(response);
+      creator = XPathHelper.valueOf(pageXml, "/page/head/created/user");
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
-    // Update the page
-    HttpPut updatePageRequest = new HttpPut(UrlUtils.concat(requestUrl, pageId));
+    // Update the creator field
+    HttpPut updatePageRequest = new HttpPut(UrlUtils.concat(requestUrl, id));
     String updatedCreator = creator + " (updated)";
-    NodeList creatorElements = pageByPathXml.getElementsByTagName("created");
+    NodeList creatorElements = pageXml.getElementsByTagName("created");
     creatorElements.item(0).getFirstChild().setTextContent(updatedCreator);
-    params = new String[][] { { "content", serializeDoc(pageByPathXml) } };
+    String[][] params = new String[][] { { "content", serializeDoc(pageXml) } };
     httpClient = new DefaultHttpClient();
     logger.info("Updating page at {}", requestUrl);
     try {
@@ -161,36 +244,135 @@ public class PagesEndpointTest extends IntegrationTestBase {
     }
 
     // Make sure the update was successful
-    HttpGet getUpdatedPageRequest = new HttpGet(UrlUtils.concat(requestUrl, pageId));
+    HttpGet getUpdatedPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
     httpClient = new DefaultHttpClient();
     logger.info("Requesting updated page at {}", requestUrl);
     try {
       HttpResponse response = TestUtils.request(httpClient, getUpdatedPageRequest, null);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      pageByPathXml = TestUtils.parseXMLResponse(response);
-      assertEquals(pageId, XPathHelper.valueOf(pageByPathXml, "/page/@id"));
-      assertEquals(testPath, XPathHelper.valueOf(pageByPathXml, "/page/@path"));
-      assertEquals(updatedCreator, XPathHelper.valueOf(pageByPathXml, "/page/head/created/user"));
+      pageXml = TestUtils.parseXMLResponse(response);
+      assertEquals(pageId, XPathHelper.valueOf(pageXml, "/page/@id"));
+      assertEquals(updatedCreator, XPathHelper.valueOf(pageXml, "/page/head/created/user"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+
+  /**
+   * Moves the page to a different url and back.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param id
+   *          the page id
+   * @throws Exception
+   *           if moving fails
+   */
+  private void testMovePage(String serverUrl, String id) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
+
+    HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
+    HttpClient httpClient = new DefaultHttpClient();
+    Document pageXml = null;
+    String oldPath = null;
+
+    // Read what's currently stored
+    logger.info("Requesting page at {}", requestUrl);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      pageXml = TestUtils.parseXMLResponse(response);
+      oldPath = XPathHelper.valueOf(pageXml, "/page/@path");
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
-    // Delete the page
-    HttpDelete deletePageRequest = new HttpDelete(UrlUtils.concat(requestUrl, pageId));
+    // Move the page
+    HttpPut movePageRequest = new HttpPut(UrlUtils.concat(requestUrl, pageId));
+    String newPath = PathUtils.concat(oldPath, "/new/");
+    pageXml.getFirstChild().getAttributes().getNamedItem("path").setNodeValue(newPath);
+    String[][] params = new String[][] { { "content", serializeDoc(pageXml) } };
     httpClient = new DefaultHttpClient();
+    logger.info("Moving page from {} to {}", oldPath, newPath);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, movePageRequest, params);
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Make sure the page is gone from the original path but can be found on
+    // the new one
+    HttpGet getPageByPathRequest = new HttpGet(requestUrl);
+    params = new String[][] { { "path", newPath } };
+    httpClient = new DefaultHttpClient();
+    logger.info("Requesting page by path at {}", newPath);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+      pageXml = TestUtils.parseXMLResponse(response);
+      assertEquals(id, XPathHelper.valueOf(pageXml, "/page/@id"));
+      assertEquals(newPath, XPathHelper.valueOf(pageXml, "/page/@path"));
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Check that the page is gone from the old path
+    getPageByPathRequest = new HttpGet(requestUrl);
+    params = new String[][] { { "path", oldPath } };
+    httpClient = new DefaultHttpClient();
+    logger.info("Requesting page by path at {}", oldPath);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, getPageByPathRequest, params);
+      Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+
+    // Move the page back
+    movePageRequest = new HttpPut(UrlUtils.concat(requestUrl, id));
+    pageXml.getFirstChild().getAttributes().getNamedItem("path").setNodeValue(oldPath);
+    params = new String[][] { { "content", serializeDoc(pageXml) } };
+    httpClient = new DefaultHttpClient();
+    logger.info("Moving page back from {} to {}", newPath, oldPath);
+    try {
+      HttpResponse response = TestUtils.request(httpClient, movePageRequest, params);
+      Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
+    } finally {
+      httpClient.getConnectionManager().shutdown();
+    }
+  }
+
+  /**
+   * Deletes the page.
+   * 
+   * @param serverUrl
+   *          the server url
+   * @param id
+   *          the page id
+   * @throws Exception
+   *           if deletion failed
+   */
+  private void testDeletePage(String serverUrl, String id) throws Exception {
+    String requestUrl = UrlUtils.concat(serverUrl, "system/weblounge/pages");
+    HttpDelete deleteRequest = new HttpDelete(UrlUtils.concat(requestUrl, pageId));
+    HttpClient httpClient = new DefaultHttpClient();
+
+    // Delete the page
     logger.info("Sending delete request to {}", requestUrl);
     try {
-      HttpResponse response = TestUtils.request(httpClient, deletePageRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, deleteRequest, null);
       Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
     // Make sure it's gone
-    logger.info("Sending requests to {}", requestUrl);
+    logger.info("Make sure page {} is gone", id);
+    HttpGet getPageRequest = new HttpGet(UrlUtils.concat(requestUrl, id));
     httpClient = new DefaultHttpClient();
     try {
-      HttpResponse response = TestUtils.request(httpClient, updatePageRequest, null);
+      HttpResponse response = TestUtils.request(httpClient, getPageRequest, null);
       Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatusLine().getStatusCode());
     } finally {
       httpClient.getConnectionManager().shutdown();
