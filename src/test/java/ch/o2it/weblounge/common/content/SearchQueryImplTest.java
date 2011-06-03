@@ -447,7 +447,7 @@ public class SearchQueryImplTest {
    */
   @Test
   public void testWithPathPrefix() {
-    String prefix = "/path/prefix";
+    String prefix = "/path/prefix/";
     query.withPathPrefix(prefix);
     assertEquals(prefix, query.getPathPrefix());
   }
