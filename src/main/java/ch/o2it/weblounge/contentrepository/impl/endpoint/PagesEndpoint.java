@@ -196,10 +196,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     ResourceURI pageURI = new PageURIImpl(site, null, pageId);
 
     // Does the page exist?
+    Page currentPage = null;
     try {
       if (!contentRepository.exists(pageURI)) {
         throw new WebApplicationException(Status.NOT_FOUND);
       }
+      currentPage = (Page)contentRepository.get(pageURI);
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -208,7 +210,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
       try {
-        Page currentPage = (Page)contentRepository.get(pageURI);
+        currentPage = (Page)contentRepository.get(pageURI);
         String etag = Long.toString(currentPage.getModificationDate().getTime());
         if (!etag.equals(ifMatchHeader)) {
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
@@ -229,6 +231,9 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       User modifier = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       page.setModified(modifier, new Date());
       contentRepository.put(page);
+      if (!page.getURI().getPath().equals(currentPage.getURI().getPath())) {
+        contentRepository.move(currentPage.getURI(), page.getURI());
+      }
     } catch (SecurityException e) {
       logger.warn("Tried to update page {} of site '{}' without permission", pageURI, site);
       throw new WebApplicationException(Status.FORBIDDEN);
