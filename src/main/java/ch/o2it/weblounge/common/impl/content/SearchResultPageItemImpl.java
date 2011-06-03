@@ -85,6 +85,15 @@ public class SearchResultPageItemImpl extends SearchResultItemImpl implements Se
   }
 
   /**
+   * Returns the xml that makes up the whole page.
+   * 
+   * @return the page xml
+   */
+  public String getPageXml() {
+    return this.headerXml;
+  }
+
+  /**
    * Sets the page header xml.
    * 
    * @param xml
@@ -92,6 +101,15 @@ public class SearchResultPageItemImpl extends SearchResultItemImpl implements Se
    */
   public void setPageHeaderXml(String xml) {
     this.headerXml = xml;
+  }
+
+  /**
+   * Returns the xml that makes up the header portion of the page.
+   * 
+   * @return the page header xml
+   */
+  public String getPageHeaderXml() {
+    return this.headerXml;
   }
 
   /**
