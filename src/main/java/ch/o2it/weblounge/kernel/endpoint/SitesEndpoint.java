@@ -21,6 +21,7 @@
 package ch.o2it.weblounge.kernel.endpoint;
 
 import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.o2it.weblounge.common.site.Module;
 import ch.o2it.weblounge.common.site.Site;
 import ch.o2it.weblounge.common.site.SiteException;
 import ch.o2it.weblounge.kernel.SiteManager;
@@ -69,6 +70,7 @@ public class SitesEndpoint {
     Iterator<Site> si = sites.sites();
     while (si.hasNext()) {
       String siteXml = si.next().toXml();
+      siteXml = siteXml.replaceAll("<password.*</password>", "");
       siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
       buf.append(siteXml);
     }
@@ -79,7 +81,7 @@ public class SitesEndpoint {
 
   /**
    * Returns the site with the given identifier or a <code>404</code> if the
-   * page could not be found.
+   * site could not be found.
    * 
    * @param siteId
    *          the site identifier
@@ -101,6 +103,11 @@ public class SitesEndpoint {
 
     // Create the response
     String siteXml = site.toXml();
+    siteXml = siteXml.replaceAll("<domains.*</domains>", "");
+    siteXml = siteXml.replaceAll("<languages.*</languages>", "");
+    siteXml = siteXml.replaceAll("<options.*</options>", "");
+    siteXml = siteXml.replaceAll("<security.*</security>", "");
+    siteXml = siteXml.replaceAll("<templates.*</templates>", "");
     siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
     ResponseBuilder response = Response.ok(siteXml);
     return response.build();
@@ -111,7 +118,7 @@ public class SitesEndpoint {
    * returned.
    * 
    * @param siteId
-   *          the page identifier
+   *          the site identifier
    * @param siteXml
    *          the updated site
    * @return response an empty response
@@ -149,9 +156,82 @@ public class SitesEndpoint {
         throw new WebApplicationException(Status.BAD_REQUEST);
       }
     }
-    
+
     // Create the response
     ResponseBuilder response = Response.ok();
+    return response.build();
+  }
+
+  /**
+   * Returns the modules of the site with the given identifier or a
+   * <code>404</code> if the site could not be found.
+   * 
+   * @param siteId
+   *          the site identifier
+   * @return the site
+   */
+  @GET
+  @Path("/{site}/modules")
+  public Response getModules(@PathParam("site") String siteId) {
+
+    // Check the parameters
+    if (siteId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Load the site
+    Site site = sites.findSiteByIdentifier(siteId);
+    if (site == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    StringBuffer buf = new StringBuffer();
+    buf.append("<modules>");
+    for (Module m : site.getModules()) {
+      String moduleXml = m.toXml();
+      moduleXml = moduleXml.replaceAll("<actions.*</actions>", "");
+      moduleXml = moduleXml.replaceAll("<jobs.*</jobs>", "");
+      moduleXml = moduleXml.replaceAll("<imagestyles.*</imagestyles>", "");
+      moduleXml = moduleXml.replaceAll("<options.*</options>", "");
+      moduleXml = moduleXml.replaceAll("<pagelets.*</pagelets>", "");
+      moduleXml = moduleXml.replaceAll("( xmlns.*?>)", ">");
+      buf.append(moduleXml);
+    }
+    buf.append("</modules>");
+    ResponseBuilder response = Response.ok(buf.toString());
+    return response.build();
+  }
+
+  /**
+   * Returns the modules of the site with the given identifier or a
+   * <code>404</code> if the site could not be found.
+   * 
+   * @param siteId
+   *          the site identifier
+   * @return the site
+   */
+  @GET
+  @Path("/{site}/modules/{module}")
+  public Response getModules(@PathParam("site") String siteId, @PathParam("module") String moduleId) {
+
+    // Check the parameters
+    if (siteId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Check the parameters
+    if (moduleId == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Load the site
+    Site site = sites.findSiteByIdentifier(siteId);
+    if (site == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    Module m = site.getModule(moduleId);
+    if (m == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    ResponseBuilder response = Response.ok(m.toXml());
     return response.build();
   }
 

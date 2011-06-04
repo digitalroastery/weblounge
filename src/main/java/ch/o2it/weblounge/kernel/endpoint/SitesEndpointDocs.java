@@ -86,6 +86,27 @@ public final class SitesEndpointDocs {
     updateSiteEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, updateSiteEndpoint);
 
+    // GET /{site}/modules
+    Endpoint modulesEndpoint = new Endpoint("/{site}/modules", Method.GET, "getmodules");
+    modulesEndpoint.setDescription("Returns the modules of the site with the given id");
+    modulesEndpoint.addFormat(Format.xml());
+    modulesEndpoint.addStatus(ok("the site was found and its modules are returned as part of the response"));
+    modulesEndpoint.addStatus(notFound("the site was not found"));
+    modulesEndpoint.addPathParameter(new Parameter("site", Parameter.Type.String, "The site identifier"));
+    modulesEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, modulesEndpoint);
+    
+    // GET /{site}/modules/{module}
+    Endpoint moduleEndpoint = new Endpoint("/{site}/modules/{module}", Method.GET, "getmodule");
+    moduleEndpoint.setDescription("Returns the module with the given id");
+    moduleEndpoint.addFormat(Format.xml());
+    moduleEndpoint.addStatus(ok("the module was found and is returned as part of the response"));
+    moduleEndpoint.addStatus(notFound("either the site or the module was not found"));
+    moduleEndpoint.addPathParameter(new Parameter("site", Parameter.Type.String, "The site identifier"));
+    moduleEndpoint.addPathParameter(new Parameter("module", Parameter.Type.String, "The module identifier"));
+    moduleEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, moduleEndpoint);
+
     return EndpointDocumentationGenerator.generate(docs);
   }
 
