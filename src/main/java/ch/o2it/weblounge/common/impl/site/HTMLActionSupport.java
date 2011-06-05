@@ -691,7 +691,7 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
     }
 
     // Includes
-    if (headers.size() > 0) {
+    if (headers != null && headers.size() > 0) {
       b.append("<includes>");
       for (HTMLHeadElement include : getHTMLHeaders()) {
         if (include instanceof Link)
