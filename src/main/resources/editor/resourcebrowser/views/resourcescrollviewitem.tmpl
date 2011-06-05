@@ -1,9 +1,46 @@
-<div class="scrollviewitem">
-	<img src="" alt="" class="page_thumbnail">
-	<h2>Startseite</h2>
-	<p>Created by Simon Betschmann<br>
-	Updated by Markus Jauss <br>
-	Tags: Topnews, HNLA, Mathias Hofbauer, SV Wiler-Ersigen<br>
-	URL: <a href="#" title="Gehe zu Seite">/weblounge/</a>
+<div class="scrollviewitem page_${page.id}">
+	<img src="images/toolbar_close.png" class="close" />
+	<div class="overlay_icons">
+		<img src="images/icon_write.png" title="Edit page properties" class="properties" />
+		<img src="images/icon_more.png" class="more" />
+		<img src="images/icon_trash.png" title="Delete page" class="delete" />
+	</div>
+	<div class="page_more_menu menu">
+		<span class="triangle-up"></span>
+			<ul>
+				<li>duplizieren</li>
+				<li>als Favorit kennzeichnen</li>
+				<li>...</li>
+			</ul>			
+			</div>
+				<img src="images/page_thumbnail.png" alt="" class="page_thumbnail" />
+				<div class="pageData">
+				<ul>
+					<li><a href="#properties">Properties</a></li>
+					<li><a href="#publishing">Publishing</a></li>
+					<li><a href="#access">Access</a></li>
+				</ul>
+				<div id="properties" class="properties">
+					<p><label for="title">Title:</label><input type="text" name="title" value="${page.head.metadata.title['de']}" /></p>
+					<p><label for="path">Path:</label> <input type="text" name="path" value="${page.path}" /></p>
+					<p><label for="keyword">Keywords:</label> <input type="text" name="keywords" class="keywords" value="{{each page.head.metadata.subject}} ${$value}, {{/each}}" /></p>
+				</div>
+				<div id="publishing">
+					<p><label for="start">Start:</label><input type="text" name="start" value="${page.head.published.from}" class="datepicker" /></p>
+					<p><label for="end">End:</label><input type="text" name="end" value="${page.head.published.from}" class="datepicker"/></p>
+				</div>
+				<div id="access">
+					<p><img src="images/icon_read.png" alt="read page" /> <img src="images/icon_write.png" alt="edit page"><br />
+					<p><input type="checkbox" id="logged_read" /> <input type="checkbox" id="logged_write" /> Besucher<br />
+					<input type="checkbox" id="logged_read" /> <input type="checkbox" id="logged_write" /> Eingeloggte User<br />
+					<input type="checkbox" id="logged_read" /> <input type="checkbox" id="logged_write" /> Administratoren<br />
+					<input type="checkbox" id="logged_read" /> <input type="checkbox" id="logged_write" /> <input type="text" name="user_access" class="user_access" /></p>
+				</div>
+		</div>
+		<h2>${page.head.metadata.title.de}</h2>
+		<p>Created by ${page.head.created.user.name}<br />
+	   Updated by ${page.head.modified.user.name}<br />
+	   Tags: {{each page.head.metadata.subject}} ${$value}, {{/each}}<br/>
+	   URL: <a href="${page.path}" title="Gehe zu Seite">${page.path}</a>
 	</p>
 </div>

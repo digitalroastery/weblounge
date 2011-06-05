@@ -19,53 +19,13 @@ steal.plugins(
      * Initialize a new MenuBar controller.
      */
         init: function(el) {
-            $(el).html('//editor/menubar/views/menubar.tmpl', {});
-            // initiate buttons
-            $('nav.weblounge div.view').buttonset();
-            $('nav.weblounge div.filter').buttonset();
-            $('nav.weblounge button.list').button({
-            	icons: {primary: "icon-list"},
-            	text: false
-            }).click(function() { 
-            		steal.dev.log('switch to list view');
-            		$('.center.icons').show();
-            		$('div.listview').show();
-            		$('div.treeview').hide();
-            		$('div.thumbnailview').hide();
-            });
-            $('button.tree').button({
-            	icons: {primary: "icon-tree"},
-            	disabled: true,
-            	text: false
-            }).click(function() { 
-            		steal.dev.log('switch to tree view') 
-            		$('div.treeview').show();
-            		$('div.listview').hide();
-            		$('div.thumbnailview').hide();
-            });
-            $('nav.weblounge button.thumbnails').button({
-            	disabled: false,
-            	icons: {primary: "icon-thumbnails"},
-            	text: false }).click(function() { 
-            		steal.dev.log('switch to thumbnail view');
-            		$('.center.icons').hide();
-            		$('div.treeview').hide();
-            		$('div.listview').hide();
-            		$('div.thumbnailview').show();
-            });
-                
+            $(el).html('//editor/menubar/views/menubar.tmpl', {});                
         },
-
-		changeMode: function() {},
 
 		".tab click": function(el, ev) {
 			this.element.find('.tab.active').removeClass('active');
 			el.addClass('active');
 			this.element.trigger('menubarmodechange', {mode: 'mymode'});
-		},
-
-		".uploader click": function(el, ev) {
-			$(this.element).trigger('startuploader');
 		},
 		
 		// trigger menus
@@ -89,7 +49,7 @@ steal.plugins(
 		/* move to new plugin "designer" */
 		".pagelet hover": function() {
 			$(this).addClass('hover');
-		},
+		}
 		
 		
     });

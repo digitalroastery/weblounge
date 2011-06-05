@@ -1,4 +1,4 @@
-steal.plugins('jquery/controller', 'editor/menubar').then(function($){
+steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser').models('../../models/page').then(function($) {
 		
 	$.Controller('Editor.App',
 	/* @prototype */
@@ -7,12 +7,15 @@ steal.plugins('jquery/controller', 'editor/menubar').then(function($){
 		init: function(el) {
 			
 			this.mode = 1;
-      	
-steal.dev.log('Starting the menubar widget.');
-			this.find('div.menubar').editor_menubar();
+ 
+			this.find('#menubar').editor_menubar();
+			Page.findAll({}, function(pages) {
+				$('#pagebrowser').editor_resourcebrowser({resources: pages});
+			});
+			
             
-        },
+        }
 		
-	})
+	});
 	
 });

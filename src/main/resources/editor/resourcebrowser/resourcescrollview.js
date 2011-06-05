@@ -24,7 +24,8 @@ steal.plugins('jquery/view/tmpl','jqueryui/widget')
 		
 		_initViewItems: function() {
 			$.each(this.options.resources, function(i, res) {
-				$('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {});
+				$('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {page: res});
+				steal.dev.log('res: ' + res);
 			});
 			
 			$('div.scrollviewitem').editor_resourcescrollviewitem();
