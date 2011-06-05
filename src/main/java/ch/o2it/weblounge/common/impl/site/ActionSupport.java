@@ -738,7 +738,7 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
     }
 
     // Includes
-    if (headers.size() > 0) {
+    if (headers != null && headers.size() > 0) {
       b.append("<includes>");
       for (HTMLHeadElement header : getHTMLHeaders()) {
         if (header instanceof Link)
