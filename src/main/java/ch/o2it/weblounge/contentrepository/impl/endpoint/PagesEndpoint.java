@@ -79,7 +79,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * This class implements the <code>REST</code> endpoint for page data.
  */
 @Path("/")
-@Produces(MediaType.TEXT_XML)
+@Produces(MediaType.APPLICATION_XML)
 public class PagesEndpoint extends ContentRepositoryEndpoint {
 
   /** Logging facility */
