@@ -120,7 +120,7 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
   private boolean processURLTemplates(Module module) {
     if (module == null || module.getSite() == null)
       return false;
-    
+
     urlTemplatesProcessed = true;
 
     // Process the renderer URL
@@ -187,20 +187,20 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     super.setRenderer(renderer);
     urlTemplatesProcessed = false;
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#getRenderer()
    */
   @Override
   public URL getRenderer() {
     return getRenderer(RendererType.Page.toString());
   }
-  
+
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.o2it.weblounge.common.impl.content.page.AbstractRenderer#getRenderer(java.lang.String)
    */
   @Override
@@ -457,7 +457,8 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
     }
 
     // Editor url
-    buf.append("<editor>").append(editor.toExternalForm()).append("</editor>");
+    if (editor != null)
+      buf.append("<editor>").append(editor.toExternalForm()).append("</editor>");
 
     // Recheck time
     if (recheckTime >= 0) {
