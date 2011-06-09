@@ -109,6 +109,7 @@ public class SitesEndpoint {
     siteXml = siteXml.replaceAll("<security.*</security>", "");
     siteXml = siteXml.replaceAll("<templates.*</templates>", "");
     siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
+    siteXml = ConfigurationUtils.processTemplate(siteXml, site);
     ResponseBuilder response = Response.ok(siteXml);
     return response.build();
   }
@@ -231,7 +232,11 @@ public class SitesEndpoint {
     if (m == null)
       throw new WebApplicationException(Status.NOT_FOUND);
 
-    ResponseBuilder response = Response.ok(m.toXml());
+    // Create the response
+    String moduleXml = m.toXml();
+    moduleXml = moduleXml.replaceAll("( xmlns.*?>)", ">");
+    moduleXml = ConfigurationUtils.processTemplate(moduleXml, m);
+    ResponseBuilder response = Response.ok(moduleXml);
     return response.build();
   }
 
