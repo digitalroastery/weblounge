@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,9 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.bridge.mail;
+package ch.entwine.weblounge.bridge.mail;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class AccountTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.bridge.mail.Account#getHost()}.
+   * Test method for {@link ch.entwine.weblounge.bridge.mail.Account#getHost()}.
    */
   @Test
   public void testGetHost() {
@@ -59,7 +59,7 @@ public class AccountTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.bridge.mail.Account#getLogin()}.
+   * Test method for {@link ch.entwine.weblounge.bridge.mail.Account#getLogin()}.
    */
   @Test
   public void testGetLogin() {
@@ -67,7 +67,7 @@ public class AccountTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.bridge.mail.Account#getPassword()}
+   * Test method for {@link ch.entwine.weblounge.bridge.mail.Account#getPassword()}
    * .
    */
   @Test

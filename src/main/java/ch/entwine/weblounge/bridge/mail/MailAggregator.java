@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,19 +18,19 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.bridge.mail;
+package ch.entwine.weblounge.bridge.mail;
 
-import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.content.repository.WritableContentRepository;
-import ch.o2it.weblounge.common.impl.content.page.PageImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.scheduler.JobException;
-import ch.o2it.weblounge.common.scheduler.JobWorker;
-import ch.o2it.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
+import ch.entwine.weblounge.common.impl.content.page.PageImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.scheduler.JobException;
+import ch.entwine.weblounge.common.scheduler.JobWorker;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -76,7 +76,7 @@ public class MailAggregator implements JobWorker {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.scheduler.JobWorker#execute(java.lang.String,
+   * @see ch.entwine.weblounge.common.scheduler.JobWorker#execute(java.lang.String,
    *      java.util.Dictionary)
    */
   public void execute(String name, Dictionary<String, Serializable> ctx)

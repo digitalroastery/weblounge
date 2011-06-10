@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ch.o2it.weblounge</groupId>
+  <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-bridge</artifactId>
   <packaging>bundle</packaging>
   <name>Weblounge Bridge</name>
   <parent>
-    <groupId>ch.o2it.weblounge</groupId>
+    <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
     <version>3.0.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
@@ -16,13 +16,13 @@
     <!-- weblounge -->
 
     <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
+      <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-common-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
+      <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -97,20 +97,20 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.bridge</Bundle-SymbolicName>
             <Import-Package>
-              ch.o2it.weblounge.common.content;version=${project.version},
-              ch.o2it.weblounge.common.content.image;version=${project.version},
-              ch.o2it.weblounge.common.content.page;version=${project.version},
-              ch.o2it.weblounge.common.content.repository;version=${project.version},
-              ch.o2it.weblounge.common.language;version=${project.version},
-              ch.o2it.weblounge.common.scheduler;version=${project.version},
-              ch.o2it.weblounge.common.site;version=${project.version},
+              ch.entwine.weblounge.common.content;version=${project.version},
+              ch.entwine.weblounge.common.content.image;version=${project.version},
+              ch.entwine.weblounge.common.content.page;version=${project.version},
+              ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.language;version=${project.version},
+              ch.entwine.weblounge.common.scheduler;version=${project.version},
+              ch.entwine.weblounge.common.site;version=${project.version},
               org.apache.commons.io;version="1.4",
               org.apache.commons.lang;version="2.4",
               org.slf4j;version="1.5.6",
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
-              ch.o2it.weblounge.bridge.mail;version=${project.version}
+              ch.entwine.weblounge.bridge.mail;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
