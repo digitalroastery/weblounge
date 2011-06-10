@@ -48,8 +48,8 @@
           <to>292278994-08-17T07:12:55Z</to>
         </published>
         <properties>
-          <property id="i18n_module_key"><![CDATA[ch.o2it.weblounge.test.i18n.modulekey]]></property>
-          <property id="i18n_page_key"><![CDATA[ch.o2it.weblounge.test.i18n.pagekey]]></property>
+          <property id="i18n_module_key"><![CDATA[ch.entwine.weblounge.test.i18n.modulekey]]></property>
+          <property id="i18n_page_key"><![CDATA[ch.entwine.weblounge.test.i18n.pagekey]]></property>
         </properties>
       </pagelet>
     </composer>

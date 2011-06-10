@@ -13,7 +13,7 @@
   
   <tag>
     <name>greeting</name>
-    <tag-class>ch.o2it.weblounge.test.site.GreeterTag</tag-class>
+    <tag-class>ch.entwine.weblounge.test.site.GreeterTag</tag-class>
     <body-content>empty</body-content>
     <display-name>Weblounge Greeter Tag</display-name>
     <description>Issues a greeting in a (random) language</description>

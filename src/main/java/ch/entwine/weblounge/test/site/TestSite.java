@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,11 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.site;
+package ch.entwine.weblounge.test.site;
 
-import ch.o2it.weblounge.common.impl.site.SiteImpl;
-import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.testing.IntegrationTest;
+import ch.entwine.weblounge.common.impl.site.SiteImpl;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
+import ch.entwine.weblounge.testing.IntegrationTest;
 
 import org.osgi.framework.Bundle;
 import org.osgi.service.component.ComponentContext;
@@ -48,7 +48,7 @@ public class TestSite extends SiteImpl {
   private static final Logger logger = LoggerFactory.getLogger(TestSite.class);
 
   /** Name of the package containing the tests */
-  private static final String TEST_PKG = "ch/o2it/weblounge/test/harness";
+  private static final String TEST_PKG = "ch/entwine/weblounge/test/harness";
 
   /**
    * Creates a new test site implementation.

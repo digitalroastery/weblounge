@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,16 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.harness.content;
-
-import static org.junit.Assert.assertNotNull;
+package ch.entwine.weblounge.test.harness.content;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.impl.util.TestUtils;
-import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
+import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
+import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -42,24 +40,21 @@ import org.w3c.dom.Document;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Integration test for the loading of site resources.
+ * Integration test for i18n.
  */
-public class JavaServerPagesTest extends IntegrationTestBase {
-  
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(JavaServerPagesTest.class);
+public class I18nTest extends IntegrationTestBase {
 
-  /** The html content type */
-  private static final String CONTENT_TYPE_HTML = "text/html";
-  
-  /** Path to the jsp page */
-  private static final String JSP_PATH = "/weblounge-sites/weblounge-test/templates/default.jsp";
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(I18nTest.class);
+
+  /** Path to the i18n test page */
+  private static final String TEST_URL = "/test/i18n";
 
   /**
-   * Creates a new instance of the <code>JavaServerPagesTest</code> test.
+   * Creates a new instance of the <code>I18nTest</code> test.
    */
-  public JavaServerPagesTest() {
-    super("Java Server Pages Test", WEBLOUNGE_CONTENT_TEST_GROUP);
+  public I18nTest() {
+    super("I18n Test", WEBLOUNGE_CONTENT_TEST_GROUP);
   }
 
   /**
@@ -77,12 +72,12 @@ public class JavaServerPagesTest extends IntegrationTestBase {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
+   * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
-    logger.info("Testing loading of java server page");
-    
-    String requestUrl = UrlUtils.concat(serverUrl, JSP_PATH);
+    logger.info("Testing i18n dictionary and tag");
+
+    String requestUrl = UrlUtils.concat(serverUrl, TEST_URL);
     HttpGet request = new HttpGet(requestUrl);
     logger.info("Sending request to {}", requestUrl);
 
@@ -91,25 +86,22 @@ public class JavaServerPagesTest extends IntegrationTestBase {
     try {
       HttpResponse response = TestUtils.request(httpClient, request, null);
       assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-      String contentType = response.getEntity().getContentType().getValue();
-      assertEquals(CONTENT_TYPE_HTML, contentType.split(";")[0]);
 
-      // Test template contents
       Document xml = TestUtils.parseXMLResponse(response);
-      String templateOutput = XPathHelper.valueOf(xml, "/html/head/title");
-      assertNotNull("General template output does not work", templateOutput);
-      assertEquals("Template title is not as expected", "Weblounge Test Site", templateOutput);
-      
-      // Test site tag libraries
-      logger.info("Testing weblounge taglibrary on {}", requestUrl);
-      String generator = "/html/head/meta[@name='generator']/@content";
-      Assert.assertNotNull("Generator tag not found", XPathHelper.valueOf(xml, generator));
-      Assert.assertNotNull("Weblounge 3.0", XPathHelper.valueOf(xml, generator));
 
+      // Test i18n values defined at the module level
+      String i18nModuleValue = "I18n Module Value";
+      String xpath = "/html/body//div[@id='i18n-module']";
+      Assert.assertEquals(i18nModuleValue, XPathHelper.valueOf(xml, xpath));
+
+      // Test i18n values defined at the page level
+      String i18nPageValue = "I18n Page Value";
+      xpath = "/html/body//div[@id='i18n-page']";
+      Assert.assertEquals(i18nPageValue, XPathHelper.valueOf(xml, xpath));
     } finally {
       httpClient.getConnectionManager().shutdown();
     }
 
   }
-  
+
 }

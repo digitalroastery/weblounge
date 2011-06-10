@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,19 +18,19 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.site;
+package ch.entwine.weblounge.test.site;
 
-import ch.o2it.weblounge.common.content.page.Composer;
-import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.impl.request.RequestUtils;
-import ch.o2it.weblounge.common.impl.site.HTMLActionSupport;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.request.RequestFlavor;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.ActionException;
-import ch.o2it.weblounge.common.site.HTMLAction;
-import ch.o2it.weblounge.test.util.TestSiteUtils;
+import ch.entwine.weblounge.common.content.page.Composer;
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.impl.site.HTMLActionSupport;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.RequestFlavor;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.site.ActionException;
+import ch.entwine.weblounge.common.site.HTMLAction;
+import ch.entwine.weblounge.test.util.TestSiteUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -55,9 +55,9 @@ public class GreeterHTMLAction extends HTMLActionSupport {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#configure(ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse,
-   *      ch.o2it.weblounge.common.request.RequestFlavor)
+   * @see ch.entwine.weblounge.common.impl.site.HTMLActionSupport#configure(ch.entwine.weblounge.common.request.WebloungeRequest,
+   *      ch.entwine.weblounge.common.request.WebloungeResponse,
+   *      ch.entwine.weblounge.common.request.RequestFlavor)
    */
   public void configure(WebloungeRequest request, WebloungeResponse response,
       RequestFlavor flavor) throws ActionException {
@@ -74,9 +74,9 @@ public class GreeterHTMLAction extends HTMLActionSupport {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse,
-   *      ch.o2it.weblounge.common.content.page.Composer)
+   * @see ch.entwine.weblounge.common.impl.site.HTMLActionSupport#startStage(ch.entwine.weblounge.common.request.WebloungeRequest,
+   *      ch.entwine.weblounge.common.request.WebloungeResponse,
+   *      ch.entwine.weblounge.common.content.page.Composer)
    */
   public int startStage(WebloungeRequest request, WebloungeResponse response,
       Composer composer) throws ActionException {

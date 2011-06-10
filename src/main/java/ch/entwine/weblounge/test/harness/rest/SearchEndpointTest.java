@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,14 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.test.harness.rest;
+package ch.entwine.weblounge.test.harness.rest;
 
 import static org.junit.Assert.assertEquals;
 
-import ch.o2it.weblounge.common.impl.testing.IntegrationTestBase;
-import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.impl.util.TestUtils;
-import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.impl.testing.IntegrationTestBase;
+import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.impl.util.TestUtils;
+import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -72,7 +72,7 @@ public class SearchEndpointTest extends IntegrationTestBase {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
+   * @see ch.entwine.weblounge.testing.kernel.IntegrationTest#execute(java.lang.String)
    */
   public void execute(String serverUrl) throws Exception {
     logger.info("Preparing test of search rest api");
