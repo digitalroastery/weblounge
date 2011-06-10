@@ -4,8 +4,8 @@
   immediate="true"
   name="Weblounge Cache Commands">
 
-  <implementation class="ch.o2it.weblounge.cache.impl.command.CacheCommand" />
+  <implementation class="ch.entwine.weblounge.cache.impl.command.CacheCommand" />
   <property name="service.description" value="Weblounge Cache Command" />
-  <reference name="cacheconfigfactory" interface="ch.o2it.weblounge.cache.impl.CacheConfigurationFactory" cardinality="0..1" policy="dynamic" bind="setCacheConfigurationFactory" unbind="removeCacheConfigurationFactory" />
+  <reference name="cacheconfigfactory" interface="ch.entwine.weblounge.cache.impl.CacheConfigurationFactory" cardinality="0..1" policy="dynamic" bind="setCacheConfigurationFactory" unbind="removeCacheConfigurationFactory" />
 
 </scr:component>
