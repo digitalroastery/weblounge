@@ -3,10 +3,10 @@
   immediate="true"
   name="Weblounge Image Serializer">	
   
-  <implementation class="ch.o2it.weblounge.contentrepository.impl.ImageResourceSerializer" />
+  <implementation class="ch.entwine.weblounge.contentrepository.impl.ImageResourceSerializer" />
   <property name="service.description" value="Weblounge Image Serializer" />
   <service>
-    <provide interface="ch.o2it.weblounge.contentrepository.ResourceSerializer" />
+    <provide interface="ch.entwine.weblounge.contentrepository.ResourceSerializer" />
   </service>
 
 </scr:component>

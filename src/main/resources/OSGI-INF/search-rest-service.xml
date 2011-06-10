@@ -3,13 +3,13 @@
   immediate="true" 
   name="Weblounge Search Endpoint">	
   
-  <implementation class="ch.o2it.weblounge.contentrepository.impl.endpoint.SearchEndpoint" />
+  <implementation class="ch.entwine.weblounge.contentrepository.impl.endpoint.SearchEndpoint" />
   <property name="service.description" value="Weblounge Search Endpoint" />
   <property name="rest.path" value="search" />
   <service>
-    <provide interface="ch.o2it.weblounge.contentrepository.impl.endpoint.SearchEndpoint" />
+    <provide interface="ch.entwine.weblounge.contentrepository.impl.endpoint.SearchEndpoint" />
   </service>
 
-  <reference name="sites" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
+  <reference name="sites" interface="ch.entwine.weblounge.kernel.SiteManager" cardinality="0..1" policy="dynamic" bind="setSiteManager" unbind="removeSiteManager" />
 
 </scr:component>
