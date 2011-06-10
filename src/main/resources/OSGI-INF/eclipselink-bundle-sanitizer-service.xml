@@ -5,7 +5,7 @@
   immediate="true"
   name="Weblounge EclipseLink Bundle Sanitizer">
   
-  <implementation class="ch.o2it.weblounge.kernel.db.EclipseLinkBundleSanitizer" />
+  <implementation class="ch.entwine.weblounge.kernel.db.EclipseLinkBundleSanitizer" />
   <property name="service.description" value="Weblounge EclipseLink Bundle Sanitizer" />
 
 </scr:component>

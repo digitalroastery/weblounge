@@ -4,8 +4,8 @@
   immediate="true"
   name="Weblounge Test Commands">
 
-  <implementation class="ch.o2it.weblounge.kernel.command.TestCommand" />
+  <implementation class="ch.entwine.weblounge.kernel.command.TestCommand" />
   <property name="service.description" value="Weblounge Test Command" />
-  <reference name="test" interface="ch.o2it.weblounge.testing.IntegrationTest" cardinality="0..n" policy="dynamic" bind="addIntegrationTest" unbind="removeIntegrationTest" />
+  <reference name="test" interface="ch.entwine.weblounge.testing.IntegrationTest" cardinality="0..n" policy="dynamic" bind="addIntegrationTest" unbind="removeIntegrationTest" />
 
 </scr:component>

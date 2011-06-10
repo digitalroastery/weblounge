@@ -6,10 +6,10 @@
   deactivate="deactivate"
   name="Weblounge Security Configuration Scanner">
   
-  <implementation class="ch.o2it.weblounge.kernel.security.SecurityConfigurationScanner" />
+  <implementation class="ch.entwine.weblounge.kernel.security.SecurityConfigurationScanner" />
   <property name="service.description" value="Weblounge Security Configuration Scanner" />
   <service>
-    <provide interface="ch.o2it.weblounge.kernel.security.SecurityConfigurationScanner" />
+    <provide interface="ch.entwine.weblounge.kernel.security.SecurityConfigurationScanner" />
   </service>
 
 </scr:component>

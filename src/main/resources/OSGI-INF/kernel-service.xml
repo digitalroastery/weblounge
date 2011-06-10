@@ -5,7 +5,7 @@
   immediate="true"
   name="Weblounge Kernel">
   
-  <implementation class="ch.o2it.weblounge.kernel.WebloungeKernel" />
+  <implementation class="ch.entwine.weblounge.kernel.WebloungeKernel" />
   <property name="service.description" value="Weblounge Kernel" />
 
 </scr:component>

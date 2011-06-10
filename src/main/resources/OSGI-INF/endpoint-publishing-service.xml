@@ -5,11 +5,11 @@
   stop="deactivate"
   name="Weblounge Endpoint Publishing Service">
   
-  <implementation class="ch.o2it.weblounge.kernel.publisher.EndpointPublishingService" />
+  <implementation class="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" />
   <property name="service.description" value="Weblounge Endpoint Publishing Service" />
-  <property name="service.pid" value="ch.o2it.weblounge.restpublisher" />
+  <property name="service.pid" value="ch.entwine.weblounge.restpublisher" />
   <service>
-    <provide interface="ch.o2it.weblounge.kernel.publisher.EndpointPublishingService" />
+    <provide interface="ch.entwine.weblounge.kernel.publisher.EndpointPublishingService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
   <reference name="httpservice" interface="org.osgi.service.http.HttpService" cardinality="1..1" policy="static" bind="setHttpService" />

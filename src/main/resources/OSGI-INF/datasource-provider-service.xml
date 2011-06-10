@@ -5,8 +5,8 @@
   immediate="true"
   name="Weblounge DataSource Provider">
   
-  <implementation class="ch.o2it.weblounge.kernel.db.DataSourceProvider" />
-  <property name="service.pid" value="ch.o2it.weblounge.datasource" />
+  <implementation class="ch.entwine.weblounge.kernel.db.DataSourceProvider" />
+  <property name="service.pid" value="ch.entwine.weblounge.datasource" />
   <property name="service.description" value="Weblounge DataSource Provider" />
 
 </scr:component>

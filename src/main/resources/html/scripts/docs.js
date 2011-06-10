@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
  *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
