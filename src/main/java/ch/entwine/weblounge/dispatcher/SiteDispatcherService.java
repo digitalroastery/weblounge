@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,9 +18,9 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher;
+package ch.entwine.weblounge.dispatcher;
 
-import ch.o2it.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.Site;
 
 import java.net.URL;
 
@@ -37,11 +37,11 @@ public interface SiteDispatcherService {
    * Returns the site associated with the given server name.
    * <p>
    * Note that the server name is expected to not end with a trailing slash, so
-   * please pass in <code>www.o2it.ch</code> instead of
-   * <code>http://www.o2it.ch/</code>.
+   * please pass in <code>www.entwinemedia.com</code> instead of
+   * <code>http://www.entwinemedia.com/</code>.
    * 
    * @param url
-   *          the server url, e.g. <code>http://www.o2it.ch</code>
+   *          the server url, e.g. <code>http://www.entwinemedia.com</code>
    * @return the site
    */
   Site findSiteByURL(URL url);
