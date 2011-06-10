@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,31 +18,14 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.contentrepository;
+package ch.entwine.weblounge.contentrepository;
 
-import java.util.Set;
+import ch.entwine.weblounge.common.content.Resource;
 
 /**
- * The <code>ResourceSerializerService</code> provides access to registered
- * <code>ResourceSerializer</code> implementations.
+ * This mapper maps resources to actual storage locations and is used if storage
+ * systems other than local disks such as Amazon S3 are being used.
  */
-public interface ResourceSerializerService {
-
-  /**
-   * Returns the resource serializer for the given type or <code>null</code> if
-   * no such serializer exists.
-   * 
-   * @param resourceType
-   *          the resource type
-   * @return the serializer
-   */
-  ResourceSerializer<?, ?> getSerializer(String resourceType);
-
-  /**
-   * Returns all registered <code>ResourceSerializer</code>s in a set.
-   * 
-   * @return the set of serializers
-   */
-  Set<ResourceSerializer<?, ?>> getSerializers();
+public interface ResourceStorageMapper<S extends Resource> {
 
 }

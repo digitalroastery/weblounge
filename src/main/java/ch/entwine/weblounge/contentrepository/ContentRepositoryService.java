@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,23 +18,25 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.contentrepository;
+package ch.entwine.weblounge.contentrepository;
+
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.site.Site;
 
 /**
- * Interface for all indices of the content repository.
+ * The <code>ContentRepositoryService</code> provides access to the content
+ * repository of a given site.
  */
-public interface VersionedContentRepositoryIndex {
-
-  /** Version of this index */
-  int INDEX_VERSION = 1;
+public interface ContentRepositoryService {
 
   /**
-   * Returns the index's version number. If that number is different from
-   * {@link #INDEX_VERSION}, a reindex is needed, since the index's structure
-   * could have changed significantly.
+   * Returns the content repository for the given site or <code>null</code> if
+   * no repository exists.
    * 
-   * @return the index version
+   * @param site
+   *          the site
+   * @return the site's content repository
    */
-  int getIndexVersion();
+  ContentRepository getRepository(Site site);
 
 }

@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,13 +18,13 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.contentrepository;
+package ch.entwine.weblounge.contentrepository;
 
-import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.ResourceContent;
-import ch.o2it.weblounge.common.content.ResourceContentReader;
-import ch.o2it.weblounge.common.content.ResourceMetadata;
-import ch.o2it.weblounge.common.content.ResourceReader;
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceContentReader;
+import ch.entwine.weblounge.common.content.ResourceMetadata;
+import ch.entwine.weblounge.common.content.ResourceReader;
 
 import org.xml.sax.SAXException;
 
