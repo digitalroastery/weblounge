@@ -2,11 +2,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <packaging>bundle</packaging>
-  <groupId>ch.o2it.weblounge</groupId>
+  <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-common-api</artifactId>
   <name>Weblounge Common API</name>
   <parent>
-    <groupId>ch.o2it.weblounge</groupId>
+    <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
     <version>3.0.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
@@ -49,19 +49,19 @@
               org.xml.sax
             </Import-Package>
             <Export-Package>
-              ch.o2it.weblounge.common;version=${project.version},
-              ch.o2it.weblounge.common.content;version=${project.version},
-              ch.o2it.weblounge.common.content.file;version=${project.version},
-              ch.o2it.weblounge.common.content.image;version=${project.version},
-              ch.o2it.weblounge.common.content.page;version=${project.version},
-              ch.o2it.weblounge.common.content.repository;version=${project.version},
-              ch.o2it.weblounge.common.language;version=${project.version},
-              ch.o2it.weblounge.common.request;version=${project.version},
-              ch.o2it.weblounge.common.scheduler;version=${project.version},
-              ch.o2it.weblounge.common.security;version=${project.version},
-              ch.o2it.weblounge.common.site;version=${project.version},
-              ch.o2it.weblounge.common.url;version=${project.version},
-              ch.o2it.weblounge.testing;version=${project.version}
+              ch.entwine.weblounge.common;version=${project.version},
+              ch.entwine.weblounge.common.content;version=${project.version},
+              ch.entwine.weblounge.common.content.file;version=${project.version},
+              ch.entwine.weblounge.common.content.image;version=${project.version},
+              ch.entwine.weblounge.common.content.page;version=${project.version},
+              ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.language;version=${project.version},
+              ch.entwine.weblounge.common.request;version=${project.version},
+              ch.entwine.weblounge.common.scheduler;version=${project.version},
+              ch.entwine.weblounge.common.security;version=${project.version},
+              ch.entwine.weblounge.common.site;version=${project.version},
+              ch.entwine.weblounge.common.url;version=${project.version},
+              ch.entwine.weblounge.testing;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
