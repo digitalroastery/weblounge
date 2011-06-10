@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,25 +18,25 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl.handler;
+package ch.entwine.weblounge.dispatcher.impl.handler;
 
-import ch.o2it.weblounge.common.content.ResourceContent;
-import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.file.FileContent;
-import ch.o2it.weblounge.common.content.file.FileResource;
-import ch.o2it.weblounge.common.content.repository.ContentRepository;
-import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
-import ch.o2it.weblounge.common.impl.content.ResourceUtils;
-import ch.o2it.weblounge.common.impl.content.file.FileResourceURIImpl;
-import ch.o2it.weblounge.common.impl.language.LanguageUtils;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.security.User;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
+import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.file.FileContent;
+import ch.entwine.weblounge.common.content.file.FileResource;
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.ResourceUtils;
+import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.entwine.weblounge.common.impl.language.LanguageUtils;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.WebUrl;
+import ch.entwine.weblounge.dispatcher.RequestHandler;
+import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -259,7 +259,7 @@ public final class FileRequestHandlerImpl implements RequestHandler {
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
+   * @see ch.entwine.weblounge.dispatcher.api.request.RequestHandler#getName()
    */
   public String getName() {
     return "file request handler";

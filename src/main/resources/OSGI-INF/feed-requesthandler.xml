@@ -3,10 +3,10 @@
   immediate="true"
   name="Weblounge Feed Request Handler">
 
-  <implementation class="ch.o2it.weblounge.dispatcher.impl.handler.FeedRequestHandlerImpl" />
+  <implementation class="ch.entwine.weblounge.dispatcher.impl.handler.FeedRequestHandlerImpl" />
   <property name="service.description" value="Weblounge Feed Request Handler" />
   <service>
-    <provide interface="ch.o2it.weblounge.dispatcher.RequestHandler" />
+    <provide interface="ch.entwine.weblounge.dispatcher.RequestHandler" />
   </service>
 
 </scr:component>

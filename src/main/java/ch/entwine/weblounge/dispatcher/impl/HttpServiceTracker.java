@@ -1,6 +1,6 @@
 /*
  * Weblounge: Web Content Management System Copyright (c) 2009 The Weblounge
- * Team http://weblounge.o2it.ch
+ * Team http://entwinemedia.com/weblounge
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl;
+package ch.entwine.weblounge.dispatcher.impl;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;

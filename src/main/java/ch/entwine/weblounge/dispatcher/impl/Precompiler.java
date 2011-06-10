@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,22 +18,22 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl;
+package ch.entwine.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.content.page.Pagelet;
-import ch.o2it.weblounge.common.content.page.PageletRenderer;
-import ch.o2it.weblounge.common.content.page.PageletURI;
-import ch.o2it.weblounge.common.impl.content.page.MockPageImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageletImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageletURIImpl;
-import ch.o2it.weblounge.common.impl.testing.MockHttpServletRequest;
-import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
-import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
+import ch.entwine.weblounge.common.content.page.PageletURI;
+import ch.entwine.weblounge.common.impl.content.page.MockPageImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageletImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageletURIImpl;
+import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
+import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
+import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,38 +18,38 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl.handler;
+package ch.entwine.weblounge.dispatcher.impl.handler;
 
-import ch.o2it.weblounge.common.content.Renderer;
-import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Composer;
-import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.content.repository.ContentRepository;
-import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
-import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
-import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.request.CacheTagSet;
-import ch.o2it.weblounge.common.impl.request.Http11Constants;
-import ch.o2it.weblounge.common.impl.request.Http11Utils;
-import ch.o2it.weblounge.common.impl.site.ActionPool;
-import ch.o2it.weblounge.common.impl.url.UrlMatcherImpl;
-import ch.o2it.weblounge.common.impl.url.WebUrlImpl;
-import ch.o2it.weblounge.common.request.CacheTag;
-import ch.o2it.weblounge.common.request.RequestFlavor;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.ActionException;
-import ch.o2it.weblounge.common.site.HTMLAction;
-import ch.o2it.weblounge.common.site.JSONAction;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.site.XMLAction;
-import ch.o2it.weblounge.common.url.UrlMatcher;
-import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.dispatcher.ActionRequestHandler;
-import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
+import ch.entwine.weblounge.common.content.Renderer;
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.page.Composer;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.request.CacheTagSet;
+import ch.entwine.weblounge.common.impl.request.Http11Constants;
+import ch.entwine.weblounge.common.impl.request.Http11Utils;
+import ch.entwine.weblounge.common.impl.site.ActionPool;
+import ch.entwine.weblounge.common.impl.url.UrlMatcherImpl;
+import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
+import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.request.RequestFlavor;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.site.Action;
+import ch.entwine.weblounge.common.site.ActionException;
+import ch.entwine.weblounge.common.site.HTMLAction;
+import ch.entwine.weblounge.common.site.JSONAction;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.XMLAction;
+import ch.entwine.weblounge.common.url.UrlMatcher;
+import ch.entwine.weblounge.common.url.WebUrl;
+import ch.entwine.weblounge.dispatcher.ActionRequestHandler;
+import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +93,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.ActionRequestHandler#register(ch.o2it.weblounge.common.site.Action)
+   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#register(ch.entwine.weblounge.common.site.Action)
    */
   public void register(Action action) {
     if (action == null)
@@ -132,7 +132,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.ActionRequestHandler#unregister(ch.o2it.weblounge.common.site.Action)
+   * @see ch.entwine.weblounge.dispatcher.ActionRequestHandler#unregister(ch.entwine.weblounge.common.site.Action)
    */
   public boolean unregister(Action action) {
     ActionPool pool = null;
@@ -166,8 +166,8 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.RequestHandler#service(ch.o2it.weblounge.common.request.WebloungeRequest,
-   *      ch.o2it.weblounge.common.request.WebloungeResponse)
+   * @see ch.entwine.weblounge.dispatcher.RequestHandler#service(ch.entwine.weblounge.common.request.WebloungeRequest,
+   *      ch.entwine.weblounge.common.request.WebloungeResponse)
    */
   public boolean service(WebloungeRequest request, WebloungeResponse response) {
     WebUrl url = request.getUrl();
@@ -647,7 +647,7 @@ public final class ActionRequestHandlerImpl implements ActionRequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getName()
+   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {
     return "action request handler";

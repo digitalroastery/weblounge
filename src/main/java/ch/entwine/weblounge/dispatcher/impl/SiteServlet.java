@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,17 +18,17 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl;
+package ch.entwine.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.common.Times;
-import ch.o2it.weblounge.common.impl.request.Http11ProtocolHandler;
-import ch.o2it.weblounge.common.impl.request.Http11ResponseType;
-import ch.o2it.weblounge.common.impl.request.WebloungeRequestImpl;
-import ch.o2it.weblounge.common.impl.request.WebloungeResponseImpl;
-import ch.o2it.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
-import ch.o2it.weblounge.common.impl.util.classloader.JasperClassLoader;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.Times;
+import ch.entwine.weblounge.common.impl.request.Http11ProtocolHandler;
+import ch.entwine.weblounge.common.impl.request.Http11ResponseType;
+import ch.entwine.weblounge.common.impl.request.WebloungeRequestImpl;
+import ch.entwine.weblounge.common.impl.request.WebloungeResponseImpl;
+import ch.entwine.weblounge.common.impl.util.classloader.ContextClassLoaderUtils;
+import ch.entwine.weblounge.common.impl.util.classloader.JasperClassLoader;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;

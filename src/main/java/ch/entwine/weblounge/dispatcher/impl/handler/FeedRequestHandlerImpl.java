@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,32 +18,32 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl.handler;
+package ch.entwine.weblounge.dispatcher.impl.handler;
 
-import ch.o2it.weblounge.common.content.Renderer.RendererType;
-import ch.o2it.weblounge.common.content.SearchQuery;
-import ch.o2it.weblounge.common.content.SearchQuery.Order;
-import ch.o2it.weblounge.common.content.SearchResult;
-import ch.o2it.weblounge.common.content.SearchResultItem;
-import ch.o2it.weblounge.common.content.SearchResultPageItem;
-import ch.o2it.weblounge.common.content.page.Composer;
-import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.content.page.Pagelet;
-import ch.o2it.weblounge.common.content.page.PageletRenderer;
-import ch.o2it.weblounge.common.content.repository.ContentRepository;
-import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
-import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
-import ch.o2it.weblounge.common.impl.content.page.ComposerImpl;
-import ch.o2it.weblounge.common.impl.testing.MockHttpServletRequest;
-import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
-import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
+import ch.entwine.weblounge.common.content.Renderer.RendererType;
+import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchQuery.Order;
+import ch.entwine.weblounge.common.content.SearchResult;
+import ch.entwine.weblounge.common.content.SearchResultItem;
+import ch.entwine.weblounge.common.content.SearchResultPageItem;
+import ch.entwine.weblounge.common.content.page.Composer;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.page.PageletRenderer;
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.content.page.ComposerImpl;
+import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
+import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
+import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.dispatcher.RequestHandler;
+import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.synd.SyndCategory;
@@ -511,7 +511,7 @@ public class FeedRequestHandlerImpl implements RequestHandler {
   }
 
   /**
-   * @see ch.o2it.weblounge.dispatcher.api.request.RequestHandler#getName()
+   * @see ch.entwine.weblounge.dispatcher.api.request.RequestHandler#getName()
    */
   public String getName() {
     return "feed request handler";

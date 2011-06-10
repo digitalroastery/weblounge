@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,21 +18,21 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl;
+package ch.entwine.weblounge.dispatcher.impl;
 
 /**
  * This resource set defines which parts of a site can be accessed from the
  * outside and which parts are protected.
  */
-public class ModuleResourceSet extends ResourceSet {
+public class SiteResourceSet extends ResourceSet {
 
   /**
    * Creates a new site resource set.
    */
-  public ModuleResourceSet() {
-    super("^/modules/[^/]+/");
-    exclude("^/modules/[^/]+/(?:classes|conf|doc|i18n|lib)/");
-    exclude("^/modules/[^/]+/module.xml");
+  public SiteResourceSet() {
+    super("^/");
+    exclude("^/(?:classes|conf|doc|i18n|lib)/");
+    exclude("^/site.xml");
   }
 
 }

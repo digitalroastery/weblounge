@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,24 +18,24 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl;
+package ch.entwine.weblounge.dispatcher.impl;
 
-import ch.o2it.weblounge.common.content.repository.ContentRepository;
-import ch.o2it.weblounge.common.impl.url.PathUtils;
-import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.impl.util.config.ConfigurationUtils;
-import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.Module;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.site.SiteListener;
-import ch.o2it.weblounge.dispatcher.ActionRequestHandler;
-import ch.o2it.weblounge.dispatcher.DispatcherConfiguration;
-import ch.o2it.weblounge.dispatcher.SiteDispatcherService;
-import ch.o2it.weblounge.dispatcher.impl.http.WebXml;
-import ch.o2it.weblounge.dispatcher.impl.http.WebXmlFilter;
-import ch.o2it.weblounge.dispatcher.impl.http.WebXmlServlet;
-import ch.o2it.weblounge.kernel.SiteManager;
-import ch.o2it.weblounge.kernel.SiteServiceListener;
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.impl.url.PathUtils;
+import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
+import ch.entwine.weblounge.common.site.Action;
+import ch.entwine.weblounge.common.site.Module;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.site.SiteListener;
+import ch.entwine.weblounge.dispatcher.ActionRequestHandler;
+import ch.entwine.weblounge.dispatcher.DispatcherConfiguration;
+import ch.entwine.weblounge.dispatcher.SiteDispatcherService;
+import ch.entwine.weblounge.dispatcher.impl.http.WebXml;
+import ch.entwine.weblounge.dispatcher.impl.http.WebXmlFilter;
+import ch.entwine.weblounge.dispatcher.impl.http.WebXmlServlet;
+import ch.entwine.weblounge.kernel.SiteManager;
+import ch.entwine.weblounge.kernel.SiteServiceListener;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -89,7 +89,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   public static final String DEFAULT_BUNDLE_ENTRY = "/site";
 
   /** Service pid, used to look up the service configuration */
-  public static final String SERVICE_PID = "ch.o2it.weblounge.sitedispatcher";
+  public static final String SERVICE_PID = "ch.entwine.weblounge.sitedispatcher";
 
   /** Configuration key prefix for jsp precompilation */
   public static final String OPT_PRECOMPILE = "precompile";
@@ -366,7 +366,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#getSiteServlet(ch.o2it.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.dispatcher.SiteDispatcherService#getSiteServlet(ch.entwine.weblounge.common.site.Site)
    */
   public Servlet getSiteServlet(Site site) {
     return siteServlets.get(site);
@@ -375,7 +375,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByIdentifier(java.lang.String)
+   * @see ch.entwine.weblounge.dispatcher.SiteDispatcherService#findSiteByIdentifier(java.lang.String)
    */
   public Site findSiteByIdentifier(String identifier) {
     return siteManager.findSiteByIdentifier(identifier);
@@ -384,7 +384,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByURL(java.lang.String)
+   * @see ch.entwine.weblounge.dispatcher.SiteDispatcherService#findSiteByURL(java.lang.String)
    */
   public Site findSiteByURL(URL siteURL) {
     return siteManager.findSiteByURL(siteURL);
@@ -393,7 +393,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.SiteDispatcherService#findSiteByRequest(javax.servlet.http.HttpServletRequest)
+   * @see ch.entwine.weblounge.dispatcher.SiteDispatcherService#findSiteByRequest(javax.servlet.http.HttpServletRequest)
    */
   public Site findSiteByRequest(HttpServletRequest request) {
     if (request == null)
@@ -523,7 +523,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.SiteListener#siteStarted(ch.o2it.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.common.site.SiteListener#siteStarted(ch.entwine.weblounge.common.site.Site)
    */
   public void siteStarted(Site site) {
     if (actionRequestHandler != null) {
@@ -538,7 +538,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.site.SiteListener#siteStopped(ch.o2it.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.common.site.SiteListener#siteStopped(ch.entwine.weblounge.common.site.Site)
    */
   public void siteStopped(Site site) {
     if (actionRequestHandler != null) {
@@ -553,21 +553,21 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.SiteListener#repositoryConnected(ch.o2it.weblounge.common.site.Site, ch.o2it.weblounge.common.content.repository.ContentRepository)
+   * @see ch.entwine.weblounge.common.site.SiteListener#repositoryConnected(ch.entwine.weblounge.common.site.Site, ch.entwine.weblounge.common.content.repository.ContentRepository)
    */
   public void repositoryConnected(Site site, ContentRepository repository) { }
   
   /**
    * {@inheritDoc}
    *
-   * @see ch.o2it.weblounge.common.site.SiteListener#repositoryDisconnected(ch.o2it.weblounge.common.site.Site, ch.o2it.weblounge.common.content.repository.ContentRepository)
+   * @see ch.entwine.weblounge.common.site.SiteListener#repositoryDisconnected(ch.entwine.weblounge.common.site.Site, ch.entwine.weblounge.common.content.repository.ContentRepository)
    */
   public void repositoryDisconnected(Site site, ContentRepository repository) { }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.kernel.SiteServiceListener#siteAppeared(ch.o2it.weblounge.common.site.Site,
+   * @see ch.entwine.weblounge.kernel.SiteServiceListener#siteAppeared(ch.entwine.weblounge.common.site.Site,
    *      org.osgi.framework.ServiceReference)
    */
   public void siteAppeared(Site site, ServiceReference reference) {
@@ -577,7 +577,7 @@ public class SiteDispatcherServiceImpl implements SiteDispatcherService, SiteLis
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.kernel.SiteServiceListener#siteDisappeared(ch.o2it.weblounge.common.site.Site)
+   * @see ch.entwine.weblounge.kernel.SiteServiceListener#siteDisappeared(ch.entwine.weblounge.common.site.Site)
    */
   public void siteDisappeared(Site site) {
     removeSite(site);

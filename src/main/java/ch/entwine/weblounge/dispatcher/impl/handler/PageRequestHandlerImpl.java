@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2009 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,35 +18,35 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.dispatcher.impl.handler;
+package ch.entwine.weblounge.dispatcher.impl.handler;
 
-import static ch.o2it.weblounge.common.request.RequestFlavor.ANY;
-import static ch.o2it.weblounge.common.request.RequestFlavor.HTML;
+import static ch.entwine.weblounge.common.request.RequestFlavor.ANY;
+import static ch.entwine.weblounge.common.request.RequestFlavor.HTML;
 
-import ch.o2it.weblounge.common.content.Renderer;
-import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.content.page.PageTemplate;
-import ch.o2it.weblounge.common.content.repository.ContentRepository;
-import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
-import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.request.CacheTagSet;
-import ch.o2it.weblounge.common.impl.request.Http11Constants;
-import ch.o2it.weblounge.common.impl.request.Http11Utils;
-import ch.o2it.weblounge.common.impl.request.RequestUtils;
-import ch.o2it.weblounge.common.request.CacheTag;
-import ch.o2it.weblounge.common.request.RequestFlavor;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.request.WebloungeResponse;
-import ch.o2it.weblounge.common.security.User;
-import ch.o2it.weblounge.common.site.Action;
-import ch.o2it.weblounge.common.site.HTMLAction;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.common.url.WebUrl;
-import ch.o2it.weblounge.dispatcher.PageRequestHandler;
-import ch.o2it.weblounge.dispatcher.RequestHandler;
-import ch.o2it.weblounge.dispatcher.impl.DispatchUtils;
+import ch.entwine.weblounge.common.content.Renderer;
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.PageTemplate;
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.request.CacheTagSet;
+import ch.entwine.weblounge.common.impl.request.Http11Constants;
+import ch.entwine.weblounge.common.impl.request.Http11Utils;
+import ch.entwine.weblounge.common.impl.request.RequestUtils;
+import ch.entwine.weblounge.common.request.CacheTag;
+import ch.entwine.weblounge.common.request.RequestFlavor;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.request.WebloungeResponse;
+import ch.entwine.weblounge.common.security.User;
+import ch.entwine.weblounge.common.site.Action;
+import ch.entwine.weblounge.common.site.HTMLAction;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.common.url.WebUrl;
+import ch.entwine.weblounge.dispatcher.PageRequestHandler;
+import ch.entwine.weblounge.dispatcher.RequestHandler;
+import ch.entwine.weblounge.dispatcher.impl.DispatchUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -407,7 +407,7 @@ public final class PageRequestHandlerImpl implements PageRequestHandler {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.dispatcher.RequestHandler#getName()
+   * @see ch.entwine.weblounge.dispatcher.RequestHandler#getName()
    */
   public String getName() {
     return "page request handler";

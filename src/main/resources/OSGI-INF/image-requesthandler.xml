@@ -3,10 +3,10 @@
   immediate="true"
   name="Weblounge Image Request Handler">
 
-  <implementation class="ch.o2it.weblounge.dispatcher.impl.handler.ImageRequestHandlerImpl" />
+  <implementation class="ch.entwine.weblounge.dispatcher.impl.handler.ImageRequestHandlerImpl" />
   <property name="service.description" value="Weblounge Image Request Handler" />
   <service>
-    <provide interface="ch.o2it.weblounge.dispatcher.RequestHandler" />
+    <provide interface="ch.entwine.weblounge.dispatcher.RequestHandler" />
   </service>
 
 </scr:component>

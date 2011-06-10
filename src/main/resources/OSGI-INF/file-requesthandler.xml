@@ -3,10 +3,10 @@
   immediate="true"
   name="Weblounge File Request Handler">
 
-  <implementation class="ch.o2it.weblounge.dispatcher.impl.handler.FileRequestHandlerImpl" />
+  <implementation class="ch.entwine.weblounge.dispatcher.impl.handler.FileRequestHandlerImpl" />
   <property name="service.description" value="Weblounge File Request Handler" />
   <service>
-    <provide interface="ch.o2it.weblounge.dispatcher.RequestHandler" />
+    <provide interface="ch.entwine.weblounge.dispatcher.RequestHandler" />
   </service>
 
 </scr:component>

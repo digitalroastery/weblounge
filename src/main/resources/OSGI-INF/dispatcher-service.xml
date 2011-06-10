@@ -5,14 +5,14 @@
   stop="deactivate"
   name="Weblounge Dispatcher Service">
   
-  <implementation class="ch.o2it.weblounge.dispatcher.impl.DispatcherServiceImpl" />
+  <implementation class="ch.entwine.weblounge.dispatcher.impl.DispatcherServiceImpl" />
   <property name="service.description" value="Weblounge Dispatcher Service" />
   <service>
-    <provide interface="ch.o2it.weblounge.dispatcher.DispatcherService" />
+    <provide interface="ch.entwine.weblounge.dispatcher.DispatcherService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
-  <reference name="sitedispatcher" interface="ch.o2it.weblounge.dispatcher.SiteDispatcherService" cardinality="0..1" policy="dynamic" bind="setSiteDispatcher" unbind="removeSiteDispatcher" />
-  <reference name="requesthandler" interface="ch.o2it.weblounge.dispatcher.RequestHandler" cardinality="0..n" policy="dynamic" bind="addRequestHandler" unbind="removeRequestHandler" />
-  <reference name="cacheservice" interface="ch.o2it.weblounge.cache.CacheService" cardinality="0..n" policy="dynamic" bind="addCacheService" unbind="removeCacheService" />
+  <reference name="sitedispatcher" interface="ch.entwine.weblounge.dispatcher.SiteDispatcherService" cardinality="0..1" policy="dynamic" bind="setSiteDispatcher" unbind="removeSiteDispatcher" />
+  <reference name="requesthandler" interface="ch.entwine.weblounge.dispatcher.RequestHandler" cardinality="0..n" policy="dynamic" bind="addRequestHandler" unbind="removeRequestHandler" />
+  <reference name="cacheservice" interface="ch.entwine.weblounge.cache.CacheService" cardinality="0..n" policy="dynamic" bind="addCacheService" unbind="removeCacheService" />
 
 </scr:component>

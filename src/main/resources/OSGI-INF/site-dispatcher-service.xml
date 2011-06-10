@@ -5,15 +5,15 @@
   stop="deactivate"
   name="Weblounge Site Dispatcher Service">
 
-  <implementation class="ch.o2it.weblounge.dispatcher.impl.SiteDispatcherServiceImpl" />
+  <implementation class="ch.entwine.weblounge.dispatcher.impl.SiteDispatcherServiceImpl" />
   <property name="service.description" value="Weblounge Site Dispatcher Service" />
-  <property name="service.pid" value="ch.o2it.weblounge.sitedispatcher" />
+  <property name="service.pid" value="ch.entwine.weblounge.sitedispatcher" />
   <service>
-    <provide interface="ch.o2it.weblounge.dispatcher.SiteDispatcherService" />
+    <provide interface="ch.entwine.weblounge.dispatcher.SiteDispatcherService" />
     <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
   <reference name="httpservice" interface="org.ops4j.pax.web.service.WebContainer" cardinality="1..1" policy="static" bind="setHttpService" unbind="removeHttpService" />
-  <reference name="actionrequesthandler" interface="ch.o2it.weblounge.dispatcher.ActionRequestHandler" cardinality="0..1" policy="dynamic" bind="setActionRequestHandler" unbind="removeActionRequestHandler" />
-  <reference name="sitemanager" interface="ch.o2it.weblounge.kernel.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" unbind="removeSiteManager" />
+  <reference name="actionrequesthandler" interface="ch.entwine.weblounge.dispatcher.ActionRequestHandler" cardinality="0..1" policy="dynamic" bind="setActionRequestHandler" unbind="removeActionRequestHandler" />
+  <reference name="sitemanager" interface="ch.entwine.weblounge.kernel.SiteManager" cardinality="1..1" policy="static" bind="setSiteManager" unbind="removeSiteManager" />
 
 </scr:component>
