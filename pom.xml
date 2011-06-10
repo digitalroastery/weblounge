@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ch.o2it.weblounge</groupId>
+  <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-taglib</artifactId>
   <packaging>bundle</packaging>
   <name>Weblounge Taglibrary</name>
   <parent>
-    <groupId>ch.o2it.weblounge</groupId>
+    <groupId>ch.entwine.weblounge</groupId>
     <artifactId>weblounge-base</artifactId>
     <version>3.0.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
@@ -16,19 +16,19 @@
     <!-- weblounge -->
 
     <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
+      <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-common-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
+      <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-contentrepository-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>ch.o2it.weblounge</groupId>
+      <groupId>ch.entwine.weblounge</groupId>
       <artifactId>weblounge-common</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -85,26 +85,26 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.taglib</Bundle-SymbolicName>
             <Import-Package>
-              ch.o2it.weblounge.common;version=${project.version},
-              ch.o2it.weblounge.common.content;version=${project.version},
-              ch.o2it.weblounge.common.content.file;version=${project.version},
-              ch.o2it.weblounge.common.content.image;version=${project.version},
-              ch.o2it.weblounge.common.content.page;version=${project.version},
-              ch.o2it.weblounge.common.content.repository;version=${project.version},
-              ch.o2it.weblounge.common.impl.content;version=${project.version},
-              ch.o2it.weblounge.common.impl.content.file;version=${project.version},
-              ch.o2it.weblounge.common.impl.content.image;version=${project.version},
-              ch.o2it.weblounge.common.impl.content.page;version=${project.version},
-              ch.o2it.weblounge.common.impl.language;version=${project.version},
-              ch.o2it.weblounge.common.impl.request;version=${project.version},
-              ch.o2it.weblounge.common.impl.url;version=${project.version},
-              ch.o2it.weblounge.common.impl.util;version=${project.version},
-              ch.o2it.weblounge.common.impl.util.config;version=${project.version},
-              ch.o2it.weblounge.common.language;version=${project.version},
-              ch.o2it.weblounge.common.request;version=${project.version},
-              ch.o2it.weblounge.common.security;version=${project.version},
-              ch.o2it.weblounge.common.site;version=${project.version},
-              ch.o2it.weblounge.common.url;version=${project.version},
+              ch.entwine.weblounge.common;version=${project.version},
+              ch.entwine.weblounge.common.content;version=${project.version},
+              ch.entwine.weblounge.common.content.file;version=${project.version},
+              ch.entwine.weblounge.common.content.image;version=${project.version},
+              ch.entwine.weblounge.common.content.page;version=${project.version},
+              ch.entwine.weblounge.common.content.repository;version=${project.version},
+              ch.entwine.weblounge.common.impl.content;version=${project.version},
+              ch.entwine.weblounge.common.impl.content.file;version=${project.version},
+              ch.entwine.weblounge.common.impl.content.image;version=${project.version},
+              ch.entwine.weblounge.common.impl.content.page;version=${project.version},
+              ch.entwine.weblounge.common.impl.language;version=${project.version},
+              ch.entwine.weblounge.common.impl.request;version=${project.version},
+              ch.entwine.weblounge.common.impl.url;version=${project.version},
+              ch.entwine.weblounge.common.impl.util;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.config;version=${project.version},
+              ch.entwine.weblounge.common.language;version=${project.version},
+              ch.entwine.weblounge.common.request;version=${project.version},
+              ch.entwine.weblounge.common.security;version=${project.version},
+              ch.entwine.weblounge.common.site;version=${project.version},
+              ch.entwine.weblounge.common.url;version=${project.version},
               org.apache.commons.lang;version="2.4",
               org.slf4j;version="1.5.6",
               javax.servlet;version="2.5",
@@ -113,11 +113,11 @@
               javax.servlet.jsp.tagext;version="2.1.0"
             </Import-Package>
             <Export-Package>
-              ch.o2it.weblounge.taglib;version=${project.version},
-              ch.o2it.weblounge.taglib.content;version=${project.version},
-              ch.o2it.weblounge.taglib.resource;version=${project.version},
-              ch.o2it.weblounge.taglib.security;version=${project.version},
-              ch.o2it.weblounge.taglib.util;version=${project.version}
+              ch.entwine.weblounge.taglib;version=${project.version},
+              ch.entwine.weblounge.taglib.content;version=${project.version},
+              ch.entwine.weblounge.taglib.resource;version=${project.version},
+              ch.entwine.weblounge.taglib.security;version=${project.version},
+              ch.entwine.weblounge.taglib.util;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>

@@ -8,13 +8,13 @@
  	<display-name>Weblounge Utilities Tags</display-name>
 	<tlib-version>3.0</tlib-version>
 	<short-name>webl-util</short-name>
- 	<uri>http://o2it.ch/weblounge/3.0/util</uri>
+ 	<uri>http://entwinemedia.com/weblounge/3.0/util</uri>
   
 	<tag>
 		<description>Lists all countries</description>
 		<display-name>Weblounge Country Tag</display-name>
 		<name>countryselection</name>
-		<tag-class>ch.o2it.weblounge.taglib.util.CountryListTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.util.CountryListTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>selected</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -49,7 +49,7 @@
 		<description>Lists all months</description>
 		<display-name>Weblounge Month Tag</display-name>
 		<name>monthselection</name>
-		<tag-class>ch.o2it.weblounge.taglib.util.MonthListTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.util.MonthListTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>selected</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>

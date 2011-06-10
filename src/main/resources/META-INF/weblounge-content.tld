@@ -8,13 +8,13 @@
   <display-name>Weblounge Content Tags</display-name>
 	<tlib-version>3.0</tlib-version>
 	<short-name>webl</short-name>
-  <uri>http://o2it.ch/weblounge/3.0/content</uri>
+  <uri>http://entwinemedia.com/weblounge/3.0/content</uri>
   
   <tag>
 		<description>Adds a tag to the cache</description>
 		<display-name>Weblounge Cache Tagging Tag</display-name>
 		<name>cachetag</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.CacheTaggingTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.CacheTaggingTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>value</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -24,7 +24,7 @@
 		<description>Embeds a composer</description>
 		<display-name>Weblounge Composer Tag</display-name>
 		<name>composer</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.ComposerTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.ComposerTag</tag-class>
 		<body-content>empty</body-content>
 
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -65,7 +65,7 @@
 		<description>Embeds style and javascript definitions</description>
 		<display-name>Weblounge Include Tag</display-name>
 		<name>headers</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.HTMLHeaderTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.HTMLHeaderTag</tag-class>
 		<body-content>empty</body-content>
 	</tag>
 
@@ -73,7 +73,7 @@
 		<description>Returns the localized message for the given i18n key</description>
 		<display-name>Internationalization tag</display-name>
 		<name>i18n</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.I18nTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.I18nTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute><name>key</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
@@ -82,8 +82,8 @@
 		<description>Displays pagelet data</description>
 		<display-name>Pagelet Content Element Tag</display-name>
 		<name>element</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.ElementTag</tag-class>
-		<tei-class>ch.o2it.weblounge.taglib.content.ElementTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.ElementTag</tag-class>
+		<tei-class>ch.entwine.weblounge.taglib.content.ElementTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>language</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -96,8 +96,8 @@
 		<description>Displays pagelet element data</description>
 		<display-name>Pagelet Element Iterator Tag</display-name>
 		<name>element-iterator</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.ElementIteratorTag</tag-class>
-		<tei-class>ch.o2it.weblounge.taglib.content.ElementIteratorTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.ElementIteratorTag</tag-class>
+		<tei-class>ch.entwine.weblounge.taglib.content.ElementIteratorTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>element</name><required>false</required><rtexprvalue>false</rtexprvalue></attribute>
 		<attribute><name>elements</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -109,8 +109,8 @@
 		<description>Tests for the existance of a pagelet element</description>
 		<display-name>Pagelet Content Element Check Tag</display-name>
 		<name>ifelement</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfElementTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.ElementCheckTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfElementTag</tag-class>
+ 		<tei-class>ch.entwine.weblounge.taglib.content.ElementCheckTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>language</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -122,8 +122,8 @@
 		<description>Tests for the existance of a pagelet element</description>
 		<display-name>Pagelet Content Element Check Tag</display-name>
 		<name>ifnotelement</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfNotElementTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.ElementCheckTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfNotElementTag</tag-class>
+ 		<tei-class>ch.entwine.weblounge.taglib.content.ElementCheckTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>language</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -135,8 +135,8 @@
 		<description>Displays pagelet property</description>
 		<display-name>Pagelet Property Tag</display-name>
 		<name>property</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PropertyTag</tag-class>
-		<tei-class>ch.o2it.weblounge.taglib.content.PropertyTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.PropertyTag</tag-class>
+		<tei-class>ch.entwine.weblounge.taglib.content.PropertyTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>define</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -147,8 +147,8 @@
 		<description>Displays pagelet property data</description>
 		<display-name>Pagelet Property Iterator Tag</display-name>
 		<name>property-iterator</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PropertyIteratorTag</tag-class>
-		<tei-class>ch.o2it.weblounge.taglib.content.PropertyIteratorTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.PropertyIteratorTag</tag-class>
+		<tei-class>ch.entwine.weblounge.taglib.content.PropertyIteratorTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>property</name><required>false</required><rtexprvalue>false</rtexprvalue></attribute>
 		<attribute><name>elements</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -160,8 +160,8 @@
 		<description>Tests for the existance of a pagelet property</description>
 		<display-name>Pagelet Property Check Tag</display-name>
 		<name>ifproperty</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfPropertyTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.PropertyCheckTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfPropertyTag</tag-class>
+ 		<tei-class>ch.entwine.weblounge.taglib.content.PropertyCheckTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>define</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -172,8 +172,8 @@
 		<description>Tests for the existance of a pagelet property</description>
 		<display-name>Pagelet Property Check Tag</display-name>
 		<name>ifnotproperty</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfNotPropertyTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.PropertyCheckTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfNotPropertyTag</tag-class>
+ 		<tei-class>ch.entwine.weblounge.taglib.content.PropertyCheckTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>define</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -184,8 +184,8 @@
 		<description>Tests for the existance of an action handler</description>
 		<display-name>ActionCheck Tag</display-name>
 		<name>ifaction</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfActionTag</tag-class>
-		<tei-class>ch.o2it.weblounge.taglib.content.ActionCheckTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfActionTag</tag-class>
+		<tei-class>ch.entwine.weblounge.taglib.content.ActionCheckTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>module</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>action</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -226,7 +226,7 @@
 		<description>Tests for the existance of a action handler</description>
 		<display-name>ActionCheck Tag</display-name>
 		<name>ifnotaction</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfNotActionTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfNotActionTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute><name>module</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>action</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -236,8 +236,8 @@
 		<description>Tests for the existance of a cookie</description>
 		<display-name>CookieCheck Tag</display-name>
 		<name>ifcookie</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfCookieTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.CookieCheckTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfCookieTag</tag-class>
+ 		<tei-class>ch.entwine.weblounge.taglib.content.CookieCheckTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
@@ -246,8 +246,8 @@
 		<description>Tests for the existance of a cookie</description>
 		<display-name>CookieCheck Tag</display-name>
 		<name>ifnotcookie</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfNotCookieTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.CookieCheckTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfNotCookieTag</tag-class>
+ 		<tei-class>ch.entwine.weblounge.taglib.content.CookieCheckTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
@@ -256,7 +256,7 @@
 		<description>Tests for a specific document version</description>
 		<display-name>VersionCheck Tag</display-name>
 		<name>ifversion</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.VersionCheckTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.VersionCheckTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute><name>version</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
@@ -265,7 +265,7 @@
 		<description>Tests if the page is currently beeing edited</description>
 		<display-name>Editing Check Tag</display-name>
 		<name>ifediting</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfEditingTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfEditingTag</tag-class>
 		<body-content>JSP</body-content>
 	</tag>
 
@@ -273,7 +273,7 @@
 		<description>Tests if the page is currently beeing edited</description>
 		<display-name>Editing Check Tag</display-name>
 		<name>ifnotediting</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.IfNotEditingTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.IfNotEditingTag</tag-class>
 		<body-content>JSP</body-content>
 	</tag>
 
@@ -281,7 +281,7 @@
 		<description>Inserts a generator meta tag</description>
 		<display-name>Weblounge Generator Tag</display-name>
 		<name>generator</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.GeneratorTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.GeneratorTag</tag-class>
 		<body-content>empty</body-content>
 	</tag>
 
@@ -289,7 +289,7 @@
 		<description>Inserts a response message tag</description>
 		<display-name>Weblounge Response Tag</display-name>
 		<name>responsemessage</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.ResponseMessageTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.ResponseMessageTag</tag-class>
 		<body-content>empty</body-content>
 	</tag>
 
@@ -297,7 +297,7 @@
 		<description>Inserts a title meta tag</description>
 		<display-name>Weblounge Title Tag</display-name>
 		<name>title</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.TitleTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.TitleTag</tag-class>
 		<body-content>empty</body-content>
 	</tag>
 
@@ -305,7 +305,7 @@
 		<description>Displays error, warning and info messages</description>
 		<display-name>Weblounge Message Tag</display-name>
 		<name>messages</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.MessageTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.MessageTag</tag-class>
 		<body-content>empty</body-content>
 
 		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -341,7 +341,7 @@
 		<description>Creates a mailto link</description>
 		<display-name>Weblounge Mailto Tag</display-name>
 		<name>mailto</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.MailtoTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.MailtoTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>user</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -378,7 +378,7 @@
 		<description>Creates a form tag, linked to the given action</description>
 		<display-name>Weblounge form tag</display-name>
 		<name>form</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.FormTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.FormTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>module</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -421,7 +421,7 @@
 		<description>Embeds the specified pagelet at the tag position</description>
 		<display-name>Weblounge Pagelet Tag</display-name>
 		<name>pagelet</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PageletTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.PageletTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute><name>module</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>id</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -431,7 +431,7 @@
 		<description>Sets a property for the enclosing pagelet tag</description>
 		<display-name>Weblounge Pagelet Property Tag</display-name>
 		<name>pageletproperty</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PageletPropertyTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.PageletPropertyTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>value</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -441,7 +441,7 @@
 		<description>Sets an element for the enclosing pagelet tag</description>
 		<display-name>Weblounge Pagelet Element Tag</display-name>
 		<name>pageletelement</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PageletElementTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.PageletElementTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>value</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -452,8 +452,8 @@
 		<description>Sets up weblounge scripting variables</description>
 		<display-name>Weblounge Context Tag</display-name>
 		<name>context</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.ContextTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.ContextTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.ContextTag</tag-class>
+ 		<tei-class>ch.entwine.weblounge.taglib.content.ContextTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>define</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 	</tag>
@@ -462,7 +462,7 @@
 		<description>Embeds a link to a Weblounge action</description>
 		<display-name>Weblounge Action Tag</display-name>
 		<name>action</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.ActionTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.ActionTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute><name>id</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>module</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -501,7 +501,7 @@
 		<description>Adds a parameter to an action call</description>
 		<display-name>Weblounge Action Parameter Tag</display-name>
 		<name>actionparam</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.ActionParameterTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.ActionParameterTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute><name>name</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>value</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -511,8 +511,8 @@
 		<description>Extracts a number of pages from the database</description>
 		<display-name>List of pages</display-name>
 		<name>pagelist</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PageListTag</tag-class>
- 		<tei-class>ch.o2it.weblounge.taglib.content.PageListTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.PageListTag</tag-class>
+ 		<tei-class>ch.entwine.weblounge.taglib.content.PageListTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>keywords</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
 		<attribute><name>count</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -523,8 +523,8 @@
 		<description>Shows a preview of the page</description>
 		<display-name>Page Preview</display-name>
 		<name>pagepreview</name>
-		<tag-class>ch.o2it.weblounge.taglib.content.PagePreviewTag</tag-class>
-    <tei-class>ch.o2it.weblounge.taglib.content.PagePreviewTagExtraInfo</tei-class>
+		<tag-class>ch.entwine.weblounge.taglib.content.PagePreviewTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.content.PagePreviewTagExtraInfo</tei-class>
 		<body-content>JSP</body-content>
 		<attribute><name>pageid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>elements</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>

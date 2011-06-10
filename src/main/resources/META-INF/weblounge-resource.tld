@@ -8,14 +8,14 @@
   <display-name>Weblounge Resource Tags</display-name>
   <tlib-version>3.0</tlib-version>
   <short-name>weblr</short-name>
-  <uri>http://o2it.ch/weblounge/3.0/resources</uri>
+  <uri>http://entwinemedia.com/weblounge/3.0/resources</uri>
   
   <tag>
     <description>Loads a page</description>
     <display-name>Page Tag</display-name>
     <name>page</name>
-    <tag-class>ch.o2it.weblounge.taglib.resource.PageTag</tag-class>
-    <tei-class>ch.o2it.weblounge.taglib.resource.PageTagExtraInfo</tei-class>
+    <tag-class>ch.entwine.weblounge.taglib.resource.PageTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.PageTagExtraInfo</tei-class>
     <body-content>JSP</body-content>
     <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -25,8 +25,8 @@
     <description>Loads a file resource</description>
     <display-name>File Resource Tag</display-name>
     <name>file</name>
-    <tag-class>ch.o2it.weblounge.taglib.resource.FileResourceTag</tag-class>
-    <tei-class>ch.o2it.weblounge.taglib.resource.FileResourceTagExtraInfo</tei-class>
+    <tag-class>ch.entwine.weblounge.taglib.resource.FileResourceTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.FileResourceTagExtraInfo</tei-class>
     <body-content>JSP</body-content>
     <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
@@ -36,8 +36,8 @@
     <description>Load an image resource</description>
     <display-name>Image Resource Tag</display-name>
     <name>image</name>
-    <tag-class>ch.o2it.weblounge.taglib.resource.ImageResourceTag</tag-class>
-    <tei-class>ch.o2it.weblounge.taglib.resource.ImageResourceTagExtraInfo</tei-class>
+    <tag-class>ch.entwine.weblounge.taglib.resource.ImageResourceTag</tag-class>
+    <tei-class>ch.entwine.weblounge.taglib.resource.ImageResourceTagExtraInfo</tei-class>
     <body-content>JSP</body-content>
     <attribute><name>uuid</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
     <attribute><name>path</name><required>false</required><rtexprvalue>true</rtexprvalue></attribute>
