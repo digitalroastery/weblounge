@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,11 +18,10 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench.suggest;
+package ch.entwine.weblounge.workbench.suggest;
 
-import ch.o2it.weblounge.workbench.suggest.SuggestionBase;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public class SuggestionBaseTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.suggest.SuggestionBase#highlight(java.lang.String, java.lang.String)}
+   * {@link ch.entwine.weblounge.workbench.suggest.SuggestionBase#highlight(java.lang.String, java.lang.String)}
    * .
    */
   @Test

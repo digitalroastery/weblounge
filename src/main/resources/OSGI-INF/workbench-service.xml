@@ -5,11 +5,11 @@
   stop="deactivate"
   name="Weblounge Workbench Service">	
   
-  <implementation class="ch.o2it.weblounge.workbench.WorkbenchService" />
+  <implementation class="ch.entwine.weblounge.workbench.WorkbenchService" />
   <property name="service.description" value="Weblounge Workbench Service" />
-  <property name="service.pid" value="ch.o2it.weblounge.workbench" />
+  <property name="service.pid" value="ch.entwine.weblounge.workbench" />
   <service>
-    <provide interface="ch.o2it.weblounge.workbench.WorkbenchService" />
+    <provide interface="ch.entwine.weblounge.workbench.WorkbenchService" />
   </service>
 
 </scr:component>

@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,18 +18,18 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench.endpoint;
+package ch.entwine.weblounge.workbench.endpoint;
 
-import ch.o2it.weblounge.common.content.Resource;
-import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.impl.content.page.PageURIImpl;
-import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.kernel.SiteManager;
-import ch.o2it.weblounge.workbench.PageletEditor;
-import ch.o2it.weblounge.workbench.WorkbenchService;
-import ch.o2it.weblounge.workbench.suggest.SubjectSuggestion;
-import ch.o2it.weblounge.workbench.suggest.SuggestionList;
+import ch.entwine.weblounge.common.content.Resource;
+import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.kernel.SiteManager;
+import ch.entwine.weblounge.workbench.PageletEditor;
+import ch.entwine.weblounge.workbench.WorkbenchService;
+import ch.entwine.weblounge.workbench.suggest.SubjectSuggestion;
+import ch.entwine.weblounge.workbench.suggest.SuggestionList;
 
 import java.io.IOException;
 

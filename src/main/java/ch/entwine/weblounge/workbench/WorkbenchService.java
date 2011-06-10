@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,24 +18,24 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench;
+package ch.entwine.weblounge.workbench;
 
-import ch.o2it.weblounge.common.content.ResourceURI;
-import ch.o2it.weblounge.common.content.SearchQuery;
-import ch.o2it.weblounge.common.content.page.Composer;
-import ch.o2it.weblounge.common.content.page.Page;
-import ch.o2it.weblounge.common.content.page.Pagelet;
-import ch.o2it.weblounge.common.content.repository.ContentRepository;
-import ch.o2it.weblounge.common.content.repository.ContentRepositoryException;
-import ch.o2it.weblounge.common.impl.content.SearchQueryImpl;
-import ch.o2it.weblounge.common.impl.testing.MockHttpServletRequest;
-import ch.o2it.weblounge.common.impl.testing.MockHttpServletResponse;
-import ch.o2it.weblounge.common.impl.url.UrlUtils;
-import ch.o2it.weblounge.common.request.WebloungeRequest;
-import ch.o2it.weblounge.common.site.Site;
-import ch.o2it.weblounge.workbench.suggest.PageSuggestion;
-import ch.o2it.weblounge.workbench.suggest.SubjectSuggestion;
-import ch.o2it.weblounge.workbench.suggest.UserSuggestion;
+import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.page.Composer;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.repository.ContentRepository;
+import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
+import ch.entwine.weblounge.common.impl.content.SearchQueryImpl;
+import ch.entwine.weblounge.common.impl.testing.MockHttpServletRequest;
+import ch.entwine.weblounge.common.impl.testing.MockHttpServletResponse;
+import ch.entwine.weblounge.common.impl.url.UrlUtils;
+import ch.entwine.weblounge.common.request.WebloungeRequest;
+import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.workbench.suggest.PageSuggestion;
+import ch.entwine.weblounge.workbench.suggest.SubjectSuggestion;
+import ch.entwine.weblounge.workbench.suggest.UserSuggestion;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;

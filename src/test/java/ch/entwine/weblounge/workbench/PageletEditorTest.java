@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,11 +18,11 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench;
+package ch.entwine.weblounge.workbench;
 
 import static org.junit.Assert.fail;
 
-import ch.o2it.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.ResourceURI;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -57,7 +57,7 @@ public class PageletEditorTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.PageletEditor#getPagelet()}.
+   * {@link ch.entwine.weblounge.workbench.PageletEditor#getPagelet()}.
    */
   @Test
   public void testGetPagelet() {
@@ -65,7 +65,7 @@ public class PageletEditorTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.workbench.PageletEditor#getURI()}.
+   * Test method for {@link ch.entwine.weblounge.workbench.PageletEditor#getURI()}.
    */
   @Test
   public void testGetURI() {
@@ -74,7 +74,7 @@ public class PageletEditorTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.PageletEditor#getComposer()}.
+   * {@link ch.entwine.weblounge.workbench.PageletEditor#getComposer()}.
    */
   @Test
   public void testGetComposer() {
@@ -83,7 +83,7 @@ public class PageletEditorTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.PageletEditor#getPageletIndex()}.
+   * {@link ch.entwine.weblounge.workbench.PageletEditor#getPageletIndex()}.
    */
   @Test
   public void testGetPageletIndex() {
@@ -92,7 +92,7 @@ public class PageletEditorTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.PageletEditor#setDataFlavor(ch.o2it.weblounge.workbench.PageletEditor.DataFlavor)}
+   * {@link ch.entwine.weblounge.workbench.PageletEditor#setDataFlavor(ch.entwine.weblounge.workbench.PageletEditor.DataFlavor)}
    * .
    */
   @Test
@@ -102,7 +102,7 @@ public class PageletEditorTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.PageletEditor#getDataFlavor()}.
+   * {@link ch.entwine.weblounge.workbench.PageletEditor#getDataFlavor()}.
    */
   @Test
   public void testGetDataFlavor() {
@@ -111,7 +111,7 @@ public class PageletEditorTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.PageletEditor#hasRenderer()}.
+   * {@link ch.entwine.weblounge.workbench.PageletEditor#hasRenderer()}.
    */
   @Test
   public void testHasRenderer() {
@@ -120,7 +120,7 @@ public class PageletEditorTest {
 
   /**
    * Test method for
-   * {@link ch.o2it.weblounge.workbench.PageletEditor#hasEditor()}.
+   * {@link ch.entwine.weblounge.workbench.PageletEditor#hasEditor()}.
    */
   @Test
   public void testHasEditor() {
@@ -128,7 +128,7 @@ public class PageletEditorTest {
   }
 
   /**
-   * Test method for {@link ch.o2it.weblounge.workbench.PageletEditor#toXml()}.
+   * Test method for {@link ch.entwine.weblounge.workbench.PageletEditor#toXml()}.
    */
   @Test
   public void testToXml() {

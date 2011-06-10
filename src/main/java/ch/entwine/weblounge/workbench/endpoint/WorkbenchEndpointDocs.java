@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,19 +18,19 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench.endpoint;
+package ch.entwine.weblounge.workbench.endpoint;
 
-import static ch.o2it.weblounge.common.impl.util.doc.Status.notFound;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.ok;
-import static ch.o2it.weblounge.common.impl.util.doc.Status.serviceUnavailable;
+import static ch.entwine.weblounge.common.impl.util.doc.Status.notFound;
+import static ch.entwine.weblounge.common.impl.util.doc.Status.ok;
+import static ch.entwine.weblounge.common.impl.util.doc.Status.serviceUnavailable;
 
-import ch.o2it.weblounge.common.impl.util.doc.Endpoint;
-import ch.o2it.weblounge.common.impl.util.doc.Endpoint.Method;
-import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentation;
-import ch.o2it.weblounge.common.impl.util.doc.EndpointDocumentationGenerator;
-import ch.o2it.weblounge.common.impl.util.doc.Format;
-import ch.o2it.weblounge.common.impl.util.doc.Parameter;
-import ch.o2it.weblounge.common.impl.util.doc.TestForm;
+import ch.entwine.weblounge.common.impl.util.doc.Endpoint;
+import ch.entwine.weblounge.common.impl.util.doc.Endpoint.Method;
+import ch.entwine.weblounge.common.impl.util.doc.EndpointDocumentation;
+import ch.entwine.weblounge.common.impl.util.doc.EndpointDocumentationGenerator;
+import ch.entwine.weblounge.common.impl.util.doc.Format;
+import ch.entwine.weblounge.common.impl.util.doc.Parameter;
+import ch.entwine.weblounge.common.impl.util.doc.TestForm;
 
 /**
  * Workbench endpoint documentation generator.

@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,17 +18,17 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench;
+package ch.entwine.weblounge.workbench;
 
-import ch.o2it.weblounge.common.content.page.Pagelet;
-import ch.o2it.weblounge.common.content.page.PageletURI;
-import ch.o2it.weblounge.common.language.Language;
-import ch.o2it.weblounge.common.language.Localizable;
-import ch.o2it.weblounge.common.security.Authority;
-import ch.o2it.weblounge.common.security.Permission;
-import ch.o2it.weblounge.common.security.PermissionSet;
-import ch.o2it.weblounge.common.security.SecurityListener;
-import ch.o2it.weblounge.common.security.User;
+import ch.entwine.weblounge.common.content.page.Pagelet;
+import ch.entwine.weblounge.common.content.page.PageletURI;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.language.Localizable;
+import ch.entwine.weblounge.common.security.Authority;
+import ch.entwine.weblounge.common.security.Permission;
+import ch.entwine.weblounge.common.security.PermissionSet;
+import ch.entwine.weblounge.common.security.SecurityListener;
+import ch.entwine.weblounge.common.security.User;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Wrapper around a {@link ch.o2it.weblounge.common.content.page.Pagelet} that
+ * Wrapper around a {@link ch.entwine.weblounge.common.content.page.Pagelet} that
  * will replace pagelet contents and properties with their trimpath equivalents.
  */
 public class TrimpathPageletWrapper implements Pagelet {
@@ -131,7 +131,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#setOwner(ch.o2it.weblounge.common.security.User)
+   * @see ch.entwine.weblounge.common.security.Securable#setOwner(ch.entwine.weblounge.common.security.User)
    */
   public void setOwner(User owner) {
     pagelet.setOwner(owner);
@@ -140,7 +140,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Publishable#getPublisher()
+   * @see ch.entwine.weblounge.common.content.Publishable#getPublisher()
    */
   public User getPublisher() {
     return pagelet.getPublisher();
@@ -149,7 +149,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
+   * @see ch.entwine.weblounge.common.content.Creatable#setCreationDate(java.util.Date)
    */
   public void setCreationDate(Date date) {
     pagelet.setCreationDate(date);
@@ -158,7 +158,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#getOwner()
+   * @see ch.entwine.weblounge.common.security.Securable#getOwner()
    */
   public User getOwner() {
     return pagelet.getOwner();
@@ -167,7 +167,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Publishable#getPublishFrom()
+   * @see ch.entwine.weblounge.common.content.Publishable#getPublishFrom()
    */
   public Date getPublishFrom() {
     return pagelet.getPublishFrom();
@@ -176,8 +176,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#allow(ch.o2it.weblounge.common.security.Permission,
-   *      ch.o2it.weblounge.common.security.Authority)
+   * @see ch.entwine.weblounge.common.security.Securable#allow(ch.entwine.weblounge.common.security.Permission,
+   *      ch.entwine.weblounge.common.security.Authority)
    */
   public void allow(Permission permission, Authority authority) {
     pagelet.allow(permission, authority);
@@ -186,7 +186,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#setCreator(ch.o2it.weblounge.common.security.User)
+   * @see ch.entwine.weblounge.common.content.Creatable#setCreator(ch.entwine.weblounge.common.security.User)
    */
   public void setCreator(User user) {
     pagelet.setCreator(user);
@@ -195,7 +195,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#getCreationDate()
+   * @see ch.entwine.weblounge.common.content.Creatable#getCreationDate()
    */
   public Date getCreationDate() {
     return pagelet.getCreationDate();
@@ -204,7 +204,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
+   * @see ch.entwine.weblounge.common.content.LocalizedModifiable#getLastModificationDate()
    */
   public Date getLastModificationDate() {
     return pagelet.getLastModificationDate();
@@ -213,7 +213,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
+   * @see ch.entwine.weblounge.common.content.Creatable#isCreatedAfter(java.util.Date)
    */
   public boolean isCreatedAfter(Date date) {
     return pagelet.isCreatedAfter(date);
@@ -222,7 +222,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Publishable#getPublishTo()
+   * @see ch.entwine.weblounge.common.content.Publishable#getPublishTo()
    */
   public Date getPublishTo() {
     return pagelet.getPublishTo();
@@ -231,7 +231,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getLastModifier()
+   * @see ch.entwine.weblounge.common.content.LocalizedModifiable#getLastModifier()
    */
   public User getLastModifier() {
     return pagelet.getLastModifier();
@@ -240,8 +240,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#deny(ch.o2it.weblounge.common.security.Permission,
-   *      ch.o2it.weblounge.common.security.Authority)
+   * @see ch.entwine.weblounge.common.security.Securable#deny(ch.entwine.weblounge.common.security.Permission,
+   *      ch.entwine.weblounge.common.security.Authority)
    */
   public void deny(Permission permission, Authority authority) {
     pagelet.deny(permission, authority);
@@ -250,7 +250,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Publishable#isPublished()
+   * @see ch.entwine.weblounge.common.content.Publishable#isPublished()
    */
   public boolean isPublished() {
     return pagelet.isPublished();
@@ -259,7 +259,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Creatable#getCreator()
+   * @see ch.entwine.weblounge.common.content.Creatable#getCreator()
    */
   public User getCreator() {
     return pagelet.getCreator();
@@ -268,7 +268,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate(ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.LocalizedModifiable#getModificationDate(ch.entwine.weblounge.common.language.Language)
    */
   public Date getModificationDate(Language language) {
     return pagelet.getModificationDate(language);
@@ -277,7 +277,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getModule()
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getModule()
    */
   public String getModule() {
     return pagelet.getModule();
@@ -286,7 +286,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.Publishable#isPublished(java.util.Date)
+   * @see ch.entwine.weblounge.common.content.Publishable#isPublished(java.util.Date)
    */
   public boolean isPublished(Date date) {
     return pagelet.isPublished(date);
@@ -295,7 +295,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getIdentifier()
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getIdentifier()
    */
   public String getIdentifier() {
     return pagelet.getIdentifier();
@@ -304,8 +304,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.Permission,
-   *      ch.o2it.weblounge.common.security.Authority)
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.Permission,
+   *      ch.entwine.weblounge.common.security.Authority)
    */
   public boolean check(Permission permission, Authority authority) {
     return pagelet.check(permission, authority);
@@ -314,7 +314,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getPropertyNames()
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getPropertyNames()
    */
   public String[] getPropertyNames() {
     return pagelet.getPropertyNames();
@@ -323,7 +323,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier(ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.LocalizedModifiable#getModifier(ch.entwine.weblounge.common.language.Language)
    */
   public User getModifier(Language language) {
     return pagelet.getModifier(language);
@@ -332,7 +332,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setProperty(java.lang.String,
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setProperty(java.lang.String,
    *      java.lang.String)
    */
   public void setProperty(String key, String value) {
@@ -342,7 +342,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModificationDate()
+   * @see ch.entwine.weblounge.common.content.LocalizedModifiable#getModificationDate()
    */
   public Date getModificationDate() {
     return pagelet.getModificationDate();
@@ -351,7 +351,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.language.Localizable#supportsLanguage(ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.language.Localizable#supportsLanguage(ch.entwine.weblounge.common.language.Language)
    */
   public boolean supportsLanguage(Language language) {
     return pagelet.supportsLanguage(language);
@@ -360,8 +360,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#check(ch.o2it.weblounge.common.security.PermissionSet,
-   *      ch.o2it.weblounge.common.security.Authority)
+   * @see ch.entwine.weblounge.common.security.Securable#check(ch.entwine.weblounge.common.security.PermissionSet,
+   *      ch.entwine.weblounge.common.security.Authority)
    */
   public boolean check(PermissionSet permissions, Authority authority) {
     return pagelet.check(permissions, authority);
@@ -370,7 +370,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getProperty(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getProperty(java.lang.String)
    */
   public String getProperty(String key) {
     return replaceProperty(key);
@@ -379,7 +379,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#isMultiValueProperty(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#isMultiValueProperty(java.lang.String)
    */
   public boolean isMultiValueProperty(String key) {
     return pagelet.isMultiValueProperty(key);
@@ -388,7 +388,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.language.Localizable#languages()
+   * @see ch.entwine.weblounge.common.language.Localizable#languages()
    */
   public Set<Language> languages() {
     return pagelet.languages();
@@ -397,7 +397,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.LocalizedModifiable#getModifier()
+   * @see ch.entwine.weblounge.common.content.LocalizedModifiable#getModifier()
    */
   public User getModifier() {
     return pagelet.getModifier();
@@ -406,8 +406,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#checkOne(ch.o2it.weblounge.common.security.Permission,
-   *      ch.o2it.weblounge.common.security.Authority[])
+   * @see ch.entwine.weblounge.common.security.Securable#checkOne(ch.entwine.weblounge.common.security.Permission,
+   *      ch.entwine.weblounge.common.security.Authority[])
    */
   public boolean checkOne(Permission permission, Authority[] authorities) {
     return pagelet.checkOne(permission, authorities);
@@ -416,7 +416,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getMultiValueProperty(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getMultiValueProperty(java.lang.String)
    */
   public String[] getMultiValueProperty(String key) {
     return replaceMultivalueProperty(key);
@@ -425,7 +425,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.language.Localizable#switchTo(ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.language.Localizable#switchTo(ch.entwine.weblounge.common.language.Language)
    */
   public Language switchTo(Language language) {
     return pagelet.switchTo(language);
@@ -434,8 +434,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#checkAll(ch.o2it.weblounge.common.security.Permission,
-   *      ch.o2it.weblounge.common.security.Authority[])
+   * @see ch.entwine.weblounge.common.security.Securable#checkAll(ch.entwine.weblounge.common.security.Permission,
+   *      ch.entwine.weblounge.common.security.Authority[])
    */
   public boolean checkAll(Permission permission, Authority[] authorities) {
     return pagelet.checkAll(permission, authorities);
@@ -444,7 +444,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getContentNames(ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getContentNames(ch.entwine.weblounge.common.language.Language)
    */
   public String[] getContentNames(Language language) {
     return pagelet.getContentNames(language);
@@ -453,8 +453,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setContent(java.lang.String,
-   *      java.lang.String, ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setContent(java.lang.String,
+   *      java.lang.String, ch.entwine.weblounge.common.language.Language)
    */
   public void setContent(String name, String value, Language language) {
     pagelet.setContent(name, value, language);
@@ -463,7 +463,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#permissions()
+   * @see ch.entwine.weblounge.common.security.Securable#permissions()
    */
   public Permission[] permissions() {
     return pagelet.permissions();
@@ -472,8 +472,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.language.Localizable#compareTo(ch.o2it.weblounge.common.language.Localizable,
-   *      ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.language.Localizable#compareTo(ch.entwine.weblounge.common.language.Localizable,
+   *      ch.entwine.weblounge.common.language.Language)
    */
   public int compareTo(Localizable o, Language l) {
     return pagelet.compareTo(o, l);
@@ -482,7 +482,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#addSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)
+   * @see ch.entwine.weblounge.common.security.Securable#addSecurityListener(ch.entwine.weblounge.common.security.SecurityListener)
    */
   public void addSecurityListener(SecurityListener listener) {
     pagelet.addSecurityListener(listener);
@@ -491,7 +491,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.security.Securable#removeSecurityListener(ch.o2it.weblounge.common.security.SecurityListener)
+   * @see ch.entwine.weblounge.common.security.Securable#removeSecurityListener(ch.entwine.weblounge.common.security.SecurityListener)
    */
   public void removeSecurityListener(SecurityListener listener) {
     pagelet.removeSecurityListener(listener);
@@ -500,7 +500,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#isMultiValueContent(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#isMultiValueContent(java.lang.String)
    */
   public boolean isMultiValueContent(String name) {
     return pagelet.isMultiValueContent(name);
@@ -509,8 +509,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language, boolean)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String,
+   *      ch.entwine.weblounge.common.language.Language, boolean)
    */
   public String[] getMultiValueContent(String name, Language language,
       boolean force) {
@@ -520,8 +520,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String,
+   *      ch.entwine.weblounge.common.language.Language)
    */
   public String[] getMultiValueContent(String name, Language language) {
     return replaceMultivalueContent(name, language, false);
@@ -530,7 +530,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getMultiValueContent(java.lang.String)
    */
   public String[] getMultiValueContent(String name) {
     return replaceMultivalueContent(name, null, false);
@@ -539,7 +539,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.language.Localizable#toString(ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.language.Localizable#toString(ch.entwine.weblounge.common.language.Language)
    */
   public String toString(Language language) {
     return pagelet.toString(language);
@@ -548,8 +548,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getContent(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getContent(java.lang.String,
+   *      ch.entwine.weblounge.common.language.Language)
    */
   public String getContent(String name, Language language) {
     return replaceContent(name, language, false);
@@ -558,7 +558,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.language.Localizable#toString(ch.o2it.weblounge.common.language.Language,
+   * @see ch.entwine.weblounge.common.language.Localizable#toString(ch.entwine.weblounge.common.language.Language,
    *      boolean)
    */
   public String toString(Language language, boolean force) {
@@ -568,8 +568,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getContent(java.lang.String,
-   *      ch.o2it.weblounge.common.language.Language, boolean)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getContent(java.lang.String,
+   *      ch.entwine.weblounge.common.language.Language, boolean)
    */
   public String getContent(String name, Language language, boolean force) {
     return replaceContent(name, language, force);
@@ -578,7 +578,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getContent(java.lang.String)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getContent(java.lang.String)
    */
   public String getContent(String name) {
     return replaceContent(name, null, false);
@@ -587,7 +587,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setURI(ch.o2it.weblounge.common.content.page.PageletURI)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setURI(ch.entwine.weblounge.common.content.page.PageletURI)
    */
   public void setURI(PageletURI uri) {
     pagelet.setURI(uri);
@@ -596,7 +596,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#getURI()
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#getURI()
    */
   public PageletURI getURI() {
     return pagelet.getURI();
@@ -605,7 +605,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setCreated(ch.o2it.weblounge.common.security.User,
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setCreated(ch.entwine.weblounge.common.security.User,
    *      java.util.Date)
    */
   public void setCreated(User creator, Date creationDate) {
@@ -615,8 +615,8 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setModified(ch.o2it.weblounge.common.security.User,
-   *      java.util.Date, ch.o2it.weblounge.common.language.Language)
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setModified(ch.entwine.weblounge.common.security.User,
+   *      java.util.Date, ch.entwine.weblounge.common.language.Language)
    */
   public void setModified(User user, Date date, Language language) {
     pagelet.setModified(user, date, language);
@@ -625,7 +625,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#setPublished(ch.o2it.weblounge.common.security.User,
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#setPublished(ch.entwine.weblounge.common.security.User,
    *      java.util.Date, java.util.Date)
    */
   public void setPublished(User publisher, Date from, Date to) {
@@ -635,7 +635,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.common.content.page.Pagelet#toXml()
+   * @see ch.entwine.weblounge.common.content.page.Pagelet#toXml()
    */
   public String toXml() {
     return pagelet.toXml();

@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2011 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -18,50 +18,48 @@
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-package ch.o2it.weblounge.workbench.suggest;
+package ch.entwine.weblounge.workbench.suggest;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * A user suggestion includes everything that is needed to display a suggested
- * list of users based on some input text.
+ * A subject suggestion includes everything that is needed to display a suggested
+ * list of subjects based on some input text.
  */
-public class UserSuggestion extends SuggestionBase {
+public class SubjectSuggestion extends SuggestionBase {
 
-  /** The user id */
-  protected String id = null;
+  /** The number of occurrences */
+  protected int count = 0;
 
-  /** The user's full name */
+  /** The subject name */
   protected String name = null;
 
   /**
-   * Creates a new suggestion containing a user's details.
+   * Creates a new suggestion containing a subject's details.
    * 
-   * @param id
-   *          the user identifier
+   * @param count
+   *          the subject count
    * @param name
-   *          the user's full name
+   *          the subject name
    */
-  public UserSuggestion(String id, String name) {
-    if (StringUtils.isBlank(id))
-      throw new IllegalArgumentException("Id must not be null");
+  public SubjectSuggestion(int count, String name) {
     if (StringUtils.isBlank(name))
       throw new IllegalArgumentException("Name must not be null");
-    this.id = id;
+    this.count = count;
     this.name = name;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.o2it.weblounge.workbench.suggest.Suggestion#toXml(java.lang.String,
+   * @see ch.entwine.weblounge.workbench.suggest.Suggestion#toXml(java.lang.String,
    *      java.lang.String)
    */
   public String toXml(String hint, String highlightTag) {
     StringBuffer xml = new StringBuffer();
-    xml.append("<user id=\"").append(id).append("\">");
+    xml.append("<subject count=\"").append(count).append("\">");
     xml.append("<name><[CDATA[").append(name).append("]]></name>");
-    xml.append("</user>");
+    xml.append("</subject>");
     return xml.toString();
   }
 
