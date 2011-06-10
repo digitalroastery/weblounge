@@ -1,7 +1,7 @@
 /*
  *  Weblounge: Web Content Management System
- *  Copyright (c) 2010 The Weblounge Team
- *  http://weblounge.o2it.ch
+ *  Copyright (c) 2003 - 2011 The Weblounge Team
+ *  http://entwinemedia.com/weblounge
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
@@ -20,8 +20,8 @@
 
 package ${groupId};
 
-import ch.o2it.weblounge.common.impl.site.SiteImpl;
-import ch.o2it.weblounge.common.site.SiteException;
+import ch.entwine.weblounge.common.impl.site.SiteImpl;
+import ch.entwine.weblounge.common.site.SiteException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

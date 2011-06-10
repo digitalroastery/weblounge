@@ -5,7 +5,7 @@
   immediate="true"
   name="${artifactId}">
 
-  <implementation class="ch.o2it.weblounge.common.impl.site.SiteActivator" />
+  <implementation class="ch.entwine.weblounge.common.impl.site.SiteActivator" />
   <property name="service.description" value="${artifactId}" />
 
 </scr:component>

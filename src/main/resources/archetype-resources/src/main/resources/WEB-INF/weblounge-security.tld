@@ -14,7 +14,7 @@
     <!-- FINNISH IMPLEMENTATION
  	<tag>
 		<name>ifpermission</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfPermissionTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.security.IfPermissionTag</tag-class>
 		<body-content>JSP</body-content>
 		<display-name>WebLounge Permission Check Tag</display-name>
 		<description>Checks if the current user meets the permission requirements</description>
@@ -39,7 +39,7 @@
     <!-- FINNISH IMPLEMENTATION
  	<tag>
 		<name>ifnotpermission</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfNotPermissionTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.security.IfNotPermissionTag</tag-class>
 		<body-content>JSP</body-content>
 		<display-name>WebLounge Permission Check Tag</display-name>
 		<description>Checks if the current user meets the permission requirements</description>
@@ -64,7 +64,7 @@
     <!-- FINNISH IMPLEMENTATION
 	<tag>
 		<name>ifrole</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfRoleTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.security.IfRoleTag</tag-class>
 		<body-content>JSP</body-content>
 		<display-name>WebLounge Role Check Tag</display-name>
 		<description>Checks if the current user meets the role requirements</description>
@@ -99,7 +99,7 @@
     <!-- FINNISH IMPLEMENTATION
 	<tag>
 		<name>ifnotrole</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfNotRoleTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.security.IfNotRoleTag</tag-class>
 		<body-content>JSP</body-content>
 		<display-name>WebLounge Role Check Tag</display-name>
 		<description>Checks if the current user failes to meet the role requirements</description>
@@ -133,7 +133,7 @@
   
 	<tag>
 		<name>ifauthenticated</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfAuthenticatedTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.security.IfAuthenticatedTag</tag-class>
 		<body-content>JSP</body-content>
 		<display-name>Weblounge Authentication Check</display-name>
 		<description>Checks if the current user is logged in</description>
@@ -141,7 +141,7 @@
 	
 	<tag>
 		<name>ifnotauthenticated</name>
-		<tag-class>ch.o2it.weblounge.taglib.security.IfNotAuthenticatedTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.security.IfNotAuthenticatedTag</tag-class>
 		<body-content>JSP</body-content>
 		<display-name>Weblounge Authentication Check</display-name>
 		<description>Checks if the current user is not logged in</description>

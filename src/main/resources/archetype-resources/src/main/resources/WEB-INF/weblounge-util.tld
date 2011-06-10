@@ -13,7 +13,7 @@
   
 	<tag>
 		<name>countryselection</name>
-		<tag-class>ch.o2it.weblounge.taglib.util.CountryListTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.util.CountryListTag</tag-class>
 		<body-content>empty</body-content>
 		<display-name>Weblounge Country Tag</display-name>
 		<description>Lists all countries</description>
@@ -48,7 +48,7 @@
 	
 		<tag>
 		<name>monthselection</name>
-		<tag-class>ch.o2it.weblounge.taglib.util.MonthListTag</tag-class>
+		<tag-class>ch.entwine.weblounge.taglib.util.MonthListTag</tag-class>
 		<body-content>empty</body-content>
 		<display-name>Weblounge Month Tag</display-name>
 		<description>Lists all months</description>

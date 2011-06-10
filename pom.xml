@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ch.o2it.weblounge</groupId>
+  <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-site</artifactId>
   <version>3.0.0-SNAPSHOT</version>
   <name>Weblounge Site Archetype</name>
@@ -33,13 +33,13 @@
   </repositories>
   <distributionManagement>
     <snapshotRepository>
-      <id>o2it.snapshots</id>
+      <id>entwine.snapshots</id>
       <name>O2 IT Snapshot Repository</name>
       <url>http://maven.o2it.ch/content/repositories/snapshots</url>
       <uniqueVersion>false</uniqueVersion>
     </snapshotRepository>
     <repository>
-      <id>o2it.releases</id>
+      <id>entwine.releases</id>
       <name>O2 IT Releases Repository</name>
       <url>http://maven.o2it.ch/content/repositories/releases</url>
     </repository>
