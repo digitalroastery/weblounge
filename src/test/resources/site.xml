@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<site id="dev" xmlns="http://www.o2it.ch/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/site http://www.o2it.ch/xsd/weblounge/3.0/site.xsd">
+<site id="dev" xmlns="http://www.entwinemedia.com/weblounge/3.0/site" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/site http://www.entwinemedia.com/xsd/weblounge/3.0/site.xsd">
   <autostart>true</autostart>
   <name>Main site</name>
   <languages>
@@ -20,7 +20,7 @@
     </administrator>
     <authentication>
     	<loginmodule>
-			  <class>ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule</class>
+			  <class>ch.entwine.weblounge.common.impl.security.jaas.AdminLoginModule</class>
 			  <relevance>sufficient</relevance>
     	</loginmodule>
     </authentication>

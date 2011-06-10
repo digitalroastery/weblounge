@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://www.o2it.ch/weblounge/3.0/site"
-  xmlns="http://www.o2it.ch/weblounge/3.0/site"
+  targetNamespace="http://www.entwinemedia.com/weblounge/3.0/site"
+  xmlns="http://www.entwinemedia.com/weblounge/3.0/site"
   elementFormDefault="qualified">
 
   <xsd:element name="site">

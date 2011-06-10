@@ -21,7 +21,7 @@
 	</security>
 	<properties>
 		<property>
-			<name>ch.o2it.weblounge.lastpage</name>
+			<name>ch.entwine.weblounge.lastpage</name>
 			<value>/test</value>
 		</property>
 	</properties>

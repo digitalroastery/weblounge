@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <action id="myaction">
   <name>Test</name>
-  <class>ch.o2it.weblounge.common.site.TestAction</class>
+  <class>ch.entwine.weblounge.common.site.TestAction</class>
   <mountpoint>/test/</mountpoint>
   <recheck>0</recheck>
   <valid>1M</valid>

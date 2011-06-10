@@ -1,5 +1,5 @@
 <loginmodule>
-  <class>ch.o2it.weblounge.common.impl.security.jaas.AdminLoginModule</class>
+  <class>ch.entwine.weblounge.common.impl.security.jaas.AdminLoginModule</class>
   <relevance>sufficient</relevance>
   <options>
     <option>
