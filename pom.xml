@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ch.o2it.weblounge</groupId>
+  <groupId>ch.entwine.weblounge</groupId>
   <artifactId>weblounge-base</artifactId>
   <packaging>pom</packaging>
   <version>3.0.0-SNAPSHOT</version>
   <name>Weblounge</name>
   <description>Weblounge is a multilingual web content management system</description>
-  <url>http://www.o2it.ch/weblounge</url>
+  <url>http://www.entwinemedia.com/weblounge</url>
   <inceptionYear>2009</inceptionYear>
 
   <prerequisites>
@@ -25,17 +25,17 @@
   </properties>
 
   <organization>
-    <name>O2 IT Engineering</name>
-    <url>http://www.o2it.ch</url>
+    <name>Entwine</name>
+    <url>http://www.entwinemedia.com</url>
   </organization>
   
   <developers>
     <developer>
       <id>tobias.wunden</id>
       <name>Tobias Wunden</name>
-      <email>tobias.wunden@o2it.ch</email>
-      <organization>O2 IT Engineering</organization>
-      <organizationUrl>http://www.o2it.ch</organizationUrl>
+      <email>tobias.wunden@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://www.entwinemedia.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -46,24 +46,24 @@
   <mailingLists>
     <mailingList>
       <name>Weblounge Announcements</name>
-      <subscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-announce</subscribe>
-      <unsubscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-announce</unsubscribe>
-      <post>weblounge-announce@o2it.ch</post>
-      <archive>http://lists.o2it.ch/pipermail/weblounge-announce</archive>
+      <subscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-announce</subscribe>
+      <unsubscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-announce</unsubscribe>
+      <post>weblounge-announce@entwinemedia.com</post>
+      <archive>http://lists.entwinemedia.com/pipermail/weblounge-announce</archive>
     </mailingList>
     <mailingList>
       <name>Weblounge Development</name>
-      <subscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-dev</subscribe>
-      <unsubscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-dev</unsubscribe>
-      <post>weblounge-dev@o2it.ch</post>
-      <archive>http://lists.o2it.ch/pipermail/weblounge-dev</archive>
+      <subscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-dev</subscribe>
+      <unsubscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-dev</unsubscribe>
+      <post>weblounge-dev@entwinemedia.com</post>
+      <archive>http://lists.entwinemedia.com/pipermail/weblounge-dev</archive>
     </mailingList>
     <mailingList>
       <name>Weblounge Talk</name>
-      <subscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-talk</subscribe>
-      <unsubscribe>http://lists.o2it.ch/mailman/listinfo/weblounge-talk</unsubscribe>
-      <post>weblounge-talk@o2it.ch</post>
-      <archive>http://lists.o2it.ch/pipermail/weblounge-talk</archive>
+      <subscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-talk</subscribe>
+      <unsubscribe>http://lists.entwinemedia.com/mailman/listinfo/weblounge-talk</unsubscribe>
+      <post>weblounge-talk@entwinemedia.com</post>
+      <archive>http://lists.entwinemedia.com/pipermail/weblounge-talk</archive>
     </mailingList>
   </mailingLists>
 
@@ -334,9 +334,9 @@
           <extensions>true</extensions>
           <configuration>
             <instructions>
-              <Bundle-Category>ch.o2it</Bundle-Category>
+              <Bundle-Category>ch.entwine</Bundle-Category>
               <Bundle-DocURL>http://digitalcafe.lighthouseapp.com/projects/35461/welcome</Bundle-DocURL>
-              <Bundle-Vendor>O2 IT Engineering</Bundle-Vendor>
+              <Bundle-Vendor>Entwine</Bundle-Vendor>
               <Bundle-Name>${project.name}</Bundle-Name>
               <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             </instructions>
@@ -752,14 +752,14 @@
 
     <snapshotRepository>
       <id>o2it.snapshots</id>
-      <name>O2 IT Snapshot Repository</name>
+      <name>Entwine Snapshot Repository</name>
       <url>http://maven.o2it.ch/content/repositories/snapshots</url>
       <uniqueVersion>false</uniqueVersion>
     </snapshotRepository>
 
     <repository>
       <id>o2it.releases</id>
-      <name>O2 IT Releases Repository</name>
+      <name>Entwine Releases Repository</name>
       <url>http://maven.o2it.ch/content/repositories/releases</url>
     </repository>
 
