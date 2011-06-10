@@ -1,7 +1,7 @@
 /*
  * PageImporterCallback.java
  *
- * Copyright 2007 by O2 IT Engineering
+ * Copyright 2007 by Entwine
  * Zurich, Switzerland (CH)
  * All rights reserved.
  *
@@ -11,12 +11,11 @@
  * agreement you entered into.
  */
 
-package ch.o2it.weblounge.tools.importer;
+package ch.entwine.weblounge.tools.importer;
 
-import ch.o2it.weblounge.common.impl.url.PathUtils;
-import ch.o2it.weblounge.common.impl.util.xml.XPathHelper;
+import ch.entwine.weblounge.common.impl.url.PathUtils;
+import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 
-import org.apache.commons.io.FilenameUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -58,7 +57,7 @@ public class PageImporterCallback extends AbstractImporterCallback {
   /**
    * This method is called if a page file has been found.
    * 
-   * @see ch.o2it.weblounge.tools.importer.AbstractImporterCallback#fileImported(java.io.File)
+   * @see ch.entwine.weblounge.tools.importer.AbstractImporterCallback#fileImported(java.io.File)
    */
   public boolean fileImported(File f) {
     try {

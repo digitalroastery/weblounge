@@ -1,7 +1,7 @@
 /**
  * CommandLineParserTest.java
  *
- * Copyright 2005 by O2 IT Engineering
+ * Copyright 2005 by Entwine
  * Zurich,  Switzerland (CH)
  * All rights reserved.
  * 
@@ -11,7 +11,9 @@
  * into.
  */
 
-package ch.o2it.weblounge.tools.util;
+package ch.entwine.weblounge.tools.util;
+
+import ch.entwine.weblounge.tools.util.CommandLineParser;
 
 import junit.framework.TestCase;
 

@@ -1,7 +1,7 @@
 /*
  * PageImporterCallback.java
  *
- * Copyright 2007 by O2 IT Engineering
+ * Copyright 2007 by Entwine
  * Zurich, Switzerland (CH)
  * All rights reserved.
  *
@@ -11,7 +11,7 @@
  * agreement you entered into.
  */
 
-package ch.o2it.weblounge.tools.importer;
+package ch.entwine.weblounge.tools.importer;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class ModuleImporterCallback extends AbstractImporterCallback {
   /**
    * This method is called if a module file has been found.
    * 
-   * @see ch.o2it.weblounge.tools.importer.AbstractImporterCallback#fileImported(java.io.File)
+   * @see ch.entwine.weblounge.tools.importer.AbstractImporterCallback#fileImported(java.io.File)
    */
   public boolean fileImported(File f) {
     try {

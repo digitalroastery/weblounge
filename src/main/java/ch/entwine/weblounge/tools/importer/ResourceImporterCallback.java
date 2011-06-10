@@ -1,7 +1,7 @@
 /*
 y * PageImporterCallback.java
  *
- * Copyright 2007 by O2 IT Engineering
+ * Copyright 2007 by Entwine
  * Zurich, Switzerland (CH)
  * All rights reserved.
  *
@@ -11,9 +11,7 @@ y * PageImporterCallback.java
  * agreement you entered into.
  */
 
-package ch.o2it.weblounge.tools.importer;
-
-import net.sf.saxon.TransformerFactoryImpl;
+package ch.entwine.weblounge.tools.importer;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.sanselan.ImageInfo;
@@ -50,7 +48,7 @@ public class ResourceImporterCallback extends AbstractImporterCallback {
   /**
    * This method is called if a resource file has been found.
    * 
-   * @see ch.o2it.weblounge.tools.importer.AbstractImporterCallback#fileImported(java.io.File)
+   * @see ch.entwine.weblounge.tools.importer.AbstractImporterCallback#fileImported(java.io.File)
    */
   public boolean fileImported(File f) {
     // load collection information

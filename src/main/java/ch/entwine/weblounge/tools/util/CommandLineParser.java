@@ -1,7 +1,7 @@
 /**
  * CommandLineParser.java
  *
- * Copyright 2005 by O2 IT Engineering
+ * Copyright 2005 by Entwine
  * Zurich,  Switzerland (CH)
  * All rights reserved.
  * 
@@ -11,7 +11,7 @@
  * into.
  */
 
-package ch.o2it.weblounge.tools.util;
+package ch.entwine.weblounge.tools.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;

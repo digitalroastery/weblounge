@@ -1,4 +1,4 @@
-package ch.o2it.weblounge.tools.importer;
+package ch.entwine.weblounge.tools.importer;
 
 import org.apache.commons.lang.StringUtils;
 

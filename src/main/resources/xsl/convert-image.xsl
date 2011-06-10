@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="2.0" xmlns="http://www.o2it.ch/weblounge/3.0/image" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns="http://www.entwinemedia.com/weblounge/3.0/image" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output method="xml" omit-xml-declaration="no" indent="yes" encoding="utf-8" standalone="yes" cdata-section-elements="title description subject type coverage rights text property filename" />
 
   <xsl:param name="fileid" />
@@ -17,7 +17,7 @@
   <xsl:variable name="entry" select="/collection/entry[@id=$fileid][1]" />
 
   <xsl:template match="/">
-    <image xmlns="http://www.o2it.ch/weblounge/3.0/image" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/image http://www.o2it.ch/xsd/weblounge/3.0/image.xsd">
+    <image xmlns="http://www.entwinemedia.com/weblounge/3.0/image" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/image http://www.entwinemedia.com/xsd/weblounge/3.0/image.xsd">
       <xsl:attribute name="id">
         <xsl:value-of select="$uuid" />
       </xsl:attribute>

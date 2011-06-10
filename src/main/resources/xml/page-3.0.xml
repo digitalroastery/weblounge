@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.o2it.ch/weblounge/3.0/page" xsi:schemaLocation="http://www.o2it.ch/weblounge/3.0/page http://www.o2it.ch/xsd/weblounge/3.0/page.xsd" id="3bec8ae8-d994-4e42-88da-560f0dc08d6f" path="/schiedsrichter/news/8310" version="live">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.entwinemedia.com/weblounge/3.0/page" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/page http://www.entwinemedia.com/xsd/weblounge/3.0/page.xsd" id="3bec8ae8-d994-4e42-88da-560f0dc08d6f" path="/schiedsrichter/news/8310" version="live">
   <head>
     <template>default</template>
     <layout>default</layout>

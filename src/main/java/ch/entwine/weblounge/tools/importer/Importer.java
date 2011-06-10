@@ -1,7 +1,7 @@
 /**
  * Importer.java
  *
- * Copyright 2005 by O2 IT Engineering
+ * Copyright 2005 by Entwine
  * Zurich,  Switzerland (CH)
  * All rights reserved.
  * 
@@ -11,9 +11,9 @@
  * into.
  */
 
-package ch.o2it.weblounge.tools.importer;
+package ch.entwine.weblounge.tools.importer;
 
-import ch.o2it.weblounge.tools.util.CommandLineParser;
+import ch.entwine.weblounge.tools.util.CommandLineParser;
 
 import java.io.File;
 import java.util.ArrayList;

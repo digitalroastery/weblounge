@@ -1,7 +1,7 @@
 /*
  * ImporterCallback.java
  *
- * Copyright 2007 by O2 IT Engineering
+ * Copyright 2007 by Entwine
  * Zurich, Switzerland (CH)
  * All rights reserved.
  *
@@ -11,7 +11,7 @@
  * agreement you entered into.
  */
 
-package ch.o2it.weblounge.tools.importer;
+package ch.entwine.weblounge.tools.importer;
 
 import java.io.File;
 
