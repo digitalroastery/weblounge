@@ -6,7 +6,7 @@ steal.plugins('jquery/model').resources('../../resources/Jsonix-all-1.1-SNAPSHOT
 		context: function() {
 			return new Jsonix.Context(
 				// Array of mapping modules
-				[ PageMappings],
+				[PageMappings],
 				// Optional properties
 				{}
 			);

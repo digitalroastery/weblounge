@@ -1,7 +1,10 @@
 steal.plugins(
 'jquery/view/tmpl', 
 'editor/app')
-.css('editor')
+.css(
+'style',
+'token-input-facebook.css',
+'token-input')
 .then(function($) {
 
   $(document).ready(function() {
@@ -10,7 +13,7 @@ steal.plugins(
     $(document.body).append('//editor/views/app', {});
 
     // Start the Weblounge Editor App
-    $('#weblounge-editor').editor_app();
+    $('#container').editor_app();
 
   });
 

@@ -12,6 +12,10 @@ PageMappings.User = new Jsonix.Model.ClassInfo({
   name: 'PageMappings.User'
 });
 
+PageMappings.LanguageValue = new Jsonix.Model.ClassInfo({
+  name: 'PageMappings.LanguageValue'
+});
+
 PageMappings.CreatedModified = new Jsonix.Model.ClassInfo({
   name: 'PageMappings.CreatedModified'
 });
@@ -26,6 +30,10 @@ PageMappings.Security = new Jsonix.Model.ClassInfo({
 
 PageMappings.Security.Owner = new Jsonix.Model.ClassInfo({
   name: 'PageMappings.Security.Owner'
+});
+
+PageMappings.Locked = new Jsonix.Model.ClassInfo({
+	name: 'PageMappings.Locked'
 });
 
 PageMappings.Head = new Jsonix.Model.ClassInfo({
@@ -68,6 +76,14 @@ PageMappings.User.properties = [new Jsonix.Model.AttributePropertyInfo({
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 })];
 
+PageMappings.LanguageValue.properties = [new Jsonix.Model.AttributePropertyInfo({
+  name: "language",
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ValuePropertyInfo({
+  name: 'value',
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+})];
+
 // <created|modified><user .../><date.../></created|modified>
 PageMappings.CreatedModified.properties = [new Jsonix.Model.ElementPropertyInfo({
   name: 'user',
@@ -97,6 +113,11 @@ PageMappings.Security.Owner.properties = [new Jsonix.Model.ElementPropertyInfo({
 	name: 'user',
 	typeInfo: PageMappings.User
 })];
+
+PageMappings.Locked.properties = [new Jsonix.Model.ElementPropertyInfo({
+	name: 'user',
+	typeInfo: PageMappings.User
+})]
 
 PageMappings.PagesCollection.properties = [new Jsonix.Model.ElementPropertyInfo({
 	name: 'page',
@@ -149,22 +170,33 @@ PageMappings.Head.properties = [new Jsonix.Model.ElementPropertyInfo({
 }), new Jsonix.Model.ElementPropertyInfo({
 	name: 'security',
 	typeInfo: PageMappings.Security
+}), new Jsonix.Model.ElementPropertyInfo({
+	name: 'locked',
+	typeInfo: PageMappings.Locked
 })];
 
-PageMappings.Head.Metadata.properties = [new Jsonix.Model.ElementMapPropertyInfo({
+PageMappings.Head.Metadata.properties = [new Jsonix.Model.ElementPropertyInfo({
   name: "title",
-  key: new Jsonix.Model.AttributePropertyInfo({
-    name: "language",
-    typeInfo: Jsonix.Schema.XSD.String.INSTANCE
-  }),
-  value: new Jsonix.Model.ValuePropertyInfo({
-    name: "value",
-    typeInfo: Jsonix.Schema.XSD.String.INSTANCE
-  })
+  collection: true,
+  typeInfo: PageMappings.LanguageValue
 }), new Jsonix.Model.ElementPropertyInfo({
-	name: 'subject',
-	collection: true,
+  name: 'subject',
+  collection: true,
+  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: "description",
+  collection: true,
+  typeInfo: PageMappings.LanguageValue
+}), new Jsonix.Model.ElementPropertyInfo({
+	name: 'type',
 	typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: "coverage",
+  collection: true,
+  typeInfo: PageMappings.LanguageValue
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: "rights",
+  typeInfo: PageMappings.LanguageValue
 })];
 
 // <body>...</body>

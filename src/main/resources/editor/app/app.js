@@ -1,4 +1,4 @@
-steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser').models('../../models/page').then(function($) {
+steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser').then(function($) {
 		
 	$.Controller('Editor.App',
 	/* @prototype */
@@ -6,14 +6,11 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser').m
 		
 		init: function(el) {
 			
-			this.mode = 1;
+//			this.mode = 1;
  
-			this.find('#menubar').editor_menubar();
-			Page.findAll({}, function(pages) {
-				$('#pagebrowser').editor_resourcebrowser({resources: pages});
-			});
-			
-            
+			this.find('header:first').editor_menubar();
+			//this.find('#designer').editor_resourcebrowser({resources: pages});		
+			//this.find('#mediabrowser').editor_resourcebrowser({resources: pages});            
         }
 		
 	});

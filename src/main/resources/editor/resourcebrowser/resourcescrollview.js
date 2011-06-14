@@ -5,10 +5,8 @@ steal.plugins('jquery/view/tmpl','jqueryui/widget')
 .then('resourceview', 'resourcescrollviewitem')
 .then(function($) {
 
-  Editor.Resourceview.extend('Editor.Resourcescrollview', 
-{},
-	{
-		
+	Editor.Resourceview.extend('Editor.Resourcescrollview', 
+	{		
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/resourcescrollview.tmpl', {});
 			this._initViewItems();
@@ -29,8 +27,19 @@ steal.plugins('jquery/view/tmpl','jqueryui/widget')
 			});
 			
 			$('div.scrollviewitem').editor_resourcescrollviewitem();
-		}
+		},
 		
+		"button.duplicate click": function(el, ev) {
+			steal.dev.log('duplicate')
+		},
+		
+		"button.delete click": function(el, ev) {
+			steal.dev.log('delete')
+		},
+		
+		"button.favorize click": function(el, ev) {
+			steal.dev.log('favorize')
+		}
 	});
 
 });
