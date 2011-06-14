@@ -15,7 +15,13 @@ steal.plugins(
     {
 		defaults: {
 			tabElement: null
-		}
+		},
+		
+        showPage: function(pageId) {
+			var tab = $('#designer');
+			this._toggleTab(tab)
+//			tab.editor_designerbrowser();
+        },
     },
     /* @prototype */
     {

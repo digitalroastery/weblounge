@@ -1,9 +1,9 @@
-<div class="scrollviewitem page_${page.id}">
-	<img src="images/toolbar_close.png" class="close" />
+<div class="scrollviewitem" id="${page.id}">
+	<img src="resourcebrowser/images/toolbar_close.png" class="close" />
 	<div class="overlay_icons">
-		<img src="images/icon_write.png" title="Edit page properties" class="properties" />
-		<img src="images/icon_more.png" class="more" />
-		<img src="images/icon_trash.png" title="Delete page" class="delete" />
+		<img src="resourcebrowser/images/icon_write.png" title="Edit page properties" class="properties" />
+		<img src="resourcebrowser/images/icon_more.png" class="more" />
+		<img src="resourcebrowser/images/icon_trash.png" title="Delete page" class="delete" />
 	</div>
 	<div class="page_more_menu menu">
 		<span class="triangle-up"></span>
@@ -13,7 +13,7 @@
 				<li>...</li>
 			</ul>			
 			</div>
-				<img src="images/page_thumbnail.png" alt="" class="page_thumbnail" />
+				<img src="resourcebrowser/images/page_thumbnail.png" alt="" class="page_thumbnail" />
 				<div class="pageData">
 				<ul>
 					<li><a href="#properties">Properties</a></li>
@@ -30,7 +30,7 @@
 					<p><label for="end">End:</label><input type="text" name="end" value="${page.head.published.from}" class="datepicker"/></p>
 				</div>
 				<div id="access">
-					<p><img src="images/icon_read.png" alt="read page" /> <img src="images/icon_write.png" alt="edit page"><br />
+					<p><img src="resourcebrowser/images/icon_read.png" alt="read page" /> <img src="resourcebrowser/images/icon_write.png" alt="edit page"><br />
 					<p><input type="checkbox" id="logged_read" /> <input type="checkbox" id="logged_write" /> Besucher<br />
 					<input type="checkbox" id="logged_read" /> <input type="checkbox" id="logged_write" /> Eingeloggte User<br />
 					<input type="checkbox" id="logged_read" /> <input type="checkbox" id="logged_write" /> Administratoren<br />

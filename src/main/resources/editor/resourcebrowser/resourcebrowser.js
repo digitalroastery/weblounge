@@ -11,23 +11,29 @@ steal.plugins(
 	{
 		defaults: {
 			resources: {},
-			resourceType: 'pages'
+			resourceType: 'pages',
+			activeElement: null
 		}
 	},
 	{
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/init.tmpl', {});
+			this.options.activeElement = this.find('div.thumbnailView');
 			this._loadResources();					
 		},
 		
 		_showResourceScrollView: function(pages) {
 			this.options.resources = pages;
-			this.find('#resourceview').editor_resourcescrollview({resources: pages});
+			var element = this.find('div.listView');
+			this._toggleElement(element)
+			element.editor_resourcescrollview({resources: pages});
 		},
 		
 		_showResourceListView: function(pages) {
 			this.options.resources = pages;
-			this.find('#resourceview').editor_resourcelistview({resources: pages});
+			var element = this.find('div.thumbnailView');
+			this._toggleElement(element)
+			element.editor_resourcelistview({resources: pages});
 		},
 		
 		_loadResources: function() {
@@ -37,6 +43,12 @@ steal.plugins(
 				steal.dev.log('load Media');
 			}
 		},
+		
+		_toggleElement: function(el) {
+        	this.options.activeElement.hide();
+        	this.options.activeElement = el;
+        	el.show();
+        },
 		
 		"button.recent click": function(el, ev) {
 			steal.dev.log('recent')

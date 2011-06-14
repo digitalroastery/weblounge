@@ -1,0 +1,8 @@
+div.pagelet-editor {
+	display: none;
+}
+
+div.pagelet:hover {
+	background-color: #ccc;
+	opacity: 0.5;
+}

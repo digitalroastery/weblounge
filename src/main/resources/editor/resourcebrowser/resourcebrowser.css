@@ -1,7 +1,257 @@
+nav.weblounge {
+	position: relative;
+	top: 46px;
+	height: 30px;
+	line-height: 30px;
+	text-align: left;
+	padding: 10px 5px;
+}
+
+nav.weblounge div.center {
+	width: 150px;
+	margin-left: 50%;
+	position: relative;
+	left: -75px;
+}
+
+nav {
+	padding: 10px 0;
+}
+
+nav.weblounge ul,
+nav.weblounge ul li {
+	list-style: none;
+	float: left;
+}
+
+.align_left {
+	float: left;
+}
+
+.align_center {
+	margin: 0 auto;
+	text-align: center;
+}
+
+.align_right {
+	float: right;
+}
+
+
+nav.weblounge ul {
+	margin-left: 300px;
+}
+
+#mainContainer {
+	position: relative;
+	top: 50px;
+	text-align: left;
+}
+
 .scrollviewitem {
     float: left;
     height: 350px;
     margin: 0 10px;
     position: relative;
     width: 400px;
+}
+
+/* Eigene Icons */
+.icon-list {background: url('images/icon_list.png') no-repeat top left !important}
+.icon-tree {background: url('images/icon_tree.png') no-repeat top left !important}
+.icon-thumbnails {background: url('images/icon_thumbnails.png') no-repeat top left !important}
+
+/* Page Browser */
+
+#container div.scrollingHotSpotLeft,
+#container div.scrollingHotSpotRight {
+	height: 261px;
+	background-color: #000;
+}
+
+div.listview {
+	width: 80%;
+	margin: 50px auto;
+	padding:  5px;
+}
+div.listview table {
+	width: 100%;
+	text-align: left !important;
+	background-color: #fff;
+}
+
+div.treeview,
+div.listview {
+	display: none;
+}
+
+div.listview input[type="checkbox"] {
+	margin-right: 10px;
+}
+
+.thumbnailview {
+	overflow: hidden;
+}
+
+.message {
+	margin: 20px auto;
+	padding: 5px;
+	text-align: center;
+	width: 400px;
+	border: 1px solid transparent;
+	background-color: transparent;
+	height: 16px;
+	color: #fff;
+	visibility: hidden;
+}
+.message.success {
+	border-color: #006600;
+	background-color: #669900;
+	color: #fff;
+}
+.message.error {
+	border-color: #990000;
+	background-color: #FF6600;
+	color: #fff;
+}
+
+tr.bg td {
+	background-color: #efefef;
+}
+
+.action {
+	width: 50px;
+}
+
+button.lock {
+	position: relative;
+	top: 50px;
+	left: 20px;
+}
+
+.page {
+	position: relative;
+	width: 400px;
+	height: 350px;
+	float: left;
+	margin: 0 10px;
+}
+
+img.page_thumbnail {
+}
+
+.page.marked img {
+	opacity: 0.3;
+}
+
+.page.marked * {
+	color: #ccc !important;
+}
+
+.pageData {
+	display: none;
+	height: 263px;
+	width: 100%;
+}
+
+.pageData label,
+#editor label {
+	float: left;
+	display: block;
+	width: 70px;
+}
+
+.pageData input[type="text"],
+.pageData ul.token-input-list-facebook,
+#editor input[type="text"],
+#editor ul.token-input-list-facebook {
+	width: 280px;
+	height: 12px;
+	display: inline-block;
+	border: 1px solid #666;
+}
+
+.pageData input[type="text"],
+#editor input[type="text"] {
+	padding: 4px 0;
+}
+
+.pageData input[type="checkbox"] {
+	position: relative;
+	top: -3px;
+}
+
+input[type="checkbox"] + ul.token-input-list-facebook {
+    position: relative;
+    top: 5px;
+}
+
+.pageData ul.ui-tabs-nav li {
+	width: 33%;
+}
+.pageData ul.ui-tabs-nav li:first-child {
+	width: 34% !important;
+}
+
+.pageData .ui-tabs-panel {
+	padding: 0 !important;
+}
+
+.pageData p,
+#editor p {
+    border-bottom: 1px solid #EFEFEF;
+    padding: 5px 0;
+    margin: 5px;
+}
+
+.page p,
+.page h2,
+.page a {
+	color: #fff;
+}
+
+.pageData p:last-child,
+#editor p:last-child {
+	border: 0;
+}
+
+.page img.close {
+	position: relative;
+	left: -5px;
+    top: 15px;
+    z-index: 2;
+    display: none;
+}
+
+.overlay_icons {
+	display: none;
+	background: url('images/bg_editing_icons.png') no-repeat top left;
+    left: 150px;
+    position: relative;
+    top: 150px;
+    width: 100px;
+    padding: 5px;
+    color: #fff;
+    z-index: 3;
+    margin-bottom: -30px; /* to set the dimensions to 0x0 */
+}
+
+.overlay_icons img {
+	padding: 0 6px;
+	cursor: pointer;
+}
+
+.hoverflip {
+	background: url('resources/icon_flip.png') no-repeat top left;
+}
+
+ul.token-input-list-facebook input {
+	border: 0 !important;
+	padding: 0 !important;
+}
+
+div.icon_bg {
+	border: 1px solid #999;
+	-moz-border-radius: 6px;
+	background-color: #efefef;
 }

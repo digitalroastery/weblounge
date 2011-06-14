@@ -1,5 +1,5 @@
 steal.plugins('jquery/view/tmpl')
-.views('//editor/resourcebrowser/views/resourcelistview.ejs')
+.views('//editor/resourcebrowser/views/resourcelistview.tmpl')
 .then('resourceview')
 .then(function($) {
 
@@ -17,6 +17,18 @@ steal.plugins('jquery/view/tmpl')
 			});
 			
 //			$('div.scrollviewitem').editor_resourcescrollviewitem();
+		},
+		
+		"img.settings click": function(el, ev) {
+			steal.dev.log('settings')
+		},
+		
+		"img.delete click": function(el, ev) {
+			steal.dev.log('delete')
+		},
+		
+		"img.favorite click": function(el, ev) {
+			steal.dev.log('favorize')
 		},
 		
 		"button.duplicate click": function(el, ev) {

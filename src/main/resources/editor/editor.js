@@ -1,10 +1,7 @@
 steal.plugins(
 'jquery/view/tmpl', 
 'editor/app')
-.css(
-'style',
-'token-input-facebook.css',
-'token-input')
+.css('editor')
 .then(function($) {
 
   $(document).ready(function() {

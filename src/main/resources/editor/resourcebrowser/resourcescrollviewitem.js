@@ -1,12 +1,22 @@
-steal.plugins()
+steal.plugins('jquery/controller', 'jquery/controller/view')
 .views()
 .then('resourceviewitem')
 .then(function($) {
 
-  Editor.Resourceview.extend('Editor.Resourcescrollviewitem', 
+  Editor.Resourceview.extend('Editor.Resourcescrollviewitem',
 	{
-		
+	  	defaults: {
+	  		pageId: null
+	  	}
+	},	  
+	{
 		init: function(el) {
+			this.options.pageId = el.id;
+		},
+		
+		"click": function(el, ev) {
+			steal.dev.log('test: ' + this.options.pageId);
+//			Editor_Menubar.showPage(this.options.pageId)
 		}
 		
 	});
