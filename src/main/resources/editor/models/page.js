@@ -2,7 +2,6 @@ steal.then('jsonix')
 .then(function($) {
 	
 	unmarshalPage = function(data, success) {
-		steal.dev.log('Unmarshalling page');
 		var unmarshaller = Editor.Jsonix.context().createUnmarshaller();
 		var json = unmarshaller.unmarshalDocument(data);
 		success(json.value.page); 
@@ -13,7 +12,7 @@ steal.then('jsonix')
 	{
 		findOne: function(params, success, error) {
 			if ('id' in params) {
-				$.ajax('/system/weblounge/pages/', {
+				$.ajax('/system/weblounge/pages/' + params.id, {
 					success: function(xml) {
 						unmarshalPage(xml, success);
 					}

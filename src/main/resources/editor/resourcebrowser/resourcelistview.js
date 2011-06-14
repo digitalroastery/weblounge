@@ -21,10 +21,13 @@ steal.plugins('jquery/view/tmpl')
 		
 		"img.settings click": function(el, ev) {
 			steal.dev.log('settings')
+			var pageID = el.parents('tr').find('td:first-child input').attr('id');
+			steal.dev.log('delete: ' + pageID);
 		},
 		
 		"img.delete click": function(el, ev) {
-			steal.dev.log('delete')
+			var pageID = el.parents('tr').find('td:first-child input').attr('id');
+			steal.dev.log('delete: ' + pageID);
 		},
 		
 		"img.favorite click": function(el, ev) {

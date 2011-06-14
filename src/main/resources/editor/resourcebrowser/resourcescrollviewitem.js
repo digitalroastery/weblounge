@@ -15,8 +15,7 @@ steal.plugins('jquery/controller', 'jquery/controller/view')
 		},
 		
 		"click": function(el, ev) {
-			steal.dev.log('test: ' + this.options.pageId);
-//			Editor_Menubar.showPage(this.options.pageId)
+			el.toggleClass('marked');
 		}
 		
 	});

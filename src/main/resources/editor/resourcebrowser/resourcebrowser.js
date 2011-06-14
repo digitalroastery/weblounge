@@ -24,14 +24,14 @@ steal.plugins(
 		
 		_showResourceScrollView: function(pages) {
 			this.options.resources = pages;
-			var element = this.find('div.listView');
+			var element = this.find('div.thumbnailView');
 			this._toggleElement(element)
 			element.editor_resourcescrollview({resources: pages});
 		},
 		
 		_showResourceListView: function(pages) {
 			this.options.resources = pages;
-			var element = this.find('div.thumbnailView');
+			var element = this.find('div.listView');
 			this._toggleElement(element)
 			element.editor_resourcelistview({resources: pages});
 		},

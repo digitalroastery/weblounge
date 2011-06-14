@@ -1,8 +1,8 @@
 <tr>
-	<td><input type="checkbox" id="seitenID_5">/news</td>
-	<td>Startseite</td>
-	<td>Betschmann / 01.01.2011</td>
-	<td>Betschmann / 01.01.2011</td>
+	<td><input type="checkbox" id="seitenID_${page.id}">${page.path}</td>
+	<td>${page.head.metadata.title.de}</td>
+	<td>${page.head.created.user.name} / ${page.head.created.date}</td>
+	<td>${page.head.modified.user.name} / ${page.head.modified.date}</td>
 	<td class="action">
 		<img src="resourcebrowser/images/icon_settings.png" class="settings" alt="settings">
 		<img src="resourcebrowser/images/icon_trash.png" class="delete" alt="trash">

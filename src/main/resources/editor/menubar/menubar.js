@@ -65,6 +65,8 @@ steal.plugins(
 		
 		"li.settings click": function(el, ev) {
 			steal.dev.log('settings')
+			$('.menu').hide();
+//			$('#editor').dialog( "option", "title", 'Einstellungen' ).dialog('open').load('user_preferences.html');
 		},
 		
 		"li.news click": function(el, ev) {
@@ -103,6 +105,11 @@ steal.plugins(
 		
 		".editor_menubar input blur": function() {
 			$('div#search-result').hide();
+		},
+		
+		".div.search-result p.footer click": function() {
+//			$('#editor').dialog( "option", "title", 'Suchresultate' ).dialog('open')
+			$('div.search-result').hide();
 		},
 		
 		/* move to new plugin "designer" */

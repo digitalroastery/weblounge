@@ -69,27 +69,27 @@ nav.weblounge ul {
 	background-color: #000;
 }
 
-div.listview {
+div.listView {
 	width: 80%;
 	margin: 50px auto;
 	padding:  5px;
 }
-div.listview table {
+div.listView table {
 	width: 100%;
 	text-align: left !important;
 	background-color: #fff;
 }
 
-div.treeview,
-div.listview {
+div.treeView,
+div.listView {
 	display: none;
 }
 
-div.listview input[type="checkbox"] {
+div.listView input[type="checkbox"] {
 	margin-right: 10px;
 }
 
-.thumbnailview {
+.thumbnailView {
 	overflow: hidden;
 }
 
