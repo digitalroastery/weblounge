@@ -1,4 +1,4 @@
-steal.plugins('jquery/view/tmpl')
+steal.plugins('jquery/view/tmpl', 'jqueryui/dialog')
 .views('//editor/resourcebrowser/views/resourcelistview.tmpl')
 .resources('jquery.dataTables.min')
 .then('resourceview', 'resourcelistviewitem')
@@ -9,6 +9,12 @@ steal.plugins('jquery/view/tmpl')
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/resourcelistview.tmpl', {});
 			this._initViewItems();
+			this._initButtons();
+			this._initDialogs();
+			this._initDataTable();
+		},
+		
+		_initDataTable: function() {
 			this.find('table').dataTable({
 				"bPaginate": true,
 				"bLengthChange": true,
@@ -45,21 +51,28 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		"button.duplicate click": function(el, ev) {
-			steal.dev.log('duplicate')
+			if($('div.listView table input:checked').length) {
+				this._showMessage('Seite dupliziert');
+			} else {
+				this._showMessage('Es wurde keine Seite markiert.');
+			}
 		},
 		
 		"button.delete click": function(el, ev) {
-			steal.dev.log('delete')
+			if($('div.listView table input:checked').length) {
+				this.confirmDialog.dialog('open');
+			} else {
+				this._showMessage('Es wurde keine Seite markiert.');
+			}
 		},
 		
 		"button.favorize click": function(el, ev) {
-			steal.dev.log('favorize')
+			if($('div.listView table input:checked').length) {
+				this._showMessage('Zu Favoriten hinzugefügt');
+			} else {
+				this._showMessage('Es wurde keine Seite markiert.');
+			}
 		},
-		
-		"a.pagePath click": function(el, ev) {
-			ev.preventDefault();
-			this.publish('designer.open', this.pageId);
-		}
 		
 	});
 

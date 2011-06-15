@@ -14,33 +14,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	// hide all menus
-	$('body').click(function() {
-		$('.menu').hide();
-	});
-	
-	// trigger editmode
-	$('input#editmode').click( function() {
-		// enable editmode
-		if ($(this).is(':checked')) {
-			log('editmode is enabled')
-		// disable editmode
-		} else {
-			log('editmode is disabled')
-			$('#editor').dialog({title: 'Seite publizieren', buttons: {
-				Ja: function() {
-					$(this).dialog('close');
-					log('weiter');
-				},
-				Nein: function() {
-					$(this).dialog('close');
-					log('abbrechen');
-				}
-				
-			}} ).dialog('open').load('publish_page.html')
-		}
-	});
-
 	$.datepicker.regional['de'] = {clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
 	    closeText: 'schließen', closeStatus: 'ohne Änderungen schließen',
 	    prevText: '&#x3c;zurück', prevStatus: 'letzten Monat zeigen',
@@ -93,41 +66,6 @@ $(document).ready(function() {
 	    searchingText: "Searching...",
 	    theme: "facebook"
 	});
-	  	  	
-	// Buttons
-	$('nav.weblounge div.view').buttonset();
-	$('nav.weblounge div.filter').buttonset();
-	$('nav.weblounge div.icons').buttonset();
-	$('nav.weblounge button').button('option', 'disabled', false);
-	$('nav.weblounge button.list').button({
-		icons: {primary: "icon-list"},
-		text: false }).click(function() { 
-			log('switch to list view');
-			$('div.listview').show();
-			$('div.treeview').hide();
-			$('div.thumbnailview').hide();
-	});
-	$('button.tree').button({
-		icons: {
-			primary: "icon-tree"
-		},
-		disabled: true,
-		text: false }).click(function() { 
-			log('switch to tree view') 
-			$('div.treeview').show();
-			$('div.listview').hide();
-			$('div.thumbnailview').hide();
-	});
-	$('nav.weblounge button.thumbnails').button({
-		disabled: false,
-		icons: {primary: "icon-thumbnails"},
-		text: false }).click(function() { 
-			log('switch to thumbnail view');
-			$('div.treeview').hide();
-			$('div.listview').hide();
-			$('div.thumbnailview').show();
-	});
-	
 // ------------
 // page actions
 // ------------
@@ -181,16 +119,4 @@ function deletePage(pageID) {
 				$(this).dequeue();
 		});
 	}
-}
-
-// duplicate page
-function duplicatePage() {
-	if($('div.listview table input:checked').length) {
-		$('#editor').dialog( "option", "title", 'Seite duplizieren' ).dialog('open').load('duplicate_page.html')
-		// add code to delete the page from weblounge
-	} else {
-		log('Keine Seite markiert')
-		$('.message').text('Es wurde keine Seite markiert.');
-	}
-	$('.message').text('Seite dupliziert');
 }

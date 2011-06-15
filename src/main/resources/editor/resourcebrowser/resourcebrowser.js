@@ -17,8 +17,27 @@ steal.plugins(
 	{
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/init.tmpl', {});
-			this.activeElement = this.find('div.thumbnailView');
+			this._initViewItems();
 			this._loadResources();					
+		},
+		
+		_initViewItems: function() {
+			this.activeElement = this.find('div.thumbnailView');
+			$('nav.weblounge div.view').buttonset();
+			$('nav.weblounge div.filter').buttonset();
+			
+			$('nav.weblounge button.list').button({
+				icons: {primary: "icon-list"},
+				text: false });
+			
+			$('button.tree').button({
+				icons: {primary: "icon-tree"},
+				disabled: true,
+				text: false });
+			$('nav.weblounge button.thumbnails').button({
+				disabled: false,
+				icons: {primary: "icon-thumbnails"},
+				text: false });
 		},
 		
 		_showResourceScrollView: function(pages) {
@@ -48,7 +67,6 @@ steal.plugins(
         	this.activeElement = el;
         	el.show();
         },
-		
 		"button.recent click": function(el, ev) {
 			steal.dev.log('recent')
 		},

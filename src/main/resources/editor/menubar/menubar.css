@@ -42,7 +42,7 @@ header.menubar a.tab:hover {
 	);
 }
 
-header input[type="text"],
+header input[type="search"],
 nav input[type="text"] {
 	background: #000 url('resources/lupe.png') no-repeat 3px right;
 	color: #999;

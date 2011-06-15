@@ -23,6 +23,9 @@ steal.plugins(
             this.pagesTab = $('#pagebrowser');
             this.mediaTab = $('#mediabrowser');
             this.designerTab = $('#designer');
+            this.toolbarMore = this.find('img.more').hide();
+            this.toolbarEdit = this.find('span.editmode').hide();
+            this.pageOptions = this.find('div#page_options').hide();
             this.tabElement = this.pagesTab.editor_resourcebrowser({resourceType: 'pages'});
         },
         
@@ -34,23 +37,35 @@ steal.plugins(
         	tab.show();
         },
         
+        _showDesignerToolbar: function(show) {
+			this.toolbarEdit.toggle(show);
+			this.toolbarMore.toggle(show);
+			this.pageOptions.toggle(show);
+        },
+        
     	"designer.open subscribe": function(called, pageId) {
-			this._toggleTab(this.designerTab, this.element.find('a[name*="designer"]'));
+			this._showDesignerToolbar(true);
+			this.element.find('.tab.active').removeClass('active');
+        	this.tabElement.hide();
+        	this.tabElement = this.designerTab;
+        	this.designerTab.show();
 //			this.designerTab.editor_designerbrowser(pageId);
     	},
         
 		".tab.designer click": function(el, ev) {
-			this._toggleTab(this.designerTab, el);
+			this._showDesignerToolbar(true);
 //			this.designerTab.editor_designerbrowser();
 		},
 		
 		".tab.pages click": function(el, ev) {
 			this._toggleTab(this.pagesTab, el);
+			this._showDesignerToolbar(false);
 			this.pagesTab.editor_resourcebrowser({resourceType: 'pages'});
 		},
 		
 		".tab.media click": function(el, ev) {
 			this._toggleTab(this.mediaTab, el);
+			this._showDesignerToolbar(false);
 			this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
 		},
 		
@@ -82,7 +97,18 @@ steal.plugins(
 	
 		// trigger menus
 		".editor_menubar img.add click": function(el, ev) {
+			$('.menu').hide();
 			$('div#add-menu').show().hover(function() { }, function() {$(this).hide();});
+		},
+		
+		".editor_menubar img.more click": function(el, ev) {
+			$('.menu').hide();
+			$('div#more-menu').show().hover(function() { }, function() {$(this).hide();});
+		},
+		
+		".editor_menubar span.profile-menu click": function(el, ev) {
+			$('.menu').hide();
+			$('div#profile-menu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
 		"div#page_options click": function(el, ev) {
@@ -91,13 +117,6 @@ steal.plugins(
 			}, function() {
 				$(this).animate({"right": "-200px"}, "slow")
 			});
-		},
-		
-		".editor_menubar span.profile-menu click": function(el, ev) {
-			ev.stopPropagation();
-			$('.menu').hide();
-			$('div#profile-menu').toggle();
-//			$('div#profile-menu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
 		".editor_menubar input focus": function(el, ev) {
@@ -116,8 +135,29 @@ steal.plugins(
 		/* move to new plugin "designer" */
 		".pagelet hover": function() {
 			$(this).addClass('hover');
+		},
+		
+		// trigger editmode
+		"input#editmode click": function(el, ev) {
+			if(el.is(':checked')) {
+				steal.dev.log('editmode is enabled');
+			} else {
+				steal.dev.log('editmode is disabled');
+				// Publish Dialog
+//				$('#editor').dialog({title: 'Seite publizieren', buttons: {
+//					Ja: function() {
+//						$(this).dialog('close');
+//						log('weiter');
+//					},
+//					Nein: function() {
+//						$(this).dialog('close');
+//						log('abbrechen');
+//					}
+//					
+//				}} ).dialog('open').load('publish_page.html')
+			}
 		}
-
+		
     });
 
 });
