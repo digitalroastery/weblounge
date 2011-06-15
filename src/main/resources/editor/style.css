@@ -5,16 +5,3 @@ img.icon_editing {
     top: -20px;
     cursor: pointer;
 }
-
-/* media */
-#empty_view {
-	display:none;
-}
-
-td.action img {
-	display:none;
-}
-
-td.action img.settings {
-	display:inline;
-}

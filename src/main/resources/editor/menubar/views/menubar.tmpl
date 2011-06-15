@@ -2,7 +2,13 @@
 <a name="designer" class="tab designer" href="#designer">Designer</a>
 <a name="pages" class="tab pages active" href="#pages">Pages</a>
 <a name="media" class="tab media" href="#media">Media</a>
-<img src="menubar/images/menu_add.png" class="add"/>
+
+<img src="menubar/images/menu_add.png" class="add" title="Neue Seite..." alt="Neue Seite..." />
+<img src="menubar/images/menu_more.png" class="more" title="Weitere Befehle..." alt="Weitere Befehle..." />
+
+<span class="editmode">
+	<input type="checkbox" name="editmode" value="" id="editmode" /> Editiermodus
+</span>
 
 <span class="right">
 	<input type="search" name="search" placeholder="Suchen..." />
@@ -22,6 +28,19 @@
 	</ul>
 </div>
 
+<div id="more-menu" class="menu">
+	<span class="triangle-up"></span>
+	<ul>
+		<li class="pageinfo">Seiten-Eigenschaften</li>
+		<li>Als Favorit kennzeichnen</li>
+		<li>Seite duplizieren</li>
+		<li>Publizieren...</li>
+		<li>Sprache wechseln</li>
+		<li>Zugriff einschr&auml;nken</li>
+		<li>Verherige Versionen...</li>
+	</ul>
+</div>
+
 <div id="profile-menu" class="menu">
 	<span class="triangle-up"></span>
 	<ul>
@@ -36,4 +55,9 @@
 	<p class="section">Dokumente <span class="documents pdf">Kursaufgebot R1</span></p>
 	<p>&nbsp;<span class="documents pdf">Kursaufgebot R2</span></p>
 	<p class="footer">Weitere Resultate...</p>
+</div>
+
+<div id="page_options">
+  	<h2>Seiteneinstellungen</h2>
+  	<p>Einstellungen...</p>
 </div>

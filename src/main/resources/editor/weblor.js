@@ -40,23 +40,7 @@ $(document).ready(function() {
 			}} ).dialog('open').load('publish_page.html')
 		}
 	});
-	
-	// trigger Seiteneigenschaften
-	$('div#page_options').toggle( 
-		function() {
-			$(this).animate({"right": "0"}, "slow")
-		}, function() {
-			$(this).animate({"right": "-200px"}, "slow")
-		}
-	);
 
-	// show action-icon on hover the settings-icon
-	$('td.action').hover(function() {
-		$(this).find('img').show();
-	}, function() {
-		$(this).find('img').not('.settings').hide();
-	});
-	
 	$.datepicker.regional['de'] = {clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
 	    closeText: 'schließen', closeStatus: 'ohne Änderungen schließen',
 	    prevText: '&#x3c;zurück', prevStatus: 'letzten Monat zeigen',
@@ -110,16 +94,6 @@ $(document).ready(function() {
 	    theme: "facebook"
 	});
 	  	  	
-	$('div.listview table').dataTable({
-		"bPaginate": true,
-		"bLengthChange": true,
-		"bFilter": true,
-		"bSort": true,
-		"bInfo": true,
-		"bAutoWidth": true,
-		"bJQueryUI": true,
-	});
-	
 	// Buttons
 	$('nav.weblounge div.view').buttonset();
 	$('nav.weblounge div.filter').buttonset();

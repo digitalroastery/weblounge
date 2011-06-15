@@ -12,13 +12,12 @@ steal.plugins(
 		defaults: {
 			resources: {},
 			resourceType: 'pages',
-			activeElement: null
 		}
 	},
 	{
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/init.tmpl', {});
-			this.options.activeElement = this.find('div.thumbnailView');
+			this.activeElement = this.find('div.thumbnailView');
 			this._loadResources();					
 		},
 		
@@ -45,8 +44,8 @@ steal.plugins(
 		},
 		
 		_toggleElement: function(el) {
-        	this.options.activeElement.hide();
-        	this.options.activeElement = el;
+        	this.activeElement.hide();
+        	this.activeElement = el;
         	el.show();
         },
 		

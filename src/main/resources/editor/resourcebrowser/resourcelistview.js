@@ -1,6 +1,7 @@
 steal.plugins('jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/resourcelistview.tmpl')
-.then('resourceview')
+.resources('jquery.dataTables.min')
+.then('resourceview', 'resourcelistviewitem')
 .then(function($) {
 
 	Editor.Resourceview.extend('Editor.Resourcelistview', 
@@ -8,6 +9,15 @@ steal.plugins('jquery/view/tmpl')
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/resourcelistview.tmpl', {});
 			this._initViewItems();
+			this.find('table').dataTable({
+				"bPaginate": true,
+				"bLengthChange": true,
+				"bFilter": true,
+				"bSort": true,
+				"bInfo": true,
+				"bAutoWidth": true,
+				"bJQueryUI": true,
+			});
 		},
 		
 		_initViewItems: function() {
@@ -16,7 +26,7 @@ steal.plugins('jquery/view/tmpl')
 				$('#listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {page: res});
 			});
 			
-//			$('div.scrollviewitem').editor_resourcescrollviewitem();
+			this.find('tr.pageEntry').editor_resourcelistviewitem();
 		},
 		
 		"img.settings click": function(el, ev) {
@@ -44,6 +54,11 @@ steal.plugins('jquery/view/tmpl')
 		
 		"button.favorize click": function(el, ev) {
 			steal.dev.log('favorize')
+		},
+		
+		"a.pagePath click": function(el, ev) {
+			ev.preventDefault();
+			this.publish('designer.open', this.pageId);
 		}
 		
 	});

@@ -1,6 +1,7 @@
 steal.plugins(
 	'jquery/controller',
 	'jquery/controller/view',
+	'jquery/controller/subscribe',
 	'jquery/view',
 	'jquery/view/tmpl',
 	'jqueryui/button')
@@ -12,17 +13,6 @@ steal.plugins(
 .then(function($) {
 
     $.Controller("Editor.Menubar",
-    {
-		defaults: {
-			tabElement: null
-		},
-		
-        showPage: function(pageId) {
-			var tab = $('#designer');
-			this._toggleTab(tab)
-//			tab.editor_designerbrowser();
-        },
-    },
     /* @prototype */
     {
      /**
@@ -30,37 +20,38 @@ steal.plugins(
      */
         init: function(el) {
             $(el).html('//editor/menubar/views/menubar.tmpl', {});
-            this.options.tabElement = $('#pagebrowser').editor_resourcebrowser({resourceType: 'pages'});
+            this.pagesTab = $('#pagebrowser');
+            this.mediaTab = $('#mediabrowser');
+            this.designerTab = $('#designer');
+            this.tabElement = this.pagesTab.editor_resourcebrowser({resourceType: 'pages'});
         },
         
-        _toggleTab: function(el) {
-        	this.options.tabElement.hide();
-        	this.options.tabElement = el;
-        	el.show();
-        },
-        
-		".tab click": function(el, ev) {
+        _toggleTab: function(tab, el) {
 			this.element.find('.tab.active').removeClass('active');
 			el.addClass('active');
-//			this.element.trigger('menubarmodechange', {mode: 'mymode'});
+        	this.tabElement.hide();
+        	this.tabElement = tab;
+        	tab.show();
+        },
+        
+    	"designer.open subscribe": function(called, pageId) {
+			this._toggleTab(this.designerTab, this.element.find('a[name*="designer"]'));
+//			this.designerTab.editor_designerbrowser(pageId);
+    	},
+        
+		".tab.designer click": function(el, ev) {
+			this._toggleTab(this.designerTab, el);
+//			this.designerTab.editor_designerbrowser();
 		},
 		
 		".tab.pages click": function(el, ev) {
-			var tab = $('#pagebrowser');
-			this._toggleTab(tab)
-			tab.editor_resourcebrowser({resourceType: 'pages'});
+			this._toggleTab(this.pagesTab, el);
+			this.pagesTab.editor_resourcebrowser({resourceType: 'pages'});
 		},
 		
 		".tab.media click": function(el, ev) {
-			var tab = $('#mediabrowser');
-			this._toggleTab(tab)
-			tab.editor_resourcebrowser({resourceType: 'media'});
-		},
-		
-		".tab.designer click": function(el, ev) {
-			var tab = $('#designer');
-			this._toggleTab(tab)
-//			tab.editor_designerbrowser();
+			this._toggleTab(this.mediaTab, el);
+			this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
 		},
 		
 		"li.settings click": function(el, ev) {
@@ -94,9 +85,19 @@ steal.plugins(
 			$('div#add-menu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
-		".editor_menubar span.profile-menu click": function() {
+		"div#page_options click": function(el, ev) {
+			el.toggle(function() {
+				$(this).animate({"right": "0"}, "slow")
+			}, function() {
+				$(this).animate({"right": "-200px"}, "slow")
+			});
+		},
+		
+		".editor_menubar span.profile-menu click": function(el, ev) {
+			ev.stopPropagation();
 			$('.menu').hide();
-			$('div#profile-menu').show().hover(function() { }, function() {$(this).hide();});
+			$('div#profile-menu').toggle();
+//			$('div#profile-menu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
 		".editor_menubar input focus": function(el, ev) {
@@ -116,7 +117,7 @@ steal.plugins(
 		".pagelet hover": function() {
 			$(this).addClass('hover');
 		}
-		
+
     });
 
 });

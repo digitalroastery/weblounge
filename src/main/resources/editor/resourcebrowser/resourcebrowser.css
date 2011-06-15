@@ -115,6 +115,14 @@ div.listView input[type="checkbox"] {
 	color: #fff;
 }
 
+td.action img {
+	display:none;
+}
+
+td.action img.settings {
+	display:inline;
+}
+
 tr.bg td {
 	background-color: #efefef;
 }

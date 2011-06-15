@@ -94,14 +94,14 @@ div.overlay_icons span.more {
 
 header.menubar .menu,
 .page .menu {
-	display: none;
 	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
-	position: relative;
-	width: 200px;
-	line-height: 20px;
-	padding: 20px 0;
-	top: 10px;
-	border: 1px solid #FFFFFF;
+    border: 1px solid #FFFFFF;
+    display: none;
+    line-height: 20px;
+    padding: 20px 0;
+    position: relative;
+    top: 10px;
+    width: 200px;
 }
 
 header.menubar span.editmode {
@@ -118,8 +118,34 @@ header.menubar div#page_options {
     cursor: pointer;
 }
 
-header span.profile-menu {
-	cursor: pointer;
+.menu ul {
+    color: #FFFFFF;
+    cursor: pointer;
+    list-style: none outside none;
+    margin-top: -2em;
+}
+.menu ul li:hover {
+    color: red;
+}
+#more-menu {
+    left: 250px;
+}
+#add-menu {
+    left: 160px;
+}
+#profile-menu {
+    position: absolute;
+    right: 10px;
+    top: 55px;
+}
+#profile-menu span.triangle-up {
+    left: 180px;
+}
+.page_more_menu {
+    left: 100px;
+    position: absolute !important;
+    top: 180px !important;
+    z-index: 2;
 }
 
 .triangle-down {
@@ -155,10 +181,6 @@ div#search-result {
 	right: 150px;
 	color: #fff;
 	z-index: 2;
-}
-
-#profile-menu span.triangle-up {
-	left: 180px;
 }
 
 div#search-result span {

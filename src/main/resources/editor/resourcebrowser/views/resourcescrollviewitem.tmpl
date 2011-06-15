@@ -41,6 +41,6 @@
 		<p>Created by ${page.head.created.user.name}<br />
 	   Updated by ${page.head.modified.user.name}<br />
 	   Tags: {{each page.head.metadata.subject}} ${$value}, {{/each}}<br/>
-	   URL: <a href="${page.path}" title="Gehe zu Seite">${page.path}</a>
+	   URL: <a href="${page.path}" class="pagePath" title="Gehe zu Seite">${page.path}</a>
 	</p>
 </div>

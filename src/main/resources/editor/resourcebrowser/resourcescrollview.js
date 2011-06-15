@@ -17,12 +17,12 @@ steal.plugins('jquery/view/tmpl','jqueryui/widget', 'jqueryui/dialog')
 			this._initViewItems();
 			
 			$(el).find('#makeMeScrollable').smoothDivScroll({
-				  	autoScroll: "onstart" , 
-					autoScrollDirection: "backandforth", 
-					autoScrollStep: 1, 
-					autoScrollInterval: 15,	
-					visibleHotSpots: "always"
-			  	});
+			  	autoScroll: "onstart" , 
+				autoScrollDirection: "backandforth", 
+				autoScrollStep: 1, 
+				autoScrollInterval: 15,	
+				visibleHotSpots: "always"
+		  	});
 			
 			this.options.confirmDialog = $('#dialog-confirm').dialog({
 				width: 400,
