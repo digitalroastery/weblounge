@@ -15,17 +15,17 @@ steal.then(function($) {
 	
     },
 
-	'hoverenter': 	function() {
+	'hoverenter': 	function(ev, hover) {
       //log('pagelet hover in');
       this.element.append('<div class="icon_editing"></div>');
     },
 
-	'hoverleave': 	function() {
+	'hoverleave': 	function(ev, hover) {
       // log('pagelet hover out');
       this.element.find('div.icon_editing').remove();
     },
 
-	'div.icon_editing click': function() {
+	'div.icon_editing click': function(ev) {
 		steal.dev.log('editing icon clicked.');
 	}
 
