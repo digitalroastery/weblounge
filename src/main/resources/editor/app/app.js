@@ -1,4 +1,4 @@
-steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser').then(function($) {
+steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', 'editor/composer').then(function($) {
 		
 	$.Controller('Editor.App',
 	/* @prototype */
@@ -11,6 +11,9 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser').t
 			this.find('header:first').editor_menubar();
 			//this.find('#designer').editor_resourcebrowser({resources: pages});		
 			//this.find('#mediabrowser').editor_resourcebrowser({resources: pages});            
+			// 
+			
+			$('.composer').editor_composer();
         }
 		
 	});
