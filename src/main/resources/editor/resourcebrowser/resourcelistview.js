@@ -52,6 +52,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/dialog')
 		
 		"button.duplicate click": function(el, ev) {
 			if($('div.listView table input:checked').length) {
+				this.duplicateDialog.dialog('open');
 				this._showMessage('Seite dupliziert');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
@@ -60,7 +61,7 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/dialog')
 		
 		"button.delete click": function(el, ev) {
 			if($('div.listView table input:checked').length) {
-				this.confirmDialog.dialog('open');
+				this.deleteDialog.dialog('open');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
 			}

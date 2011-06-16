@@ -118,13 +118,13 @@ header.menubar div#page_options {
     cursor: pointer;
 }
 
-.menu ul {
+.menu ul, #page_options ul {
     color: #FFFFFF;
     cursor: pointer;
     list-style: none outside none;
     margin-top: -2em;
 }
-.menu ul li:hover {
+.menu ul li:hover, #page_options ul li:hover {
     color: red;
 }
 #more-menu {

@@ -12,7 +12,7 @@ steal.plugins('jquery/controller').then(function($) {
 	},
 	{	
 		init: function(el) {
-			
+
 		},
 		
 		_initButtons: function() {
@@ -38,10 +38,12 @@ steal.plugins('jquery/controller').then(function($) {
 						$(this).dialog('close');
 					}
 				},
-				close: function(event, ui) {
-					// Delete Pages
-				}
 			});
+			
+			this.deleteDialog.bind("dialogclose", function(event, ui) {
+               steal.dev.log('deletePages');
+            });
+			
 			this.duplicateDialog = $('<div></div>')
 			.html('Seite(n) duplizieren!')
 			.dialog({
@@ -56,10 +58,11 @@ steal.plugins('jquery/controller').then(function($) {
 					OK: function() {
 						$(this).dialog('close');
 					}
-				},
-				close: function(event, ui) {
-					// Duplicate Pages
 				}
+			});
+			
+			this.duplicateDialog.bind("dialogclose", function(event, ui) {
+				steal.dev.log('duplicateDialog');
 			});
 		},
 		
@@ -70,6 +73,7 @@ steal.plugins('jquery/controller').then(function($) {
 			});
 			$('.message').text(messageText);
 		}
+		
 	});
 
 });

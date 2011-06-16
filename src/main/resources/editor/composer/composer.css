@@ -2,13 +2,51 @@
 	min-height: 50px;
 }
 
-.pagelet:hover {
-	background-color: yellow;
-}
-
 .composer div.icon_editing {
 	width: 40px;
 	height: 40px;
 	text-align: center;
 	background-image: url('resources/icon_editing.png');
+}
+
+img.icon_editing {
+    cursor: pointer;
+    left: 50%;
+    margin-left: -40px;
+    position: relative;
+    top: -20px;
+}
+
+div.pagelet-editor {
+	display: none;
+}
+
+div.pagelet-editor {
+    display: none;
+}
+
+div.pagelet-editor a {
+    display: inline !important;
+    padding: 0 !important;
+}
+
+div.pagelet:hover {
+    background-color: #CCCCCC;
+    opacity: 0.5;
+}
+
+div.pagelet:hover {
+	background-color: #ccc;
+	opacity: 0.5;
+}
+
+/* move to new plugin "designer" */
+.pagelet:hover,
+.pagelet:hover div,
+.pagelet:hover p {
+	background-color: #ccc !important
+}
+
+.pagelet:hover {
+	background-color: yellow;
 }

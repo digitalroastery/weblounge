@@ -1,7 +1,6 @@
 steal.plugins(
 	'jquery/controller',
 	'jquery/controller/view',
-	'jquery/controller/subscribe',
 	'jquery/view',
 	'jquery/view/tmpl',
 	'jqueryui/button')
@@ -15,9 +14,9 @@ steal.plugins(
     $.Controller("Editor.Menubar",
     /* @prototype */
     {
-     /**
-     * Initialize a new MenuBar controller.
-     */
+	    /**
+	     * Initialize a new MenuBar controller.
+	     */
         init: function(el) {
             $(el).html('//editor/menubar/views/menubar.tmpl', {});
             this.pagesTab = $('#pagebrowser');
@@ -37,26 +36,21 @@ steal.plugins(
         	tab.show();
         },
         
+        _openDesigner: function(pageId, url) {
+        	this._showDesignerToolbar(true);
+        	this.element.find('.tab.active').removeClass('active');
+        	this.tabElement.hide();
+        	this.tabElement = this.designerTab;
+        	this.designerTab.show();
+        	this.designerTab.editor_designer(url);
+        },
+        
         _showDesignerToolbar: function(show) {
 			this.toolbarEdit.toggle(show);
 			this.toolbarMore.toggle(show);
 			this.pageOptions.toggle(show);
         },
         
-    	"designer.open subscribe": function(called, pageId) {
-			this._showDesignerToolbar(true);
-			this.element.find('.tab.active').removeClass('active');
-        	this.tabElement.hide();
-        	this.tabElement = this.designerTab;
-        	this.designerTab.show();
-//			this.designerTab.editor_designerbrowser(pageId);
-    	},
-        
-		".tab.designer click": function(el, ev) {
-			this._showDesignerToolbar(true);
-//			this.designerTab.editor_designerbrowser();
-		},
-		
 		".tab.pages click": function(el, ev) {
 			this._toggleTab(this.pagesTab, el);
 			this._showDesignerToolbar(false);
@@ -143,18 +137,21 @@ steal.plugins(
 				steal.dev.log('editmode is enabled');
 			} else {
 				steal.dev.log('editmode is disabled');
-				// Publish Dialog
-//				$('#editor').dialog({title: 'Seite publizieren', buttons: {
-//					Ja: function() {
-//						$(this).dialog('close');
-//						log('weiter');
-//					},
-//					Nein: function() {
-//						$(this).dialog('close');
-//						log('abbrechen');
-//					}
-//					
-//				}} ).dialog('open').load('publish_page.html')
+				$('<div></div>').html('Wollen Sie die Seite jetzt publizieren?<br/>' +
+						'Wenn Sie die Seite publizieren, werden die gemachten Änderungen sofort sichtbar...')
+				.dialog({
+					modal: true,
+					resizable: false,
+					title: 'Seite publizieren',
+					buttons: {
+						Nein: function() {
+							$(this).dialog('close');
+						},
+						Ja: function() {
+							$(this).dialog('close');
+						}
+					}
+				});
 			}
 		}
 		

@@ -17,6 +17,10 @@ time, mark, audio, video {
   vertical-align: baseline;
 }
 
+body {
+	height: 100%;
+}
+
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block;
@@ -74,13 +78,6 @@ a:hover { color: #036; }
 /* make space for the menubar */
 #page_margins {
 	padding-top: 100px;
-}
-
-/* move to new plugin "designer" */
-.pagelet:hover,
-.pagelet:hover div,
-.pagelet:hover p {
-	background-color: #ccc !important
 }
 
 #container {
