@@ -14,6 +14,12 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/dialog')
 			this._initDataTable();
 		},
 		
+		update: function(options) {
+			this.options.resources = options.resources;
+			this.find('tr.pageEntry').remove();
+			this._initViewItems();
+		},
+		
 		_initDataTable: function() {
 			this.find('table').dataTable({
 				"bPaginate": true,
@@ -28,11 +34,19 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/dialog')
 		
 		_initViewItems: function() {
 			$.each(this.options.resources, function(i, res) {
-				steal.dev.log('res list: ' + res);
-				$('#listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {page: res});
+				var listViewItem = $('#listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {page: res});
+				listViewItem.find('tr.pageEntry').editor_resourcelistviewitem({page: res});
 			});
-			
-			this.find('tr.pageEntry').editor_resourcelistviewitem();
+		},
+		
+		_openDialog: function(dialog, message) {
+			this.options.selectedPages = $('div.listView table input:checked');
+			if(this.options.selectedPages.length) {
+				dialog.dialog('open');
+				this._showMessage();
+			} else {
+				this._showMessage('Es wurde keine Seite markiert.');
+			}
 		},
 		
 		"img.settings click": function(el, ev) {
@@ -51,24 +65,16 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/dialog')
 		},
 		
 		"button.duplicate click": function(el, ev) {
-			if($('div.listView table input:checked').length) {
-				this.duplicateDialog.dialog('open');
-				this._showMessage('Seite dupliziert');
-			} else {
-				this._showMessage('Es wurde keine Seite markiert.');
-			}
+			this._openDialog(this.duplicateDialog, 'Seite dupliziert');
 		},
 		
 		"button.delete click": function(el, ev) {
-			if($('div.listView table input:checked').length) {
-				this.deleteDialog.dialog('open');
-			} else {
-				this._showMessage('Es wurde keine Seite markiert.');
-			}
+			this._openDialog(this.deleteDialog, 'Seite gelöscht');
 		},
 		
 		"button.favorize click": function(el, ev) {
-			if($('div.listView table input:checked').length) {
+			this.options.selectedPages = $('div.listView table input:checked');
+			if(this.options.selectedPages.length) {
 				this._showMessage('Zu Favoriten hinzugefügt');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');

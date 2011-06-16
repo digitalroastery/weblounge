@@ -8,11 +8,12 @@ steal.plugins('jquery/controller').then(function($) {
 		defaults: {
 			resources: {},
 			resourceType: 'pages',
+			selectedPages: {}
 		}
 	},
 	{	
 		init: function(el) {
-
+			
 		},
 		
 		_initButtons: function() {
@@ -23,29 +24,23 @@ steal.plugins('jquery/controller').then(function($) {
 		},
 		
 		_initDialogs: function() {
-			this.deleteDialog = $('<div></div>')
-			.html('Seite(n) löschen?')
+			this.deleteDialog = $('#dialog-delete')
 			.dialog({
 				modal: true,
 				autoOpen: false,
 				resizable: false,
-				title: 'Seite(n) löschen',
 				buttons: {
 					Abbrechen: function() {
 						$(this).dialog('close');
 					},
 					OK: function() {
+						$(this).trigger('deletePages', this.options.selectedPages);
 						$(this).dialog('close');
 					}
 				},
 			});
 			
-			this.deleteDialog.bind("dialogclose", function(event, ui) {
-               steal.dev.log('deletePages');
-            });
-			
-			this.duplicateDialog = $('<div></div>')
-			.html('Seite(n) duplizieren!')
+			this.duplicateDialog = $('#dialog-duplicate')
 			.dialog({
 				modal: true,
 				autoOpen: false,
@@ -56,13 +51,10 @@ steal.plugins('jquery/controller').then(function($) {
 						$(this).dialog('close');
 					},
 					OK: function() {
+						$(this).trigger('duplicatePages', this.options.selectedPages);
 						$(this).dialog('close');
-					}
+					},
 				}
-			});
-			
-			this.duplicateDialog.bind("dialogclose", function(event, ui) {
-				steal.dev.log('duplicateDialog');
 			});
 		},
 		
@@ -72,6 +64,10 @@ steal.plugins('jquery/controller').then(function($) {
 				$(this).dequeue();
 			});
 			$('.message').text(messageText);
+		},
+		
+		'drawer.open subscribe': function() {
+			steal.dev.log('hallo Welt');
 		}
 		
 	});

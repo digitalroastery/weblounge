@@ -21,8 +21,15 @@ steal.plugins(
 			this._loadResources();					
 		},
 		
+		_update: function(pages) {
+			this.scrollView.editor_resourcescrollview({resources: pages});
+			this.listView.editor_resourcelistview({resources: pages});
+		},
+		
 		_initViewItems: function() {
-			this.activeElement = this.find('div.thumbnailView');
+			this.scrollView = this.find('div.thumbnailView');
+			this.listView = this.find('div.listView');
+			this.activeElement = this.scrollView;
 			$('nav.weblounge div.view').buttonset();
 			$('nav.weblounge div.filter').buttonset();
 			
@@ -44,14 +51,14 @@ steal.plugins(
 			this.options.resources = pages;
 			var element = this.find('div.thumbnailView');
 			this._toggleElement(element)
-			element.editor_resourcescrollview({resources: pages});
+			element.editor_resourcescrollview({resources: this.options.resources});
 		},
 		
 		_showResourceListView: function(pages) {
 			this.options.resources = pages;
 			var element = this.find('div.listView');
 			this._toggleElement(element)
-			element.editor_resourcelistview({resources: pages});
+			element.editor_resourcelistview({resources: this.options.resources});
 		},
 		
 		_loadResources: function() {
@@ -67,8 +74,17 @@ steal.plugins(
         	this.activeElement = el;
         	el.show();
         },
+        
+        // Delete Pages
+        "div deletePages": function(el, ev, pages) {
+        	steal.dev.log('deletePages');
+//        	Page.remove(pages);
+        	this._update(pages);
+        },
+        
 		"button.recent click": function(el, ev) {
 			steal.dev.log('recent')
+			this._update();
 		},
 		"button.favorites click": function(el, ev) {
 			steal.dev.log('favorites')

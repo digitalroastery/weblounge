@@ -5,21 +5,35 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 	{
 		
 		init: function(el) {
-			
-//			this.mode = 1;
-			//TODO GLOBALER ABFANGPUNKT FÜR TRIGGER ANSTATT Ajax.Open.hub
- 
 			this.menuBar = this.find('header:first').editor_menubar();
-			//this.find('#designer').editor_resourcebrowser({resources: pages});		
-			//this.find('#mediabrowser').editor_resourcebrowser({resources: pages});            
-			// 
-			
+			this.designerTab = this.find('#designer').editor_designer();
+            this.pagesTab = this.find('#pagebrowser').editor_resourcebrowser({resourceType: 'pages'});
+            this.mediaTab = this.find('#mediabrowser').editor_resourcebrowser({resourceType: 'media'});
+            this.tabElement = this.pagesTab;
+            this.designerTab.hide();
+            this.mediaTab.hide();
 			$('.composer').editor_composer();
         },
         
-        "a openDesigner": function(el, ev, param1, param2) {
-        	steal.dev.log('param1' + param1);
-        	this.menuBar.editor_menubar("_openDesigner", param1, param2);
+        _toggleTab: function(tab) {
+        	this.tabElement.hide();
+        	this.tabElement = tab;
+        	tab.show();
+        },
+        
+        "a showDesigner": function(el, ev, pageId, url) {
+        	this._toggleTab(this.designerTab);
+        	this.designerTab.editor_designer('show', pageId, url);
+        },
+        
+        "a showPages": function(el, ev) {
+        	this._toggleTab(this.pagesTab);
+//        	this.pagesTab.editor_resourcebrowser('mach öbis');
+        },
+        
+        "a showMedia": function(el, ev) {
+        	this._toggleTab(this.mediaTab);
+//        	this.mediaTab.editor_resourcebrowser('mach öbis');
         }
 		
 	});

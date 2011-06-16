@@ -19,30 +19,27 @@ steal.plugins(
 	     */
         init: function(el) {
             $(el).html('//editor/menubar/views/menubar.tmpl', {});
-            this.pagesTab = $('#pagebrowser');
-            this.mediaTab = $('#mediabrowser');
-            this.designerTab = $('#designer');
             this.toolbarMore = this.find('img.more').hide();
             this.toolbarEdit = this.find('span.editmode').hide();
             this.pageOptions = this.find('div#page_options').hide();
-            this.tabElement = this.pagesTab.editor_resourcebrowser({resourceType: 'pages'});
         },
         
-        _toggleTab: function(tab, el) {
+        _showDesigner: function(pageId, url) {
+        	this._showDesignerToolbar(true);
 			this.element.find('.tab.active').removeClass('active');
 			el.addClass('active');
-        	this.tabElement.hide();
-        	this.tabElement = tab;
-        	tab.show();
         },
         
-        _openDesigner: function(pageId, url) {
-        	this._showDesignerToolbar(true);
-        	this.element.find('.tab.active').removeClass('active');
-        	this.tabElement.hide();
-        	this.tabElement = this.designerTab;
-        	this.designerTab.show();
-        	this.designerTab.editor_designer(url);
+        _showPages: function(mode) {
+        	this._showDesignerToolbar(false);
+			this.element.find('.tab.active').removeClass('active');
+			this.element.find('.tab.pages').addClass('active');
+        },
+        
+        _showMedia: function() {
+        	this._showDesignerToolbar(false);
+			this.element.find('.tab.active').removeClass('active');
+			this.element.find('.tab.media').addClass('active');
         },
         
         _showDesignerToolbar: function(show) {
@@ -51,16 +48,22 @@ steal.plugins(
 			this.pageOptions.toggle(show);
         },
         
+        _toggleTab: function(el) {
+        	this.element.find('.tab.active').removeClass('active');
+        	el.addClass('active');
+        },
+        
+        ".tab click": function(el, ev) {
+        	this._toggleTab(el);
+        	this._showDesignerToolbar(false);
+        },
+        
 		".tab.pages click": function(el, ev) {
-			this._toggleTab(this.pagesTab, el);
-			this._showDesignerToolbar(false);
-			this.pagesTab.editor_resourcebrowser({resourceType: 'pages'});
+			el.trigger('showPages');
 		},
 		
 		".tab.media click": function(el, ev) {
-			this._toggleTab(this.mediaTab, el);
-			this._showDesignerToolbar(false);
-			this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
+			el.trigger('showMedia');
 		},
 		
 		"li.settings click": function(el, ev) {

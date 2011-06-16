@@ -9,7 +9,7 @@ steal.plugins('jquery/controller',
   Editor.Resourceviewitem.extend('Editor.Resourcelistviewitem',
 	{
 		init: function(el) {
-			this.pageId = el.id;
+
 		},
 		
 		"td.action hoverenter": function(el, ev) {

@@ -5,7 +5,7 @@ steal.plugins().then(function($) {
   */
   $.Controller('Editor.Resourceviewitem', {
     defaults: {
-      resource: {}
+  		page: {}
     }
   },
 
@@ -22,7 +22,7 @@ steal.plugins().then(function($) {
     
 	"a.pagePath click": function(el, ev) {
 		ev.preventDefault();
-		el.trigger('openDesigner', [this.pageId, el.attr('href')]);
+		el.trigger('showDesigner', [this.options.page.id, el.attr('href')]);
 	}
 
   });

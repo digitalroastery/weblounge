@@ -10,12 +10,15 @@ steal.plugins(
 	$.Controller("Editor.Designer",
 	/* @prototype */
 	{
-		init: function(el, url) {
-//			$('html').css('background', '#FFFFFF');
-			$(el).load(url);
-//			$(el).html('//editor/designer/views/init.tmpl', {});
-			steal.dev.log('test designer: ' + url);
+		init: function(el) {
+			$(el).html('//editor/designer/views/init.tmpl', {});
+		},
+		
+		show: function(pageId, url) {
+			steal.dev.log('pageId: ' + pageId)
+			this.element.load(url);
 		}
+		
 	});
 	
 });
