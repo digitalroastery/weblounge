@@ -24,36 +24,41 @@ steal.plugins('jquery/controller').then(function($) {
 		},
 		
 		_initDialogs: function() {
-			this.deleteDialog = $('#dialog-delete')
+			this.deleteDialog = $('<div></div>')
+			.load('resourcebrowser/views/delete-dialog.html')
 			.dialog({
 				modal: true,
+				title: 'Seite(n) löschen',
 				autoOpen: false,
 				resizable: false,
 				buttons: {
 					Abbrechen: function() {
 						$(this).dialog('close');
 					},
-					OK: function() {
-						$(this).trigger('deletePages', this.options.selectedPages);
-						$(this).dialog('close');
-					}
+					OK: $.proxy(function () {
+						this.element.trigger('deletePages', [this.options.selectedPages]);
+						this._showMessage('Seite(n) gelöscht!');
+						this.deleteDialog.dialog('close');
+					},this)
 				},
 			});
-			
-			this.duplicateDialog = $('#dialog-duplicate')
+
+			this.duplicateDialog = $('<div></div>')
+			.load('resourcebrowser/views/duplicate-dialog.html')
 			.dialog({
 				modal: true,
+				title: 'Seite duplizieren',
 				autoOpen: false,
 				resizable: false,
-				title: 'Seite(n) duplizieren',
 				buttons: {
 					Abbrechen: function() {
 						$(this).dialog('close');
 					},
-					OK: function() {
-						$(this).trigger('duplicatePages', this.options.selectedPages);
-						$(this).dialog('close');
-					},
+					OK: $.proxy(function () {
+						this.element.trigger('duplicatePages', [this.options.selectedPages]);
+						this._showMessage('Seite dupliziert!');
+						this.duplicateDialog.dialog('close');
+					},this)
 				}
 			});
 		},
@@ -64,10 +69,6 @@ steal.plugins('jquery/controller').then(function($) {
 				$(this).dequeue();
 			});
 			$('.message').text(messageText);
-		},
-		
-		'drawer.open subscribe': function() {
-			steal.dev.log('hallo Welt');
 		}
 		
 	});

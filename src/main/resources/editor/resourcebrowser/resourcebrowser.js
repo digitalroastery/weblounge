@@ -1,5 +1,5 @@
 steal.plugins(
-	'jquery/controller/view', 
+	'jquery/controller/view',
 	'jquery/view/tmpl')
 	.models('../../models/page')
 .views('//editor/resourcebrowser/views/init.tmpl')
@@ -21,9 +21,9 @@ steal.plugins(
 			this._loadResources();					
 		},
 		
-		_update: function(pages) {
-			this.scrollView.editor_resourcescrollview({resources: pages});
-			this.listView.editor_resourcelistview({resources: pages});
+		update: function() {
+			this.scrollView.editor_resourcescrollview({resources: this.options.resources});
+			this.listView.editor_resourcelistview({resources: this.options.resources});
 		},
 		
 		_initViewItems: function() {
@@ -75,31 +75,50 @@ steal.plugins(
         	el.show();
         },
         
+		"button.list click": function(el, ev) {
+			this._showResourceListView(this.options.resources);
+		},
+		
+		"button.thumbnails click": function(el, ev) {
+			this._showResourceScrollView(this.options.resources)
+		},
+        
         // Delete Pages
-        "div deletePages": function(el, ev, pages) {
-        	steal.dev.log('deletePages');
+        "div#mainContainer deletePages": function(el, ev, pages) {
 //        	Page.remove(pages);
-        	this._update(pages);
+        	this.update();
+        },
+        
+        // Duplicate Pages
+        "div#mainContainer duplicatePages": function(el, ev, pages) {
+//        	Page.duplicate(pages);
+        	this.update();
+        },
+        
+        // Favorize Pages
+        "div#mainContainer favorizePages": function(el, ev, pages) {
+//        	Page.duplicate(pages);
+        	this.update();
         },
         
 		"button.recent click": function(el, ev) {
 			steal.dev.log('recent')
-			this._update();
+			this.update();
 		},
+		
 		"button.favorites click": function(el, ev) {
 			steal.dev.log('favorites')
+			this.update();
 		},
+		
 		"button.pending click": function(el, ev) {
 			steal.dev.log('show pending')
+			this.update();
 		},
+		
 		"button.all click": function(el, ev) {
 			steal.dev.log('show all')
-		},
-		"button.list click": function(el, ev) {
-			this._showResourceListView(this.options.resources);
-		},
-		"button.thumbnails click": function(el, ev) {
-			this._showResourceScrollView(this.options.resources)
+			this.update();
 		}
 	});
 });

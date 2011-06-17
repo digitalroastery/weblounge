@@ -3,6 +3,7 @@ steal.plugins(
 	'jquery/controller/view',
 	'jquery/view',
 	'jquery/view/tmpl',
+	'jqueryui/dialog',
 	'jqueryui/button')
 .views(
 	'//editor/menubar/views/menubar.tmpl')
@@ -12,6 +13,16 @@ steal.plugins(
 .then(function($) {
 
     $.Controller("Editor.Menubar",
+	{
+    	/**
+    	 * Mode 0 = Designer
+    	 * Mode 1 = Pages
+    	 * Mode 2 = Media
+    	 */
+    	defaults: {
+    		mode: 1
+    	}
+	},
     /* @prototype */
     {
 	    /**
@@ -19,43 +30,97 @@ steal.plugins(
 	     */
         init: function(el) {
             $(el).html('//editor/menubar/views/menubar.tmpl', {});
-            this.toolbarMore = this.find('img.more').hide();
-            this.toolbarEdit = this.find('span.editmode').hide();
-            this.pageOptions = this.find('div#page_options').hide();
+            this._updateView();
+            this._initDialogs();
         },
         
-        _showDesigner: function(pageId, url) {
-        	this._showDesignerToolbar(true);
-			this.element.find('.tab.active').removeClass('active');
-			el.addClass('active');
+        update: function(options) {
+        	if(options !== undefined) {
+        		this.options.mode = options.mode;
+        	}
+        	this._updateView();
         },
         
-        _showPages: function(mode) {
-        	this._showDesignerToolbar(false);
-			this.element.find('.tab.active').removeClass('active');
-			this.element.find('.tab.pages').addClass('active');
+        _updateView: function() {
+        	switch (this.options.mode) {
+	      	  case 0:
+	      		  this.toolbarMore = this.find('img.more').show();
+	      		  this.toolbarEdit = this.find('span.editmode').show();
+	      		  this.pageOptions = this.find('div#page_options').show();
+	      		  this.element.find('.tab.active').removeClass('active');
+	      		  break;
+	      	  case 1:
+	      		  this.toolbarMore = this.find('img.more').hide();
+	      		  this.toolbarEdit = this.find('span.editmode').hide();
+	      		  this.pageOptions = this.find('div#page_options').hide();
+	      		  break;
+	      	  case 2:
+	      		  this.toolbarMore = this.find('img.more').hide();
+	      		  this.toolbarEdit = this.find('span.editmode').hide();
+	      		  this.pageOptions = this.find('div#page_options').hide();
+	      		  break;
+        	}
         },
         
-        _showMedia: function() {
-        	this._showDesignerToolbar(false);
-			this.element.find('.tab.active').removeClass('active');
-			this.element.find('.tab.media').addClass('active');
-        },
-        
-        _showDesignerToolbar: function(show) {
-			this.toolbarEdit.toggle(show);
-			this.toolbarMore.toggle(show);
-			this.pageOptions.toggle(show);
-        },
-        
-        _toggleTab: function(el) {
-        	this.element.find('.tab.active').removeClass('active');
-        	el.addClass('active');
+        _initDialogs: function() {
+			this.addDialog = $('<div></div>')
+			.load('menubar/views/add-dialog.html')
+			.dialog({
+				modal: true,
+				title: 'Seite hinzufügen',
+				autoOpen: false,
+				resizable: false,
+				buttons: {
+					Abbrechen: function() {
+						$(this).dialog('close');
+					},
+					OK: $.proxy(function () {
+//						this.element.trigger('addPages');
+						this.addDialog.dialog('close');
+					},this)
+				},
+			});
+			
+			this.userDialog = $('<div></div>')
+			.load('menubar/views/user-dialog.html')
+			.dialog({
+				modal: true,
+				title: 'Einstellungen',
+				autoOpen: false,
+				resizable: false,
+				buttons: {
+					Abbrechen: function() {
+						$(this).dialog('close');
+					},
+					OK: $.proxy(function () {
+//						this.element.trigger('addPages');
+						this.userDialog.dialog('close');
+					},this)
+				},
+			});
+			
+			this.publishDialog = $('<div></div>')
+			.load('menubar/views/publish-dialog.html')
+			.dialog({
+				modal: true,
+				title: 'Seite publizieren',
+				autoOpen: false,
+				resizable: false,
+				buttons: {
+					Nein: function() {
+						$(this).dialog('close');
+					},
+					Ja: $.proxy(function () {
+//						this.element.trigger('addPages');
+						this.userDialog.dialog('close');
+					},this)
+				},
+			});
         },
         
         ".tab click": function(el, ev) {
-        	this._toggleTab(el);
-        	this._showDesignerToolbar(false);
+        	this.element.find('.tab.active').removeClass('active');
+        	el.addClass('active');
         },
         
 		".tab.pages click": function(el, ev) {
@@ -67,28 +132,32 @@ steal.plugins(
 		},
 		
 		"li.settings click": function(el, ev) {
-			steal.dev.log('settings')
 			$('.menu').hide();
-//			$('#editor').dialog( "option", "title", 'Einstellungen' ).dialog('open').load('user_preferences.html');
+			this.userDialog.dialog('open');
 		},
 		
 		"li.news click": function(el, ev) {
+			// TODO
 			steal.dev.log('news')
 		},
 		
 		"li.logout click": function(el, ev) {
+			// TODO
 			steal.dev.log('logout')
 		},
 		
 		"li.new_page click": function(el, ev) {
-			steal.dev.log('new_page')
+			$('.menu').hide();
+			this.addDialog.dialog('open');
 		},
 		
 		"li.new_upload click": function(el, ev) {
+			// TODO
 			steal.dev.log('upload')
 		},
 		
 		"li.new_note click": function(el, ev) {
+			// TODO
 			steal.dev.log('note')
 		},
 	
@@ -140,21 +209,7 @@ steal.plugins(
 				steal.dev.log('editmode is enabled');
 			} else {
 				steal.dev.log('editmode is disabled');
-				$('<div></div>').html('Wollen Sie die Seite jetzt publizieren?<br/>' +
-						'Wenn Sie die Seite publizieren, werden die gemachten Änderungen sofort sichtbar...')
-				.dialog({
-					modal: true,
-					resizable: false,
-					title: 'Seite publizieren',
-					buttons: {
-						Nein: function() {
-							$(this).dialog('close');
-						},
-						Ja: function() {
-							$(this).dialog('close');
-						}
-					}
-				});
+				this.publishDialog.dialog('open');
 			}
 		}
 		

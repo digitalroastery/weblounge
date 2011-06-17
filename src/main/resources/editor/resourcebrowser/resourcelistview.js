@@ -39,42 +39,50 @@ steal.plugins('jquery/view/tmpl', 'jqueryui/dialog')
 			});
 		},
 		
-		_openDialog: function(dialog, message) {
-			this.options.selectedPages = $('div.listView table input:checked');
+		"img.settings click": function(el, ev) {
+			var pageId = this.options.selectedPages = el.parents('tr.pageEntry');
+			steal.dev.log('open settings: ' + pageId);
+		},
+		
+		"img.delete click": function(el, ev) {
+			this.options.selectedPages = el.parents('tr.pageEntry');
 			if(this.options.selectedPages.length) {
-				dialog.dialog('open');
-				this._showMessage();
+				this.deleteDialog.dialog('open');
+			} else {
+				this._showMessage('Es wurde keine Seite markiert.');
+			}
+			
+		},
+		
+		"img.favorite click": function(el, ev) {
+			this.element.trigger('favorizePages', [el.parents('tr.pageEntry')]);
+			this._showMessage('Zu Favoriten hinzugefügt');
+		},
+		
+		"button.duplicate click": function(el, ev) {
+			this.options.selectedPages = this.find('tr.pageEntry input:checked').parents('tr.pageEntry');
+			if(this.options.selectedPages.length == 1) {
+				this.duplicateDialog.dialog('open');
+			} else if(this.options.selectedPages.length > 1) {
+				this._showMessage('Es kann nur eine Seite markiert werden.')
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
 			}
 		},
 		
-		"img.settings click": function(el, ev) {
-			steal.dev.log('settings')
-			var pageID = el.parents('tr').find('td:first-child input').attr('id');
-			steal.dev.log('delete: ' + pageID);
-		},
-		
-		"img.delete click": function(el, ev) {
-			var pageID = el.parents('tr').find('td:first-child input').attr('id');
-			steal.dev.log('delete: ' + pageID);
-		},
-		
-		"img.favorite click": function(el, ev) {
-			steal.dev.log('favorize')
-		},
-		
-		"button.duplicate click": function(el, ev) {
-			this._openDialog(this.duplicateDialog, 'Seite dupliziert');
-		},
-		
 		"button.delete click": function(el, ev) {
-			this._openDialog(this.deleteDialog, 'Seite gelöscht');
+			this.options.selectedPages = this.find('tr.pageEntry input:checked').parents('tr.pageEntry');
+			if(this.options.selectedPages.length) {
+				this.deleteDialog.dialog('open');
+			} else {
+				this._showMessage('Es wurde keine Seite markiert.');
+			}
 		},
 		
 		"button.favorize click": function(el, ev) {
-			this.options.selectedPages = $('div.listView table input:checked');
+			this.options.selectedPages = this.find('tr.pageEntry input:checked').parents('tr.pageEntry');
 			if(this.options.selectedPages.length) {
+				this.element.trigger('favorizePages', [this.options.selectedPages]);
 				this._showMessage('Zu Favoriten hinzugefügt');
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');

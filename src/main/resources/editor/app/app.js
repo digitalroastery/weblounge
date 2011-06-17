@@ -1,6 +1,16 @@
 steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', 'editor/composer', 'editor/designer').then(function($) {
 		
 	$.Controller('Editor.App',
+	{
+    	/**
+    	 * Mode 0 = Designer
+    	 * Mode 1 = Pages
+    	 * Mode 2 = Media
+    	 */
+    	defaults: {
+    		mode: 1
+    	}
+	},
 	/* @prototype */
 	{
 		
@@ -9,31 +19,53 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 			this.designerTab = this.find('#designer').editor_designer();
             this.pagesTab = this.find('#pagebrowser').editor_resourcebrowser({resourceType: 'pages'});
             this.mediaTab = this.find('#mediabrowser').editor_resourcebrowser({resourceType: 'media'});
-            this.tabElement = this.pagesTab;
-            this.designerTab.hide();
-            this.mediaTab.hide();
-			$('.composer').editor_composer();
+            $('.composer').editor_composer();
+            this._initTab();
         },
         
-        _toggleTab: function(tab) {
-        	this.tabElement.hide();
-        	this.tabElement = tab;
-        	tab.show();
+        _initTab: function() {
+        	this.update();
+        },
+        
+        update: function(options) {
+        	if(options !== undefined) {
+        		this.options.mode = options.mode;
+        	}
+        	switch (this.options.mode) {
+	      	  case 0:
+	      		this.designerTab.show();
+	      	  	this.pagesTab.hide();
+	      	  	this.mediaTab.hide();
+	      		break;
+	      	  case 1:
+	      		this.pagesTab.show();
+	      	  	this.designerTab.hide();
+	      	  	this.mediaTab.hide();
+	      	  	break;
+	      	  case 2:
+	      		this.mediaTab.show();
+	      		this.designerTab.hide();
+	      	  	this.pagesTab.hide();
+	      		break;
+        	}
         },
         
         "a showDesigner": function(el, ev, pageId, url) {
-        	this._toggleTab(this.designerTab);
+        	this.update({mode: 0});
+        	this.menuBar.editor_menubar({mode: 0});
         	this.designerTab.editor_designer('show', pageId, url);
         },
         
         "a showPages": function(el, ev) {
-        	this._toggleTab(this.pagesTab);
-//        	this.pagesTab.editor_resourcebrowser('mach öbis');
+        	this.update({mode: 1});
+        	this.menuBar.editor_menubar({mode: 1});
+        	this.pagesTab.editor_resourcebrowser();
         },
         
         "a showMedia": function(el, ev) {
-        	this._toggleTab(this.mediaTab);
-//        	this.mediaTab.editor_resourcebrowser('mach öbis');
+        	this.update({mode: 2});
+        	this.menuBar.editor_menubar({mode: 2});
+        	this.mediaTab.editor_resourcebrowser();
         }
 		
 	});
