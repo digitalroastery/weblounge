@@ -10,7 +10,7 @@ steal.plugins(
     $(document.body).append('//editor/views/app', {});
 
     // Start the Weblounge Editor App
-    $('#container').editor_app();
+    $('#weblounge-editor').editor_app();
 
   });
 

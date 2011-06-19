@@ -1,151 +1,47 @@
-header.menubar {
-	position: fixed;
-	height: 44px;
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4D585E), to(#242F37));
-	background-image: -moz-linear-gradient(0% 0% 90deg,#4D585E, #242F37);
-/*	background: #000 url(../images/bg_toolbar.png) repeat-x; old Browser only */
-	border: 1px solid #333;
-	width: 100%;
-	line-height: 44px;
-	z-index: 99;
-	text-align: left;
-	color: #fff;
-}
-
-header.menubar a.tab {
-	padding: 15px 15px;
-	margin: 0 1px;
-	color: #fff;
-	text-decoration: none;
-	border-left: 1px solid transparent;
-	border-right: 1px solid transparent;
-}
-
-header.menubar a.tab.active,
-header.menubar a.tab:hover {
-	background-color: #2c2c2d;
-	border-left: 1px solid #464647;
-	border-right: 1px solid #464647;
-	background-image: -webkit-gradient(
-	    linear,
-	    left top,
-	    right top,
-	    color-stop(0, rgb(50,50,50)),
-	    color-stop(0.5, rgb(69,68,68)),
-	    color-stop(1, rgb(50,50,50))
-	);
-	background-image: -moz-linear-gradient(
-	    left center,
-	    rgb(50,50,50) 0%,
-	    rgb(69,68,68) 50%,
-	    rgb(50,50,50) 100%
-	);
-}
-
-header input[type="search"],
-nav input[type="text"] {
-	background: #000 url('resources/lupe.png') no-repeat 3px right;
-	color: #999;
-	padding: 5px;
-	margin-right: 50px;
-	-moz-border-radius: 10px;
-	border-radius: 6px;
-	border: 1px solid #9B9B9B;
-	border-top: 0;
-	border-left: 0;
-	width: 200px;
-}
-
-header.menubar .right {
-	float: right;
-	margin-right: 10px;
-}
-
-header.menubar img.user {
-	position: relative;
-	top: 8px;
-	padding-right: 5px;
-}
-
-header.menubar img.add {
-	position: relative;
-	top: 8px;
-	padding: 0 50px;
-}
-
-header.menubar img.publish {
-	position: relative;
-	top: 8px;
-	padding: 0 0 0 50px;
-}
-
-header.menubar img.more,
-header.menubar img.write {
-	position: relative;
-	top: 8px;
-	padding: 0 0 0 10px
-}
-
-header.menubar img,
-header.menubar .profile-menu,
-div.overlay_icons span.more {
-	cursor: pointer;
-}
-
-header.menubar .menu,
-.page .menu {
-	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
-    border: 1px solid #FFFFFF;
-    display: none;
-    line-height: 20px;
-    padding: 20px 0;
-    position: relative;
-    top: 10px;
-    width: 200px;
-}
-
-header.menubar span.editmode {
-	margin-left: 50px;
-}
-
-header.menubar div#page_options {
-	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
-	position: fixed;
-    right: -200px;
-    top: 350px;
-    width: 200px;
-    padding-left: 50px;
-    cursor: pointer;
-}
-
-.menu ul, #page_options ul {
+.editor_menubar {
+    background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
+    border: 1px solid #333333;
     color: #FFFFFF;
-    cursor: pointer;
-    list-style: none outside none;
-    margin-top: -2em;
+    height: 44px;
+    line-height: 44px;
+    position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+    text-align: left;
+    width: 100%;
+    z-index: 99;
 }
-.menu ul li:hover, #page_options ul li:hover {
-    color: red;
+
+.editor_menubar a.tab {
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    color: #FFFFFF;
+    margin: 0 1px;
+    padding: 15px 15px;
+    text-decoration: none;
 }
-#more-menu {
-    left: 250px;
+
+.editor_menubar a.tab.active,
+.editor_menubar a.tab:hover {
+    background-color: #2C2C2D;
+    background-image: -moz-linear-gradient(left center , #323232 0%, #454444 50%, #323232 100%);
+    border-left: 1px solid #464647;
+    border-right: 1px solid #464647;
 }
-#add-menu {
-    left: 160px;
+
+.editor_menubar input[type="search"] {
+    border-left: 0 none;
+    border-radius: 6px 6px 6px 6px;
+    border-top: 0 none;
+    color: #999999;
+    margin-right: 50px;
+    padding: 5px;
 }
-#profile-menu {
-    position: absolute;
-    right: 10px;
-    top: 55px;
-}
-#profile-menu span.triangle-up {
-    left: 180px;
-}
-.page_more_menu {
-    left: 100px;
-    position: absolute !important;
-    top: 180px !important;
-    z-index: 2;
+
+.editor_menubar .right {
+    float: right;
+    margin-right: 10px;
 }
 
 .triangle-down {
@@ -169,6 +65,67 @@ header.menubar div#page_options {
 	top: -42px;
 	margin: 0 5px;
 	left: 90px;
+}
+
+.editor_menubar img,
+.editor_menubar .profile-menu,
+div.overlay_icons span.more {
+	cursor: pointer;
+}
+
+img.user {
+	position: relative;
+	top: 8px;
+	padding-right: 5px;
+}
+
+img.add {
+	position: relative;
+	top: 8px;
+	padding: 0 50px;
+}
+
+/* menu */
+.menu {
+	display: none;
+	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
+    border: 1px solid #FFFFFF;
+    -moz-border-radius: 5px;
+    line-height: 20px;
+    padding: 20px 0;
+    width: 200px;
+    z-index: 2;
+}
+
+.menu ul {
+	list-style: none;
+	margin-top: -2em;
+	color: #fff;
+}
+.menu ul li:hover {
+	color: red;
+	cursor: pointer;
+}
+.menu ul li.inactive,
+.menu ul li.inactive:hover {
+	color: #999;
+	cursor: default;
+}
+
+#add-menu {
+	position: absolute;
+	top: 55px;
+    left: 240px;
+}
+
+#profile-menu {
+	position: absolute;
+	top: 55px;
+	right: 10px;
+}
+
+#profile-menu span.triangle-up {
+	left: 180px;
 }
 
 div#search-result {
@@ -225,3 +182,32 @@ div#search-result p.footer {
 	padding: 5px 0;
 	cursor: pointer;
 }
+
+nav.weblounge {
+	position: relative;
+	height: 30px;
+	line-height: 30px;
+	text-align: left;
+	padding: 10px 5px;
+	padding: 10px 0;
+}
+
+.align_left {
+	float: left;
+}
+
+.align_center {
+	margin: 0 auto;
+	text-align: center;
+}
+
+.align_right {
+	float: right;
+}
+
+/* custom button icons */
+.icon-list {background: url('images/icon_list.png') no-repeat top left !important}
+.icon-tree {background: url('images/icon_tree.png') no-repeat top left !important}
+.icon-thumbnails {background: url('images/icon_thumbnails.png') no-repeat top left !important}
+
+button:hover {color: #000}

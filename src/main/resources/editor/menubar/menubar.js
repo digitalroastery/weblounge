@@ -13,16 +13,7 @@ steal.plugins(
 .then(function($) {
 
     $.Controller("Editor.Menubar",
-	{
-    	/**
-    	 * Mode 0 = Designer
-    	 * Mode 1 = Pages
-    	 * Mode 2 = Media
-    	 */
-    	defaults: {
-    		mode: 1
-    	}
-	},
+	{	},
     /* @prototype */
     {
 	    /**
@@ -30,92 +21,12 @@ steal.plugins(
 	     */
         init: function(el) {
             $(el).html('//editor/menubar/views/menubar.tmpl', {});
-            this._updateView();
-            this._initDialogs();
         },
         
         update: function(options) {
         	if(options !== undefined) {
         		this.options.mode = options.mode;
         	}
-        	this._updateView();
-        },
-        
-        _updateView: function() {
-        	switch (this.options.mode) {
-	      	  case 0:
-	      		  this.toolbarMore = this.find('img.more').show();
-	      		  this.toolbarEdit = this.find('span.editmode').show();
-	      		  this.pageOptions = this.find('div#page_options').show();
-	      		  this.element.find('.tab.active').removeClass('active');
-	      		  break;
-	      	  case 1:
-	      		  this.toolbarMore = this.find('img.more').hide();
-	      		  this.toolbarEdit = this.find('span.editmode').hide();
-	      		  this.pageOptions = this.find('div#page_options').hide();
-	      		  break;
-	      	  case 2:
-	      		  this.toolbarMore = this.find('img.more').hide();
-	      		  this.toolbarEdit = this.find('span.editmode').hide();
-	      		  this.pageOptions = this.find('div#page_options').hide();
-	      		  break;
-        	}
-        },
-        
-        _initDialogs: function() {
-			this.addDialog = $('<div></div>')
-			.load('menubar/views/add-dialog.html')
-			.dialog({
-				modal: true,
-				title: 'Seite hinzufügen',
-				autoOpen: false,
-				resizable: false,
-				buttons: {
-					Abbrechen: function() {
-						$(this).dialog('close');
-					},
-					OK: $.proxy(function () {
-//						this.element.trigger('addPages');
-						this.addDialog.dialog('close');
-					},this)
-				},
-			});
-			
-			this.userDialog = $('<div></div>')
-			.load('menubar/views/user-dialog.html')
-			.dialog({
-				modal: true,
-				title: 'Einstellungen',
-				autoOpen: false,
-				resizable: false,
-				buttons: {
-					Abbrechen: function() {
-						$(this).dialog('close');
-					},
-					OK: $.proxy(function () {
-//						this.element.trigger('addPages');
-						this.userDialog.dialog('close');
-					},this)
-				},
-			});
-			
-			this.publishDialog = $('<div></div>')
-			.load('menubar/views/publish-dialog.html')
-			.dialog({
-				modal: true,
-				title: 'Seite publizieren',
-				autoOpen: false,
-				resizable: false,
-				buttons: {
-					Nein: function() {
-						$(this).dialog('close');
-					},
-					Ja: $.proxy(function () {
-//						this.element.trigger('addPages');
-						this.userDialog.dialog('close');
-					},this)
-				},
-			});
         },
         
         ".tab click": function(el, ev) {
