@@ -1,11 +1,11 @@
 /* mini-rest & general declarations */
-html * {
+.editor_app * {
   font-size: 100.01%;
-}
-
-body {
   font-family: arial,verdana,tahoma;
   font-size: 12px;
-  /* make space for the menubar */
+}
+
+/* make space for the menubar */
+body {
   margin-top: 45px;
 }
