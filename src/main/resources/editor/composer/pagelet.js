@@ -12,21 +12,20 @@ steal.then(function($) {
      * Initialize a new Pagelet controller.
      */
     init: function(el) {
-	
+		this.index = this.element.index();
+		steal.dev.log('init pagelet with index ' + this.index);
     },
 
 	'hoverenter': 	function(ev, hover) {
-      //log('pagelet hover in');
       this.element.append('<div class="icon_editing"></div>');
     },
 
 	'hoverleave': 	function(ev, hover) {
-      // log('pagelet hover out');
       this.element.find('div.icon_editing').remove();
     },
 
 	'div.icon_editing click': function(ev) {
-		steal.dev.log('editing icon clicked.');
+		steal.dev.log('editing pagelet with index ' + this.index + ' in composer ' + this.options.composer.id);
 	}
 
   });
