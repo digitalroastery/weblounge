@@ -507,6 +507,14 @@
       </plugins>
     </pluginManagement>
     
+    <extensions>
+        <extension>
+            <groupId>org.springframework.build.aws</groupId>
+            <artifactId>org.springframework.build.aws.maven</artifactId>
+            <version>3.0.0.RELEASE</version>
+        </extension>
+    </extensions>
+        
   </build>
 
   <dependencyManagement>
@@ -749,19 +757,18 @@
   </repositories>
 
   <distributionManagement>
+    
+    <repository>
+        <id>entwine.releases</id>
+        <name>Entwine S3 Release Repository</name>
+        <url>s3://com.entwinemedia.maven/releases</url>
+    </repository>
 
     <snapshotRepository>
-      <id>o2it.snapshots</id>
-      <name>Entwine Snapshot Repository</name>
-      <url>http://maven.o2it.ch/content/repositories/snapshots</url>
-      <uniqueVersion>false</uniqueVersion>
+        <id>entwine.snapshots</id>
+        <name>Entwine S3 Snapshot Repository</name>
+        <url>s3://com.entwinemedia.maven/snapshots</url>
     </snapshotRepository>
-
-    <repository>
-      <id>o2it.releases</id>
-      <name>Entwine Releases Repository</name>
-      <url>http://maven.o2it.ch/content/repositories/releases</url>
-    </repository>
 
   </distributionManagement>
 
