@@ -45,6 +45,9 @@ public class ComposerTag extends ComposerTagSupport {
   /** Serial version uid */
   private static final long serialVersionUID = 3832079623323702494L;
 
+  /** Name of the request parameter that will trigger editing support */
+  public static final String WORKBENCH_PARAM = "edit";
+
   /** True if the composer should not be editable */
   protected boolean isLocked = false;
 
@@ -106,9 +109,10 @@ public class ComposerTag extends ComposerTagSupport {
     // Start editing support
     // FIXME temporary solution
     // if (version == Page.WORK && isLockedByCurrentUser) {
-    writer.println("<div class=\"pagelet\">");
-    writer.flush();
-    // }
+    if (request.getParameter(WORKBENCH_PARAM) != null) {
+      writer.println("<div class=\"pagelet\">");
+      writer.flush();
+    }
 
     return super.beforePagelet(pagelet, position, writer);
   }
@@ -129,12 +133,13 @@ public class ComposerTag extends ComposerTagSupport {
     // finally {
     // FIXME temporary solution
     // if (version == Page.WORK && isLockedByCurrentUser && request.getAttribute(PageletEditorTag.ID) == null) {
+    if (request.getParameter(WORKBENCH_PARAM) != null) {
       request.setAttribute(WebloungeRequest.PAGE, targetPage);
       request.setAttribute(WebloungeRequest.PAGELET, pagelet);
       request.setAttribute(WebloungeRequest.COMPOSER, new ComposerImpl(name));
       writer.println("</div>");
       writer.flush();
-    //}
+    }
 
     super.afterPagelet(pagelet, position, writer);
   }
