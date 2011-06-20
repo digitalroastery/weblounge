@@ -25,7 +25,7 @@ steal.plugins('jquery/controller').then(function($) {
 		
 		_initDialogs: function() {
 			this.deleteDialog = $('<div></div>')
-			.load('resourcebrowser/views/delete-dialog.html')
+			.load('weblounge/editor/resourcebrowser/views/delete-dialog.html')
 			.dialog({
 				modal: true,
 				title: 'Seite(n) löschen',
@@ -44,7 +44,7 @@ steal.plugins('jquery/controller').then(function($) {
 			});
 
 			this.duplicateDialog = $('<div></div>')
-			.load('resourcebrowser/views/duplicate-dialog.html')
+			.load('weblounge/editor/resourcebrowser/views/duplicate-dialog.html')
 			.dialog({
 				modal: true,
 				title: 'Seite duplizieren',

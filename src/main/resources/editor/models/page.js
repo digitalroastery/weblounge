@@ -1,41 +1,58 @@
 steal.then('jsonix')
 .then(function($) {
 	
-	unmarshalPage = function(data, success) {
+	unmarshalPage = function(xml) {
 		var unmarshaller = Editor.Jsonix.context().createUnmarshaller();
-		var json = unmarshaller.unmarshalDocument(data);
-		success(json.value.page); 
+		return unmarshaller.unmarshalDocument(xml);
+	};
+	
+	marshalPage = function(json) {
+		var marshaller = Editor.Jsonix.context().createMarshaller();
+		var xml = marshaller.marshalString(json);
+		return xml;
 	};
 	
 	$.Model('Page',
 	/* @Static */
 	{
-		findOne: function(params, success, error) {
+		getFromId: function(params, success, error) {
 			if ('id' in params) {
 				$.ajax('/system/weblounge/pages/' + params.id, {
 					success: function(xml) {
-						unmarshalPage(xml, success);
+						var json = unmarshalPage(xml);
+						success(json.value);
+					}
+				});
+			}
+		},
+		
+		getFromPath: function(params, success, error) {
+			if ('path' in params) {
+				$.ajax('/system/weblounge/pages?path=' + params.path, {
+					success: function(xml) {
+						var json = unmarshalPage(xml);
+						success(json.value);
 					}
 				});
 			}
 		},
 		
 		findAll: function(params, success, error) {
-			steal.dev.log('try loading children...');
 			$.ajax('/system/weblounge/pages/4bb19980-8f98-4873-a813-000000000001/children', {
 				success: function(xml) {
-					unmarshalPage(xml, success);
+					var json = unmarshalPage(xml);
+					success(json.value.page);
 				}
 			});
 		},
 		
-		destroy: function(params, attrs, success, error){
+		update: function(params, attrs, success, error){
 			if ('id' in params) {
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id,
 					type: 'put',
 					dataType: 'xml',
-					data: attrs
+					data: marshalPage(attrs)
 				});
 			}	
 		},
@@ -51,7 +68,7 @@ steal.then('jsonix')
 			}	
 		},
 		
-		update: function(params, success, error){
+		destroy: function(params, success, error){
 			if ('id' in params) {
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id,

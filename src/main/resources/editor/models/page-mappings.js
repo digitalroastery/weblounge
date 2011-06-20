@@ -12,10 +12,6 @@ PageMappings.User = new Jsonix.Model.ClassInfo({
   name: 'PageMappings.User'
 });
 
-PageMappings.LanguageValue = new Jsonix.Model.ClassInfo({
-  name: 'PageMappings.LanguageValue'
-});
-
 PageMappings.CreatedModified = new Jsonix.Model.ClassInfo({
   name: 'PageMappings.CreatedModified'
 });
@@ -73,14 +69,6 @@ PageMappings.User.properties = [new Jsonix.Model.AttributePropertyInfo({
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 }), new Jsonix.Model.ValuePropertyInfo({
   name: 'name',
-  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
-})];
-
-PageMappings.LanguageValue.properties = [new Jsonix.Model.AttributePropertyInfo({
-  name: "language",
-  typeInfo: Jsonix.Schema.XSD.String.INSTANCE
-}), new Jsonix.Model.ValuePropertyInfo({
-  name: 'value',
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 })];
 
@@ -175,28 +163,53 @@ PageMappings.Head.properties = [new Jsonix.Model.ElementPropertyInfo({
 	typeInfo: PageMappings.Locked
 })];
 
-PageMappings.Head.Metadata.properties = [new Jsonix.Model.ElementPropertyInfo({
-  name: "title",
-  collection: true,
-  typeInfo: PageMappings.LanguageValue
+PageMappings.Head.Metadata.properties = [new Jsonix.Model.ElementMapPropertyInfo({
+	name: "title",
+	key : new Jsonix.Model.AttributePropertyInfo({
+		name : "language",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	}),
+	value : new Jsonix.Model.ValuePropertyInfo({
+		name : "value",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	})
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'subject',
   collection: true,
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
-}), new Jsonix.Model.ElementPropertyInfo({
-  name: "description",
-  collection: true,
-  typeInfo: PageMappings.LanguageValue
+}), new Jsonix.Model.ElementMapPropertyInfo({
+	name: "description",
+	key : new Jsonix.Model.AttributePropertyInfo({
+		name : "language",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	}),
+	value : new Jsonix.Model.ValuePropertyInfo({
+		name : "value",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	})
 }), new Jsonix.Model.ElementPropertyInfo({
 	name: 'type',
 	typeInfo: Jsonix.Schema.XSD.String.INSTANCE
-}), new Jsonix.Model.ElementPropertyInfo({
-  name: "coverage",
-  collection: true,
-  typeInfo: PageMappings.LanguageValue
-}), new Jsonix.Model.ElementPropertyInfo({
-  name: "rights",
-  typeInfo: PageMappings.LanguageValue
+}), new Jsonix.Model.ElementMapPropertyInfo({
+	name: "coverage",
+	key : new Jsonix.Model.AttributePropertyInfo({
+		name : "language",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	}),
+	value : new Jsonix.Model.ValuePropertyInfo({
+		name : "value",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	})
+}), new Jsonix.Model.ElementMapPropertyInfo({
+	name: "rights",
+	key : new Jsonix.Model.AttributePropertyInfo({
+		name : "language",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	}),
+	value : new Jsonix.Model.ValuePropertyInfo({
+		name : "value",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	})
 })];
 
 // <body>...</body>
@@ -227,6 +240,9 @@ PageMappings.Body.Composer.Pagelet.properties = [new Jsonix.Model.AttributePrope
   name: 'id',
   typeInfo: Jsonix.Schema.XSD.String.INSTANCE
 }), new Jsonix.Model.ElementPropertyInfo({
+	name: 'security',
+	typeInfo: PageMappings.Security
+}), new Jsonix.Model.ElementPropertyInfo({
   name: 'created',
   typeInfo: PageMappings.CreatedModified
 }), new Jsonix.Model.ElementPropertyInfo({
@@ -235,6 +251,9 @@ PageMappings.Body.Composer.Pagelet.properties = [new Jsonix.Model.AttributePrope
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'locale',
   typeInfo: PageMappings.Body.Composer.Pagelet.Locale
+}), new Jsonix.Model.ElementPropertyInfo({
+  name: 'properties',
+  typeInfo: PageMappings.Body.Composer.Pagelet.Property
 })];
 
 PageMappings.Body.Composer.Pagelet.Locale.properties = [new Jsonix.Model.AttributePropertyInfo({
@@ -258,12 +277,16 @@ PageMappings.Body.Composer.Pagelet.Locale.properties = [new Jsonix.Model.Attribu
 	})
 })];
 
-PageMappings.Body.Composer.Pagelet.Property.properties = [new Jsonix.Model.AttributePropertyInfo({
-	name: 'id',
-	typeInfo: Jsonix.Schema.XSD.String.INSTANCE
-}), new Jsonix.Model.ValuePropertyInfo({
-	name: 'value',
-	typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+PageMappings.Body.Composer.Pagelet.Property.properties = [new Jsonix.Model.ElementMapPropertyInfo({
+	name: 'property',
+	key: new Jsonix.Model.AttributePropertyInfo({
+		name: 'id',
+		typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+	}),
+	value: new Jsonix.Model.ValuePropertyInfo({
+		name: 'value',
+		typeInfo: Jsonix.Schema.XSD.String.INSTANCE
+	})
 })];
 
 PageMappings.typeInfos = [PageMappings.Head];
