@@ -54,7 +54,7 @@
     <dependency>
       <groupId>org.apache.felix.karaf.shell</groupId>
       <artifactId>org.apache.felix.karaf.shell.console</artifactId>
-      <version>1.0.0</version>
+      <version>1.4.0</version>
     </dependency>
 
     <!-- thirdparty -->
@@ -68,7 +68,7 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
-
+    
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-lgpl</artifactId>
@@ -78,7 +78,7 @@
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-lgpl</artifactId>
     </dependency>
-
+ 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
