@@ -5,6 +5,7 @@
 		<title>Welcome to Weblounge</title>
 		<webl:generator/>
 		<webl:headers/>
+		<webl:workbench/>
 	</head>
 	<body>
 		<h1><%= "Welcome to the Weblounge 3.0 testpage!" %></h1>

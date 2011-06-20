@@ -5,6 +5,7 @@
 		<title>Weblounge Test Site</title>
 		<webl:generator/>
 		<webl:headers/>
+		<webl:workbench/>
 	</head>
 	<body>
 		<webl:composer name="main"/>
