@@ -9,20 +9,23 @@
 
     <pagelet id="title" composeable="true">
       <name>Title</name>
-      <renderer>file://${module.root}/jsp/title/title.jsp</renderer>
-      <renderer type="feed">file://${module.root}/jsp/title/title-feed.jsp</renderer>
+      <renderer>file://${module.root}/title/title.jsp</renderer>
+      <renderer type="feed">file://${module.root}/title/title-feed.jsp</renderer>
+      <editor>file://${module.root}/title/title_editor.jsp</editor>
       <preview>first</preview>
     </pagelet>
 
     <pagelet id="subtitle" composeable="true">
       <name>Subtitle</name>
-      <renderer>file://${module.root}/jsp/subtitle/subtitle.jsp</renderer>
+      <renderer>file://${module.root}/subtitle/subtitle.jsp</renderer>
+      <editor>file://${module.root}/subtitle/subtitle_editor.jsp</editor>
     </pagelet>
 
     <pagelet id="paragraph" composeable="true">
       <name>Paragraph</name>
-      <renderer>file://${module.root}/jsp/paragraph/paragraph.jsp</renderer>
-      <renderer type="feed">file://${module.root}/jsp/paragraph/paragraph-feed.jsp</renderer>
+      <renderer>file://${module.root}/paragraph/paragraph.jsp</renderer>
+      <renderer type="feed">file://${module.root}/paragraph/paragraph-feed.jsp</renderer>
+      <editor>file://${module.root}/paragraph/paragraph_editor.jsp</editor>
     </pagelet>
 
   </pagelets>

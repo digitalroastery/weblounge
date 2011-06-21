@@ -40,6 +40,44 @@
   </head>
   <body>
     <composer id="main">
+      <pagelet module="text" id="title">
+        <security>
+          <owner>
+            <user id="hans" realm="testland">Hans Muster</user>
+          </owner>
+        </security>
+        <created>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <date>2009-01-07T19:05:41Z</date>
+        </created>
+        <published>
+          <user id="hans" realm="testland">Hans Muster</user>
+          <from>2009-01-07T19:05:41Z</from>
+          <to>292278994-08-17T07:12:55Z</to>
+        </published>
+        <locale language="de" original="true">
+          <modified>
+            <user id="hans" realm="testland">Hans Muster</user>
+            <date>2009-01-07T19:05:41Z</date>
+          </modified>
+          <text id="title"><![CDATA[Friedrich Nietzsche]]></text>
+          <text id="keyword"><![CDATA[Neu]]></text>
+          <text id="lead"><![CDATA[Technik]]></text>
+        </locale>
+        <locale language="fr">
+          <modified>
+            <user id="amelie" realm="testland">Amélie Poulard</user>
+            <date>2009-02-18T21:06:40Z</date>
+          </modified>
+          <text id="title"><![CDATA[Friedrich Nietzsche]]></text>
+          <text id="keyword"><![CDATA[Nouveau]]></text>
+          <text id="lead"><![CDATA[Technique]]></text>
+        </locale>
+        <properties>
+          <property id="date"><![CDATA[01.04.2011]]></property>
+          <property id="author"><![CDATA[Gandalf der Weise]]></property>
+        </properties>
+      </pagelet>
       <pagelet module="test" id="content">
         <security>
           <owner>
