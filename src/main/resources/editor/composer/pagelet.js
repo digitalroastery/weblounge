@@ -1,4 +1,7 @@
-steal.plugins('jqueryui/widget')
+steal.plugins('jqueryui/dialog',
+		'jqueryui/draggable',
+		'jqueryui/resizable',
+		'jqueryui/mouse')
 .models('../../models/workbench')
 .resources('trimpath-template')
 .then(function($) {
@@ -16,35 +19,34 @@ steal.plugins('jqueryui/widget')
      */
     init: function(el) {
 		this.index = this.element.index();
-		steal.dev.log('init pagelet with index ' + this.index);
+		this.element.attr('index', this.index);
     },
     
-    _openPageEditor: function(editor) {
-    	// TODO Editordialog
-//    	var data = editor.getData();
-//    	var template = editor.getTemplate();
-//    	
-//    	var templateObject = TrimPath.parseTemplate (template);
-//    	var result  = templateObject.process(data);
-//    	
-//    	steal.dev.log(editor);
-//		this.editorDialog = $('<div></div>').html('')
-//		.dialog({
-//			modal: true,
-//			title: 'Seite bearbeiten',
-//			resizable: true,
-//			draggable: true,
-//			buttons: {
-//				Abbrechen: function() {
-//					$(this).dialog('close');
-//				},
-//				OK: $.proxy(function () {
-////					this.element.trigger('duplicatePages', [this.options.selectedPages]);
-////					this._showMessage('Seite dupliziert!');
-//					this.editorDialog.dialog('close');
-//				}, this)
-//			}
-//		});
+    _openPageEditor: function(pageletEditor) {
+    	// Evtl. einlesen mit marshaller oder JSON in data muss von Server korrekt oder als xml kommen
+    	var data = jQuery.parseJSON(pageletEditor.getElementsByTagName('data')[0].firstChild.nodeValue);
+    	var editor = pageletEditor.getElementsByTagName('editor')[0].firstChild.nodeValue;
+    	var renderer = pageletEditor.getElementsByTagName('renderer')[0].firstChild.nodeValue;
+    	
+    	var templateObject = TrimPath.parseTemplate(editor);
+    	var result  = templateObject.process(data);
+		this.editorDialog = $('<div></div>').html(result)
+		.dialog({
+			modal: true,
+			title: 'Seite bearbeiten',
+			resizable: true,
+			buttons: {
+				Abbrechen: function() {
+					$(this).dialog('close');
+				},
+				OK: $.proxy(function () {
+					// SAVE JSON DATA
+//					this.element.trigger('duplicatePages', [this.options.selectedPages]);
+//					this._showMessage('Seite dupliziert!');
+					this.editorDialog.dialog('close');
+				}, this)
+			}
+		});
     	
     },
 
@@ -57,8 +59,7 @@ steal.plugins('jqueryui/widget')
     },
 
 	'div.icon_editing click': function(ev) {
-		Workbench.findOne({ id: this.options.composer.pageId, composer: this.options.composer.id, pagelet: this.index }, this.callback('_openPageEditor'));
-		steal.dev.log('editing pagelet with index ' + this.index + ' in composer ' + this.options.composer.id);
+		Workbench.findOne({ id: this.options.composer.page.id, composer: this.options.composer.id, pagelet: this.index }, this.callback('_openPageEditor'));
 	}
 
   });

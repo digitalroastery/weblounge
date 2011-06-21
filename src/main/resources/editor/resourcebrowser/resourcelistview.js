@@ -1,4 +1,4 @@
-steal.plugins('jquery/view/tmpl', 'jqueryui/dialog')
+steal.plugins('jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/resourcelistview.tmpl')
 .resources('jquery.dataTables.min')
 .then('resourceview', 'resourcelistviewitem')

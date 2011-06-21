@@ -4,6 +4,9 @@ steal.plugins(
 	'jquery/view',
 	'jquery/view/tmpl',
 	'jqueryui/dialog',
+	'jqueryui/draggable',
+	'jqueryui/resizable',
+	'jqueryui/mouse',
 	'jqueryui/button')
 .views(
 	'//editor/menubar/views/menubar.tmpl')
@@ -44,17 +47,19 @@ steal.plugins(
         _updateView: function() {
         	switch (this.options.mode) {
 	      	  case 0:
+	      		  this._toggleTab(this.find('.tab.designer'));
 	      		  this.toolbarMore = this.find('img.more').show();
 	      		  this.toolbarEdit = this.find('span.editmode').show();
 	      		  this.pageOptions = this.find('div#page_options').show();
-	      		  this.element.find('.tab.active').removeClass('active');
 	      		  break;
 	      	  case 1:
+	      		  this._toggleTab(this.find('.tab.pages'));
 	      		  this.toolbarMore = this.find('img.more').hide();
 	      		  this.toolbarEdit = this.find('span.editmode').hide();
 	      		  this.pageOptions = this.find('div#page_options').hide();
 	      		  break;
 	      	  case 2:
+	      		  this._toggleTab(this.find('.tab.media'));
 	      		  this.toolbarMore = this.find('img.more').hide();
 	      		  this.toolbarEdit = this.find('span.editmode').hide();
 	      		  this.pageOptions = this.find('div#page_options').hide();
@@ -69,7 +74,7 @@ steal.plugins(
 				modal: true,
 				title: 'Seite hinzufügen',
 				autoOpen: false,
-				resizable: false,
+				resizable: true,
 				buttons: {
 					Abbrechen: function() {
 						$(this).dialog('close');
@@ -87,7 +92,7 @@ steal.plugins(
 				modal: true,
 				title: 'Einstellungen',
 				autoOpen: false,
-				resizable: false,
+				resizable: true,
 				buttons: {
 					Abbrechen: function() {
 						$(this).dialog('close');
@@ -118,10 +123,17 @@ steal.plugins(
 			});
         },
         
-        
-        ".tab click": function(el, ev) {
+        _toggleTab: function(el) {
         	this.element.find('.tab.active').removeClass('active');
         	el.addClass('active');
+        },
+        
+        ".tab click": function(el, ev) {
+        	this._toggleTab(el);
+        },
+        
+        ".tab.designer click": function(el, ev) {
+        	el.trigger('showDesigner');
         },
         
 		".tab.pages click": function(el, ev) {
@@ -209,7 +221,7 @@ steal.plugins(
 			if(el.is(':checked')) {
 //				steal.dev.log(location.href);
 //				steal.dev.log(window.location.search);
-				$('body').load(location.href + '?mode=edit');
+//				$('body').load(location.href + '?mode=edit');
 				// Reload Page with Parameter mode=edit oder so
 //				steal.dev.log('editmode is enabled');
 			} else {

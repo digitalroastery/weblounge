@@ -1,4 +1,4 @@
-steal.plugins('jquery/view/tmpl','jqueryui/widget')
+steal.plugins('jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/resourcescrollview.tmpl')
 .resources('jquery.smoothDivScroll-1.1')
 .css('smoothDivScroll')

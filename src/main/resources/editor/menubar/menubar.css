@@ -30,8 +30,9 @@
     border-right: 1px solid #464647;
 }
 
-.editor_menubar input[type="search"] {
+.editor_menubar input[type="search"], nav.icons input[type="text"] {
     border-left: 0 none;
+    background: #000 url('images/lupe.png') no-repeat 3px right;
     border-radius: 6px 6px 6px 6px;
     border-top: 0 none;
     color: #999999;

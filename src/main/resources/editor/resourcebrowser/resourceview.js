@@ -1,4 +1,9 @@
-steal.plugins('jquery/controller').then(function($) {
+steal.plugins('jquery/controller',
+		'jqueryui/dialog',
+		'jqueryui/draggable',
+		'jqueryui/resizable',
+		'jqueryui/mouse')
+.then(function($) {
 
 	/*
 	 *
@@ -30,7 +35,7 @@ steal.plugins('jquery/controller').then(function($) {
 				modal: true,
 				title: 'Seite(n) löschen',
 				autoOpen: false,
-				resizable: false,
+				resizable: true,
 				buttons: {
 					Abbrechen: function() {
 						$(this).dialog('close');
@@ -49,7 +54,7 @@ steal.plugins('jquery/controller').then(function($) {
 				modal: true,
 				title: 'Seite duplizieren',
 				autoOpen: false,
-				resizable: false,
+				resizable: true,
 				buttons: {
 					Abbrechen: function() {
 						$(this).dialog('close');

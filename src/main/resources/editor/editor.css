@@ -5,7 +5,13 @@
   font-size: 12px;
 }
 
+/* global */
+div.DataTables_sort_wrapper span {
+	display: inline-block;
+}
+
 /* make space for the menubar */
 body {
   margin-top: 45px;
 }
+

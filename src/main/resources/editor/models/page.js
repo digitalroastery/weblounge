@@ -1,46 +1,37 @@
 steal.then('jsonix')
 .then(function($) {
 	
-	unmarshalPage = function(xml) {
-		var unmarshaller = Editor.Jsonix.context().createUnmarshaller();
-		return unmarshaller.unmarshalDocument(xml);
-	};
-	
-	marshalPage = function(json) {
-		var marshaller = Editor.Jsonix.context().createMarshaller();
-		var xml = marshaller.marshalString(json);
-		return xml;
-	};
-	
 	$.Model('Page',
 	/* @Static */
 	{
-		getFromId: function(params, success, error) {
-			if ('id' in params) {
+		findOne: function(params, success, error) {
+			
+			if ('path' in params) {
+				$.ajax('/system/weblounge/pages?path=' + params.path, {
+					success: this.callback(['parseXML','wrap',success]),
+				});
+			} 
+			else if ('id' in params) {
 				$.ajax('/system/weblounge/pages/' + params.id, {
-					success: function(xml) {
-						var json = unmarshalPage(xml);
-						success(json.value);
-					}
+					success: this.callback(['parseXML','wrap',success]),
 				});
 			}
 		},
 		
-		getFromPath: function(params, success, error) {
-			if ('path' in params) {
-				$.ajax('/system/weblounge/pages?path=' + params.path, {
-					success: function(xml) {
-						var json = unmarshalPage(xml);
-						success(json.value);
-					}
-				});
-			}
+		parseXML: function(xml) {
+			var unmarshaller = Editor.Jsonix.context().createUnmarshaller();
+			return unmarshaller.unmarshalDocument(xml);
+		},
+		
+		parseJSON: function(json) {
+			var marshaller = Editor.Jsonix.context().createMarshaller();
+			return marshaller.marshalString(json);
 		},
 		
 		findAll: function(params, success, error) {
 			$.ajax('/system/weblounge/pages/4bb19980-8f98-4873-a813-000000000001/children', {
 				success: function(xml) {
-					var json = unmarshalPage(xml);
+					var json = Page.parseXML(xml);
 					success(json.value.page);
 				}
 			});
@@ -52,7 +43,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/pages/' + params.id,
 					type: 'put',
 					dataType: 'xml',
-					data: marshalPage(attrs)
+					data: {content : Page.parseJSON(attrs)}
 				});
 			}	
 		},
@@ -79,6 +70,44 @@ steal.then('jsonix')
 
 	},
 	/* @Prototype */
-	{});
+	{
+	    getComposer: function(id) {
+	    	var composer;
+	    	$.each(this.value.body.composers, function(i, comp) {
+	    		if(comp.id == id) {
+	    			composer = comp;
+	    			return false;
+	    		}
+    		});
+	    	return composer;
+	    },
+	    
+	    getComposerIndex: function(id) {
+	    	var index = -1;
+	    	$.each(this.value.body.composers, function(i, composer) {
+	    		if(composer.id == id) {
+	    			index = i;
+	    			return false;
+	    		};
+    		});
+	    	return index;
+	    },
+	    
+	    getPagelet: function(composerId, index) {
+	    	var composer = this.getComposer(composerId);
+	    	return composer.pagelets[index];
+	    },
+	    
+	    updateComposer: function(composerId, newComposer) {
+	    	var index = this.getComposerIndex(composerId);
+	    	var composers = this.value.body.composers;
+	    	
+	    	$.each(newComposer, function(i, pagelet) {
+	    		composers[index].pagelets.splice(i, 1, pagelet);
+    		});
+	    	Page.update({id:this.value.id}, this);
+	    }
+	    
+	});
 
 });

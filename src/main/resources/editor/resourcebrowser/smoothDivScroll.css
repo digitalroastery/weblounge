@@ -67,12 +67,10 @@ div.scrollWrapper
 	position: relative;
 	overflow: hidden;
 	width: 100%;
-	height: 100%;
 }
 
 div.scrollableArea
 {
 	position: relative;
 	width: auto;
-	height: 100%;
 }
