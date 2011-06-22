@@ -55,7 +55,7 @@ public class PageletEditor {
   protected int pageletIndex = -1;
 
   /** The data flavor */
-  protected DataFlavor dataFlavor = DataFlavor.Json;
+  protected DataFlavor dataFlavor = DataFlavor.Xml;
 
   /** The pagelet renderer */
   protected PageletRenderer renderer = null;
@@ -223,7 +223,7 @@ public class PageletEditor {
     buf.append("index=\"").append(pageletIndex).append("\">");
 
     // the pagelet
-    buf.append("<data flavor=\"json\"><![CDATA[");
+    buf.append("<data flavor=\"").append(dataFlavor.toString().toLowerCase()).append("\"><![CDATA[");
     String data = null;
     switch (dataFlavor) {
       case Json:
