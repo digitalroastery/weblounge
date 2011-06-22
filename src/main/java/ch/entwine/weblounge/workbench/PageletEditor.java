@@ -223,12 +223,12 @@ public class PageletEditor {
     buf.append("index=\"").append(pageletIndex).append("\">");
 
     // the pagelet
-    buf.append("<data flavor=\"").append(dataFlavor.toString().toLowerCase()).append("\"><![CDATA[");
+    buf.append("<data flavor=\"").append(dataFlavor.toString().toLowerCase()).append("\">");
     String data = null;
     switch (dataFlavor) {
       case Json:
         try {
-          data = XML.toJSONObject(pagelet.toXml()).toString();
+          data = "<![CDATA[" + XML.toJSONObject(pagelet.toXml()).toString() + "]]>";
         } catch (JSONException e) {
           throw new IllegalStateException("Pagelet xml can't be converted to json: " + e.getMessage(), e);
         }
@@ -240,7 +240,7 @@ public class PageletEditor {
         throw new IllegalStateException("An unhandled flavor was found: " + dataFlavor);
     }
     buf.append(data);
-    buf.append("]]></data>");
+    buf.append("</data>");
 
     // the renderer
     if (rendererContents != null) {
