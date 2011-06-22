@@ -23,13 +23,18 @@ steal.plugins('jqueryui/dialog',
     },
     
     _openPageEditor: function(pageletEditor) {
-    	// Evtl. einlesen mit marshaller oder JSON in data muss von Server korrekt oder als xml kommen
-    	var data = jQuery.parseJSON(pageletEditor.getElementsByTagName('data')[0].firstChild.nodeValue);
-    	var editor = pageletEditor.getElementsByTagName('editor')[0].firstChild.nodeValue;
-    	var renderer = pageletEditor.getElementsByTagName('renderer')[0].firstChild.nodeValue;
+    	// Parse Pagelet-Editor Data
+    	var data = Page.parseXML($(pageletEditor).find('pagelet:first')[0]);
     	
+    	// TODO beim Parsen von Data muss currentLanguage hinzugefügt werden.
+    	
+    	var editor = $(pageletEditor).find('editor')[0].firstChild.nodeValue;
+    	var renderer = $(pageletEditor).find('renderer')[0].firstChild.nodeValue;
+    	
+    	// Process Template Engine
     	var templateObject = TrimPath.parseTemplate(editor);
-    	var result  = templateObject.process(data);
+    	var result  = templateObject.process(data.value);
+    	
 		this.editorDialog = $('<div></div>').html(result)
 		.dialog({
 			modal: true,
@@ -40,7 +45,7 @@ steal.plugins('jqueryui/dialog',
 					$(this).dialog('close');
 				},
 				OK: $.proxy(function () {
-					// SAVE JSON DATA
+					// TODO SAVE JSON DATA
 //					this.element.trigger('duplicatePages', [this.options.selectedPages]);
 //					this._showMessage('Seite dupliziert!');
 					this.editorDialog.dialog('close');
@@ -59,7 +64,7 @@ steal.plugins('jqueryui/dialog',
     },
 
 	'div.icon_editing click': function(ev) {
-		Workbench.findOne({ id: this.options.composer.page.id, composer: this.options.composer.id, pagelet: this.index }, this.callback('_openPageEditor'));
+		Workbench.findOne({ id: this.options.composer.page.value.id, composer: this.options.composer.id, pagelet: this.index }, this.callback('_openPageEditor'));
 	}
 
   });

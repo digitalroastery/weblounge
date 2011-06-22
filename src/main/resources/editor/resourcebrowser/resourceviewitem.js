@@ -12,8 +12,6 @@ steal.plugins().then(function($) {
   {
 
     init: function(el) {
-		//TODO Liste mit SelektiertenPages
-		// Löschfunktionen usw. hier drin
     },
     
     _selectPage: function() {
@@ -21,6 +19,7 @@ steal.plugins().then(function($) {
     },
     
 	"a.pagePath click": function(el, ev) {
+		// Open Designer from clicked PageUrl
 		ev.preventDefault();
 		el.trigger('showDesigner', [this.options.page.id, el.attr('href')]);
 	}

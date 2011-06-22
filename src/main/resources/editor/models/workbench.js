@@ -7,7 +7,7 @@ steal.then(function($) {
 			if ('id' in params) {
 				$.get('/system/weblounge/workbench/edit/' + params.id + '/' + params.composer + '/' + params.pagelet, function(xml) {
 					success(xml);
-				});
+				}, 'xml');
 			}
 		}
 	},

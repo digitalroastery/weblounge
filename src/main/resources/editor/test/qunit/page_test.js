@@ -1,13 +1,24 @@
 module("Model: Editor.Models.Page")
 
+test("findOne", function(){
+	stop(2000);
+	Editor.Models.Page.findOne({path: '/'}, function(page){
+		start()
+		ok(page)
+        ok(page.value.id)
+        equals(page.value.id, "4bb19980-8f98-4873-a813-000000000001")
+        start();
+	});
+	
+})
+
 test("findAll", function(){
 	stop(2000);
 	Editor.Models.Page.findAll({}, function(pages){
 		start()
 		ok(pages)
-        ok(pages.length)
-        ok(pages[0].name)
-        ok(pages[0].description)
+		ok(pages[0].value.id)
+		start();
 	});
 	
 })
@@ -17,11 +28,12 @@ test("create", function(){
 	new Editor.Models.Page({name: "dry cleaning", description: "take to street corner"}).save(function(page){
 		start();
 		ok(page);
-        ok(page.id);
+        ok(page.value.id);
         equals(page.name,"dry cleaning")
-        page.destroy()
+        start();
 	})
 })
+
 test("update" , function(){
 	stop();
 	new Editor.Models.Page({name: "cook dinner", description: "chicken"}).
@@ -34,7 +46,8 @@ test("update" , function(){
         		})
             })
 
-});
+})
+
 test("destroy", function(){
 	stop(2000);
 	new Editor.Models.Page({name: "mow grass", description: "use riding mower"}).
@@ -42,4 +55,5 @@ test("destroy", function(){
             	start();
             	ok( true ,"Destroy called" )
             })
-})
+});
+

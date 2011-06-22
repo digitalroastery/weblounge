@@ -44,6 +44,9 @@ steal.plugins(
         	this._updateView();
         },
         
+        /**
+         * Show selected Tab
+         */
         _updateView: function() {
         	switch (this.options.mode) {
 	      	  case 0:
@@ -80,6 +83,7 @@ steal.plugins(
 						$(this).dialog('close');
 					},
 					OK: $.proxy(function () {
+						//TODO Add new Page
 //						this.element.trigger('addPages');
 						this.addDialog.dialog('close');
 					},this)
@@ -98,7 +102,8 @@ steal.plugins(
 						$(this).dialog('close');
 					},
 					OK: $.proxy(function () {
-//						this.element.trigger('addPages');
+						//TODO Save User Settings
+//						this.element.trigger('saveSettings');
 						this.userDialog.dialog('close');
 					},this)
 				},
@@ -116,7 +121,8 @@ steal.plugins(
 						$(this).dialog('close');
 					},
 					Ja: $.proxy(function () {
-//						this.element.trigger('addPages');
+						//TODO Publish Site
+//						this.element.trigger('publishPage');
 						this.userDialog.dialog('close');
 					},this)
 				},

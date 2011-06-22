@@ -248,9 +248,13 @@ PageMappings.Body.Composer.Pagelet.properties = [new Jsonix.Model.AttributePrope
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'published',
   typeInfo: PageMappings.Published
-}), new Jsonix.Model.ElementPropertyInfo({
-  name: 'locale',
-  typeInfo: PageMappings.Body.Composer.Pagelet.Locale
+}), new Jsonix.Model.ElementMapPropertyInfo({
+	name: 'locale',
+	key : new Jsonix.Model.AttributePropertyInfo({
+		name : "key",
+		typeInfo : Jsonix.Schema.XSD.String.INSTANCE
+	}),
+	value : PageMappings.Body.Composer.Pagelet.Locale
 }), new Jsonix.Model.ElementPropertyInfo({
   name: 'properties',
   typeInfo: PageMappings.Body.Composer.Pagelet.Property
@@ -301,4 +305,8 @@ PageMappings.elementInfos = [{
 {
   elementName: new Jsonix.XML.QName('head'),
   typeInfo: PageMappings.Head
+},
+{
+  elementName: new Jsonix.XML.QName('pagelet'),
+  typeInfo: PageMappings.Body.Composer.Pagelet
 }];

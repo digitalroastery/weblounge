@@ -21,6 +21,7 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		_initDataTable: function() {
+			// init jquery dataTable Plugin over Table
 			this.find('table').dataTable({
 				"bPaginate": true,
 				"bLengthChange": true,
