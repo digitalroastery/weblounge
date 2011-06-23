@@ -149,7 +149,41 @@ steal.then('jsonix')
 	    	$.each(newComposer, function(i, pagelet) {
 	    		composers[index].pagelets.splice(i, 1, pagelet);
     		});
+	    	// TODO nur beim publishen updaten
 	    	Page.update({id:this.value.id}, this);
+	    },
+	    
+	    /**
+	     * Return Pagelet for Pagelet-Editor with current and original Language
+	     * @param {String} composerId
+	     * @param {int} index
+	     * @param {String} language
+	     */
+	    getEditorPagelet: function(composerId, index, language) {
+	    	var pagelet = this.getPagelet(composerId, index);
+			$.each(pagelet.locale, function(i, locale) {
+				if(locale.language == language) {
+					pagelet.locale.current = locale;
+				}
+				if(locale.original == true) {
+					pagelet.locale.original = locale;
+				}
+			});
+			return pagelet;
+	    },
+	    
+	    /**
+	     * Insert Pagelet to the specified position in the composer, this removes the current pagelet at that position
+	     * @param {Object} pagelet The pagelet to insert
+	     * @param {String} composerId The parent composer id 
+	     * @param {int} index The pagelet index to insert
+	     */
+	    insertPagelet: function(pagelet, composerId, index) {
+	    	delete pagelet.locale.current;
+	    	delete pagelet.locale.original;
+	    	this.value.body.composers[this.getComposerIndex(composerId)].pagelets[index] = pagelet;
+	    	// TODO nur beim publishen updaten
+//	    	Page.update({id:this.value.id}, this);
 	    }
 	    
 	});

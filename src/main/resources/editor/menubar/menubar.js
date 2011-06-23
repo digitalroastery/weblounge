@@ -179,11 +179,28 @@ steal.plugins(
 			// TODO
 			steal.dev.log('note')
 		},
+		
+		"li.german click": function(el, ev) {
+			el.trigger('changeLanguage', 'de');
+		},
+		
+		"li.french click": function(el, ev) {
+			el.trigger('changeLanguage', 'fr');
+		},
+		
+		"li.english click": function(el, ev) {
+			el.trigger('changeLanguage', 'en');
+		},
 	
 		// trigger menus
 		".editor_menubar img.add click": function(el, ev) {
 			$('.menu').hide();
 			$('div#add-menu').show().hover(function() { }, function() {$(this).hide();});
+		},
+		
+		".editor_menubar span.language click": function(el, ev) {
+			$('.menu').hide();
+			$('div#language-menu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
 		".editor_menubar img.more click": function(el, ev) {

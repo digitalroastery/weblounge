@@ -43,7 +43,8 @@ steal.plugins('jquery/controller','jqueryui/sortable')
       $(el).find('div.pagelet').editor_pagelet({
         composer: {
           id: this.id,
-          page: this.options.page
+          page: this.options.page,
+          language: this.options.language
         }
       });
 
@@ -59,6 +60,18 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         steal.dev.log('pagelet moved to new composer');
       });
     },
+    
+    update: function(options) {
+    	if(options === undefined) return;
+    	this.options = options;
+    	this.element.find('div.pagelet').editor_pagelet({
+        composer: {
+            id: this.id,
+            page: this.options.page,
+            language: this.options.language
+          }
+        });
+    }
     
   });
 

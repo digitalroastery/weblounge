@@ -8,7 +8,8 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
     	 * Mode 2 = Media
     	 */
     	defaults: {
-    		mode: 0
+    		mode: 0,
+    		language: 'de'
     	}
 	},
 	/* @prototype */
@@ -31,7 +32,8 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         _setPage: function(page) {
-        	$('.composer').editor_composer({page: page});
+        	this.page = page;
+        	$('.composer').editor_composer({page: page, language: this.options.language});
         },
         
         update: function(options) {
@@ -68,6 +70,11 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         "a showMedia": function(el, ev) {
         	this.update({mode: 2});
         	this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
+        },
+        
+        "li changeLanguage": function(el, ev, language) {
+        	this.options.language = language;
+        	$('.composer').editor_composer({page: this.page, language: language});
         }
         
 	});
