@@ -161,15 +161,17 @@ steal.then('jsonix')
 	     */
 	    getEditorPagelet: function(composerId, index, language) {
 	    	var pagelet = this.getPagelet(composerId, index);
-			$.each(pagelet.locale, function(i, locale) {
+	    	var copyPagelet = jQuery.extend(true, {}, pagelet);
+
+			$.each(copyPagelet.locale, function(i, locale) {
 				if(locale.language == language) {
-					pagelet.locale.current = locale;
+					copyPagelet.locale.current = locale;
 				}
 				if(locale.original == true) {
-					pagelet.locale.original = locale;
+					copyPagelet.locale.original = locale;
 				}
 			});
-			return pagelet;
+			return copyPagelet;
 	    },
 	    
 	    /**
@@ -183,7 +185,7 @@ steal.then('jsonix')
 	    	delete pagelet.locale.original;
 	    	this.value.body.composers[this.getComposerIndex(composerId)].pagelets[index] = pagelet;
 	    	// TODO nur beim publishen updaten
-//	    	Page.update({id:this.value.id}, this);
+	    	Page.update({id:this.value.id}, this);
 	    }
 	    
 	});
