@@ -32,9 +32,8 @@ import java.io.OutputStream;
 public interface PreviewGenerator {
 
   /**
-   * Creates a preview image for a resource and returns the preview contents as
-   * an {@link OutputStream} or <code>null</code> if the resource cannot be
-   * handled.
+   * Creates a preview image for a resource and writes the content to the
+   * {@link OutputStream}.
    * 
    * @param resource
    *          the resource
@@ -42,11 +41,12 @@ public interface PreviewGenerator {
    *          the image style
    * @param format
    *          the image format
-   * @return the generated image
+   * @param os
+   *          the output stream
    * @throws IOException
    *           if the resource content cannot be read
    */
-  OutputStream createPreview(InputStream resource, ImageStyle style, String format)
-      throws IOException;
+  void createPreview(InputStream resource, ImageStyle style, String format,
+      OutputStream os) throws IOException;
 
 }
