@@ -153,6 +153,12 @@
       <version>2.4.0-beta-1</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.xhtmlrenderer</groupId>
+      <artifactId>core-renderer</artifactId>
+      <version>R8pre2</version>
+    </dependency>
+
     <!-- testing -->
 
     <dependency>
@@ -264,7 +270,8 @@
             <Embed-Dependency>
               com.springsource.javax.media.jai.core;inline=true,
               com.springsource.javax.media.jai.codec;inline=true,
-              freemarker
+              core-renderer;inline=true,
+              freemarker;inline=true
             </Embed-Dependency>
             <Private-Package>
               freemarker.core,

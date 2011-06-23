@@ -38,12 +38,11 @@ public class FilePreviewGenerator implements PreviewGenerator {
    * 
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(java.io.InputStream,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
-   *      java.lang.String)
+   *      java.lang.String, java.io.OutputStream)
    */
-  public OutputStream createPreview(InputStream resource, ImageStyle style,
-      String format) throws IOException {
+  public void createPreview(InputStream resource, ImageStyle style,
+      String format, OutputStream os) throws IOException {
     // TODO: Implement
-    return null;
   }
 
 }

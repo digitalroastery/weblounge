@@ -23,8 +23,6 @@ package ch.entwine.weblounge.common.impl.content.image;
 import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,13 +38,11 @@ public class ImagePreviewGenerator implements PreviewGenerator {
    * 
    * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(java.io.InputStream,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
-   *      java.lang.String)
+   *      java.lang.String, java.io.OutputStream)
    */
-  public OutputStream createPreview(InputStream content, ImageStyle style,
-      String format) throws IOException {
-    OutputStream os = new BufferedOutputStream(new ByteArrayOutputStream());
+  public void createPreview(InputStream content, ImageStyle style,
+      String format, OutputStream os) throws IOException {
     ImageStyleUtils.style(content, os, format, style);
-    return os;
   }
 
 }
