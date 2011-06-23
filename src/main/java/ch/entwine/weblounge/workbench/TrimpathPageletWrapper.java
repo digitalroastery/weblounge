@@ -69,7 +69,7 @@ public class TrimpathPageletWrapper implements Pagelet {
   protected String replaceContent(String element, Language language,
       boolean force) {
     StringBuilder sb = new StringBuilder();
-    sb.append("{ pagelet.locale.text['").append(element).append("'] }");
+    sb.append("${ locale.current.text.").append(element).append(" }");
     return sb.toString();
   }
 
@@ -90,7 +90,7 @@ public class TrimpathPageletWrapper implements Pagelet {
     List<String> replacements = new ArrayList<String>();
     for (int i = 0; i < pagelet.getMultiValueContent(element, language, force).length; i++) {
       StringBuilder sb = new StringBuilder();
-      sb.append("{ pagelet.locale.text['").append(element).append("'][").append(i).append("] }");
+      sb.append("${ locale.text").append(element).append("[").append(i).append("] }");
       replacements.add(sb.toString());
     }
     return replacements.toArray(new String[replacements.size()]);
@@ -106,7 +106,7 @@ public class TrimpathPageletWrapper implements Pagelet {
    */
   protected String replaceProperty(String property) {
     StringBuilder sb = new StringBuilder();
-    sb.append("{ pagelet.properties.property['").append(property).append("'] }");
+    sb.append("${ properties.property.").append(property).append(" }");
     return sb.toString();
   }
 
@@ -122,7 +122,7 @@ public class TrimpathPageletWrapper implements Pagelet {
     List<String> replacements = new ArrayList<String>();
     for (int i = 0; i < pagelet.getMultiValueProperty(property).length; i++) {
       StringBuilder sb = new StringBuilder();
-      sb.append("{ pagelet.properties.property['").append(property).append("'][").append(i).append("] }");
+      sb.append("${ properties.property.").append(property).append("[").append(i).append("] }");
       replacements.add(sb.toString());
     }
     return replacements.toArray(new String[replacements.size()]);
