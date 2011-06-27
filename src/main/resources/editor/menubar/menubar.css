@@ -69,6 +69,7 @@
 }
 
 .editor_menubar img,
+.editor_menubar .language
 .editor_menubar .profile-menu,
 div.overlay_icons span.more {
 	cursor: pointer;
@@ -123,6 +124,18 @@ img.add {
 	position: absolute;
 	top: 55px;
 	right: 10px;
+}
+
+.language {
+	position: absolute;
+	top: 15px;
+	right: 500px;
+}
+
+.language-menu {
+	position: absolute;
+	right: 400px;
+	display: none;
 }
 
 #profile-menu span.triangle-up {

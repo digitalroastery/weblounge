@@ -1,4 +1,6 @@
-steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', 'editor/composer').then(function($) {
+steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', 'editor/composer')
+.models('../../models/site', '../../models/page')
+.then(function($) {
 		
 	$.Controller('Editor.App',
 	{
@@ -16,11 +18,43 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 	{
 		
 		init: function(el) {
-			this.menuBar = this.find('#menubar').editor_menubar();
+			if (!this._supportsLocaleStorage()) {
+				alert('Your browser does not support HTML5! Update your browser to the latest version.');
+				return false;
+			}
+			
+			Site.findOne({}, this.callback('_loadSite'));
+			this._loadCurrentLanguage();
+			
+			this.menuBar = this.find('#menubar').editor_menubar({site: this.site, language: this.options.language});
             this.pagesTab = this.find('#pagebrowser');
             this.mediaTab = this.find('#mediabrowser');
             this._initTab();
             this._loadPage();
+        },
+        
+        _loadSite: function(site) {
+        	this.site = site;
+        	this.options.language = this.site.getDefaultLanguage();
+        },
+        
+        _loadCurrentLanguage: function() {
+        	var language = location.pathname.substring(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
+        	if(language == '') {
+        		var language = localStorage["weblounge.editor.language"];
+        		if (!language) { return false; }
+        	} else {
+        		localStorage["weblounge.editor.language"] = language;
+        	}
+            this.options.language = language;
+        },
+        
+        _supportsLocaleStorage: function() {
+        	try {
+        		return 'localStorage' in window && window['localStorage'] !== null;
+        	} catch (e) {
+        		return false;
+        	}
         },
         
         _initTab: function() {
@@ -28,7 +62,8 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         },
         
         _loadPage: function() {
-        	Page.findOne({path: location.pathname}, this.callback('_setPage'));
+        	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+        	Page.findOne({path: path}, this.callback('_setPage'));
         },
         
         _setPage: function(page) {
@@ -59,7 +94,6 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         
         "a showDesigner": function(el, ev, pageId, url) {
         	this.update({mode: 0});
-//        	this.designerTab.editor_designer('show', pageId, url);
         },
         
         "a showPages": function(el, ev) {
@@ -72,9 +106,10 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         	this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
         },
         
-        "li changeLanguage": function(el, ev, language) {
-        	this.options.language = language;
-        	$('.composer').editor_composer({page: this.page, language: language});
+        "span changeLanguage": function(el, ev, language) {
+        	localStorage["weblounge.editor.language"] = language;
+        	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
+        	location.href = path + language + "?edit";
         }
         
 	});

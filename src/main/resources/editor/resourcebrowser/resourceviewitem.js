@@ -21,7 +21,13 @@ steal.plugins().then(function($) {
 	"a.pagePath click": function(el, ev) {
 		// Open Designer from clicked PageUrl
 		ev.preventDefault();
-		el.trigger('showDesigner', [this.options.page.id, el.attr('href')]);
+        var language = localStorage["weblounge.editor.language"];
+        if (!language) {
+        	location.href = el.attr('href') + "?edit";
+        }
+        else {
+        	location.href = el.attr('href') + language + "?edit";
+        }
 	}
 
   });

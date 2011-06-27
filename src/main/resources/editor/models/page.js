@@ -184,7 +184,6 @@ steal.then('jsonix')
 	    	delete pagelet.locale.current;
 	    	delete pagelet.locale.original;
 	    	this.value.body.composers[this.getComposerIndex(composerId)].pagelets[index] = pagelet;
-	    	// TODO nur beim publishen updaten
 	    	Page.update({id:this.value.id}, this);
 	    }
 	    

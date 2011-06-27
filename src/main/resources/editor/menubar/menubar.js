@@ -23,7 +23,9 @@ steal.plugins(
     	 * Mode 2 = Media
     	 */
     	defaults: {
-    		mode: 1
+    		mode: 1,
+    		site: {},
+    		language: {}
     	}
 	},
     /* @prototype */
@@ -32,7 +34,7 @@ steal.plugins(
 	     * Initialize a new MenuBar controller.
 	     */
         init: function(el) {
-            $(el).html('//editor/menubar/views/menubar.tmpl', {});
+            $(el).html('//editor/menubar/views/menubar.tmpl', {languages: this.options.site.getLanguages(), current: this.options.language});
             this._updateView();
             this._initDialogs();
         },
@@ -72,7 +74,7 @@ steal.plugins(
         
         _initDialogs: function() {
 			this.addDialog = $('<div></div>')
-			.load('weblounge/editor/menubar/views/add-dialog.html')
+			.load('/weblounge/editor/menubar/views/add-dialog.html')
 			.dialog({
 				modal: true,
 				title: 'Seite hinzufügen',
@@ -91,7 +93,7 @@ steal.plugins(
 			});
 			
 			this.userDialog = $('<div></div>')
-			.load('weblounge/editor/menubar/views/user-dialog.html')
+			.load('/weblounge/editor/menubar/views/user-dialog.html')
 			.dialog({
 				modal: true,
 				title: 'Einstellungen',
@@ -110,7 +112,7 @@ steal.plugins(
 			});
 			
 			this.publishDialog = $('<div></div>')
-			.load('weblounge/editor/menubar/views/publish-dialog.html')
+			.load('/weblounge/editor/menubar/views/publish-dialog.html')
 			.dialog({
 				modal: true,
 				title: 'Seite publizieren',
@@ -180,18 +182,10 @@ steal.plugins(
 			steal.dev.log('note')
 		},
 		
-		"li.german click": function(el, ev) {
-			el.trigger('changeLanguage', 'de');
+		"span.language-menu img click": function(el, ev) {
+			el.trigger('changeLanguage', el.attr('title'));
 		},
 		
-		"li.french click": function(el, ev) {
-			el.trigger('changeLanguage', 'fr');
-		},
-		
-		"li.english click": function(el, ev) {
-			el.trigger('changeLanguage', 'en');
-		},
-	
 		// trigger menus
 		".editor_menubar img.add click": function(el, ev) {
 			$('.menu').hide();
@@ -200,7 +194,7 @@ steal.plugins(
 		
 		".editor_menubar span.language click": function(el, ev) {
 			$('.menu').hide();
-			$('div#language-menu').show().hover(function() { }, function() {$(this).hide();});
+			$('span.language-menu').show().hover(function() { }, function() {$(this).hide();});
 		},
 		
 		".editor_menubar img.more click": function(el, ev) {

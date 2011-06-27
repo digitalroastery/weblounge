@@ -20,7 +20,7 @@ steal.plugins('jquery/controller','jqueryui/sortable')
      */
     init: function(el) {
       this.id = this.element.attr('id');
-
+      
       // init jQuery UI sortable plugin to support drag'n'drop of pagelets
       $(el).sortable({
         connectWith: this.options.connectWith,

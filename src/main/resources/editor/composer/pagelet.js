@@ -31,12 +31,10 @@ steal.plugins('jqueryui/dialog',
     	// Parse Pagelet-Editor Data
     	this.pagelet = this.options.composer.page.getEditorPagelet(this.options.composer.id, this.index, this.options.composer.language);
     	
-//    	var pageletData = Page.parseXML($(pageletEditor).find('pagelet:first')[0]);
-//    	pageletData = Pagelet.addCurrentLanguage(pageletData, 'fr');
     	this.renderer = $(pageletEditor).find('renderer')[0].firstChild.nodeValue.trim();
     	var editor = $(pageletEditor).find('editor')[0].firstChild.nodeValue;
     	
-    	// Process Template Engine
+    	// Process Editor Template
     	var templateObject = TrimPath.parseTemplate(editor);
     	var result  = templateObject.process(this.pagelet);
     	
@@ -50,30 +48,13 @@ steal.plugins('jqueryui/dialog',
 					$(this).dialog('close');
 				},
 				OK: $.proxy(function () {
-					// Get new values and set current to current or original
-					var allInputs = this.editorDialog.find(':input');
-					var newPagelet = this.pagelet;
+					var newPagelet = this._getNewEditorPagelet();
 					
-					if(newPagelet.locale.current == undefined) {
-						newPagelet = this._createNewLocale(newPagelet, this.options.composer.language);
-					}
-					
-					$.each(allInputs, function(i, input) {
-						if(input.value == '') return;
-						var element = input.name.split(':')
-						if(element[0] == 'property') {
-							newPagelet.properties.property[element[1]] = input.value;
-						} 
-						else if(element[0] == 'element') {
-							newPagelet.locale.current.text[element[1]] = input.value;
-						}
-					});
-					
-					// Process Renderer Template with
+					// Process Renderer Template
 					var templateObject = TrimPath.parseTemplate(this.renderer);
 					var result  = templateObject.process(newPagelet);
 					
-					// Remove Current and Original and Save
+					// Save New Pagelet
 			    	this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.index);
 					
 					// Render site
@@ -83,6 +64,28 @@ steal.plugins('jqueryui/dialog',
 			}
 		});
     	
+    },
+    
+    _getNewEditorPagelet: function() {
+		// Get new values and set current to current or original
+		var allInputs = this.editorDialog.find(':input');
+		var newPagelet = this.pagelet;
+		
+		if(newPagelet.locale.current == undefined) {
+			newPagelet = this._createNewLocale(newPagelet, this.options.composer.language);
+		}
+		
+		$.each(allInputs, function(i, input) {
+			if(input.value == '') return;
+			var element = input.name.split(':')
+			if(element[0] == 'property') {
+				newPagelet.properties.property[element[1]] = input.value;
+			} 
+			else if(element[0] == 'element') {
+				newPagelet.locale.current.text[element[1]] = input.value;
+			}
+		});
+		return newPagelet;
     },
     
     _createNewLocale: function(pagelet, language) {

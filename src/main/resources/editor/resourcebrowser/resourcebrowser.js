@@ -1,7 +1,6 @@
 steal.plugins(
 	'jquery/controller/view',
 	'jquery/view/tmpl')
-	.models('../../models/page')
 .views('//editor/resourcebrowser/views/init.tmpl')
 .css('resourcebrowser')
 .then('resourcescrollview', 'resourcelistview')
