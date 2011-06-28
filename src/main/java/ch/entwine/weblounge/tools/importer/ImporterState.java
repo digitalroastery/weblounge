@@ -66,7 +66,7 @@ public class ImporterState {
    */
   public void putUUID(String path, UUID uuid) {
     try {
-      uuidStore.put(path, uuid);
+      uuidStore.put(path.toLowerCase(), uuid);
     } catch (Exception e) {
       System.err.println(e.getMessage());
     }
@@ -88,7 +88,7 @@ public class ImporterState {
     if (path.length() > 1 && path.endsWith("/"))
       path = path.substring(0, path.length() - 1);
 
-    UUID uuid = uuidStore.get(path);
+    UUID uuid = uuidStore.get(path.toLowerCase());
 
     if (uuid != null) {
       // log_.info("Returning UUID ".concat(uuidStore.get(path).toString().concat(" for path ").concat(path)));
