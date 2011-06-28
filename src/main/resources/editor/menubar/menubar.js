@@ -173,8 +173,8 @@ steal.plugins(
 		},
 		
 		"li.new_upload click": function(el, ev) {
-			// TODO
-			steal.dev.log('upload')
+			$('.menu').hide();
+			el.trigger('uploadMedia');
 		},
 		
 		"li.new_note click": function(el, ev) {
@@ -236,12 +236,9 @@ steal.plugins(
 		// trigger editmode
 		"input#editmode click": function(el, ev) {
 			if(el.is(':checked')) {
-//				steal.dev.log(location.href);
-//				steal.dev.log(window.location.search);
-//				$('body').load(location.href + '?mode=edit');
-				// Reload Page with Parameter mode=edit oder so
-//				steal.dev.log('editmode is enabled');
+//				el.trigger('editMode', true);
 			} else {
+//				el.trigger('editMode', false);
 				// Open Publish Dialog an reload Page in normal mode
 				steal.dev.log('editmode is disabled');
 				this.publishDialog.dialog('open');

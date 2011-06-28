@@ -1,4 +1,4 @@
-steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', 'editor/composer')
+steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'editor/resourcebrowser', 'editor/composer')
 .models('../../models/site', '../../models/page')
 .then(function($) {
 		
@@ -104,6 +104,12 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         "a showMedia": function(el, ev) {
         	this.update({mode: 2});
         	this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
+        },
+        
+        "li uploadMedia": function(el, ev) {
+        	this.update({mode: 2});
+        	this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
+        	$('#massuploader').editor_massuploader();
         },
         
         "span changeLanguage": function(el, ev, language) {

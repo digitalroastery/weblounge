@@ -48,17 +48,6 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         }
       });
 
-      $(el).bind('sortchange', function(event, ui) {
-        steal.dev.log('position of pagelet changed');
-      });
-
-      $(el).bind('sortremove', function(event, ui) {
-        steal.dev.log('pagelet removed to new composer');
-      });
-
-      $(el).bind('sortreceive', function(event, ui) {
-        steal.dev.log('pagelet moved to new composer');
-      });
     },
     
     update: function(options) {

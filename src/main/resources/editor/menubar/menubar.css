@@ -69,7 +69,7 @@
 }
 
 .editor_menubar img,
-.editor_menubar .language
+.editor_menubar .language,
 .editor_menubar .profile-menu,
 div.overlay_icons span.more {
 	cursor: pointer;
@@ -84,7 +84,13 @@ img.user {
 img.add {
 	position: relative;
 	top: 8px;
-	padding: 0 50px;
+	padding: 0 30px;
+}
+
+img.more {
+	position: relative;
+	top: 8px;
+	padding: 0 30px;
 }
 
 /* menu */
