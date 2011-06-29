@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
+import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.file.FileResource;
@@ -35,12 +36,18 @@ import ch.entwine.weblounge.common.impl.security.UserImpl;
 import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.impl.url.WebUrlImpl;
 import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.WebUrl;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -56,6 +63,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -700,10 +708,8 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    */
   @POST
   @Path("/uploads")
-  public Response uploadFile(@Context HttpServletRequest request,
-      @FormParam("path") String path,
-      @FormParam("languageid") String languageId,
-      @FormParam("mimetype") String mimeType, InputStream is) {
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  public Response uploadFile(@Context HttpServletRequest request) {
 
     Site site = getSite(request);
 
@@ -712,11 +718,52 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Attempt to write to read-only content repository {}", site);
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
-
-    // Extract the language
-    Language language = LanguageUtils.getLanguage(languageId);
+    
+    InputStream is = null;
+    String fileName = null;
+    Language language = null;
+    String path = null;
+    String mimeType = null;
+    
+    if (!ServletFileUpload.isMultipartContent(request))
+      throw new WebApplicationException(Status.BAD_REQUEST);
+      
+    try {
+      ServletFileUpload payload = new ServletFileUpload();
+      for (FileItemIterator iter = payload.getItemIterator(request); iter.hasNext();) {
+        FileItemStream item = iter.next();
+        String fieldName = item.getFieldName();
+        if (item.isFormField()) {
+          String fieldValue = Streams.asString(item.openStream());
+          if (StringUtils.isBlank(fieldValue))
+            continue;
+          if ("path".equals(fieldName)) {
+            path = Streams.asString(item.openStream());
+          } else if ("language".equals(fieldName)) {
+            try {
+              language = LanguageUtils.getLanguage(fieldValue);
+            } catch (UnknownLanguageException e) {
+              throw new WebApplicationException(Status.BAD_REQUEST);
+            }
+          } else if ("mimetype".equals(fieldName)) {
+            mimeType = Streams.asString(item.openStream());
+          }
+        } else {
+          // once the body gets read iter.hasNext must not be invoked
+          // or the stream can not be read
+          fileName = item.getName();
+          is = item.openStream();
+        }
+      }
+    } catch (FileUploadException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IOException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+    
+    // Make sure there is a language
     if (language == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
+      language = LanguageUtils.getPreferredLanguage(request, site);
     }
 
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
@@ -785,10 +832,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     ResourceContent content = null;
-    ResourceReader<?, ?> reader = null;
+    ResourceContentReader<?> reader = null;
     try {
-      reader = (ResourceReader<?, ?>) serializer.getContentReader();
-      content = (ResourceContent) reader.read(is, resource.getURI().getSite());
+      reader = serializer.getContentReader();
+      content = reader.read(is);
     } catch (IOException e) {
       logger.warn("Error reading resource content {} from request", uri);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -803,6 +850,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // TODO: Replace with current user
     User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
     content.setCreator(user);
+    content.setFilename(fileName);
 
     try {
       resource = contentRepository.putContent(resource.getURI(), content, is);

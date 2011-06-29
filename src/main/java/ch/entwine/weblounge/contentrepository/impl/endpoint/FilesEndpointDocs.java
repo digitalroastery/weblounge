@@ -184,6 +184,8 @@ public final class FilesEndpointDocs {
     uploadFileEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
     uploadFileEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The target path"));
     uploadFileEndpoint.addOptionalParameter(new Parameter("mimeType", Parameter.Type.String, "The mime type"));
+    uploadFileEndpoint.addOptionalParameter(new Parameter("language", Parameter.Type.String, "The language"));
+    uploadFileEndpoint.addBodyParameter(true, null, "the file");
     uploadFileEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, uploadFileEndpoint);
 
