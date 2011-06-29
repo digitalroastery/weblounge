@@ -25,6 +25,7 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.ResourceReader;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.xml.sax.SAXException;
 
@@ -45,6 +46,16 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @return the resource type
    */
   String getType();
+
+  /**
+   * Returns <code>true</code> if this serializer supports file content of this
+   * type.
+   * 
+   * @param mimeType
+   *          the content mime type
+   * @return <code>true</code> if the serializer supports content of this type
+   */
+  boolean supportsContent(String mimeType);
 
   /**
    * Returns a <code>ResourceReader</code> for the type of resources that is
@@ -80,5 +91,13 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    */
   ResourceContentReader<S> getContentReader()
       throws ParserConfigurationException, SAXException;
+
+  /**
+   * Creates a new resource for this type.
+   * 
+   * @param site the site
+   * @return the new resource
+   */
+  Resource<?> createNewResource(Site site);
 
 }

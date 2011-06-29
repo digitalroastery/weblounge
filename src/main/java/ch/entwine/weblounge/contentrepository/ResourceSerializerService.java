@@ -36,7 +36,17 @@ public interface ResourceSerializerService {
    *          the resource type
    * @return the serializer
    */
-  ResourceSerializer<?, ?> getSerializer(String resourceType);
+  ResourceSerializer<?, ?> getSerializerByType(String resourceType);
+
+  /**
+   * Returns the resource serializer based on the content's mime type or
+   * <code>null</code> if no suitable serializer was found.
+   * 
+   * @param mimeType
+   *          the content mime type
+   * @return the serializer
+   */
+  ResourceSerializer<?, ?> getSerializerByMimeType(String mimeType);
 
   /**
    * Returns all registered <code>ResourceSerializer</code>s in a set.

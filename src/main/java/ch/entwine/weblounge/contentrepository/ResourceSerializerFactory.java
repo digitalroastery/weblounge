@@ -65,12 +65,28 @@ public final class ResourceSerializerFactory {
    *          the resource type
    * @return the serializer
    */
-  public static ResourceSerializer<?, ?> getSerializer(String resourceType) {
+  public static ResourceSerializer<?, ?> getSerializerByType(String resourceType) {
     if (serializerService == null) {
       logger.warn("Tried to access resource serializer while backing service is not yet configured");
       return null;
     }
-    return serializerService.getSerializer(resourceType);
+    return serializerService.getSerializerByType(resourceType);
+  }
+
+  /**
+   * Returns the resource serializer based on the mime type or <code>null</code>
+   * if no suitable serializer was found.
+   * 
+   * @param mimeType
+   *          the the content mime type
+   * @return the serializer
+   */
+  public static ResourceSerializer<?, ?> getSerializerByMimeType(String mimeType) {
+    if (serializerService == null) {
+      logger.warn("Tried to access resource serializer while backing service is not yet configured");
+      return null;
+    }
+    return serializerService.getSerializerByMimeType(mimeType);
   }
 
   /**
