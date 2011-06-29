@@ -26,7 +26,10 @@ import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.image.ImageContentReader;
+import ch.entwine.weblounge.common.impl.content.image.ImageResourceImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceReader;
+import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.ImageInputDocument;
 
 import org.xml.sax.SAXException;
@@ -53,6 +56,24 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   public ImageResourceSerializer() {
     super(ImageResource.TYPE);
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supportsContent(java.lang.String)
+   */
+  public boolean supportsContent(String mimeType) {
+    return mimeType != null && mimeType.toLowerCase().startsWith("image/");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createNewResource(ch.entwine.weblounge.common.site.Site)
+   */
+  public Resource<?> createNewResource(Site site) {
+    return new ImageResourceImpl(new ImageResourceURIImpl(site));
   }
 
   /**

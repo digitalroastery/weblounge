@@ -243,7 +243,7 @@ public class FileSystemContentRepository extends AbstractWritableContentReposito
 
     logger.info("Populating site index '{}' with {}s...", site, resourceType);
 
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
     if (serializer == null) {
       logger.warn("Unable to index resources of type '{}': no resource serializer found", resourceType);
       return 0;

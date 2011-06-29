@@ -25,7 +25,10 @@ import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.PageInputDocument;
 
 import org.xml.sax.SAXException;
@@ -44,6 +47,24 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
    */
   public PageSerializer() {
     super(Page.TYPE);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supportsContent(java.lang.String)
+   */
+  public boolean supportsContent(String mimeType) {
+    return false;
+  }
+  
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createNewResource(ch.entwine.weblounge.common.site.Site)
+   */
+  public Resource<?> createNewResource(Site site) {
+    return new PageImpl(new PageURIImpl(site));
   }
 
   /**

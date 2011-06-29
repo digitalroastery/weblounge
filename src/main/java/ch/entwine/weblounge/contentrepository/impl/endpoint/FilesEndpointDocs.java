@@ -96,7 +96,7 @@ public final class FilesEndpointDocs {
     getFileContentEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getFileContentEndpoint);
 
-    // POST /{resource}
+    // POST /
     Endpoint createFileEndpoint = new Endpoint("/", Method.POST, "createfile");
     createFileEndpoint.setDescription("Creates a new file, either at the given path or at a random location and returns the REST url of the created resource.");
     createFileEndpoint.addFormat(Format.xml());
@@ -170,6 +170,22 @@ public final class FilesEndpointDocs {
     deleteFileContentEndpoint.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
     deleteFileContentEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.WRITE, deleteFileContentEndpoint);
+
+    // POST /uploads
+    Endpoint uploadFileEndpoint = new Endpoint("/uploads", Method.POST, "uploadfile");
+    uploadFileEndpoint.setDescription("Creates a new file as well as content, either at the given path or at a random location and returns the REST url of the created resource.");
+    uploadFileEndpoint.addFormat(Format.xml());
+    uploadFileEndpoint.addStatus(ok("the file was created and the response body contains it's resource url"));
+    uploadFileEndpoint.addStatus(badRequest("the path was not specified"));
+    uploadFileEndpoint.addStatus(badRequest("the file content is malformed"));
+    uploadFileEndpoint.addStatus(badRequest("the language does not exist"));
+    uploadFileEndpoint.addStatus(conflict("a file already exists at the specified path"));
+    uploadFileEndpoint.addStatus(methodNotAllowed("the site or its content repository is read-only"));
+    uploadFileEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    uploadFileEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The target path"));
+    uploadFileEndpoint.addOptionalParameter(new Parameter("mimeType", Parameter.Type.String, "The mime type"));
+    uploadFileEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.WRITE, uploadFileEndpoint);
 
     return EndpointDocumentationGenerator.generate(docs);
   }

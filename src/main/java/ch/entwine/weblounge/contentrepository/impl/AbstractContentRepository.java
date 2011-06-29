@@ -216,7 +216,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
         logger.debug("Resource {} not found, probably due to wrong resource type", uri);
         return null;
       }
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
       if (serializer == null) {
         logger.warn("No resource serializer for type '{}' found", uri.getType());
         throw new ContentRepositoryException("No resource serializer for type '" + uri.getType() + "' found");
@@ -508,7 +508,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
   protected Resource<?> loadResource(ResourceURI uri) throws IOException {
     InputStream is = new BufferedInputStream(openStreamToResource(uri));
     try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
     } catch (Throwable t) {
@@ -531,7 +531,7 @@ public abstract class AbstractContentRepository implements ContentRepository {
       throws IOException {
     InputStream is = new BufferedInputStream(contentUrl.openStream());
     try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
       ResourceReader<?, ?> reader = serializer.getReader();
       return reader.read(is, site);
     } catch (Throwable t) {

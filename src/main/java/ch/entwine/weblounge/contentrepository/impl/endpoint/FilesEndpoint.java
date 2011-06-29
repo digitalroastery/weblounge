@@ -24,6 +24,7 @@ import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceReader;
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.content.repository.WritableContentRepository;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
@@ -46,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -292,7 +294,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // Try to create the resource
     ResourceURI uri = resource.getURI();
     ResourceContent content = null;
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resource.getURI().getType());
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resource.getURI().getType());
     ResourceReader<?, ?> reader;
     try {
       reader = (ResourceReader<?, ?>) serializer.getContentReader();
@@ -310,13 +312,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     Site site = getSite(request);
-    
+
     // Make sure the content repository is writable
     if (site.getContentRepository().isReadOnly()) {
       logger.warn("Attempt to write to read-only content repository {}", site);
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
-    
+
     // TODO: Replace with current user
     User admin = site.getAdministrator();
     User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
@@ -386,7 +388,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     ResourceURI uri = resource.getURI();
     Site site = getSite(request);
-    
+
     // Make sure the content repository is writable
     if (site.getContentRepository().isReadOnly()) {
       logger.warn("Attempt to write to read-only content repository {}", site);
@@ -446,13 +448,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
     // Extract the site
     Site site = getSite(request);
-    
+
     // Make sure the content repository is writable
     if (site.getContentRepository().isReadOnly()) {
       logger.warn("Attempt to write to read-only content repository {}", site);
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
-    
+
     User user = null; // TODO: Extract user
     WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
     ResourceURI resourceURI = new ResourceURIImpl(null, site, null, resourceId);
@@ -483,7 +485,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     // TOOD: Extract resource type
     String resourceType = null;
     try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
       ResourceReader<?, ?> resourceReader = (ResourceReader<?, ?>) serializer.getContentReader();
       resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       // TODO: Replace this with current user
@@ -579,7 +581,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     if (!StringUtils.isBlank(resourceXml)) {
       logger.debug("Adding resource to {}", resourceURI);
       try {
-        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+        ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
         ResourceReader<?, ?> resourceReader = serializer.getReader();
         resource = resourceReader.read(IOUtils.toInputStream(resourceXml, "utf-8"), site);
       } catch (IOException e) {
@@ -643,7 +645,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
 
     Site site = getSite(request);
-    
+
     // Make sure the content repository is writable
     if (site.getContentRepository().isReadOnly()) {
       logger.warn("Attempt to write to read-only content repository {}", site);
@@ -680,6 +682,145 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     }
 
     return Response.ok().build();
+  }
+
+  /**
+   * Creates a file resource at the site's content repository by uploading
+   * initial file content and returns the location to post updates to.
+   * 
+   * @param request
+   *          the http request
+   * @param resourceXml
+   *          the new resource
+   * @param path
+   *          the path to store the resource at
+   * @param mimeType
+   *          the content mime type
+   * @return response the resource location
+   */
+  @POST
+  @Path("/uploads")
+  public Response uploadFile(@Context HttpServletRequest request,
+      @FormParam("path") String path,
+      @FormParam("languageid") String languageId,
+      @FormParam("mimetype") String mimeType, InputStream is) {
+
+    Site site = getSite(request);
+
+    // Make sure the content repository is writable
+    if (site.getContentRepository().isReadOnly()) {
+      logger.warn("Attempt to write to read-only content repository {}", site);
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    }
+
+    // Extract the language
+    Language language = LanguageUtils.getLanguage(languageId);
+    if (language == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+
+    WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
+
+    // Create the resource uri
+    ResourceURIImpl resourceURI = null;
+    String uuid = UUID.randomUUID().toString();
+    if (!StringUtils.isBlank(path)) {
+      try {
+        if (!path.startsWith("/"))
+          path = "/" + path;
+        WebUrl url = new WebUrlImpl(site, path);
+        resourceURI = new ResourceURIImpl(null, site, url.getPath(), uuid);
+
+        // Make sure the resource doesn't exist
+        if (contentRepository.exists(new ResourceURIImpl(null, site, url.getPath()))) {
+          logger.warn("Tried to create already existing resource {} in site '{}'", resourceURI, site);
+          throw new WebApplicationException(Status.CONFLICT);
+        }
+      } catch (IllegalArgumentException e) {
+        logger.warn("Tried to create a resource with an invalid path '{}': {}", path, e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      } catch (ContentRepositoryException e) {
+        logger.warn("Resource lookup {} failed for site '{}'", resourceURI, site);
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
+    } else {
+      resourceURI = new ResourceURIImpl(null, site, "/" + uuid.replaceAll("-", ""), uuid);
+    }
+
+    // TODO: Store temporary file here
+    if (mimeType == null) {
+      File file = null;
+      // TODO: figure out mime type
+    }
+
+    Resource<?> resource = null;
+    URI uri = null;
+    logger.debug("Adding resource to {}", resourceURI);
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+    if (serializer == null) {
+      logger.debug("No specialized resource serializer found, using regular file serializer");
+      serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
+    }
+    resource = serializer.createNewResource(site);
+    User admin = site.getAdministrator();
+    User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+    resource.setCreated(creator, new Date());
+
+    // Store the new resource
+    try {
+      contentRepository.put(resource);
+      uri = new URI(UrlUtils.concat(request.getRequestURL().toString(), resourceURI.getIdentifier()));
+    } catch (URISyntaxException e) {
+      logger.warn("Error creating a uri for resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IOException e) {
+      logger.warn("Error writing new resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Illegal state while adding new resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error adding new resource {}: {}", resourceURI, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    ResourceContent content = null;
+    ResourceReader<?, ?> reader = null;
+    try {
+      reader = (ResourceReader<?, ?>) serializer.getContentReader();
+      content = (ResourceContent) reader.read(is, resource.getURI().getSite());
+    } catch (IOException e) {
+      logger.warn("Error reading resource content {} from request", uri);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (ParserConfigurationException e) {
+      logger.warn("Error configuring parser to read resource content {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (SAXException e) {
+      logger.warn("Error parsing udpated resource {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+
+    // TODO: Replace with current user
+    User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+    content.setCreator(user);
+
+    try {
+      resource = contentRepository.putContent(resource.getURI(), content, is);
+    } catch (IOException e) {
+      logger.warn("Error writing content to resource {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (IllegalStateException e) {
+      logger.warn("Illegal state while adding content to resource {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+    } catch (ContentRepositoryException e) {
+      logger.warn("Error adding content to resource {}: {}", uri, e.getMessage());
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    // Create the response
+    ResponseBuilder response = Response.created(uri);
+    response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
+    return response.build();
   }
 
   /**

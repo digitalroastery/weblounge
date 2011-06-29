@@ -26,7 +26,10 @@ import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.file.FileContentReader;
+import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
+import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
+import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.FileInputDocument;
 
 import org.xml.sax.SAXException;
@@ -47,6 +50,27 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
     super(FileResource.TYPE);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supportsContent(java.lang.String)
+   */
+  public boolean supportsContent(String mimeType) {
+    // This implementation always returns <code>false</code>, as it is the
+    // default implementation anyway. Returning false here will give more
+    // specialized serializers a chance to pick up the request
+    return false;
+  }
+  
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createNewResource(ch.entwine.weblounge.common.site.Site)
+   */
+  public Resource<?> createNewResource(Site site) {
+    return new FileResourceImpl(new FileResourceURIImpl(site));
+  }
+  
   /**
    * {@inheritDoc}
    * 

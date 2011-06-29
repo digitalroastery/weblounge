@@ -283,7 +283,7 @@ public class WritableBundleContentRepository extends FileSystemContentRepository
     if (url == null)
       return null;
     try {
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(uri.getType());
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(uri.getType());
       if (serializer == null) {
         logger.warn("Unable to read {} {}: no serializer found", uri.getType(), uri);
         return null;

@@ -126,9 +126,9 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializer(java.lang.String)
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializerByType(java.lang.String)
    */
-  public ResourceSerializer<?, ?> getSerializer(String resourceType) {
+  public ResourceSerializer<?, ?> getSerializerByType(String resourceType) {
     synchronized (serializers) {
       return serializers.get(resourceType);
     }
@@ -136,7 +136,22 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
 
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializerByMimeType(java.lang.String)
+   */
+  public ResourceSerializer<?, ?> getSerializerByMimeType(String mimeType) {
+    synchronized (serializers) {
+      for (ResourceSerializer<?, ?> serializer : serializers.values()) {
+        if (serializer.supportsContent(mimeType))
+          return serializer;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializers()
    */
   public Set<ResourceSerializer<?, ?>> getSerializers() {
@@ -146,7 +161,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
     }
     return set;
   }
-  
+
   /**
    * Service tracker for {@link ResourceSerializer} instances.
    */
@@ -177,7 +192,7 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
      */
     @Override
     public Object addingService(ServiceReference reference) {
-      ResourceSerializer<?, ?> serializer = (ResourceSerializer<?, ?>)super.addingService(reference);
+      ResourceSerializer<?, ?> serializer = (ResourceSerializer<?, ?>) super.addingService(reference);
       serializerService.registerSerializer(serializer);
       return serializer;
     }

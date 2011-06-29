@@ -191,7 +191,7 @@ public class SearchIndex {
 
     // Have the serializer create an input document
     String resourceType = resource.getURI().getType();
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
     if (serializer == null) {
       throw new ContentRepositoryException("Unable to create an input document for " + resource.getURI() + ": no serializer found");
     }
@@ -220,7 +220,7 @@ public class SearchIndex {
 
     // Have the serializer create an input document
     String resourceType = resource.getURI().getType();
-    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializer(resourceType);
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceType);
     if (serializer == null) {
       logger.error("Unable to create an input document for {}: no serializer found", resource.getURI());
       return false;
