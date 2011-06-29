@@ -59,7 +59,7 @@ public class FileContentImpl extends ResourceContentImpl implements FileContent 
    * @param language
    *          the language
    * @param mimetype
-   *          the file's mimetype
+   *          the file's content type
    * @param filesize
    *          the file size in bytes
    */

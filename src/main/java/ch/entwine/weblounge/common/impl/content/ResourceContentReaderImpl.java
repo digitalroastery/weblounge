@@ -69,7 +69,7 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
    * @throws SAXException
    *           if an error occurs while parsing
    * 
-   * @see #read(InputStream)
+   * @see #createFromXml(InputStream)
    */
   public ResourceContentReaderImpl() throws ParserConfigurationException,
       SAXException {
@@ -79,9 +79,9 @@ public abstract class ResourceContentReaderImpl<T extends ResourceContent> exten
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.ResourceContentReader#read(java.io.InputStream)
+   * @see ch.entwine.weblounge.common.content.ResourceContentReader#createFromXml(java.io.InputStream)
    */
-  public T read(InputStream is) throws SAXException, IOException,
+  public T createFromXml(InputStream is) throws SAXException, IOException,
       ParserConfigurationException {
 
     SAXParser parser = parserRef.get();

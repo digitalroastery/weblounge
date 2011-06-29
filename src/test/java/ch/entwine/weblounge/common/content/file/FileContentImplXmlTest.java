@@ -47,7 +47,7 @@ public class FileContentImplXmlTest extends FileContentImplTest {
   public void setUp() throws Exception {
     URL testContext = this.getClass().getResource(testFile);
     FileContentReader reader = new FileContentReader();
-    content = reader.read(testContext.openStream());
+    content = reader.createFromXml(testContext.openStream());
   }
 
   /**

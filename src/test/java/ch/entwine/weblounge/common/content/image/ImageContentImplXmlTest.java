@@ -47,7 +47,7 @@ public class ImageContentImplXmlTest extends ImageContentImplTest {
   public void setUp() throws Exception {
     URL testContext = this.getClass().getResource(testFile);
     ImageContentReader reader = new ImageContentReader();
-    image = reader.read(testContext.openStream());
+    image = reader.createFromXml(testContext.openStream());
   }
 
   /**

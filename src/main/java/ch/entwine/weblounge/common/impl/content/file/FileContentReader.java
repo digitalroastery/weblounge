@@ -22,6 +22,7 @@ package ch.entwine.weblounge.common.impl.content.file;
 
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl;
+import ch.entwine.weblounge.common.language.Language;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class FileContentReader extends ResourceContentReaderImpl<FileContent> {
    * @throws SAXException
    *           if an error occurs while parsing
    * 
-   * @see #read(InputStream)
+   * @see #createFromXml(InputStream)
    */
   public FileContentReader() throws ParserConfigurationException, SAXException {
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
@@ -68,14 +69,14 @@ public class FileContentReader extends ResourceContentReaderImpl<FileContent> {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl#createContent()
    */
   @Override
   protected FileContent createContent() {
     return new FileContentImpl();
   }
-  
+
   /**
    * This method is called to parse the serialized XML of a {@link FileContent}.
    * 
@@ -88,8 +89,8 @@ public class FileContentReader extends ResourceContentReaderImpl<FileContent> {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public FileContent read(InputStream is) throws SAXException, IOException,
-      ParserConfigurationException {
+  public FileContent createFromXml(InputStream is) throws SAXException,
+      IOException, ParserConfigurationException {
 
     SAXParser parser = parserRef.get();
     if (parser == null) {
@@ -98,6 +99,18 @@ public class FileContentReader extends ResourceContentReaderImpl<FileContent> {
     }
     parser.parse(is, this);
     return content;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceContentReader#createFromContent(java.io.InputStream,
+   *      ch.entwine.weblounge.common.language.Language, long, java.lang.String,
+   *      java.lang.String)
+   */
+  public FileContent createFromContent(InputStream is, Language language,
+      long size, String fileName, String mimeType) throws IOException {
+    return new FileContentImpl(fileName, language, mimeType, size);
   }
 
   /**

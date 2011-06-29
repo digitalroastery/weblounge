@@ -22,7 +22,12 @@ package ch.entwine.weblounge.common.impl.content.image;
 
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.impl.content.ResourceContentReaderImpl;
+import ch.entwine.weblounge.common.language.Language;
 
+import com.sun.media.jai.codec.MemoryCacheSeekableStream;
+import com.sun.media.jai.codec.SeekableStream;
+
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -32,6 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 
@@ -54,7 +61,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
    * @throws SAXException
    *           if an error occurs while parsing
    * 
-   * @see #read(InputStream)
+   * @see #createFromXml(InputStream)
    */
   public ImageContentReader() throws ParserConfigurationException, SAXException {
     parserRef = new WeakReference<SAXParser>(parserFactory.newSAXParser());
@@ -73,7 +80,7 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  public ImageContent read(InputStream is) throws SAXException, IOException,
+  public ImageContent createFromXml(InputStream is) throws SAXException, IOException,
       ParserConfigurationException {
 
     SAXParser parser = parserRef.get();
@@ -82,6 +89,29 @@ public class ImageContentReader extends ResourceContentReaderImpl<ImageContent> 
       parserRef = new WeakReference<SAXParser>(parser);
     }
     parser.parse(is, this);
+    return content;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.ResourceContentReader#createFromContent(java.io.InputStream,
+   *      ch.entwine.weblounge.common.language.Language, long, java.lang.String)
+   */
+  public ImageContent createFromContent(InputStream is, Language language,
+      long size, String fileName, String mimeType) throws IOException {
+    ImageContentImpl content = new ImageContentImpl(fileName, language, mimeType);
+    
+    SeekableStream imageInputStream = null;
+    try {
+      imageInputStream = new MemoryCacheSeekableStream(is);
+      RenderedOp image = JAI.create("stream", imageInputStream);
+      content.setWidth(image.getWidth());
+      content.setHeight(image.getHeight());
+    } finally {
+      IOUtils.closeQuietly(imageInputStream);
+    }
+
     return content;
   }
 
