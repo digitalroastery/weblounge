@@ -72,7 +72,7 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createNewResource(ch.entwine.weblounge.common.site.Site)
    */
-  public Resource<?> createNewResource(Site site) {
+  public Resource<ImageContent> createNewResource(Site site) {
     return new ImageResourceImpl(new ImageResourceURIImpl(site));
   }
 

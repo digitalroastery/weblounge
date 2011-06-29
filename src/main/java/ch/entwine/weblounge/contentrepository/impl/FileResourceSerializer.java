@@ -67,7 +67,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
    * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#createNewResource(ch.entwine.weblounge.common.site.Site)
    */
-  public Resource<?> createNewResource(Site site) {
+  public Resource<FileContent> createNewResource(Site site) {
     return new FileResourceImpl(new FileResourceURIImpl(site));
   }
   
