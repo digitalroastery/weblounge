@@ -734,7 +734,7 @@
 
     <repository>
       <id>central</id>
-      <url>http://maven.o2it.ch/content/groups/public</url>
+      <url>http://maven.entwinemedia.com/nexus/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -745,7 +745,7 @@
 
     <repository>
       <id>snapshots</id>
-      <url>http://maven.o2it.ch/content/groups/public-snapshots</url>
+      <url>http://maven.entwinemedia.com/nexus/content/groups/public-snapshots</url>
       <releases>
         <enabled>false</enabled>
       </releases>
