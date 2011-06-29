@@ -95,9 +95,10 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
   /**
    * Creates a new resource for this type.
    * 
-   * @param site the site
+   * @param site
+   *          the site
    * @return the new resource
    */
-  Resource<?> createNewResource(Site site);
+  Resource<S> createNewResource(Site site);
 
 }
