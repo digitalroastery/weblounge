@@ -20,6 +20,8 @@
 
 package ch.entwine.weblounge.common.content;
 
+import ch.entwine.weblounge.common.language.Language;
+
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -45,8 +47,27 @@ public interface ResourceContentReader<T extends ResourceContent> {
    * @throws SAXException
    *           if an error occurs while parsing
    */
-  T read(InputStream is) throws SAXException, IOException,
+  T createFromXml(InputStream is) throws SAXException, IOException,
       ParserConfigurationException;
+
+  /**
+   * Creates a new {@link ResourceContent} object by looking at the content
+   * data.
+   * 
+   * @param is
+   *          the content data
+   * @param size
+   *          the content length
+   * @param language
+   *          the language
+   * @param fileName
+   *          the file name
+   * @param mimeType
+   *          the content type
+   * @return the resource content object
+   */
+  T createFromContent(InputStream is, Language language, long size,
+      String fileName, String mimeType) throws IOException;
 
   /**
    * Resets the parser.
