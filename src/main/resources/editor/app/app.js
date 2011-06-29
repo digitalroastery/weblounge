@@ -29,6 +29,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
 			this.menuBar = this.find('#menubar').editor_menubar({site: this.site, language: this.options.language});
             this.pagesTab = this.find('#pagebrowser');
             this.mediaTab = this.find('#mediabrowser');
+            this.massuploader = this.find('#massuploader');
             this._initTab();
             this._loadPage();
         },
@@ -108,8 +109,10 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         
         "li uploadMedia": function(el, ev) {
         	this.update({mode: 2});
-        	this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
-        	$('#massuploader').editor_massuploader();
+      		this.mediaTab.hide();
+      		this.pagesTab.hide();
+      		this.massuploader.show();
+      		this.massuploader.editor_massuploader();
         },
         
         "span changeLanguage": function(el, ev, language) {
