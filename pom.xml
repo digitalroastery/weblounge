@@ -104,8 +104,8 @@
               ch.entwine.weblounge.common.language;version=${project.version},
               ch.entwine.weblounge.common.scheduler;version=${project.version},
               ch.entwine.weblounge.common.site;version=${project.version},
-              org.apache.commons.io;version="1.4",
-              org.apache.commons.lang;version="2.4",
+              org.apache.commons.io;version="2.0",
+              org.apache.commons.lang;version="2.6",
               org.slf4j;version="1.5.6",
               *;resolution:=optional
             </Import-Package>
