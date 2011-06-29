@@ -265,7 +265,11 @@
               ch.entwine.weblounge.common.impl.testing;version=${project.version},
               ch.entwine.weblounge.common.impl.url;version=${project.version},
               ch.entwine.weblounge.common.impl.util;version=${project.version},
-              ch.entwine.weblounge.common.impl.util.*;version=${project.version}
+              ch.entwine.weblounge.common.impl.util.classloader;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.config;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.datatype;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.doc;version=${project.version},
+              ch.entwine.weblounge.common.impl.util.xml;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
               com.springsource.javax.media.jai.core;inline=true,
