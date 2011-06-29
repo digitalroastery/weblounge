@@ -26,6 +26,8 @@ import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.impl.url.UrlImpl;
 import ch.entwine.weblounge.common.site.Site;
 
+import java.util.UUID;
+
 
 /**
  * Implementation of the {@link ResourceURI} interface.
@@ -152,6 +154,8 @@ public class ResourceURIImpl extends UrlImpl implements ResourceURI {
       throw new IllegalArgumentException("Site must not be null");
     if (path != null && !path.startsWith("/"))
       path = "/" + path;
+    if (path == null && id == null)
+      id = UUID.randomUUID().toString();
     this.type = type;
     this.site = site;
     this.id = id;

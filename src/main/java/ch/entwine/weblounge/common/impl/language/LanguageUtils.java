@@ -396,6 +396,7 @@ public final class LanguageUtils {
    * <li>The first language of what is supported by both the localizable and the
    * site</li>
    * </ul>
+   * 
    * @param localizable
    *          the localizable
    * @param request
@@ -405,7 +406,7 @@ public final class LanguageUtils {
    */
   public static Language getPreferredLanguage(Localizable localizable,
       HttpServletRequest request, Site site) {
-    
+
     // Path
     String[] pathElements = StringUtils.split(request.getRequestURI(), "/");
     for (String element : pathElements) {
@@ -415,7 +416,7 @@ public final class LanguageUtils {
         }
       }
     }
-    
+
     // Accept-Language header
     if (request.getHeader("Accept-Language") != null) {
       Enumeration<?> locales = request.getLocales();
@@ -428,21 +429,21 @@ public final class LanguageUtils {
         return l;
       }
     }
-    
+
     // The localizable's original language
     if (localizable != null && localizable instanceof Resource) {
-      Resource<?> r = (Resource<?>)localizable;
+      Resource<?> r = (Resource<?>) localizable;
       if (r.getOriginalContent() != null) {
         if (site.supportsLanguage(r.getOriginalContent().getLanguage()))
           return r.getOriginalContent().getLanguage();
       }
     }
-    
+
     // Site default language
     if (localizable != null && localizable.supportsLanguage(site.getDefaultLanguage())) {
       return site.getDefaultLanguage();
     }
-    
+
     // Any match
     if (localizable != null) {
       for (Language l : site.getLanguages()) {
@@ -451,8 +452,41 @@ public final class LanguageUtils {
         }
       }
     }
-    
+
     return null;
+  }
+
+  /**
+   * Returns the preferred one out of of those languages that are requested by
+   * the client through the <code>Accept-Language</code> header and are
+   * supported by the site. If there is no match, the site's default language is
+   * returned.
+   * <p>
+   * The preferred one is defined by the following priorities:
+   * <ul>
+   * <li>Requested by the client</li>
+   * <li>The site default language</li>
+   * </ul>
+   * 
+   * @param request
+   *          the http request
+   * @param site
+   *          the site
+   */
+  public static Language getPreferredLanguage(HttpServletRequest request,
+      Site site) {
+
+    // Accept-Language header
+    if (request.getHeader("Accept-Language") != null) {
+      Enumeration<?> locales = request.getLocales();
+      while (locales.hasMoreElements()) {
+        Language l = getLanguage((Locale) locales.nextElement());
+        if (site.supportsLanguage(l))
+          return l;
+      }
+    }
+
+    return site.getDefaultLanguage();
   }
 
   /**
