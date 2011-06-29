@@ -41,7 +41,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.common-api</Bundle-SymbolicName>
             <Import-Package>
-              org.apache.commons.lang;version="2.4",
+              org.apache.commons.lang;version="2.6",
               javax.security.auth.login,
               javax.security.auth.spi,
               javax.servlet.http;version="2.5",
