@@ -70,7 +70,11 @@ public class SitesEndpoint {
     Iterator<Site> si = sites.sites();
     while (si.hasNext()) {
       String siteXml = si.next().toXml();
-      siteXml = siteXml.replaceAll("<password.*</password>", "");
+      siteXml = siteXml.replaceAll("<domains.*</domains>", "");
+      siteXml = siteXml.replaceAll("<languages.*</languages>", "");
+      siteXml = siteXml.replaceAll("<options.*</options>", "");
+      siteXml = siteXml.replaceAll("<security.*</security>", "");
+      siteXml = siteXml.replaceAll("<templates.*</templates>", "");
       siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
       buf.append(siteXml);
     }
@@ -103,11 +107,7 @@ public class SitesEndpoint {
 
     // Create the response
     String siteXml = site.toXml();
-    siteXml = siteXml.replaceAll("<domains.*</domains>", "");
-    siteXml = siteXml.replaceAll("<languages.*</languages>", "");
-    siteXml = siteXml.replaceAll("<options.*</options>", "");
-    siteXml = siteXml.replaceAll("<security.*</security>", "");
-    siteXml = siteXml.replaceAll("<templates.*</templates>", "");
+    siteXml = siteXml.replaceAll("<password.*</password>", "");
     siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
     siteXml = ConfigurationUtils.processTemplate(siteXml, site);
     ResponseBuilder response = Response.ok(siteXml);
