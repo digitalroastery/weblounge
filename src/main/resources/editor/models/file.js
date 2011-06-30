@@ -67,6 +67,22 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Creates a new file as well as content, either at the given path or at a random location and returns the REST url of the created resource.
+		 * @param {Object} params The target path, mimeType and languageid
+		 * @param {File} file The file data
+		 */
+		create: function(params, file, success, error){
+			if ('path' in params) {
+				$.ajax({
+					url: '/system/weblounge/files/uploads',
+					type: 'post',
+					dataType: 'xml',
+					data: {path : params.path, mimeType: params.mimeType, languageid: params.languageid, content : File.parseJSON(file)}
+				});
+			}	
+		},
+		
+		/**
 		 * Deletes the specified file or the specified file content.
 		 * @param {Object} params The file id or id and language
 		 */
@@ -90,6 +106,10 @@ steal.then('jsonix')
 		 */
 		parseXML: function(xml) {
 			return null;
+		},
+		
+		createNewFile: function() {
+			return '<file id="6bc19990-8f99-4873-a813-71b6dfac22ad" path="/test/document/" version="live">'
 		},
 		
 		/**

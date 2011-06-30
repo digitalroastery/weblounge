@@ -12,6 +12,11 @@ div#uploader {
 	top: 46px;
 }
 
+div#file-uploader {
+	position: relative;
+	top: 46px;
+}
+
 div#photos {
 	position: relative;
 	top: 70px;
@@ -24,4 +29,23 @@ div#drop-area {
 	height: 200px;
 	width: 200px;
 	border: 1px solid;
+}
+
+div.progress-bar-container {
+    border: 1px solid #555555;
+    height: 10px;
+    margin-bottom: 20px;
+    width: 400px;
+}
+
+div.progress-bar-container.uploaded {
+    border: medium none;
+    height: auto;
+}
+
+div.progress-bar {
+    background: none repeat scroll 0 0 #6787E3;
+    font-weight: bold;
+    height: 10px;
+    width: 0;
 }

@@ -14,6 +14,7 @@ steal.then('jsonix')
 		parseXML: function(xml) {
 			var site = new Object();
 			$(xml).find('#weblounge-test').each(function(index) {
+				site.id = $(this).attr('id');
 				site.languages = [];
 				
 				$(this).find('language').each(function(index) {
@@ -40,11 +41,15 @@ steal.then('jsonix')
 	    	return this.languages;
 	    },
 	    
+	    getId: function() {
+	    	return this.id;
+	    },
+	    
 	    getDefaultLanguage: function() {
 	    	var language; 
 	    	$.each(this.languages, function(index, lang) { 
-	    		if(lang.default == "true") {
-	    			language = lang;
+	    		if(lang.default) {
+	    			language = lang.language;
 	    			return false;
 	    		}
 	    	});
