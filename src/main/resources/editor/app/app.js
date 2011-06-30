@@ -42,12 +42,12 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         _loadCurrentLanguage: function() {
         	var language = location.pathname.substring(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
         	if(language == '') {
-        		var language = localStorage["weblounge.editor.language"];
-        		if (!language) { return false; }
-        	} else {
-        		localStorage["weblounge.editor.language"] = language;
+        		language = localStorage['weblounge.editor.' + this.site.getId() + '.language'];
         	}
-            this.options.language = language;
+        	if (language) { 
+        		this.options.language = language;
+        	}
+        	localStorage['weblounge.editor.' + this.site.getId() + '.language'] = this.options.language;
         },
         
         _supportsLocaleStorage: function() {
@@ -97,6 +97,16 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         	this.update({mode: 0});
         },
         
+        "a openDesigner": function(el, ev) {
+            var language = localStorage['weblounge.editor.' + this.site.getId() + '.language'];
+            if (!language) {
+            	location.href = el.attr('href') + "?edit";
+            }
+            else {
+            	location.href = el.attr('href') + language + "?edit";
+            }
+        },
+        
         "a showPages": function(el, ev) {
         	this.update({mode: 1});
         	this.pagesTab.editor_resourcebrowser({resourceType: 'pages'});
@@ -116,7 +126,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         },
         
         "span changeLanguage": function(el, ev, language) {
-        	localStorage["weblounge.editor.language"] = language;
+        	localStorage['weblounge.editor.' + this.site.getId() + '.language'] = language;
         	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
         	location.href = path + language + "?edit";
         }

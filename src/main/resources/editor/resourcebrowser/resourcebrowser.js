@@ -10,7 +10,7 @@ steal.plugins(
 	{
 		defaults: {
 			resources: {},
-			resourceType: 'pages',
+			resourceType: 'pages'
 		}
 	},
 	{

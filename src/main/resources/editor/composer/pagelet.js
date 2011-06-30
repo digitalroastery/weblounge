@@ -1,10 +1,12 @@
 steal.plugins('jqueryui/dialog',
 		'jqueryui/draggable',
 		'jqueryui/resizable',
-		'jqueryui/mouse')
+		'jqueryui/mouse',
+		'editor/dialog')
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template')
+.then('trimpathconverter')
 .then(function($) {
 
   $.Controller("Editor.Pagelet",
@@ -34,15 +36,18 @@ steal.plugins('jqueryui/dialog',
     	this.renderer = $(pageletEditor).find('renderer')[0].firstChild.nodeValue.trim();
     	var editor = $(pageletEditor).find('editor')[0].firstChild.nodeValue;
     	
-    	// Process Editor Template
     	var templateObject = TrimPath.parseTemplate(editor);
     	var result  = templateObject.process(this.pagelet);
     	
-		this.editorDialog = $('<div></div>').html(result)
-		.dialog({
-			modal: true,
+    	// Hack to create new Dom element
+    	var resultDom = $('<div></div>').html(result);
+    	this._convertInputs(resultDom, this.pagelet);
+    	
+    	// Process Editor Template
+    	
+		this.editorDialog = $('<div></div>').html(resultDom.html())
+		.editor_dialog({
 			title: 'Seite bearbeiten',
-			resizable: true,
 			buttons: {
 				Abbrechen: function() {
 					$(this).dialog('close');
@@ -66,6 +71,33 @@ steal.plugins('jqueryui/dialog',
     	
     },
     
+    // Converts Editor Input Fields with Trimpath syntax
+    _convertInputs: function(editor, pagelet) {
+    	$(editor).find(':input').each(function(index) {
+    		var element = $(this).attr('name').split(':')
+    		
+    		if($(this).attr('type') == 'text' || $(this).attr('type') == 'hidden') {
+    			TrimPathConverter.convertText($(this), element, pagelet);
+    		}
+    		else if($(this).attr('type') == 'checkbox') {
+    			TrimPathConverter.convertCheckbox($(this), element, pagelet);
+    		}
+    		else if($(this).attr('type') == 'radio') {
+    			TrimPathConverter.convertRadio($(this), element, pagelet);
+    		}
+    		else if($(this).type == 'textarea') {
+    			TrimPathConverter.convertTextarea($(this), element, pagelet);
+    		}
+    		else if($(this).type == 'select') {
+    			TrimPathConverter.convertSelect($(this), element, pagelet);
+    		}
+    		// ???
+    		else if($(this).attr('type') == 'file') {
+    			TrimPathConverter.convertFile($(this), element, pagelet);
+    		}
+    	});
+    },
+    
     _getNewEditorPagelet: function() {
 		// Get new values and set current to current or original
 		var allInputs = this.editorDialog.find(':input');
@@ -76,6 +108,9 @@ steal.plugins('jqueryui/dialog',
 		}
 		
 		$.each(allInputs, function(i, input) {
+			// TODO!!!!
+			// Werte von Checkboxen, Select und RadioButtons anderst speichern
+			
 			if(input.value == '') return;
 			var element = input.name.split(':')
 			if(element[0] == 'property') {
