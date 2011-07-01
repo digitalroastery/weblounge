@@ -30,6 +30,7 @@ import ch.entwine.weblounge.common.security.Permission;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -292,7 +293,7 @@ public abstract class AbstractResourceReaderImpl<S extends ResourceContent, T ex
       resource.getURI().setIdentifier(attrs.getValue("id"));
       if (attrs.getValue("path") != null)
         resource.getURI().setPath(attrs.getValue("path"));
-      if (attrs.getValue("version") != null) {
+      if (StringUtils.isNotBlank(attrs.getValue("version"))) {
         long version = ResourceUtils.getVersion(attrs.getValue("version"));
         resource.getURI().setVersion(version);
       }

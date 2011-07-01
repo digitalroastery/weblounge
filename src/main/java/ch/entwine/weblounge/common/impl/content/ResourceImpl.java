@@ -35,6 +35,8 @@ import ch.entwine.weblounge.common.security.PermissionSet;
 import ch.entwine.weblounge.common.security.SecurityListener;
 import ch.entwine.weblounge.common.security.User;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -873,8 +875,10 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
     b.append("<").append(rootTag);
     b.append(" id=\"");
     b.append(uri.getIdentifier());
-    b.append("\" path=\"");
-    b.append(uri.getPath());
+    if (StringUtils.isNotBlank(uri.getPath())) {
+      b.append("\" path=\"");
+      b.append(uri.getPath());
+    }
     b.append("\" version=\"");
     b.append(ResourceUtils.getVersionString(uri.getVersion()));
     b.append("\">");
