@@ -712,6 +712,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   @POST
   @Path("/uploads")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Produces(MediaType.MEDIA_TYPE_WILDCARD)
   public Response uploadFile(@Context HttpServletRequest request) {
 
     Site site = getSite(request);
@@ -756,8 +757,8 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
           } else {
             // once the body gets read iter.hasNext must not be invoked
             // or the stream can not be read
-            fileName = item.getName();
-            mimeType = item.getContentType();
+            fileName = StringUtils.trim(item.getName());
+            mimeType = StringUtils.trim(item.getContentType());
             uploadedFile = File.createTempFile("upload-", null);
             FileOutputStream fos = new FileOutputStream(uploadedFile);
             try {
@@ -785,14 +786,30 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
   
       // Create the resource uri
-      ResourceURIImpl resourceURI = null;
-      String uuid = UUID.randomUUID().toString();
-      if (!StringUtils.isBlank(path)) {
+      ResourceURI resourceURI = null;
+      Resource<?> resource = null;
+      URI uri = null;
+      logger.debug("Adding resource to {}", resourceURI);
+      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
+      if (serializer == null) {
+        logger.debug("No specialized resource serializer found, using regular file serializer");
+        serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
+      }
+      resource = serializer.createNewResource(site);
+      resourceURI = resource.getURI();
+
+      // Set owner and date created
+      User admin = site.getAdministrator();
+      User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
+      resource.setCreated(creator, new Date());
+      
+      // If a path has been specified, set it
+      if (path != null && StringUtils.isNotBlank(path)) {
         try {
           if (!path.startsWith("/"))
             path = "/" + path;
           WebUrl url = new WebUrlImpl(site, path);
-          resourceURI = new ResourceURIImpl(null, site, url.getPath(), uuid);
+          resourceURI.setPath(url.getPath());
   
           // Make sure the resource doesn't exist
           if (contentRepository.exists(new ResourceURIImpl(null, site, url.getPath()))) {
@@ -806,28 +823,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
           logger.warn("Resource lookup {} failed for site '{}'", resourceURI, site);
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
-      } else {
-        resourceURI = new ResourceURIImpl(null, site, "/" + uuid.replaceAll("-", ""), uuid);
       }
-  
-      Resource<?> resource = null;
-      URI uri = null;
-      logger.debug("Adding resource to {}", resourceURI);
-      ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByMimeType(mimeType);
-      if (serializer == null) {
-        logger.debug("No specialized resource serializer found, using regular file serializer");
-        serializer = ResourceSerializerFactory.getSerializerByType(FileResource.TYPE);
-      }
-      resource = serializer.createNewResource(site);
-      User admin = site.getAdministrator();
-      User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
-      resource.setCreated(creator, new Date());
-  
+    
       // Store the new resource
       try {
+        uri = new URI(resourceURI.getIdentifier());
         contentRepository.put(resource);
-        String endpointURI = StringUtils.chomp(request.getRequestURI(), request.getPathInfo());
-        uri = new URI(UrlUtils.concat(endpointURI, resourceURI.getIdentifier()));
       } catch (URISyntaxException e) {
         logger.warn("Error creating a uri for resource {}: {}", resourceURI, e.getMessage());
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -885,6 +886,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
 
       // Create the response
       ResponseBuilder response = Response.created(uri);
+      response.type(MediaType.MEDIA_TYPE_WILDCARD);
       response.tag(new EntityTag(ResourceUtils.getETagValue(resource, null)));
       return response.build();
 

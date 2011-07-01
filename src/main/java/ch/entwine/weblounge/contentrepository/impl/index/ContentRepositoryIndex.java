@@ -26,7 +26,6 @@ import ch.entwine.weblounge.common.content.SearchQuery;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
 import ch.entwine.weblounge.common.impl.content.ResourceURIImpl;
-import ch.entwine.weblounge.common.impl.url.UrlUtils;
 import ch.entwine.weblounge.common.language.Language;
 
 import org.slf4j.Logger;
@@ -287,8 +286,7 @@ public class ContentRepositoryIndex {
 
       // Make sure we have a path
       if (path == null) {
-        path = UrlUtils.concat("/" + type + "s", id);
-        uri.setPath(path);
+        path = id;
       }
 
       try {
