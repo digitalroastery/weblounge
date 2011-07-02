@@ -199,7 +199,7 @@ public class WorkbenchEndpoint {
    */
   @Override
   public String toString() {
-    return "workbench rest endpoint";
+    return "Workbench rest endpoint";
   }
 
 }
