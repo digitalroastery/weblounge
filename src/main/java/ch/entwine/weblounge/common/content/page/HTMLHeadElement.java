@@ -20,11 +20,28 @@
 
 package ch.entwine.weblounge.common.content.page;
 
+import ch.entwine.weblounge.common.content.page.HTMLInclude.Use;
+
 /**
  * This interface describes elements that are included in the &lt;head&gt;
  * section of an <code>HTML</code> page, namely &lt;link&gt; and &lt;script&gt;.
  */
 public interface HTMLHeadElement {
+
+  /**
+   * Indicates the use of this include.
+   * 
+   * @return
+   */
+  Use getUse();
+
+  /**
+   * Specifies the usage of this element.
+   * 
+   * @param use
+   *          the element use
+   */
+  void setUse(Use use);
 
   /**
    * Returns the xml representation of this script.

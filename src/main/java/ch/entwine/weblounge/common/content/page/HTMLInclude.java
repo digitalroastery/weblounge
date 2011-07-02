@@ -27,6 +27,11 @@ package ch.entwine.weblounge.common.content.page;
  */
 public interface HTMLInclude extends HTMLHeadElement {
 
+  /** When to include this element */
+  enum Use {
+    Renderer, Editor, All
+  }
+
   /** Returns the <code>href</code> attribute */
   String getHref();
   
