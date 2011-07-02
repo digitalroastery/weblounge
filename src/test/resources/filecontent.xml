@@ -1,6 +1,6 @@
 <content language="de">
   <created>
-    <user id="amelie" realm="testland">Amélie Poulard</user>
+    <user id="amelie" realm="testland"><![CDATA[Amélie Poulard]]></user>
     <date>2009-01-07T20:05:41Z</date>
   </created>
   <filename><![CDATA[document.pdf]]></filename>

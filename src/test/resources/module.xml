@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module id="testmodule" xmlns="http://www.entwinemedia.com/weblounge/3.0/module" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.entwinemedia.com/weblounge/3.0/module http://www.entwinemedia.com/xsd/weblounge/3.0/module.xsd">
   <enable>true</enable>
-  <name>Test module</name>
+  <name><![CDATA[Test module]]></name>
   <pagelets>
     <pagelet id="renderer" composeable="true">
-      <name>Pagelet renderer</name>
+      <name><![CDATA[Pagelet renderer]]></name>
       <renderer>file://renderer/renderer.jsp</renderer>
       <editor>file://renderer/editor.jsp</editor>
       <recheck>1d10M</recheck>
       <valid>1w1d1H1M</valid>
       <includes>
-        <link href="http://localhost/css/stylesheet.css" type="text/css"></link>
+        <link use="renderer" href="http://localhost/css/stylesheet.css" type="text/css"></link>
       </includes>
     </pagelet>
   </pagelets>
   <actions>
     <action id="myaction">
-      <name>Test</name>
+      <name><![CDATA[Test]]></name>
       <class>ch.entwine.weblounge.common.site.TestAction</class>
       <mountpoint>/test/</mountpoint>
       <page>/testpage/</page>
@@ -30,27 +30,27 @@
       <options>
         <option>
           <name>key</name>
-          <value>value</value>
+          <value><![CDATA[value]]></value>
         </option>
       </options>
     </action>
   </actions>
   <jobs>
     <job id="testjob">
-      <name>Job title</name>
+      <name><![CDATA[Job title]]></name>
       <class>ch.entwine.weblounge.common.scheduler.TestJob</class>
       <schedule>0 0 * * 1</schedule>
       <options>
         <option>
           <name>key</name>
-          <value>value</value>
+          <value><![CDATA[value]]></value>
         </option>
       </options>
     </job>
   </jobs>
   <imagestyles>
     <imagestyle id="modulestyle" composeable="true">
-      <name>Module image</name>
+      <name><![CDATA[Module image]]></name>
       <scalingmode>box</scalingmode>
       <width>150</width>
       <height>200</height>
@@ -59,12 +59,12 @@
   <options>
     <option>
       <name>complex</name>
-      <value>complex</value>
-      <value>value</value>
+      <value><![CDATA[complex]]></value>
+      <value><![CDATA[value]]></value>
     </option>
     <option>
       <name>simple</name>
-      <value>simple value</value>
+      <value><![CDATA[simple value]]></value>
     </option>
   </options>
 </module>

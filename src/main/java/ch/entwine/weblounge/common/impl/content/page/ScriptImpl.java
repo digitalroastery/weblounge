@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
 import javax.xml.xpath.XPath;
@@ -55,6 +56,9 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
 
   /** True to wait with the execution of the script until the page was loaded */
   protected boolean defer = false;
+
+  /** Element usage scenario */
+  protected Use use = null;
 
   /**
    * Creates a new <code>Script</code> object with the script's path and
@@ -125,6 +129,24 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
     if (href != null && href.matches(".*\\$\\{.*\\}.*")) {
       href = ConfigurationUtils.processTemplate(href, module);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#getUse()
+   */
+  public Use getUse() {
+    return use != null ? use : Use.All;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#setUse(ch.entwine.weblounge.common.content.page.HTMLInclude.Use)
+   */
+  public void setUse(Use use) {
+    this.use = use;
   }
 
   /**
@@ -233,6 +255,11 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
     script.setCharset(XPathHelper.valueOf(config, "@charset", xpathProcessor));
     script.setDeferred("true".equalsIgnoreCase(XPathHelper.valueOf(config, "@defer", xpathProcessor)));
 
+    String use = XPathHelper.valueOf(config, "@use", xpathProcessor);
+    if (StringUtils.isNotBlank(use)) {
+      script.setUse(Use.valueOf(StringUtils.capitalize(use)));
+    }
+
     return script;
   }
 
@@ -242,10 +269,17 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    * @see ch.entwine.weblounge.common.content.page.Script#toXml()
    */
   public String toXml() {
-    StringBuilder sb = new StringBuilder("<script ");
+    StringBuilder sb = new StringBuilder("<script");
+
+    // use
+    if (use != null) {
+      sb.append(" use=\"");
+      sb.append(use.toString().toLowerCase());
+      sb.append("\"");
+    }
 
     // The source
-    sb.append("src=\"");
+    sb.append(" src=\"");
     sb.append(href);
     sb.append("\"");
 
@@ -298,6 +332,13 @@ public class ScriptImpl implements Script, DeclarativeHTMLHeadElement {
    */
   public String toString() {
     StringBuilder sb = new StringBuilder("script [");
+
+    // use
+    if (use != null) {
+      sb.append(" use=\"");
+      sb.append(use.toString().toLowerCase());
+      sb.append("\"");
+    }
 
     // The source
     sb.append("src=");

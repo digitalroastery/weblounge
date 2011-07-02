@@ -438,9 +438,9 @@ public class PageletRendererImpl extends AbstractRenderer implements PageletRend
 
     // Names
     if (StringUtils.isNotBlank(name)) {
-      buf.append("<name>");
+      buf.append("<name><![CDATA[");
       buf.append(name);
-      buf.append("</name>");
+      buf.append("]]></name>");
     }
 
     // Renderer class

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <published>
-	<user id="john" realm="testland">John Doe</user>
+	<user id="john" realm="testland"><![CDATA[John Doe]]></user>
 	<from>2009-11-06T09:52:52Z</from>
 	<to>2010-11-06T23:59:59Z</to>
 </published>

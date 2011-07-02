@@ -653,9 +653,9 @@ public class HTMLActionSupport extends ActionSupport implements HTMLAction {
 
     // Names
     if (StringUtils.isNotBlank(name)) {
-      b.append("<name>");
+      b.append("<name><![CDATA[");
       b.append(name);
-      b.append("</name>");
+      b.append("]]></name>");
     }
 
     // class

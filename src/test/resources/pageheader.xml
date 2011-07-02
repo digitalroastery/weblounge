@@ -18,25 +18,25 @@
       <rights language="de"><![CDATA[Copyright 2009 by T. Wunden]]></rights>
     </metadata>
     <created>
-      <user id="hans" realm="testland">Hans Muster</user>
+      <user id="hans" realm="testland"><![CDATA[Hans Muster]]></user>
       <date>2009-01-07T20:05:41Z</date>
     </created>
     <modified>
-      <user id="amelie" realm="testland">Amélie Poulard</user>
+      <user id="amelie" realm="testland"><![CDATA[Amélie Poulard]]></user>
       <date>2009-02-18T22:06:40Z</date>
     </modified>
     <published>
-      <user id="hans" realm="testland">Hans Muster</user>
+      <user id="hans" realm="testland"><![CDATA[Hans Muster]]></user>
       <from>2006-05-05T17:58:21Z</from>
       <to>2010-01-01T01:00:00Z</to>
     </published>
     <security>
       <owner>
-        <user id="hans" realm="testland">Hans Muster</user>
+        <user id="hans" realm="testland"><![CDATA[Hans Muster]]></user>
       </owner>
     </security>
     <locked>
-      <user id="amelie" realm="testland">Amélie Poulard</user>
+      <user id="amelie" realm="testland"><![CDATA[Amélie Poulard]]></user>
     </locked>
   </head>
 </page>

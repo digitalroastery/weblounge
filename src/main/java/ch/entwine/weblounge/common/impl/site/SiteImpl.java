@@ -1532,7 +1532,7 @@ public class SiteImpl implements Site {
     b.append("<autostart>").append(autoStart).append("</autostart>");
 
     // name
-    b.append("<name>").append(name).append("</name>");
+    b.append("<name><![CDATA[").append(name).append("]]></name>");
 
     // class
     if (!this.getClass().equals(SiteImpl.class))

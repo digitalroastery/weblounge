@@ -1,7 +1,7 @@
 <test>
-  <name>Action Tests</name>
+  <name><![CDATA[Action Tests]]></name>
   <test-case>
-    <name>English greeting test</name>
+    <name><![CDATA[English greeting test]]></name>
     <url method="get">/greeting</url>
     <parameter name="language">english</parameter>
     <assert-status>200,304</assert-status>
@@ -13,15 +13,15 @@
     </assert-not-exists>
     <assert-equals ignorewhitespace="true" ignorecase="true">
       <path>//div[@id='main']/h1</path>
-      <value>hello world i am happy today</value>
+      <value><![CDATA[hello world i am happy today]]></value>
     </assert-equals>
     <assert-not-equals ignorewhitespace="true" ignorecase="false">
       <path>//div[@id='main']/h2</path>
-      <value>hello world i am happy now</value>
+      <value><![CDATA[hello world i am happy now]]></value>
     </assert-not-equals>
   </test-case>
   <test-case>
-    <name>German greeting test</name>
+    <name><![CDATA[German greeting test]]></name>
     <url method="get">/greeting</url>
     <parameter name="language">german</parameter>
     <assert-status>200,304</assert-status>
@@ -33,11 +33,11 @@
     </assert-not-exists>
     <assert-equals ignorewhitespace="true" ignorecase="true">
       <path>//div[@id='main']/h1</path>
-      <value>hello world i am happy today</value>
+      <value><![CDATA[hello world i am happy today]]></value>
     </assert-equals>
     <assert-not-equals ignorewhitespace="true" ignorecase="false">
       <path>//div[@id='main']/h1</path>
-      <value>hello world i am happy today</value>
+      <value><![CDATA[hello world i am happy today]]></value>
     </assert-not-equals>
   </test-case>
 </test>

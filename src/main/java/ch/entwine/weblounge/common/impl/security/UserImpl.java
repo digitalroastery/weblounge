@@ -379,7 +379,7 @@ public class UserImpl implements User {
 
     // name
     if (name != null) {
-      buf.append(name);
+      buf.append("<![CDATA[").append(name).append("]]>");
     }
 
     buf.append("</user>");

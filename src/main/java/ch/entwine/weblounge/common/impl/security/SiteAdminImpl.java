@@ -208,9 +208,9 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
       Password password = (Password)o;
       b.append("<password type=\"");
       b.append(password.getDigestType().toString());
-      b.append("\">");
+      b.append("\"><![CDATA[");
       b.append(password.getPassword());
-      b.append("</password>");
+      b.append("]]></password>");
     }
 
     // First name
@@ -229,9 +229,9 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
 
     // Name, if first name and last name were not given
     if (name != null && firstName == null && lastName == null) {
-      b.append("<name>");
+      b.append("<name><![CDATA[");
       b.append(name);
-      b.append("</name>");
+      b.append("]]></name>");
     }
 
     // Email
@@ -246,9 +246,9 @@ public final class SiteAdminImpl extends WebloungeUserImpl {
       b.append("<properties>");
       for (Map.Entry<String, Object> entry : properties.entrySet()) {
         b.append("<property>");
-        b.append("<name>");
+        b.append("<name><![CDATA[");
         b.append(entry.getKey());
-        b.append("</name>");
+        b.append("]]></name>");
         b.append("<value>");
         // TODO: Examine object. If XML node or serializable, serialize with
         // care

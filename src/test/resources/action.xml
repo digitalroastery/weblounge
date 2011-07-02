@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <action id="myaction">
-  <name>Test</name>
+  <name><![CDATA[Test]]></name>
   <class>ch.entwine.weblounge.common.site.TestAction</class>
   <mountpoint>/test/</mountpoint>
   <recheck>0</recheck>
@@ -12,7 +12,7 @@
   <options>
     <option>
       <name>key</name>
-      <value>value</value>
+      <value><![CDATA[value]]></value>
     </option>
   </options>
 </action>

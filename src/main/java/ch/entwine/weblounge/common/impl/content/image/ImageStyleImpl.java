@@ -353,9 +353,9 @@ public class ImageStyleImpl extends GeneralComposeable implements ImageStyle {
 
     // name
     if (StringUtils.isNotBlank(name)) {
-      buf.append("<name>");
+      buf.append("<name><![CDATA[");
       buf.append(name);
-      buf.append("</name>");
+      buf.append("]]></name>");
     }
 
     // scaling mode

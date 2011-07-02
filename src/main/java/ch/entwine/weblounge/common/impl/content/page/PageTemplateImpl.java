@@ -347,9 +347,9 @@ public class PageTemplateImpl extends AbstractRenderer implements PageTemplate {
 
     // Names
     if (StringUtils.isNotBlank(name)) {
-      buf.append("<name>");
+      buf.append("<name><![CDATA[");
       buf.append(name);
-      buf.append("</name>");
+      buf.append("]]></name>");
     }
 
     // Renderer class

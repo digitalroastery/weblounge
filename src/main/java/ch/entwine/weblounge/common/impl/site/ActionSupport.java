@@ -732,9 +732,9 @@ public abstract class ActionSupport extends GeneralComposeable implements Action
 
     // Name
     if (StringUtils.isNotBlank(name)) {
-      b.append("<name>");
+      b.append("<name><![CDATA[");
       b.append(name);
-      b.append("</name>");
+      b.append("]]></name>");
     }
 
     // Includes

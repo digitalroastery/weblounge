@@ -4,7 +4,7 @@
   <options>
     <option>
       <name>key</name>
-      <value>value</value>
+      <value><![CDATA[value]]></value>
     </option>
   </options>
 </loginmodule>

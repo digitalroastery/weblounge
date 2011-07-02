@@ -284,7 +284,7 @@ public final class OptionsHelper implements Customizable {
       List<String> values = options.get(key);
       Collections.sort(values);
       for (String value : values)
-        b.append("<value>").append(value).append("</value>");
+        b.append("<value><![CDATA[").append(value).append("]]></value>");
       b.append("</option>");
     }
 

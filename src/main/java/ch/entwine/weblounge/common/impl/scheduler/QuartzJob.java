@@ -318,9 +318,9 @@ public final class QuartzJob implements Job {
 
     // Names
     if (StringUtils.isNotBlank(name)) {
-      b.append("<name>");
+      b.append("<name><![CDATA[");
       b.append(name);
-      b.append("</name>");
+      b.append("]]></name>");
     }
 
     // Class
@@ -349,14 +349,14 @@ public final class QuartzJob implements Job {
         if (value instanceof String[]) {
           String[] values = (String[]) ctx.get(key);
           for (String v : values) {
-            b.append("<value>");
+            b.append("<value><![CDATA[");
             b.append(v);
-            b.append("</value>");
+            b.append("]]></value>");
           }
         } else {
-          b.append("<value>");
+          b.append("<value><![CDATA[");
           b.append(value);
-          b.append("</value>");
+          b.append("]]></value>");
         }
         b.append("</option>");
       }

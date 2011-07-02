@@ -29,6 +29,7 @@ import ch.entwine.weblounge.common.request.WebloungeRequest;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
 import javax.xml.xpath.XPath;
@@ -57,6 +58,9 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   
   /** The character set */
   protected String charset = null;
+
+  /** Element usage scenario */
+  protected Use use = null;
 
   /**
    * Creates a new link of type <code>text/css</code>, media <code>all</code>
@@ -136,7 +140,25 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
   
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#getUse()
+   */
+  public Use getUse() {
+    return use != null ? use : Use.All;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#setUse(ch.entwine.weblounge.common.content.page.HTMLInclude.Use)
+   */
+  public void setUse(Use use) {
+    this.use = use;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#getHref()
    */
   public String getHref() {
@@ -279,6 +301,11 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
 
     LinkImpl include = new LinkImpl(href, type, media, rel, rev, charset);
 
+    String use = XPathHelper.valueOf(config, "@use", xpathProcessor);
+    if (StringUtils.isNotBlank(use)) {
+      include.setUse(Use.valueOf(StringUtils.capitalize(use)));
+    }
+
     return include;
   }
 
@@ -288,10 +315,17 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
    * @see ch.entwine.weblounge.common.content.page.HTMLHeadElement#toXml()
    */
   public String toXml() {
-    StringBuilder sb = new StringBuilder("<link ");
+    StringBuilder sb = new StringBuilder("<link");
+
+    // use
+    if (use != null) {
+      sb.append(" use=\"");
+      sb.append(use.toString().toLowerCase());
+      sb.append("\"");
+    }
 
     // The source
-    sb.append("href=\"");
+    sb.append(" href=\"");
     sb.append(href);
     sb.append("\"");
 
@@ -363,6 +397,13 @@ public class LinkImpl implements Link, DeclarativeHTMLHeadElement {
    */
   public String toString() {
     StringBuilder sb = new StringBuilder("link [");
+
+    // use
+    if (use != null) {
+      sb.append(" use=\"");
+      sb.append(use.toString().toLowerCase());
+      sb.append("\"");
+    }
 
     // The source
     sb.append("src=");

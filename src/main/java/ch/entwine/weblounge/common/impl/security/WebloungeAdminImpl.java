@@ -169,30 +169,30 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
       Password password = (Password)o;
       b.append("<password type=\"");
       b.append(password.getDigestType().toString());
-      b.append("\">");
+      b.append("\"><![CDATA[");
       b.append(password.getPassword());
-      b.append("</password>");
+      b.append("]]></password>");
     }
 
     // First name
     if (firstName != null) {
-      b.append("<firstname>");
+      b.append("<firstname><![CDATA[");
       b.append(firstName);
-      b.append("</firstname>");
+      b.append("]]></firstname>");
     }
 
     // Last name
     if (lastName != null) {
-      b.append("<lastname>");
+      b.append("<lastname><![CDATA[");
       b.append(lastName);
-      b.append("</lastname>");
+      b.append("]]></lastname>");
     }
 
     // Name, if first name and last name were not given
     if (name != null && firstName == null && lastName == null) {
-      b.append("<name>");
+      b.append("<name><![CDATA[");
       b.append(name);
-      b.append("</name>");
+      b.append("]]></name>");
     }
 
     // Email
@@ -217,11 +217,11 @@ public final class WebloungeAdminImpl extends WebloungeUserImpl {
         b.append("<name>");
         b.append(entry.getKey());
         b.append("</name>");
-        b.append("<value>");
+        b.append("<value><![CDATA[");
         // TODO: Examine object. If XML node or serializable, serialize with
         // care
         b.append(entry.getValue().toString());
-        b.append("</value>");
+        b.append("]]></value>");
         b.append("</property>");
       }
       b.append("</properties>");

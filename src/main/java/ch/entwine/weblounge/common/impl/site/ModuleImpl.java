@@ -680,9 +680,9 @@ public class ModuleImpl implements Module {
 
     // Names
     if (StringUtils.isNotBlank(name)) {
-      b.append("<name>");
+      b.append("<name><![CDATA[");
       b.append(name);
-      b.append("</name>");
+      b.append("]]></name>");
     }
 
     // class

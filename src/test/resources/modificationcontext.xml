@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <modified>
-	<user id="john" realm="testland">John Doe</user>
+	<user id="john" realm="testland"><![CDATA[John Doe]]></user>
 	<date>2009-11-06T09:52:52Z</date>
 </modified>
