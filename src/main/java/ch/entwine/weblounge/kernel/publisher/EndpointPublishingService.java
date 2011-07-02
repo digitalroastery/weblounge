@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,7 +79,7 @@ public class EndpointPublishingService implements ManagedService {
 
   /** Context of this component */
   protected ComponentContext componentContext = null;
-  
+
   /** The bundle context */
   protected BundleContext bundleContext = null;
 
@@ -89,12 +90,16 @@ public class EndpointPublishingService implements ManagedService {
   protected String defaultContextPathPrefix = DEFAULT_PATH;
 
   /** Mapping of registered endpoints */
+  protected Map<String, Object> serviceMap = null;
+
+  /** Mapping of registered endpoints */
   protected Map<String, GenericServlet> servletMap = null;
 
   /**
    * Creates a new publishing service for JSR 311 annotated classes.
    */
   public EndpointPublishingService() {
+    serviceMap = new ConcurrentHashMap<String, Object>();
     servletMap = new ConcurrentHashMap<String, GenericServlet>();
     jsr311ServiceListener = new JSR311AnnotatedServiceListener();
   }
@@ -157,9 +162,10 @@ public class EndpointPublishingService implements ManagedService {
     }
 
     // Unregister the current jsr311 servlets
-    for (String contextPath : servletMap.keySet()) {
-      unregisterEndpoint(contextPath);
+    for (String path : serviceMap.keySet()) {
+      unregisterEndpoint(path);
     }
+    serviceMap.clear();
     servletMap.clear();
   }
 
@@ -178,10 +184,10 @@ public class EndpointPublishingService implements ManagedService {
       return;
 
     // Unregister all current endpoints
-    for (String path : servletMap.keySet()) {
+    for (String path : serviceMap.keySet()) {
       unregisterEndpoint(path);
     }
-    
+
     // Register any existing JAX-RS services that have already been loaded
     for (Bundle bundle : componentContext.getBundleContext().getBundles()) {
       ServiceReference[] refs = bundle.getRegisteredServices();
@@ -193,6 +199,17 @@ public class EndpointPublishingService implements ManagedService {
       }
     }
 
+  }
+
+  /**
+   * Returns a list of all service endpoints along with their paths.
+   * 
+   * @return the service paths
+   */
+  public Map<String, Object> getEndpoints() {
+    Map<String, Object> services = new HashMap<String, Object>(serviceMap.size());
+    services.putAll(serviceMap);
+    return services;
   }
 
   /**
@@ -238,6 +255,7 @@ public class EndpointPublishingService implements ManagedService {
 
       CXFNonSpringServlet servlet = new JAXRSServlet(endpointPath, service);
       httpService.registerServlet(contextPath, servlet, new Hashtable<String, String>(), httpContext);
+      serviceMap.put(contextPath, service);
       servletMap.put(contextPath, servlet);
 
       logger.debug("Registering {} at {}", service, contextPath);
@@ -245,7 +263,7 @@ public class EndpointPublishingService implements ManagedService {
     } catch (Throwable t) {
       logger.error("Error registering rest service at " + contextPath, t);
       return;
-    }      
+    }
 
   }
 
@@ -266,6 +284,7 @@ public class EndpointPublishingService implements ManagedService {
     }
 
     // Destroy the servlet
+    serviceMap.remove(contextPath);
     GenericServlet servlet = servletMap.remove(contextPath);
     if (servlet != null) {
       servlet.destroy();
@@ -301,7 +320,7 @@ public class EndpointPublishingService implements ManagedService {
       // Sometimes, there is a service reference without a service
       if (service == null)
         return;
-      
+
       // Is this a JSR 311 annotated class?
       Path pathAnnotation = service.getClass().getAnnotation(Path.class);
       if (pathAnnotation == null)

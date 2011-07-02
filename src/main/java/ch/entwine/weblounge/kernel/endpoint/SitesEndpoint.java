@@ -285,7 +285,7 @@ public class SitesEndpoint {
    */
   @Override
   public String toString() {
-    return "sites rest endpoint";
+    return "Sites rest endpoint";
   }
 
 }

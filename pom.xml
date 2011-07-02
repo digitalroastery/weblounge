@@ -453,6 +453,7 @@
               ch.entwine.weblounge.kernel.db;version=${project.version},
               ch.entwine.weblounge.kernel.endpoint;version=${project.version},
               ch.entwine.weblounge.kernel.publisher;version=${project.version},
+              ch.entwine.weblounge.kernel.runtime;version=${project.version},
               ch.entwine.weblounge.kernel.shared;version=${project.version},
               ch.entwine.weblounge.kernel.webconsole;version=${project.version}
               ch.entwine.weblounge.kernel.security;version=${project.version},
@@ -480,13 +481,18 @@
               OSGI-INF/datasource-provider-service.xml,
               OSGI-INF/endpoint-publishing-service.xml,
               OSGI-INF/eclipselink-bundle-sanitizer-service.xml,
+              OSGI-INF/endpoint-runtime-information.xml,
               OSGI-INF/kernel-service.xml,
+              OSGI-INF/language-runtime-information.xml,
               OSGI-INF/resource-publishing-service.xml,
+              OSGI-INF/runtime-information-rest-service.xml,
               OSGI-INF/shared-resources.xml,
               OSGI-INF/site-command.xml,
               OSGI-INF/site-manager-service.xml,
               OSGI-INF/site-rest-service.xml,
+              OSGI-INF/site-runtime-information.xml,
               OSGI-INF/test-command.xml,
+              OSGI-INF/user-runtime-information.xml,
               OSGI-INF/webconsole-plugin.xml
             </Service-Component>
           </instructions>
