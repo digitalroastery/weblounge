@@ -605,7 +605,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
    */
   @Override
   public String toString() {
-    return "pages rest endpoint";
+    return "Pages rest endpoint";
   }
 
 }

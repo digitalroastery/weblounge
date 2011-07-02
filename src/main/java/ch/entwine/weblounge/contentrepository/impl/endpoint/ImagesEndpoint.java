@@ -498,7 +498,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    */
   @Override
   public String toString() {
-    return "images rest endpoint";
+    return "Images rest endpoint";
   }
 
 }

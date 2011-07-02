@@ -198,7 +198,7 @@ public class SearchEndpoint {
    */
   @Override
   public String toString() {
-    return "search rest endpoint";
+    return "Search rest endpoint";
   }
 
 }

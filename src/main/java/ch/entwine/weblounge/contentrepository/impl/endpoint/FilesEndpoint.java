@@ -920,7 +920,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    */
   @Override
   public String toString() {
-    return "file rest endpoint";
+    return "File rest endpoint";
   }
 
 }
