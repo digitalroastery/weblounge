@@ -15,3 +15,11 @@ Author: <input type="text" name="property:author" /><br />
 <textarea name="element:beschreibung" cols="49" rows="7">
 Optionale Textvorbelegung
 </textarea>
+<br />
+<select name="element:stars" size="5" multiple>
+  <option>Heino</option>
+  <option>Michael Jackson</option>
+  <option selected>Tom Waits</option>
+  <option>Nina Hagen</option>
+  <option>Marianne Rosenberg</option>
+</select>
