@@ -268,6 +268,7 @@ PageMappings.Body.Composer.Pagelet.Locale.properties = [new Jsonix.Model.Attribu
   typeInfo: PageMappings.CreatedModified
 }), new Jsonix.Model.ElementMapPropertyInfo({
 	name: 'text',
+	collection: true,
 	key: new Jsonix.Model.AttributePropertyInfo({
 		name: 'id',
 		typeInfo: Jsonix.Schema.XSD.String.INSTANCE

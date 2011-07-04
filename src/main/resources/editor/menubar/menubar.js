@@ -182,7 +182,7 @@ steal.plugins(
 			steal.dev.log('note')
 		},
 		
-		"span.language-menu img click": function(el, ev) {
+		".editor_menubar span.language-menu img click": function(el, ev) {
 			el.trigger('changeLanguage', el.attr('title'));
 		},
 		

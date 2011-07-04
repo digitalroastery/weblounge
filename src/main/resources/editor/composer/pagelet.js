@@ -6,7 +6,7 @@ steal.plugins('jqueryui/dialog',
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template')
-.then('trimpathconverter')
+.then('inputconverter')
 .then(function($) {
 
   $.Controller("Editor.Pagelet",
@@ -20,18 +20,18 @@ steal.plugins('jqueryui/dialog',
      * Initialize a new Pagelet controller.
      */
     init: function(el) {
-		this.index = this.element.index();
-		this.element.attr('index', this.index);
+		this.element.attr('index', this.element.index());
     },
     
     update: function(options) {
     	if(options === undefined) return;
+    	this.element.attr('index', this.element.index());
     	this.options.composer = options.composer;
     },
     
     _openPageEditor: function(pageletEditor) {
     	// Parse Pagelet-Editor Data
-    	this.pagelet = this.options.composer.page.getEditorPagelet(this.options.composer.id, this.index, this.options.composer.language);
+    	this.pagelet = this.options.composer.page.getEditorPagelet(this.options.composer.id, this.element.index(), this.options.composer.language);
     	
     	this.renderer = $(pageletEditor).find('renderer')[0].firstChild.nodeValue.trim();
     	var editor = $(pageletEditor).find('editor')[0].firstChild.nodeValue;
@@ -60,7 +60,7 @@ steal.plugins('jqueryui/dialog',
 					var result  = templateObject.process(newPagelet);
 					
 					// Save New Pagelet
-			    	this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.index);
+			    	this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.element.index());
 					
 					// Render site
 					this.element.html(result);
@@ -85,15 +85,11 @@ steal.plugins('jqueryui/dialog',
     		else if($(this).attr('type') == 'radio') {
     			TrimPathConverter.convertRadio($(this), element, pagelet);
     		}
-    		else if($(this).type == 'textarea') {
+    		else if(this.tagName == 'TEXTAREA') {
     			TrimPathConverter.convertTextarea($(this), element, pagelet);
     		}
-    		else if($(this).type == 'select') {
+    		else if(this.tagName == 'SELECT') {
     			TrimPathConverter.convertSelect($(this), element, pagelet);
-    		}
-    		// ???
-    		else if($(this).attr('type') == 'file') {
-    			TrimPathConverter.convertFile($(this), element, pagelet);
     		}
     	});
     },
@@ -108,17 +104,46 @@ steal.plugins('jqueryui/dialog',
 		}
 		
 		$.each(allInputs, function(i, input) {
-			// TODO!!!!
-			// Werte von Checkboxen, Select und RadioButtons anderst speichern
-			
-			if(input.value == '') return;
 			var element = input.name.split(':')
-			if(element[0] == 'property') {
-				newPagelet.properties.property[element[1]] = input.value;
-			} 
-			else if(element[0] == 'element') {
-				newPagelet.locale.current.text[element[1]] = input.value;
-			}
+    		if(input.type == 'select-one' || input.type == 'select-multiple') {
+    			var optionArray = new Array();
+    			$(input).find('option:selected').each(function(){
+    				optionArray.push($(this).val());
+    			});
+    			if($.isEmptyObject(optionArray)) return;
+    			if(element[0] == 'property') {
+    				newPagelet.properties.property[element[1]] = optionArray.toString();
+    			} 
+    			else if(element[0] == 'element') {
+    				newPagelet.locale.current.text[element[1]] = optionArray.toString();
+    			}
+    		}
+    		else if(input.type == 'checkbox') {
+    			if(element[0] == 'property') {
+					newPagelet.properties.property[element[1]] = input.checked ? "true" : "false";
+    			} 
+    			else if(element[0] == 'element') {
+					newPagelet.locale.current.text[element[1]] = input.checked ? "true" : "false";
+    			}
+    		}
+    		else if(input.type == 'radio') {
+    			if(input.checked == false) return;
+    			if(element[0] == 'property') {
+    				newPagelet.properties.property[element[1]] = input.value;
+    			} 
+    			else if(element[0] == 'element') {
+    				newPagelet.locale.current.text[element[1]] = input.value;
+    			}
+    		}
+    		else {
+    			if(input.value == '') return;
+    			if(element[0] == 'property') {
+    				newPagelet.properties.property[element[1]] = input.value;
+    			} 
+    			else if(element[0] == 'element') {
+    				newPagelet.locale.current.text[element[1]] = input.value;
+    			}
+    		}
 		});
 		return newPagelet;
     },
@@ -142,7 +167,7 @@ steal.plugins('jqueryui/dialog',
     },
 
 	'div.icon_editing click': function(ev) {
-		Workbench.findOne({ id: this.options.composer.page.value.id, composer: this.options.composer.id, pagelet: this.index }, this.callback('_openPageEditor'));
+		Workbench.findOne({ id: this.options.composer.page.value.id, composer: this.options.composer.id, pagelet: this.element.index() }, this.callback('_openPageEditor'));
 	}
 
   });

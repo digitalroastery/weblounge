@@ -18,22 +18,22 @@ $.Class.extend('TrimPathConverter',
 	convertCheckbox: function(input, element, pagelet) {
 		if(element[0] == 'element') {
 			if(!$.isEmptyObject(pagelet.locale.current)) {
-				if(pagelet.locale.current.text[element[1]] == true)
+				if(pagelet.locale.current.text[element[1]] == "true")
 					input.attr('checked', 'checked');
-				else if(pagelet.locale.current.text[element[1]] == false)
+				else if(pagelet.locale.current.text[element[1]] == "false")
 					input.removeAttr('checked');
 			}
 			else if(!$.isEmptyObject(pagelet.locale.original)) {
-				if(pagelet.locale.original.text[element[1]] == true)
+				if(pagelet.locale.original.text[element[1]] == "true")
 					input.attr('checked', 'checked');
-				else if(!pagelet.locale.original.text[element[1]] == false)
+				else if(pagelet.locale.original.text[element[1]] == "false")
 					input.removeAttr('checked');
 			}
 		} 
 		else if(element[0] == 'property') {
-			if(pagelet.properties.property[element[1]] == true) 
+			if(pagelet.properties.property[element[1]] == "true") 
 				input.attr('checked', 'checked');
-			else if(!pagelet.properties.property[element[1]] == false)
+			else if(pagelet.properties.property[element[1]] == "false")
 				input.removeAttr('checked');
 		}
 	},
@@ -76,9 +76,9 @@ $.Class.extend('TrimPathConverter',
 	convertTextarea: function(textarea, element, pagelet) {
 		if(element[0] == 'element') {
 			if(!$.isEmptyObject(pagelet.locale.current)) {
-				textarea.html(pagelet.properties.property[element[1]]);
+				textarea.html('Current: ' + pagelet.locale.original.text[element[1]]);
 			}
-			if(!$.isEmptyObject(pagelet.locale.original)) {
+			else if(!$.isEmptyObject(pagelet.locale.original)) {
 				textarea.html('Original: ' + pagelet.locale.original.text[element[1]]);
 			}
 		} 
@@ -87,12 +87,46 @@ $.Class.extend('TrimPathConverter',
 		}
 	},
 	
-	convertSelect: function(select, element) {
-	},
-
-	convertFile: function(input, element) {
+	convertSelect: function(select, element, pagelet) {
+		$(select).find('option').each(function(){
+			if(element[0] == 'element') {
+				if(!$.isEmptyObject(pagelet.locale.current)) {
+					var array = pagelet.locale.current.text[element[1]];
+					if(array == undefined) return;
+					array = array.split(',');
+					if($.inArray($(this).val(), array) == -1) {
+						$(this).removeAttr('selected');
+					} 
+					else {
+						$(this).attr('selected', 'selected');
+					}
+				}
+				else if(!$.isEmptyObject(pagelet.locale.original)) {
+					var array = pagelet.locale.original.text[element[1]];
+					if(array == undefined) return;
+					array = array.split(',');
+					if($.inArray($(this).val(), array) == -1) {
+						$(this).removeAttr('selected');
+					} 
+					else {
+						$(this).attr('selected', 'selected');
+					}
+				}
+			} 
+			else if(element[0] == 'property') {
+				var array = pagelet.properties.property[element[1]];
+				if(array == undefined) return;
+				array = array.split(',');
+				if($.inArray($(this).val(), array) == -1) {
+					$(this).removeAttr('selected');
+				} 
+				else {
+					$(this).attr('selected', 'selected');
+				}
+			}
+		});
 	}
-	
+
 },
 /* @prototype */
 {

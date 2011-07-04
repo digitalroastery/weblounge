@@ -1,11 +1,11 @@
 steal.then('jsonix')
 .then(function($) {
 	
-	$.Model('Site',
+	$.Model('Runtime',
 	/* @Static */
 	{
 		findOne: function(params, success, error) {
-			$.ajax('/system/weblounge/sites/weblounge-test', {
+			$.ajax('system/weblounge/runtime/', {
 				async: false,
 				success: this.callback(['parseXML', 'wrap', success]),
 			});
@@ -13,20 +13,22 @@ steal.then('jsonix')
 		
 		parseXML: function(xml) {
 			var site = new Object();
-			site.id = $(xml).attr('id');
-			site.languages = [];
-			
-			$(xml).find('language').each(function(index) {
-				site.languages[index] = {};
-				site.languages[index].language = $(this).text();
-				site.languages[index].default = ($(this).attr('default') == "true");
-			});
-			
-			site.domains = [];
-			$(xml).find('url').each(function(index) {
-				site.domains[index] = {};
-				site.domains[index].url = $(this).text();
-				site.domains[index].default = ($(this).attr('default') == "true");
+			$(xml).find('site').each(function(index) {
+				site.id = $(this).attr('id');
+				site.languages = [];
+				
+				$(this).find('language').each(function(index) {
+					site.languages[index] = {};
+					site.languages[index].language = $(this).text();
+					site.languages[index].default = ($(this).attr('default') == "true");
+				});
+				
+				site.domains = [];
+				$(this).find('url').each(function(index) {
+					site.domains[index] = {};
+					site.domains[index].url = $(this).text();
+					site.domains[index].default = ($(this).attr('default') == "true");
+				});
 			});
 			return site;
 		}

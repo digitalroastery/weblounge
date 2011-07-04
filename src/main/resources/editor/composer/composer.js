@@ -36,7 +36,7 @@ steal.plugins('jquery/controller','jqueryui/sortable')
             });
             
             this.options.page.updateComposer(this.id, newComposer);
-            
+            this.update(this.options);
 		}, this)
       });
       

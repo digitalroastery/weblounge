@@ -1,5 +1,5 @@
 steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'editor/resourcebrowser', 'editor/composer')
-.models('../../models/site', '../../models/page')
+.models('../../models/runtime', '../../models/page')
 .then(function($) {
 		
 	$.Controller('Editor.App',
@@ -23,7 +23,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
 				return false;
 			}
 			
-			Site.findOne({}, this.callback('_loadSite'));
+			Runtime.findOne({}, this.callback('_loadSite'));
 			this._loadCurrentLanguage();
 			
 			this.menuBar = this.find('#menubar').editor_menubar({site: this.site, language: this.options.language});
