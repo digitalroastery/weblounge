@@ -25,6 +25,9 @@ import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.security.User;
 import ch.entwine.weblounge.common.site.Site;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Returns runtime information on the current site.
  */
@@ -50,8 +53,14 @@ public class SiteRuntimeInformation implements RuntimeInformationProvider {
     if (site == null)
       return null;
     String siteXml = site.toXml();
+
+    // Filter out the root tag
+    Pattern p = Pattern.compile("^<([^>]*)>(.*)</site>$");
+    Matcher m = p.matcher(siteXml);
+    if (m.matches())
+      siteXml = m.group(2);
+    siteXml = "<id>" + site.getIdentifier() + "</id>" + siteXml;
     siteXml = siteXml.replaceAll("<password.*</password>", "");
-    siteXml = siteXml.replaceAll("( xmlns.*?>)", ">");
     siteXml = ConfigurationUtils.processTemplate(siteXml, site);
     return siteXml;
   }
