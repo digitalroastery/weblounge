@@ -66,7 +66,6 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -91,6 +90,15 @@ import javax.xml.parsers.ParserConfigurationException;
 @Path("/")
 @Produces(MediaType.TEXT_XML)
 public class FilesEndpoint extends ContentRepositoryEndpoint {
+
+  /** Request parameter name for the path */
+  public static final String OPT_PATH = "path";
+
+  /** Request parameter name for the content language */
+  public static final String OPT_LANGUAGE = "languageId";
+
+  /** Request parameter name for the content type */
+  public static final String OPT_MIMETYPE = "mimetype";
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(FilesEndpoint.class);
@@ -711,7 +719,6 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
    */
   @POST
   @Path("/uploads")
-  @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.MEDIA_TYPE_WILDCARD)
   public Response uploadFile(@Context HttpServletRequest request) {
 
@@ -729,55 +736,92 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
     String mimeType = null;
     File uploadedFile = null;
     
-    if (!ServletFileUpload.isMultipartContent(request))
-      throw new WebApplicationException(Status.BAD_REQUEST);
-      
     try {
-      
-      try {
-        ServletFileUpload payload = new ServletFileUpload();
-        for (FileItemIterator iter = payload.getItemIterator(request); iter.hasNext();) {
-          FileItemStream item = iter.next();
-          String fieldName = item.getFieldName();
-          if (item.isFormField()) {
-            String fieldValue = Streams.asString(item.openStream());
-            if (StringUtils.isBlank(fieldValue))
-              continue;
-            if ("path".equals(fieldName)) {
-              path = Streams.asString(item.openStream());
-            } else if ("language".equals(fieldName)) {
-              try {
-                language = LanguageUtils.getLanguage(fieldValue);
-              } catch (UnknownLanguageException e) {
-                throw new WebApplicationException(Status.BAD_REQUEST);
+
+      // Multipart form encoding?
+
+      if (ServletFileUpload.isMultipartContent(request)) {
+        try {
+          ServletFileUpload payload = new ServletFileUpload();
+          for (FileItemIterator iter = payload.getItemIterator(request); iter.hasNext();) {
+            FileItemStream item = iter.next();
+            String fieldName = item.getFieldName();
+            if (item.isFormField()) {
+              String fieldValue = Streams.asString(item.openStream());
+              if (StringUtils.isBlank(fieldValue))
+                continue;
+              if (OPT_PATH.equals(fieldName)) {
+                path = Streams.asString(item.openStream());
+              } else if (OPT_LANGUAGE.equals(fieldName)) {
+                try {
+                  language = LanguageUtils.getLanguage(fieldValue);
+                } catch (UnknownLanguageException e) {
+                  throw new WebApplicationException(Status.BAD_REQUEST);
+                }
+              } else if (OPT_MIMETYPE.equals(fieldName)) {
+                mimeType = Streams.asString(item.openStream());
               }
-            } else if ("mimetype".equals(fieldName)) {
-              mimeType = Streams.asString(item.openStream());
-            }
-          } else {
-            // once the body gets read iter.hasNext must not be invoked
-            // or the stream can not be read
-            fileName = StringUtils.trim(item.getName());
-            mimeType = StringUtils.trim(item.getContentType());
-            uploadedFile = File.createTempFile("upload-", null);
-            FileOutputStream fos = new FileOutputStream(uploadedFile);
-            try {
-              IOUtils.copy(item.openStream(), fos);
-            } catch (IOException e) {
-              IOUtils.closeQuietly(fos);
-              throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-            } finally {
-              IOUtils.closeQuietly(fos);
+            } else {
+              // once the body gets read iter.hasNext must not be invoked
+              // or the stream can not be read
+              fileName = StringUtils.trim(item.getName());
+              mimeType = StringUtils.trim(item.getContentType());
+              uploadedFile = File.createTempFile("upload-", null);
+              FileOutputStream fos = new FileOutputStream(uploadedFile);
+              try {
+                IOUtils.copy(item.openStream(), fos);
+              } catch (IOException e) {
+                IOUtils.closeQuietly(fos);
+                throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+              } finally {
+                IOUtils.closeQuietly(fos);
+              }
             }
           }
+        } catch (FileUploadException e) {
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
-      } catch (FileUploadException e) {
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-      } catch (IOException e) {
-        FileUtils.deleteQuietly(uploadedFile);
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+
+      }
+
+      // Octet binary stream
+
+      else {
+
+        try {
+          fileName = StringUtils.trimToNull(request.getHeader("X-File-Name"));
+          path = StringUtils.trimToNull(request.getParameter(OPT_PATH));
+          mimeType = StringUtils.trimToNull(request.getParameter(OPT_MIMETYPE));
+          language = LanguageUtils.getLanguage(request.getParameter(OPT_LANGUAGE));
+        } catch (UnknownLanguageException e) {
+          throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+
+        InputStream is = null;
+        FileOutputStream fos = null;
+        try {
+          is = request.getInputStream();
+          if (is == null)
+            throw new WebApplicationException(Status.BAD_REQUEST);
+          uploadedFile = File.createTempFile("upload-", null);
+          fos = new FileOutputStream(uploadedFile);
+          IOUtils.copy(is, fos);
+        } catch (IOException e) {
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        } finally {
+          IOUtils.closeQuietly(is);
+          IOUtils.closeQuietly(fos);
+        }
+
       }
       
+      if (fileName == null && uploadedFile != null) {
+        logger.warn("No filename found for upload, request header 'X-File-Name' not specified");
+        fileName = uploadedFile.getName();
+      }
+
       // Make sure there is a language
       if (language == null) {
         language = LanguageUtils.getPreferredLanguage(request, site);
