@@ -21,8 +21,10 @@
 package ch.entwine.weblounge.workbench;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
+import ch.entwine.weblounge.common.content.page.HTMLHeadElement;
 import ch.entwine.weblounge.common.content.page.Pagelet;
 import ch.entwine.weblounge.common.content.page.PageletRenderer;
+import ch.entwine.weblounge.common.impl.util.config.ConfigurationUtils;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
@@ -254,6 +256,12 @@ public class PageletEditor {
       buf.append("<editor type=\"xhtml\"><![CDATA[");
       buf.append(editorContents);
       buf.append("]]></editor>");
+    }
+
+    // HTML head elements
+    Module m = renderer.getModule();
+    for (HTMLHeadElement headElement : renderer.getHTMLHeaders()) {
+      buf.append(ConfigurationUtils.processTemplate(headElement.toXml(), m));
     }
 
     buf.append("</pageleteditor>");
