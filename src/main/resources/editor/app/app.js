@@ -117,14 +117,6 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         	this.mediaTab.editor_resourcebrowser({resourceType: 'media'});
         },
         
-        "li uploadMedia": function(el, ev) {
-        	this.update({mode: 2});
-      		this.mediaTab.hide();
-      		this.pagesTab.hide();
-      		this.massuploader.show();
-      		this.massuploader.editor_massuploader();
-        },
-        
         "span changeLanguage": function(el, ev, language) {
         	localStorage['weblounge.editor.' + this.site.getId() + '.language'] = language;
         	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);

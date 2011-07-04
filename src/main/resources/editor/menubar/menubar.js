@@ -3,6 +3,7 @@ steal.plugins(
 	'jquery/controller/view',
 	'jquery/view',
 	'jquery/view/tmpl',
+	'editor/massuploader',
 	'jqueryui/dialog',
 	'jqueryui/draggable',
 	'jqueryui/resizable',
@@ -174,7 +175,7 @@ steal.plugins(
 		
 		"li.new_upload click": function(el, ev) {
 			$('.menu').hide();
-			el.trigger('uploadMedia');
+			$('<div></div>').editor_massuploader({});
 		},
 		
 		"li.new_note click": function(el, ev) {

@@ -77,19 +77,19 @@ steal.plugins('jqueryui/dialog',
     		var element = $(this).attr('name').split(':')
     		
     		if($(this).attr('type') == 'text' || $(this).attr('type') == 'hidden') {
-    			TrimPathConverter.convertText($(this), element, pagelet);
+    			InputConverter.convertText($(this), element, pagelet);
     		}
     		else if($(this).attr('type') == 'checkbox') {
-    			TrimPathConverter.convertCheckbox($(this), element, pagelet);
+    			InputConverter.convertCheckbox($(this), element, pagelet);
     		}
     		else if($(this).attr('type') == 'radio') {
-    			TrimPathConverter.convertRadio($(this), element, pagelet);
+    			InputConverter.convertRadio($(this), element, pagelet);
     		}
     		else if(this.tagName == 'TEXTAREA') {
-    			TrimPathConverter.convertTextarea($(this), element, pagelet);
+    			InputConverter.convertTextarea($(this), element, pagelet);
     		}
     		else if(this.tagName == 'SELECT') {
-    			TrimPathConverter.convertSelect($(this), element, pagelet);
+    			InputConverter.convertSelect($(this), element, pagelet);
     		}
     	});
     },

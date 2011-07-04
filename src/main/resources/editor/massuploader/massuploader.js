@@ -1,4 +1,14 @@
-steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl')
+steal.plugins('jquery',
+		'jquery/controller/view',
+		'jquery/view',
+		'jquery/view/tmpl',
+		'jqueryui/core',
+		'jqueryui/widget', 
+		'jqueryui/position', 
+		'jqueryui/dialog',
+		'jqueryui/draggable',
+		'jqueryui/resizable',
+		'jqueryui/mouse')
 .views('//editor/massuploader/views/init.tmpl')
 .css('massuploader', 'fileuploader')
 .resources('jsupload/jsupload.nocache', 'fileuploader').then(function($) {
@@ -26,6 +36,23 @@ steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl')
 		 */
 		init: function(el) {
 			$(el).html('//editor/massuploader/views/init.tmpl', {});
+			this.element.dialog({
+				modal: true,
+				title: 'Medien upload',
+				autoOpen: true,
+				resizable: true,
+				buttons: this.options.buttons,
+				width: 900,
+				height: 800,
+				buttons: {
+					Abbrechen: function() {
+						$(this).dialog('close');
+					},
+					Upload: $.proxy(function () {
+						this.element.dialog('close');
+					},this)
+				},
+			});
 			
 			var uploader = new qq.FileUploader({
 			    // pass the dom node (ex. $(selector)[0] for jQuery users)
@@ -33,67 +60,6 @@ steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl')
 			    // path to server-side upload script
 			    action: '/system/weblounge/files/uploads?path=/test/&languageId=fr'
 			});
-			
-//	        new jsu.Upload({
-//	        	multiple: true,  // specify whether the uploader has a multiple behavior
-//	        	chooser: "browser",  // Choose file button type, options are: "browser", "button", "label", "anchor".
-//	        	type: "chismes",  // Type of progress bar, valid options are "basic", "chismes" or "incubator"
-//	        	maxFiles: 0,  // Only used if multiple=true. The maximum number of files which the user can send to the server. 0 means unlimited. Only successful uploads are counted.
-//		   
-//	        	uploadBrowse: "", // ????
-//	            auto: true, // ???
-//	            
-//	        	onStart: this.openTagDialog,  // Javascript method called when the upload process starts
-//	        	onChange: null,  // Javascript method called when the user selects a file
-//	        	onFinish: this.loadImage,  // Javascript method called when the upload process finishes
-//	        	onCancel: this.deleteFile,  // Javascript method called when the upload file is canceled, removed from the queue or from the server
-//	        	onStatus: null,  // Javascript method called when the upload file's status changes
-//		   
-//	        	containerId: "uploader",  // Id of the element where the widget will be inserted
-//	        	action: "servlet.gupld",  // Servlet path, it has to be in the same domain, because cross-domain is not supported
-//	        	validExtensions: null,  // List of valid extensions, the extensions has to be separated by comma or spaces
-//	        	
-//	        	regional: {     // hash with the set of key/values to internationalize the widget
-//	        		uploaderActiveUpload: "There is already an active upload, try later.", 
-//	        		uploaderAlreadyDone: "This file was already uploaded.", 
-//	        		uploaderInvalidExtension: "Invalid file.\nOnly these types are allowed:\n", 
-//	        		uploaderTimeout: "Timeout sending the file:\n perhups your browser does not send files correctly,\n your session has expired,\n or there was a server error.\nPlease try again.", 
-//	        		uploaderServerError: "Invalid server response. Have you configured correctly your application in the server side?", 
-//	        		uploaderServerUnavailable: "Unable to contact with the server: ", 
-//	        		uploaderSend: "Send", 
-//	        		uploadLabelCancel: null, 
-//	        		uploadStatusCanceling: "Canceling", 
-//	        		uploadStatusCanceled: "Canceled", 
-//	        		uploadStatusError: "Error", 
-//	        		uploadStatusInProgress: "Sending...", 
-//	        		uploadStatusQueued: "Queued", 
-//	        		uploadStatusSubmitting: "Submiting form...", 
-//	        		uploadStatusSuccess: "Done", 
-//	        		uploadStatusDeleted: "Deleted", 
-//	        		uploadBrowse: "Select a file ...", 
-//	        		progressPercentMsg: "{0}%", // Set the message used to format the progress in percent units. 
-//	        		progressSecondsMsg: "Time remaining: {0} Seconds", // Set the message used to format the time remaining text below the progress bar in seconds.
-//	        		progressMinutesMsg: "Time remaining: {0} Minutes", // Set the message used to format the time remaining text below the progress bar in minutes
-//	        		progressHoursMsg: "Time remaining: {0} Hours" // Set the message used to format the time remaining text below the progress bar in hours
-//        		}
-//	        });
-	        
-//			this.uploadDialog = $('<div></div>')
-//			.load('/weblounge/editor/massuploader/views/upload-dialog.html')
-//			.dialog({
-//				modal: true,
-//				title: 'Medien upload',
-//				autoOpen: true,
-//				resizable: true,
-//				buttons: {
-//					Abbrechen: function() {
-//						$(this).dialog('close');
-//					},
-//					OK: $.proxy(function () {
-//						this.deleteDialog.dialog('close');
-//					},this)
-//				},
-//			});
 	    },
 	    
 	    deleteFile: function(upl_data) {
@@ -118,6 +84,27 @@ steal.plugins('jquery', 'jquery/controller/view', 'jquery/view/tmpl')
                 });
             }
         },
+        
+//		ready : function() {
+////			this.options.resize = this.callback("resize");
+////			this.options.close = this.callback("close");
+////			this.element.dialog(this.options);
+//		},
+//		
+//		resize : function(event, ui) {
+//		},
+//		
+//		close : function(even, ui) {
+//			alert("Dialog closed");
+//		},
+//		
+//		destroy : function() {
+//			this.element.dialog("destroy");
+//		},
+//		
+//		"input change": function(el, ev) {
+//			steal.dev.log('test');
+//		},
         
 	    "#drop-area dragleave": function(el, ev) {
 			var target = ev.target;
