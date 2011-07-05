@@ -58,15 +58,20 @@ public final class PagesEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "pages");
     docs.setTitle("Weblounge Pages");
 
-    // GET /?path=
-    Endpoint getPageByPathEndpoint = new Endpoint("/", Method.GET, "getpagebypath");
-    getPageByPathEndpoint.setDescription("Returns the page that is located at the given path");
+    // GET /
+    Endpoint getPageByPathEndpoint = new Endpoint("/", Method.GET, "getallpages");
+    getPageByPathEndpoint.setDescription("Returns a collection of pages matching the given parameters");
     getPageByPathEndpoint.addFormat(Format.xml());
-    getPageByPathEndpoint.addStatus(ok("the page was found and is returned as part of the response"));
-    getPageByPathEndpoint.addStatus(notFound("the page was not found or could not be loaded"));
-    getPageByPathEndpoint.addStatus(badRequest("an invalid path was received"));
+    getPageByPathEndpoint.addStatus(ok("a collection (may be empty) of pages is returned as part of the response"));
+    getPageByPathEndpoint.addStatus(badRequest("an invalid request was received"));
     getPageByPathEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getPageByPathEndpoint.addRequiredParameter(new Parameter("path", Parameter.Type.String, "The page path"));
+    getPageByPathEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The page path"));
+    getPageByPathEndpoint.addOptionalParameter(new Parameter("subjects", Parameter.Type.String, "The page subjects, separated by a comma"));
+    getPageByPathEndpoint.addOptionalParameter(new Parameter("searchterms", Parameter.Type.String, "search terms to search the pages content"));
+    String[] sortParams = {"published-asc", "published-desc", "created-asc", "created-desc", "modified-asc", "modified-desc"};
+    getPageByPathEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
+    getPageByPathEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
+    getPageByPathEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
     getPageByPathEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getPageByPathEndpoint);
 

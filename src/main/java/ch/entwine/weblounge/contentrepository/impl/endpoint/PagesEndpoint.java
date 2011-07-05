@@ -22,6 +22,7 @@ package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
 import ch.entwine.weblounge.common.content.ResourceURI;
 import ch.entwine.weblounge.common.content.SearchQuery;
+import ch.entwine.weblounge.common.content.SearchQuery.Order;
 import ch.entwine.weblounge.common.content.SearchResult;
 import ch.entwine.weblounge.common.content.SearchResultItem;
 import ch.entwine.weblounge.common.content.page.Composer;
@@ -53,10 +54,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -88,41 +91,70 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
   /** The endpoint documentation */
   private String docs = null;
 
-  /**
-   * Returns the page with the given identifier or a <code>404</code> if the
-   * page could not be found.
-   * 
-   * @param request
-   *          the request
-   * @param pageId
-   *          the page identifier
-   * @return the page
-   */
+  
   @GET
   @Path("/")
-  public Response getPageURI(@Context HttpServletRequest request,
-      @QueryParam("path") String path) {
+  public Response getAllPages(@Context HttpServletRequest request,
+      @QueryParam("path") String path,
+      @QueryParam("subjects") String subjectstring,
+      @QueryParam("searchterms") String searchterms,
+      @QueryParam("sort") @DefaultValue("modified-desc") String sort,
+      @QueryParam("limit") @DefaultValue("10") int limit,
+      @QueryParam("offset") @DefaultValue("0") int offset) {
 
-    // Check the parameters
-    if (path == null)
-      return Response.status(Status.BAD_REQUEST).build();
-
-    // Load the page
-    Page page = (Page) loadResourceByPath(request, path, Page.TYPE);
-    if (page == null) {
-      return Response.status(Status.NOT_FOUND).build();
+    // Create search query
+    Site site = getSite(request);
+    SearchQuery q = new SearchQueryImpl(site);
+    q.withType(Page.TYPE);
+    if (StringUtils.isNotBlank(path))
+      q.withPath(path);
+    if (StringUtils.isNotBlank(subjectstring)) {
+      StringTokenizer subjects = new StringTokenizer(subjectstring, ",");
+      while (subjects.hasMoreTokens())
+        q.withSubject(subjects.nextToken());
+    }
+    if (StringUtils.isNotBlank(searchterms))
+      q.withText(searchterms);
+    q.withLimit(limit);
+    q.withOffset(offset);
+    if (StringUtils.equalsIgnoreCase("modified-asc", sort)) {
+      q.sortByModificationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("modified-desc", sort)) {
+      q.sortByModificationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("created-asc", sort)) {
+      q.sortByCreationDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("created-desc", sort)) {
+      q.sortByCreationDate(Order.Descending);
+    } else if (StringUtils.equalsIgnoreCase("published-asc", sort)) {
+      q.sortByPublishingDate(Order.Ascending);
+    } else if (StringUtils.equalsIgnoreCase("published-desc", sort)) {
+      q.sortByPublishingDate(Order.Descending);
     }
 
-    // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(page, request)) {
-      return Response.notModified().build();
+    // Load results
+    ContentRepository repository = getContentRepository(site, false);
+    SearchResult result = null;
+    try {
+      result = repository.find(q);
+    } catch (ContentRepositoryException e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
 
-    // Create the response
-    ResponseBuilder response = Response.ok(page.toXml());
-    response.tag(new EntityTag(Long.toString(page.getModificationDate().getTime())));
-    response.lastModified(page.getModificationDate());
-    return response.build();
+    StringBuffer buf = new StringBuffer("<pages ");
+    buf.append("hits=\"").append(result.getHitCount()).append("\" ");
+    buf.append("offset=\"").append(result.getOffset()).append("\" ");
+    if (limit > 0)
+      buf.append("limit=\"").append(result.getLimit()).append("\" ");
+    buf.append("page=\"").append(result.getPage()).append("\" ");
+    buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
+    buf.append(">");
+    for (SearchResultItem item : result.getItems()) {
+      String headerXml = ((SearchResultPageItemImpl) item).getPageHeaderXml();
+      buf.append(headerXml);
+    }
+    buf.append("</pages>");
+
+    return Response.ok(buf.toString()).build();
   }
 
   /**
@@ -186,12 +218,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     if (page == null) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    
+
     Site site = getSite(request);
     SearchQuery q = new SearchQueryImpl(site);
     q.withType(Page.TYPE);
     q.withPathPrefix(page.getURI().getPath());
-    
+
     ContentRepository repository = getContentRepository(site, false);
     SearchResult result = null;
     try {
@@ -202,11 +234,11 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
     StringBuffer buf = new StringBuffer("<pages>");
     for (SearchResultItem item : result.getItems()) {
-      String headerXml = ((SearchResultPageItemImpl)item).getPageHeaderXml(); 
+      String headerXml = ((SearchResultPageItemImpl) item).getPageHeaderXml();
       buf.append(headerXml);
     }
     buf.append("</pages>");
-    
+
     // Create the response
     ResponseBuilder response = Response.ok(buf.toString());
     return response.build();
@@ -257,7 +289,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       if (!contentRepository.exists(pageURI)) {
         throw new WebApplicationException(Status.NOT_FOUND);
       }
-      currentPage = (Page)contentRepository.get(pageURI);
+      currentPage = (Page) contentRepository.get(pageURI);
     } catch (ContentRepositoryException e) {
       logger.warn("Error lookup up page {} from repository: {}", pageURI, e.getMessage());
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -266,7 +298,7 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Check the value of the If-Match header against the etag
     if (ifMatchHeader != null) {
       try {
-        currentPage = (Page)contentRepository.get(pageURI);
+        currentPage = (Page) contentRepository.get(pageURI);
         String etag = Long.toString(currentPage.getModificationDate().getTime());
         if (!etag.equals(ifMatchHeader)) {
           throw new WebApplicationException(Status.PRECONDITION_FAILED);
