@@ -21,6 +21,7 @@
 package ch.entwine.weblounge.common.content;
 
 import ch.entwine.weblounge.common.content.image.ImageStyle;
+import ch.entwine.weblounge.common.language.Language;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,16 +38,47 @@ public interface PreviewGenerator {
    * 
    * @param resource
    *          the resource
+   * @param language
+   *          the preview language
    * @param style
    *          the image style
-   * @param format
-   *          the image format
+   * @param is
+   *          the resource content stream
    * @param os
    *          the output stream
    * @throws IOException
    *           if the resource content cannot be read
    */
-  void createPreview(InputStream resource, ImageStyle style, String format,
-      OutputStream os) throws IOException;
+  void createPreview(Resource<?> resource, Language language, ImageStyle style,
+      InputStream is, OutputStream os) throws IOException;
+
+  /**
+   * Creates a filename for the resource preview based on the resource itself,
+   * the language and the image style.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @param style
+   *          the image style
+   * @return the filename
+   */
+  String getContentType(Resource<?> resource, Language language,
+      ImageStyle style);
+
+  /**
+   * Returns the suffix for the preview's filename based on the resource itself,
+   * the language and the image style.
+   * 
+   * @param resource
+   *          the resource
+   * @param language
+   *          the language
+   * @param style
+   *          the image style
+   * @return the filename
+   */
+  String getSuffix(Resource<?> resource, Language language, ImageStyle style);
 
 }
