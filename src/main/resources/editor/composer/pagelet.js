@@ -5,7 +5,7 @@ steal.plugins('jqueryui/dialog',
 		'editor/dialog')
 .models('../../models/workbench',
 		'../../models/pagelet')
-.resources('trimpath-template')
+.resources('trimpath-template', 'jquery.validate.min')
 .then('inputconverter')
 .then(function($) {
 
@@ -45,7 +45,7 @@ steal.plugins('jqueryui/dialog',
     	
     	// Process Editor Template
     	
-		this.editorDialog = $('<div></div>').html(resultDom.html())
+		this.editorDialog = $('<div></div>').html('<form id="validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.editor_dialog({
 			title: 'Pagelet bearbeiten',
 			width: 900,
@@ -70,7 +70,7 @@ steal.plugins('jqueryui/dialog',
 				}, this)
 			}
 		});
-    	
+		this.editorDialog.find("form#validate").validate();
     },
     
     // Converts Editor Input Fields with Trimpath syntax

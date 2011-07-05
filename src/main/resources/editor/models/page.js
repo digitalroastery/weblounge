@@ -10,13 +10,13 @@ steal.then('jsonix')
 		 */
 		findOne: function(params, success, error) {
 			if ('path' in params) {
-				$.ajax('/system/weblounge/pages?path=' + params.path, {
-					success: this.callback(['parseXML','wrap',success]),
+				$.ajax('/system/weblounge/pages?details=true&path=' + params.path, {
+					success: this.callback(['parseXMLPage', 'wrap', success]),
 				});
 			} 
 			else if ('id' in params) {
 				$.ajax('/system/weblounge/pages/' + params.id, {
-					success: this.callback(['parseXML','wrap',success]),
+					success: this.callback(['parseXMLPage','wrap', success]),
 				});
 			}
 		},
@@ -84,6 +84,15 @@ steal.then('jsonix')
 		parseXML: function(xml) {
 			var unmarshaller = Editor.Jsonix.context().createUnmarshaller();
 			return unmarshaller.unmarshalDocument(xml);
+		},
+		
+		/**
+		 * Converts XML to JSON
+		 */
+		parseXMLPage: function(xml) {
+			var page = $(xml).find('page')[0];
+			var unmarshaller = Editor.Jsonix.context().createUnmarshaller();
+			return unmarshaller.unmarshalDocument(page);
 		},
 		
 		/**
