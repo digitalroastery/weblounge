@@ -91,7 +91,7 @@ public class SearchResultPageItemImpl extends SearchResultItemImpl implements Se
    * @return the page xml
    */
   public String getPageXml() {
-    return this.headerXml;
+    return this.pageXml;
   }
 
   /**
