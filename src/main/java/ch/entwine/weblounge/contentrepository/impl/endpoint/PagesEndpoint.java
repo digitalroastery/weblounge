@@ -90,7 +90,6 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
   /** The endpoint documentation */
   private String docs = null;
-
   
   @GET
   @Path("/")
@@ -100,7 +99,8 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
       @QueryParam("searchterms") String searchterms,
       @QueryParam("sort") @DefaultValue("modified-desc") String sort,
       @QueryParam("limit") @DefaultValue("10") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset) {
+      @QueryParam("offset") @DefaultValue("0") int offset,
+      @QueryParam("details") @DefaultValue("false") boolean details) {
 
     // Create search query
     Site site = getSite(request);
@@ -149,8 +149,12 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     buf.append("pagesize=\"").append(result.getPageSize()).append("\"");
     buf.append(">");
     for (SearchResultItem item : result.getItems()) {
-      String headerXml = ((SearchResultPageItemImpl) item).getPageHeaderXml();
-      buf.append(headerXml);
+      String xml = null;
+      if (details)
+        xml = ((SearchResultPageItemImpl) item).getPageXml();
+      else
+        xml = ((SearchResultPageItemImpl) item).getPageHeaderXml();
+      buf.append(xml);
     }
     buf.append("</pages>");
 

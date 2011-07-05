@@ -72,6 +72,7 @@ public final class PagesEndpointDocs {
     getPageByPathEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
     getPageByPathEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
     getPageByPathEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getPageByPathEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
     getPageByPathEndpoint.setTestForm(new TestForm());
     docs.addEndpoint(Endpoint.Type.READ, getPageByPathEndpoint);
 
