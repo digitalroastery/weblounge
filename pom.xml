@@ -376,10 +376,10 @@
             <Service-Component>
               OSGI-INF/files-rest-service.xml,
               OSGI-INF/file-serializer.xml,
-              OSGI-INF/images-rest-service.xml,
               OSGI-INF/image-serializer.xml,
               OSGI-INF/pages-rest-service.xml,
               OSGI-INF/page-serializer.xml,
+              OSGI-INF/previews-rest-service.xml,
               OSGI-INF/resourceserializer-service.xml,
               OSGI-INF/search-rest-service.xml,
               OSGI-INF/service-factory.xml

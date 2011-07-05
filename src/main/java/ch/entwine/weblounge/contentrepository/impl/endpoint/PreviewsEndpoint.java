@@ -38,6 +38,7 @@ import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.IOUtils;
+import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,6 +46,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -61,56 +64,25 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
 /**
- * This class implements the <code>REST</code> endpoint for images.
+ * This class implements the <code>REST</code> endpoint for resource previews.
  */
 @Path("/")
-public class ImagesEndpoint extends ContentRepositoryEndpoint {
+public class PreviewsEndpoint extends ContentRepositoryEndpoint {
 
   /** The endpoint documentation */
   private String docs = null;
 
+  /** The list of image styles */
+  private List<ImageStyle> styles = new ArrayList<ImageStyle>();
+
   /**
-   * Returns the image with the given identifier or a <code>404</code> if the
-   * image could not be found.
+   * OSGi callback on component deactivation.
    * 
-   * @param request
-   *          the request
-   * @param imageId
-   *          the resource identifier
-   * @return the image
+   * @param ctx
+   *          the component context
    */
-  @GET
-  @Produces(MediaType.TEXT_XML)
-  @Path("/{image}/metadata")
-  public Response getImageResource(@Context HttpServletRequest request,
-      @PathParam("image") String imageId) {
-
-    // Check the parameters
-    if (imageId == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-
-    // Get the resource
-    final ImageResource resource = (ImageResource) loadResource(request, imageId, ImageResource.TYPE);
-    if (resource == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    }
-
-    // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(resource, request)) {
-      return Response.notModified().build();
-    }
-
-    // Check the ETag
-    String eTagValue = ResourceUtils.getETagValue(resource, null);
-    if (!ResourceUtils.isMismatch(resource, null, request)) {
-      return Response.notModified(new EntityTag(eTagValue)).build();
-    }
-
-    // Create the response
-    ResponseBuilder response = Response.ok(resource.toXml());
-    response.tag(new EntityTag(eTagValue));
-    response.lastModified(resource.getModificationDate());
-    return response.build();
+  void deactivate(ComponentContext ctx) {
+    styles.clear();
   }
 
   /**
@@ -119,21 +91,21 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * 
    * @param request
    *          the request
-   * @param imageId
+   * @param resourceId
    *          the resource identifier
    * @return the resource
    */
   @GET
-  @Path("/{image}/original")
+  @Path("/{resource}/original")
   public Response getOriginalImage(@Context HttpServletRequest request,
-      @PathParam("image") String imageId) {
+      @PathParam("resource") String resourceId) {
 
     // Check the parameters
-    if (imageId == null)
+    if (resourceId == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Get the resource
-    final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
+    final Resource<?> resource = loadResource(request, resourceId, ImageResource.TYPE);
     if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
@@ -151,20 +123,20 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * 
    * @param request
    *          the request
-   * @param imageId
+   * @param resourceId
    *          the resource identifier
    * @param languageId
    *          the language identifier
    * @return the image
    */
   @GET
-  @Path("/{image}/locales/{language}/original")
+  @Path("/{resource}/locales/{language}/original")
   public Response getOriginalImage(@Context HttpServletRequest request,
-      @PathParam("image") String imageId,
+      @PathParam("resource") String resourceId,
       @PathParam("language") String languageId) {
 
     // Check the parameters
-    if (imageId == null)
+    if (resourceId == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
@@ -176,7 +148,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the image
-    final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
+    final Resource<?> resource = loadResource(request, resourceId, ImageResource.TYPE);
     if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
@@ -190,27 +162,27 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * 
    * @param request
    *          the request
-   * @param imageId
+   * @param resourceId
    *          the resource identifier
    * @param styleId
    *          the image style identifier
    * @return the resource
    */
   @GET
-  @Path("/{image}/styles/{style}")
+  @Path("/{resource}/styles/{style}")
   public Response getStyledImage(@Context HttpServletRequest request,
-      @PathParam("image") String imageId, @PathParam("style") String styleId) {
+      @PathParam("resource") String resourceId, @PathParam("style") String styleId) {
 
     // Check the parameters
-    if (imageId == null)
+    if (resourceId == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Get the resource
-    final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
+    final Resource<?> resource = loadResource(request, resourceId, ImageResource.TYPE);
     if (resource == null || resource.contents().isEmpty()) {
       throw new WebApplicationException(Status.NOT_FOUND);
     }
-    ImageResource imageResource = (ImageResource)resource;
+    ImageResource imageResource = (ImageResource) resource;
 
     // Determine the language
     Site site = getSite(request);
@@ -224,7 +196,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     for (Module m : site.getModules()) {
       style = m.getImageStyle(styleId);
       if (style != null) {
-        return getScaledImage(request, imageResource, preferred, style);
+        return getScaledResource(request, imageResource, preferred, style);
       }
     }
 
@@ -239,7 +211,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * 
    * @param request
    *          the request
-   * @param imageId
+   * @param resourceId
    *          the resource identifier
    * @param languageId
    *          the language identifier
@@ -248,14 +220,14 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    * @return the image
    */
   @GET
-  @Path("/{image}/locales/{language}/styles/{style}")
+  @Path("/{resource}/locales/{language}/styles/{style}")
   public Response getStyledImageContent(@Context HttpServletRequest request,
-      @PathParam("image") String imageId,
+      @PathParam("resource") String resourceId,
       @PathParam("language") String languageId,
       @PathParam("style") String styleId) {
 
     // Check the parameters
-    if (imageId == null)
+    if (resourceId == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     // Extract the language
@@ -267,10 +239,10 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     }
 
     // Get the image
-    final Resource<?> resource = loadResource(request, imageId, ImageResource.TYPE);
+    final Resource<?> resource = loadResource(request, resourceId, ImageResource.TYPE);
     if (resource == null || resource.contents().isEmpty())
       throw new WebApplicationException(Status.NOT_FOUND);
-    ImageResource imageResource = (ImageResource)resource;
+    ImageResource imageResource = (ImageResource) resource;
 
     // Find the image style
     Site site = getSite(request);
@@ -278,7 +250,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
     for (Module m : site.getModules()) {
       style = m.getImageStyle(styleId);
       if (style != null) {
-        return getScaledImage(request, imageResource, language, style);
+        return getScaledResource(request, imageResource, language, style);
       }
     }
 
@@ -302,12 +274,20 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
 
     StringBuffer buf = new StringBuffer("<styles>");
+    
+    // Add styles of current site
     for (Module m : site.getModules()) {
       ImageStyle[] styles = m.getImageStyles();
       for (ImageStyle style : styles) {
         buf.append(style.toXml());
       }
     }
+    
+    // Add global styles
+    for (ImageStyle style : styles) {
+      buf.append(style.toXml());
+    }
+    
     buf.append("</styles>");
 
     ResponseBuilder response = Response.ok(buf.toString());
@@ -328,17 +308,25 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
   @Path("/styles/{style}")
   public Response getImagestyle(@Context HttpServletRequest request,
       @PathParam("style") String styleId) {
-
     Site site = getSite(request);
-    ImageStyle style = null;
+
+    // Search styles of current site
     for (Module m : site.getModules()) {
-      style = m.getImageStyle(styleId);
+      ImageStyle style = m.getImageStyle(styleId);
       if (style != null) {
         ResponseBuilder response = Response.ok(style.toXml());
         return response.build();
       }
     }
 
+    // Search global styles
+    for (ImageStyle style : styles) {
+      if (style.getIdentifier().equals(styleId)) {
+        ResponseBuilder response = Response.ok(style.toXml());
+        return response.build();
+      }
+    }
+    
     // The image style was not found
     throw new WebApplicationException(Status.NOT_FOUND);
   }
@@ -356,7 +344,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    *          the image style
    * @return the resource content
    */
-  protected Response getScaledImage(HttpServletRequest request,
+  protected Response getScaledResource(HttpServletRequest request,
       final ImageResource imageResource, final Language language,
       final ImageStyle style) {
 
@@ -437,7 +425,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       IOUtils.closeQuietly(fos);
     }
 
-     // Create the response
+    // Create the response
     final InputStream is = imageInputStream;
     ResponseBuilder response = Response.ok(new StreamingOutput() {
       public void write(OutputStream os) throws IOException,
@@ -486,9 +474,31 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
       String docsPath = request.getRequestURI();
       String docsPathExtension = request.getPathInfo();
       String servicePath = request.getRequestURI().substring(0, docsPath.length() - docsPathExtension.length());
-      docs = ImagesEndpointDocs.createDocumentation(servicePath);
+      docs = PreviewsEndpointDocs.createDocumentation(servicePath);
     }
     return docs;
+  }
+
+  /**
+   * Callback from OSGi declarative services on registration of a new image
+   * style in the service registry.
+   * 
+   * @param style
+   *          the image style
+   */
+  void addImageStyle(ImageStyle style) {
+    styles.add(style);
+  }
+
+  /**
+   * Callback from OSGi declarative services on removal of an image style from
+   * the service registry.
+   * 
+   * @param style
+   *          the image style
+   */
+  void removeImageStyle(ImageStyle style) {
+    styles.remove(style);
   }
 
   /**
@@ -498,7 +508,7 @@ public class ImagesEndpoint extends ContentRepositoryEndpoint {
    */
   @Override
   public String toString() {
-    return "Images rest endpoint";
+    return "Previews rest endpoint";
   }
 
 }
