@@ -20,6 +20,7 @@
 
 package ch.entwine.weblounge.contentrepository;
 
+import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
@@ -46,6 +47,15 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @return the resource type
    */
   String getType();
+
+  /**
+   * Returns the resource content's mime type.
+   * 
+   * @param resourceContent
+   *          the resource content
+   * @return the content type
+   */
+  String getMimeType(S resourceContent);
 
   /**
    * Returns <code>true</code> if this serializer supports file content of this
@@ -100,5 +110,7 @@ public interface ResourceSerializer<S extends ResourceContent, T extends Resourc
    * @return the new resource
    */
   Resource<S> createNewResource(Site site);
+
+  PreviewGenerator getPreviewGenerator();
 
 }
