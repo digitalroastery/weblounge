@@ -29,7 +29,6 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
 			this.menuBar = this.find('#menubar').editor_menubar({site: this.site, language: this.options.language});
             this.pagesTab = this.find('#pagebrowser');
             this.mediaTab = this.find('#mediabrowser');
-            this.massuploader = this.find('#massuploader');
             this._initTab();
             this._loadPage();
         },

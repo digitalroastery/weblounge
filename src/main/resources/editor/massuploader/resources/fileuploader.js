@@ -143,6 +143,9 @@ qq.setText = function(element, text){
     element.innerText = text;
     element.textContent = text;
 };
+qq.setStyle = function(element, percent){
+	element.style.width = percent;
+};
 
 //
 // Selecting elements
@@ -485,6 +488,7 @@ qq.FileUploader = function(o){
         listElement: null,
                 
         template: '<div class="qq-uploader">' + 
+        		'<div id="qq-file-preview"></div>' +
                 '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
                 '<div class="qq-upload-button">Upload a file</div>' +
                 '<ul class="qq-upload-list"></ul>' + 
@@ -494,7 +498,7 @@ qq.FileUploader = function(o){
         fileTemplate: '<li>' +
                 '<span class="qq-upload-file"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
-                '<div id="progress-bar-container"><div id="progress-bar"></div></div>' +
+                '<div class="qq-upload-progress-bar-container"><div class="qq-upload-progress-bar"></div></div>' +
                 '<span class="qq-upload-size"></span>' +
                 '<a class="qq-upload-cancel" href="#">Cancel</a>' +
                 '<span class="qq-upload-failed-text">Failed</span>' +
@@ -511,6 +515,8 @@ qq.FileUploader = function(o){
             spinner: 'qq-upload-spinner',
             size: 'qq-upload-size',
             cancel: 'qq-upload-cancel',
+            progressBar: 'qq-upload-progress-bar',
+            progressContainer: 'qq-upload-progress-bar-container',
 
             // added to list item when upload completes
 //             used in css to hide progress spinner
@@ -597,15 +603,19 @@ qq.extend(qq.FileUploader.prototype, {
 
         var item = this._getItemByFileId(id);
         var size = this._find(item, 'size');
+        var bar = this._find(item, 'progressBar');
         size.style.display = 'inline';
         
-        var text; 
+        var text;
+        var percent;
         if (loaded != total){
+        	percent = Math.round(loaded / total * 100) + "%";
             text = Math.round(loaded / total * 100) + '% from ' + this._formatSize(total);
         } else {                                   
             text = this._formatSize(total);
         }          
         
+        qq.setStyle(bar, percent);
         qq.setText(size, text);         
     },
     _onComplete: function(id, fileName, result){
@@ -615,6 +625,7 @@ qq.extend(qq.FileUploader.prototype, {
         var item = this._getItemByFileId(id);                
         qq.remove(this._find(item, 'cancel'));
         qq.remove(this._find(item, 'spinner'));
+        qq.remove(this._find(item, 'progressContainer'));
         
         if (result.success){
             qq.addClass(item, this._classes.success);    
@@ -1182,9 +1193,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         
         xhr.upload.onprogress = function(e){
             if (e.lengthComputable){
-            	// Progress in prozent
-            	self._loaded[id].style.width = (e.loaded / e.total) * 100 + "%";
-//                self._loaded[id] = e.loaded;
+                self._loaded[id] = e.loaded;
                 self._options.onProgress(id, name, e.loaded, e.total);
             }
         };
@@ -1215,21 +1224,10 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         
         this._options.onProgress(id, name, size, size);
                 
-        if (xhr.status == 200){
-            this.log("xhr - server response received");
-            this.log("responseText = " + xhr.responseText);
-                        
-            var response;
-                    
-            try {
-                response = eval("(" + xhr.responseText + ")");
-            } catch(err){
-                response = {};
-            }
-            
-            this._options.onComplete(id, name, response);
-                        
-        } else {                   
+        if (xhr.status == 201){
+            var result = {success: true, url: xhr.getResponseHeader('Location')};
+            this._options.onComplete(id, name, result);
+        } else {
             this._options.onComplete(id, name, {});
         }
                 

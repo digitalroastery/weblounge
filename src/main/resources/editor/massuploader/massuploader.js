@@ -11,12 +11,10 @@ steal.plugins('jquery',
 		'jqueryui/mouse')
 .views('//editor/massuploader/views/init.tmpl')
 .css('massuploader', 'fileuploader')
-.resources('jsupload/jsupload.nocache', 'fileuploader').then(function($) {
+.resources('fileuploader', 'jsupload/jsupload.nocache')
+.then('tagger')
+.then(function($) {
 	
- 	function jsuOnLoad() {
-	 	steal.dev.log('test');
- 	}
-
 	$.Controller("Editor.Massuploader",	
 	/* @static */
 	{
@@ -49,6 +47,7 @@ steal.plugins('jquery',
 						$(this).dialog('close');
 					},
 					Upload: $.proxy(function () {
+						this._openTagDialog();
 						this.element.dialog('close');
 					},this)
 				},
@@ -57,27 +56,45 @@ steal.plugins('jquery',
 			var uploader = new qq.FileUploader({
 			    // pass the dom node (ex. $(selector)[0] for jQuery users)
 			    element: document.getElementById('file-uploader'),
+			    params: {languageId: this.options.language},
+				// validation    
+				// ex. ['jpg', 'jpeg', 'png', 'gif'] or []
+				allowedExtensions: [],        
+				// each file size limit in bytes
+				// this option isn't supported in all browsers
+				sizeLimit: 0, // max size   
+				minSizeLimit: 0, // min size
+				onCancel: this._cancel,
+				onComplete: $.proxy(function(id, fileName, response) {
+					this._loadImage(response.url + '/content/' + this.options.language);
+			    }, this),
 			    // path to server-side upload script
-			    action: '/system/weblounge/files/uploads?path=/test/&languageId=fr'
+			    action: '/system/weblounge/files/uploads',
 			});
 	    },
 	    
-	    deleteFile: function(upl_data) {
+	    update: function(options) {
+	    	this.options = options;
+	    	this.element.dialog('open');
+	    },
+	    
+	    _cancel: function(id, fileName) {
+	    	steal.dev.log(id + fileName);
+	    },
+	    
+	    _deleteFile: function(upl_data) {
 	    	// REST Delete Image
 	    },
 	    
-	    openTagDialog: function(upl_data) {
-	    	alert(upl_data.url);
+	    _openTagDialog: function() {
+	    	$('<div></div>').editor_tagger({});
 	    },
 	    
-        // Method to show a picture using the class PreloadImage
-        // The image is not shown until it has been sucessfully downloaded
-        loadImage: function(upl_data) {
-        	// REST CREATE Image update
-        	if (upl_data && upl_data.url) {
+        _loadImage: function(url) {
+        	if (url) {
         		var image = new jsu.PreloadImage({
-        			url: upl_data.url,
-        			containerId: "photos",
+        			url: url,
+        			containerId: "qq-file-preview",
         			onLoad: function(img_data) {
         				image.setSize(100, -1);
         			}
@@ -101,44 +118,6 @@ steal.plugins('jquery',
 //		destroy : function() {
 //			this.element.dialog("destroy");
 //		},
-//		
-//		"input change": function(el, ev) {
-//			steal.dev.log('test');
-//		},
         
-	    "#drop-area dragleave": function(el, ev) {
-			var target = ev.target;
-			
-			if (target && target === this.dropArea) {
-				this.className = "";
-			}
-			ev.preventDefault();
-			ev.stopPropagation();
-	    },
-	    
-	    "#drop-area dragenter": function(el, ev) {
-			this.className = "over";
-			ev.preventDefault();
-			ev.stopPropagation();
-	    },
-	    
-	    "#drop-area dragover": function(el, ev) {
-			ev.preventDefault();
-			ev.stopPropagation();
-	    },
-	    
-	    "input[type=file] change": function(el, ev, bla) {
-	    	steal.dev.log('adsfadf');
-	    },
-	    
-	    "#drop-area drop": function(el, ev) {
-//	    	this.find("input[type=file]:first").val("test.jpg");
-//	    	this.find("input[type=file]:first").trigger('change');
-//	    	this.find("input[type=file]");
-//			this.traverseFiles(ev.dataTransfer.files);
-	    	this.className = "";
-	    	ev.preventDefault();
-	    	ev.stopPropagation();
-	    }
   	});
 });

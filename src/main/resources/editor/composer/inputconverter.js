@@ -16,132 +16,83 @@ $.Class.extend('InputConverter',
 		}
 	},
 	
-	// TODO
-	convertText_: function(input, element, pagelet) {
-		fun(
-				function() { input.attr('value', pagelet.locale.current.text[element[1]]); },
-				function() { input.attr('placeholder', pagelet.locale.original.text[element[1]]); },
-				function() { input.attr('value', pagelet.properties.property[element[1]]); })
-	},
-	
-	fun: function(f1, f2, f3) {		
-		if(element[0] == 'element') {
-			if(InputConverter.existsCurrent(pagelet, element[1])) {
-				f1();
-			}
-			if(InputConverter.existsOriginal(pagelet, element[1])) {
-				f2();
-			}
-		} 
-		else if(element[0] == 'property') {
-			if(!InputConverter.existsProperty(pagelet, element[1])) return;
-			f3();
-		}		
-	},
-	
 	convertCheckbox: function(input, element, pagelet) {
-		if(element[0] == 'element') {
-			if(InputConverter.existsCurrent(pagelet, element[1])) {
-				if(pagelet.locale.current.text[element[1]] == "true")
-					input.attr('checked', 'checked');
-				else if(pagelet.locale.current.text[element[1]] == "false")
-					input.removeAttr('checked');
-			}
-			else if(InputConverter.existsOriginal(pagelet, element[1])) {
-				if(pagelet.locale.original.text[element[1]] == "true")
-					input.attr('checked', 'checked');
-				else if(pagelet.locale.original.text[element[1]] == "false")
-					input.removeAttr('checked');
-			}
-		} 
-		else if(element[0] == 'property') {
-			if(!InputConverter.existsProperty(pagelet, element[1])) return;
+		InputConverter.convert(element, pagelet,
+		function() {
+			if(pagelet.locale.current.text[element[1]] == "true")
+				input.attr('checked', 'checked');
+			else if(pagelet.locale.current.text[element[1]] == "false")
+				input.removeAttr('checked');
+		}, 
+		function() {
+			if(pagelet.locale.original.text[element[1]] == "true")
+				input.attr('checked', 'checked');
+			else if(pagelet.locale.original.text[element[1]] == "false")
+				input.removeAttr('checked');
+		},
+		function() {
 			if(pagelet.properties.property[element[1]] == "true") 
 				input.attr('checked', 'checked');
 			else if(pagelet.properties.property[element[1]] == "false")
 				input.removeAttr('checked');
-		}
+		});
 	},
 	
 	convertRadio: function(input, element, pagelet) {
-		if(element[0] == 'element') {
-			if(InputConverter.existsCurrent(pagelet, element[1])) {
-				var value = pagelet.locale.original.text[element[1]];
-				if(input.val() == value) {
-					input.attr('checked', 'checked');
-				}
-				else {
-					input.removeAttr('checked');
-				}
-			}
-			else if(InputConverter.existsOriginal(pagelet, element[1])) {
-				var value = pagelet.locale.original.text[element[1]];
-				if(input.val() == value) {
-					input.attr('checked', 'checked');
-				}
-				else {
-					input.removeAttr('checked');
-				}
-			}
-		} 
-		else if(element[0] == 'property') {
-			if(!InputConverter.existsProperty(pagelet, element[1])) return;
-			if(input.val() == pagelet.properties.property[element[1]]) {
+		InputConverter.convert(element, pagelet,
+		function() {
+			var value = pagelet.locale.original.text[element[1]];
+			if(input.val() == value)
 				input.attr('checked', 'checked');
-			}
-			else {
-				input.removeAttr('checked');
-			}
-		}
+			else input.removeAttr('checked');
+		}, 
+		function() {
+			var value = pagelet.locale.original.text[element[1]];
+			if(input.val() == value) 
+				input.attr('checked', 'checked');
+			else input.removeAttr('checked');
+		},
+		function() {
+			if(input.val() == pagelet.properties.property[element[1]]) 
+				input.attr('checked', 'checked');
+			else input.removeAttr('checked');
+		});
 	},
 	
 	convertTextarea: function(textarea, element, pagelet) {
-		if(element[0] == 'element') {
-			if(InputConverter.existsCurrent(pagelet, element[1])) {
-				textarea.html('Current: ' + pagelet.locale.original.text[element[1]]);
-			}
-			else if(InputConverter.existsOriginal(pagelet, element[1])) {
-				textarea.html('Original: ' + pagelet.locale.original.text[element[1]]);
-			}
-		} 
-		else if(element[0] == 'property') {
-			if(!InputConverter.existsProperty(pagelet, element[1])) return;
+		InputConverter.convert(element, pagelet,
+		function() {
+			textarea.html('Current: ' + pagelet.locale.original.text[element[1]]);
+		}, 
+		function() {
+			textarea.html('Original: ' + pagelet.locale.original.text[element[1]]);
+		},
+		function() {
 			textarea.html(pagelet.properties.property[element[1]]);
-		}
+		});
 	},
 	
 	convertSelect: function(select, element, pagelet) {
 		$(select).find('option').each(function(){
-			if(element[0] == 'element') {
-				if(InputConverter.existsCurrent(pagelet, element[1])) {
-					var array = pagelet.locale.current.text[element[1]].split(',');
-					if($.inArray($(this).val(), array) == -1) {
-						$(this).removeAttr('selected');
-					} 
-					else {
-						$(this).attr('selected', 'selected');
-					}
-				}
-				else if(InputConverter.existsOriginal(pagelet, element[1])) {
-					var array = pagelet.locale.original.text[element[1]].split(',');
-					if($.inArray($(this).val(), array) == -1) {
-						$(this).removeAttr('selected');
-					} 
-					else {
-						$(this).attr('selected', 'selected');
-					}
-				}
-			} 
-			else if(element[0] == 'property') {
-				if(!InputConverter.existsProperty(pagelet, element[1])) return;
-				var array = pagelet.properties.property[element[1]].split(',');
-				if($.inArray($(this).val(), array) == -1) {
+			InputConverter.convert(element, pagelet,
+			function() {
+				var array = pagelet.locale.current.text[element[1]].split(',');
+				if($.inArray($(this).val(), array) == -1) 
 					$(this).removeAttr('selected');
-				} 
-				else {
-					$(this).attr('selected', 'selected');
-				}
-			}
+				else $(this).attr('selected', 'selected');
+			}, 
+			function() {
+				var array = pagelet.locale.original.text[element[1]].split(',');
+				if($.inArray($(this).val(), array) == -1) 
+					$(this).removeAttr('selected');
+				else $(this).attr('selected', 'selected');
+			},
+			function() {
+				var array = pagelet.properties.property[element[1]].split(',');
+				if($.inArray($(this).val(), array) == -1) 
+					$(this).removeAttr('selected');
+				else $(this).attr('selected', 'selected');
+			});
 		});
 	},
 	
@@ -156,8 +107,23 @@ $.Class.extend('InputConverter',
 	},
 	
 	existsProperty: function(pagelet, property) {
-		return !$.isEmptyObject(pagelet.properties.property[element[1]]);
-	}
+		return !$.isEmptyObject(pagelet.properties.property[property]);
+	},
+	
+	convert: function(element, pagelet, currentFunction, originalFunction, propertyFuction) {
+		if(element[0] == 'element') {
+			if(InputConverter.existsCurrent(pagelet, element[1])) {
+				currentFunction();
+			}
+			else if(InputConverter.existsOriginal(pagelet, element[1])) {
+				originalFunction();
+			}
+		} 
+		else if(element[0] == 'property') {
+			if(!InputConverter.existsProperty(pagelet, element[1])) return;
+			propertyFuction();
+		}
+	},
 
 },
 /* @prototype */

@@ -175,7 +175,7 @@ steal.plugins(
 		
 		"li.new_upload click": function(el, ev) {
 			$('.menu').hide();
-			$('<div></div>').editor_massuploader({});
+			$('#massuploader').editor_massuploader({language: this.options.language});
 		},
 		
 		"li.new_note click": function(el, ev) {

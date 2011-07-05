@@ -47,7 +47,9 @@ steal.plugins('jqueryui/dialog',
     	
 		this.editorDialog = $('<div></div>').html(resultDom.html())
 		.editor_dialog({
-			title: 'Seite bearbeiten',
+			title: 'Pagelet bearbeiten',
+			width: 900,
+			height: 800,
 			buttons: {
 				Abbrechen: function() {
 					$(this).dialog('close');

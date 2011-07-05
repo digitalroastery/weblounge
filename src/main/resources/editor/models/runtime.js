@@ -5,7 +5,7 @@ steal.then('jsonix')
 	/* @Static */
 	{
 		findOne: function(params, success, error) {
-			$.ajax('system/weblounge/runtime/', {
+			$.ajax('/system/weblounge/runtime/', {
 				async: false,
 				success: this.callback(['parseXML', 'wrap', success]),
 			});
@@ -20,14 +20,14 @@ steal.then('jsonix')
 				$(this).find('language').each(function(index) {
 					site.languages[index] = {};
 					site.languages[index].language = $(this).text();
-					site.languages[index].default = ($(this).attr('default') == "true");
+					site.languages[index]._default = ($(this).attr('default') == "true");
 				});
 				
 				site.domains = [];
 				$(this).find('url').each(function(index) {
 					site.domains[index] = {};
 					site.domains[index].url = $(this).text();
-					site.domains[index].default = ($(this).attr('default') == "true");
+					site.domains[index]._default = ($(this).attr('default') == "true");
 				});
 			});
 			return site;
@@ -47,7 +47,7 @@ steal.then('jsonix')
 	    getDefaultLanguage: function() {
 	    	var language; 
 	    	$.each(this.languages, function(index, lang) { 
-	    		if(lang.default) {
+	    		if(lang._default) {
 	    			language = lang.language;
 	    			return false;
 	    		}

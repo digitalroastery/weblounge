@@ -25,6 +25,8 @@ steal.plugins('jquery/controller',
 				autoOpen: true,
 				resizable: true,
 				buttons: this.options.buttons,
+				width: this.options.width,
+				height: this.options.height,
 			});
 		},
 	

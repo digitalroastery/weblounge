@@ -19,14 +19,14 @@ steal.then('jsonix')
 			$(xml).find('language').each(function(index) {
 				site.languages[index] = {};
 				site.languages[index].language = $(this).text();
-				site.languages[index].default = ($(this).attr('default') == "true");
+				site.languages[index]._default = ($(this).attr('default') == "true");
 			});
 			
 			site.domains = [];
 			$(xml).find('url').each(function(index) {
 				site.domains[index] = {};
 				site.domains[index].url = $(this).text();
-				site.domains[index].default = ($(this).attr('default') == "true");
+				site.domains[index]._default = ($(this).attr('default') == "true");
 			});
 			return site;
 		}
@@ -45,7 +45,7 @@ steal.then('jsonix')
 	    getDefaultLanguage: function() {
 	    	var language; 
 	    	$.each(this.languages, function(index, lang) { 
-	    		if(lang.default) {
+	    		if(lang._default) {
 	    			language = lang.language;
 	    			return false;
 	    		}
