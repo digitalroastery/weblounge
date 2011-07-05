@@ -64,7 +64,7 @@ public class AmazonWebServices implements ManagedService {
   private AWSCredentials accessCredentials = null;
   
   /** The Amazon S3 resource serializer */
-  private S3ResourceSerializer s3Serializer = null;
+  private AmazonResourceSerializer s3Serializer = null;
 
   /**
    * Activates the service implementation.
@@ -115,7 +115,7 @@ public class AmazonWebServices implements ManagedService {
     // Create the credentials
     accessCredentials = new BasicAWSCredentials(accessKeyId, accessKeySecret);
     
-    s3Serializer = new S3ResourceSerializer(accessCredentials);
+    s3Serializer = new AmazonResourceSerializer(accessCredentials);
   }
 
 }

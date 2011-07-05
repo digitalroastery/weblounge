@@ -50,10 +50,10 @@ import java.util.UUID;
  * Implementation of the resource serializer api which is using Amazon S3 to
  * store weblounge assets.
  */
-public class S3ResourceSerializer {
+public class AmazonResourceSerializer {
   
   /** The logging implementation */
-  private static final Logger logger = LoggerFactory.getLogger(S3ResourceSerializer.class);
+  private static final Logger logger = LoggerFactory.getLogger(AmazonResourceSerializer.class);
 
   /** Amazon web services access credentials */
   private AWSCredentials accessCredentials = null;
@@ -64,7 +64,7 @@ public class S3ResourceSerializer {
    * 
    *  @param credentials the aws credentials
    */
-  public S3ResourceSerializer(AWSCredentials credentials) {
+  public AmazonResourceSerializer(AWSCredentials credentials) {
     this.accessCredentials = credentials;
   }
 
