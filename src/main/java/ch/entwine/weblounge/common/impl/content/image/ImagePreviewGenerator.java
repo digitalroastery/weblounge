@@ -21,7 +21,11 @@
 package ch.entwine.weblounge.common.impl.content.image;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
+import ch.entwine.weblounge.common.language.Language;
+
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,13 +40,42 @@ public class ImagePreviewGenerator implements PreviewGenerator {
   /**
    * {@inheritDoc}
    * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(java.io.InputStream,
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.language.Language,
    *      ch.entwine.weblounge.common.content.image.ImageStyle,
-   *      java.lang.String, java.io.OutputStream)
+   *      java.io.InputStream, java.io.OutputStream)
    */
-  public void createPreview(InputStream content, ImageStyle style,
-      String format, OutputStream os) throws IOException {
-    ImageStyleUtils.style(content, os, format, style);
+  public void createPreview(Resource<?> resource, Language language,
+      ImageStyle style, InputStream is, OutputStream os) throws IOException {
+    String mimetype = resource.getContent(language).getMimetype();
+    String format = mimetype.substring(mimetype.indexOf("/") + 1);
+    ImageStyleUtils.style(is, os, format, style);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getContentType(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.language.Language,
+   *      ch.entwine.weblounge.common.content.image.ImageStyle)
+   */
+  public String getContentType(Resource<?> resource, Language language,
+      ImageStyle style) {
+    String mimetype = resource.getContent(language).getMimetype();
+    return mimetype;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getSuffix(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.language.Language,
+   *      ch.entwine.weblounge.common.content.image.ImageStyle)
+   */
+  public String getSuffix(Resource<?> resource, Language language,
+      ImageStyle style) {
+    String filename = resource.getContent(language).getFilename();
+    return FilenameUtils.getExtension(filename);
   }
 
 }

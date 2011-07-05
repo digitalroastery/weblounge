@@ -20,11 +20,18 @@
 
 package ch.entwine.weblounge.common.content.page;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.content.image.ImageStyleImpl;
+import ch.entwine.weblounge.common.impl.content.page.PageImpl;
 import ch.entwine.weblounge.common.impl.content.page.PagePreviewGenerator;
+import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
+import ch.entwine.weblounge.common.impl.language.LanguageImpl;
+import ch.entwine.weblounge.common.language.Language;
+import ch.entwine.weblounge.common.site.Site;
 
 import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.Locale;
 
 /**
  * Test case for {@link PagePreviewGenerator}.
@@ -48,9 +56,18 @@ public class PagePreviewGeneratorTest {
   /** The generator */
   private PagePreviewGenerator generator = new PagePreviewGenerator();
 
+  /** The site */
+  private Site site = null;
+
   /** The image style used to create the preview */
   private ImageStyle style = new ImageStyleImpl("preview", 150, 150);
-  
+
+  /** English */
+  private Language language = new LanguageImpl(Locale.ENGLISH);
+
+  /** The resource */
+  private Resource<?> resource = null;
+
   /**
    * @throws java.lang.Exception
    */
@@ -58,6 +75,8 @@ public class PagePreviewGeneratorTest {
   public void setUp() throws Exception {
     File f = new File(PagePreviewGeneratorTest.class.getResource(pagePath).getPath());
     page = new FileInputStream(f);
+    site = EasyMock.createNiceMock(Site.class);
+    resource = new PageImpl(new PageURIImpl(site));
   }
   
   /**
@@ -76,7 +95,7 @@ public class PagePreviewGeneratorTest {
     File f = File.createTempFile("test", ".jpg");
     try {
       FileOutputStream fos = new FileOutputStream(f);
-      generator.createPreview(page, style, "jpeg", fos);
+      generator.createPreview(resource, language, style, page, fos);
     } finally {
       f.delete();
     }

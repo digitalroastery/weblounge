@@ -21,7 +21,10 @@
 package ch.entwine.weblounge.common.impl.content.page;
 
 import ch.entwine.weblounge.common.content.PreviewGenerator;
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
+import ch.entwine.weblounge.common.content.page.Page;
+import ch.entwine.weblounge.common.language.Language;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -31,6 +34,7 @@ import org.xhtmlrenderer.swing.Java2DRenderer;
 import org.xhtmlrenderer.util.FSImageWriter;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,25 +49,30 @@ public class PagePreviewGenerator implements PreviewGenerator {
   /** Logger factory */
   private final static Logger logger = LoggerFactory.getLogger(PagePreviewGenerator.class);
 
+  /** Format for the preview images */
+  private static final String PREVIEW_FORMAT = "png";
+
+  /** Format for the preview images */
+  private static final String PREVIEW_CONTENT_TYPE = "image/png";
+
   /**
    * {@inheritDoc}
-   * 
-   * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(java.io.InputStream,
-   *      ch.entwine.weblounge.common.content.image.ImageStyle,
-   *      java.lang.String, java.io.OutputStream)
+   *
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#createPreview(ch.entwine.weblounge.common.content.Resource, ch.entwine.weblounge.common.language.Language, ch.entwine.weblounge.common.content.image.ImageStyle, java.io.InputStream, java.io.OutputStream)
    */
-  public void createPreview(InputStream resource, ImageStyle style,
-      String format, OutputStream os) throws IOException {
+  public void createPreview(Resource<?> resource, Language language,
+      ImageStyle style, InputStream is, OutputStream os) throws IOException {
 
     File f = null;
     FileOutputStream fos = null;
+    is = new ByteArrayInputStream(((Page) resource).toXml().getBytes("UTF-8"));
 
     // Write the resource content to disk. This step is needed, as the preview
     // generator can only handle files.
     try {
       f = File.createTempFile("preview", null);
       fos = new FileOutputStream(f);
-      IOUtils.copy(resource, fos);
+      IOUtils.copy(is, fos);
     } catch (IOException e) {
       logger.error("Error creating temporary copy of file content at " + f, e);
       IOUtils.closeQuietly(fos);
@@ -78,7 +87,7 @@ public class PagePreviewGenerator implements PreviewGenerator {
       Java2DRenderer renderer = new Java2DRenderer(f, style.getWidth(), style.getHeight());
       renderer.getSharedContext().setInteractive(false);
       BufferedImage img = renderer.getImage();
-      FSImageWriter imageWriter = new FSImageWriter(format);
+      FSImageWriter imageWriter = new FSImageWriter(PREVIEW_FORMAT);
       imageWriter.write(img, os);
     } catch (IOException e) {
       logger.error("Error creating temporary copy of file content at " + f, e);
@@ -87,6 +96,30 @@ public class PagePreviewGenerator implements PreviewGenerator {
       FileUtils.deleteQuietly(f);
     }
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getContentType(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.language.Language,
+   *      ch.entwine.weblounge.common.content.image.ImageStyle)
+   */
+  public String getContentType(Resource<?> resource, Language language,
+      ImageStyle style) {
+    return PREVIEW_CONTENT_TYPE;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.common.content.PreviewGenerator#getSuffix(ch.entwine.weblounge.common.content.Resource,
+   *      ch.entwine.weblounge.common.language.Language,
+   *      ch.entwine.weblounge.common.content.image.ImageStyle)
+   */
+  public String getSuffix(Resource<?> resource, Language language,
+      ImageStyle style) {
+    return PREVIEW_FORMAT;
   }
 
 }

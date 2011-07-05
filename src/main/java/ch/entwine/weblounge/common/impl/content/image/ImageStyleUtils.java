@@ -20,10 +20,11 @@
 
 package ch.entwine.weblounge.common.impl.content.image;
 
+import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.image.ImageContent;
-import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.impl.url.PathUtils;
+import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
@@ -34,6 +35,7 @@ import com.sun.media.jai.codec.SeekableStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.awt.RenderingHints;
 import java.awt.image.renderable.ParameterBlock;
@@ -330,15 +332,15 @@ public final class ImageStyleUtils {
         scaleParams.addSource(image);
         scaleParams.add(scale).add(scale).add(0.0f).add(0.0f);
         scaleParams.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2));
-        
+
         image = JAI.create("scale", scaleParams, scaleHints);
       } else if (scale < 1.0) {
         ParameterBlock subsampleAverageParams = new ParameterBlock();
         subsampleAverageParams.addSource(image);
         subsampleAverageParams.add(Double.valueOf(scale));
         subsampleAverageParams.add(Double.valueOf(scale));
-        
-        image = JAI.create("subsampleaverage", subsampleAverageParams, scaleHints);        
+
+        image = JAI.create("subsampleaverage", subsampleAverageParams, scaleHints);
       }
 
       float scaledWidth = image.getWidth();
@@ -361,7 +363,7 @@ public final class ImageStyleUtils {
 
         image = JAI.create("crop", cropTopLeftParams, croppingHints);
       }
-      
+
       // Write resized/cropped image encoded as JPEG to the output stream
       ParameterBlock encodeParams = new ParameterBlock();
       encodeParams.addSource(image);
@@ -402,15 +404,16 @@ public final class ImageStyleUtils {
 
   /**
    * Creates a file for the scaled image that is identified by
-   * <code>image</code>, <code>contents</code>, <code>site</code> and
-   * <code>style</code>.
+   * <code>filename</code>, <code>language</code> and <code>style</code>.
+   * <p>
+   * If no filename is specified, the resource's identifier is used.
    * 
    * @param resource
-   *          the image resource
-   * @param image
-   *          the image contents
-   * @param site
-   *          the site
+   *          the resource
+   * @param filename
+   *          the file name
+   * @param language
+   *          the language
    * @param style
    *          the image style
    * @throws IOException
@@ -419,28 +422,30 @@ public final class ImageStyleUtils {
    *           if a file is found at the parent directory location
    * @return
    */
-  public static File getScaledImageFile(ImageResource resource,
-      ImageContent image, Site site, ImageStyle style) throws IOException,
+  public static File createScaledFile(Resource<?> resource, String filename,
+      Language language, ImageStyle style) throws IOException,
       IllegalStateException {
 
+    if (filename == null)
+      filename = resource.getURI().getIdentifier();
+    String suffix = FilenameUtils.getExtension(filename);
+
     // If needed, create the scaled file's parent directory
-    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), resource.getIdentifier(), image.getLanguage().getIdentifier()));
+    Site site = resource.getURI().getSite();
+    File dir = new File(PathUtils.concat(System.getProperty("java.io.tmpdir"), "sites", site.getIdentifier(), "images", style.getIdentifier(), resource.getIdentifier(), language.getIdentifier()));
 
     if (dir.exists() && !dir.isDirectory())
       throw new IllegalStateException("Found a file at " + dir + " instead of a directory");
     if (!dir.isDirectory())
       FileUtils.forceMkdir(dir);
 
-    // Get scaled width and height
-    float styledWidth = ImageStyleUtils.getStyledWidth(image.getWidth(), image.getHeight(), style);
-    float styledHeight = ImageStyleUtils.getStyledHeight(image.getWidth(), image.getHeight(), style);
-
     // Create the filename
-    StringBuffer filename = new StringBuffer(FilenameUtils.getBaseName(image.getFilename()));
-    filename.append("_").append((int) styledWidth).append("x").append((int) styledHeight);
-    filename.append(".").append(FilenameUtils.getExtension(image.getFilename()));
+    StringBuffer scaledFilename = new StringBuffer(FilenameUtils.getBaseName(filename));
+    scaledFilename.append("-").append(style.getIdentifier());
+    if (StringUtils.isNotBlank(suffix))
+      scaledFilename.append(".").append(suffix);
 
-    return new File(dir, filename.toString());
+    return new File(dir, scaledFilename.toString());
   }
 
 }
