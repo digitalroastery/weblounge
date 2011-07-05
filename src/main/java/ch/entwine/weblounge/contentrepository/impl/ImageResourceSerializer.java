@@ -20,12 +20,14 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.image.ImageContent;
 import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.impl.content.image.ImageContentReader;
+import ch.entwine.weblounge.common.impl.content.image.ImagePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceImpl;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceReader;
 import ch.entwine.weblounge.common.impl.content.image.ImageResourceURIImpl;
@@ -43,6 +45,9 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class ImageResourceSerializer extends AbstractResourceSerializer<ImageContent, ImageResource> {
 
+  /** The preview generator */
+  protected PreviewGenerator previewGenerator = null;
+
   /**
    * this gets rid of exception for not using native acceleration
    */
@@ -55,7 +60,16 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
    */
   public ImageResourceSerializer() {
     super(ImageResource.TYPE);
+    previewGenerator = new ImagePreviewGenerator();
+  }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  public String getMimeType(ImageContent resourceContent) {
+    return resourceContent.getMimetype();
   }
 
   /**
@@ -104,6 +118,15 @@ public class ImageResourceSerializer extends AbstractResourceSerializer<ImageCon
   public ResourceContentReader<ImageContent> getContentReader()
       throws ParserConfigurationException, SAXException {
     return new ImageContentReader();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator()
+   */
+  public PreviewGenerator getPreviewGenerator() {
+    return previewGenerator;
   }
 
   /**

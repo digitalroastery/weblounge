@@ -20,11 +20,10 @@
 
 package ch.entwine.weblounge.contentrepository.impl.endpoint;
 
+import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceURI;
-import ch.entwine.weblounge.common.content.image.ImageContent;
-import ch.entwine.weblounge.common.content.image.ImageResource;
 import ch.entwine.weblounge.common.content.image.ImageStyle;
 import ch.entwine.weblounge.common.content.repository.ContentRepository;
 import ch.entwine.weblounge.common.content.repository.ContentRepositoryException;
@@ -36,8 +35,12 @@ import ch.entwine.weblounge.common.language.UnknownLanguageException;
 import ch.entwine.weblounge.common.site.ImageScalingMode;
 import ch.entwine.weblounge.common.site.Module;
 import ch.entwine.weblounge.common.site.Site;
+import ch.entwine.weblounge.contentrepository.ResourceSerializer;
+import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
@@ -86,128 +89,12 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
   }
 
   /**
-   * Returns the original image with the given identifier or a <code>404</code>
-   * if the image resource or the image could not be found.
-   * 
-   * @param request
-   *          the request
-   * @param resourceId
-   *          the resource identifier
-   * @return the resource
-   */
-  @GET
-  @Path("/{resource}/original")
-  public Response getOriginalImage(@Context HttpServletRequest request,
-      @PathParam("resource") String resourceId) {
-
-    // Check the parameters
-    if (resourceId == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-
-    // Get the resource
-    final Resource<?> resource = loadResource(request, resourceId, ImageResource.TYPE);
-    if (resource == null || resource.contents().isEmpty()) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    }
-
-    // Determine the language
-    Language preferred = resource.getOriginalContent().getLanguage();
-
-    return getResourceContent(request, resource, preferred);
-  }
-
-  /**
-   * Returns the original image with the given identifier or a <code>404</code>
-   * if the image resource or the image could not be found in the given
-   * language.
-   * 
-   * @param request
-   *          the request
-   * @param resourceId
-   *          the resource identifier
-   * @param languageId
-   *          the language identifier
-   * @return the image
-   */
-  @GET
-  @Path("/{resource}/locales/{language}/original")
-  public Response getOriginalImage(@Context HttpServletRequest request,
-      @PathParam("resource") String resourceId,
-      @PathParam("language") String languageId) {
-
-    // Check the parameters
-    if (resourceId == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-
-    // Extract the language
-    Language language = null;
-    try {
-      language = LanguageUtils.getLanguage(languageId);
-    } catch (UnknownLanguageException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
-    }
-
-    // Get the image
-    final Resource<?> resource = loadResource(request, resourceId, ImageResource.TYPE);
-    if (resource == null || resource.contents().isEmpty()) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    }
-
-    return getResourceContent(request, resource, language);
-  }
-
-  /**
-   * Returns the original image with the given identifier or a <code>404</code>
-   * if the image resource or the image could not be found.
-   * 
-   * @param request
-   *          the request
-   * @param resourceId
-   *          the resource identifier
-   * @param styleId
-   *          the image style identifier
-   * @return the resource
-   */
-  @GET
-  @Path("/{resource}/styles/{style}")
-  public Response getStyledImage(@Context HttpServletRequest request,
-      @PathParam("resource") String resourceId, @PathParam("style") String styleId) {
-
-    // Check the parameters
-    if (resourceId == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-
-    // Get the resource
-    final Resource<?> resource = loadResource(request, resourceId, ImageResource.TYPE);
-    if (resource == null || resource.contents().isEmpty()) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    }
-    ImageResource imageResource = (ImageResource) resource;
-
-    // Determine the language
-    Site site = getSite(request);
-    Language preferred = LanguageUtils.getPreferredLanguage(resource, request, site);
-    if (preferred == null) {
-      preferred = resource.getOriginalContent().getLanguage();
-    }
-
-    // Find the image style
-    ImageStyle style = null;
-    for (Module m : site.getModules()) {
-      style = m.getImageStyle(styleId);
-      if (style != null) {
-        return getScaledResource(request, imageResource, preferred, style);
-      }
-    }
-
-    // The image style was not found
-    throw new WebApplicationException(Status.BAD_REQUEST);
-  }
-
-  /**
-   * Returns the original image with the given identifier or a <code>404</code>
-   * if the image resource or the image could not be found in the given
-   * language.
+   * Returns the resource with the given identifier and styled using the
+   * requested image style or a <code>404</code> if the resource or the resource
+   * content could not be found.
+   * <p>
+   * If the content is not available in the requested language, the original
+   * language version is used.
    * 
    * @param request
    *          the request
@@ -221,7 +108,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
    */
   @GET
   @Path("/{resource}/locales/{language}/styles/{style}")
-  public Response getStyledImageContent(@Context HttpServletRequest request,
+  public Response getPreview(@Context HttpServletRequest request,
       @PathParam("resource") String resourceId,
       @PathParam("language") String languageId,
       @PathParam("style") String styleId) {
@@ -230,32 +117,168 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     if (resourceId == null)
       throw new WebApplicationException(Status.BAD_REQUEST);
 
+    // Get the resource
+    final Resource<?> resource = loadResource(request, resourceId, null);
+    if (resource == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
     // Extract the language
     Language language = null;
     try {
       language = LanguageUtils.getLanguage(languageId);
+      if (!resource.supportsLanguage(language)) {
+        if (!resource.contents().isEmpty())
+          language = resource.getOriginalContent().getLanguage();
+        else
+          throw new WebApplicationException(Status.NOT_FOUND);
+      }
     } catch (UnknownLanguageException e) {
       throw new WebApplicationException(Status.BAD_REQUEST);
     }
 
-    // Get the image
-    final Resource<?> resource = loadResource(request, resourceId, ImageResource.TYPE);
-    if (resource == null || resource.contents().isEmpty())
-      throw new WebApplicationException(Status.NOT_FOUND);
-    ImageResource imageResource = (ImageResource) resource;
-
-    // Find the image style
+    // Search the site for the image style
     Site site = getSite(request);
     ImageStyle style = null;
     for (Module m : site.getModules()) {
       style = m.getImageStyle(styleId);
       if (style != null) {
-        return getScaledResource(request, imageResource, language, style);
+        break;
+      }
+    }
+
+    // Search the global styles
+    if (style == null) {
+      for (ImageStyle s : styles) {
+        if (s.getIdentifier().equals(styleId)) {
+          style = s;
+          break;
+        }
       }
     }
 
     // The image style was not found
-    throw new WebApplicationException(Status.BAD_REQUEST);
+    if (style == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    // Is there an up-to-date, cached version on the client side?
+    if (!ResourceUtils.isModified(resource, request)) {
+      return Response.notModified().build();
+    }
+
+    // Load the content
+    ResourceContent resourceContent = resource.getContent(language);
+
+    // Check the ETag
+    String eTag = ResourceUtils.getETagValue(resource, language, style);
+    if (!ResourceUtils.isMismatch(eTag, request)) {
+      return Response.notModified(new EntityTag(eTag)).build();
+    }
+
+    ResourceURI resourceURI = resource.getURI();
+    final ContentRepository contentRepository = getContentRepository(site, false);
+
+    // When there is no scaling required, just return the original
+    if (ImageScalingMode.None.equals(style.getScalingMode())) {
+      return getResourceContent(request, resource, language);
+    }
+
+    // Find a serializer
+    ResourceSerializer<?, ?> serializer = ResourceSerializerFactory.getSerializerByType(resourceURI.getType());
+    if (serializer == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    // Does the serializer come with a preview generator?
+    PreviewGenerator previewGenerator = serializer.getPreviewGenerator();
+    if (previewGenerator == null)
+      throw new WebApplicationException(Status.NOT_FOUND);
+
+    // Load the resource contents from the repository
+    InputStream resourceInputStream = null;
+    long contentLength = -1;
+
+    // Create the target file name
+    StringBuilder filename = new StringBuilder();
+    String basename = null;
+    if (resourceContent != null)
+      basename = FilenameUtils.getBaseName(resourceContent.getFilename());
+    else
+      basename = resource.getIdentifier();
+    String suffix = previewGenerator.getSuffix(resource, language, style);
+    filename.append(basename);
+    filename.append("-").append(language.getIdentifier());
+    if (StringUtils.isNotBlank(suffix)) {
+      filename.append(".").append(suffix);
+    }
+
+    // Load the input stream from the scaled image
+    InputStream contentRepositoryIs = null;
+    FileOutputStream fos = null;
+    try {
+      File scaledResourceFile = ImageStyleUtils.createScaledFile(resource, filename.toString(), language, style);
+      long lastModified = resource.getModificationDate().getTime();
+      if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
+        contentRepositoryIs = contentRepository.getContent(resourceURI, language);
+        fos = new FileOutputStream(scaledResourceFile);
+        logger.debug("Creating scaled image '{}' at {}", resource, scaledResourceFile);
+        previewGenerator.createPreview(resource, language, style, contentRepositoryIs, fos);
+        scaledResourceFile.setLastModified(lastModified);
+      }
+
+      // The scaled resource should now exist
+      resourceInputStream = new FileInputStream(scaledResourceFile);
+      contentLength = scaledResourceFile.length();
+    } catch (ContentRepositoryException e) {
+      logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
+          language,
+          resource,
+          contentRepository,
+          e.getMessage() });
+      logger.error(e.getMessage(), e);
+      IOUtils.closeQuietly(resourceInputStream);
+      throw new WebApplicationException();
+    } catch (IOException e) {
+      logger.error("Error scaling image '{}': {}", resourceURI, e.getMessage());
+      IOUtils.closeQuietly(resourceInputStream);
+      throw new WebApplicationException();
+    } finally {
+      IOUtils.closeQuietly(contentRepositoryIs);
+      IOUtils.closeQuietly(fos);
+    }
+
+    // Create the response
+    final InputStream is = resourceInputStream;
+    ResponseBuilder response = Response.ok(new StreamingOutput() {
+      public void write(OutputStream os) throws IOException,
+          WebApplicationException {
+        try {
+          IOUtils.copy(is, os);
+          os.flush();
+        } finally {
+          IOUtils.closeQuietly(is);
+        }
+      }
+    });
+
+    // Add mime type header
+    String mimetype = previewGenerator.getContentType(resource, language, style);
+    if (mimetype == null)
+      mimetype = MediaType.APPLICATION_OCTET_STREAM;
+    response.type(mimetype);
+
+    // Add last modified header
+    response.lastModified(resource.getModificationDate());
+
+    // Add ETag header
+    response.tag(new EntityTag(eTag));
+
+    // Add filename header
+    response.header("Content-Disposition", "inline; filename=" + filename);
+
+    // Content length
+    response.header("Content-Length", Long.toString(contentLength));
+
+    // Send the response
+    return response.build();
   }
 
   /**
@@ -274,7 +297,7 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
       throw new WebApplicationException(Status.NOT_FOUND);
 
     StringBuffer buf = new StringBuffer("<styles>");
-    
+
     // Add styles of current site
     for (Module m : site.getModules()) {
       ImageStyle[] styles = m.getImageStyles();
@@ -282,12 +305,12 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
         buf.append(style.toXml());
       }
     }
-    
+
     // Add global styles
     for (ImageStyle style : styles) {
       buf.append(style.toXml());
     }
-    
+
     buf.append("</styles>");
 
     ResponseBuilder response = Response.ok(buf.toString());
@@ -326,139 +349,9 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
         return response.build();
       }
     }
-    
+
     // The image style was not found
     throw new WebApplicationException(Status.NOT_FOUND);
-  }
-
-  /**
-   * Loads the given resource content.
-   * 
-   * @param request
-   *          the servlet request
-   * @param imageResource
-   *          the resource
-   * @param language
-   *          the language
-   * @param style
-   *          the image style
-   * @return the resource content
-   */
-  protected Response getScaledResource(HttpServletRequest request,
-      final ImageResource imageResource, final Language language,
-      final ImageStyle style) {
-
-    // Check the parameters
-    if (imageResource == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-
-    // Is there an up-to-date, cached version on the client side?
-    if (!ResourceUtils.isModified(imageResource, request)) {
-      return Response.notModified().build();
-    }
-
-    // Load the content
-    ResourceContent resourceContent = imageResource.getContent(language);
-    if (resourceContent == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    } else if (!(resourceContent instanceof ImageContent)) {
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
-    }
-
-    // Check the ETag
-    String eTag = ResourceUtils.getETagValue(imageResource, language, style);
-    if (!ResourceUtils.isMismatch(eTag, request)) {
-      return Response.notModified(new EntityTag(eTag)).build();
-    }
-
-    final String mimetype = ((ImageContent) resourceContent).getMimetype();
-    final String format = mimetype.substring(mimetype.indexOf("/") + 1);
-    ResourceURI imageURI = imageResource.getURI();
-
-    Site site = getSite(request);
-    final ContentRepository contentRepository = getContentRepository(site, false);
-
-    // When there is no scaling required, just return the original
-    if (ImageScalingMode.None.equals(style.getScalingMode())) {
-      return getResourceContent(request, imageResource, language);
-    }
-
-    // Load the image contents from the repository
-    ImageContent imageContents = imageResource.getContent(language);
-    InputStream imageInputStream = null;
-    String filename = null;
-    long contentLength = -1;
-
-    // Load the input stream from the scaled image
-    InputStream contentRepositoryIs = null;
-    FileOutputStream fos = null;
-    try {
-      File scaledImageFile = ImageStyleUtils.getScaledImageFile(imageResource, imageContents, site, style);
-      long lastModified = imageResource.getModificationDate().getTime();
-      if (!scaledImageFile.isFile() || scaledImageFile.lastModified() < lastModified) {
-        contentRepositoryIs = contentRepository.getContent(imageURI, language);
-        fos = new FileOutputStream(scaledImageFile);
-        logger.debug("Creating scaled image '{}' at {}", imageResource, scaledImageFile);
-        ImageStyleUtils.style(contentRepositoryIs, fos, format, style);
-        scaledImageFile.setLastModified(lastModified);
-      }
-
-      // The scaled image should now exist
-      imageInputStream = new FileInputStream(scaledImageFile);
-      filename = scaledImageFile.getName();
-      contentLength = scaledImageFile.length();
-    } catch (ContentRepositoryException e) {
-      logger.error("Error loading {} image '{}' from {}: {}", new Object[] {
-          language,
-          imageResource,
-          contentRepository,
-          e.getMessage() });
-      logger.error(e.getMessage(), e);
-      IOUtils.closeQuietly(imageInputStream);
-      throw new WebApplicationException();
-    } catch (IOException e) {
-      logger.error("Error scaling image '{}': {}", imageURI, e.getMessage());
-      IOUtils.closeQuietly(imageInputStream);
-      throw new WebApplicationException();
-    } finally {
-      IOUtils.closeQuietly(contentRepositoryIs);
-      IOUtils.closeQuietly(fos);
-    }
-
-    // Create the response
-    final InputStream is = imageInputStream;
-    ResponseBuilder response = Response.ok(new StreamingOutput() {
-      public void write(OutputStream os) throws IOException,
-          WebApplicationException {
-        try {
-          IOUtils.copy(is, os);
-          os.flush();
-        } finally {
-          IOUtils.closeQuietly(is);
-        }
-      }
-    });
-
-    // Add mime type header
-    String contentType = imageContents.getMimetype();
-    if (contentType == null)
-      contentType = MediaType.APPLICATION_OCTET_STREAM;
-    response.type(contentType);
-
-    // Add last modified header
-    response.lastModified(imageResource.getModificationDate());
-
-    // Add ETag header
-    response.tag(new EntityTag(eTag));
-
-    // Add filename header
-    response.header("Content-Disposition", "inline; filename=" + filename);
-
-    // Content length
-    response.header("Content-Length", Long.toString(contentLength));
-
-    // Send the response
-    return response.build();
   }
 
   /**

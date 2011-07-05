@@ -20,12 +20,14 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContent;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.page.Page;
 import ch.entwine.weblounge.common.impl.content.page.PageImpl;
+import ch.entwine.weblounge.common.impl.content.page.PagePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.page.PageReader;
 import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.site.Site;
@@ -42,16 +44,29 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class PageSerializer extends AbstractResourceSerializer<ResourceContent, Page> {
 
+  /** The preview generator */
+  protected PreviewGenerator previewGenerator = null;
+
   /**
    * Creates a new page serializer.
    */
   public PageSerializer() {
     super(Page.TYPE);
+    previewGenerator = new PagePreviewGenerator();
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  public String getMimeType(ResourceContent resourceContent) {
+    return "text/html";
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supportsContent(java.lang.String)
    */
   public boolean supportsContent(String mimeType) {
@@ -99,7 +114,16 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator()
+   */
+  public PreviewGenerator getPreviewGenerator() {
+    return previewGenerator;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

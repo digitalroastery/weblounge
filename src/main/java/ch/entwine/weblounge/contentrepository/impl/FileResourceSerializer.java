@@ -20,12 +20,14 @@
 
 package ch.entwine.weblounge.contentrepository.impl;
 
+import ch.entwine.weblounge.common.content.PreviewGenerator;
 import ch.entwine.weblounge.common.content.Resource;
 import ch.entwine.weblounge.common.content.ResourceContentReader;
 import ch.entwine.weblounge.common.content.ResourceMetadata;
 import ch.entwine.weblounge.common.content.file.FileContent;
 import ch.entwine.weblounge.common.content.file.FileResource;
 import ch.entwine.weblounge.common.impl.content.file.FileContentReader;
+import ch.entwine.weblounge.common.impl.content.file.FilePreviewGenerator;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceImpl;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceReader;
 import ch.entwine.weblounge.common.impl.content.file.FileResourceURIImpl;
@@ -43,16 +45,29 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class FileResourceSerializer extends AbstractResourceSerializer<FileContent, FileResource> {
 
+  /** The preview generator */
+  protected PreviewGenerator previewGenerator = null;
+
   /**
    * Creates a new file resource serializer.
    */
   public FileResourceSerializer() {
     super(FileResource.TYPE);
+    previewGenerator = new FilePreviewGenerator();
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getMimeType(ch.entwine.weblounge.common.content.ResourceContent)
+   */
+  public String getMimeType(FileContent resourceContent) {
+    return resourceContent.getMimetype();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#supportsContent(java.lang.String)
    */
   public boolean supportsContent(String mimeType) {
@@ -61,7 +76,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
     // specialized serializers a chance to pick up the request
     return false;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -70,7 +85,7 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   public Resource<FileContent> createNewResource(Site site) {
     return new FileResourceImpl(new FileResourceURIImpl(site));
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -99,6 +114,15 @@ public class FileResourceSerializer extends AbstractResourceSerializer<FileConte
   public ResourceContentReader<FileContent> getContentReader()
       throws ParserConfigurationException, SAXException {
     return new FileContentReader();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see ch.entwine.weblounge.contentrepository.ResourceSerializer#getPreviewGenerator()
+   */
+  public PreviewGenerator getPreviewGenerator() {
+    return previewGenerator;
   }
 
   /**

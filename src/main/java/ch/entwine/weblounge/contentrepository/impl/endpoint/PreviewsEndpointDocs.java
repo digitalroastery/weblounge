@@ -55,46 +55,6 @@ public final class PreviewsEndpointDocs {
     EndpointDocumentation docs = new EndpointDocumentation(endpointUrl, "previews");
     docs.setTitle("Weblounge Previews");
 
-    // GET /{resource}/original
-    Endpoint getOriginalImage = new Endpoint("/{resource}/original", Method.GET, "originalimage");
-    getOriginalImage.setDescription("Returns the original version of the resource with the given identifier");
-    getOriginalImage.addFormat(new Format("resource", null, null));
-    getOriginalImage.addStatus(ok("the resource was found and is returned as part of the response"));
-    getOriginalImage.addStatus(notFound("the resource was not found or could not be loaded"));
-    getOriginalImage.addStatus(badRequest("an invalid image identifier was received"));
-    getOriginalImage.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getOriginalImage.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
-    getOriginalImage.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getOriginalImage);
-
-    // GET /{resource}/locales/{language}/original
-    Endpoint getOriginalLocalizedImage = new Endpoint("/{resource}/locales/{language}/original", Method.GET, "originallocalizedimage");
-    getOriginalLocalizedImage.setDescription("Returns the original version of the resource with the given identifier and language");
-    getOriginalLocalizedImage.addFormat(new Format("resource", null, null));
-    getOriginalLocalizedImage.addStatus(ok("the resource was found and is returned as part of the response"));
-    getOriginalLocalizedImage.addStatus(notFound("the resource was not found or could not be loaded"));
-    getOriginalLocalizedImage.addStatus(notFound("the resource does not exist in the specified language"));
-    getOriginalLocalizedImage.addStatus(badRequest("an invalid image identifier was received"));
-    getOriginalLocalizedImage.addStatus(badRequest("an invalid language identifier was specified"));
-    getOriginalLocalizedImage.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getOriginalLocalizedImage.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
-    getOriginalLocalizedImage.addPathParameter(new Parameter("language", Parameter.Type.String, "The language identifier"));
-    getOriginalLocalizedImage.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getOriginalLocalizedImage);
-
-    // GET /{resource}/styles/{styleid}
-    Endpoint getScaleImage = new Endpoint("/{resource}/styles/{style}", Method.GET, "styledimage");
-    getScaleImage.setDescription("Returns a scaled version of the resource with the given identifier");
-    getScaleImage.addFormat(new Format("resource", null, null));
-    getScaleImage.addStatus(ok("the resource was scaled using the specified image style and is returned as part of the response"));
-    getScaleImage.addStatus(notFound("the resource was not found or could not be loaded"));
-    getScaleImage.addStatus(badRequest("an invalid image or image style identifier was received"));
-    getScaleImage.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getScaleImage.addPathParameter(new Parameter("resource", Parameter.Type.String, "The resource identifier"));
-    getScaleImage.addPathParameter(new Parameter("style", Parameter.Type.String, "The image style identifier"));
-    getScaleImage.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getScaleImage);
-
     // GET /{resource}/locales/{language}/styles/{styleid}
     Endpoint getScaleLocalizedImage = new Endpoint("/{resource}/locales/{language}/styles/{style}", Method.GET, "localizedstyledimage");
     getScaleLocalizedImage.setDescription("Returns a scaled version of the resource with the given identifier and language");
