@@ -1,6 +1,6 @@
 Title: <input type="text" name="element:title" /><br />
 Keyword: <input type="text" name="element:keyword" /><br />
-Lead: <input type="text" name="element:lead" /><br />
+Lead: <input type="text" class="required email" name="element:lead" /><br />
 Date: <input type="text" name="property:date" /><br />
 Author: <input type="text" name="property:author" /><br />
 <br />
