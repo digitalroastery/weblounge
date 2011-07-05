@@ -49,6 +49,7 @@
               ch.entwine.weblounge.ui.runtime;version=${project.version}
             </Export-Package>
             <Service-Component>
+              OSGI-INF/ui.xml,
               OSGI-INF/ui-runtime-information.xml
             </Service-Component>
           </instructions>
