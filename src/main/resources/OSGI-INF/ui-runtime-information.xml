@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  immediate="true"
+  activate="activate"
+  name="Weblounge UI Runtime Information">
+  
+  <implementation class="ch.entwine.weblounge.ui.runtime.UIRuntimeInformation" />
+  <property name="service.description" value="Weblounge UI Runtime Information" />
+  <service>
+    <provide interface="ch.entwine.weblounge.kernel.runtime.RuntimeInformationProvider" />
+  </service>
+
+</scr:component>
