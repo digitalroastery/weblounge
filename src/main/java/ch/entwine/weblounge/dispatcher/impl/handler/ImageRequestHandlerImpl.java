@@ -294,7 +294,8 @@ public final class ImageRequestHandlerImpl implements RequestHandler {
     try {
 
       // If the scaled version is not there yet, create it
-      scaledImageFile = ImageStyleUtils.getScaledImageFile(imageResource, imageContents, site, style);
+      String filename = imageContents.getFilename();
+      scaledImageFile = ImageStyleUtils.createScaledFile(imageResource, filename, language, style);
       long lastModified = imageResource.getModificationDate().getTime();
       if (!scaledImageFile.isFile() || scaledImageFile.lastModified() < lastModified) {
         InputStream is = contentRepository.getContent(imageURI, language);
