@@ -6,6 +6,7 @@ steal.plugins('jqueryui/dialog',
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template', 'jquery.validate.min')
+.css('validation')
 .then('inputconverter')
 .then(function($) {
 
@@ -36,6 +37,25 @@ steal.plugins('jqueryui/dialog',
     	this.renderer = $(pageletEditor).find('renderer')[0].firstChild.nodeValue.trim();
     	var editor = $(pageletEditor).find('editor')[0].firstChild.nodeValue;
     	
+    	// Load Pagelet CSS
+    	$(pageletEditor).find('link').each(function(index) {
+    		var test = $('head link[href="' + $(this).attr('href') + '"][rel="stylesheet"]');
+    		if(test.length > 0) return;
+    		$("head").append("<link>");
+    	    var css = $("head").children(":last");
+    	    css.attr({
+    	      rel:  "stylesheet",
+    	      type: $(this).attr('type'),
+    	      href: $(this).attr('href')
+    	    });
+    	});
+    	
+    	// Load Pagelet Javascript
+    	$(pageletEditor).find('script').each(function(index) {
+    		$.getScript($(this).attr('src'));
+    	});
+    	
+    	// Process Editor Template
     	var templateObject = TrimPath.parseTemplate(editor);
     	var result  = templateObject.process(this.pagelet);
     	
@@ -43,10 +63,9 @@ steal.plugins('jqueryui/dialog',
     	var resultDom = $('<div></div>').html(result);
     	this._convertInputs(resultDom, this.pagelet);
     	
-    	// Process Editor Template
-    	
 		this.editorDialog = $('<div></div>').html('<form id="validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.editor_dialog({
+			language: this.options.composer.language,
 			title: 'Pagelet bearbeiten',
 			width: 900,
 			height: 800,
@@ -55,6 +74,8 @@ steal.plugins('jqueryui/dialog',
 					$(this).dialog('close');
 				},
 				OK: $.proxy(function () {
+					this.editorDialog.find("form#validate").submit();
+					if(!this.editorDialog.find("form#validate").valid()) return;
 					var newPagelet = this._getNewEditorPagelet();
 					
 					// Process Renderer Template

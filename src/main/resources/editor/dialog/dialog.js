@@ -19,6 +19,7 @@ steal.plugins('jquery/controller',
 	}, /* @Prototype */
 	{
 		init: function(el) {
+			$.getScript('/weblounge/editor/composer/resources/localization/messages_' + this.options.language + '.js');
 			this.element.dialog({
 				modal: true,
 				title: this.options.title,
@@ -47,8 +48,11 @@ steal.plugins('jquery/controller',
 			this.element.dialog("destroy");
 		},
 		
+		"dialogbeforeclose": function(event, ui) {
+			steal.dev.log('hallo');
+		},
+		
 		"input change": function(el, ev) {
-			steal.dev.log('test');
 		},
 		
 	});

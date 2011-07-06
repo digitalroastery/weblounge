@@ -75,24 +75,25 @@ $.Class.extend('InputConverter',
 	convertSelect: function(select, element, pagelet) {
 		$(select).find('option').each(function(){
 			InputConverter.convert(element, pagelet,
-			function() {
+			$.proxy(function () {
 				var array = pagelet.locale.current.text[element[1]].split(',');
+				
 				if($.inArray($(this).val(), array) == -1) 
 					$(this).removeAttr('selected');
 				else $(this).attr('selected', 'selected');
-			}, 
-			function() {
+			}, this),
+			$.proxy(function () {
 				var array = pagelet.locale.original.text[element[1]].split(',');
 				if($.inArray($(this).val(), array) == -1) 
 					$(this).removeAttr('selected');
 				else $(this).attr('selected', 'selected');
-			},
-			function() {
+			}, this),
+			$.proxy(function () {
 				var array = pagelet.properties.property[element[1]].split(',');
 				if($.inArray($(this).val(), array) == -1) 
 					$(this).removeAttr('selected');
 				else $(this).attr('selected', 'selected');
-			});
+			}, this));
 		});
 	},
 	
