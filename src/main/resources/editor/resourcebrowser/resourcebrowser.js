@@ -21,8 +21,8 @@ steal.plugins(
 		},
 		
 		update: function() {
-			this.scrollView.editor_resourcescrollview({resources: this.options.resources});
-			this.listView.editor_resourcelistview({resources: this.options.resources});
+			this.scrollView.editor_resourcescrollview({resources: this.options.resources, language: this.options.language});
+			this.listView.editor_resourcelistview({resources: this.options.resources, language: this.options.language});
 		},
 		
 		_initViewItems: function() {
@@ -50,14 +50,14 @@ steal.plugins(
 			this.options.resources = pages;
 			var element = this.find('div.thumbnailView');
 			this._toggleElement(element)
-			element.editor_resourcescrollview({resources: this.options.resources});
+			element.editor_resourcescrollview({resources: this.options.resources, language: this.options.language});
 		},
 		
 		_showResourceListView: function(pages) {
 			this.options.resources = pages;
 			var element = this.find('div.listView');
 			this._toggleElement(element)
-			element.editor_resourcelistview({resources: this.options.resources});
+			element.editor_resourcelistview({resources: this.options.resources, language: this.options.language});
 		},
 		
 		_loadResources: function() {
@@ -101,7 +101,10 @@ steal.plugins(
         },
         
 		"button.recent click": function(el, ev) {
-			steal.dev.log('recent')
+			Page.findRecent({}, $.proxy(function(pages) {
+				this.options.resources = pages;
+				this.update();
+			}, this));
 			this.update();
 		},
 		
@@ -116,8 +119,10 @@ steal.plugins(
 		},
 		
 		"button.all click": function(el, ev) {
-			steal.dev.log('show all')
-			this.update();
+			Page.findAll({}, $.proxy(function(pages) {
+				this.options.resources = pages;
+				this.update();
+			}, this));
 		}
 	});
 });

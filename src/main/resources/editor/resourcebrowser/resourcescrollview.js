@@ -33,10 +33,10 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		_initViewItems: function() {
-			$.each(this.options.resources, function(i, res) {
-				var scrollViewItem = $('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {page: res});
+			$.each(this.options.resources, $.proxy(function (i, res) {
+				var scrollViewItem = $('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {page: res, language: this.options.language});
 				scrollViewItem.find('div.scrollviewitem').editor_resourcescrollviewitem({page: res});
-			});
+			}, this));
 		},
 		
 		"button.duplicate click": function(el, ev) {

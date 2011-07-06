@@ -25,7 +25,19 @@ steal.then('jsonix')
 		 * Get all Pages
 		 */
 		findAll: function(params, success, error) {
-			$.ajax('/system/weblounge/pages/4bb19980-8f98-4873-a813-000000000001/children', {
+			$.ajax('/system/weblounge/pages/?sort=created-asc&limit=0&offset=0', {
+				success: function(xml) {
+					var json = Page.parseXML(xml);
+					success(json.value.page);
+				}
+			});
+		},
+		
+		/**
+		 * Get Recent Pages
+		 */
+		findRecent: function(params, success, error) {
+			$.ajax('/system/weblounge/pages/?sort=modified-desc&limit=8&offset=0', {
 				success: function(xml) {
 					var json = Page.parseXML(xml);
 					success(json.value.page);
