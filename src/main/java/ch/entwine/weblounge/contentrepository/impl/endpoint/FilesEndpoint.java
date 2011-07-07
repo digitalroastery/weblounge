@@ -95,10 +95,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
   public static final String OPT_PATH = "path";
 
   /** Request parameter name for the content language */
-  public static final String OPT_LANGUAGE = "languageId";
+  public static final String OPT_LANGUAGE = "language";
 
   /** Request parameter name for the content type */
-  public static final String OPT_MIMETYPE = "mimetype";
+  public static final String OPT_MIMETYPE = "mimeType";
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(FilesEndpoint.class);
