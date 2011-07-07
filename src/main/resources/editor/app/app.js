@@ -23,30 +23,30 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
 				return false;
 			}
 			
-			Runtime.findOne({}, this.callback('_loadSite'));
+			Runtime.findOne({}, this.callback('_loadRuntime'));
 			this._loadCurrentLanguage();
 			
-			this.menuBar = this.find('#menubar').editor_menubar({site: this.site, language: this.options.language});
+			this.menuBar = this.find('#menubar').editor_menubar({runtime: this.runtime, language: this.options.language});
             this.pagesTab = this.find('#pagebrowser');
             this.mediaTab = this.find('#mediabrowser');
             this._initTab();
             this._loadPage();
         },
         
-        _loadSite: function(site) {
-        	this.site = site;
-        	this.options.language = this.site.getDefaultLanguage();
+        _loadRuntime: function(runtime) {
+        	this.runtime = runtime;
+        	this.options.language = this.runtime.getDefaultLanguage();
         },
         
         _loadCurrentLanguage: function() {
         	var language = location.pathname.substring(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
         	if(language == '') {
-        		language = localStorage['weblounge.editor.' + this.site.getId() + '.language'];
+        		language = localStorage['weblounge.editor.' + this.runtime.getId() + '.language'];
         	}
         	if (language) { 
         		this.options.language = language;
         	}
-        	localStorage['weblounge.editor.' + this.site.getId() + '.language'] = this.options.language;
+        	localStorage['weblounge.editor.' + this.runtime.getId() + '.language'] = this.options.language;
         },
         
         _supportsLocaleStorage: function() {
@@ -97,7 +97,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         },
         
         "a openDesigner": function(el, ev) {
-            var language = localStorage['weblounge.editor.' + this.site.getId() + '.language'];
+            var language = localStorage['weblounge.editor.' + this.runtime.getId() + '.language'];
             if (!language) {
             	location.href = el.attr('href') + "?edit";
             }
@@ -117,7 +117,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         },
         
         "span changeLanguage": function(el, ev, language) {
-        	localStorage['weblounge.editor.' + this.site.getId() + '.language'] = language;
+        	localStorage['weblounge.editor.' + this.runtime.getId() + '.language'] = language;
         	var path = location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1);
         	location.href = path + language + "?edit";
         }

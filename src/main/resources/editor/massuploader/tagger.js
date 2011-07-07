@@ -22,7 +22,8 @@ steal.plugins('jquery',
 		 * Initialize a new MassUploader controller.
 		 */
 		init: function(el) {
-			$(el).html('//editor/massuploader/views/tagger.tmpl', {});
+			// TODO Beim Upload der Bilder denk er es ist ein File weil kein mimetype gesetzt wird!!!
+			$(el).html('//editor/massuploader/views/tagger.tmpl', {map : this.options.map, language: this.options.language});
 			this.element.dialog({
 				modal: true,
 				title: 'Metadaten eingeben',

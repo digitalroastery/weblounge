@@ -28,6 +28,9 @@ steal.plugins('jquery/controller',
 				buttons: this.options.buttons,
 				width: this.options.width,
 				height: this.options.height,
+				close: function() {
+					$(this).dialog('destory');
+				}
 			});
 		},
 	

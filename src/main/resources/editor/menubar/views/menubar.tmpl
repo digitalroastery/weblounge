@@ -15,7 +15,7 @@
 </span> 
 
 <span class="language-menu">
-	{{each languages}}
+	{{each runtime.getLanguages()}}
 		<img src="/weblounge/editor/resources/flags/${$value.language}.png" alt="${$value.language}" title="${$value.language}" />
     {{/each}}
 </span>
@@ -24,7 +24,7 @@
 	<input type="search" name="search" placeholder="Suchen..." />
 	<span class="profile-menu">
 		<img src="/weblounge/editor/menubar/images/user.png" class="user" alt="" />
-		<span id="user">Simon</span>
+		<span id="user">${runtime.getUserName()}</span>
 		<span class="triangle-down"></span>
 	</span>
 </span>

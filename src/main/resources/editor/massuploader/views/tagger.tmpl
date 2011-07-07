@@ -1,4 +1,12 @@
-<div id="file-preview"></div>
+<div id="makeMeScrollableTagger">
+	<div class="scrollingHotSpotLeft"></div>
+	<div class="scrollingHotSpotRight"></div>
+	<div class="scrollWrapper">
+		{{each map}}
+			<img src="/system/weblounge/previews/${$value}/locales/${language}/styles/weblounge-ui:preview" alt="" class="page_thumbnail" />
+		{{/each}}
+	</div>
+</div>
 <div id="metadata">
 Title: <input type="text" name="title" /><br />
 Beschreibung: <input type="text" name="description" /><br />

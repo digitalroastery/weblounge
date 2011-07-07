@@ -1,7 +1,7 @@
 steal.then('jsonix')
 .then(function($) {
 	
-	$.Model('File',
+	$.Model('Editor.File',
 	/* @Static */
 	{
 		/**

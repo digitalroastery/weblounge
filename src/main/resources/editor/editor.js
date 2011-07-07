@@ -2,6 +2,7 @@ steal.plugins(
 'jquery/view/tmpl', 
 'editor/app')
 .css('editor', 'token-input-facebook', 'token-input')
+.resources('underscore-min')
 .then(function($) {
 
   $(document).ready(function() {

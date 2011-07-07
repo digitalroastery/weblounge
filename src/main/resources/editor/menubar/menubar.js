@@ -35,7 +35,7 @@ steal.plugins(
 	     * Initialize a new MenuBar controller.
 	     */
         init: function(el) {
-            $(el).html('//editor/menubar/views/menubar.tmpl', {languages: this.options.site.getLanguages(), current: this.options.language});
+            $(el).html('//editor/menubar/views/menubar.tmpl', {runtime: this.options.runtime, current: this.options.language});
             this._updateView();
             this._initDialogs();
         },

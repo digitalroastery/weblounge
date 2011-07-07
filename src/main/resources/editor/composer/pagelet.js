@@ -71,7 +71,7 @@ steal.plugins('jqueryui/dialog',
 			height: 800,
 			buttons: {
 				Abbrechen: function() {
-					$(this).dialog('close');
+					$(this).editor_dialog('destroy');
 				},
 				OK: $.proxy(function () {
 					this.editorDialog.find("form#validate").submit();
@@ -87,7 +87,7 @@ steal.plugins('jqueryui/dialog',
 					
 					// Render site
 					this.element.html(result);
-					this.editorDialog.dialog('close');
+					this.editorDialog.editor_dialog('destroy');
 				}, this)
 			}
 		});
