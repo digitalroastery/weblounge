@@ -33,6 +33,7 @@ import ch.entwine.weblounge.common.impl.content.page.PageURIImpl;
 import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.impl.index.solr.PageInputDocument;
 
+import org.osgi.service.component.ComponentContext;
 import org.xml.sax.SAXException;
 
 import java.util.List;
@@ -45,7 +46,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class PageSerializer extends AbstractResourceSerializer<ResourceContent, Page> {
 
   /** The preview generator */
-  protected PreviewGenerator previewGenerator = null;
+  protected PagePreviewGenerator previewGenerator = null;
 
   /**
    * Creates a new page serializer.
@@ -53,6 +54,23 @@ public class PageSerializer extends AbstractResourceSerializer<ResourceContent, 
   public PageSerializer() {
     super(Page.TYPE);
     previewGenerator = new PagePreviewGenerator();
+  }
+
+  /**
+   * Callback from OSGi declarative services on component startup.
+   * 
+   * @param ctx
+   *          the component context
+   */
+  void activate(ComponentContext ctx) {
+    previewGenerator.activate(ctx);
+  }
+
+  /**
+   * Callback from OSGi declarative services on component shutdown.
+   */
+  void deactivate() {
+    previewGenerator.deactivate();
   }
 
   /**

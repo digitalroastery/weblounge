@@ -38,6 +38,7 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.contentrepository.ResourceSerializer;
 import ch.entwine.weblounge.contentrepository.ResourceSerializerFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -213,8 +214,9 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
     // Load the input stream from the scaled image
     InputStream contentRepositoryIs = null;
     FileOutputStream fos = null;
+    File scaledResourceFile = null;
     try {
-      File scaledResourceFile = ImageStyleUtils.createScaledFile(resource, filename.toString(), language, style);
+      scaledResourceFile = ImageStyleUtils.createScaledFile(resource, filename.toString(), language, style);
       long lastModified = resource.getModificationDate().getTime();
       if (!scaledResourceFile.isFile() || scaledResourceFile.lastModified() < lastModified) {
         contentRepositoryIs = contentRepository.getContent(resourceURI, language);
@@ -235,10 +237,12 @@ public class PreviewsEndpoint extends ContentRepositoryEndpoint {
           e.getMessage() });
       logger.error(e.getMessage(), e);
       IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
       throw new WebApplicationException();
     } catch (IOException e) {
       logger.error("Error scaling image '{}': {}", resourceURI, e.getMessage());
       IOUtils.closeQuietly(resourceInputStream);
+      FileUtils.deleteQuietly(scaledResourceFile);
       throw new WebApplicationException();
     } finally {
       IOUtils.closeQuietly(contentRepositoryIs);
