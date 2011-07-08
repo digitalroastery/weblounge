@@ -24,7 +24,7 @@ package ch.entwine.weblounge.common.security;
 import ch.entwine.weblounge.common.impl.content.page.PageSecurityContext;
 import ch.entwine.weblounge.common.impl.security.SecurityContextImpl;
 import ch.entwine.weblounge.common.impl.security.SystemRole;
-import ch.entwine.weblounge.common.impl.util.xml.XMLUtilities;
+import ch.entwine.weblounge.common.impl.util.xml.XMLUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class PermissionSecurityContextTest extends TestCase {
   protected void setUp() throws Exception {
     super.setUp();
     config = createSecurityContext();
-    path = XMLUtilities.getXPath();
+    path = XMLUtils.getXPath();
   }
 
   /**
@@ -428,7 +428,7 @@ public class PermissionSecurityContextTest extends TestCase {
     xml.append("</security>");
 
     // Create xml builder
-    DocumentBuilder builder = XMLUtilities.getDocumentBuilder();
+    DocumentBuilder builder = XMLUtils.getDocumentBuilder();
 
     // Read document and create xml node
     root = builder.parse(new ByteArrayInputStream(xml.toString().getBytes()));

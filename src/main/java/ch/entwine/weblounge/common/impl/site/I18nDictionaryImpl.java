@@ -21,7 +21,7 @@
 package ch.entwine.weblounge.common.impl.site;
 
 import ch.entwine.weblounge.common.impl.language.LanguageUtils;
-import ch.entwine.weblounge.common.impl.util.xml.XMLUtilities;
+import ch.entwine.weblounge.common.impl.util.xml.XMLUtils;
 import ch.entwine.weblounge.common.impl.util.xml.XPathHelper;
 import ch.entwine.weblounge.common.language.Language;
 import ch.entwine.weblounge.common.site.I18nDictionary;
@@ -215,7 +215,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
   public void addDictionary(URL url, Language language) {
     DocumentBuilder docBuilder;
     try {
-      docBuilder = XMLUtilities.getDocumentBuilder();
+      docBuilder = XMLUtils.getDocumentBuilder();
       Document doc = docBuilder.parse(url.openStream());
 
       if (language != null)
@@ -241,7 +241,7 @@ public class I18nDictionaryImpl implements I18nDictionary {
 
       // Read and store the messages
 
-      XPath path = XMLUtilities.getXPath();
+      XPath path = XMLUtils.getXPath();
       NodeList nodes = XPathHelper.selectList(doc, "/resources/string", path);
       for (int j = 0; j < nodes.getLength(); j++) {
         Node messageNode = nodes.item(j);

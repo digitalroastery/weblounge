@@ -57,7 +57,7 @@ public class XMLDocument {
   protected Document document = null;
 
   /** the XPath engine used by this document */
-  protected XPath engine = XMLUtilities.getXPath();
+  protected XPath engine = XMLUtils.getXPath();
 
   /** Dirty flag for the document */
   protected boolean isDirty = false;
@@ -158,7 +158,7 @@ public class XMLDocument {
       FileOutputStream fos = new FileOutputStream(file);
       DOMSource domSource = new DOMSource(document);
       StreamResult streamResult = new StreamResult(fos);
-      Transformer serializer = XMLUtilities.getTransformer();
+      Transformer serializer = XMLUtils.getTransformer();
       serializer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
       // serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,"users.dtd");
       serializer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -356,7 +356,7 @@ public class XMLDocument {
   private void load() {
     DocumentBuilder docBuilder;
     try {
-      docBuilder = XMLUtilities.getDocumentBuilder();
+      docBuilder = XMLUtils.getDocumentBuilder();
       if (!file.exists() || !file.canRead()) {
         document = docBuilder.newDocument();
       } else {

@@ -42,7 +42,7 @@ import javax.xml.xpath.XPathFactory;
 /**
  * Provides various utility routines for xml handling.
  */
-public final class XMLUtilities {
+public final class XMLUtils {
 
   /** the DOM parser factory */
   private static final DocumentBuilderFactory docBuilderFactory_;
@@ -87,7 +87,7 @@ public final class XMLUtilities {
   /**
    * This class is not intended to be instantiated.
    */
-  private XMLUtilities() { 
+  private XMLUtils() { 
     // Nothing to be done here
   }
 
