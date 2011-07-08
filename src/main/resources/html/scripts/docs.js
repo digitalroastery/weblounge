@@ -148,9 +148,15 @@ var Docs = (function($) {
 	                              }
 	                              
 	                              // response body
-	                              if (data !== undefined && data != "" && (contentType.indexOf("text") == 0 || contentType == "application/xml" || contentType == "application/json")) {
-	                                responseBody.find("pre.response_body").text(prettify(data, contentType));
-	                                responseBody.find("pre.response_body").show();
+	                              if (data !== undefined && data != "") {
+	                            	  if (contentType.indexOf("text") == 0 || contentType == "application/xml" || contentType == "application/json") {
+		                                responseBody.find("pre.response_body").text(prettify(data, contentType));
+		                                responseBody.find("pre.response_body").show();
+	                            	  } else if (contentType.match("image/.*")) {
+	                            		var img = "<img src=\"" + url + "\" />";
+		                                responseBody.find("pre.response_body").html(img);
+		                                responseBody.find("pre.response_body").show();
+	                            	  }
 	                              } else {
 	                                responseBody.find("pre.response_body").hide();
 	                              }
