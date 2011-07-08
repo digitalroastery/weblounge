@@ -15,5 +15,8 @@ steal.plugins(
 	"jqueryui/selectable",
 	"jqueryui/slider",
 	"jqueryui/sortable",
+	"jqueryui/spinner",
+	"jqueryui/tooltip",
 	"jqueryui/tabs"
 );
+
