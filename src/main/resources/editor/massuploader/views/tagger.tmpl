@@ -1,15 +1,13 @@
-<div id="makeMeScrollableTagger">
-	<div class="scrollingHotSpotLeft"></div>
-	<div class="scrollingHotSpotRight"></div>
-	<div class="scrollWrapper">
+<div class="buttonLeft"></div>
+<div class="buttonRight"></div>
+<div class="taggerImage">
 		{{each map}}
-			<img src="/system/weblounge/previews/${$value}/locales/${language}/styles/weblounge-ui:preview" alt="" class="page_thumbnail" />
+			<img src="/system/weblounge/previews/${$value}/locales/${language}/styles/weblounge-ui:preview" alt="" style="display:none"/>
 		{{/each}}
-	</div>
 </div>
-<div id="metadata">
-Title: <input type="text" name="title" /><br />
-Beschreibung: <input type="text" name="description" /><br />
-Tags: <input type="text" name="tags" /><br />
-Ersteller: <input type="text" name="author" /><br />
+<div class="metadata">
+Title: <input type="text" name="title" /> <img src="/weblounge/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="copyMetadata"><br /><br />
+Beschreibung: <input type="text" name="description" /> <img src="/weblounge/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="copyMetadata"><br /><br />
+Tags: <input type="text" name="tags" /> <img src="/weblounge/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="copyMetadata"><br /><br />
+Ersteller: <input type="text" name="author" placeholder="${user}" /> <img src="/weblounge/editor/resourcebrowser/images/icon_more.png" alt="Übernehmen" class="copyMetadata">
 </div>

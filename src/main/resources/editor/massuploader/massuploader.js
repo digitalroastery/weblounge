@@ -2,9 +2,6 @@ steal.plugins('jquery',
 		'jquery/controller/view',
 		'jquery/view',
 		'jquery/view/tmpl',
-		'jqueryui/core',
-		'jqueryui/widget', 
-		'jqueryui/position', 
 		'jqueryui/dialog',
 		'jqueryui/draggable',
 		'jqueryui/resizable',
@@ -44,9 +41,13 @@ steal.plugins('jquery',
 				width: 900,
 				height: 800,
 				buttons: {
-					Abbrechen: function() {
+					Abbrechen: $.proxy(function() {
+						// TODO Bilder auch löschen bei esc event oder X
+						$.each(this.map, $.proxy(function(key, value) {
+							this._deleteFile(value);
+						},this));
 						$(this).dialog('close');
-					},
+					},this),
 					Upload: $.proxy(function() {
 						this._openTagDialog();
 						this.element.dialog('close');
@@ -107,7 +108,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _openTagDialog: function() {
-	    	$('<div></div>').editor_tagger({map: this.map, language: this.options.language});
+	    	$('<div></div>').editor_tagger({map: this.map, language: this.options.language, user: this.options.runtime.getUserName()});
 	    },
 	    
         _loadImage: function(url, id) {
@@ -118,7 +119,7 @@ steal.plugins('jquery',
         			containerId: "previewImageContainer",
         			onLoad: function(img_data) {
         				var element = image.getElement();
-        				$(element).wrap('<div id="' + id + '" class="previewImage" />');
+        				$(element).wrap('<div class="previewImage" />');
         				image.setSize(200, -1);
         				divScroll.smoothDivScroll('recalculateScrollableArea');
         			    $(element).bind('hoverinit', function(el, hover){
@@ -135,10 +136,10 @@ steal.plugins('jquery',
         },
         
         "a.removeButton click": function(el, ev) {
-        	var id = el.parent().attr('id');
+        	var index = el.parent().index();
         	el.parent().remove();
         	this._deleteFile(this.map[id]);
-        	delete this.map[id];
+        	this.map.splice(index, 1);
         }
         
   	});
