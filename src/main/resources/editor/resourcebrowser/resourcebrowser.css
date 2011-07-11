@@ -272,3 +272,91 @@ div.icon_bg {
     width: 100%;
     padding-bottom: 20px;
 }
+
+div.searchBox {
+    height: 70%;
+}
+
+div.resourceSearch {
+	position: relative;
+	float: left;
+	align: center;
+	width: 50%;
+	top: 35%;
+	text-align: center;
+}
+
+div.dropBox {
+	border: 2px dashed #DDDDDD;
+	float: left;
+    height: 300px;
+    margin-bottom: 2em;
+    margin: 0 auto;
+    margin-top: 10%;
+    min-height: 70px;
+    padding: 10px;
+    text-align: center;
+    width: 300px;
+    z-index: 2;
+}
+
+div.dropBox span {
+    font-size: 16px;
+    position: relative;
+    top: 50%;
+    width: 100%;
+    margin-top:-8px;
+}
+
+#resourceSearch {
+	border-left: 0 none;
+    border-radius: 6px 6px 6px 6px;
+    border-top: 0 none;
+    color: #999999;
+    padding: 5px;
+    width: 300px;
+}
+
+#tutorial_stage_1 {
+	display: block;
+    position: absolute;
+    z-index: 4;
+    background: url("images/stage_2.png") no-repeat scroll 0 0 transparent;
+    height: 67px;
+    left: 50%;
+    top: 0;
+    width: 230px;
+}
+
+#tutorial_stage_2 {
+	display: block;
+    position: absolute;
+    z-index: 4;
+    background: url("images/stage_4.png") no-repeat scroll 0 0 transparent;
+    height: 79px;
+    right: 20px;
+    top: 0;
+    width: 230px;
+}
+
+#tutorial_stage_3 {
+	display: block;
+    position: absolute;
+    z-index: 4;
+    background: url("images/stage_6.png") no-repeat scroll 0 0 transparent;
+    height: 77px;
+    right: 75%;
+    top: 25%;
+    width: 330px;
+}
+
+#tutorial_stage_4 {
+	display: block;
+    position: absolute;
+    z-index: 4;
+    background: url("images/stage_3.png") no-repeat scroll 0 0 transparent;
+    height: 55px;
+    right: 10%;
+    top: 35%;
+    width: 282px;
+}

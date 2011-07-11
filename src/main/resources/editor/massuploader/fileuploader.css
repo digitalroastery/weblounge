@@ -38,7 +38,7 @@
 
 .qq-upload-drop-area span {
     display: block;
-    position:absolute;
+    position:relative;
     top: 50%;
     width:100%;
     font-size:16px;

@@ -20,8 +20,7 @@ steal.then('jsonix')
 			runtime.user.email = $(xml).find('user email')[0].textContent;
 			runtime.site = new Object();
 			$(xml).find('site').each(function(index) {
-				// TODO SiteId wird benötigt
-//				runtime.site.id = $(this).attr('id');
+				runtime.site.id = $(this).find('id')[0].textContent;
 				runtime.site.languages = [];
 				
 				$(this).find('language').each(function(index) {

@@ -3,7 +3,7 @@ steal.plugins(
 	'jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/init.tmpl')
 .css('resourcebrowser')
-.then('resourcescrollview', 'resourcelistview')
+.then('resourcescrollview', 'resourcelistview', 'resourcesearch')
 .then(function($) {
 
   $.Controller('Editor.Resourcebrowser',
@@ -17,15 +17,18 @@ steal.plugins(
 		init: function(el) {
 			$(el).html('//editor/resourcebrowser/views/init.tmpl', {});
 			this._initViewItems();
-			this._loadResources();					
+//			this._loadResources();
 		},
 		
 		update: function() {
+			if($.isEmptyObject(this.options.resources)) return;
+			this.searchBox.hide();
 			this.scrollView.editor_resourcescrollview({resources: this.options.resources, language: this.options.language});
 			this.listView.editor_resourcelistview({resources: this.options.resources, language: this.options.language});
 		},
 		
 		_initViewItems: function() {
+			this.searchBox = this.find('div.searchBox').editor_resourcesearch({resourceType: this.options.resourceType});
 			this.scrollView = this.find('div.thumbnailView');
 			this.listView = this.find('div.listView');
 			this.activeElement = this.scrollView;
@@ -35,7 +38,6 @@ steal.plugins(
 			$('nav.weblounge button.list').button({
 				icons: {primary: "icon-list"},
 				text: false });
-			
 			$('button.tree').button({
 				icons: {primary: "icon-tree"},
 				disabled: true,
@@ -60,13 +62,13 @@ steal.plugins(
 			element.editor_resourcelistview({resources: this.options.resources, language: this.options.language});
 		},
 		
-		_loadResources: function() {
-			if(this.options.resourceType == 'pages') {
-				Page.findAll({}, this.callback('_showResourceScrollView'));
-			} else if(this.options.resourceType == 'media') {
-				Editor.File.findAll({}, this.callback('_showResourceScrollView'));
-			}
-		},
+//		_loadResources: function() {
+//			if(this.options.resourceType == 'pages') {
+//				Page.findAll({}, this.callback('_showResourceScrollView'));
+//			} else if(this.options.resourceType == 'media') {
+//				Editor.File.findAll({}, this.callback('_showResourceScrollView'));
+//			}
+//		},
 		
 		_toggleElement: function(el) {
         	this.activeElement.hide();
@@ -74,12 +76,22 @@ steal.plugins(
         	el.show();
         },
         
+		"input searchMedia": function(el, ev, serachValue) {
+			steal.dev.log(serachValue);
+		},
+		
+		"input searchPages": function(el, ev, serachValue) {
+			steal.dev.log(serachValue);
+		},
+		
 		"button.list click": function(el, ev) {
+			if($.isEmptyObject(this.options.resources)) return;
 			this._showResourceListView(this.options.resources);
 		},
 		
 		"button.thumbnails click": function(el, ev) {
-			this._showResourceScrollView(this.options.resources)
+			if($.isEmptyObject(this.options.resources)) return;
+			this._showResourceScrollView(this.options.resources);
 		},
         
         // Delete Pages
