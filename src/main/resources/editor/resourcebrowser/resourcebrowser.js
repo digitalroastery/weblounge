@@ -46,15 +46,15 @@ steal.plugins(
 				text: false });
 		},
 		
-		_showResourceScrollView: function(pages) {
-			this.options.resources = pages;
+		_showResourceScrollView: function(resources) {
+			this.options.resources = resources;
 			var element = this.find('div.thumbnailView');
 			this._toggleElement(element)
 			element.editor_resourcescrollview({resources: this.options.resources, language: this.options.language});
 		},
 		
-		_showResourceListView: function(pages) {
-			this.options.resources = pages;
+		_showResourceListView: function(resources) {
+			this.options.resources = resources;
 			var element = this.find('div.listView');
 			this._toggleElement(element)
 			element.editor_resourcelistview({resources: this.options.resources, language: this.options.language});
@@ -64,7 +64,7 @@ steal.plugins(
 			if(this.options.resourceType == 'pages') {
 				Page.findAll({}, this.callback('_showResourceScrollView'));
 			} else if(this.options.resourceType == 'media') {
-				steal.dev.log('load Media');
+				Editor.File.findAll({}, this.callback('_showResourceScrollView'));
 			}
 		},
 		
@@ -101,11 +101,12 @@ steal.plugins(
         },
         
 		"button.recent click": function(el, ev) {
-			Page.findRecent({}, $.proxy(function(pages) {
-				this.options.resources = pages;
-				this.update();
-			}, this));
-			this.update();
+			if(this.options.resourceType == 'pages') {
+				Page.findRecent({}, $.proxy(function(pages) {
+					this.options.resources = pages;
+					this.update();
+				}, this));
+			}
 		},
 		
 		"button.favorites click": function(el, ev) {
@@ -119,10 +120,12 @@ steal.plugins(
 		},
 		
 		"button.all click": function(el, ev) {
-			Page.findAll({}, $.proxy(function(pages) {
-				this.options.resources = pages;
-				this.update();
-			}, this));
+			if(this.options.resourceType == 'pages') {
+				Page.findAll({}, $.proxy(function(pages) {
+					this.options.resources = pages;
+					this.update();
+				}, this));
+			}
 		}
 	});
 });

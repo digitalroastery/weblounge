@@ -1,4 +1,4 @@
-steal.plugins('jquery/model').resources('../../resources/Jsonix-all-1.1-SNAPSHOT').then('page-mappings').then(function($) {
+steal.plugins('jquery/model').resources('../../resources/Jsonix-all-1.1-SNAPSHOT').then('page-mappings', 'file-mappings', 'image-mappings').then(function($) {
 
 	$.Class('Editor.Jsonix',
 	
@@ -6,7 +6,7 @@ steal.plugins('jquery/model').resources('../../resources/Jsonix-all-1.1-SNAPSHOT
 		context: function() {
 			return new Jsonix.Context(
 				// Array of mapping modules
-				[PageMappings],
+				[PageMappings, FileMappings, ImageMappings],
 				// Optional properties
 				{}
 			);

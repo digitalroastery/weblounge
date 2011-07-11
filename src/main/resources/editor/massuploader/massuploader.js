@@ -41,19 +41,21 @@ steal.plugins('jquery',
 				width: 900,
 				height: 800,
 				buttons: {
-					Abbrechen: $.proxy(function() {
-						// TODO Bilder auch löschen bei esc event oder X
-						$.each(this.map, $.proxy(function(key, value) {
-							this._deleteFile(value);
-						},this));
+					Abbrechen: function() {
 						$(this).dialog('close');
-					},this),
+					},
 					Upload: $.proxy(function() {
+						// If no element uploaded Upload button disable
 						this._openTagDialog();
-						this.element.dialog('close');
+						this.element.dialog('destroy');
+						this.destroy();
 					},this)
 				},
 				close: $.proxy(function () {
+					$.each(this.map, $.proxy(function(key, value) {
+						this._deleteFile(value);
+					},this));
+					
 //					this.divScroll.smoothDivScroll('destroy');
 					this.element.dialog('destroy');
 					this.destroy();
@@ -78,6 +80,7 @@ steal.plugins('jquery',
 				onComplete: $.proxy(function(id, fileName, response) {
 					this.map[id] = response.url.substring(response.url.lastIndexOf('/') + 1);
 					this._loadImage(response.url + '/content/' + this.options.language, id);
+					this._updateUploadButton();
 			    }, this),
 			    // path to server-side upload script
 			    action: '/system/weblounge/files/uploads',
@@ -91,6 +94,8 @@ steal.plugins('jquery',
 				autoScrollInterval: 15,
 				visibleHotSpots: "always"
 		  	});
+			
+			this.uploadButton = this.element.parent().find(".ui-dialog-buttonpane button:contains('Upload')").button('disable');
 	    },
 	    
 	    update: function(options) {
@@ -100,6 +105,14 @@ steal.plugins('jquery',
 	    
 	    _cancel: function(id, fileName) {
 	    	steal.dev.log(id + fileName);
+	    },
+	    
+	    _updateUploadButton: function() {
+	    	if(this.map.length > 0) {
+	    		this.uploadButton.button('enable');
+	    	} else {
+	    		this.uploadButton.button('disable');
+	    	}
 	    },
 	    
 	    _deleteFile: function(resourceId) {
@@ -138,8 +151,9 @@ steal.plugins('jquery',
         "a.removeButton click": function(el, ev) {
         	var index = el.parent().index();
         	el.parent().remove();
-        	this._deleteFile(this.map[id]);
+        	this._deleteFile(this.map[index]);
         	this.map.splice(index, 1);
+        	this._updateUploadButton();
         }
         
   	});

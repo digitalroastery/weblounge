@@ -27,6 +27,21 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Get all Files
+		 */
+		findAll: function(params, success, error) {
+			$.ajax('/system/weblounge/files/5bc19990-8f99-4873-a813-71b6dfac22ad', {
+				success: function(xml) {
+					var json = Editor.File.parseXML(xml);
+					var files = new Array();
+					files.push(json.value);
+					files.push(json.value);
+					success(files);
+				}
+			});
+		},
+		
+		/**
 		 * Updates the specified file or the specified file content.
 		 * @param {Object} params The file identifier
 		 * @param {File} file The file object
@@ -105,18 +120,16 @@ steal.then('jsonix')
 		 * Converts XML to JSON
 		 */
 		parseXML: function(xml) {
-			return null;
-		},
-		
-		createNewFile: function() {
-			return '<file id="6bc19990-8f99-4873-a813-71b6dfac22ad" path="/test/document/" version="live">'
+			var unmarshaller = Editor.Jsonix.context().createUnmarshaller();
+			return unmarshaller.unmarshalDocument(xml);
 		},
 		
 		/**
 		 * Converts JSON to XML
 		 */
 		parseJSON: function(json) {
-			return null
+			var marshaller = Editor.Jsonix.context().createMarshaller();
+			return marshaller.marshalString(json);
 		}
 
 	},
