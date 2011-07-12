@@ -126,6 +126,23 @@ img.more {
     left: 240px;
 }
 
+#trashcan {
+	position: relative;
+	left: 100px;
+	padding: 10px 50px;
+	background: url('images/trashcan.png') no-repeat center;
+	border: 2px solid grey;
+	visibility: hidden;
+}
+
+.delete_droppable_hover, #delete_droppable .delete_droppable_hover {
+	background: url('images/trashcan_hover.png') no-repeat center !important;
+}
+
+.delete_droppable_active {
+	visibility: visible !important;
+}
+
 #profile-menu {
 	position: absolute;
 	top: 55px;

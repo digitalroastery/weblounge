@@ -6,6 +6,7 @@ steal.plugins(
 	'editor/massuploader',
 	'jqueryui/dialog',
 	'jqueryui/draggable',
+	'jqueryui/droppable',
 	'jqueryui/resizable',
 	'jqueryui/mouse',
 	'jqueryui/button')
@@ -38,6 +39,15 @@ steal.plugins(
             $(el).html('//editor/menubar/views/menubar.tmpl', {runtime: this.options.runtime, current: this.options.language});
             this._updateView();
             this._initDialogs();
+    		$("#trashcan").droppable({
+    			accept: "div.pagelet",
+    			activeClass: "delete_droppable_active",
+    			hoverClass: "delete_droppable_hover",
+    			tolerance: "pointer",
+    			drop: $.proxy(function(event, ui) {
+    				ui.draggable.remove();
+    			}, this)
+    		});
         },
         
         update: function(options) {
@@ -130,6 +140,7 @@ steal.plugins(
 					},this)
 				},
 			});
+			
         },
         
         _toggleTab: function(el) {

@@ -148,6 +148,12 @@ steal.then('jsonix')
 	    	return index;
 	    },
 	    
+	    deletePagelet: function(composerId, index){
+	    	var composer = this.getComposer(composerId);
+	    	composer.pagelets.splice(index, 1);
+//	    	Page.update({id:this.value.id}, this);
+	    },
+ 	    
 	    /**
 	     * Return the specified Pagelet
 	     * @param {String} composerId

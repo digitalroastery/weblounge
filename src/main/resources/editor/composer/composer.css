@@ -17,6 +17,12 @@ img.icon_editing {
     top: -20px;
 }
 
+.pagelet-placeholder {
+    border: 1px solid #FCEFA1;
+    color: #363636;
+	height: 1.5em; line-height: 1.2em;
+}
+
 div.pagelet-editor {
 	display: none;
 }

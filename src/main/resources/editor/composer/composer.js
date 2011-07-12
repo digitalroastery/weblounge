@@ -26,7 +26,9 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         connectWith: this.options.connectWith,
         distance: 15,
         items: 'div.pagelet',
-        update: $.proxy(function() {
+        revert: true,
+        update: $.proxy(function(event, ui) {
+        	if(ui.sender != null) return;
         	var page = this.options.page;
         	var composerId = this.id;
         	

@@ -92,6 +92,11 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         	}
         },
         
+        "div deletePagelet": function(el, ev, params) {
+        	// UI Element remove();
+        	this.page.deletePagelet(params.composerId, params.index);
+        },
+        
         "a showDesigner": function(el, ev, pageId, url) {
         	this.update({mode: 0});
         },

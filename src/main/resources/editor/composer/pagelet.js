@@ -1,8 +1,8 @@
 steal.plugins('jqueryui/dialog',
 		'jqueryui/draggable',
+		'jqueryui/droppable',
 		'jqueryui/resizable',
-		'jqueryui/mouse',
-		'editor/dialog')
+		'jqueryui/mouse')
 .models('../../models/workbench',
 		'../../models/pagelet')
 .resources('trimpath-template', 'jquery.validate.min')
