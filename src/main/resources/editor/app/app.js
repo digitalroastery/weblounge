@@ -1,4 +1,4 @@
-steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'editor/resourcebrowser', 'editor/composer')
+steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', 'editor/composer')
 .models('../../models/runtime', '../../models/page')
 .then(function($) {
 		
@@ -68,7 +68,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         
         _setPage: function(page) {
         	this.page = page;
-        	$('.composer').editor_composer({page: page, language: this.options.language});
+        	$('.composer').editor_composer({page: page, language: this.options.language, runtime: this.runtime});
         },
         
         update: function(options) {
@@ -92,11 +92,6 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         	}
         },
         
-        "div deletePagelet": function(el, ev, params) {
-        	// UI Element remove();
-        	this.page.deletePagelet(params.composerId, params.index);
-        },
-        
         "a showDesigner": function(el, ev, pageId, url) {
         	this.update({mode: 0});
         },
@@ -113,12 +108,12 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/massuploader', 'edi
         
         "a showPages": function(el, ev) {
         	this.update({mode: 1});
-        	this.pagesTab.editor_resourcebrowser({resourceType: 'pages', language: this.options.language});
+        	this.pagesTab.editor_resourcebrowser({resourceType: 'pages', language: this.options.language, runtime: this.runtime});
         },
         
         "a showMedia": function(el, ev) {
         	this.update({mode: 2});
-        	this.mediaTab.editor_resourcebrowser({resourceType: 'media', language: this.options.language});
+        	this.mediaTab.editor_resourcebrowser({resourceType: 'media', language: this.options.language, runtime: this.runtime});
         },
         
         "span changeLanguage": function(el, ev, language) {

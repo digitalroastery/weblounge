@@ -23,8 +23,8 @@ steal.plugins(
 		update: function() {
 			if($.isEmptyObject(this.options.resources)) return;
 			this.searchBox.hide();
-			this.scrollView.editor_resourcescrollview({resources: this.options.resources, language: this.options.language});
-			this.listView.editor_resourcelistview({resources: this.options.resources, language: this.options.language});
+			this.scrollView.editor_resourcescrollview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
+			this.listView.editor_resourcelistview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 		},
 		
 		_initViewItems: function() {
@@ -52,14 +52,14 @@ steal.plugins(
 			this.options.resources = resources;
 			var element = this.find('div.thumbnailView');
 			this._toggleElement(element)
-			element.editor_resourcescrollview({resources: this.options.resources, language: this.options.language});
+			element.editor_resourcescrollview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 		},
 		
 		_showResourceListView: function(resources) {
 			this.options.resources = resources;
 			var element = this.find('div.listView');
 			this._toggleElement(element)
-			element.editor_resourcelistview({resources: this.options.resources, language: this.options.language});
+			element.editor_resourcelistview({resources: this.options.resources, language: this.options.language, runtime: this.options.runtime});
 		},
 		
 //		_loadResources: function() {

@@ -85,7 +85,7 @@ steal.plugins(
         
         _initDialogs: function() {
 			this.addDialog = $('<div></div>')
-			.load('/weblounge/editor/menubar/views/add-dialog.html')
+			.load(this.options.runtime.getRootPath() + '/editor/menubar/views/add-dialog.html')
 			.dialog({
 				modal: true,
 				title: 'Seite hinzufügen',
@@ -104,7 +104,7 @@ steal.plugins(
 			});
 			
 			this.userDialog = $('<div></div>')
-			.load('/weblounge/editor/menubar/views/user-dialog.html')
+			.load(this.options.runtime.getRootPath() + '/editor/menubar/views/user-dialog.html')
 			.dialog({
 				modal: true,
 				title: 'Einstellungen',
@@ -123,7 +123,7 @@ steal.plugins(
 			});
 			
 			this.publishDialog = $('<div></div>')
-			.load('/weblounge/editor/menubar/views/publish-dialog.html')
+			.load(this.options.runtime.getRootPath() + '/editor/menubar/views/publish-dialog.html')
 			.dialog({
 				modal: true,
 				title: 'Seite publizieren',

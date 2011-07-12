@@ -63,7 +63,7 @@ steal.plugins('jqueryui/dialog',
     	var resultDom = $('<div></div>').html(result);
     	this._convertInputs(resultDom, this.pagelet);
     	
-    	$.getScript('/weblounge/editor/composer/resources/localization/messages_' + this.options.composer.language + '.js');
+    	$.getScript(this.options.composer.runtime.getRootPath() + '/editor/composer/resources/localization/messages_' + this.options.composer.language + '.js');
 		this.editorDialog = $('#pageleteditor').html('<form id="validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.dialog({
 			title: 'Pagelet bearbeiten',

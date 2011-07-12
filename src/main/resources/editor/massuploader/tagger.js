@@ -21,7 +21,7 @@ steal.plugins('jquery',
 		 * Initialize a new MassUploader controller.
 		 */
 		init: function(el) {
-			$(el).html('//editor/massuploader/views/tagger.tmpl', {map : this.options.map, language: this.options.language, user: this.options.user});
+			$(el).html('//editor/massuploader/views/tagger.tmpl', {map : this.options.map, language: this.options.language, runtime: this.options.runtime});
 			this.img = this.element.find('.taggerImage img:first').show();
 			this.element.find('div.buttonLeft:first').hide();
 			

@@ -28,7 +28,6 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         items: 'div.pagelet',
         revert: true,
         update: $.proxy(function(event, ui) {
-        	if(ui.sender != null) return;
         	var page = this.options.page;
         	var composerId = this.id;
         	
@@ -46,7 +45,8 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         composer: {
           id: this.id,
           page: this.options.page,
-          language: this.options.language
+          language: this.options.language,
+          runtime: this.options.runtime
         }
       });
 
@@ -59,7 +59,8 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         composer: {
             id: this.id,
             page: this.options.page,
-            language: this.options.language
+            language: this.options.language,
+            runtime: this.options.runtime
           }
         });
     }

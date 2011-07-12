@@ -121,7 +121,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _openTagDialog: function() {
-	    	$('<div></div>').editor_tagger({map: this.map, language: this.options.language, user: this.options.runtime.getUserName()});
+	    	$('<div></div>').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
 	    },
 	    
         _loadImage: function(url, id) {

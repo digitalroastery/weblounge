@@ -151,7 +151,7 @@ steal.then('jsonix')
 	    deletePagelet: function(composerId, index){
 	    	var composer = this.getComposer(composerId);
 	    	composer.pagelets.splice(index, 1);
-//	    	Page.update({id:this.value.id}, this);
+	    	Page.update({id:this.value.id}, this);
 	    },
  	    
 	    /**
@@ -171,12 +171,7 @@ steal.then('jsonix')
 	     */
 	    updateComposer: function(composerId, newComposer) {
 	    	var index = this.getComposerIndex(composerId);
-	    	var composers = this.value.body.composers;
-	    	
-	    	$.each(newComposer, function(i, pagelet) {
-	    		composers[index].pagelets.splice(i, 1, pagelet);
-    		});
-	    	// TODO nur beim publishen updaten
+	    	this.value.body.composers[index].pagelets = newComposer;
 	    	Page.update({id:this.value.id}, this);
 	    },
 	    
