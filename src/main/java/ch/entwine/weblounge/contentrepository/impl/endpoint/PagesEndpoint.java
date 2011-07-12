@@ -90,7 +90,29 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
 
   /** The endpoint documentation */
   private String docs = null;
-  
+
+  /**
+   * Returns a collection of pages which match the given criteria.
+   * 
+   * @param request
+   *          the request
+   * @param path
+   *          the page path (e.g. <code>/my/simple/path</code>)
+   * @param subjectstring
+   *          one ore more subjects, divided by a comma
+   * @param searchterms
+   *          fulltext search terms
+   * @param sort
+   *          sort order, possible values are
+   *          <code>created-asc, created-desc, published-asc, published-desc, modified-asc & modified-desc</code>
+   * @param limit
+   *          search result limit
+   * @param offset
+   *          search result offset (for paging in combination with limit)
+   * @param details
+   *          switch for providing pages including their bodies
+   * @return a collection of matching pages
+   */
   @GET
   @Path("/")
   public Response getAllPages(@Context HttpServletRequest request,
