@@ -63,15 +63,18 @@ steal.plugins('jqueryui/dialog',
     	var resultDom = $('<div></div>').html(result);
     	this._convertInputs(resultDom, this.pagelet);
     	
-		this.editorDialog = $('<div></div>').html('<form id="validate" onsubmit="return false;">' + resultDom.html() + '</form>')
-		.editor_dialog({
-			language: this.options.composer.language,
+    	$.getScript('/weblounge/editor/composer/resources/localization/messages_' + this.options.composer.language + '.js');
+		this.editorDialog = $('#pageleteditor').html('<form id="validate" onsubmit="return false;">' + resultDom.html() + '</form>')
+		.dialog({
 			title: 'Pagelet bearbeiten',
 			width: 900,
 			height: 800,
+			modal: true,
+			autoOpen: true,
+			resizable: true,
 			buttons: {
 				Abbrechen: function() {
-					$(this).editor_dialog('destroy');
+					$(this).editor_dialog('close');
 				},
 				OK: $.proxy(function () {
 					this.editorDialog.find("form#validate").submit();
@@ -87,8 +90,11 @@ steal.plugins('jqueryui/dialog',
 					
 					// Render site
 					this.element.html(result);
-					this.editorDialog.editor_dialog('destroy');
+					this.editorDialog.editor_dialog('close');
 				}, this)
+			},
+			close: function() {
+				$(this).dialog('destroy');
 			}
 		});
 		this.editorDialog.find("form#validate").validate();
