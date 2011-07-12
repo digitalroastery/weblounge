@@ -59,22 +59,22 @@ public final class PagesEndpointDocs {
     docs.setTitle("Weblounge Pages");
 
     // GET /
-    Endpoint getPageByPathEndpoint = new Endpoint("/", Method.GET, "getallpages");
-    getPageByPathEndpoint.setDescription("Returns a collection of pages matching the given parameters");
-    getPageByPathEndpoint.addFormat(Format.xml());
-    getPageByPathEndpoint.addStatus(ok("a collection (may be empty) of pages is returned as part of the response"));
-    getPageByPathEndpoint.addStatus(badRequest("an invalid request was received"));
-    getPageByPathEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
-    getPageByPathEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The page path"));
-    getPageByPathEndpoint.addOptionalParameter(new Parameter("subjects", Parameter.Type.String, "The page subjects, separated by a comma"));
-    getPageByPathEndpoint.addOptionalParameter(new Parameter("searchterms", Parameter.Type.String, "search terms to search the pages content"));
+    Endpoint getAllPagesEndpoint = new Endpoint("/", Method.GET, "getallpages");
+    getAllPagesEndpoint.setDescription("Returns a collection of pages matching the given parameters");
+    getAllPagesEndpoint.addFormat(Format.xml());
+    getAllPagesEndpoint.addStatus(ok("a collection (may be empty) of pages is returned as part of the response"));
+    getAllPagesEndpoint.addStatus(badRequest("an invalid request was received"));
+    getAllPagesEndpoint.addStatus(serviceUnavailable("the site or its content repository is temporarily offline"));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("path", Parameter.Type.String, "The page path"));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("subjects", Parameter.Type.String, "The page subjects, separated by a comma"));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("searchterms", Parameter.Type.String, "search terms to search the pages content"));
     String[] sortParams = {"published-asc", "published-desc", "created-asc", "created-desc", "modified-asc", "modified-desc"};
-    getPageByPathEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
-    getPageByPathEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
-    getPageByPathEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
-    getPageByPathEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
-    getPageByPathEndpoint.setTestForm(new TestForm());
-    docs.addEndpoint(Endpoint.Type.READ, getPageByPathEndpoint);
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("sort", Parameter.Type.Enum, "The sort parameter", "modified-desc", sortParams));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("limit", Parameter.Type.String, "Offset within the result set", "10"));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("offset", Parameter.Type.String, "Number of result items to include", "0"));
+    getAllPagesEndpoint.addOptionalParameter(new Parameter("details", Parameter.Type.Boolean, "Whether to include the all page data", "false"));
+    getAllPagesEndpoint.setTestForm(new TestForm());
+    docs.addEndpoint(Endpoint.Type.READ, getAllPagesEndpoint);
 
     // GET /{page}
     Endpoint getPageByURIEndpoint = new Endpoint("/{page}", Method.GET, "getpagebyuri");
