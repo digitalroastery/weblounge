@@ -160,11 +160,27 @@ public interface SearchQuery {
   SearchQuery withType(String type);
 
   /**
+   * Returns the resources except the ones with the given type.
+   * 
+   * @param type
+   *          the resource type to block
+   * @return the query extended by this criterion
+   */
+  SearchQuery withoutType(String type);
+
+  /**
    * Returns the resource type or <code>null</code> if no type was specified.
    * 
    * @return the type
    */
   String getType();
+  
+  /**
+   * Returns the blocked resource type or <code>null</code> if no type was specified.
+   * 
+   * @return the type
+   */
+  String getWithoutType();
 
   /**
    * Return resources that contain the given text either in the page header or
