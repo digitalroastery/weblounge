@@ -24,18 +24,19 @@ import ch.entwine.weblounge.common.site.Site;
 import ch.entwine.weblounge.common.url.Path;
 
 /**
- * A page uri defines the location of a page within a <code>Site</code>. In
- * addition, it provides a unique identifier and a page version.
+ * A resource uri defines the location of a resource within a <code>Site</code>.
+ * In addition, it provides a unique identifier and a resource version.
  */
 public interface ResourceURI extends Path {
 
   /**
    * Sets the resource identifier.
    * 
-   * @param identifier the identifier
+   * @param identifier
+   *          the identifier
    */
   void setIdentifier(String identifier);
-  
+
   /**
    * Returns the page identifier.
    * 
@@ -46,7 +47,8 @@ public interface ResourceURI extends Path {
   /**
    * Sets the uri path.
    * 
-   * @param path the path
+   * @param path
+   *          the path
    */
   void setPath(String path);
 
