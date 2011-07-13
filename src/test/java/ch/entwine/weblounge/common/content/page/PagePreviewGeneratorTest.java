@@ -34,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -91,6 +92,7 @@ public class PagePreviewGeneratorTest {
    * Test method for {@link ch.entwine.weblounge.common.impl.content.page.PagePreviewGenerator#createPreview(java.io.InputStream, ch.entwine.weblounge.common.content.image.ImageStyle, java.lang.String)}.
    */
   @Test
+  @Ignore
   public void testCreatePreview() throws Exception {
     File f = File.createTempFile("test", ".jpg");
     try {
