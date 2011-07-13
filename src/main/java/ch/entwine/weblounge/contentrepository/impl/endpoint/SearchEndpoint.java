@@ -86,16 +86,18 @@ public class SearchEndpoint {
    *          the request
    * @param searchterms
    *          the search terms
+   * @param limit
+   *          search result limit
+   * @param offset
+   *          search result offset (for paging in combination with limit)
    * @return the search result
    */
   @GET
   @Path("/{searchterms:.*}")
-  public Response getPage(
-      @Context HttpServletRequest request,
+  public Response getPage(@Context HttpServletRequest request,
       @PathParam("searchterms") String terms,
       @QueryParam("offset") @DefaultValue("-1") int offset,
-      @QueryParam("limit") @DefaultValue("-1") int limit
-    ) {
+      @QueryParam("limit") @DefaultValue("-1") int limit) {
 
     // Check the search terms
     if (StringUtils.isBlank(terms))
@@ -109,13 +111,13 @@ public class SearchEndpoint {
     } else if (!site.isOnline()) {
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
-    
+
     // Load the content repository
     ContentRepository repository = site.getContentRepository();
     if (repository == null) {
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
-    
+
     // Create the search expression and the query
     SearchQuery query = new SearchQueryImpl(site);
     try {
