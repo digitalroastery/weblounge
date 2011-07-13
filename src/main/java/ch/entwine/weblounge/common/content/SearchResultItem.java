@@ -33,7 +33,7 @@ import ch.entwine.weblounge.common.url.WebUrl;
 public interface SearchResultItem extends Comparable<SearchResultItem> {
 
   /**
-   * Returns the page identifier.
+   * Returns the identifier.
    * 
    * @return the identifier
    */

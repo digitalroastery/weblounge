@@ -25,6 +25,8 @@ import ch.entwine.weblounge.common.content.page.Page;
 /**
  * This extended <code>SearchResultItem</code> interface is intended for pages
  * that were found in the weblounge search index.
+ * 
+ * @see ch.entwine.weblounge.common.content.SearchResultItem
  */
 public interface SearchResultPageItem extends SearchResultItem {
 
