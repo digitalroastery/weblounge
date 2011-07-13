@@ -170,6 +170,17 @@ public class SearchQueryImplTest {
     query.withType(type);
     assertEquals(type, query.getType());
   }
+  
+  /**
+   * Test method for
+   * {@link ch.entwine.weblounge.common.impl.content.SearchQueryImpl#withoutType(java.lang.String)}
+   */
+  @Test
+  public void testWithoutType() {
+    String withoutType = "page";
+    query.withoutType(withoutType);
+    assertEquals(withoutType, query.getWithoutType());
+  }
 
   /**
    * Test method for

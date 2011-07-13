@@ -67,6 +67,9 @@ public class SearchQueryImpl implements SearchQuery {
 
   /** The type */
   protected String type = null;
+  
+  /** The type to block */
+  protected String withoutType = null;
 
   /** The template */
   protected String template = null;
@@ -311,11 +314,30 @@ public class SearchQueryImpl implements SearchQuery {
   
   /**
    * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#withoutType(java.lang.String)
+   */
+  public SearchQuery withoutType(String type) {
+    this.withoutType = type;
+    return this;
+  }
+  
+  /**
+   * {@inheritDoc}
    * 
    * @see ch.entwine.weblounge.common.content.SearchQuery#getType()
    */
   public String getType() {
     return type;
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see ch.entwine.weblounge.common.content.SearchQuery#getWithoutType()
+   */
+  public String getWithoutType() {
+    return withoutType;
   }
 
   /**
