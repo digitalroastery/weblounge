@@ -34,11 +34,10 @@ steal.plugins('jquery/view/tmpl')
 		},
 		
 		_initViewItems: function() {
-			var runtime = this.options.runtime;
-			$.each(this.options.resources, function(i, res) {
-				var listViewItem = $('#listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {page: res, runtime: runtime});
+			$.each(this.options.resources,$.proxy(function(i, res) {
+				var listViewItem = this.element.find('#listViewContent').append('//editor/resourcebrowser/views/resourcelistviewitem.tmpl', {page: res, runtime: this.options.runtime});
 				listViewItem.find('tr.pageEntry').editor_resourcelistviewitem({page: res});
-			});
+			}, this));
 		},
 		
 		"img.settings click": function(el, ev) {

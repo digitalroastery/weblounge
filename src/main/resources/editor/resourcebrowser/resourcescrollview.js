@@ -8,7 +8,6 @@ steal.plugins('jquery/view/tmpl')
 	Editor.Resourceview.extend('Editor.Resourcescrollview', 
 	{
 		init: function(el) {
-			steal.dev.log('neue scrollview');
 			$(el).html('//editor/resourcebrowser/views/resourcescrollview.tmpl', {});
 			this._initViewItems();
 			this._initButtons();
@@ -34,7 +33,7 @@ steal.plugins('jquery/view/tmpl')
 		
 		_initViewItems: function() {
 			$.each(this.options.resources, $.proxy(function (i, res) {
-				var scrollViewItem = $('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {page: res, language: this.options.language});
+				var scrollViewItem = this.element.find('div.scrollableArea').append('//editor/resourcebrowser/views/resourcescrollviewitem.tmpl', {page: res, language: this.options.language});
 				scrollViewItem.find('div.scrollviewitem').editor_resourcescrollviewitem({page: res});
 			}, this));
 		},

@@ -1,0 +1,14 @@
+.editor_pageletcreator {
+    background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
+    border: 1px solid #333333;
+    color: #FFFFFF;
+    height: 44px;
+    line-height: 44px;
+    position: fixed;
+	top: 45px;
+	bottom: 0;
+	left: 0;
+    text-align: left;
+    width: 100%;
+    z-index: 99;
+}

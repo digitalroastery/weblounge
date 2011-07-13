@@ -113,11 +113,20 @@ steal.plugins(
         },
         
 		"button.recent click": function(el, ev) {
-			if(this.options.resourceType == 'pages') {
-				Page.findRecent({}, $.proxy(function(pages) {
-					this.options.resources = pages;
-					this.update();
-				}, this));
+			switch(this.options.resourceType) {
+				case 'pages':
+					Page.findRecent({}, $.proxy(function(pages) {
+						this.options.resources = pages;
+						this.update();
+					}, this));
+					break;
+				case 'media':
+					// TODO Replace with Files Model
+					Page.findRecent({}, $.proxy(function(media) {
+						this.options.resources = media;
+						this.update();
+					}, this));
+					break;
 			}
 		},
 		
@@ -132,11 +141,20 @@ steal.plugins(
 		},
 		
 		"button.all click": function(el, ev) {
-			if(this.options.resourceType == 'pages') {
+			switch(this.options.resourceType) {
+			case 'pages':
 				Page.findAll({}, $.proxy(function(pages) {
 					this.options.resources = pages;
 					this.update();
 				}, this));
+				break;
+			case 'media':
+				// TODO Replace with Files Model
+				Page.findAll({}, $.proxy(function(media) {
+					this.options.resources = media;
+					this.update();
+				}, this));
+				break;
 			}
 		}
 	});

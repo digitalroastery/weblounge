@@ -4,6 +4,7 @@ steal.plugins(
 	'jquery/view',
 	'jquery/view/tmpl',
 	'editor/massuploader',
+	'editor/pageletcreator',
 	'jqueryui/dialog',
 	'jqueryui/draggable',
 	'jqueryui/droppable',
@@ -39,15 +40,7 @@ steal.plugins(
             $(el).html('//editor/menubar/views/menubar.tmpl', {runtime: this.options.runtime, current: this.options.language});
             this._updateView();
             this._initDialogs();
-    		$("#trashcan").droppable({
-    			accept: "div.pagelet",
-    			activeClass: "delete_droppable_active",
-    			hoverClass: "delete_droppable_hover",
-    			tolerance: "pointer",
-    			drop: $.proxy(function(event, ui) {
-    				ui.draggable.remove();
-    			}, this)
-    		});
+            this._initDragDrop();
         },
         
         update: function(options) {
@@ -143,6 +136,24 @@ steal.plugins(
 			
         },
         
+        _initDragDrop: function() {
+//    		this.element.find("div#add-menu li.new_pagelet").draggable({
+////    			connectToSortable: ".composer",
+//    			helper: "clone",
+//    			revert: "invalid"
+//    		}).disableSelection();
+            
+    		this.element.find("#trashcan").droppable({
+    			accept: "div.pagelet",
+    			activeClass: "delete_droppable_active",
+    			hoverClass: "delete_droppable_hover",
+    			tolerance: "pointer",
+    			drop: $.proxy(function(event, ui) {
+    				ui.draggable.remove();
+    			}, this)
+    		});
+        },
+        
         _toggleTab: function(el) {
         	this.element.find('.tab.active').removeClass('active');
         	el.addClass('active');
@@ -192,6 +203,11 @@ steal.plugins(
 		"li.new_note click": function(el, ev) {
 			// TODO
 			steal.dev.log('note')
+		},
+		
+		"li.new_pagelet click": function(el, ev) {
+			$('.menu').hide();
+			$('#pageletcreator').editor_pageletcreator({language: this.options.language, runtime: this.options.runtime});
 		},
 		
 		".editor_menubar span.language-menu img click": function(el, ev) {

@@ -11,6 +11,56 @@ steal.then('jsonix')
 			});
 		},
 		
+		getModules: function(params, success, error) {
+			$.ajax('/system/weblounge/sites/weblounge-test/modules', {
+				success: function(xml) {
+					success(Site.parseModules(xml));
+				}
+			});
+		},
+		
+		getModule: function(params, success, error) {
+			$.ajax('/system/weblounge/sites/weblounge-test/modules/' + params.module, {
+				success: function(xml) {
+					success(Site.parseModule(xml));
+				}
+			});
+		},
+		
+		parseModules: function(xml) {
+			var modules = new Array();
+			$(xml).find('module').each(function(index) {
+				modules[index] = {};
+				modules[index].id = $(this).attr('id');
+				modules[index].enable =($(this).find('enable:first').text() == "true");
+				modules[index].name = $(this).find('name:first').text();
+			});
+			return modules;
+		},
+		
+		parseModule: function(xml) {
+			var pagelets = new Array();
+			$(xml).find('pagelet').each(function(index) {
+				pagelets[index] = {};
+				pagelets[index].id = $(this).attr('id');
+				pagelets[index].composeable = ($(this).attr('composeable') == "true");
+				
+				pagelets[index].renderer = new Array();
+				var renderer = pagelets[index].renderer;
+				$(this).find('renderer').each(function(index) {
+					renderer[index] = {};
+					renderer[index].type = $(this).attr('type');
+					renderer[index].value = $(this).text();
+				});
+				
+				pagelets[index].editor = $(this).find('editor:first').text();
+				pagelets[index].recheck = $(this).find('recheck:first').text();
+				pagelets[index].valid = $(this).find('valid:first').text();
+				pagelets[index].preview = $(this).find('preview:first').text();
+			});
+			return pagelets;
+		},
+		
 		parseXML: function(xml) {
 			var site = new Object();
 			site.id = $(xml).attr('id');
