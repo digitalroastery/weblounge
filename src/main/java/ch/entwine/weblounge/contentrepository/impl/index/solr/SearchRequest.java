@@ -132,6 +132,11 @@ public class SearchRequest {
     if (query.getType() != null) {
       and(solrQuery, TYPE, query.getType(), true, true);
     }
+    
+    // Without type
+    if (query.getWithoutType() != null) {
+      andNot(solrQuery, TYPE, query.getWithoutType(), true, true);
+    }
 
     // Subjects
     if (query.getSubjects().length > 0) {
@@ -404,6 +409,40 @@ public class SearchRequest {
       first = false;
     }
     buf.append(")");
+    return buf;
+  }
+  
+  /**
+   * Encodes field name and value as part of the AND clause of a solr query:
+   * <tt>AND -fieldName : fieldValue</tt>.
+   * 
+   * @param buf
+   *          the <code>StringBuilder</code> to append to
+   * @param fieldName
+   *          the field name
+   * @param fieldValue
+   *          the field value
+   * @param quote
+   *          <code>true</code> to put the field values in quotes
+   * @param clean
+   *          <code>true</code> to escape solr special characters in the field
+   *          value
+   * @return the encoded query part
+   */
+  private StringBuilder andNot(StringBuilder buf, String fieldName,
+      String fieldValue, boolean quote, boolean clean) {
+    if (buf.length() > 0)
+      buf.append(" AND -"); // notice the minus sign
+    buf.append(StringUtils.trim(fieldName));
+    buf.append(":");
+    if (quote)
+      buf.append("\"");
+    if (clean)
+      buf.append(StringUtils.trim(clean(fieldValue)));
+    else
+      buf.append(StringUtils.trim(fieldValue));
+    if (quote)
+      buf.append("\"");
     return buf;
   }
 
