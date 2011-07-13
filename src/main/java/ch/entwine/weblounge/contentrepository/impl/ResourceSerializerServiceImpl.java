@@ -140,13 +140,16 @@ public class ResourceSerializerServiceImpl implements ResourceSerializerService 
    * @see ch.entwine.weblounge.contentrepository.ResourceSerializerService#getSerializerByMimeType(java.lang.String)
    */
   public ResourceSerializer<?, ?> getSerializerByMimeType(String mimeType) {
+    ResourceSerializer<?, ?> serializerForMimeType = null;
     synchronized (serializers) {
       for (ResourceSerializer<?, ?> serializer : serializers.values()) {
-        if (serializer.supportsContent(mimeType))
-          return serializer;
+        if (serializer.supportsContent(mimeType)) {
+          serializerForMimeType = serializer;
+          break;
+        }
       }
     }
-    return null;
+    return serializerForMimeType;
   }
 
   /**
