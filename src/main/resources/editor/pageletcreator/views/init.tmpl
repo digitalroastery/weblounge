@@ -1,8 +1,17 @@
 <div id="module_tabs">
 	<ul>
+		<li><a id="favorites" href="#module_favorites">Favoriten</a></li>
 		{{each modules}}
-			<li><a id="${$value.id}">${$value.name}</a></li>
+			<li><a id="${$value.id}" href="#tabcontent">${$value.name}</a></li>
     	{{/each}}
 	</ul>
+	<div id="module_favorites">
+		<div class="draggable ui-widget-content">Item 1</div>
+		<div class="draggable ui-widget-content">Item 2</div>
+		<div class="draggable ui-widget-content">Item 3</div>
+		<div class="draggable ui-widget-content">Item 4</div>
+		<div class="draggable ui-widget-content">Item 5</div>
+		<div style="clear: both;"></div>
+	</div>
 	<div id="tabcontent"></div>
 </div>

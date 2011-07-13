@@ -12,3 +12,15 @@
     width: 100%;
     z-index: 99;
 }
+
+.tab_hover {
+	background: green !important;
+}
+
+.draggable {
+	width: 100px; 
+	height: 20px; 
+	padding: 0.5em; 
+	float: left;
+	margin: 10px 10px 10px 0; 
+}

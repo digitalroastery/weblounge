@@ -135,11 +135,11 @@ img.more {
 	visibility: hidden;
 }
 
-.delete_droppable_hover, #delete_droppable .delete_droppable_hover {
+.trashcan_hover {
 	background: url('images/trashcan_hover.png') no-repeat center !important;
 }
 
-.delete_droppable_active {
+.trashcan_active {
 	visibility: visible !important;
 }
 

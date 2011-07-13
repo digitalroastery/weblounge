@@ -14,8 +14,7 @@ steal.plugins(
 .views(
 	'//editor/menubar/views/menubar.tmpl')
 .css(
-	'menubar',
-	'css/blitzer/jquery-ui-1.8.11')
+	'menubar')
 .then(function($) {
 
     $.Controller("Editor.Menubar",
@@ -145,8 +144,8 @@ steal.plugins(
             
     		this.element.find("#trashcan").droppable({
     			accept: "div.pagelet",
-    			activeClass: "delete_droppable_active",
-    			hoverClass: "delete_droppable_hover",
+    			activeClass: "trashcan_active",
+    			hoverClass: "trashcan_hover",
     			tolerance: "pointer",
     			drop: $.proxy(function(event, ui) {
     				ui.draggable.remove();
