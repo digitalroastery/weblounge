@@ -45,7 +45,6 @@ steal.plugins('jquery',
 						$(this).dialog('close');
 					},
 					Upload: $.proxy(function() {
-						// If no element uploaded Upload button disable
 						this._openTagDialog();
 						this.element.dialog('destroy');
 						this.destroy();
@@ -68,7 +67,7 @@ steal.plugins('jquery',
 			    // pass the dom node (ex. $(selector)[0] for jQuery users)
 			    element: document.getElementById('file-uploader'),
 			    // TODO MIME-TYPE ANPASSEN
-			    params: {language: this.options.language, mimeType: 'image/png'},
+			    params: {language: this.options.language},
 				// validation    
 				// ex. ['jpg', 'jpeg', 'png', 'gif'] or []
 				allowedExtensions: [],        
@@ -121,7 +120,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _openTagDialog: function() {
-	    	$('<div></div>').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
+	    	$('div#tagger').editor_tagger({map: this.map, language: this.options.language, runtime: this.options.runtime});
 	    },
 	    
         _loadImage: function(url, id) {

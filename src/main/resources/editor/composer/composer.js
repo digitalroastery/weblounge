@@ -25,9 +25,14 @@ steal.plugins('jquery/controller','jqueryui/sortable')
       $(el).sortable({
         connectWith: this.options.connectWith,
         distance: 15,
+        placeholder: "pagelet-placeholder",
         items: 'div.pagelet',
+        tolerance: 'pointer',
+        cursor: 'move',
+        cursorAt: { top: -8, left: -10 },
         revert: true,
         update: $.proxy(function(event, ui) {
+        	if(ui.sender != null) return;
         	var page = this.options.page;
         	var composerId = this.id;
         	
@@ -35,10 +40,28 @@ steal.plugins('jquery/controller','jqueryui/sortable')
             	var oldIndex = $(elem).attr("index");
             	return page.getPagelet(composerId, oldIndex);
             });
+            if(ui.item.attr('class').indexOf("draggable") != -1) {
+            	var newPagelet = {};
+            	newPagelet.id = ui.item.attr('id');
+            	newPagelet.module = ui.item.attr('module')
+            	newComposer.splice(ui.item.index(), 0, newPagelet);
+        	}
             
             this.options.page.updateComposer(this.id, newComposer);
             this.update(this.options);
-		}, this)
+            
+            if(ui.item.attr('class').indexOf("draggable") != -1) {
+            	Workbench.findOne({ id: this.options.page.value.id, composer: this.id, pagelet: ui.item.index() }, $.proxy(function(pageletEditor) {
+            		var renderer = $(pageletEditor).find('renderer')[0].firstChild.nodeValue.trim();
+            		ui.item.after('<div class="pagelet editor_pagelet" index="' + ui.item.index() + '">');
+            		var newPagelet = ui.item.next().html(renderer);
+            		ui.item.remove();
+            		this.update(this.options);
+            		// TODO Simulate Click event for opening Dialog
+            		newPagelet.find('img.icon_editing').trigger('click');
+            	}, this));
+        	}
+		}, this),
       });
       
       $(el).find('div.pagelet').editor_pagelet({

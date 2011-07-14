@@ -72,6 +72,10 @@ steal.plugins('jquery',
 						this.element.dialog('close');
 					},this)
 				},
+				close: $.proxy(function () {
+					this.element.dialog('destroy');
+					this.destroy();
+				},this)
 			});
 	    },
 	    

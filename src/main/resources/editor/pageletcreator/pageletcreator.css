@@ -1,20 +1,33 @@
 .editor_pageletcreator {
     background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
     border: 1px solid #333333;
-    color: #FFFFFF;
-    height: 44px;
-    line-height: 44px;
+    height: 130px;
     position: fixed;
 	top: 45px;
 	bottom: 0;
 	left: 0;
-    text-align: left;
     width: 100%;
-    z-index: 99;
+    z-index: 1;
+}
+
+div#module_tabs {
+	height: 100%;
 }
 
 .tab_hover {
 	background: green !important;
+}
+
+a.tab_close {
+	background-image: url("../css/images/ui-icons_ffffff_256x240.png");
+	background-position: -96px -128px;
+	background-repeat: no-repeat;
+	height: 16px;
+    width: 16px;
+	position: absolute;
+	right: 15px;
+	top: 12px;
+	z-index: 1000;
 }
 
 .draggable {
@@ -22,5 +35,13 @@
 	height: 20px; 
 	padding: 0.5em; 
 	float: left;
+	margin: 10px 10px 10px 0; 
+}
+
+.draggable_helper {
+	width: 100px; 
+	height: 30px; 
+	padding: 0.5em; 
+	float: none;
 	margin: 10px 10px 10px 0; 
 }

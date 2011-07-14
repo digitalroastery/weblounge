@@ -54,6 +54,7 @@ steal.then('jsonix')
 			if ('id' in params) {
 				$.ajax({
 					url: '/system/weblounge/pages/' + params.id,
+					async: false,
 					type: 'put',
 					dataType: 'xml',
 					data: {content : Page.parseJSON(page)}

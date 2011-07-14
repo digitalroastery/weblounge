@@ -2,25 +2,27 @@
 	min-height: 50px;
 }
 
-.composer div.icon_editing {
-	width: 40px;
-	height: 40px;
-	text-align: center;
-	background-image: url('resources/icon_editing.png');
-}
-
 img.icon_editing {
-    cursor: pointer;
-    left: 50%;
-    margin-left: -40px;
-    position: relative;
-    top: -20px;
+	cursor: pointer;
+	display: inline-block;
+	position:absolute;
+  	top: 0;
+  	left: 0;
+	height: 39px;
+	width:44px;
+	z-index: 1000;
+	border: 1px solid black;
+	background-color: white;
 }
 
 .pagelet-placeholder {
-    border: 1px solid #FCEFA1;
+    border: 2px dashed black;
     color: #363636;
 	height: 1.5em; line-height: 1.2em;
+}
+
+div.pagelet {
+	position:relative;
 }
 
 div.pagelet-editor {

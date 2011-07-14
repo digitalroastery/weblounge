@@ -188,14 +188,14 @@ steal.plugins('jqueryui/dialog',
     },
 
 	'hoverenter': function(ev, hover) {
-      this.element.append('<div class="icon_editing"></div>');
+		this.element.append('<img class="icon_editing" src="/weblounge/editor/composer/resources/icon_editing.png" />');
     },
 
 	'hoverleave': function(ev, hover) {
-      this.element.find('div.icon_editing').remove();
+		this.element.find('img.icon_editing').remove();
     },
 
-	'div.icon_editing click': function(ev) {
+	'img.icon_editing click': function(ev) {
 		Workbench.findOne({ id: this.options.composer.page.value.id, composer: this.options.composer.id, pagelet: this.element.index() }, this.callback('_openPageEditor'));
 	}
 
