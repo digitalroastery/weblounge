@@ -51,6 +51,7 @@ import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -729,13 +730,13 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       logger.warn("Attempt to write to read-only content repository {}", site);
       throw new WebApplicationException(Status.PRECONDITION_FAILED);
     }
-    
+
     String fileName = null;
     Language language = null;
     String path = null;
     String mimeType = null;
     File uploadedFile = null;
-    
+
     try {
 
       // Multipart form encoding?
@@ -805,6 +806,10 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
           is = request.getInputStream();
           if (is == null)
             throw new WebApplicationException(Status.BAD_REQUEST);
+          if (StringUtils.isBlank(mimeType)) { // try guessing mime type
+            Tika tika = new Tika();
+            mimeType = tika.detect(is);
+          }
           uploadedFile = File.createTempFile("upload-", null);
           fos = new FileOutputStream(uploadedFile);
           IOUtils.copy(is, fos);
@@ -816,7 +821,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         }
 
       }
-      
+
       if (fileName == null && uploadedFile != null) {
         logger.warn("No filename found for upload, request header 'X-File-Name' not specified");
         fileName = uploadedFile.getName();
@@ -826,9 +831,9 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       if (language == null) {
         language = LanguageUtils.getPreferredLanguage(request, site);
       }
-  
+
       WritableContentRepository contentRepository = (WritableContentRepository) getContentRepository(site, true);
-  
+
       // Create the resource uri
       ResourceURI resourceURI = null;
       Resource<?> resource = null;
@@ -846,7 +851,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       User admin = site.getAdministrator();
       User creator = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       resource.setCreated(creator, new Date());
-      
+
       // If a path has been specified, set it
       if (path != null && StringUtils.isNotBlank(path)) {
         try {
@@ -854,7 +859,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
             path = "/" + path;
           WebUrl url = new WebUrlImpl(site, path);
           resourceURI.setPath(url.getPath());
-  
+
           // Make sure the resource doesn't exist
           if (contentRepository.exists(new ResourceURIImpl(null, site, url.getPath()))) {
             logger.warn("Tried to create already existing resource {} in site '{}'", resourceURI, site);
@@ -868,7 +873,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
       }
-    
+
       // Store the new resource
       try {
         uri = new URI(resourceURI.getIdentifier());
@@ -886,7 +891,7 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
         logger.warn("Error adding new resource {}: {}", resourceURI, e.getMessage());
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
-  
+
       ResourceContent content = null;
       ResourceContentReader<?> reader = null;
       InputStream is = null;
@@ -906,12 +911,12 @@ public class FilesEndpoint extends ContentRepositoryEndpoint {
       } finally {
         IOUtils.closeQuietly(is);
       }
-  
+
       // TODO: Replace with current user
       User user = new UserImpl(admin.getLogin(), site.getIdentifier(), admin.getName());
       content.setCreator(user);
       content.setFilename(fileName);
-  
+
       try {
         is = new FileInputStream(uploadedFile);
         resource = contentRepository.putContent(resource.getURI(), content, is);
