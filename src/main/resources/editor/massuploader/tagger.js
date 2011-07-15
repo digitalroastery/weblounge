@@ -28,6 +28,7 @@ steal.plugins('jquery',
 			this.index = 1;
 			
 			this.metadata = new Array();
+			this.file = new Array();
 			this._loadMetadata(this.img.index());
 			
 			if(this.options.map.length < 2) {
@@ -64,9 +65,7 @@ steal.plugins('jquery',
 					},
 					Fertig: $.proxy(function () {
 						$.each(this.metadata, $.proxy(function(key, value) {
-							var resourceId = this.options.map[key];
-							// SAVE Metadata REST Endpoint resourceid value
-							steal.dev.log('save metadata id: ' + resourceId + 'value: ' + value);
+							this.file[key].saveMetadata(value, this.options.language);
 				    	},this));
 						
 						this.element.dialog('close');
@@ -81,12 +80,18 @@ steal.plugins('jquery',
 	    
 	    _loadMetadata: function(index) {
 	    	if(this.metadata[index] == undefined) {
-				// Load Metadata from Server!
-	    		var resourceId = this.options.map[index];
-				steal.dev.log('load metadata for: ' + resourceId);
-				this.metadata[index] = {};
+	    		Editor.File.findOne({id: this.options.map[index]}, $.proxy(function(file) {
+//	    		Editor.File.findOne({id: '5bc19990-8f99-4873-a813-71b6dfac22ad'}, function(file) {
+	    			this.file[index] = file;
+	    			this.metadata[index] = file.getMetadata(this.options.language);
+	    			this._showMetadata(index);
+	    		}, this));
+			} else {
+				this._showMetadata(index);
 			}
-	    	
+	    },
+	    
+	    _showMetadata: function(index) {
 	    	// Clear input fields
 	    	this.element.find(':input').each(function() {
 	    		$(this).val('');

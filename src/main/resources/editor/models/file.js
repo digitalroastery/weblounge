@@ -52,7 +52,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/files/' + params.id + '/content/' + params.language,
 					type: 'put',
 					dataType: 'xml',
-					data: {content : File.parseJSON(file)}
+					data: {content : Editor.File.parseJSON(file)}
 				});
 			}	
 			if ('id' in params) {
@@ -60,7 +60,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/files/' + params.id,
 					type: 'put',
 					dataType: 'xml',
-					data: {content : File.parseJSON(file)}
+					data: {content : Editor.File.parseJSON(file)}
 				});
 			}	
 		},
@@ -76,7 +76,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/files/',
 					type: 'post',
 					dataType: 'xml',
-					data: {path : params.path, content : File.parseJSON(file)}
+					data: {path : params.path, content : Editor.File.parseJSON(file)}
 				});
 			}	
 		},
@@ -92,7 +92,7 @@ steal.then('jsonix')
 					url: '/system/weblounge/files/uploads',
 					type: 'post',
 					dataType: 'xml',
-					data: {path : params.path, mimeType: params.mimeType, languageid: params.languageid, content : File.parseJSON(file)}
+					data: {path : params.path, mimeType: params.mimeType, languageid: params.languageid, content : Editor.File.parseJSON(file)}
 				});
 			}	
 		},
@@ -135,6 +135,57 @@ steal.then('jsonix')
 	},
 	/* @Prototype */
 	{
+		
+		getMetadata: function(language) {
+			var metadata = new Object();
+			metadata.title = '';
+			metadata.description = '';
+			metadata.tags = [];
+			metadata.author = '';
+			
+			if($.isEmptyObject(this.value.head.metadata)) {
+				this.value.head.metadata = {};
+			}
+			if(!$.isEmptyObject(this.value.head.metadata.title) && this.value.head.metadata.title[language] != undefined) {
+				metadata.title = this.value.head.metadata.title[language];
+			}
+			if(!$.isEmptyObject(this.value.head.metadata.description) && this.value.head.metadata.description[language] != undefined) {
+				metadata.description = this.value.head.metadata.description[language];
+			}
+			if(!$.isEmptyObject(this.value.head.metadata.subject)) {
+				metadata.description = this.value.head.metadata.subject;
+			}
+			if(!$.isEmptyObject(this.value.head.created)) {
+				metadata.author = this.value.head.created.user.name;
+			}
+			return metadata;
+		},
+		
+		saveMetadata: function(metadata, language) {
+			if($.isEmptyObject(this.value.head.metadata)) {
+				this.value.head.metadata = {};
+			}
+			if($.isEmptyObject(this.value.head.metadata.title)) {
+				this.value.head.metadata.title = {};
+			}
+			if($.isEmptyObject(this.value.head.metadata.description)) {
+				this.value.head.metadata.description = {};
+			}
+			if($.isEmptyObject(this.value.head.metadata.subject)) {
+				this.value.head.metadata.subject = [];
+			}
+			
+			$.each(metadata.tags.split(','), function(key, value) { 
+				value.trim();
+			});
+			
+			this.value.head.metadata.title[language] = metadata.title;
+			this.value.head.metadata.description[language] = metadata.description;
+			this.value.head.metadata.subject = metadata.tags.split(',');
+			this.value.head.created.user.name = metadata.author;
+			Editor.File.update({id:this.value.id}, this);
+		}
+		
 	});
 
 });
