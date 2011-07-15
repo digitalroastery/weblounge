@@ -60,7 +60,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    update: function() {
-	    	$("body").css("margin-top","200px");
+	    	$("body").css("margin-top","185px");
 	    	this.element.show();
 	    },
 	    

@@ -2,6 +2,22 @@
 	min-height: 50px;
 }
 
+.empty {
+	position: relative;
+	border: 1px solid black;
+}
+
+a.add-pagelet {
+	cursor: pointer;
+	background: url("../menubar/images/menu_add.png") center center no-repeat ;
+	display: inline-block;
+	position: absolute;
+  	top: 25%;
+  	left: 50%;
+	width:24px;
+  	height:24px;
+}
+
 img.icon_editing {
 	cursor: pointer;
 	display: inline-block;

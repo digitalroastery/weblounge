@@ -30,7 +30,7 @@ steal.plugins('jqueryui/dialog',
     	this.options.composer = options.composer;
     },
     
-    _openPageEditor: function(pageletEditor) {
+    _openPageEditor: function(pageletEditor, isNew) {
     	// Parse Pagelet-Editor Data
     	this.pagelet = this.options.composer.page.getEditorPagelet(this.options.composer.id, this.element.index(), this.options.composer.language);
     	
@@ -74,7 +74,7 @@ steal.plugins('jqueryui/dialog',
 			resizable: true,
 			buttons: {
 				Abbrechen: function() {
-					$(this).editor_dialog('close');
+					$(this).dialog('close');
 				},
 				OK: $.proxy(function () {
 					this.editorDialog.find("form#validate").submit();
@@ -90,12 +90,18 @@ steal.plugins('jqueryui/dialog',
 					
 					// Render site
 					this.element.html(result);
-					this.editorDialog.editor_dialog('close');
+					this.editorDialog.dialog('destroy');
 				}, this)
 			},
-			close: function() {
-				$(this).dialog('destroy');
-			}
+			close: $.proxy(function () {
+				if(isNew == true) {
+					this.options.composer.page.deletePagelet(this.options.composer.id, this.element.index());
+					var composer = this.element.parent();
+					this.element.remove();
+					composer.editor_composer();
+				}
+				this.editorDialog.dialog('destroy');
+			}, this)
 		});
 		this.editorDialog.find("form#validate").validate();
     },
@@ -182,7 +188,15 @@ steal.plugins('jqueryui/dialog',
     	pagelet.locale.current.text = {};
     	pagelet.locale.current.language = language;
     	pagelet.locale.current.original = false;
-    	pagelet.locale.current.modified = pagelet.locale.original.modified;
+    	if($.isEmptyObject(pagelet.locale.original)) {
+    		pagelet.locale.current.original = true;
+    	}
+		pagelet.locale.current.modified = {};
+		pagelet.locale.current.modified.user = {};
+		pagelet.locale.current.modified.user.id = this.options.composer.runtime.getUserLogin();
+		pagelet.locale.current.modified.user.name = this.options.composer.runtime.getUserName();
+		pagelet.locale.current.modified.user.realm = this.options.composer.runtime.getId();
+		pagelet.locale.current.modified.date = new Date();
     	pagelet.locale.push(pagelet.locale.current);
 		return pagelet;
     },

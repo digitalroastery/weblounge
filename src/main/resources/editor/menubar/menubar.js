@@ -136,12 +136,6 @@ steal.plugins(
         },
         
         _initDragDrop: function() {
-//    		this.element.find("div#add-menu li.new_pagelet").draggable({
-////    			connectToSortable: ".composer",
-//    			helper: "clone",
-//    			revert: "invalid"
-//    		}).disableSelection();
-            
     		this.element.find("#trashcan").droppable({
     			accept: "div.pagelet",
     			activeClass: "trashcan_active",
