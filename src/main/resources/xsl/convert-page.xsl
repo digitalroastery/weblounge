@@ -4,7 +4,7 @@
 
   <xsl:param name="uuid" />
   <xsl:param name="path" />
-  
+
   <xsl:variable name="adminuserid">
     <xsl:text>admin</xsl:text>
   </xsl:variable>
@@ -30,8 +30,12 @@
     <head>
       <template>
         <xsl:choose>
-          <xsl:when test="string-length(renderer) = 0">default</xsl:when>
-          <xsl:otherwise><xsl:value-of select="renderer" /></xsl:otherwise>
+          <xsl:when test="string-length(renderer) = 0">
+            default
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="renderer" />
+          </xsl:otherwise>
         </xsl:choose>
       </template>
       <xsl:copy-of select="layout"></xsl:copy-of>
@@ -115,8 +119,16 @@
 
   <xsl:template match="pagelet">
     <pagelet>
-      <xsl:attribute name="module"><xsl:value-of select="@module" /></xsl:attribute>
-      <xsl:attribute name="id"><xsl:value-of select="@id" /></xsl:attribute>
+      <xsl:choose>
+        <xsl:when test="@module = 'navigation' and (@id = 'linkinternal' or @id = 'linkexternal')">
+          <xsl:attribute name="module">navigation</xsl:attribute>
+          <xsl:attribute name="id">link</xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="module"><xsl:value-of select="@module" /></xsl:attribute>
+          <xsl:attribute name="id"><xsl:value-of select="@id" /></xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
       <security>
         <owner>
           <xsl:call-template name="user">
@@ -151,28 +163,73 @@
       </published>
       <xsl:apply-templates select="./content" />
       <properties>
-        <xsl:if test="property[@id='partition'] and property[@id='path']">
-          <property id="pageid">
-            <xsl:value-of select="importer:getUUID(property[@id='partition'], property[@id='path'])" />
-          </property>
+        <!-- Special handling of some pagelets of the repository module -->
+        <xsl:if test="@module = 'navigation' and @id = 'linkinternal'">
+          <property id="typ">internal</property>
         </xsl:if>
-        <xsl:if test="properties/property[@id='partition'] and properties/property[@id='path']">
-          <property id="pageid">
-            <xsl:value-of select="importer:getUUID(properties/property[@id='partition'], properties/property[@id='path'])" />
-          </property>
+        <xsl:if test="@module = 'navigation' and @id = 'linkexternal'">
+          <property id="typ">external</property>
         </xsl:if>
-        <xsl:if test="not(property[@id='partition']) and property[@id='path']">
-          <property id="resourceid">
-            <xsl:value-of select="importer:getUUID(property[@id='path'])" />
-          </property>
-        </xsl:if>
-        <xsl:if test="not(properties/property[@id='partition']) and properties/property[@id='path']">
-          <property id="resourceid">
-            <xsl:value-of select="importer:getUUID(properties/property[@id='path'])" />
-          </property>
-        </xsl:if>
-        <xsl:apply-templates select="./properties/property" />
-        <xsl:apply-templates select="./property" />
+        <xsl:choose>
+          <xsl:when test="@module = 'text' and @id='address'">
+            <property id="name">
+              <xsl:value-of select="properties/property[@id='name']" />
+            </property>
+            <property id="company">
+              <xsl:value-of select="content[@original = 'true']/text[@id='company']" />
+            </property>
+            <property id="street">
+              <xsl:value-of select="content[@original = 'true']/text[@id='adress']" />
+            </property>
+            <property id="pob">
+              <xsl:value-of select="content[@original = 'true']/text[@id='pob']" />
+            </property>
+            <property id="zip">
+              <xsl:value-of select="properties/property[@id='zip']" />
+            </property>
+            <property id="city">
+              <xsl:value-of select="content[@original = 'true']/text[@id='city']" />
+            </property>
+            <property id="country">
+              <xsl:value-of select="properties/property[@id='country']" />
+            </property>
+            <property id="email">
+              <xsl:value-of select="properties/property[@id='email']" />
+            </property>
+            <property id="phone">
+              <xsl:value-of select="properties/property[@id='phone-area']" />
+              <xsl:value-of select="properties/property[@id='phone']" />
+            </property>
+            <property id="mobile">
+              <xsl:value-of select="properties/property[@id='mobile-area']" />
+              <xsl:value-of select="properties/property[@id='mobile']" />
+            </property>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="property[@id='partition'] and property[@id='path']">
+              <property id="pageid">
+                <xsl:value-of select="importer:getUUID(property[@id='partition'], property[@id='path'])" />
+              </property>
+            </xsl:if>
+            <xsl:if test="properties/property[@id='partition'] and properties/property[@id='path']">
+              <property id="pageid">
+                <xsl:value-of select="importer:getUUID(properties/property[@id='partition'], properties/property[@id='path'])" />
+              </property>
+            </xsl:if>
+            <xsl:if test="not(property[@id='partition']) and property[@id='path']">
+              <property id="resourceid">
+                <xsl:value-of select="importer:getUUID(property[@id='path'])" />
+              </property>
+            </xsl:if>
+            <xsl:if test="not(properties/property[@id='partition']) and properties/property[@id='path']">
+              <property id="resourceid">
+                <xsl:value-of select="importer:getUUID(properties/property[@id='path'])" />
+              </property>
+            </xsl:if>
+            <xsl:apply-templates select="./properties/property" />
+            <xsl:apply-templates select="./property" />
+          </xsl:otherwise>
+        </xsl:choose>
       </properties>
     </pagelet>
   </xsl:template>
