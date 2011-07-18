@@ -103,7 +103,7 @@
 				scriptTag += steal.loadErrorTimer(options);
 			}
 			scriptTag += '>' + (bodyText || '') + '</script>';
-			if ( steal.support.load && !browser.msie) {
+			if ( steal.support.load && !browser.msie ) {
 				scriptTag += '<script type="text/javascript"' + '>steal.end()</script>';
 			}
 			else { // this is here b/c IE will run a script above right away (before the script above it loads)
@@ -220,7 +220,7 @@
 	 *   - steal loads relative to the current file</li>
 	 *   - steal adds .js if not present</li>
 	 *   - steal is chainable (most function return steal)
-     * 
+	 * 
 	 * ### Building the app
 	 * 
 	 * Building the app means combining and compressing your apps JavaScript and CSS into a single file.
@@ -565,7 +565,7 @@
 				var urls = url.split('/'),
 					paths = this.path.split('/'),
 					path = paths[0];
-				
+
 				//if we are joining from a folder like cookbook/, remove the last empty part
 				if ( url.match(/\/$/) ) {
 					urls.pop();
@@ -574,11 +574,11 @@
 				while ( path == '..' && paths.length > 0 ) {
 					// if we've emptied out, folders, just break
 					// leaving any additional ../s
-					if(! urls.pop() ){ 
+					if (!urls.pop() ) {
 						break;
 					}
 					paths.shift();
-					
+
 					path = paths[0];
 				}
 				return urls.concat(paths).join('/');
@@ -762,7 +762,9 @@
 		//    
 		current_steals = [],
 		//steals that are pending to be steald
-		total = []; //
+		total = [],
+		//mapping of loaded css files
+		css = {};
 	extend(steal, {
 		/**
 		 * Sets options from script
@@ -770,9 +772,7 @@
 		 */
 		setScriptOptions: function() {
 			var scripts = document.getElementsByTagName("script"),
-				scriptOptions, 
-				commaSplit, 
-				stealReg = /steal\.(production\.)?js/;
+				scriptOptions, commaSplit, stealReg = /steal\.(production\.)?js/;
 
 			//find the steal script and setup initial paths.
 			for ( var i = 0; i < scripts.length; i++ ) {
@@ -860,8 +860,10 @@
 				steal.options.production = steal.options.production + (steal.options.production.indexOf('.js') == -1 ? '.js' : '');
 			}
 			//we only load things with force = true
-			if ( steal.options.env == 'production' && steal.options.loadProduction ) {
-				if ( steal.options.production ) {
+			if ( steal.options.env == 'production' ) {
+
+				// if we have a production script and we haven't been told not to load it
+				if ( steal.options.production && steal.options.loadProduction ) {
 					first = false; //makes it so we call close after
 					//steal(steal.options.startFile);
 					steal({
@@ -941,13 +943,13 @@
 				current_steals.unshift(newInclude); //add to the front
 				return;
 			}
-			var cur = steal.cur(), 
+			var cur = steal.cur(),
 				existing = steal.exists(newInclude);
 
-			
+
 			//if we have already performed loads, insert new steals in head
 			//now we should check if it has already been steald or added earlier in this file
-			if ( !existing ) {
+			if (!existing ) {
 				if ( cur ) {
 					cur.dependencies.push(newInclude);
 				}
@@ -964,7 +966,7 @@
 				}
 				//console.log("add FILE",newInclude.path)
 				current_steals.unshift(newInclude);
-			}else{
+			} else {
 				cur.dependencies.push(existing);
 			}
 		},
@@ -986,7 +988,7 @@
 			return;
 		},
 		done: function() {
-			if ( steal.options.evalAfter ){
+			if ( steal.options.evalAfter ) {
 				eval(steal.options.evalAfter);
 			}
 			if ( typeof steal.options.done == "function" ) {
@@ -999,7 +1001,7 @@
 			clearTimeout(steal.timer);
 			// add steals that were just added to the end of the list
 			steals = steals.concat(current_steals);
-			
+
 
 			// take the last one
 			var next = steals.pop();
@@ -1059,8 +1061,12 @@
 			}
 			var current;
 			for ( var i = 0; i < arguments.length; i++ ) {
-				current = File(arguments[i] + ".css").joinCurrent();
-				steal.createLink(steal.root.join(current));
+				current = steal.root.join(File(arguments[i] + ".css").joinCurrent());
+				if (!css[current] ) {
+					steal.createLink(current);
+					css[current] = true;
+				}
+
 			}
 			return this;
 		},
@@ -1172,6 +1178,10 @@
 				return steal;
 			};
 		},
+		/**
+		 * @function then
+		 * A chainable alias for [steal].
+		 */
 		then: steal,
 		total: total
 	});
@@ -1324,8 +1334,8 @@
 		timerCount: 0,
 		view: function( path ) {
 			var type = path.match(/\.\w+$/gi)[0].replace(".", "");
-			if( path.indexOf("//") !== 0 ){
-				path = "views/"+path;
+			if ( path.indexOf("//") !== 0 ) {
+				path = "views/" + path;
 			}
 			steal({
 				path: path,
