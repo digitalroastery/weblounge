@@ -4,6 +4,7 @@ steal.plugins(
 	'jquery/view',
 	'jquery/view/tmpl',
 	'editor/massuploader',
+	'editor/pagecreator',
 	'editor/pageletcreator',
 	'jqueryui/dialog',
 	'jqueryui/draggable',
@@ -76,25 +77,6 @@ steal.plugins(
         },
         
         _initDialogs: function() {
-			this.addDialog = $('<div></div>')
-			.load(this.options.runtime.getRootPath() + '/editor/menubar/views/add-dialog.html')
-			.dialog({
-				modal: true,
-				title: 'Seite hinzufügen',
-				autoOpen: false,
-				resizable: true,
-				buttons: {
-					Abbrechen: function() {
-						$(this).dialog('close');
-					},
-					OK: $.proxy(function () {
-						//TODO Add new Page
-//						this.element.trigger('addPages');
-						this.addDialog.dialog('close');
-					},this)
-				},
-			});
-			
 			this.userDialog = $('<div></div>')
 			.load(this.options.runtime.getRootPath() + '/editor/menubar/views/user-dialog.html')
 			.dialog({
@@ -185,7 +167,7 @@ steal.plugins(
 		
 		"li.new_page click": function(el, ev) {
 			$('.menu').hide();
-			this.addDialog.dialog('open');
+			$('#pagecreator').editor_pagecreator();
 		},
 		
 		"li.new_upload click": function(el, ev) {

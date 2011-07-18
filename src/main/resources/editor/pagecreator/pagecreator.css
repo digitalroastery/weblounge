@@ -1,0 +1,11 @@
+.editor_pagecreator {
+    background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
+    border: 1px solid #333333;
+    height: 130px;
+    position: fixed;
+	top: 45px;
+	bottom: 0;
+	left: 0;
+    width: 100%;
+    z-index: 1;
+}
