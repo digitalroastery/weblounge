@@ -37,7 +37,6 @@ steal.plugins('jquery',
 				title: 'Medien upload',
 				autoOpen: true,
 				resizable: true,
-				buttons: this.options.buttons,
 				width: 900,
 				height: 800,
 				buttons: {
@@ -82,7 +81,7 @@ steal.plugins('jquery',
 					this._updateUploadButton();
 			    }, this),
 			    // path to server-side upload script
-			    action: '/system/weblounge/files/uploads',
+			    action: '/system/weblounge/files/uploads'
 			});
 			
 			this.divScroll = this.element.find('div#makeMeScrollableImage').smoothDivScroll({

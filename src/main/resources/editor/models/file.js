@@ -11,17 +11,17 @@ steal.then('jsonix')
 		findOne: function(params, success, error) {
 			if ('path' in params) {
 				$.ajax('/system/weblounge/files?path=' + params.path, {
-					success: this.callback(['parseXML', 'wrap', success]),
+					success: this.callback(['parseXML', 'wrap', success])
 				});
 			} 
 			else if ('language' in params) {
 				$.ajax('/system/weblounge/files/' + params.id + '/content/' + params.language, {
-					success: this.callback(['parseXML', 'wrap', success]),
+					success: this.callback(['parseXML', 'wrap', success])
 				});
 			}
 			else if ('id' in params) {
 				$.ajax('/system/weblounge/files/' + params.id, {
-					success: this.callback(['parseXML', 'wrap', success]),
+					success: this.callback(['parseXML', 'wrap', success])
 				});
 			}
 		},
@@ -175,13 +175,14 @@ steal.then('jsonix')
 				this.value.head.metadata.subject = [];
 			}
 			
-			$.each(metadata.tags.split(','), function(key, value) { 
-				value.trim();
-			});
-			
 			this.value.head.metadata.title[language] = metadata.title;
 			this.value.head.metadata.description[language] = metadata.description;
-			this.value.head.metadata.subject = metadata.tags.split(',');
+			
+			// Filter out empty values
+			this.value.head.metadata.subject = metadata.tags.split(/,\s*/).filter(function(value) { 
+				return value != ''; 
+			});
+			
 			this.value.head.created.user.name = metadata.author;
 			Editor.File.update({id:this.value.id}, this);
 		}

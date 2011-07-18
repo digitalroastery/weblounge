@@ -93,7 +93,7 @@ steal.plugins(
 //						this.element.trigger('saveSettings');
 						this.userDialog.dialog('close');
 					},this)
-				},
+				}
 			});
 			
 			this.publishDialog = $('<div></div>')
@@ -112,7 +112,7 @@ steal.plugins(
 //						this.element.trigger('publishPage');
 						this.userDialog.dialog('close');
 					},this)
-				},
+				}
 			});
 			
         },
@@ -167,7 +167,7 @@ steal.plugins(
 		
 		"li.new_page click": function(el, ev) {
 			$('.menu').hide();
-			$('#pagecreator').editor_pagecreator();
+			$('#pagecreator').editor_pagecreator({language: this.options.language, runtime: this.options.runtime});
 		},
 		
 		"li.new_upload click": function(el, ev) {

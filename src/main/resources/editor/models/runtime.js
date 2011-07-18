@@ -7,7 +7,7 @@ steal.then('jsonix')
 		findOne: function(params, success, error) {
 			$.ajax('/system/weblounge/runtime/', {
 				async: false,
-				success: this.callback(['parseXML', 'wrap', success]),
+				success: this.callback(['parseXML', 'wrap', success])
 			});
 		},
 		

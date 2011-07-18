@@ -12,8 +12,8 @@ steal.plugins('jquery',
 	/* @static */
 	{
 		defaults: {
-			max_file_size: '10mb'
-	    }
+
+		}
   	},
   	/* @prototype */
   	{

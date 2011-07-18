@@ -5,7 +5,7 @@ steal.plugins('jqueryui/dialog',
 		'jqueryui/mouse')
 .models('../../models/workbench',
 		'../../models/pagelet')
-.resources('trimpath-template', 'jquery.validate.min')
+.resources('trimpath-template')
 .css('validation')
 .then('inputconverter')
 .then(function($) {
@@ -63,7 +63,6 @@ steal.plugins('jqueryui/dialog',
     	var resultDom = $('<div></div>').html(result);
     	this._convertInputs(resultDom, this.pagelet);
     	
-    	$.getScript(this.options.composer.runtime.getRootPath() + '/editor/composer/resources/localization/messages_' + this.options.composer.language + '.js');
 		this.editorDialog = $('#pageleteditor').html('<form id="validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.dialog({
 			title: 'Pagelet bearbeiten',

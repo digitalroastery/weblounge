@@ -29,7 +29,7 @@ steal.plugins('jquery/view/tmpl')
 				"bSort": true,
 				"bInfo": true,
 				"bAutoWidth": true,
-				"bJQueryUI": true,
+				"bJQueryUI": true
 			});
 		},
 		
@@ -88,7 +88,7 @@ steal.plugins('jquery/view/tmpl')
 			} else {
 				this._showMessage('Es wurde keine Seite markiert.');
 			}
-		},
+		}
 		
 	});
 

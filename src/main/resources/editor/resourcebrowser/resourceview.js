@@ -45,7 +45,7 @@ steal.plugins('jquery/controller',
 						this._showMessage('Seite(n) gelöscht!');
 						this.deleteDialog.dialog('close');
 					},this)
-				},
+				}
 			});
 
 			this.duplicateDialog = $('<div></div>')

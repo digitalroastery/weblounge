@@ -124,7 +124,7 @@ $.Class.extend('InputConverter',
 			if(!InputConverter.existsProperty(pagelet, element[1])) return;
 			propertyFuction();
 		}
-	},
+	}
 
 },
 /* @prototype */

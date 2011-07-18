@@ -11,12 +11,12 @@ steal.then('jsonix')
 		findOne: function(params, success, error) {
 			if ('path' in params) {
 				$.ajax('/system/weblounge/pages?details=true&path=' + params.path, {
-					success: this.callback(['parseXMLPage', 'wrap', success]),
+					success: this.callback(['parseXMLPage', 'wrap', success])
 				});
 			} 
 			else if ('id' in params) {
 				$.ajax('/system/weblounge/pages/' + params.id, {
-					success: this.callback(['parseXMLPage','wrap', success]),
+					success: this.callback(['parseXMLPage','wrap', success])
 				});
 			}
 		},

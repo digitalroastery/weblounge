@@ -2,7 +2,8 @@ steal.plugins(
 	'jquery/controller/view',
 	'jquery/view/tmpl')
 .views('//editor/resourcebrowser/views/init.tmpl')
-.css('resourcebrowser')
+.resources('jquery.treeview')
+.css('resourcebrowser', 'resources/jquery.treeview')
 .then('resourcescrollview', 'resourcelistview', 'resourcesearch')
 .then(function($) {
 

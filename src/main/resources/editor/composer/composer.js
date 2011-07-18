@@ -68,7 +68,7 @@ steal.plugins('jquery/controller','jqueryui/sortable')
             		newPagelet.editor_pagelet('_openPageEditor', pageletEditor, true);
             	}, this));
         	}
-		}, this),
+		}, this)
       });
       
       if(this.element.hasClass('empty')) {

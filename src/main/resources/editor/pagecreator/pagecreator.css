@@ -1,11 +1,40 @@
 .editor_pagecreator {
-    background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
-    border: 1px solid #333333;
-    height: 130px;
-    position: fixed;
-	top: 45px;
-	bottom: 0;
-	left: 0;
+
+}
+
+#makeMeScrollablePageCreator {
+    height: 330px;
+    padding-bottom: 20px;
+    position: relative;
     width: 100%;
-    z-index: 1;
+}
+
+#pagecreator_step1 {
+	position: relative;
+}
+
+#pagecreator_step1 input[type="text"], #pagecreator_step2 input[type="text"] {
+    width: 200px;
+}
+
+.top_right {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.filetree span.file {
+	cursor: pointer;
+}
+
+.active img {
+	opacity: 0.3;
+}
+
+.active {
+	color: #CCCCCC !important;
+}
+
+#pagecreator_step2 {
+
 }

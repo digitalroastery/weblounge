@@ -25,6 +25,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 			
 			Runtime.findOne({}, this.callback('_loadRuntime'));
 			this._loadCurrentLanguage();
+			this._loadValidateLanguage();
 			
 			this.menuBar = this.find('#menubar').editor_menubar({runtime: this.runtime, language: this.options.language});
             this.pagesTab = this.find('#pagebrowser');
@@ -47,6 +48,10 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         		this.options.language = language;
         	}
         	localStorage['weblounge.editor.' + this.runtime.getId() + '.language'] = this.options.language;
+        },
+        
+        _loadValidateLanguage: function() {
+        	$.getScript(this.runtime.getRootPath() + '/editor/resources/localization/messages_' + this.options.language + '.js');
         },
         
         _supportsLocaleStorage: function() {
