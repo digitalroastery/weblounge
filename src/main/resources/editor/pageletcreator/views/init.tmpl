@@ -6,6 +6,10 @@
     	{{/each}}
 	</ul>
 	<a class="tab_close" href="#" role="button"></a>
-	<div id="module_favorites"></div>
+	<div id="module_favorites">
+	{{each favorites}}
+		<div id="${$value.name}" class="draggable ui-widget-content" module="${$value.module}" style="display: block;">${$value.name}</div>
+	{{/each}}
+	</div>
 	<div id="tabcontent"></div>
 </div>

@@ -1,7 +1,8 @@
 steal.plugins('jquery',
 		'jquery/controller/view',
 		'jquery/view',
-		'jquery/view/tmpl')
+		'jquery/view/tmpl',
+		'jqueryui/widget')
 .views('//editor/pagecreator/views/init.tmpl')
 .css('pagecreator')
 .models()
@@ -24,11 +25,9 @@ steal.plugins('jquery',
 		},
 		
 		_initViews: function(pages) {
-			// TODO Load Layouts
-			var options = ['one', 'two', 'three'];
 			var pageData = new Object();
 			
-			this.element.html('//editor/pagecreator/views/init.tmpl', {pages: pages, options: options, language: this.options.language});
+			this.element.html('//editor/pagecreator/views/init.tmpl', {pages: pages, options: this.options.runtime.getSiteLayouts(), language: this.options.language});
 			
 			this.scrollView = this.find('div.thumbnailView').show();
 			this.listView = this.find('div.listView').hide();
@@ -60,7 +59,7 @@ steal.plugins('jquery',
 				"bJQueryUI": true
 			});
 			
-			this.element.find('#makeMeScrollablePageCreator').smoothDivScroll({
+			var divScroll = this.element.find('#makeMeScrollablePageCreator').smoothDivScroll({
 			  	autoScroll: "onstart" ,
 				autoScrollDirection: "backandforth", 
 				autoScrollStep: 1, 
@@ -97,10 +96,11 @@ steal.plugins('jquery',
 			});
 			
 			this.element.dialog({
-				modal: true,
+				modal: false,
 				title: 'Neue Seite anlegen',
 				autoOpen: true,
 				resizable: true,
+				draggable: true,
 				width: 1024,
 				height: 800,
 				buttons: {
@@ -142,7 +142,7 @@ steal.plugins('jquery',
 					}, this)
 				},
 				close: $.proxy(function () {
-//					this.divScroll.smoothDivScroll('destroy');
+					divScroll.smoothDivScroll('destroy');
 					this.element.dialog('destroy');
 					this.destroy();
 				},this)

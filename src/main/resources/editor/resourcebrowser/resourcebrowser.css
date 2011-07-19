@@ -286,26 +286,35 @@ div.resourceSearch {
 	text-align: center;
 }
 
-div.dropBox {
-	border: 2px dashed #DDDDDD;
+div#media-file-uploader {
+	position: relative;
 	float: left;
-    height: 300px;
-    margin-bottom: 2em;
+    height: 400px;
+    width: 324px;
     margin: 0 auto;
-    margin-top: 10%;
-    min-height: 70px;
-    padding: 10px;
-    text-align: center;
-    width: 300px;
-    z-index: 2;
+    margin-top: 5%;
 }
 
-div.dropBox span {
-    font-size: 16px;
-    position: relative;
-    top: 50%;
-    width: 100%;
-    margin-top:-8px;
+#tag_button {
+	cursor: pointer;
+	position: absolute;
+	top: 0;
+	right: 0;
+	background-color: #FF9900;
+    border: 1px solid #333333;
+    color: #000000;
+    display: block;
+    font-size: 14px;
+    text-align: center;
+    width: 105px;
+    padding: 6px;
+}
+
+#tag_button:hover {
+    background: none repeat scroll 0 0 #CC0000;
+}
+#tag_button:focus {
+    outline: 1px dotted black;
 }
 
 #resourceSearch {

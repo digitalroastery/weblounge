@@ -18,7 +18,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
 	{
 		
 		init: function(el) {
-			if (!this._supportsLocaleStorage()) {
+			if (!this._supportsLocalStorage()) {
 				alert('Your browser does not support HTML5! Update your browser to the latest version.');
 				return false;
 			}
@@ -54,7 +54,7 @@ steal.plugins('jquery/controller', 'editor/menubar', 'editor/resourcebrowser', '
         	$.getScript(this.runtime.getRootPath() + '/editor/resources/localization/messages_' + this.options.language + '.js');
         },
         
-        _supportsLocaleStorage: function() {
+        _supportsLocalStorage: function() {
         	try {
         		return 'localStorage' in window && window['localStorage'] !== null;
         	} catch (e) {

@@ -5,14 +5,13 @@ steal.then('jsonix')
 	/* @Static */
 	{
 		findOne: function(params, success, error) {
-			$.ajax('/system/weblounge/sites/weblounge-test', {
-				async: false,
+			$.ajax('/system/weblounge/sites/' + params.id, {
 				success: this.callback(['parseXML', 'wrap', success])
 			});
 		},
 		
 		getModules: function(params, success, error) {
-			$.ajax('/system/weblounge/sites/weblounge-test/modules', {
+			$.ajax('/system/weblounge/sites/' + params.id + '/modules', {
 				success: function(xml) {
 					success(Site.parseModules(xml));
 				}
@@ -20,7 +19,7 @@ steal.then('jsonix')
 		},
 		
 		getModule: function(params, success, error) {
-			$.ajax('/system/weblounge/sites/weblounge-test/modules/' + params.module, {
+			$.ajax('/system/weblounge/sites/' + params.id + '/modules/' + params.module, {
 				success: function(xml) {
 					success(Site.parseModule(xml));
 				}

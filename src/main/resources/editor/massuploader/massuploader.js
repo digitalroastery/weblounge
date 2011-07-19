@@ -2,6 +2,7 @@ steal.plugins('jquery',
 		'jquery/controller/view',
 		'jquery/view',
 		'jquery/view/tmpl',
+		'jqueryui/widget',
 		'jqueryui/dialog',
 		'jqueryui/draggable',
 		'jqueryui/resizable',
@@ -65,7 +66,6 @@ steal.plugins('jquery',
 			var uploader = new qq.FileUploader({
 			    // pass the dom node (ex. $(selector)[0] for jQuery users)
 			    element: document.getElementById('file-uploader'),
-			    // TODO MIME-TYPE ANPASSEN
 			    params: {language: this.options.language},
 				// validation    
 				// ex. ['jpg', 'jpeg', 'png', 'gif'] or []
@@ -76,6 +76,7 @@ steal.plugins('jquery',
 				minSizeLimit: 0, // min size
 				onCancel: this._cancel,
 				onComplete: $.proxy(function(id, fileName, response) {
+					if($.isEmptyObject(response)) return;
 					this.map[id] = response.url.substring(response.url.lastIndexOf('/') + 1);
 					this._loadImage(response.url + '/content/' + this.options.language, id);
 					this._updateUploadButton();
@@ -102,6 +103,7 @@ steal.plugins('jquery',
 	    },
 	    
 	    _cancel: function(id, fileName) {
+	    	// TODO ???
 	    	steal.dev.log(id + fileName);
 	    },
 	    

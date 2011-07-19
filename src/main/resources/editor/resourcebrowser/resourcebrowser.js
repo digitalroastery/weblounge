@@ -29,7 +29,11 @@ steal.plugins(
 		},
 		
 		_initViewItems: function() {
-			this.searchBox = this.find('div.searchBox').editor_resourcesearch({resourceType: this.options.resourceType});
+			this.searchBox = this.find('div.searchBox').editor_resourcesearch({
+				resourceType: this.options.resourceType, 
+				language: this.options.language, 
+				runtime: this.options.runtime
+			});
 			this.scrollView = this.find('div.thumbnailView');
 			this.listView = this.find('div.listView');
 			this.activeElement = this.scrollView;

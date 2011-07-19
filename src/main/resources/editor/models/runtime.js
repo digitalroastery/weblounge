@@ -21,8 +21,8 @@ steal.then('jsonix')
 			runtime.site = new Object();
 			$(xml).find('site').each(function(index) {
 				runtime.site.id = $(this).find('id:first').text();
-				runtime.site.languages = [];
 				
+				runtime.site.languages = [];
 				$(this).find('language').each(function(index) {
 					runtime.site.languages[index] = {};
 					runtime.site.languages[index].language = $(this).text();
@@ -34,6 +34,13 @@ steal.then('jsonix')
 					runtime.site.domains[index] = {};
 					runtime.site.domains[index].url = $(this).text();
 					runtime.site.domains[index]._default = ($(this).attr('default') == "true");
+				});
+				
+				runtime.site.templates = [];
+				$(this).find('template').each(function(index) {
+					runtime.site.templates[index] = {};
+					runtime.site.templates[index].id = $(this).attr('id');
+					runtime.site.templates[index].composeable = ($(this).attr('composeable') == "true");
 				});
 			});
 			return runtime;
@@ -65,6 +72,22 @@ steal.then('jsonix')
 	    getRootPath: function() {
 	    	return this.path;
 	    },
+	    
+	    getSiteLayouts: function() {
+	    	var layouts = new Array();
+	    	$.each(this.site.templates, function(index, template){
+    		  if(template.composeable) layouts.push(template.id);
+    		});
+	    	return layouts;
+	    },
+	    
+		getSiteModules: function(success) {
+			Site.getModules({id: this.getId()}, success);
+		},
+		
+		getModulePagelets: function(module, success) {
+			Site.getModule({id: this.getId(), module: module}, success);
+		},
 	    
 	    getDefaultLanguage: function() {
 	    	var language; 
