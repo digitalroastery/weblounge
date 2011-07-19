@@ -201,6 +201,11 @@ public class PagesEndpoint extends ContentRepositoryEndpoint {
     // Check the parameters
     if (pageId == null)
       return Response.status(Status.BAD_REQUEST).build();
+    
+    // Resolve name clash
+    if ("docs".equals(pageId)) {
+      return Response.ok(getDocumentation(request)).type(MediaType.TEXT_HTML).build();
+    }
 
     // Load the page
     Page page = (Page) loadResource(request, pageId, Page.TYPE);
