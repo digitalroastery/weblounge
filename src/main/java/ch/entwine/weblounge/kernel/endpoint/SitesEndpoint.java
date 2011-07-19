@@ -181,9 +181,8 @@ public class SitesEndpoint {
 
     // Load the site
     Site site = sites.findSiteByIdentifier(siteId);
-    if (site == null) {
+    if (site == null)
       throw new WebApplicationException(Status.NOT_FOUND);
-    }
 
     StringBuffer buf = new StringBuffer();
     buf.append("<modules>");
