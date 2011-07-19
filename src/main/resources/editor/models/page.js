@@ -46,6 +46,18 @@ steal.then('jsonix')
 		},
 		
 		/**
+		 * Get pages searched by string
+		 */
+		findBySearch: function(params, success, error) {
+			$.ajax('/system/weblounge/pages/?searchterms=' + params.search + '&sort=modified-desc&limit=8&offset=0', {
+				success: function(xml) {
+					var json = Page.parseXML(xml);
+					success(json.value.page);
+				}
+			});
+		},
+		
+		/**
 		 * Updates the specified page.
 		 * @param {Object} params The page identifier
 		 * @param {Page} page The page object
@@ -208,7 +220,32 @@ steal.then('jsonix')
 	    	delete pagelet.locale.original;
 	    	this.value.body.composers[this.getComposerIndex(composerId)].pagelets[index] = pagelet;
 	    	Page.update({id:this.value.id}, this);
-	    }
+	    },
+	    
+		saveMetadata: function(metadata, language) {
+			if($.isEmptyObject(this.value.head.metadata)) {
+				this.value.head.metadata = {};
+			}
+			if($.isEmptyObject(this.value.head.metadata.title)) {
+				this.value.head.metadata.description = {};
+			}
+			if($.isEmptyObject(this.value.head.metadata.description)) {
+				this.value.head.metadata.description = {};
+			}
+			if($.isEmptyObject(this.value.head.metadata.subject)) {
+				this.value.head.metadata.subject = [];
+			}
+			
+			this.value.head.metadata.title[language] = metadata.title;
+			this.value.head.metadata.description[language] = metadata.description;
+			
+			// Filter out empty values
+			this.value.head.metadata.subject = metadata.tags.split(/,\s*/).filter(function(value) { 
+				return value != ''; 
+			});
+			
+			Page.update({id:this.value.id}, this);
+		}
 	    
 	});
 

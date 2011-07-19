@@ -21,7 +21,13 @@ steal.then('jsonix')
 		getModule: function(params, success, error) {
 			$.ajax('/system/weblounge/sites/' + params.id + '/modules/' + params.module, {
 				success: function(xml) {
-					success(Site.parseModule(xml));
+					var pagelets = Site.parseModule(xml);
+					if(params.composeable == true) {
+						pagelets = $.grep(pagelets, function(pagelet, index){
+							return pagelet.composeable;
+						});
+					}
+					success(pagelets);
 				}
 			});
 		},

@@ -133,10 +133,11 @@ steal.plugins('jquery',
 							return value != ''; 
 						});
 						
-						// SAVE Page
-						steal.dev.log(pageData);
+						// TODO Create Page
+//						Page.create({path: pageData.url}, $.proxy(function(page) {
+//							page.saveMetadata(pageData, this.options.language)
+//						}, this));
 						
-//						this._openTagDialog();
 						this.element.dialog('destroy');
 						this.destroy();
 					}, this)

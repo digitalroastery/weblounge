@@ -86,7 +86,7 @@ steal.then('jsonix')
 		},
 		
 		getModulePagelets: function(module, success) {
-			Site.getModule({id: this.getId(), module: module}, success);
+			Site.getModule({id: this.getId(), module: module, composeable: true}, success);
 		},
 	    
 	    getDefaultLanguage: function() {

@@ -38,17 +38,17 @@ steal.plugins('jquery/view/tmpl', 'jquery/event/key')
 				});
 			}
 			
-			$("input#resourceSearch").keypress(function(ev){
+			$("input#resourceSearch").keypress($.proxy(function(ev) {
 				if(ev.key() == '\r') {
 					ev.preventDefault();
 					if(this.options.resourceType == 'pages') {
-						$(this).trigger('searchPages', $(this).val());
+						$(ev.target).trigger('searchPages', ev.target.value);
 					}
 					else if(this.options.resourceType == 'media') {
-						$(this).trigger('searchMedia', $(this).val());
+						$(ev.target).trigger('searchMedia', ev.target.value);
 					}
 				}
-			});
+			}, this));
 		},
 		
 	    _cancel: function(id, fileName) {

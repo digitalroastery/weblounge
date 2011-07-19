@@ -30,7 +30,7 @@ steal.plugins(
 		
 		_initViewItems: function() {
 			this.searchBox = this.find('div.searchBox').editor_resourcesearch({
-				resourceType: this.options.resourceType, 
+				resourceType: this.options.resourceType,
 				language: this.options.language, 
 				runtime: this.options.runtime
 			});
@@ -81,12 +81,18 @@ steal.plugins(
         	el.show();
         },
         
-		"input searchMedia": function(el, ev, serachValue) {
-			steal.dev.log(serachValue);
+		"input searchMedia": function(el, ev, searchValue) {
+			Page.findBySearch({search: searchValue}, $.proxy(function(pages) {
+				this.options.resources = pages;
+				this.update();
+			}, this));
 		},
 		
-		"input searchPages": function(el, ev, serachValue) {
-			steal.dev.log(serachValue);
+		"input searchPages": function(el, ev, searchValue) {
+			Page.findBySearch({search: searchValue}, $.proxy(function(pages) {
+				this.options.resources = pages;
+				this.update();
+			}, this));
 		},
 		
 		"button.list click": function(el, ev) {
