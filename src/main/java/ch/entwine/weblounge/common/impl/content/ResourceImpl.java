@@ -981,6 +981,8 @@ public abstract class ResourceImpl<T extends ResourceContent> extends Localizabl
       b.append("<body>");
       b.append(body);
       b.append("</body>");
+    } else {
+      b.append("<body/>");
     }
 
     b.append("</").append(rootTag).append(">");
