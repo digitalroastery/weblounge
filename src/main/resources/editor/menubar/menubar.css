@@ -1,4 +1,5 @@
 .editor_menubar {
+	background-color: #242F37;
     background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
     border: 1px solid #333333;
     color: #FFFFFF;
@@ -46,14 +47,14 @@
 }
 
 .triangle-down {
-	border-color: #fff transparent transparent transparent;
-	border-style: solid;
-	border-width: 5px;
-	height: 0px;
-	width: 0px;
 	position: relative;
 	top: 10px;
 	margin: 0 5px;
+	border-color: #fff transparent transparent transparent;
+	border-style: solid;
+	border-width: 5px;
+	height: 2px;
+	width: 10px;
 }
 
 .triangle-up {
@@ -96,6 +97,7 @@ img.more {
 /* menu */
 .menu {
 	display: none;
+	background-color: #242F37;
 	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
     border: 1px solid #FFFFFF;
     -moz-border-radius: 5px;
@@ -123,7 +125,13 @@ img.more {
 #add-menu {
 	position: absolute;
 	top: 55px;
-    left: 240px;
+    left: 220px;
+}
+
+#more-menu {
+	position: absolute;
+	top: 55px;
+    left: 310px;
 }
 
 #trashcan {
@@ -170,6 +178,7 @@ div#search-result {
 	width: 500px;
 	height: 400px;
 	border: 1px solid #666;
+	background-color: #242F37;
 	background-image: -moz-linear-gradient(0% 0 90deg, #4D585E, #242F37);
 	position: absolute;
 	right: 150px;
