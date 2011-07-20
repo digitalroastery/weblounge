@@ -67,7 +67,16 @@ steal.plugins('jquery',
 				}
 			});
 			
-			this.element.find('#module_favorites .draggable').draggable({
+			this._updateDraggable();
+	    },
+	    
+	    update: function() {
+	    	$("body").css("margin-top","185px");
+	    	this.element.show();
+	    },
+	    
+	    _updateDraggable: function() {
+			this.element.find('.draggable').draggable({
 				connectToSortable: ".composer",
 				helper: "clone",
 				revert: "invalid",
@@ -80,29 +89,14 @@ steal.plugins('jquery',
 			}).disableSelection();
 	    },
 	    
-	    update: function() {
-	    	$("body").css("margin-top","185px");
-	    	this.element.show();
-	    },
-	    
 	    _loadContent: function(module) {
-	    	var pagelets = this.options.runtime.getModulePagelets(module, function(pagelets) {
+	    	this.options.runtime.getModulePagelets(module, $.proxy(function(pagelets) {
 	    		var tabContent = $("#tabcontent").empty();
 	    		$.each(pagelets, function(key, pagelet) {
 	    			tabContent.append('<div id="' + pagelet.id + '" class="draggable ui-widget-content" module="' + module + '">' + pagelet.id + '</div>');
 	    		});
-	    		tabContent.find('.draggable').draggable({
-	    			connectToSortable: ".composer",
-	    			helper: "clone",
-	    			revert: "invalid",
-	    			cursor: 'move',
-	    			cursorAt: { top: -8, left: -10 },
-	    			start: function(e, ui) {
-	    				$(ui.helper).removeClass('draggable');
-	    				$(ui.helper).addClass('draggable_helper');
-	    			}
-	    		}).disableSelection();
-	    	});
+	    		this._updateDraggable();
+	    	}, this));
 	    },
 	    
 	    "li a click": function(el, ev) {

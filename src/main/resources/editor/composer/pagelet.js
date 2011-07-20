@@ -32,10 +32,14 @@ steal.plugins('jqueryui/dialog',
     
     _openPageEditor: function(pageletEditor, isNew) {
     	// Parse Pagelet-Editor Data
-    	this.pagelet = this.options.composer.page.getEditorPagelet(this.options.composer.id, this.element.index(), this.options.composer.language);
+    	var pagelet = this.options.composer.page.getEditorPagelet(this.options.composer.id, this.element.index(), this.options.composer.language);
+    	var renderer = $(pageletEditor).find('renderer:first').text().trim();
+    	var editor = $(pageletEditor).find('editor:first');
     	
-    	this.renderer = $(pageletEditor).find('renderer')[0].firstChild.nodeValue.trim();
-    	var editor = $(pageletEditor).find('editor')[0].firstChild.nodeValue;
+    	if(!editor.length) {
+    		this.element.html(this._processTemplate(renderer, pagelet));
+    		return;
+    	}
     	
     	// Load Pagelet CSS
     	$(pageletEditor).find('link').each(function(index) {
@@ -56,12 +60,11 @@ steal.plugins('jqueryui/dialog',
     	});
     	
     	// Process Editor Template
-    	var templateObject = TrimPath.parseTemplate(editor);
-    	var result  = templateObject.process(this.pagelet);
+    	var result  = this._processTemplate(editor.text(), pagelet);
     	
     	// Hack to create new Dom element
     	var resultDom = $('<div></div>').html(result);
-    	this._convertInputs(resultDom, this.pagelet);
+    	this._convertInputs(resultDom, pagelet);
     	
 		this.editorDialog = $('#pageleteditor').html('<form id="validate" onsubmit="return false;">' + resultDom.html() + '</form>')
 		.dialog({
@@ -78,17 +81,14 @@ steal.plugins('jqueryui/dialog',
 				OK: $.proxy(function () {
 					this.editorDialog.find("form#validate").submit();
 					if(!this.editorDialog.find("form#validate").valid()) return;
-					var newPagelet = this._getNewEditorPagelet();
+					var newPagelet = this._updatePageletValues(pagelet);
 					
-					// Process Renderer Template
-					var templateObject = TrimPath.parseTemplate(this.renderer);
-					var result  = templateObject.process(newPagelet);
+					// Render site
+					this.element.html(this._processTemplate(renderer, newPagelet));
 					
 					// Save New Pagelet
 			    	this.options.composer.page.insertPagelet(newPagelet, this.options.composer.id, this.element.index());
-					
-					// Render site
-					this.element.html(result);
+			    	
 					this.editorDialog.dialog('destroy');
 				}, this)
 			},
@@ -105,7 +105,17 @@ steal.plugins('jqueryui/dialog',
 		this.editorDialog.find("form#validate").validate();
     },
     
-    // Converts Editor Input Fields with Trimpath syntax
+    /**
+     * Process a TrimPath template
+     */
+    _processTemplate: function(template, data) {
+		var templateObject = TrimPath.parseTemplate(template);
+		return templateObject.process(data);
+    },
+    
+    /**
+     * Converts editor input fields with Trimpath syntax
+     */
     _convertInputs: function(editor, pagelet) {
     	$(editor).find(':input').each(function(index) {
     		var element = $(this).attr('name').split(':')
@@ -128,13 +138,14 @@ steal.plugins('jqueryui/dialog',
     	});
     },
     
-    _getNewEditorPagelet: function() {
-		// Get new values and set current to current or original
+    /**
+     * Update the pagelet values from the dialog inputs and set the "current"
+     */
+    _updatePageletValues: function(pagelet) {
 		var allInputs = this.editorDialog.find(':input');
-		var newPagelet = this.pagelet;
 		
-		if(newPagelet.locale.current == undefined) {
-			newPagelet = this._createNewLocale(newPagelet, this.options.composer.language);
+		if(pagelet.locale.current == undefined) {
+			pagelet = this._createNewLocale(pagelet, this.options.composer.language);
 		}
 		
 		$.each(allInputs, function(i, input) {
@@ -146,42 +157,45 @@ steal.plugins('jqueryui/dialog',
     			});
     			if($.isEmptyObject(optionArray)) return;
     			if(element[0] == 'property') {
-    				newPagelet.properties.property[element[1]] = optionArray.toString();
+    				pagelet.properties.property[element[1]] = optionArray.toString();
     			} 
     			else if(element[0] == 'element') {
-    				newPagelet.locale.current.text[element[1]] = optionArray.toString();
+    				pagelet.locale.current.text[element[1]] = optionArray.toString();
     			}
     		}
     		else if(input.type == 'checkbox') {
     			if(element[0] == 'property') {
-					newPagelet.properties.property[element[1]] = input.checked ? "true" : "false";
+					pagelet.properties.property[element[1]] = input.checked ? "true" : "false";
     			} 
     			else if(element[0] == 'element') {
-					newPagelet.locale.current.text[element[1]] = input.checked ? "true" : "false";
+					pagelet.locale.current.text[element[1]] = input.checked ? "true" : "false";
     			}
     		}
     		else if(input.type == 'radio') {
     			if(input.checked == false) return;
     			if(element[0] == 'property') {
-    				newPagelet.properties.property[element[1]] = input.value;
+    				pagelet.properties.property[element[1]] = input.value;
     			} 
     			else if(element[0] == 'element') {
-    				newPagelet.locale.current.text[element[1]] = input.value;
+    				pagelet.locale.current.text[element[1]] = input.value;
     			}
     		}
     		else {
     			if(input.value == '') return;
     			if(element[0] == 'property') {
-    				newPagelet.properties.property[element[1]] = input.value;
+    				pagelet.properties.property[element[1]] = input.value;
     			} 
     			else if(element[0] == 'element') {
-    				newPagelet.locale.current.text[element[1]] = input.value;
+    				pagelet.locale.current.text[element[1]] = input.value;
     			}
     		}
 		});
-		return newPagelet;
+		return pagelet;
     },
     
+    /**
+     * Create a new locale
+     */
     _createNewLocale: function(pagelet, language) {
     	pagelet.locale.current = {};
     	pagelet.locale.current.text = {};

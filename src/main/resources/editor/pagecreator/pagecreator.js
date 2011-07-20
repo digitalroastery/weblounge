@@ -37,6 +37,8 @@ steal.plugins('jquery',
 			var step1 = this.element.find('div#pagecreator_step1').show();
 			var step2 = this.element.find('div#pagecreator_step2').hide();
 			
+			
+			// Buttons
 			this.element.find('button.list').button({
 				icons: {primary: "icon-list"},
 				text: false });
@@ -49,6 +51,7 @@ steal.plugins('jquery',
 				icons: {primary: "icon-thumbnails"},
 				text: false });
 			
+			// TableView
 			this.element.find('table').dataTable({
 				"bPaginate": true,
 				"bLengthChange": true,
@@ -59,6 +62,7 @@ steal.plugins('jquery',
 				"bJQueryUI": true
 			});
 			
+			// ThumbnailView
 			var divScroll = this.element.find('#makeMeScrollablePageCreator').smoothDivScroll({
 			  	autoScroll: "onstart" ,
 				autoScrollDirection: "backandforth", 
@@ -67,11 +71,13 @@ steal.plugins('jquery',
 				visibleHotSpots: "always"
 		  	});
 			
+			// TreeView
 			this.element.find("#tree").treeview({
 				collapsed: true
 			});
 			
 			// TODO Load AvailableTags
+			// Autocomplete Tags
 			var availableTags = ["ActionScript","Scheme"];
 			this.element.find("input[name=tags]").autocomplete({
 				source: function(request, response) {
@@ -95,6 +101,8 @@ steal.plugins('jquery',
 				}
 			});
 			
+			
+			// Dialog
 			this.element.dialog({
 				modal: false,
 				title: 'Neue Seite anlegen',
@@ -133,10 +141,10 @@ steal.plugins('jquery',
 							return value != ''; 
 						});
 						
-						// TODO Create Page
-//						Page.create({path: pageData.url}, $.proxy(function(page) {
-//							page.saveMetadata(pageData, this.options.language)
-//						}, this));
+						// Create page and update pageData
+						Page.create({path: pageData.url}, $.proxy(function(page) {
+							page.saveCreationData(pageData, this.options.language);
+						}, this));
 						
 						this.element.dialog('destroy');
 						this.destroy();

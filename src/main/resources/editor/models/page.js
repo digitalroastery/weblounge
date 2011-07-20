@@ -76,16 +76,23 @@ steal.then('jsonix')
 		
 		/**
 		 * Creates a new page, either at the given path or at a random location and returns the REST url of the created resource.
-		 * @param {Object} params The target path
-		 * @param {Page} page The page data
+		 * @param {Object} params The target path and optionally the page content
 		 */
-		create: function(params, page, success, error){
+		create: function(params, success, error){
 			if ('path' in params) {
+				var data = {path : params.path};
+				if('content' in params)
+					data = {path : params.path, content : Page.parseJSON(params.content)}
 				$.ajax({
 					url: '/system/weblounge/pages/',
 					type: 'post',
 					dataType: 'xml',
-					data: {path : params.path, content : Page.parseJSON(page)}
+					data: data,
+					success: function(data, status, xhr){
+						var url = xhr.getResponseHeader('Location');
+						Page.findOne({id : url.substring(url.lastIndexOf('/') + 1)}, success);
+					}
+
 				});
 			}	
 		},
@@ -178,6 +185,19 @@ steal.then('jsonix')
 	    },
 	    
 	    /**
+	     * Create an empty composer element
+	     * @param {String} composerId Composer to create
+	     */
+	    createComposer: function(composerId) {
+	    	if($.isEmptyObject(this.value.body.composers)) {
+	    		this.value.body.composers = new Array();
+	    	}
+	    	
+	    	if(this.getComposerIndex(composerId) != -1) return;
+	    	this.value.body.composers.push({id: composerId});
+	    },
+	    
+	    /**
 	     * Changes current Composer with new one and Update in Repository
 	     * @param {String} composerId Composer to change
 	     * @param {Object} newComposer New Composer Object
@@ -222,12 +242,17 @@ steal.then('jsonix')
 	    	Page.update({id:this.value.id}, this);
 	    },
 	    
-		saveMetadata: function(metadata, language) {
+	    /**
+	     * Update the page with the new data from the creation dialog.
+	     * @param {Object} creationData The data from the creation dialog
+	     * @param {String} language The languageId
+	     */
+	    saveCreationData: function(creationData, language) {
 			if($.isEmptyObject(this.value.head.metadata)) {
 				this.value.head.metadata = {};
 			}
 			if($.isEmptyObject(this.value.head.metadata.title)) {
-				this.value.head.metadata.description = {};
+				this.value.head.metadata.title = {};
 			}
 			if($.isEmptyObject(this.value.head.metadata.description)) {
 				this.value.head.metadata.description = {};
@@ -236,11 +261,13 @@ steal.then('jsonix')
 				this.value.head.metadata.subject = [];
 			}
 			
-			this.value.head.metadata.title[language] = metadata.title;
-			this.value.head.metadata.description[language] = metadata.description;
+			this.value.head.template = creationData.layout;
+			
+			this.value.head.metadata.title[language] = creationData.title;
+			this.value.head.metadata.description[language] = creationData.description;
 			
 			// Filter out empty values
-			this.value.head.metadata.subject = metadata.tags.split(/,\s*/).filter(function(value) { 
+			this.value.head.metadata.subject = creationData.tags.split(/,\s*/).filter(function(value) { 
 				return value != ''; 
 			});
 			

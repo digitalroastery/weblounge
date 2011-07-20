@@ -36,10 +36,18 @@ steal.plugins('jquery/controller','jqueryui/sortable')
         	var page = this.options.page;
         	var composerId = this.id;
         	
-            var newComposer = $.map(this.element.find('.pagelet'), function(elem, i) {
-            	var oldIndex = $(elem).attr("index");
-            	return page.getPagelet(composerId, oldIndex);
-            });
+        	var newComposer = [];
+        	
+        	if(this.element.hasClass('empty')) {
+        		this.options.page.createComposer(this.id);
+        	}
+        	else {
+        		newComposer = $.map(this.element.find('.pagelet'), function(elem, i) {
+        			var oldIndex = $(elem).attr("index");
+        			return page.getPagelet(composerId, oldIndex);
+        		});
+        	}
+        	
             if(ui.item.hasClass('draggable')) {
             	var newPagelet = {};
             	newPagelet.id = ui.item.attr('id');
@@ -54,18 +62,18 @@ steal.plugins('jquery/controller','jqueryui/sortable')
             	newPagelet.created.user.realm = this.options.runtime.getId();
             	newPagelet.created.date = new Date();
             	newComposer.splice(ui.item.index(), 0, newPagelet);
+            	ui.item.after('<div class="pagelet editor_pagelet" >');
+            	var pagelet = ui.item.next();
+            	ui.item.remove();
         	}
             
             this.options.page.updateComposer(this.id, newComposer);
             this.update();
             
+            // Index false
             if(ui.item.hasClass('draggable')) {
-            	Workbench.findOne({ id: this.options.page.value.id, composer: this.id, pagelet: ui.item.index() }, $.proxy(function(pageletEditor) {
-            		ui.item.after('<div class="pagelet editor_pagelet" index="' + ui.item.index() + '">');
-            		var newPagelet = ui.item.next();
-            		ui.item.remove();
-            		this.update();
-            		newPagelet.editor_pagelet('_openPageEditor', pageletEditor, true);
+            	Workbench.findOne({ id: this.options.page.value.id, composer: this.id, pagelet: pagelet.attr('index') }, $.proxy(function(pageletEditor) {
+            		pagelet.editor_pagelet('_openPageEditor', pageletEditor, true);
             	}, this));
         	}
 		}, this)
