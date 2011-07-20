@@ -249,7 +249,7 @@ public class WorkbenchService {
     }
 
     // Get the pagelet
-    if (composer.getPagelets().length < pageletIndex || composer.size() < pageletIndex) {
+    if (composer.getPagelets().length <= pageletIndex || composer.size() <= pageletIndex) {
       logger.warn("Client requested pagelet editor for non existing pagelet on page {}", pageURI);
       return null;
     }
