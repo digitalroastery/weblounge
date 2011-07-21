@@ -29,7 +29,7 @@ steal.plugins('jquery',
 			
 			this.metadata = new Array();
 			this.file = new Array();
-			this._loadMetadata(this.img.index());
+			this._loadMetadata();
 			
 			if(this.options.map.length < 2) {
 				this.element.find('div.buttonRight:first').hide();
@@ -94,16 +94,13 @@ steal.plugins('jquery',
 			});
 	    },
 	    
-	    _loadMetadata: function(index) {
-	    	if(this.metadata[index] == undefined) {
-	    		Editor.File.findOne({id: this.options.map[index].resourceId}, $.proxy(function(file) {
-	    			this.file[index] = file;
-	    			this.metadata[index] = file.getMetadata(this.options.language);
-	    			this._showMetadata(index);
+	    _loadMetadata: function() {
+	    	$.each(this.options.map, $.proxy(function(key, value) {
+	    		Editor.File.findOne({id: value.resourceId}, $.proxy(function(file) {
+	    			this.file[key] = file;
+	    			this.metadata[key] = file.getMetadata(this.options.language);
 	    		}, this));
-			} else {
-				this._showMetadata(index);
-			}
+	    	}, this));
 	    },
 	    
 	    _showMetadata: function(index) {
@@ -148,7 +145,7 @@ steal.plugins('jquery',
 	    	this.img = prevImg.show();
 	    	if(prevImg.prev().length < 1) el.hide();
 	    	el.next().show();
-	    	this._loadMetadata(this.img.index());
+	    	this._showMetadata(this.img.index());
 	    	this.index--;
 	    	this.element.dialog('option', 'title', 'Metadaten eingeben: Datei ' + this.index + ' / ' + this.options.map.length);
 	    },
@@ -160,7 +157,7 @@ steal.plugins('jquery',
 	    	this.img = nextImg.show();
 	    	if(nextImg.next().length < 1) el.hide();
 	    	el.prev().show();
-	    	this._loadMetadata(this.img.index());
+	    	this._showMetadata(this.img.index());
 	    	this.index++;
 	    	this.element.dialog('option', 'title', 'Metadaten eingeben: Datei ' + this.index + ' / ' + this.options.map.length);
 	    },

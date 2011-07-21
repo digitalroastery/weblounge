@@ -51,7 +51,7 @@ steal.then('jsonix')
 			var url = '';
 			
 			if('eTag' in params)
-				headers = {"If-None-Match": params.eTag};
+				headers = {"If-Match": params.eTag};
 			if ('id' in params)
 				url = '/system/weblounge/files/' + params.id;
 			if ('language' in params)
@@ -180,13 +180,19 @@ steal.then('jsonix')
 			this.value.head.metadata.description[language] = metadata.description;
 			
 			// Filter out empty values
-			this.value.head.metadata.subject = metadata.tags.split(/,\s*/).filter(function(value) { 
-				return value != ''; 
-			});
+			if(!$.isEmptyObject(metadata.tags.split)) {
+				this.value.head.metadata.subject = metadata.tags.split(/,\s*/).filter(function(value) { 
+					return value != ''; 
+				});
+			}
 			
 			this.value.head.created.user.name = metadata.author;
-			if(eTag == null) Editor.File.update({id:this.value.id}, this);
-			else Editor.File.update({id:this.value.id, eTag: eTag}, this);
+			if(eTag == null) 
+				Editor.File.update({id:this.value.id}, this);
+			else {
+				eTag = eTag.replace(/"/g, '');
+				Editor.File.update({id:this.value.id, eTag: eTag}, this);
+			}
 		}
 		
 	});

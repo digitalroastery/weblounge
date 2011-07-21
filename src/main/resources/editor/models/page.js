@@ -65,7 +65,7 @@ steal.then('jsonix')
 		update: function(params, page, success, error){
 			var headers = {};
 			if('eTag' in params) 
-				headers = {"If-None-Match": params.eTag};
+				headers = {"If-Match": params.eTag};
 			
 			if ('id' in params) {
 				$.ajax({
